@@ -432,6 +432,21 @@ struct SIMDInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseAndXor() {
+        let mismatches = Mismatches("bitwiseAndXor")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x332E_C617_3035_3523)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x332E_C517_3035_3370)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x332E_C817_3035_3889)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x3990_28B9_271D_BC25) {
+            mismatches.check(
+                H.bitwiseAndXor(a, b, c),
+                port(HighwayReference.bitwiseAndXorI64(reference(a), reference(b), reference(c))),
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func shiftedLeft() {
         let mismatches = Mismatches("shiftedLeft")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDA68_26F5_66A3_B3DE)
@@ -608,6 +623,147 @@ struct SIMDInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseAndWhere() {
+        let mismatches = Mismatches("bitwiseAndWhere")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF2D0_B372_8587_DCB1)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF2D0_B272_8587_DAFE)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF2D0_B172_8587_D94B)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x7B27_B35A_AD8B_6EEB)
+        {
+            mismatches.check(
+                H.bitwiseAnd(a, b, where: mask),
+                port(
+                    HighwayReference.bitwiseAndWhereI64(reference(mask), reference(a), reference(b))
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseOrWhere() {
+        let mismatches = Mismatches("bitwiseOrWhere")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x81C6_F49B_EB9B_C0E5)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x81C6_F39B_EB9B_BF32)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x81C6_F29B_EB9B_BD7F)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xDAB8_911E_90FD_4BD7)
+        {
+            mismatches.check(
+                H.bitwiseOr(a, b, where: mask),
+                port(
+                    HighwayReference.bitwiseOrWhereI64(reference(mask), reference(a), reference(b))
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseXorWhere() {
+        let mismatches = Mismatches("bitwiseXorWhere")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8A0D_4DBA_B5C0_6AF9)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8A0D_4CBA_B5C0_6946)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8A0D_4BBA_B5C0_6793)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x99F3_CBAA_92C8_59B3)
+        {
+            mismatches.check(
+                H.bitwiseXor(a, b, where: mask),
+                port(
+                    HighwayReference.bitwiseXorWhereI64(reference(mask), reference(a), reference(b))
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseAndWhereOtherwise() {
+        let mismatches = Mismatches("bitwiseAndWhereOtherwise")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xEB30_3999_C6D2_E4F3)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEB30_3899_C6D2_E340)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEB30_3B99_C6D2_E859)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEB30_3A99_C6D2_E6A6)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x2FF4_C715_3C40_1935
+        ) {
+            mismatches.check(
+                H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
+                port(
+                    HighwayReference.bitwiseAndWhereOtherwiseI64(
+                        reference(otherwise),
+                        reference(mask),
+                        reference(a),
+                        reference(b)
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseOrWhereOtherwise() {
+        let mismatches = Mismatches("bitwiseOrWhereOtherwise")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xBA08_8820_92E0_8317)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBA08_8720_92E0_8164)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBA08_8A20_92E0_867D)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBA08_8920_92E0_84CA)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0xAF84_0CEB_5EBF_4D11
+        ) {
+            mismatches.check(
+                H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
+                port(
+                    HighwayReference.bitwiseOrWhereOtherwiseI64(
+                        reference(otherwise),
+                        reference(mask),
+                        reference(a),
+                        reference(b)
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseXorWhereOtherwise() {
+        let mismatches = Mismatches("bitwiseXorWhereOtherwise")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xACF3_7F46_B7BD_52DB)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xACF3_7E46_B7BD_5128)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xACF3_8146_B7BD_5641)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xACF3_8046_B7BD_548E)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x0EE1_CEA2_D250_817D
+        ) {
+            mismatches.check(
+                H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
+                port(
+                    HighwayReference.bitwiseXorWhereOtherwiseI64(
+                        reference(otherwise),
+                        reference(mask),
+                        reference(a),
+                        reference(b)
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func firstLanes() {
         let mismatches = Mismatches("firstLanes")
         let countInputs = Inputs.maskCounts(lanes: H.laneCount, lane: Int64.self)
@@ -762,6 +918,138 @@ struct SIMDInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func slideUpLanesFillingWith() {
+        let mismatches = Mismatches("slideUpLanesFillingWith")
+        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x189D_12E6_A857_EEE8)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x189D_13E6_A857_F09B)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        for (fill, a, lanes) in mixedTriples(
+            fillInputs,
+            aInputs,
+            lanesInputs,
+            seed: 0xC9BC_AB4B_27F7_BFE4
+        ) {
+            mismatches.check(
+                H.slideUpLanes(a, by: lanes, fillingWith: fill),
+                port(
+                    HighwayReference.slideUpLanesFillingWithI64(
+                        reference(fill),
+                        reference(a),
+                        lanes
+                    )
+                ),
+                "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideUpLanesFillingWithOutOfContract() {
+        let mismatches = Mismatches("slideUpLanesFillingWith out of contract")
+        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xAD2D_94BC_65B4_C059)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAD2D_93BC_65B4_BEA6)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: false)
+        for (fill, a, lanes) in mixedTriples(
+            fillInputs,
+            aInputs,
+            lanesInputs,
+            seed: 0xEB7B_C829_E797_F013
+        ) {
+            mismatches.check(
+                H.slideUpLanes(a, by: lanes, fillingWith: fill),
+                port(
+                    HighwayReference.slideUpLanesFillingWithI64(
+                        reference(fill),
+                        reference(a),
+                        lanes
+                    )
+                ),
+                "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideDownLanes() {
+        let mismatches = Mismatches("slideDownLanes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD352_FF4C_A38C_ACA4)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        for (a, lanes) in everyPair(aInputs, lanesInputs) {
+            mismatches.check(
+                H.slideDownLanes(a, by: lanes),
+                port(HighwayReference.slideDownLanesI64(reference(a), lanes)),
+                "a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideDownLanesOutOfContract() {
+        let mismatches = Mismatches("slideDownLanes out of contract")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC049_014A_14E1_7BF5)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: false)
+        for (a, lanes) in everyPair(aInputs, lanesInputs) {
+            mismatches.check(
+                H.slideDownLanes(a, by: lanes),
+                port(HighwayReference.slideDownLanesI64(reference(a), lanes)),
+                "a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideDownLanesFillingWith() {
+        let mismatches = Mismatches("slideDownLanesFillingWith")
+        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x200C_D2ED_59C5_81E5)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x200C_D1ED_59C5_8032)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        for (fill, a, lanes) in mixedTriples(
+            fillInputs,
+            aInputs,
+            lanesInputs,
+            seed: 0xA72D_89BF_BA8A_96D7
+        ) {
+            mismatches.check(
+                H.slideDownLanes(a, by: lanes, fillingWith: fill),
+                port(
+                    HighwayReference.slideDownLanesFillingWithI64(
+                        reference(fill),
+                        reference(a),
+                        lanes
+                    )
+                ),
+                "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideDownLanesFillingWithOutOfContract() {
+        let mismatches = Mismatches("slideDownLanesFillingWith out of contract")
+        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x9C4E_1495_77B8_15EE)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9C4E_1595_77B8_17A1)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: false)
+        for (fill, a, lanes) in mixedTriples(
+            fillInputs,
+            aInputs,
+            lanesInputs,
+            seed: 0x1247_C89A_046F_40CA
+        ) {
+            mismatches.check(
+                H.slideDownLanes(a, by: lanes, fillingWith: fill),
+                port(
+                    HighwayReference.slideDownLanesFillingWithI64(
+                        reference(fill),
+                        reference(a),
+                        lanes
+                    )
+                ),
+                "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func slide1Up() {
         let mismatches = Mismatches("slide1Up")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x446D_CC3E_5490_6295)
@@ -770,6 +1058,47 @@ struct SIMDInt64ReferenceTests {
                 H.slide1Up(a),
                 port(HighwayReference.slide1UpI64(reference(a))),
                 "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1UpFillingWith() {
+        let mismatches = Mismatches("slide1UpFillingWith")
+        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x3799_C9CF_19AD_ADD2)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3799_CACF_19AD_AF85)
+        for (fill, a) in everyPair(fillInputs, aInputs) {
+            mismatches.check(
+                H.slide1Up(a, fillingWith: fill),
+                port(HighwayReference.slide1UpFillingWithI64(fill, reference(a))),
+                "fill: \(hex(fill)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1Down() {
+        let mismatches = Mismatches("slide1Down")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA3DC_4673_C916_004C)
+        for a in aInputs {
+            mismatches.check(
+                H.slide1Down(a),
+                port(HighwayReference.slide1DownI64(reference(a))),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slide1DownFillingWith() {
+        let mismatches = Mismatches("slide1DownFillingWith")
+        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x2789_F33C_D9CD_DE4D)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2789_F23C_D9CD_DC9A)
+        for (fill, a) in everyPair(fillInputs, aInputs) {
+            mismatches.check(
+                H.slide1Down(a, fillingWith: fill),
+                port(HighwayReference.slide1DownFillingWithI64(fill, reference(a))),
+                "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
         mismatches.record()

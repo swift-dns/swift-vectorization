@@ -1108,6 +1108,72 @@ public func highwayBitwiseAndNotU32ConstantB(
 }
 
 @inline(never)
+public func portBitwiseAndXorU32(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    _ c: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAndXor(a, b, c)
+}
+
+@inline(never)
+public func highwayBitwiseAndXorU32(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    _ c: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndXorU32(a, b, c)
+}
+
+@inline(never)
+public func portBitwiseAndXorU32ConstantA(
+    _ b: SIMDUInt32.Vector,
+    _ c: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAndXor(SIMDUInt32.repeating(26), b, c)
+}
+
+@inline(never)
+public func highwayBitwiseAndXorU32ConstantA(
+    _ b: HighwayReference.VectorU32,
+    _ c: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndXorU32(HighwayReference.repeatingU32(26), b, c)
+}
+
+@inline(never)
+public func portBitwiseAndXorU32ConstantB(
+    _ a: SIMDUInt32.Vector,
+    _ c: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAndXor(a, SIMDUInt32.repeating(26), c)
+}
+
+@inline(never)
+public func highwayBitwiseAndXorU32ConstantB(
+    _ a: HighwayReference.VectorU32,
+    _ c: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndXorU32(a, HighwayReference.repeatingU32(26), c)
+}
+
+@inline(never)
+public func portBitwiseAndXorU32ConstantC(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAndXor(a, b, SIMDUInt32.repeating(26))
+}
+
+@inline(never)
+public func highwayBitwiseAndXorU32ConstantC(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndXorU32(a, b, HighwayReference.repeatingU32(26))
+}
+
+@inline(never)
 public func portShiftedLeftU32(_ a: SIMDUInt32.Vector, by bits: Int32) -> SIMDUInt32.Vector {
     SIMDUInt32.shiftedLeft(a, by: Int(bits))
 }
@@ -1428,6 +1494,408 @@ public func highwayZeroingSelectedU32ConstantA(
 }
 
 @inline(never)
+public func portBitwiseAndWhereU32(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAnd(a, b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereU32(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndWhereU32(mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseAndWhereU32ConstantA(
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAnd(SIMDUInt32.repeating(26), b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereU32ConstantA(
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndWhereU32(mask, HighwayReference.repeatingU32(26), b)
+}
+
+@inline(never)
+public func portBitwiseAndWhereU32ConstantB(
+    _ a: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAnd(a, SIMDUInt32.repeating(26), where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereU32ConstantB(
+    _ a: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndWhereU32(mask, a, HighwayReference.repeatingU32(26))
+}
+
+@inline(never)
+public func portBitwiseOrWhereU32(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseOr(a, b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereU32(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseOrWhereU32(mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseOrWhereU32ConstantA(
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseOr(SIMDUInt32.repeating(26), b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereU32ConstantA(
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseOrWhereU32(mask, HighwayReference.repeatingU32(26), b)
+}
+
+@inline(never)
+public func portBitwiseOrWhereU32ConstantB(
+    _ a: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseOr(a, SIMDUInt32.repeating(26), where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereU32ConstantB(
+    _ a: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseOrWhereU32(mask, a, HighwayReference.repeatingU32(26))
+}
+
+@inline(never)
+public func portBitwiseXorWhereU32(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseXor(a, b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereU32(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseXorWhereU32(mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseXorWhereU32ConstantA(
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseXor(SIMDUInt32.repeating(26), b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereU32ConstantA(
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseXorWhereU32(mask, HighwayReference.repeatingU32(26), b)
+}
+
+@inline(never)
+public func portBitwiseXorWhereU32ConstantB(
+    _ a: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseXor(a, SIMDUInt32.repeating(26), where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereU32ConstantB(
+    _ a: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseXorWhereU32(mask, a, HighwayReference.repeatingU32(26))
+}
+
+@inline(never)
+public func portBitwiseAndWhereOtherwiseU32(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAnd(a, b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereOtherwiseU32(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndWhereOtherwiseU32(otherwise, mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseAndWhereOtherwiseU32ConstantA(
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAnd(SIMDUInt32.repeating(26), b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereOtherwiseU32ConstantA(
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndWhereOtherwiseU32(
+        otherwise,
+        mask,
+        HighwayReference.repeatingU32(26),
+        b
+    )
+}
+
+@inline(never)
+public func portBitwiseAndWhereOtherwiseU32ConstantB(
+    _ a: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAnd(a, SIMDUInt32.repeating(26), where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereOtherwiseU32ConstantB(
+    _ a: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndWhereOtherwiseU32(
+        otherwise,
+        mask,
+        a,
+        HighwayReference.repeatingU32(26)
+    )
+}
+
+@inline(never)
+public func portBitwiseAndWhereOtherwiseU32ConstantOtherwise(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseAnd(a, b, where: mask, otherwise: SIMDUInt32.repeating(26))
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereOtherwiseU32ConstantOtherwise(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseAndWhereOtherwiseU32(HighwayReference.repeatingU32(26), mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseOrWhereOtherwiseU32(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseOr(a, b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereOtherwiseU32(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseOrWhereOtherwiseU32(otherwise, mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseOrWhereOtherwiseU32ConstantA(
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseOr(SIMDUInt32.repeating(26), b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereOtherwiseU32ConstantA(
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseOrWhereOtherwiseU32(
+        otherwise,
+        mask,
+        HighwayReference.repeatingU32(26),
+        b
+    )
+}
+
+@inline(never)
+public func portBitwiseOrWhereOtherwiseU32ConstantB(
+    _ a: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseOr(a, SIMDUInt32.repeating(26), where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereOtherwiseU32ConstantB(
+    _ a: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseOrWhereOtherwiseU32(
+        otherwise,
+        mask,
+        a,
+        HighwayReference.repeatingU32(26)
+    )
+}
+
+@inline(never)
+public func portBitwiseOrWhereOtherwiseU32ConstantOtherwise(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseOr(a, b, where: mask, otherwise: SIMDUInt32.repeating(26))
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereOtherwiseU32ConstantOtherwise(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseOrWhereOtherwiseU32(HighwayReference.repeatingU32(26), mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseXorWhereOtherwiseU32(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseXor(a, b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereOtherwiseU32(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseXorWhereOtherwiseU32(otherwise, mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseXorWhereOtherwiseU32ConstantA(
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseXor(SIMDUInt32.repeating(26), b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereOtherwiseU32ConstantA(
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseXorWhereOtherwiseU32(
+        otherwise,
+        mask,
+        HighwayReference.repeatingU32(26),
+        b
+    )
+}
+
+@inline(never)
+public func portBitwiseXorWhereOtherwiseU32ConstantB(
+    _ a: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseXor(a, SIMDUInt32.repeating(26), where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereOtherwiseU32ConstantB(
+    _ a: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32,
+    otherwise: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseXorWhereOtherwiseU32(
+        otherwise,
+        mask,
+        a,
+        HighwayReference.repeatingU32(26)
+    )
+}
+
+@inline(never)
+public func portBitwiseXorWhereOtherwiseU32ConstantOtherwise(
+    _ a: SIMDUInt32.Vector,
+    _ b: SIMDUInt32.Vector,
+    where mask: SIMDUInt32.Mask
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.bitwiseXor(a, b, where: mask, otherwise: SIMDUInt32.repeating(26))
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereOtherwiseU32ConstantOtherwise(
+    _ a: HighwayReference.VectorU32,
+    _ b: HighwayReference.VectorU32,
+    where mask: HighwayReference.MaskU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.bitwiseXorWhereOtherwiseU32(HighwayReference.repeatingU32(26), mask, a, b)
+}
+
+@inline(never)
 public func portFirstLanesU32(count: Int) -> SIMDUInt32.Mask {
     SIMDUInt32.firstLanes(count: count)
 }
@@ -1588,31 +2056,32 @@ public func highwayReversedU32ConstantA() -> HighwayReference.VectorU32 {
 }
 
 @inline(never)
-public func portSlideUpLanesU32(_ a: SIMDUInt32.Vector, by lanes: Int) -> SIMDUInt32.Vector {
-    SIMDUInt32.slideUpLanes(a, by: lanes)
+public func portSlideUpLanesU32(_ a: SIMDUInt32.Vector, byUnchecked lanes: Int) -> SIMDUInt32.Vector
+{
+    unsafe SIMDUInt32.slideUpLanes(a, byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideUpLanesU32(
     _ a: HighwayReference.VectorU32,
-    by lanes: Int
+    byUnchecked lanes: Int
 ) -> HighwayReference.VectorU32 {
     HighwayReference.slideUpLanesU32(a, lanes)
 }
 
 @inline(never)
-public func portSlideUpLanesU32ConstantA(by lanes: Int) -> SIMDUInt32.Vector {
-    SIMDUInt32.slideUpLanes(SIMDUInt32.repeating(26), by: lanes)
+public func portSlideUpLanesU32ConstantA(byUnchecked lanes: Int) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideUpLanes(SIMDUInt32.repeating(26), byUnchecked: lanes)
 }
 
 @inline(never)
-public func highwaySlideUpLanesU32ConstantA(by lanes: Int) -> HighwayReference.VectorU32 {
+public func highwaySlideUpLanesU32ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorU32 {
     HighwayReference.slideUpLanesU32(HighwayReference.repeatingU32(26), lanes)
 }
 
 @inline(never)
 public func portSlideUpLanesU32ConstantLanes(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
-    SIMDUInt32.slideUpLanes(a, by: 1)
+    unsafe SIMDUInt32.slideUpLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
@@ -1620,6 +2089,181 @@ public func highwaySlideUpLanesU32ConstantLanes(
     _ a: HighwayReference.VectorU32
 ) -> HighwayReference.VectorU32 {
     HighwayReference.slideUpLanesU32(a, 1)
+}
+
+@inline(never)
+public func portSlideUpLanesFillingWithU32(
+    _ a: SIMDUInt32.Vector,
+    byUnchecked lanes: Int,
+    fillingWith fill: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideUpLanesFillingWithU32(
+    _ a: HighwayReference.VectorU32,
+    byUnchecked lanes: Int,
+    fillingWith fill: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideUpLanesFillingWithU32(fill, a, lanes)
+}
+
+@inline(never)
+public func portSlideUpLanesFillingWithU32ConstantA(
+    byUnchecked lanes: Int,
+    fillingWith fill: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideUpLanes(SIMDUInt32.repeating(26), byUnchecked: lanes, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideUpLanesFillingWithU32ConstantA(
+    byUnchecked lanes: Int,
+    fillingWith fill: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideUpLanesFillingWithU32(fill, HighwayReference.repeatingU32(26), lanes)
+}
+
+@inline(never)
+public func portSlideUpLanesFillingWithU32ConstantLanes(
+    _ a: SIMDUInt32.Vector,
+    fillingWith fill: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideUpLanes(a, byUnchecked: 1, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideUpLanesFillingWithU32ConstantLanes(
+    _ a: HighwayReference.VectorU32,
+    fillingWith fill: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideUpLanesFillingWithU32(fill, a, 1)
+}
+
+@inline(never)
+public func portSlideUpLanesFillingWithU32ConstantFill(
+    _ a: SIMDUInt32.Vector,
+    byUnchecked lanes: Int
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideUpLanes(a, byUnchecked: lanes, fillingWith: SIMDUInt32.repeating(26))
+}
+
+@inline(never)
+public func highwaySlideUpLanesFillingWithU32ConstantFill(
+    _ a: HighwayReference.VectorU32,
+    byUnchecked lanes: Int
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideUpLanesFillingWithU32(HighwayReference.repeatingU32(26), a, lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesU32(
+    _ a: SIMDUInt32.Vector,
+    byUnchecked lanes: Int
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideDownLanes(a, byUnchecked: lanes)
+}
+
+@inline(never)
+public func highwaySlideDownLanesU32(
+    _ a: HighwayReference.VectorU32,
+    byUnchecked lanes: Int
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideDownLanesU32(a, lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesU32ConstantA(byUnchecked lanes: Int) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideDownLanes(SIMDUInt32.repeating(26), byUnchecked: lanes)
+}
+
+@inline(never)
+public func highwaySlideDownLanesU32ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorU32
+{
+    HighwayReference.slideDownLanesU32(HighwayReference.repeatingU32(26), lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesU32ConstantLanes(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideDownLanes(a, byUnchecked: 1)
+}
+
+@inline(never)
+public func highwaySlideDownLanesU32ConstantLanes(
+    _ a: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideDownLanesU32(a, 1)
+}
+
+@inline(never)
+public func portSlideDownLanesFillingWithU32(
+    _ a: SIMDUInt32.Vector,
+    byUnchecked lanes: Int,
+    fillingWith fill: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideDownLanesFillingWithU32(
+    _ a: HighwayReference.VectorU32,
+    byUnchecked lanes: Int,
+    fillingWith fill: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideDownLanesFillingWithU32(fill, a, lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesFillingWithU32ConstantA(
+    byUnchecked lanes: Int,
+    fillingWith fill: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideDownLanes(
+        SIMDUInt32.repeating(26),
+        byUnchecked: lanes,
+        fillingWith: fill
+    )
+}
+
+@inline(never)
+public func highwaySlideDownLanesFillingWithU32ConstantA(
+    byUnchecked lanes: Int,
+    fillingWith fill: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideDownLanesFillingWithU32(fill, HighwayReference.repeatingU32(26), lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesFillingWithU32ConstantLanes(
+    _ a: SIMDUInt32.Vector,
+    fillingWith fill: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideDownLanes(a, byUnchecked: 1, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideDownLanesFillingWithU32ConstantLanes(
+    _ a: HighwayReference.VectorU32,
+    fillingWith fill: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideDownLanesFillingWithU32(fill, a, 1)
+}
+
+@inline(never)
+public func portSlideDownLanesFillingWithU32ConstantFill(
+    _ a: SIMDUInt32.Vector,
+    byUnchecked lanes: Int
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.slideDownLanes(a, byUnchecked: lanes, fillingWith: SIMDUInt32.repeating(26))
+}
+
+@inline(never)
+public func highwaySlideDownLanesFillingWithU32ConstantFill(
+    _ a: HighwayReference.VectorU32,
+    byUnchecked lanes: Int
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slideDownLanesFillingWithU32(HighwayReference.repeatingU32(26), a, lanes)
 }
 
 @inline(never)
@@ -1640,6 +2284,110 @@ public func portSlide1UpU32ConstantA() -> SIMDUInt32.Vector {
 @inline(never)
 public func highwaySlide1UpU32ConstantA() -> HighwayReference.VectorU32 {
     HighwayReference.slide1UpU32(HighwayReference.repeatingU32(26))
+}
+
+@inline(never)
+public func portSlide1UpFillingWithU32(
+    _ a: SIMDUInt32.Vector,
+    fillingWith fill: SIMDUInt32.Lane
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.slide1Up(a, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlide1UpFillingWithU32(
+    _ a: HighwayReference.VectorU32,
+    fillingWith fill: UInt32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slide1UpFillingWithU32(fill, a)
+}
+
+@inline(never)
+public func portSlide1UpFillingWithU32ConstantA(
+    fillingWith fill: SIMDUInt32.Lane
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.slide1Up(SIMDUInt32.repeating(26), fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlide1UpFillingWithU32ConstantA(
+    fillingWith fill: UInt32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slide1UpFillingWithU32(fill, HighwayReference.repeatingU32(26))
+}
+
+@inline(never)
+public func portSlide1UpFillingWithU32ConstantFill(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+    SIMDUInt32.slide1Up(a, fillingWith: 26)
+}
+
+@inline(never)
+public func highwaySlide1UpFillingWithU32ConstantFill(
+    _ a: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slide1UpFillingWithU32(26, a)
+}
+
+@inline(never)
+public func portSlide1DownU32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+    SIMDUInt32.slide1Down(a)
+}
+
+@inline(never)
+public func highwaySlide1DownU32(_ a: HighwayReference.VectorU32) -> HighwayReference.VectorU32 {
+    HighwayReference.slide1DownU32(a)
+}
+
+@inline(never)
+public func portSlide1DownU32ConstantA() -> SIMDUInt32.Vector {
+    SIMDUInt32.slide1Down(SIMDUInt32.repeating(26))
+}
+
+@inline(never)
+public func highwaySlide1DownU32ConstantA() -> HighwayReference.VectorU32 {
+    HighwayReference.slide1DownU32(HighwayReference.repeatingU32(26))
+}
+
+@inline(never)
+public func portSlide1DownFillingWithU32(
+    _ a: SIMDUInt32.Vector,
+    fillingWith fill: SIMDUInt32.Lane
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.slide1Down(a, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlide1DownFillingWithU32(
+    _ a: HighwayReference.VectorU32,
+    fillingWith fill: UInt32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slide1DownFillingWithU32(fill, a)
+}
+
+@inline(never)
+public func portSlide1DownFillingWithU32ConstantA(
+    fillingWith fill: SIMDUInt32.Lane
+) -> SIMDUInt32.Vector {
+    SIMDUInt32.slide1Down(SIMDUInt32.repeating(26), fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlide1DownFillingWithU32ConstantA(
+    fillingWith fill: UInt32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slide1DownFillingWithU32(fill, HighwayReference.repeatingU32(26))
+}
+
+@inline(never)
+public func portSlide1DownFillingWithU32ConstantFill(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+    SIMDUInt32.slide1Down(a, fillingWith: 26)
+}
+
+@inline(never)
+public func highwaySlide1DownFillingWithU32ConstantFill(
+    _ a: HighwayReference.VectorU32
+) -> HighwayReference.VectorU32 {
+    HighwayReference.slide1DownFillingWithU32(26, a)
 }
 
 @inline(never)

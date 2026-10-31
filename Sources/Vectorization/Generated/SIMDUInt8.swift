@@ -354,6 +354,11 @@ public enum SIMDUInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
     }
 
     @export(implementation) @inline(always)
+    public static func bitwiseAndXor(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_bitwise_and_xor_u8(a.raw, b.raw, c.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector {
         Vector(raw: cvectorization_ops_shifted_left_u8(a.raw, Int32(truncatingIfNeeded: bits)))
     }
@@ -399,6 +404,72 @@ public enum SIMDUInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
     }
 
     @export(implementation) @inline(always)
+    public static func bitwiseAnd(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector {
+        Vector(raw: cvectorization_ops_bitwise_and_where_u8(mask.raw, a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func bitwiseOr(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector {
+        Vector(raw: cvectorization_ops_bitwise_or_where_u8(mask.raw, a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func bitwiseXor(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector {
+        Vector(raw: cvectorization_ops_bitwise_xor_where_u8(mask.raw, a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func bitwiseAnd(
+        _ a: Vector,
+        _ b: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector {
+        Vector(
+            raw: cvectorization_ops_bitwise_and_where_otherwise_u8(
+                otherwise.raw,
+                mask.raw,
+                a.raw,
+                b.raw
+            )
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func bitwiseOr(
+        _ a: Vector,
+        _ b: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector {
+        Vector(
+            raw: cvectorization_ops_bitwise_or_where_otherwise_u8(
+                otherwise.raw,
+                mask.raw,
+                a.raw,
+                b.raw
+            )
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func bitwiseXor(
+        _ a: Vector,
+        _ b: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector {
+        Vector(
+            raw: cvectorization_ops_bitwise_xor_where_otherwise_u8(
+                otherwise.raw,
+                mask.raw,
+                a.raw,
+                b.raw
+            )
+        )
+    }
+
+    @export(implementation) @inline(always)
     public static func firstLanes(count: Int) -> Mask {
         Mask(raw: cvectorization_ops_first_lanes_u8(count))
     }
@@ -435,12 +506,111 @@ public enum SIMDUInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
 
     @export(implementation) @inline(always)
     public static func slideUpLanes(_ a: Vector, by lanes: Int) -> Vector {
-        Vector(raw: cvectorization_ops_slide_up_lanes_u8(a.raw, lanes))
+        precondition(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return unsafe slideUpLanes(a, byUnchecked: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func slideUpLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector {
+        assert(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return Vector(raw: cvectorization_ops_slide_up_lanes_u8(a.raw, lanes))
+    }
+
+    @export(implementation) @inline(always)
+    public static func slideUpLanes(_ a: Vector, by lanes: Int, fillingWith fill: Vector) -> Vector
+    {
+        precondition(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return unsafe slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func slideUpLanes(
+        _ a: Vector,
+        byUnchecked lanes: Int,
+        fillingWith fill: Vector
+    ) -> Vector {
+        assert(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return Vector(
+            raw: cvectorization_ops_slide_up_lanes_filling_with_u8(fill.raw, a.raw, lanes)
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func slideDownLanes(_ a: Vector, by lanes: Int) -> Vector {
+        precondition(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return unsafe slideDownLanes(a, byUnchecked: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func slideDownLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector {
+        assert(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return Vector(raw: cvectorization_ops_slide_down_lanes_u8(a.raw, lanes))
+    }
+
+    @export(implementation) @inline(always)
+    public static func slideDownLanes(
+        _ a: Vector,
+        by lanes: Int,
+        fillingWith fill: Vector
+    ) -> Vector {
+        precondition(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return unsafe slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func slideDownLanes(
+        _ a: Vector,
+        byUnchecked lanes: Int,
+        fillingWith fill: Vector
+    ) -> Vector {
+        assert(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return Vector(
+            raw: cvectorization_ops_slide_down_lanes_filling_with_u8(fill.raw, a.raw, lanes)
+        )
     }
 
     @export(implementation) @inline(always)
     public static func slide1Up(_ a: Vector) -> Vector {
         Vector(raw: cvectorization_ops_slide1_up_u8(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func slide1Up(_ a: Vector, fillingWith fill: Lane) -> Vector {
+        Vector(raw: cvectorization_ops_slide1_up_filling_with_u8(fill, a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func slide1Down(_ a: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_slide1_down_u8(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func slide1Down(_ a: Vector, fillingWith fill: Lane) -> Vector {
+        Vector(raw: cvectorization_ops_slide1_down_filling_with_u8(fill, a.raw))
     }
 
     @export(implementation) @inline(always)

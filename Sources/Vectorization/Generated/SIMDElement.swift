@@ -76,7 +76,25 @@ public protocol SIMDElement {
     static func firstLane(_ a: Vector) -> Lane
     static func reversed(_ a: Vector) -> Vector
     static func slideUpLanes(_ a: Vector, by lanes: Int) -> Vector
+    @unsafe static func slideUpLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector
+    static func slideUpLanes(_ a: Vector, by lanes: Int, fillingWith fill: Vector) -> Vector
+    @unsafe static func slideUpLanes(
+        _ a: Vector,
+        byUnchecked lanes: Int,
+        fillingWith fill: Vector
+    ) -> Vector
+    static func slideDownLanes(_ a: Vector, by lanes: Int) -> Vector
+    @unsafe static func slideDownLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector
+    static func slideDownLanes(_ a: Vector, by lanes: Int, fillingWith fill: Vector) -> Vector
+    @unsafe static func slideDownLanes(
+        _ a: Vector,
+        byUnchecked lanes: Int,
+        fillingWith fill: Vector
+    ) -> Vector
     static func slide1Up(_ a: Vector) -> Vector
+    static func slide1Up(_ a: Vector, fillingWith fill: Lane) -> Vector
+    static func slide1Down(_ a: Vector) -> Vector
+    static func slide1Down(_ a: Vector, fillingWith fill: Lane) -> Vector
     static func loadInterleaved2(from: UnsafePointer<Lane>, _ v0: inout Vector, _ v1: inout Vector)
     @available(SwiftStdlib 5.1, *)
     static func loadInterleaved2(from span: Span<Lane>, _ v0: inout Vector, _ v1: inout Vector)
@@ -228,8 +246,15 @@ public protocol SIMDIntegerElement: SIMDElement {
     static func bitwiseXor(_ a: Vector, _ b: Vector) -> Vector
     static func bitwiseNot(_ a: Vector) -> Vector
     static func bitwiseAndNot(_ a: Vector, _ b: Vector) -> Vector
+    static func bitwiseAndXor(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
     static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector
     static func shiftedRight(_ a: Vector, by bits: Int) -> Vector
+    static func bitwiseAnd(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func bitwiseOr(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func bitwiseXor(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func bitwiseAnd(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func bitwiseOr(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func bitwiseXor(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
 }
 
 /// The ops that only the floating point element types have.
@@ -242,5 +267,7 @@ public protocol SIMDFloatElement: SIMDElement {
     static func multiplyAdding(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
     static func sum(_ a: Vector) -> Lane
     static func smallest(_ a: Vector) -> Lane
+    static func smallestOrNaN(_ a: Vector) -> Lane
     static func largest(_ a: Vector) -> Lane
+    static func largestOrNaN(_ a: Vector) -> Lane
 }

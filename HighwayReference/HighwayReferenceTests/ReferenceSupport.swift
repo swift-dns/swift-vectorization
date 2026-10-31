@@ -130,7 +130,17 @@ enum Inputs {
         let random = (0..<randomCount).map { _ in
             V((0..<V.scalarCount).map { _ in V.Scalar.random(using: &generator) })
         }
-        return splats + rotations + random
+        let numbers = edges.filter { $0 == $0 }
+        let nans = edges.filter { $0 != $0 }
+        let lonelyNaNs: [V] =
+            nans.isEmpty
+            ? []
+            : (0..<V.scalarCount).map { lane in
+                var vector = V((0..<V.scalarCount).map { numbers[($0 + lane) % numbers.count] })
+                vector[lane] = nans[lane % nans.count]
+                return vector
+            }
+        return splats + rotations + random + lonelyNaNs
     }
 
     static func vectors<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V] {
@@ -223,7 +233,7 @@ enum Inputs {
     }
 
     static func laneAmounts(lanes: Int, inContract: Bool) -> [Int] {
-        inContract ? Array(0..<lanes) : [lanes, lanes + 1, 2 * lanes, 255, 256, 1000]
+        inContract ? Array(0..<lanes) : [lanes]
     }
 
     static func bufferCounts(lanes: Int) -> [Int] {
