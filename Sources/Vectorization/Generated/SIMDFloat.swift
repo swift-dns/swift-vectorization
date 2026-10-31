@@ -398,8 +398,18 @@ public enum SIMDFloat: SIMDElement, SIMDFloatElement, SendableMetatype {
     }
 
     @export(implementation) @inline(always)
+    public static func smallestOrNaN(_ a: Vector) -> Lane {
+        cvectorization_ops_smallest_or_nan_f32(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func largest(_ a: Vector) -> Lane {
         cvectorization_ops_largest_f32(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func largestOrNaN(_ a: Vector) -> Lane {
+        cvectorization_ops_largest_or_nan_f32(a)
     }
 
     @export(implementation) @inline(always)
@@ -414,12 +424,107 @@ public enum SIMDFloat: SIMDElement, SIMDFloatElement, SendableMetatype {
 
     @export(implementation) @inline(always)
     public static func slideUpLanes(_ a: Vector, by lanes: Int) -> Vector {
-        cvectorization_ops_slide_up_lanes_f32(a, lanes)
+        precondition(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return unsafe slideUpLanes(a, byUnchecked: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func slideUpLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector {
+        assert(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return cvectorization_ops_slide_up_lanes_f32(a, lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func slideUpLanes(_ a: Vector, by lanes: Int, fillingWith fill: Vector) -> Vector
+    {
+        precondition(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return unsafe slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func slideUpLanes(
+        _ a: Vector,
+        byUnchecked lanes: Int,
+        fillingWith fill: Vector
+    ) -> Vector {
+        assert(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return cvectorization_ops_slide_up_lanes_filling_with_f32(fill, a, lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func slideDownLanes(_ a: Vector, by lanes: Int) -> Vector {
+        precondition(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return unsafe slideDownLanes(a, byUnchecked: lanes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func slideDownLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector {
+        assert(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return cvectorization_ops_slide_down_lanes_f32(a, lanes)
+    }
+
+    @export(implementation) @inline(always)
+    public static func slideDownLanes(
+        _ a: Vector,
+        by lanes: Int,
+        fillingWith fill: Vector
+    ) -> Vector {
+        precondition(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return unsafe slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func slideDownLanes(
+        _ a: Vector,
+        byUnchecked lanes: Int,
+        fillingWith fill: Vector
+    ) -> Vector {
+        assert(
+            lanes >= 0 && lanes <= laneCount,
+            "Lane amount is negative or more than a vector has lanes"
+        )
+        return cvectorization_ops_slide_down_lanes_filling_with_f32(fill, a, lanes)
     }
 
     @export(implementation) @inline(always)
     public static func slide1Up(_ a: Vector) -> Vector {
         cvectorization_ops_slide1_up_f32(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func slide1Up(_ a: Vector, fillingWith fill: Lane) -> Vector {
+        cvectorization_ops_slide1_up_filling_with_f32(fill, a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func slide1Down(_ a: Vector) -> Vector {
+        cvectorization_ops_slide1_down_f32(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func slide1Down(_ a: Vector, fillingWith fill: Lane) -> Vector {
+        cvectorization_ops_slide1_down_filling_with_f32(fill, a)
     }
 
     @export(implementation) @inline(always)

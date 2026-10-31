@@ -8,11 +8,10 @@ target.
 
 ## Vendored code
 
-`HighwayReference/CHighway/include/hwy` is a copy of highway, taken at the commit recorded in
-[highway-version.json](highway-version.json), with the patches in [patches/](patches) applied by
-`scripts/vendor-highway.sh`, and `HighwayReference/CHighway/quick_reference.md` is highway's op
-reference from the same commit. They are used by the `HighwayReference` test package only, not by
-the product. They are not edited by hand: `scripts/vendor-highway.sh` replaces them from upstream,
+`HighwayReference/CHighway/include/hwy` is a verbatim copy of highway, taken at the commit recorded
+in [highway-version.json](highway-version.json), and `HighwayReference/CHighway/quick_reference.md`
+is highway's op reference from the same commit. They are used by the `HighwayReference` test
+package only, not by the product. They are not edited by hand: `scripts/vendor-highway.sh` replaces them from upstream,
 and CI fails if the committed copy differs from what that script produces.
 
 highway is dual-licensed under your choice of the Apache License 2.0 or the BSD 3-Clause

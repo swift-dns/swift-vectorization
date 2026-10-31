@@ -51,6 +51,87 @@ struct OpsTests {
         #expect(smallest == zip(a, b).map(Swift.min))
     }
 
+    @Test("Multiply-adding the low 52 bits of a product keeps what is below bit 52")
+    func multiplyAddingLow52Bits() {
+        typealias H = SIMDUInt64
+        let lanes = H.laneCount
+        let limit: UInt64 = 1 << 52
+        let cases: [(a: UInt64, b: UInt64, c: UInt64)] = [
+            (limit - 1, limit - 1, 0),
+            (limit - 1, limit - 1, .max),
+            (limit - 1, 1, 7),
+            (0, limit - 1, 3),
+            (1 << 32, 1 << 32, 1),
+            ((1 << 51) + 12345, limit - 7, 1 << 63),
+            (0x1_2345_6789, 0xF_EDCB_A987_6543, 0xFFFF_FFFF),
+            (1 << 26, 1 << 26, 0),
+        ]
+
+        for offset in cases.indices {
+            let chosen = (0..<lanes).map { cases[($0 + offset) % cases.count] }
+            let a = ContiguousArray(chosen.map(\.a))
+            let b = ContiguousArray(chosen.map(\.b))
+            let c = ContiguousArray(chosen.map(\.c))
+            var output = ContiguousArray<UInt64>(repeating: 0, count: lanes)
+
+            var destination = output.mutableSpan
+            H.store(
+                H.multiplyAddingLow52Bits(
+                    H.load(from: a.span),
+                    H.load(from: b.span),
+                    H.load(from: c.span)
+                ),
+                to: &destination
+            )
+
+            let expected = chosen.map { (($0.a &* $0.b) & (limit - 1)) &+ $0.c }
+            #expect(Array(output) == expected)
+        }
+    }
+
+    @Test("Multiply-adding the high 52 bits of a product keeps bits 52 to 103, past the carry")
+    func multiplyAddingHigh52Bits() {
+        typealias H = SIMDUInt64
+        let lanes = H.laneCount
+        let limit: UInt64 = 1 << 52
+        let cases: [(a: UInt64, b: UInt64, c: UInt64)] = [
+            (limit - 1, limit - 1, 0),
+            (limit - 1, limit - 1, .max),
+            (limit - 1, 1, 7),
+            (0, limit - 1, 3),
+            (1 << 32, 1 << 32, 1),
+            (1 << 51, 1 << 51, 0),
+            ((1 << 51) + 12345, limit - 7, 1 << 63),
+            (0x1_2345_6789, 0xF_EDCB_A987_6543, 0xFFFF_FFFF),
+            (0xF_FFFF_FFFF_FFFF, 0xF_0000_0001, 0),
+            (0x0_FFFF_FFFF, 0xF_FFFF_FFFF_FFFF, 0),
+        ]
+
+        for offset in cases.indices {
+            let chosen = (0..<lanes).map { cases[($0 + offset) % cases.count] }
+            let a = ContiguousArray(chosen.map(\.a))
+            let b = ContiguousArray(chosen.map(\.b))
+            let c = ContiguousArray(chosen.map(\.c))
+            var output = ContiguousArray<UInt64>(repeating: 0, count: lanes)
+
+            var destination = output.mutableSpan
+            H.store(
+                H.multiplyAddingHigh52Bits(
+                    H.load(from: a.span),
+                    H.load(from: b.span),
+                    H.load(from: c.span)
+                ),
+                to: &destination
+            )
+
+            let expected = chosen.map { lane in
+                let product = lane.a.multipliedFullWidth(by: lane.b)
+                return ((product.low >> 52) | (product.high << 12)) &+ lane.c
+            }
+            #expect(Array(output) == expected)
+        }
+    }
+
     @Test("Shifts and bitwise ops match the scalar result")
     func bitwise() {
         typealias H = SIMDUInt32
@@ -73,6 +154,98 @@ struct OpsTests {
 
         #expect(shifted == a.map { $0 >> 8 })
         #expect(masked == a.map { $0 & 0xFF })
+    }
+
+    @Test("An and-xor combines three vectors lane by lane")
+    func bitwiseAndXor() {
+        func check<H: SIMDIntegerElement>(_ type: H.Type) where H.Lane: FixedWidthInteger {
+            let lanes = H.laneCount
+            let a = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
+            let b = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
+            let c = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 53 &+ 29) })
+            var output = ContiguousArray<H.Lane>(repeating: 0, count: lanes)
+
+            var destination = output.mutableSpan
+            H.store(
+                H.bitwiseAndXor(H.load(from: a.span), H.load(from: b.span), H.load(from: c.span)),
+                to: &destination
+            )
+
+            #expect(Array(output) == (0..<lanes).map { a[$0] & (b[$0] ^ c[$0]) })
+        }
+
+        check(SIMDUInt32.self)
+        check(SIMDInt8.self)
+    }
+
+    @Test("A masked bitwise op zeroes the lanes the mask does not select")
+    func maskedBitwise() {
+        func check<H: SIMDIntegerElement>(_ type: H.Type) where H.Lane: FixedWidthInteger {
+            let lanes = H.laneCount
+            let selected = lanes / 2
+            let a = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
+            let b = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
+            let mask = H.firstLanes(count: selected)
+            let operations: [(vector: H.Vector, scalar: (H.Lane, H.Lane) -> H.Lane)] = [
+                (
+                    H.bitwiseAnd(H.load(from: a.span), H.load(from: b.span), where: mask),
+                    { $0 & $1 }
+                ),
+                (H.bitwiseOr(H.load(from: a.span), H.load(from: b.span), where: mask), { $0 | $1 }),
+                (
+                    H.bitwiseXor(H.load(from: a.span), H.load(from: b.span), where: mask),
+                    { $0 ^ $1 }
+                ),
+            ]
+
+            for operation in operations {
+                var output = ContiguousArray<H.Lane>(repeating: 1, count: lanes)
+                var destination = output.mutableSpan
+                H.store(operation.vector, to: &destination)
+                let expected = (0..<lanes).map { lane in
+                    lane < selected ? operation.scalar(a[lane], b[lane]) : 0
+                }
+                #expect(Array(output) == expected)
+            }
+        }
+
+        check(SIMDUInt16.self)
+        check(SIMDInt64.self)
+    }
+
+    @Test("A masked bitwise op takes the lanes the mask does not select from otherwise")
+    func maskedBitwiseOtherwise() {
+        func check<H: SIMDIntegerElement>(_ type: H.Type) where H.Lane: FixedWidthInteger {
+            let lanes = H.laneCount
+            let selected = lanes / 2
+            let a = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 37 &+ 11) })
+            let b = ContiguousArray((0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 91 &+ 5) })
+            let other = ContiguousArray(
+                (0..<lanes).map { H.Lane(truncatingIfNeeded: $0 &* 53 &+ 29) }
+            )
+            let mask = H.firstLanes(count: selected)
+            let (va, vb, vo) = (
+                H.load(from: a.span), H.load(from: b.span), H.load(from: other.span)
+            )
+            let operations: [(vector: H.Vector, scalar: (H.Lane, H.Lane) -> H.Lane)] = [
+                (H.bitwiseAnd(va, vb, where: mask, otherwise: vo), { $0 & $1 }),
+                (H.bitwiseOr(va, vb, where: mask, otherwise: vo), { $0 | $1 }),
+                (H.bitwiseXor(va, vb, where: mask, otherwise: vo), { $0 ^ $1 }),
+            ]
+
+            for operation in operations {
+                var output = ContiguousArray<H.Lane>(repeating: 0, count: lanes)
+                var destination = output.mutableSpan
+                H.store(operation.vector, to: &destination)
+                let expected = (0..<lanes).map { lane in
+                    lane < selected ? operation.scalar(a[lane], b[lane]) : other[lane]
+                }
+                #expect(Array(output) == expected)
+            }
+        }
+
+        check(SIMDUInt8.self)
+        check(SIMDInt32.self)
     }
 
     @Test("Comparing produces a mask that selects")
@@ -121,6 +294,57 @@ struct OpsTests {
 
         #expect(sum == a.reduce(0, &+))
         #expect(largest == a.max())
+    }
+
+    @Test("Extrema or NaN are NaN when any lane is NaN, and the extrema otherwise")
+    func extremaOrNaN() {
+        typealias F = SIMDFloat
+        typealias D = SIMDDouble
+        let floats = ContiguousArray((0..<F.laneCount).map { Float($0 &* 3) - 4.5 })
+        let doubles = ContiguousArray((0..<D.laneCount).map { Double($0 &* 3) - 4.5 })
+
+        #expect(F.smallestOrNaN(F.load(from: floats.span)) == floats.min())
+        #expect(F.largestOrNaN(F.load(from: floats.span)) == floats.max())
+        #expect(D.smallestOrNaN(D.load(from: doubles.span)) == doubles.min())
+        #expect(D.largestOrNaN(D.load(from: doubles.span)) == doubles.max())
+
+        for nanLane in 0..<F.laneCount {
+            var lanes = floats
+            lanes[nanLane] = .nan
+            let vector = F.load(from: lanes.span)
+            #expect(F.smallestOrNaN(vector).isNaN)
+            #expect(F.largestOrNaN(vector).isNaN)
+        }
+        for nanLane in 0..<D.laneCount {
+            var lanes = doubles
+            lanes[nanLane] = .nan
+            let vector = D.load(from: lanes.span)
+            #expect(D.smallestOrNaN(vector).isNaN)
+            #expect(D.largestOrNaN(vector).isNaN)
+        }
+
+        #expect(F.smallestOrNaN(F.repeating(.nan)).isNaN)
+        #expect(F.largestOrNaN(F.repeating(.nan)).isNaN)
+        #expect(D.smallestOrNaN(D.repeating(.nan)).isNaN)
+        #expect(D.largestOrNaN(D.repeating(.nan)).isNaN)
+    }
+
+    @Test("Extrema or NaN see past infinities and a NaN in the lane that would be the extremum")
+    func extremaOrNaNWithInfinities() {
+        typealias F = SIMDFloat
+        let lanes = F.laneCount
+
+        for nanLane in 0..<lanes {
+            var smallest = ContiguousArray(repeating: Float.infinity, count: lanes)
+            var largest = ContiguousArray(repeating: -Float.infinity, count: lanes)
+            smallest[nanLane] = .nan
+            largest[nanLane] = .nan
+            #expect(F.smallestOrNaN(F.load(from: smallest.span)).isNaN)
+            #expect(F.largestOrNaN(F.load(from: largest.span)).isNaN)
+        }
+
+        #expect(F.smallestOrNaN(F.repeating(.infinity)) == .infinity)
+        #expect(F.largestOrNaN(F.repeating(-.infinity)) == -.infinity)
     }
 
     @Test("A repeated block fills every 128-bit block with its lanes")
@@ -178,6 +402,122 @@ struct OpsTests {
         var destination = output.mutableSpan
         H.store(H.slide1Up(vector), to: &destination)
         #expect(Array(output) == [0] + Array(input.prefix(lanes - 1)))
+    }
+
+    @Test("A slide down moves the lanes down and zeroes the lanes it leaves behind")
+    func slideDown() {
+        typealias H = SIMDUInt8
+        let lanes = H.laneCount
+        let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
+        let vector = H.load(from: input.span)
+
+        for amount in 0..<lanes {
+            var output = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+            var destination = output.mutableSpan
+            H.store(H.slideDownLanes(vector, by: amount), to: &destination)
+            #expect(Array(output.prefix(lanes - amount)) == Array(input.dropFirst(amount)))
+            #expect(Array(output.suffix(amount)) == [UInt8](repeating: 0, count: amount))
+        }
+
+        var output = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+        var destination = output.mutableSpan
+        H.store(H.slide1Down(vector), to: &destination)
+        #expect(Array(output) == Array(input.dropFirst()) + [0])
+    }
+
+    @Test("A slide up with a fill takes the lanes it leaves behind from the fill")
+    func slideUpFilling() {
+        typealias H = SIMDUInt8
+        let lanes = H.laneCount
+        let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
+        let filler = ContiguousArray((0..<lanes).map { UInt8($0 &+ 0x41) })
+        let vector = H.load(from: input.span)
+        let fill = H.load(from: filler.span)
+
+        for amount in 0..<lanes {
+            var output = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+            var destination = output.mutableSpan
+            H.store(H.slideUpLanes(vector, by: amount, fillingWith: fill), to: &destination)
+            #expect(Array(output.prefix(amount)) == Array(filler.prefix(amount)))
+            #expect(Array(output.dropFirst(amount)) == Array(input.prefix(lanes - amount)))
+        }
+
+        var output = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+        var destination = output.mutableSpan
+        H.store(H.slide1Up(vector, fillingWith: 0x7F), to: &destination)
+        #expect(Array(output) == [0x7F] + Array(input.prefix(lanes - 1)))
+    }
+
+    @Test("A slide down with a fill takes the lanes it leaves behind from the fill")
+    func slideDownFilling() {
+        typealias H = SIMDUInt8
+        let lanes = H.laneCount
+        let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
+        let filler = ContiguousArray((0..<lanes).map { UInt8($0 &+ 0x41) })
+        let vector = H.load(from: input.span)
+        let fill = H.load(from: filler.span)
+
+        for amount in 0..<lanes {
+            var output = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+            var destination = output.mutableSpan
+            H.store(H.slideDownLanes(vector, by: amount, fillingWith: fill), to: &destination)
+            #expect(Array(output.prefix(lanes - amount)) == Array(input.dropFirst(amount)))
+            #expect(Array(output.suffix(amount)) == Array(filler.suffix(amount)))
+        }
+
+        var output = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+        var destination = output.mutableSpan
+        H.store(H.slide1Down(vector, fillingWith: 0x7F), to: &destination)
+        #expect(Array(output) == Array(input.dropFirst()) + [0x7F])
+    }
+
+    @Test("An unchecked slide gives the lanes the checked one does")
+    func uncheckedSlides() {
+        typealias H = SIMDUInt8
+        let lanes = H.laneCount
+        let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
+        let vector = H.load(from: input.span)
+
+        for amount in 0..<lanes {
+            var up = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+            var down = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+            var upDestination = up.mutableSpan
+            var downDestination = down.mutableSpan
+            H.store(unsafe H.slideUpLanes(vector, byUnchecked: amount), to: &upDestination)
+            H.store(unsafe H.slideDownLanes(vector, byUnchecked: amount), to: &downDestination)
+            let zeros = [UInt8](repeating: 0, count: amount)
+            #expect(Array(up) == zeros + Array(input.prefix(lanes - amount)))
+            #expect(Array(down) == Array(input.dropFirst(amount)) + zeros)
+        }
+    }
+
+    @Test("An unchecked slide with a fill gives the lanes the checked one does")
+    func uncheckedFillingSlides() {
+        typealias H = SIMDUInt8
+        let lanes = H.laneCount
+        let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
+        let filler = ContiguousArray((0..<lanes).map { UInt8($0 &+ 0x41) })
+        let vector = H.load(from: input.span)
+        let fill = H.load(from: filler.span)
+
+        for amount in 0..<lanes {
+            var up = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+            var down = ContiguousArray<UInt8>(repeating: 0xEE, count: lanes)
+            var upDestination = up.mutableSpan
+            var downDestination = down.mutableSpan
+            H.store(
+                unsafe H.slideUpLanes(vector, byUnchecked: amount, fillingWith: fill),
+                to: &upDestination
+            )
+            H.store(
+                unsafe H.slideDownLanes(vector, byUnchecked: amount, fillingWith: fill),
+                to: &downDestination
+            )
+            #expect(Array(up) == Array(filler.prefix(amount)) + Array(input.prefix(lanes - amount)))
+            #expect(
+                Array(down) == Array(input.dropFirst(amount)) + Array(filler.suffix(amount))
+            )
+        }
     }
 
     @Test("A partial load only reads the lanes it is asked for")
@@ -629,6 +969,42 @@ struct OpsTests {
             _ = ContiguousArray<UInt8>(capacity: 1) { output in
                 SIMDUInt8.append(SIMDUInt8.zero(), addingCount: -1, to: &output)
             }
+        }
+    }
+
+    @Test("Checked lane amount ops trap on an amount outside 0...laneCount")
+    func checkedLaneAmountOpsTrap() async {
+        await #expect(processExitsWith: .failure) {
+            _ = SIMDUInt8.slideUpLanes(SIMDUInt8.zero(), by: -1)
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMDUInt8.slideUpLanes(SIMDUInt8.zero(), by: SIMDUInt8.laneCount + 1)
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMDUInt8.slideDownLanes(SIMDUInt8.zero(), by: -1)
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMDUInt8.slideDownLanes(SIMDUInt8.zero(), by: SIMDUInt8.laneCount + 1)
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMDUInt8.slideUpLanes(SIMDUInt8.zero(), by: -1, fillingWith: SIMDUInt8.zero())
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMDUInt8.slideUpLanes(
+                SIMDUInt8.zero(),
+                by: SIMDUInt8.laneCount + 1,
+                fillingWith: SIMDUInt8.zero()
+            )
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMDUInt8.slideDownLanes(SIMDUInt8.zero(), by: -1, fillingWith: SIMDUInt8.zero())
+        }
+        await #expect(processExitsWith: .failure) {
+            _ = SIMDUInt8.slideDownLanes(
+                SIMDUInt8.zero(),
+                by: SIMDUInt8.laneCount + 1,
+                fillingWith: SIMDUInt8.zero()
+            )
         }
     }
 

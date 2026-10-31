@@ -186,6 +186,10 @@ normalize_disassembly() {
       return 0
     }
 
+    function is_constant_data(section) {
+      return section == "__const" || section ~ /^\.rodata/
+    }
+
     function without_segment(section) {
       sub(/^[^,]*,/, "", section)
       return section
@@ -369,6 +373,36 @@ normalize_disassembly() {
       return constant_annotation(section, address, size)
     }
 
+    function data_extent_end(section, address,    position, end, other) {
+      end = -1
+      for (position = 1; position <= section_total; position++) {
+        if (section_name[position] == section &&
+            section_vma[position] <= address &&
+            address < section_vma[position] + section_size[position]) {
+          end = section_vma[position] + section_size[position]
+        }
+      }
+      if (end < 0) {
+        unresolvable("the address " sprintf("0x%x", address) " is outside of the section " quoted(section))
+      }
+      for (other in symbol_section) {
+        if (symbol_section[other] == section &&
+            symbol_value[other] > address &&
+            symbol_value[other] < end) {
+          end = symbol_value[other]
+        }
+      }
+      return end
+    }
+
+    function data_annotation(symbol, addend, addend_sign,    section, start, annotation) {
+      section = symbol_section[symbol]
+      start = symbol_value[symbol]
+      annotation = constant_annotation(section, start, data_extent_end(section, start) - start)
+      sub(/}$/, offset_text(addend, addend_sign) "}", annotation)
+      return annotation
+    }
+
     function symbol_annotation(symbol, addend, addend_sign,    section, size) {
       if (symbol_ambiguous[symbol]) {
         unresolvable("the symbol " quoted(symbol) " is defined more than once")
@@ -387,6 +421,9 @@ normalize_disassembly() {
       if (size == 0) {
         if (is_local_label(symbol)) {
           return "{data:" section "}"
+        }
+        if (is_constant_data(section)) {
+          return data_annotation(symbol, addend, addend_sign)
         }
         return symbol_name_annotation("data", symbol, addend, addend_sign)
       }
@@ -514,7 +551,7 @@ normalize_disassembly() {
         sub(/^Contents of section /, "", block_section)
         sub(/:$/, "", block_section)
         block_section = without_segment(block_section)
-        block_is_constant = (constant_size(block_section) > 0)
+        block_is_constant = (constant_size(block_section) > 0 || is_constant_data(block_section))
       } else if (block_is_constant && $0 ~ /^ [0-9a-fA-F]+ /) {
         line_address = $0
         sub(/^ /, "", line_address)

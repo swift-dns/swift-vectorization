@@ -15,6 +15,7 @@ readonly allowlist_path="${repository_root}/scripts/codegen-allowlist.txt"
 readonly normalize_script="${repository_root}/scripts/normalize-disassembly.sh"
 readonly allowlist_entry_pattern='^([A-Z][A-Z0-9_]*)[[:space:]]+([A-Za-z0-9_]+)[[:space:]]+[^[:space:]]'
 readonly target_name="HighwayReferenceCodegen"
+readonly host_dependent_target="EMU128"
 
 architecture=""
 verbose="false"
@@ -94,6 +95,12 @@ validate_allowlist() {
         "Blank lines and comments are not allowed"
     fi
 
+    if [[ "${BASH_REMATCH[1]}" == "${host_dependent_target}" ]]; then
+      fatal "Line ${line_number} of '${allowlist_file}' allowlists '${BASH_REMATCH[2]}'" \
+        "on ${host_dependent_target}, whose instructions depend on the host architecture" \
+        "It must name the host: '${host_dependent_target}_ARM64' or '${host_dependent_target}_X86_64'"
+    fi
+
     entry_key="${BASH_REMATCH[1]} ${BASH_REMATCH[2]}"
     if [[ -n "${line_of_entry["${entry_key}"]:-}" ]]; then
       fatal "Line ${line_number} of '${allowlist_file}' repeats '${entry_key}'," \
@@ -101,6 +108,29 @@ validate_allowlist() {
     fi
     line_of_entry["${entry_key}"]="${line_number}"
   done < "${allowlist_file}"
+  return 0
+}
+
+architecture_key() {
+  local requested_architecture="${1:-}"
+
+  local machine="${requested_architecture}"
+  if [[ -z "${machine}" ]] && ! machine="$(uname -m)"; then
+    fatal "Failed to tell which architecture this host is"
+  fi
+
+  case "${machine}" in
+    arm64 | aarch64)
+      printf -- 'ARM64\n'
+      ;;
+    x86_64 | amd64)
+      printf -- 'X86_64\n'
+      ;;
+    *)
+      fatal "Cannot name the architecture '${machine}' in the ${host_dependent_target} allowlist entries" \
+        "Only 'arm64', 'aarch64', 'x86_64' and 'amd64' are known"
+      ;;
+  esac
   return 0
 }
 
@@ -177,12 +207,22 @@ compare_functions() {
   local listing_file="${2:?compare_functions requires the disassembly listing}"
   local allowlist_file="${3:?compare_functions requires the allowlist file}"
   local show_listings="${4:?compare_functions requires whether to print the listings}"
+  local host_architecture_key="${5:?compare_functions requires the key of the host architecture}"
 
   if ! awk -F '\t' \
     -v names_file="${names_file}" \
     -v allowlist_file="${allowlist_file}" \
     -v allowlist_name="${allowlist_file#"${repository_root}/"}" \
-    -v show_listings="${show_listings}" '
+    -v show_listings="${show_listings}" \
+    -v host_dependent_target="${host_dependent_target}" \
+    -v host_architecture_key="${host_architecture_key}" '
+    function keyed_target(target) {
+      if (target == host_dependent_target) {
+        return target "_" host_architecture_key
+      }
+      return target
+    }
+
     function trimmed_length(function_name,    length_without_padding) {
       length_without_padding = instruction_count[function_name]
       while (length_without_padding > 0 &&
@@ -278,6 +318,7 @@ compare_functions() {
     }
 
     END {
+      highway_target = keyed_target(highway_target)
       call_pattern = "^(bl|blr|blraa|blraaz|blrab|blrabz|call|callq|calll)$"
       branch_pattern = "^(b|b\\.[a-z]+|bc\\.[a-z]+|br|braa|braaz|brab|brabz|cbz|cbnz|tbz|tbnz|j[a-z]+)$"
 
@@ -408,6 +449,9 @@ main() {
 
   validate_allowlist "${allowlist_path}"
 
+  local host_architecture_key
+  host_architecture_key="$(architecture_key "${architecture}")"
+
   local -a build_arguments=(
     -c release
     --build-system native
@@ -447,7 +491,8 @@ main() {
   demangle_symbols "${listing_file}" "${symbols_file}" "${demangled_file}" > "${names_file}"
 
   log "Comparing the functions..."
-  compare_functions "${names_file}" "${listing_file}" "${allowlist_path}" "${verbose}"
+  compare_functions "${names_file}" "${listing_file}" "${allowlist_path}" "${verbose}" \
+    "${host_architecture_key}"
   return 0
 }
 

@@ -1163,6 +1163,72 @@ public func highwayBitwiseAndNotI64ConstantB(
 }
 
 @inline(never)
+public func portBitwiseAndXorI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    _ c: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAndXor(a, b, c)
+}
+
+@inline(never)
+public func highwayBitwiseAndXorI64(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    _ c: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndXorI64(a, b, c)
+}
+
+@inline(never)
+public func portBitwiseAndXorI64ConstantA(
+    _ b: SIMDInt64.Vector,
+    _ c: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAndXor(SIMDInt64.repeating(26), b, c)
+}
+
+@inline(never)
+public func highwayBitwiseAndXorI64ConstantA(
+    _ b: HighwayReference.VectorI64,
+    _ c: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndXorI64(HighwayReference.repeatingI64(26), b, c)
+}
+
+@inline(never)
+public func portBitwiseAndXorI64ConstantB(
+    _ a: SIMDInt64.Vector,
+    _ c: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAndXor(a, SIMDInt64.repeating(26), c)
+}
+
+@inline(never)
+public func highwayBitwiseAndXorI64ConstantB(
+    _ a: HighwayReference.VectorI64,
+    _ c: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndXorI64(a, HighwayReference.repeatingI64(26), c)
+}
+
+@inline(never)
+public func portBitwiseAndXorI64ConstantC(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAndXor(a, b, SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwayBitwiseAndXorI64ConstantC(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndXorI64(a, b, HighwayReference.repeatingI64(26))
+}
+
+@inline(never)
 public func portShiftedLeftI64(_ a: SIMDInt64.Vector, by bits: Int32) -> SIMDInt64.Vector {
     SIMDInt64.shiftedLeft(a, by: Int(bits))
 }
@@ -1483,6 +1549,408 @@ public func highwayZeroingSelectedI64ConstantA(
 }
 
 @inline(never)
+public func portBitwiseAndWhereI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAnd(a, b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereI64(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndWhereI64(mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseAndWhereI64ConstantA(
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAnd(SIMDInt64.repeating(26), b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereI64ConstantA(
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndWhereI64(mask, HighwayReference.repeatingI64(26), b)
+}
+
+@inline(never)
+public func portBitwiseAndWhereI64ConstantB(
+    _ a: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAnd(a, SIMDInt64.repeating(26), where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereI64ConstantB(
+    _ a: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndWhereI64(mask, a, HighwayReference.repeatingI64(26))
+}
+
+@inline(never)
+public func portBitwiseOrWhereI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseOr(a, b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereI64(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseOrWhereI64(mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseOrWhereI64ConstantA(
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseOr(SIMDInt64.repeating(26), b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereI64ConstantA(
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseOrWhereI64(mask, HighwayReference.repeatingI64(26), b)
+}
+
+@inline(never)
+public func portBitwiseOrWhereI64ConstantB(
+    _ a: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseOr(a, SIMDInt64.repeating(26), where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereI64ConstantB(
+    _ a: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseOrWhereI64(mask, a, HighwayReference.repeatingI64(26))
+}
+
+@inline(never)
+public func portBitwiseXorWhereI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseXor(a, b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereI64(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseXorWhereI64(mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseXorWhereI64ConstantA(
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseXor(SIMDInt64.repeating(26), b, where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereI64ConstantA(
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseXorWhereI64(mask, HighwayReference.repeatingI64(26), b)
+}
+
+@inline(never)
+public func portBitwiseXorWhereI64ConstantB(
+    _ a: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseXor(a, SIMDInt64.repeating(26), where: mask)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereI64ConstantB(
+    _ a: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseXorWhereI64(mask, a, HighwayReference.repeatingI64(26))
+}
+
+@inline(never)
+public func portBitwiseAndWhereOtherwiseI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAnd(a, b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereOtherwiseI64(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndWhereOtherwiseI64(otherwise, mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseAndWhereOtherwiseI64ConstantA(
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAnd(SIMDInt64.repeating(26), b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereOtherwiseI64ConstantA(
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndWhereOtherwiseI64(
+        otherwise,
+        mask,
+        HighwayReference.repeatingI64(26),
+        b
+    )
+}
+
+@inline(never)
+public func portBitwiseAndWhereOtherwiseI64ConstantB(
+    _ a: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAnd(a, SIMDInt64.repeating(26), where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereOtherwiseI64ConstantB(
+    _ a: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndWhereOtherwiseI64(
+        otherwise,
+        mask,
+        a,
+        HighwayReference.repeatingI64(26)
+    )
+}
+
+@inline(never)
+public func portBitwiseAndWhereOtherwiseI64ConstantOtherwise(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseAnd(a, b, where: mask, otherwise: SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwayBitwiseAndWhereOtherwiseI64ConstantOtherwise(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseAndWhereOtherwiseI64(HighwayReference.repeatingI64(26), mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseOrWhereOtherwiseI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseOr(a, b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereOtherwiseI64(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseOrWhereOtherwiseI64(otherwise, mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseOrWhereOtherwiseI64ConstantA(
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseOr(SIMDInt64.repeating(26), b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereOtherwiseI64ConstantA(
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseOrWhereOtherwiseI64(
+        otherwise,
+        mask,
+        HighwayReference.repeatingI64(26),
+        b
+    )
+}
+
+@inline(never)
+public func portBitwiseOrWhereOtherwiseI64ConstantB(
+    _ a: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseOr(a, SIMDInt64.repeating(26), where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereOtherwiseI64ConstantB(
+    _ a: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseOrWhereOtherwiseI64(
+        otherwise,
+        mask,
+        a,
+        HighwayReference.repeatingI64(26)
+    )
+}
+
+@inline(never)
+public func portBitwiseOrWhereOtherwiseI64ConstantOtherwise(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseOr(a, b, where: mask, otherwise: SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwayBitwiseOrWhereOtherwiseI64ConstantOtherwise(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseOrWhereOtherwiseI64(HighwayReference.repeatingI64(26), mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseXorWhereOtherwiseI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseXor(a, b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereOtherwiseI64(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseXorWhereOtherwiseI64(otherwise, mask, a, b)
+}
+
+@inline(never)
+public func portBitwiseXorWhereOtherwiseI64ConstantA(
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseXor(SIMDInt64.repeating(26), b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereOtherwiseI64ConstantA(
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseXorWhereOtherwiseI64(
+        otherwise,
+        mask,
+        HighwayReference.repeatingI64(26),
+        b
+    )
+}
+
+@inline(never)
+public func portBitwiseXorWhereOtherwiseI64ConstantB(
+    _ a: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask,
+    otherwise: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseXor(a, SIMDInt64.repeating(26), where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereOtherwiseI64ConstantB(
+    _ a: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64,
+    otherwise: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseXorWhereOtherwiseI64(
+        otherwise,
+        mask,
+        a,
+        HighwayReference.repeatingI64(26)
+    )
+}
+
+@inline(never)
+public func portBitwiseXorWhereOtherwiseI64ConstantOtherwise(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector,
+    where mask: SIMDInt64.Mask
+) -> SIMDInt64.Vector {
+    SIMDInt64.bitwiseXor(a, b, where: mask, otherwise: SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwayBitwiseXorWhereOtherwiseI64ConstantOtherwise(
+    _ a: HighwayReference.VectorI64,
+    _ b: HighwayReference.VectorI64,
+    where mask: HighwayReference.MaskI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.bitwiseXorWhereOtherwiseI64(HighwayReference.repeatingI64(26), mask, a, b)
+}
+
+@inline(never)
 public func portFirstLanesI64(count: Int) -> SIMDInt64.Mask {
     SIMDInt64.firstLanes(count: count)
 }
@@ -1643,31 +2111,31 @@ public func highwayReversedI64ConstantA() -> HighwayReference.VectorI64 {
 }
 
 @inline(never)
-public func portSlideUpLanesI64(_ a: SIMDInt64.Vector, by lanes: Int) -> SIMDInt64.Vector {
-    SIMDInt64.slideUpLanes(a, by: lanes)
+public func portSlideUpLanesI64(_ a: SIMDInt64.Vector, byUnchecked lanes: Int) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideUpLanesI64(
     _ a: HighwayReference.VectorI64,
-    by lanes: Int
+    byUnchecked lanes: Int
 ) -> HighwayReference.VectorI64 {
     HighwayReference.slideUpLanesI64(a, lanes)
 }
 
 @inline(never)
-public func portSlideUpLanesI64ConstantA(by lanes: Int) -> SIMDInt64.Vector {
-    SIMDInt64.slideUpLanes(SIMDInt64.repeating(26), by: lanes)
+public func portSlideUpLanesI64ConstantA(byUnchecked lanes: Int) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideUpLanes(SIMDInt64.repeating(26), byUnchecked: lanes)
 }
 
 @inline(never)
-public func highwaySlideUpLanesI64ConstantA(by lanes: Int) -> HighwayReference.VectorI64 {
+public func highwaySlideUpLanesI64ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorI64 {
     HighwayReference.slideUpLanesI64(HighwayReference.repeatingI64(26), lanes)
 }
 
 @inline(never)
 public func portSlideUpLanesI64ConstantLanes(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
-    SIMDInt64.slideUpLanes(a, by: 1)
+    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
@@ -1675,6 +2143,175 @@ public func highwaySlideUpLanesI64ConstantLanes(
     _ a: HighwayReference.VectorI64
 ) -> HighwayReference.VectorI64 {
     HighwayReference.slideUpLanesI64(a, 1)
+}
+
+@inline(never)
+public func portSlideUpLanesFillingWithI64(
+    _ a: SIMDInt64.Vector,
+    byUnchecked lanes: Int,
+    fillingWith fill: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: lanes, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideUpLanesFillingWithI64(
+    _ a: HighwayReference.VectorI64,
+    byUnchecked lanes: Int,
+    fillingWith fill: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideUpLanesFillingWithI64(fill, a, lanes)
+}
+
+@inline(never)
+public func portSlideUpLanesFillingWithI64ConstantA(
+    byUnchecked lanes: Int,
+    fillingWith fill: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideUpLanes(SIMDInt64.repeating(26), byUnchecked: lanes, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideUpLanesFillingWithI64ConstantA(
+    byUnchecked lanes: Int,
+    fillingWith fill: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideUpLanesFillingWithI64(fill, HighwayReference.repeatingI64(26), lanes)
+}
+
+@inline(never)
+public func portSlideUpLanesFillingWithI64ConstantLanes(
+    _ a: SIMDInt64.Vector,
+    fillingWith fill: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: 1, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideUpLanesFillingWithI64ConstantLanes(
+    _ a: HighwayReference.VectorI64,
+    fillingWith fill: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideUpLanesFillingWithI64(fill, a, 1)
+}
+
+@inline(never)
+public func portSlideUpLanesFillingWithI64ConstantFill(
+    _ a: SIMDInt64.Vector,
+    byUnchecked lanes: Int
+) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideUpLanes(a, byUnchecked: lanes, fillingWith: SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwaySlideUpLanesFillingWithI64ConstantFill(
+    _ a: HighwayReference.VectorI64,
+    byUnchecked lanes: Int
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideUpLanesFillingWithI64(HighwayReference.repeatingI64(26), a, lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesI64(_ a: SIMDInt64.Vector, byUnchecked lanes: Int) -> SIMDInt64.Vector
+{
+    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: lanes)
+}
+
+@inline(never)
+public func highwaySlideDownLanesI64(
+    _ a: HighwayReference.VectorI64,
+    byUnchecked lanes: Int
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideDownLanesI64(a, lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesI64ConstantA(byUnchecked lanes: Int) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideDownLanes(SIMDInt64.repeating(26), byUnchecked: lanes)
+}
+
+@inline(never)
+public func highwaySlideDownLanesI64ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorI64
+{
+    HighwayReference.slideDownLanesI64(HighwayReference.repeatingI64(26), lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesI64ConstantLanes(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: 1)
+}
+
+@inline(never)
+public func highwaySlideDownLanesI64ConstantLanes(
+    _ a: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideDownLanesI64(a, 1)
+}
+
+@inline(never)
+public func portSlideDownLanesFillingWithI64(
+    _ a: SIMDInt64.Vector,
+    byUnchecked lanes: Int,
+    fillingWith fill: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: lanes, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideDownLanesFillingWithI64(
+    _ a: HighwayReference.VectorI64,
+    byUnchecked lanes: Int,
+    fillingWith fill: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideDownLanesFillingWithI64(fill, a, lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesFillingWithI64ConstantA(
+    byUnchecked lanes: Int,
+    fillingWith fill: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideDownLanes(SIMDInt64.repeating(26), byUnchecked: lanes, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideDownLanesFillingWithI64ConstantA(
+    byUnchecked lanes: Int,
+    fillingWith fill: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideDownLanesFillingWithI64(fill, HighwayReference.repeatingI64(26), lanes)
+}
+
+@inline(never)
+public func portSlideDownLanesFillingWithI64ConstantLanes(
+    _ a: SIMDInt64.Vector,
+    fillingWith fill: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: 1, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlideDownLanesFillingWithI64ConstantLanes(
+    _ a: HighwayReference.VectorI64,
+    fillingWith fill: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideDownLanesFillingWithI64(fill, a, 1)
+}
+
+@inline(never)
+public func portSlideDownLanesFillingWithI64ConstantFill(
+    _ a: SIMDInt64.Vector,
+    byUnchecked lanes: Int
+) -> SIMDInt64.Vector {
+    unsafe SIMDInt64.slideDownLanes(a, byUnchecked: lanes, fillingWith: SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwaySlideDownLanesFillingWithI64ConstantFill(
+    _ a: HighwayReference.VectorI64,
+    byUnchecked lanes: Int
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slideDownLanesFillingWithI64(HighwayReference.repeatingI64(26), a, lanes)
 }
 
 @inline(never)
@@ -1695,6 +2332,110 @@ public func portSlide1UpI64ConstantA() -> SIMDInt64.Vector {
 @inline(never)
 public func highwaySlide1UpI64ConstantA() -> HighwayReference.VectorI64 {
     HighwayReference.slide1UpI64(HighwayReference.repeatingI64(26))
+}
+
+@inline(never)
+public func portSlide1UpFillingWithI64(
+    _ a: SIMDInt64.Vector,
+    fillingWith fill: SIMDInt64.Lane
+) -> SIMDInt64.Vector {
+    SIMDInt64.slide1Up(a, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlide1UpFillingWithI64(
+    _ a: HighwayReference.VectorI64,
+    fillingWith fill: Int64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slide1UpFillingWithI64(fill, a)
+}
+
+@inline(never)
+public func portSlide1UpFillingWithI64ConstantA(
+    fillingWith fill: SIMDInt64.Lane
+) -> SIMDInt64.Vector {
+    SIMDInt64.slide1Up(SIMDInt64.repeating(26), fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlide1UpFillingWithI64ConstantA(
+    fillingWith fill: Int64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slide1UpFillingWithI64(fill, HighwayReference.repeatingI64(26))
+}
+
+@inline(never)
+public func portSlide1UpFillingWithI64ConstantFill(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.slide1Up(a, fillingWith: 26)
+}
+
+@inline(never)
+public func highwaySlide1UpFillingWithI64ConstantFill(
+    _ a: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slide1UpFillingWithI64(26, a)
+}
+
+@inline(never)
+public func portSlide1DownI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.slide1Down(a)
+}
+
+@inline(never)
+public func highwaySlide1DownI64(_ a: HighwayReference.VectorI64) -> HighwayReference.VectorI64 {
+    HighwayReference.slide1DownI64(a)
+}
+
+@inline(never)
+public func portSlide1DownI64ConstantA() -> SIMDInt64.Vector {
+    SIMDInt64.slide1Down(SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwaySlide1DownI64ConstantA() -> HighwayReference.VectorI64 {
+    HighwayReference.slide1DownI64(HighwayReference.repeatingI64(26))
+}
+
+@inline(never)
+public func portSlide1DownFillingWithI64(
+    _ a: SIMDInt64.Vector,
+    fillingWith fill: SIMDInt64.Lane
+) -> SIMDInt64.Vector {
+    SIMDInt64.slide1Down(a, fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlide1DownFillingWithI64(
+    _ a: HighwayReference.VectorI64,
+    fillingWith fill: Int64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slide1DownFillingWithI64(fill, a)
+}
+
+@inline(never)
+public func portSlide1DownFillingWithI64ConstantA(
+    fillingWith fill: SIMDInt64.Lane
+) -> SIMDInt64.Vector {
+    SIMDInt64.slide1Down(SIMDInt64.repeating(26), fillingWith: fill)
+}
+
+@inline(never)
+public func highwaySlide1DownFillingWithI64ConstantA(
+    fillingWith fill: Int64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slide1DownFillingWithI64(fill, HighwayReference.repeatingI64(26))
+}
+
+@inline(never)
+public func portSlide1DownFillingWithI64ConstantFill(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.slide1Down(a, fillingWith: 26)
+}
+
+@inline(never)
+public func highwaySlide1DownFillingWithI64ConstantFill(
+    _ a: HighwayReference.VectorI64
+) -> HighwayReference.VectorI64 {
+    HighwayReference.slide1DownFillingWithI64(26, a)
 }
 
 @inline(never)

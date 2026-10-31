@@ -6840,9 +6840,8 @@ template <class V, HWY_IF_V_SIZE_V(V, 16)>
 HWY_INLINE V SlideUpLanesImpl(V v, size_t amt) {
   const DFromV<V> d;
   const Repartition<uint8_t, decltype(d)> du8;
-  const auto idx =
-      Iota(du8, static_cast<uint8_t>(size_t{0} - amt * sizeof(TFromV<V>)));
-  return BitCast(d, TableLookupBytesOr0(BitCast(du8, v), idx));
+  return BitCast(d, TableLookupBytesOr0(BitCast(du8, v),
+    LoadU(du8, kSlideTable() + 16 - sizeof(TFromV<V>) * amt)));
 }
 
 }  // namespace detail

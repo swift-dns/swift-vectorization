@@ -66,6 +66,7 @@ HWY_INLINE VectorU8 bitwiseOrU8(VectorU8 a, VectorU8 b) { return hn::Or(a, b); }
 HWY_INLINE VectorU8 bitwiseXorU8(VectorU8 a, VectorU8 b) { return hn::Xor(a, b); }
 HWY_INLINE VectorU8 bitwiseNotU8(VectorU8 a) { return hn::Not(a); }
 HWY_INLINE VectorU8 bitwiseAndNotU8(VectorU8 a, VectorU8 b) { return hn::AndNot(a, b); }
+HWY_INLINE VectorU8 bitwiseAndXorU8(VectorU8 a, VectorU8 b, VectorU8 c) { return hn::AndXor(a, b, c); }
 HWY_INLINE VectorU8 shiftedLeftU8(VectorU8 a, int bits) { return hn::ShiftLeftSame(a, bits); }
 HWY_INLINE VectorU8 shiftedRightU8(VectorU8 a, int bits) { return hn::ShiftRightSame(a, bits); }
 HWY_INLINE MaskU8 equalToU8(VectorU8 a, VectorU8 b) { return hn::Eq(a, b); }
@@ -75,6 +76,12 @@ HWY_INLINE MaskU8 greaterThanU8(VectorU8 a, VectorU8 b) { return hn::Gt(a, b); }
 HWY_INLINE VectorU8 selectingU8(MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::IfThenElse(mask, a, b); }
 HWY_INLINE VectorU8 selectingOrZeroU8(MaskU8 mask, VectorU8 a) { return hn::IfThenElseZero(mask, a); }
 HWY_INLINE VectorU8 zeroingSelectedU8(MaskU8 mask, VectorU8 a) { return hn::IfThenZeroElse(mask, a); }
+HWY_INLINE VectorU8 bitwiseAndWhereU8(MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedAnd(mask, a, b); }
+HWY_INLINE VectorU8 bitwiseOrWhereU8(MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedOr(mask, a, b); }
+HWY_INLINE VectorU8 bitwiseXorWhereU8(MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedXor(mask, a, b); }
+HWY_INLINE VectorU8 bitwiseAndWhereOtherwiseU8(VectorU8 otherwise, MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU8 bitwiseOrWhereOtherwiseU8(VectorU8 otherwise, MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU8 bitwiseXorWhereOtherwiseU8(VectorU8 otherwise, MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
 HWY_INLINE MaskU8 firstLanesU8(size_t count) { return hn::FirstN(TagU8(), count); }
 HWY_INLINE bool allTrueU8(MaskU8 mask) { return hn::AllTrue(TagU8(), mask); }
 HWY_INLINE bool allFalseU8(MaskU8 mask) { return hn::AllFalse(TagU8(), mask); }
@@ -83,7 +90,13 @@ HWY_INLINE intptr_t firstTrueIndexU8(MaskU8 mask) { return hn::FindFirstTrue(Tag
 HWY_INLINE uint8_t firstLaneU8(VectorU8 a) { return hn::GetLane(a); }
 HWY_INLINE VectorU8 reversedU8(VectorU8 a) { return hn::Reverse(TagU8(), a); }
 HWY_INLINE VectorU8 slideUpLanesU8(VectorU8 a, size_t lanes) { return hn::SlideUpLanes(TagU8(), a, lanes); }
+HWY_INLINE VectorU8 slideUpLanesFillingWithU8(VectorU8 fill, VectorU8 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagU8(), a, lanes); }
+HWY_INLINE VectorU8 slideDownLanesU8(VectorU8 a, size_t lanes) { return hn::SlideDownLanes(TagU8(), a, lanes); }
+HWY_INLINE VectorU8 slideDownLanesFillingWithU8(VectorU8 fill, VectorU8 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagU8(), a, lanes); }
 HWY_INLINE VectorU8 slide1UpU8(VectorU8 a) { return hn::Slide1Up(TagU8(), a); }
+HWY_INLINE VectorU8 slide1UpFillingWithU8(uint8_t fill, VectorU8 a) { return hn::Slide1UpOr(fill, TagU8(), a); }
+HWY_INLINE VectorU8 slide1DownU8(VectorU8 a) { return hn::Slide1Down(TagU8(), a); }
+HWY_INLINE VectorU8 slide1DownFillingWithU8(uint8_t fill, VectorU8 a) { return hn::Slide1DownOr(fill, TagU8(), a); }
 HWY_INLINE VectorU8 tableLookupBytesU8(VectorU8 a, VectorU8 b) { return hn::TableLookupBytes(a, b); }
 HWY_INLINE void loadInterleaved2U8(const uint8_t* from, VectorU8& v0, VectorU8& v1) { hn::LoadInterleaved2(TagU8(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3U8(const uint8_t* from, VectorU8& v0, VectorU8& v1, VectorU8& v2) { hn::LoadInterleaved3(TagU8(), from, v0, v1, v2); }
@@ -123,6 +136,7 @@ HWY_INLINE VectorU16 bitwiseOrU16(VectorU16 a, VectorU16 b) { return hn::Or(a, b
 HWY_INLINE VectorU16 bitwiseXorU16(VectorU16 a, VectorU16 b) { return hn::Xor(a, b); }
 HWY_INLINE VectorU16 bitwiseNotU16(VectorU16 a) { return hn::Not(a); }
 HWY_INLINE VectorU16 bitwiseAndNotU16(VectorU16 a, VectorU16 b) { return hn::AndNot(a, b); }
+HWY_INLINE VectorU16 bitwiseAndXorU16(VectorU16 a, VectorU16 b, VectorU16 c) { return hn::AndXor(a, b, c); }
 HWY_INLINE VectorU16 shiftedLeftU16(VectorU16 a, int bits) { return hn::ShiftLeftSame(a, bits); }
 HWY_INLINE VectorU16 shiftedRightU16(VectorU16 a, int bits) { return hn::ShiftRightSame(a, bits); }
 HWY_INLINE MaskU16 equalToU16(VectorU16 a, VectorU16 b) { return hn::Eq(a, b); }
@@ -132,6 +146,12 @@ HWY_INLINE MaskU16 greaterThanU16(VectorU16 a, VectorU16 b) { return hn::Gt(a, b
 HWY_INLINE VectorU16 selectingU16(MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::IfThenElse(mask, a, b); }
 HWY_INLINE VectorU16 selectingOrZeroU16(MaskU16 mask, VectorU16 a) { return hn::IfThenElseZero(mask, a); }
 HWY_INLINE VectorU16 zeroingSelectedU16(MaskU16 mask, VectorU16 a) { return hn::IfThenZeroElse(mask, a); }
+HWY_INLINE VectorU16 bitwiseAndWhereU16(MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedAnd(mask, a, b); }
+HWY_INLINE VectorU16 bitwiseOrWhereU16(MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedOr(mask, a, b); }
+HWY_INLINE VectorU16 bitwiseXorWhereU16(MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedXor(mask, a, b); }
+HWY_INLINE VectorU16 bitwiseAndWhereOtherwiseU16(VectorU16 otherwise, MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU16 bitwiseOrWhereOtherwiseU16(VectorU16 otherwise, MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU16 bitwiseXorWhereOtherwiseU16(VectorU16 otherwise, MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
 HWY_INLINE MaskU16 firstLanesU16(size_t count) { return hn::FirstN(TagU16(), count); }
 HWY_INLINE bool allTrueU16(MaskU16 mask) { return hn::AllTrue(TagU16(), mask); }
 HWY_INLINE bool allFalseU16(MaskU16 mask) { return hn::AllFalse(TagU16(), mask); }
@@ -143,7 +163,13 @@ HWY_INLINE uint16_t largestU16(VectorU16 a) { return hn::ReduceMax(TagU16(), a);
 HWY_INLINE uint16_t firstLaneU16(VectorU16 a) { return hn::GetLane(a); }
 HWY_INLINE VectorU16 reversedU16(VectorU16 a) { return hn::Reverse(TagU16(), a); }
 HWY_INLINE VectorU16 slideUpLanesU16(VectorU16 a, size_t lanes) { return hn::SlideUpLanes(TagU16(), a, lanes); }
+HWY_INLINE VectorU16 slideUpLanesFillingWithU16(VectorU16 fill, VectorU16 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagU16(), a, lanes); }
+HWY_INLINE VectorU16 slideDownLanesU16(VectorU16 a, size_t lanes) { return hn::SlideDownLanes(TagU16(), a, lanes); }
+HWY_INLINE VectorU16 slideDownLanesFillingWithU16(VectorU16 fill, VectorU16 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagU16(), a, lanes); }
 HWY_INLINE VectorU16 slide1UpU16(VectorU16 a) { return hn::Slide1Up(TagU16(), a); }
+HWY_INLINE VectorU16 slide1UpFillingWithU16(uint16_t fill, VectorU16 a) { return hn::Slide1UpOr(fill, TagU16(), a); }
+HWY_INLINE VectorU16 slide1DownU16(VectorU16 a) { return hn::Slide1Down(TagU16(), a); }
+HWY_INLINE VectorU16 slide1DownFillingWithU16(uint16_t fill, VectorU16 a) { return hn::Slide1DownOr(fill, TagU16(), a); }
 HWY_INLINE void loadInterleaved2U16(const uint16_t* from, VectorU16& v0, VectorU16& v1) { hn::LoadInterleaved2(TagU16(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3U16(const uint16_t* from, VectorU16& v0, VectorU16& v1, VectorU16& v2) { hn::LoadInterleaved3(TagU16(), from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4U16(const uint16_t* from, VectorU16& v0, VectorU16& v1, VectorU16& v2, VectorU16& v3) { hn::LoadInterleaved4(TagU16(), from, v0, v1, v2, v3); }
@@ -181,6 +207,7 @@ HWY_INLINE VectorU32 bitwiseOrU32(VectorU32 a, VectorU32 b) { return hn::Or(a, b
 HWY_INLINE VectorU32 bitwiseXorU32(VectorU32 a, VectorU32 b) { return hn::Xor(a, b); }
 HWY_INLINE VectorU32 bitwiseNotU32(VectorU32 a) { return hn::Not(a); }
 HWY_INLINE VectorU32 bitwiseAndNotU32(VectorU32 a, VectorU32 b) { return hn::AndNot(a, b); }
+HWY_INLINE VectorU32 bitwiseAndXorU32(VectorU32 a, VectorU32 b, VectorU32 c) { return hn::AndXor(a, b, c); }
 HWY_INLINE VectorU32 shiftedLeftU32(VectorU32 a, int bits) { return hn::ShiftLeftSame(a, bits); }
 HWY_INLINE VectorU32 shiftedRightU32(VectorU32 a, int bits) { return hn::ShiftRightSame(a, bits); }
 HWY_INLINE MaskU32 equalToU32(VectorU32 a, VectorU32 b) { return hn::Eq(a, b); }
@@ -190,6 +217,12 @@ HWY_INLINE MaskU32 greaterThanU32(VectorU32 a, VectorU32 b) { return hn::Gt(a, b
 HWY_INLINE VectorU32 selectingU32(MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::IfThenElse(mask, a, b); }
 HWY_INLINE VectorU32 selectingOrZeroU32(MaskU32 mask, VectorU32 a) { return hn::IfThenElseZero(mask, a); }
 HWY_INLINE VectorU32 zeroingSelectedU32(MaskU32 mask, VectorU32 a) { return hn::IfThenZeroElse(mask, a); }
+HWY_INLINE VectorU32 bitwiseAndWhereU32(MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedAnd(mask, a, b); }
+HWY_INLINE VectorU32 bitwiseOrWhereU32(MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedOr(mask, a, b); }
+HWY_INLINE VectorU32 bitwiseXorWhereU32(MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedXor(mask, a, b); }
+HWY_INLINE VectorU32 bitwiseAndWhereOtherwiseU32(VectorU32 otherwise, MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU32 bitwiseOrWhereOtherwiseU32(VectorU32 otherwise, MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU32 bitwiseXorWhereOtherwiseU32(VectorU32 otherwise, MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
 HWY_INLINE MaskU32 firstLanesU32(size_t count) { return hn::FirstN(TagU32(), count); }
 HWY_INLINE bool allTrueU32(MaskU32 mask) { return hn::AllTrue(TagU32(), mask); }
 HWY_INLINE bool allFalseU32(MaskU32 mask) { return hn::AllFalse(TagU32(), mask); }
@@ -201,7 +234,13 @@ HWY_INLINE uint32_t largestU32(VectorU32 a) { return hn::ReduceMax(TagU32(), a);
 HWY_INLINE uint32_t firstLaneU32(VectorU32 a) { return hn::GetLane(a); }
 HWY_INLINE VectorU32 reversedU32(VectorU32 a) { return hn::Reverse(TagU32(), a); }
 HWY_INLINE VectorU32 slideUpLanesU32(VectorU32 a, size_t lanes) { return hn::SlideUpLanes(TagU32(), a, lanes); }
+HWY_INLINE VectorU32 slideUpLanesFillingWithU32(VectorU32 fill, VectorU32 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagU32(), a, lanes); }
+HWY_INLINE VectorU32 slideDownLanesU32(VectorU32 a, size_t lanes) { return hn::SlideDownLanes(TagU32(), a, lanes); }
+HWY_INLINE VectorU32 slideDownLanesFillingWithU32(VectorU32 fill, VectorU32 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagU32(), a, lanes); }
 HWY_INLINE VectorU32 slide1UpU32(VectorU32 a) { return hn::Slide1Up(TagU32(), a); }
+HWY_INLINE VectorU32 slide1UpFillingWithU32(uint32_t fill, VectorU32 a) { return hn::Slide1UpOr(fill, TagU32(), a); }
+HWY_INLINE VectorU32 slide1DownU32(VectorU32 a) { return hn::Slide1Down(TagU32(), a); }
+HWY_INLINE VectorU32 slide1DownFillingWithU32(uint32_t fill, VectorU32 a) { return hn::Slide1DownOr(fill, TagU32(), a); }
 HWY_INLINE void loadInterleaved2U32(const uint32_t* from, VectorU32& v0, VectorU32& v1) { hn::LoadInterleaved2(TagU32(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3U32(const uint32_t* from, VectorU32& v0, VectorU32& v1, VectorU32& v2) { hn::LoadInterleaved3(TagU32(), from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4U32(const uint32_t* from, VectorU32& v0, VectorU32& v1, VectorU32& v2, VectorU32& v3) { hn::LoadInterleaved4(TagU32(), from, v0, v1, v2, v3); }
@@ -241,6 +280,7 @@ HWY_INLINE VectorU64 bitwiseOrU64(VectorU64 a, VectorU64 b) { return hn::Or(a, b
 HWY_INLINE VectorU64 bitwiseXorU64(VectorU64 a, VectorU64 b) { return hn::Xor(a, b); }
 HWY_INLINE VectorU64 bitwiseNotU64(VectorU64 a) { return hn::Not(a); }
 HWY_INLINE VectorU64 bitwiseAndNotU64(VectorU64 a, VectorU64 b) { return hn::AndNot(a, b); }
+HWY_INLINE VectorU64 bitwiseAndXorU64(VectorU64 a, VectorU64 b, VectorU64 c) { return hn::AndXor(a, b, c); }
 HWY_INLINE VectorU64 shiftedLeftU64(VectorU64 a, int bits) { return hn::ShiftLeftSame(a, bits); }
 HWY_INLINE VectorU64 shiftedRightU64(VectorU64 a, int bits) { return hn::ShiftRightSame(a, bits); }
 HWY_INLINE MaskU64 equalToU64(VectorU64 a, VectorU64 b) { return hn::Eq(a, b); }
@@ -250,6 +290,14 @@ HWY_INLINE MaskU64 greaterThanU64(VectorU64 a, VectorU64 b) { return hn::Gt(a, b
 HWY_INLINE VectorU64 selectingU64(MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::IfThenElse(mask, a, b); }
 HWY_INLINE VectorU64 selectingOrZeroU64(MaskU64 mask, VectorU64 a) { return hn::IfThenElseZero(mask, a); }
 HWY_INLINE VectorU64 zeroingSelectedU64(MaskU64 mask, VectorU64 a) { return hn::IfThenZeroElse(mask, a); }
+HWY_INLINE VectorU64 bitwiseAndWhereU64(MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedAnd(mask, a, b); }
+HWY_INLINE VectorU64 bitwiseOrWhereU64(MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedOr(mask, a, b); }
+HWY_INLINE VectorU64 bitwiseXorWhereU64(MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedXor(mask, a, b); }
+HWY_INLINE VectorU64 bitwiseAndWhereOtherwiseU64(VectorU64 otherwise, MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU64 bitwiseOrWhereOtherwiseU64(VectorU64 otherwise, MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU64 bitwiseXorWhereOtherwiseU64(VectorU64 otherwise, MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
+HWY_INLINE VectorU64 multiplyAddingLow52BitsU64(VectorU64 a, VectorU64 b, VectorU64 c) { return hn::MulAdd52Lo(a, b, c); }
+HWY_INLINE VectorU64 multiplyAddingHigh52BitsU64(VectorU64 a, VectorU64 b, VectorU64 c) { return hn::MulAdd52Hi(a, b, c); }
 HWY_INLINE MaskU64 firstLanesU64(size_t count) { return hn::FirstN(TagU64(), count); }
 HWY_INLINE bool allTrueU64(MaskU64 mask) { return hn::AllTrue(TagU64(), mask); }
 HWY_INLINE bool allFalseU64(MaskU64 mask) { return hn::AllFalse(TagU64(), mask); }
@@ -261,7 +309,13 @@ HWY_INLINE uint64_t largestU64(VectorU64 a) { return hn::ReduceMax(TagU64(), a);
 HWY_INLINE uint64_t firstLaneU64(VectorU64 a) { return hn::GetLane(a); }
 HWY_INLINE VectorU64 reversedU64(VectorU64 a) { return hn::Reverse(TagU64(), a); }
 HWY_INLINE VectorU64 slideUpLanesU64(VectorU64 a, size_t lanes) { return hn::SlideUpLanes(TagU64(), a, lanes); }
+HWY_INLINE VectorU64 slideUpLanesFillingWithU64(VectorU64 fill, VectorU64 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagU64(), a, lanes); }
+HWY_INLINE VectorU64 slideDownLanesU64(VectorU64 a, size_t lanes) { return hn::SlideDownLanes(TagU64(), a, lanes); }
+HWY_INLINE VectorU64 slideDownLanesFillingWithU64(VectorU64 fill, VectorU64 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagU64(), a, lanes); }
 HWY_INLINE VectorU64 slide1UpU64(VectorU64 a) { return hn::Slide1Up(TagU64(), a); }
+HWY_INLINE VectorU64 slide1UpFillingWithU64(uint64_t fill, VectorU64 a) { return hn::Slide1UpOr(fill, TagU64(), a); }
+HWY_INLINE VectorU64 slide1DownU64(VectorU64 a) { return hn::Slide1Down(TagU64(), a); }
+HWY_INLINE VectorU64 slide1DownFillingWithU64(uint64_t fill, VectorU64 a) { return hn::Slide1DownOr(fill, TagU64(), a); }
 HWY_INLINE void loadInterleaved2U64(const uint64_t* from, VectorU64& v0, VectorU64& v1) { hn::LoadInterleaved2(TagU64(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3U64(const uint64_t* from, VectorU64& v0, VectorU64& v1, VectorU64& v2) { hn::LoadInterleaved3(TagU64(), from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4U64(const uint64_t* from, VectorU64& v0, VectorU64& v1, VectorU64& v2, VectorU64& v3) { hn::LoadInterleaved4(TagU64(), from, v0, v1, v2, v3); }
@@ -306,6 +360,7 @@ HWY_INLINE VectorI8 bitwiseOrI8(VectorI8 a, VectorI8 b) { return hn::Or(a, b); }
 HWY_INLINE VectorI8 bitwiseXorI8(VectorI8 a, VectorI8 b) { return hn::Xor(a, b); }
 HWY_INLINE VectorI8 bitwiseNotI8(VectorI8 a) { return hn::Not(a); }
 HWY_INLINE VectorI8 bitwiseAndNotI8(VectorI8 a, VectorI8 b) { return hn::AndNot(a, b); }
+HWY_INLINE VectorI8 bitwiseAndXorI8(VectorI8 a, VectorI8 b, VectorI8 c) { return hn::AndXor(a, b, c); }
 HWY_INLINE VectorI8 shiftedLeftI8(VectorI8 a, int bits) { return hn::ShiftLeftSame(a, bits); }
 HWY_INLINE VectorI8 shiftedRightI8(VectorI8 a, int bits) { return hn::ShiftRightSame(a, bits); }
 HWY_INLINE MaskI8 equalToI8(VectorI8 a, VectorI8 b) { return hn::Eq(a, b); }
@@ -315,6 +370,12 @@ HWY_INLINE MaskI8 greaterThanI8(VectorI8 a, VectorI8 b) { return hn::Gt(a, b); }
 HWY_INLINE VectorI8 selectingI8(MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::IfThenElse(mask, a, b); }
 HWY_INLINE VectorI8 selectingOrZeroI8(MaskI8 mask, VectorI8 a) { return hn::IfThenElseZero(mask, a); }
 HWY_INLINE VectorI8 zeroingSelectedI8(MaskI8 mask, VectorI8 a) { return hn::IfThenZeroElse(mask, a); }
+HWY_INLINE VectorI8 bitwiseAndWhereI8(MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedAnd(mask, a, b); }
+HWY_INLINE VectorI8 bitwiseOrWhereI8(MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedOr(mask, a, b); }
+HWY_INLINE VectorI8 bitwiseXorWhereI8(MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedXor(mask, a, b); }
+HWY_INLINE VectorI8 bitwiseAndWhereOtherwiseI8(VectorI8 otherwise, MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
+HWY_INLINE VectorI8 bitwiseOrWhereOtherwiseI8(VectorI8 otherwise, MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
+HWY_INLINE VectorI8 bitwiseXorWhereOtherwiseI8(VectorI8 otherwise, MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
 HWY_INLINE MaskI8 firstLanesI8(size_t count) { return hn::FirstN(TagI8(), count); }
 HWY_INLINE bool allTrueI8(MaskI8 mask) { return hn::AllTrue(TagI8(), mask); }
 HWY_INLINE bool allFalseI8(MaskI8 mask) { return hn::AllFalse(TagI8(), mask); }
@@ -323,7 +384,13 @@ HWY_INLINE intptr_t firstTrueIndexI8(MaskI8 mask) { return hn::FindFirstTrue(Tag
 HWY_INLINE int8_t firstLaneI8(VectorI8 a) { return hn::GetLane(a); }
 HWY_INLINE VectorI8 reversedI8(VectorI8 a) { return hn::Reverse(TagI8(), a); }
 HWY_INLINE VectorI8 slideUpLanesI8(VectorI8 a, size_t lanes) { return hn::SlideUpLanes(TagI8(), a, lanes); }
+HWY_INLINE VectorI8 slideUpLanesFillingWithI8(VectorI8 fill, VectorI8 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagI8(), a, lanes); }
+HWY_INLINE VectorI8 slideDownLanesI8(VectorI8 a, size_t lanes) { return hn::SlideDownLanes(TagI8(), a, lanes); }
+HWY_INLINE VectorI8 slideDownLanesFillingWithI8(VectorI8 fill, VectorI8 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagI8(), a, lanes); }
 HWY_INLINE VectorI8 slide1UpI8(VectorI8 a) { return hn::Slide1Up(TagI8(), a); }
+HWY_INLINE VectorI8 slide1UpFillingWithI8(int8_t fill, VectorI8 a) { return hn::Slide1UpOr(fill, TagI8(), a); }
+HWY_INLINE VectorI8 slide1DownI8(VectorI8 a) { return hn::Slide1Down(TagI8(), a); }
+HWY_INLINE VectorI8 slide1DownFillingWithI8(int8_t fill, VectorI8 a) { return hn::Slide1DownOr(fill, TagI8(), a); }
 HWY_INLINE VectorI8 tableLookupBytesI8(VectorI8 a, VectorI8 b) { return hn::TableLookupBytes(a, b); }
 HWY_INLINE void loadInterleaved2I8(const int8_t* from, VectorI8& v0, VectorI8& v1) { hn::LoadInterleaved2(TagI8(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3I8(const int8_t* from, VectorI8& v0, VectorI8& v1, VectorI8& v2) { hn::LoadInterleaved3(TagI8(), from, v0, v1, v2); }
@@ -364,6 +431,7 @@ HWY_INLINE VectorI16 bitwiseOrI16(VectorI16 a, VectorI16 b) { return hn::Or(a, b
 HWY_INLINE VectorI16 bitwiseXorI16(VectorI16 a, VectorI16 b) { return hn::Xor(a, b); }
 HWY_INLINE VectorI16 bitwiseNotI16(VectorI16 a) { return hn::Not(a); }
 HWY_INLINE VectorI16 bitwiseAndNotI16(VectorI16 a, VectorI16 b) { return hn::AndNot(a, b); }
+HWY_INLINE VectorI16 bitwiseAndXorI16(VectorI16 a, VectorI16 b, VectorI16 c) { return hn::AndXor(a, b, c); }
 HWY_INLINE VectorI16 shiftedLeftI16(VectorI16 a, int bits) { return hn::ShiftLeftSame(a, bits); }
 HWY_INLINE VectorI16 shiftedRightI16(VectorI16 a, int bits) { return hn::ShiftRightSame(a, bits); }
 HWY_INLINE MaskI16 equalToI16(VectorI16 a, VectorI16 b) { return hn::Eq(a, b); }
@@ -373,6 +441,12 @@ HWY_INLINE MaskI16 greaterThanI16(VectorI16 a, VectorI16 b) { return hn::Gt(a, b
 HWY_INLINE VectorI16 selectingI16(MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::IfThenElse(mask, a, b); }
 HWY_INLINE VectorI16 selectingOrZeroI16(MaskI16 mask, VectorI16 a) { return hn::IfThenElseZero(mask, a); }
 HWY_INLINE VectorI16 zeroingSelectedI16(MaskI16 mask, VectorI16 a) { return hn::IfThenZeroElse(mask, a); }
+HWY_INLINE VectorI16 bitwiseAndWhereI16(MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedAnd(mask, a, b); }
+HWY_INLINE VectorI16 bitwiseOrWhereI16(MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedOr(mask, a, b); }
+HWY_INLINE VectorI16 bitwiseXorWhereI16(MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedXor(mask, a, b); }
+HWY_INLINE VectorI16 bitwiseAndWhereOtherwiseI16(VectorI16 otherwise, MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
+HWY_INLINE VectorI16 bitwiseOrWhereOtherwiseI16(VectorI16 otherwise, MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
+HWY_INLINE VectorI16 bitwiseXorWhereOtherwiseI16(VectorI16 otherwise, MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
 HWY_INLINE MaskI16 firstLanesI16(size_t count) { return hn::FirstN(TagI16(), count); }
 HWY_INLINE bool allTrueI16(MaskI16 mask) { return hn::AllTrue(TagI16(), mask); }
 HWY_INLINE bool allFalseI16(MaskI16 mask) { return hn::AllFalse(TagI16(), mask); }
@@ -384,7 +458,13 @@ HWY_INLINE int16_t largestI16(VectorI16 a) { return hn::ReduceMax(TagI16(), a); 
 HWY_INLINE int16_t firstLaneI16(VectorI16 a) { return hn::GetLane(a); }
 HWY_INLINE VectorI16 reversedI16(VectorI16 a) { return hn::Reverse(TagI16(), a); }
 HWY_INLINE VectorI16 slideUpLanesI16(VectorI16 a, size_t lanes) { return hn::SlideUpLanes(TagI16(), a, lanes); }
+HWY_INLINE VectorI16 slideUpLanesFillingWithI16(VectorI16 fill, VectorI16 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagI16(), a, lanes); }
+HWY_INLINE VectorI16 slideDownLanesI16(VectorI16 a, size_t lanes) { return hn::SlideDownLanes(TagI16(), a, lanes); }
+HWY_INLINE VectorI16 slideDownLanesFillingWithI16(VectorI16 fill, VectorI16 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagI16(), a, lanes); }
 HWY_INLINE VectorI16 slide1UpI16(VectorI16 a) { return hn::Slide1Up(TagI16(), a); }
+HWY_INLINE VectorI16 slide1UpFillingWithI16(int16_t fill, VectorI16 a) { return hn::Slide1UpOr(fill, TagI16(), a); }
+HWY_INLINE VectorI16 slide1DownI16(VectorI16 a) { return hn::Slide1Down(TagI16(), a); }
+HWY_INLINE VectorI16 slide1DownFillingWithI16(int16_t fill, VectorI16 a) { return hn::Slide1DownOr(fill, TagI16(), a); }
 HWY_INLINE void loadInterleaved2I16(const int16_t* from, VectorI16& v0, VectorI16& v1) { hn::LoadInterleaved2(TagI16(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3I16(const int16_t* from, VectorI16& v0, VectorI16& v1, VectorI16& v2) { hn::LoadInterleaved3(TagI16(), from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4I16(const int16_t* from, VectorI16& v0, VectorI16& v1, VectorI16& v2, VectorI16& v3) { hn::LoadInterleaved4(TagI16(), from, v0, v1, v2, v3); }
@@ -424,6 +504,7 @@ HWY_INLINE VectorI32 bitwiseOrI32(VectorI32 a, VectorI32 b) { return hn::Or(a, b
 HWY_INLINE VectorI32 bitwiseXorI32(VectorI32 a, VectorI32 b) { return hn::Xor(a, b); }
 HWY_INLINE VectorI32 bitwiseNotI32(VectorI32 a) { return hn::Not(a); }
 HWY_INLINE VectorI32 bitwiseAndNotI32(VectorI32 a, VectorI32 b) { return hn::AndNot(a, b); }
+HWY_INLINE VectorI32 bitwiseAndXorI32(VectorI32 a, VectorI32 b, VectorI32 c) { return hn::AndXor(a, b, c); }
 HWY_INLINE VectorI32 shiftedLeftI32(VectorI32 a, int bits) { return hn::ShiftLeftSame(a, bits); }
 HWY_INLINE VectorI32 shiftedRightI32(VectorI32 a, int bits) { return hn::ShiftRightSame(a, bits); }
 HWY_INLINE MaskI32 equalToI32(VectorI32 a, VectorI32 b) { return hn::Eq(a, b); }
@@ -433,6 +514,12 @@ HWY_INLINE MaskI32 greaterThanI32(VectorI32 a, VectorI32 b) { return hn::Gt(a, b
 HWY_INLINE VectorI32 selectingI32(MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::IfThenElse(mask, a, b); }
 HWY_INLINE VectorI32 selectingOrZeroI32(MaskI32 mask, VectorI32 a) { return hn::IfThenElseZero(mask, a); }
 HWY_INLINE VectorI32 zeroingSelectedI32(MaskI32 mask, VectorI32 a) { return hn::IfThenZeroElse(mask, a); }
+HWY_INLINE VectorI32 bitwiseAndWhereI32(MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedAnd(mask, a, b); }
+HWY_INLINE VectorI32 bitwiseOrWhereI32(MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedOr(mask, a, b); }
+HWY_INLINE VectorI32 bitwiseXorWhereI32(MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedXor(mask, a, b); }
+HWY_INLINE VectorI32 bitwiseAndWhereOtherwiseI32(VectorI32 otherwise, MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
+HWY_INLINE VectorI32 bitwiseOrWhereOtherwiseI32(VectorI32 otherwise, MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
+HWY_INLINE VectorI32 bitwiseXorWhereOtherwiseI32(VectorI32 otherwise, MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
 HWY_INLINE MaskI32 firstLanesI32(size_t count) { return hn::FirstN(TagI32(), count); }
 HWY_INLINE bool allTrueI32(MaskI32 mask) { return hn::AllTrue(TagI32(), mask); }
 HWY_INLINE bool allFalseI32(MaskI32 mask) { return hn::AllFalse(TagI32(), mask); }
@@ -444,7 +531,13 @@ HWY_INLINE int32_t largestI32(VectorI32 a) { return hn::ReduceMax(TagI32(), a); 
 HWY_INLINE int32_t firstLaneI32(VectorI32 a) { return hn::GetLane(a); }
 HWY_INLINE VectorI32 reversedI32(VectorI32 a) { return hn::Reverse(TagI32(), a); }
 HWY_INLINE VectorI32 slideUpLanesI32(VectorI32 a, size_t lanes) { return hn::SlideUpLanes(TagI32(), a, lanes); }
+HWY_INLINE VectorI32 slideUpLanesFillingWithI32(VectorI32 fill, VectorI32 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagI32(), a, lanes); }
+HWY_INLINE VectorI32 slideDownLanesI32(VectorI32 a, size_t lanes) { return hn::SlideDownLanes(TagI32(), a, lanes); }
+HWY_INLINE VectorI32 slideDownLanesFillingWithI32(VectorI32 fill, VectorI32 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagI32(), a, lanes); }
 HWY_INLINE VectorI32 slide1UpI32(VectorI32 a) { return hn::Slide1Up(TagI32(), a); }
+HWY_INLINE VectorI32 slide1UpFillingWithI32(int32_t fill, VectorI32 a) { return hn::Slide1UpOr(fill, TagI32(), a); }
+HWY_INLINE VectorI32 slide1DownI32(VectorI32 a) { return hn::Slide1Down(TagI32(), a); }
+HWY_INLINE VectorI32 slide1DownFillingWithI32(int32_t fill, VectorI32 a) { return hn::Slide1DownOr(fill, TagI32(), a); }
 HWY_INLINE void loadInterleaved2I32(const int32_t* from, VectorI32& v0, VectorI32& v1) { hn::LoadInterleaved2(TagI32(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3I32(const int32_t* from, VectorI32& v0, VectorI32& v1, VectorI32& v2) { hn::LoadInterleaved3(TagI32(), from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4I32(const int32_t* from, VectorI32& v0, VectorI32& v1, VectorI32& v2, VectorI32& v3) { hn::LoadInterleaved4(TagI32(), from, v0, v1, v2, v3); }
@@ -486,6 +579,7 @@ HWY_INLINE VectorI64 bitwiseOrI64(VectorI64 a, VectorI64 b) { return hn::Or(a, b
 HWY_INLINE VectorI64 bitwiseXorI64(VectorI64 a, VectorI64 b) { return hn::Xor(a, b); }
 HWY_INLINE VectorI64 bitwiseNotI64(VectorI64 a) { return hn::Not(a); }
 HWY_INLINE VectorI64 bitwiseAndNotI64(VectorI64 a, VectorI64 b) { return hn::AndNot(a, b); }
+HWY_INLINE VectorI64 bitwiseAndXorI64(VectorI64 a, VectorI64 b, VectorI64 c) { return hn::AndXor(a, b, c); }
 HWY_INLINE VectorI64 shiftedLeftI64(VectorI64 a, int bits) { return hn::ShiftLeftSame(a, bits); }
 HWY_INLINE VectorI64 shiftedRightI64(VectorI64 a, int bits) { return hn::ShiftRightSame(a, bits); }
 HWY_INLINE MaskI64 equalToI64(VectorI64 a, VectorI64 b) { return hn::Eq(a, b); }
@@ -495,6 +589,12 @@ HWY_INLINE MaskI64 greaterThanI64(VectorI64 a, VectorI64 b) { return hn::Gt(a, b
 HWY_INLINE VectorI64 selectingI64(MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::IfThenElse(mask, a, b); }
 HWY_INLINE VectorI64 selectingOrZeroI64(MaskI64 mask, VectorI64 a) { return hn::IfThenElseZero(mask, a); }
 HWY_INLINE VectorI64 zeroingSelectedI64(MaskI64 mask, VectorI64 a) { return hn::IfThenZeroElse(mask, a); }
+HWY_INLINE VectorI64 bitwiseAndWhereI64(MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedAnd(mask, a, b); }
+HWY_INLINE VectorI64 bitwiseOrWhereI64(MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedOr(mask, a, b); }
+HWY_INLINE VectorI64 bitwiseXorWhereI64(MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedXor(mask, a, b); }
+HWY_INLINE VectorI64 bitwiseAndWhereOtherwiseI64(VectorI64 otherwise, MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
+HWY_INLINE VectorI64 bitwiseOrWhereOtherwiseI64(VectorI64 otherwise, MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
+HWY_INLINE VectorI64 bitwiseXorWhereOtherwiseI64(VectorI64 otherwise, MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
 HWY_INLINE MaskI64 firstLanesI64(size_t count) { return hn::FirstN(TagI64(), count); }
 HWY_INLINE bool allTrueI64(MaskI64 mask) { return hn::AllTrue(TagI64(), mask); }
 HWY_INLINE bool allFalseI64(MaskI64 mask) { return hn::AllFalse(TagI64(), mask); }
@@ -506,7 +606,13 @@ HWY_INLINE int64_t largestI64(VectorI64 a) { return hn::ReduceMax(TagI64(), a); 
 HWY_INLINE int64_t firstLaneI64(VectorI64 a) { return hn::GetLane(a); }
 HWY_INLINE VectorI64 reversedI64(VectorI64 a) { return hn::Reverse(TagI64(), a); }
 HWY_INLINE VectorI64 slideUpLanesI64(VectorI64 a, size_t lanes) { return hn::SlideUpLanes(TagI64(), a, lanes); }
+HWY_INLINE VectorI64 slideUpLanesFillingWithI64(VectorI64 fill, VectorI64 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagI64(), a, lanes); }
+HWY_INLINE VectorI64 slideDownLanesI64(VectorI64 a, size_t lanes) { return hn::SlideDownLanes(TagI64(), a, lanes); }
+HWY_INLINE VectorI64 slideDownLanesFillingWithI64(VectorI64 fill, VectorI64 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagI64(), a, lanes); }
 HWY_INLINE VectorI64 slide1UpI64(VectorI64 a) { return hn::Slide1Up(TagI64(), a); }
+HWY_INLINE VectorI64 slide1UpFillingWithI64(int64_t fill, VectorI64 a) { return hn::Slide1UpOr(fill, TagI64(), a); }
+HWY_INLINE VectorI64 slide1DownI64(VectorI64 a) { return hn::Slide1Down(TagI64(), a); }
+HWY_INLINE VectorI64 slide1DownFillingWithI64(int64_t fill, VectorI64 a) { return hn::Slide1DownOr(fill, TagI64(), a); }
 HWY_INLINE void loadInterleaved2I64(const int64_t* from, VectorI64& v0, VectorI64& v1) { hn::LoadInterleaved2(TagI64(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3I64(const int64_t* from, VectorI64& v0, VectorI64& v1, VectorI64& v2) { hn::LoadInterleaved3(TagI64(), from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4I64(const int64_t* from, VectorI64& v0, VectorI64& v1, VectorI64& v2, VectorI64& v3) { hn::LoadInterleaved4(TagI64(), from, v0, v1, v2, v3); }
@@ -562,11 +668,19 @@ HWY_INLINE size_t trueCountF32(MaskF32 mask) { return hn::CountTrue(TagF32(), ma
 HWY_INLINE intptr_t firstTrueIndexF32(MaskF32 mask) { return hn::FindFirstTrue(TagF32(), mask); }
 HWY_INLINE float sumF32(VectorF32 a) { return hn::ReduceSum(TagF32(), a); }
 HWY_INLINE float smallestF32(VectorF32 a) { return hn::ReduceMin(TagF32(), a); }
+HWY_INLINE float smallestOrNaNF32(VectorF32 a) { return hn::ReduceMinOrNaN(TagF32(), a); }
 HWY_INLINE float largestF32(VectorF32 a) { return hn::ReduceMax(TagF32(), a); }
+HWY_INLINE float largestOrNaNF32(VectorF32 a) { return hn::ReduceMaxOrNaN(TagF32(), a); }
 HWY_INLINE float firstLaneF32(VectorF32 a) { return hn::GetLane(a); }
 HWY_INLINE VectorF32 reversedF32(VectorF32 a) { return hn::Reverse(TagF32(), a); }
 HWY_INLINE VectorF32 slideUpLanesF32(VectorF32 a, size_t lanes) { return hn::SlideUpLanes(TagF32(), a, lanes); }
+HWY_INLINE VectorF32 slideUpLanesFillingWithF32(VectorF32 fill, VectorF32 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagF32(), a, lanes); }
+HWY_INLINE VectorF32 slideDownLanesF32(VectorF32 a, size_t lanes) { return hn::SlideDownLanes(TagF32(), a, lanes); }
+HWY_INLINE VectorF32 slideDownLanesFillingWithF32(VectorF32 fill, VectorF32 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagF32(), a, lanes); }
 HWY_INLINE VectorF32 slide1UpF32(VectorF32 a) { return hn::Slide1Up(TagF32(), a); }
+HWY_INLINE VectorF32 slide1UpFillingWithF32(float fill, VectorF32 a) { return hn::Slide1UpOr(fill, TagF32(), a); }
+HWY_INLINE VectorF32 slide1DownF32(VectorF32 a) { return hn::Slide1Down(TagF32(), a); }
+HWY_INLINE VectorF32 slide1DownFillingWithF32(float fill, VectorF32 a) { return hn::Slide1DownOr(fill, TagF32(), a); }
 HWY_INLINE void loadInterleaved2F32(const float* from, VectorF32& v0, VectorF32& v1) { hn::LoadInterleaved2(TagF32(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3F32(const float* from, VectorF32& v0, VectorF32& v1, VectorF32& v2) { hn::LoadInterleaved3(TagF32(), from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4F32(const float* from, VectorF32& v0, VectorF32& v1, VectorF32& v2, VectorF32& v3) { hn::LoadInterleaved4(TagF32(), from, v0, v1, v2, v3); }
@@ -616,11 +730,19 @@ HWY_INLINE size_t trueCountF64(MaskF64 mask) { return hn::CountTrue(TagF64(), ma
 HWY_INLINE intptr_t firstTrueIndexF64(MaskF64 mask) { return hn::FindFirstTrue(TagF64(), mask); }
 HWY_INLINE double sumF64(VectorF64 a) { return hn::ReduceSum(TagF64(), a); }
 HWY_INLINE double smallestF64(VectorF64 a) { return hn::ReduceMin(TagF64(), a); }
+HWY_INLINE double smallestOrNaNF64(VectorF64 a) { return hn::ReduceMinOrNaN(TagF64(), a); }
 HWY_INLINE double largestF64(VectorF64 a) { return hn::ReduceMax(TagF64(), a); }
+HWY_INLINE double largestOrNaNF64(VectorF64 a) { return hn::ReduceMaxOrNaN(TagF64(), a); }
 HWY_INLINE double firstLaneF64(VectorF64 a) { return hn::GetLane(a); }
 HWY_INLINE VectorF64 reversedF64(VectorF64 a) { return hn::Reverse(TagF64(), a); }
 HWY_INLINE VectorF64 slideUpLanesF64(VectorF64 a, size_t lanes) { return hn::SlideUpLanes(TagF64(), a, lanes); }
+HWY_INLINE VectorF64 slideUpLanesFillingWithF64(VectorF64 fill, VectorF64 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagF64(), a, lanes); }
+HWY_INLINE VectorF64 slideDownLanesF64(VectorF64 a, size_t lanes) { return hn::SlideDownLanes(TagF64(), a, lanes); }
+HWY_INLINE VectorF64 slideDownLanesFillingWithF64(VectorF64 fill, VectorF64 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagF64(), a, lanes); }
 HWY_INLINE VectorF64 slide1UpF64(VectorF64 a) { return hn::Slide1Up(TagF64(), a); }
+HWY_INLINE VectorF64 slide1UpFillingWithF64(double fill, VectorF64 a) { return hn::Slide1UpOr(fill, TagF64(), a); }
+HWY_INLINE VectorF64 slide1DownF64(VectorF64 a) { return hn::Slide1Down(TagF64(), a); }
+HWY_INLINE VectorF64 slide1DownFillingWithF64(double fill, VectorF64 a) { return hn::Slide1DownOr(fill, TagF64(), a); }
 HWY_INLINE void loadInterleaved2F64(const double* from, VectorF64& v0, VectorF64& v1) { hn::LoadInterleaved2(TagF64(), from, v0, v1); }
 HWY_INLINE void loadInterleaved3F64(const double* from, VectorF64& v0, VectorF64& v1, VectorF64& v2) { hn::LoadInterleaved3(TagF64(), from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4F64(const double* from, VectorF64& v0, VectorF64& v1, VectorF64& v2, VectorF64& v3) { hn::LoadInterleaved4(TagF64(), from, v0, v1, v2, v3); }

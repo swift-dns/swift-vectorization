@@ -75,9 +75,14 @@ out-of-range inputs, so the ops behave like highway's. `HighwayReference/` holds
 and generated tests that compare every op with highway's, lane for lane, on NEON, SSE2, SSSE3, SSE4
 and highway's EMU128.
 
-The one deliberate difference is `firstLanes(count:)` on NEON, which selects every lane for any
-count of at least `laneCount`, as highway's x86 and EMU128 ops do. Highway's NEON op wraps counts
-above the lane type's signed maximum.
+Two differences are deliberate:
+
+- `firstLanes(count:)` on NEON selects every lane for any count of at least `laneCount`, as
+  highway's x86 and EMU128 ops do. Highway's NEON op wraps counts above the lane type's signed
+  maximum.
+- The slide ops' `by:` forms trap on lane amounts outside `0...laneCount`, and their `@unsafe`
+  `byUnchecked:` forms only assert it. Above `laneCount`, highway's NEON ops read their index
+  tables out of bounds.
 
 ## What is not wrapped
 

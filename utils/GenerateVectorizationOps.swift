@@ -140,6 +140,22 @@ enum Parameter {
     case shiftAmount
     case laneAmount
     case outVector
+    case fillVector
+    case fillLane
+    case whereMask
+    case otherwiseVector
+
+    /// The label of a parameter that only some overloads of an op take, and its rank among such
+    /// parameters. Highway takes them first, as in `SlideUpLanesOr(lo, d, hi, amt)`, while Swift
+    /// declares them after the ordinary ones, the lowest rank first.
+    var overloading: (label: String, rank: Int)? {
+        switch self {
+        case .fillVector, .fillLane: return ("fillingWith", 1)
+        case .whereMask: return ("where", 1)
+        case .otherwiseVector: return ("otherwise", 2)
+        default: return nil
+        }
+    }
 }
 
 enum ReturnType {
@@ -201,6 +217,39 @@ struct Op {
         self.targets = targets
         self.helpers = helpers
         self.portable = portable
+    }
+
+    var operands: [Parameter] {
+        parameters.filter { $0 != .tag }
+    }
+
+    /// The positions in `operands` of the parameters in the order Swift declares them.
+    var swiftOrder: [Int] {
+        let operands = self.operands
+        return operands.indices.sorted {
+            (operands[$0].overloading?.rank ?? 0, $0) < (operands[$1].overloading?.rank ?? 0, $1)
+        }
+    }
+
+    /// `values`, one per operand in Highway's order, in the order Swift declares them.
+    func swiftOrdered<Value>(_ values: [Value]) -> [Value] {
+        swiftOrder.map { values[$0] }
+    }
+
+    /// `values`, one per operand in Swift's order, in the order Highway takes them.
+    func highwayOrdered<Value>(_ values: [Value]) -> [Value] {
+        var ordered = values
+        for (position, index) in swiftOrder.enumerated() {
+            ordered[index] = values[position]
+        }
+        return ordered
+    }
+
+    /// What tells this op from the overloads that share its `swiftName`, which the names of its
+    /// C, reference and test functions are made of.
+    var identifier: String {
+        let labels = swiftOrdered(operands).compactMap { $0.overloading?.label }
+        return swiftName + labels.map(uppercasedFirst).joined()
     }
 }
 
@@ -313,34 +362,113 @@ func elementwiseExtremum(_ name: String, comparing symbol: String, for element: 
         """
 }
 
+func highestValue(of element: Element) -> String {
+    switch element.category {
+    case .float: return infinity(of: element)
+    case .signedInteger: return "INT\(element.bits)_MAX"
+    case .unsignedInteger: return "UINT\(element.bits)_MAX"
+    }
+}
+
+func lowestValue(of element: Element) -> String {
+    switch element.category {
+    case .float: return "-\(infinity(of: element))"
+    case .signedInteger: return "INT\(element.bits)_MIN"
+    case .unsignedInteger: return "0"
+    }
+}
+
+func reducedSum(for element: Element) -> String {
+    let isSigned = element.category == .signedInteger
+    let accumulator = isSigned ? element.cUnsignedLane : element.cType
+    return """
+        \(accumulator) sum = 0;
+        for (size_t i = 0; i < \(element.laneCount); ++i) {
+          sum += a[i];
+        }
+        return \(isSigned ? "(\(element.cType))sum" : "sum");
+        """
+}
+
 func reducedExtremum(
-    _ name: String,
     comparing symbol: String,
     from start: String,
     for element: Element
 ) -> String {
-    guard element.category == .float else { return "return __builtin_reduce_\(name)(a);" }
+    """
+    \(element.cType) result = \(start);
+    for (size_t i = 0; i < \(element.laneCount); ++i) {
+      result = result \(symbol) a[i] ? result : a[i];
+    }
+    return result;
+    """
+}
+
+func builtinReduction(_ name: String) -> String {
+    "return __builtin_reduce_\(name)(a);"
+}
+
+func shiftedWithinWidth(_ symbol: String, for element: Element) -> String {
+    let lane = element.cUnsignedLane
+    let width = element.bits
+    let inRange = splat("inRange", as: element.cUnsignedVector, lanes: element.laneCount)
+    let shifted = "\(unsignedBits("a", of: element)) \(symbol) (bits & \(width - 1))"
     return """
-        \(element.cType) result = \(start);
-        for (size_t i = 0; i < \(element.laneCount); ++i) {
-          result = result \(symbol) a[i] ? result : a[i];
-        }
-        return result;
+        const \(lane) inRange = (\(lane))0 - (\(lane))((unsigned)bits < \(width));
+        \(vectorResult(fromUnsignedBits("(\(shifted)) & \(inRange)", of: element), for: element))
         """
 }
 
-func interleavedIndex(_ channel: Int, of channels: Int) -> String {
-    channel == 0 ? "\(channels) * i" : "\(channels) * i + \(channel)"
+func scalarNaN(of element: Element) -> String {
+    let bits = (UInt64(1) << UInt64(element.bits - 1)) - 1
+    let literal = "(\(element.cUnsignedLane))0x\(String(bits, radix: 16))"
+    return "__builtin_bit_cast(\(element.cType), \(literal))"
+}
+
+func reducedExtremumOrNaN(_ name: String, isNaN: String, for element: Element) -> String {
+    let allFalse = cFunctionName("allFalse", element)
+    let extremum = cFunctionName(name, element)
+    let hasNoNaN = "\(allFalse)((\(element.cRawMask))\(isNaN))"
+    return "return \(hasNoNaN) ? \(extremum)(\(rawName("a"))) : \(scalarNaN(of: element));"
+}
+
+func assumedAligned(_ pointer: String) -> String {
+    "__builtin_assume_aligned(\(pointer), 16)"
+}
+
+func loadedVector(from pointer: String, for element: Element) -> String {
+    """
+    \(element.cVector) v;
+    __builtin_memcpy(&v, \(pointer), sizeof v);
+    \(vectorResult("v", for: element))
+    """
+}
+
+func storedVector(to pointer: String) -> String {
+    "__builtin_memcpy(\(pointer), &a, sizeof a);"
+}
+
+func zeroedVector(of type: String) -> String {
+    """
+    \(type) v;
+    __builtin_memset(&v, 0, sizeof v);
+    """
 }
 
 func loadInterleaved(channels: Int, for element: Element) -> String {
-    let names = (0..<channels).map { "r\($0)" }
-    let loads = names.enumerated().map { channel, name in
-        "  \(name)[i] = from[\(interleavedIndex(channel, of: channels))];"
+    let names = (0..<channels).map { "buf\($0)" }
+    let declarations = names.map {
+        "\(element.cType) \($0)[\(element.laneCount)] __attribute__((aligned(16)));"
     }
-    let stores = names.indices.map { "*v\($0) = r\($0);" }
+    let loads = names.map { "  \($0)[i] = *from++;" }
+    let load = cFunctionName("loadAligned", element)
+    let stores = names.enumerated().map { channel, name in
+        element.bits >= 32
+            ? "__builtin_memcpy(v\(channel), \(name), sizeof *v\(channel));"
+            : "*v\(channel) = (\(element.cVector))\(load)(\(name));"
+    }
     return """
-        \(element.cVector) \(names.joined(separator: ", "));
+        \(declarations.joined(separator: "\n"))
         for (size_t i = 0; i < \(element.laneCount); ++i) {
         \(loads.joined(separator: "\n"))
         }
@@ -349,10 +477,11 @@ func loadInterleaved(channels: Int, for element: Element) -> String {
 }
 
 func storeInterleaved(channels: Int, for element: Element) -> String {
-    let stores = ["a", "b", "c", "d"].prefix(channels).enumerated().map { channel, name in
-        "  to[\(interleavedIndex(channel, of: channels))] = \(name)[i];"
+    let stores = ["a", "b", "c", "d"].prefix(channels).map { name in
+        "  *to++ = \(name)[i];"
     }
     return """
+        #pragma clang loop unroll(full)
         for (size_t i = 0; i < \(element.laneCount); ++i) {
         \(stores.joined(separator: "\n"))
         }
@@ -522,6 +651,15 @@ func neonTableLookup(_ bytes: String, _ indices: String, for element: Element) -
     neonBuiltin("vqtbl1q_v", [bytes, indices], code: 48, for: element)
 }
 
+func neonTwoTablesLookup(
+    _ first: String,
+    _ second: String,
+    _ indices: String,
+    for element: Element
+) -> String {
+    neonBuiltin("vqtbl2q_v", [first, second, indices], code: 48, for: element)
+}
+
 let neonNibbles = """
     typedef uint16_t wide_vector __attribute__((vector_size(16)));
     typedef uint8_t narrow_vector __attribute__((vector_size(8)));
@@ -536,17 +674,15 @@ func neonFirstTrueIndex(for element: Element) -> String {
     """
 }
 
-func neonSlide1Up(for element: Element) -> String {
-    let lanes = element.laneCount
-    let zero = compoundLiteral(element.cVector, ["0"])
-    let indices = laneIndices(lanes - 1..<2 * lanes - 1)
-    return vectorResult("__builtin_shufflevector(\(zero), a, \(indices))", for: element)
-}
-
 enum X86Level: Comparable {
     case sse2
     case ssse3
     case sse4
+}
+
+enum SlideDirection: String {
+    case up
+    case down
 }
 
 enum Reduction {
@@ -712,6 +848,10 @@ func x86Extremum(
     for element: Element
 ) -> String {
     "__builtin_ia32_\(name)\(element.bits == 32 ? "ps" : "pd")(\(first), \(second))"
+}
+
+func x86IsNaN(for element: Element) -> String {
+    "__builtin_ia32_cmp\(element.bits == 32 ? "ps" : "pd")(a, a, 3)"
 }
 
 func x86CombiningFunctionName(_ reduction: Reduction, _ element: Element) -> String {
@@ -955,13 +1095,30 @@ func x86TableLookup(_ bytes: String, _ indices: String, for element: Element) ->
     x86Builtin("pshufb128", [bytes, indices], as: "i8", returning: element.cVector)
 }
 
-func slideUpConstants(for element: Element) -> String {
+func slideShuffle(_ direction: SlideDirection, by amount: Int, for element: Element) -> String {
     let lanes = element.laneCount
     let zero = compoundLiteral(element.cVector, ["0"])
-    let cases = (1..<lanes).map { amount in
+    switch direction {
+    case .up:
         let indices = laneIndices(lanes - amount..<2 * lanes - amount)
-        let shifted = vectorResult("__builtin_shufflevector(\(zero), a, \(indices))", for: element)
-        return "case \(amount): \(shifted)"
+        return "__builtin_shufflevector(\(zero), a, \(indices))"
+    case .down:
+        let indices = laneIndices(amount..<lanes + amount)
+        return "__builtin_shufflevector(a, \(zero), \(indices))"
+    }
+}
+
+func slideConstants(
+    _ direction: SlideDirection,
+    byteShifted: Bool = false,
+    for element: Element
+) -> String {
+    let cases = (1..<element.laneCount).map { amount in
+        let shuffle =
+            byteShifted
+            ? x86SlideBytes(direction, by: amount, for: element)
+            : slideShuffle(direction, by: amount, for: element)
+        return "case \(amount): \(vectorResult(shuffle, for: element))"
     }
     let unshifted = "case 0: \(vectorResult("a", for: element))"
     return """
@@ -973,31 +1130,71 @@ func slideUpConstants(for element: Element) -> String {
         """
 }
 
-func slideUpIndices(for element: Element) -> String {
+let neonSlideTableName = "cvectorization_ops_neon_slide_table"
+
+func neonSlideIndices(_ direction: SlideDirection, for element: Element) -> String {
     let bytes = "cvectorization_ops_vector_u8"
-    let first = splat("first", as: bytes, lanes: 16)
+    let offset = direction == .up ? "-" : "+"
     return """
-        const uint8_t first = (uint8_t)(0 - lanes * sizeof(\(element.cType)));
-        const \(bytes) indices = \(first) + \(iota(as: bytes, lanes: 16));
+        \(bytes) indices;
+        __builtin_memcpy(&indices, \(neonSlideTableName)() + 16 \(offset) lanes * sizeof(\(element.cType)), sizeof indices);
         """
 }
 
-func x86SlideUp(for element: Element) -> String {
+func x86SlideIndices(_ direction: SlideDirection, for element: Element) -> String {
+    switch direction {
+    case .up:
+        let bytes = "cvectorization_ops_vector_u8"
+        let first = splat("first", as: bytes, lanes: 16)
+        return """
+            const uint8_t first = (uint8_t)(0 - lanes * sizeof(\(element.cType)));
+            const \(bytes) indices = \(first) + \(iota(as: bytes, lanes: 16));
+            """
+    case .down:
+        let bytes = x86Vector("i8")
+        let first = splat("first", as: bytes, lanes: 16)
+        let limit = splat("15", as: bytes, lanes: 16)
+        return """
+            const int8_t first = (int8_t)(lanes * sizeof(\(element.cType)));
+            const \(bytes) offsets = \(first) + \(iota(as: bytes, lanes: 16));
+            const \(bytes) indices = offsets | (offsets > \(limit));
+            """
+    }
+}
+
+func x86ByteShift(_ direction: SlideDirection, _ operand: String, by bytes: Int) -> String {
+    let name = direction == .up ? "pslldqi128" : "psrldqi128"
+    return "__builtin_ia32_\(name)_byteshift(\(operand), \(bytes))"
+}
+
+func x86SlideBytes(_ direction: SlideDirection, by lanes: Int, for element: Element) -> String {
+    let shifted = x86ByteShift(direction, "(\(x86Vector("i64")))a", by: lanes * element.bits / 8)
+    return "(\(element.cVector))\(shifted)"
+}
+
+func x86Slide(_ direction: SlideDirection, for element: Element) -> String {
     let vector = x86Vector("i64")
     let selected = compoundLiteral(x86Vector("i32"), Array(repeating: "selected", count: 4))
-    let left = x86ShiftSame(
-        "psll",
-        "high",
+    let (own, ownShift, other, otherShift) =
+        switch direction {
+        case .up: ("high", "psll", "low", "psrl")
+        case .down: ("low", "psrl", "high", "psll")
+        }
+    let shiftedOwn = "shifted\(uppercasedFirst(own))"
+    let shiftedOther = "shifted\(uppercasedFirst(other))"
+    let ownShifted = x86ShiftSame(
+        ownShift,
+        own,
         by: "shift",
-        into: "shiftedHigh",
+        into: shiftedOwn,
         laneBits: 64,
         returning: vector
     )
-    let right = x86ShiftSame(
-        "psrl",
-        "low",
+    let otherShifted = x86ShiftSame(
+        otherShift,
+        other,
         by: "64 - shift",
-        into: "shiftedLow",
+        into: shiftedOther,
         laneBits: 64,
         returning: vector
     )
@@ -1005,14 +1202,217 @@ func x86SlideUp(for element: Element) -> String {
         const int selected = -(int)(lanes >= \(element.laneCount / 2));
         const \(vector) mask = (\(vector))\(selected);
         const \(vector) whole = (\(vector))a;
-        const \(vector) moved = __builtin_ia32_pslldqi128_byteshift(whole, 8);
-        const \(vector) high = (mask & moved) | (~mask & whole);
-        const \(vector) low = __builtin_ia32_pslldqi128_byteshift(high, 8);
+        const \(vector) moved = \(x86ByteShift(direction, "whole", by: 8));
+        const \(vector) \(own) = (mask & moved) | (~mask & whole);
+        const \(vector) \(other) = \(x86ByteShift(direction, own, by: 8));
         const int shift = (int)((lanes * \(element.bits)) & 63);
-        \(left)
-        \(right)
-        \(vectorResult("(\(element.cVector))(shiftedHigh | shiftedLow)", for: element))
+        \(ownShifted)
+        \(otherShifted)
+        \(vectorResult("(\(element.cVector))(\(shiftedOwn) | \(shiftedOther))", for: element))
         """
+}
+
+func slideTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
+    TargetBodies(
+        neon: { element in
+            """
+            \(slideConstants(direction, for: element))
+            \(neonSlideIndices(direction, for: element))
+            \(vectorResult(neonTableLookup("a", "indices", for: element), for: element))
+            """
+        },
+        ssse3: { element in
+            """
+            \(slideConstants(direction, for: element))
+            \(x86SlideIndices(direction, for: element))
+            \(vectorResult(x86TableLookup("a", "indices", for: element), for: element))
+            """
+        },
+        sse2: { element in
+            """
+            \(slideConstants(direction, for: element))
+            \(x86Slide(direction, for: element))
+            """
+        }
+    )
+}
+
+func portableSlideCopy(
+    _ direction: SlideDirection,
+    by lanes: String,
+    for element: Element
+) -> String {
+    let lane = element.cType
+    let (destination, source) =
+        switch direction {
+        case .up: ("(\(lane)*)&result + \(lanes)", "&a")
+        case .down: ("&result", "(const \(lane)*)&a + \(lanes)")
+        }
+    let kept = "(\(element.laneCount) - \(lanes)) * sizeof(\(lane))"
+    return "__builtin_memcpy(\(destination), \(source), \(kept));"
+}
+
+func portableSlide(_ direction: SlideDirection, for element: Element) -> String {
+    let lanes = element.laneCount
+    return """
+        \(element.cVector) result = {0};
+        const size_t clamped = lanes < \(lanes) ? lanes : \(lanes);
+        \(portableSlideCopy(direction, by: "clamped", for: element))
+        \(vectorResult("result", for: element))
+        """
+}
+
+func portableSlide1(_ direction: SlideDirection, for element: Element) -> String {
+    """
+    \(element.cVector) result = {0};
+    \(portableSlideCopy(direction, by: "1", for: element))
+    \(vectorResult("result", for: element))
+    """
+}
+
+func shuffledSlide1(_ direction: SlideDirection, for element: Element) -> String {
+    vectorResult(slideShuffle(direction, by: 1, for: element), for: element)
+}
+
+func neonSlideFillingTableName(_ direction: SlideDirection) -> String {
+    "cvectorization_ops_neon_slide_\(direction.rawValue)_or_table"
+}
+
+func neonSlideFillingTable(_ direction: SlideDirection) -> [Int] {
+    (0...16).flatMap { shift in
+        (0..<16).map { byte in
+            switch direction {
+            case .up: return byte < shift ? byte : 16 + byte - shift
+            case .down: return byte + shift < 16 ? 16 + byte + shift : byte
+            }
+        }
+    }
+}
+
+func neonSlideFillingIndices(_ direction: SlideDirection, for element: Element) -> String {
+    let bytes = "cvectorization_ops_vector_u8"
+    return """
+        \(bytes) indices;
+        __builtin_memcpy(&indices, \(neonSlideFillingTableName(direction))() + 16 * lanes * sizeof(\(element.cType)), sizeof indices);
+        """
+}
+
+func slideLanesName(_ direction: SlideDirection, for element: Element) -> String {
+    cFunctionName("slide\(uppercasedFirst(direction.rawValue))Lanes", element)
+}
+
+func slideFilling(
+    _ direction: SlideDirection,
+    sliding slide: String,
+    for element: Element
+) -> String {
+    let raw = element.cRawVector
+    let slid = "\(slide)((\(raw))a, lanes)"
+    let filled = "(\(raw))fill"
+    let (count, yes, no) =
+        switch direction {
+        case .up: ("lanes", filled, slid)
+        case .down: ("\(element.laneCount) - lanes", slid, filled)
+        }
+    let mask = "\(cFunctionName("firstLanes", element))(\(count))"
+    return "return \(cFunctionName("selecting", element))(\(mask), \(yes), \(no));"
+}
+
+func neonSlideFilling(_ direction: SlideDirection, for element: Element) -> String {
+    let slide = slideLanesName(direction, for: element)
+    let lookup = neonTwoTablesLookup("fill", "a", "indices", for: element)
+    return """
+        if (__builtin_constant_p(lanes)) {
+        \(indented(slideFilling(direction, sliding: slide, for: element)))
+        }
+        \(neonSlideFillingIndices(direction, for: element))
+        \(vectorResult(lookup, for: element))
+        """
+}
+
+func x86SlideLanesName(_ direction: SlideDirection, for element: Element) -> String {
+    "cvectorization_ops_x86_slide_\(direction.rawValue)_lanes_\(element.cSuffix)"
+}
+
+func x86SlideLanes(_ direction: SlideDirection, for element: Element) -> String {
+    let function = cFunction(
+        returns: element.cRawVector,
+        name: x86SlideLanesName(direction, for: element),
+        parameters: ["\(element.cRawVector) rawA", "size_t lanes"],
+        body: """
+            const \(element.cVector) a = (\(element.cVector))rawA;
+            \(slideConstants(direction, byteShifted: true, for: element))
+            return \(slideLanesName(direction, for: element))(rawA, lanes);
+            """
+    )
+    return function.trimmingCharacters(in: .newlines)
+}
+
+func slideFillingTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
+    TargetBodies(
+        neon: { element in neonSlideFilling(direction, for: element) },
+        sse4: { element in
+            slideFilling(direction, sliding: slideLanesName(direction, for: element), for: element)
+        },
+        sse2: { element in
+            slideFilling(
+                direction,
+                sliding: x86SlideLanesName(direction, for: element),
+                for: element
+            )
+        }
+    )
+}
+
+func slide1FillingLane(_ direction: SlideDirection, for element: Element) -> Int {
+    direction == .up ? 0 : element.laneCount - 1
+}
+
+func slideFilledLane(_ vector: String, _ lane: Int, for element: Element) -> String {
+    """
+    \(element.cVector) result = \(vector);
+    result[\(lane)] = fill;
+    \(vectorResult("result", for: element))
+    """
+}
+
+func slide1Filling(_ direction: SlideDirection, for element: Element) -> String {
+    let slide = cFunctionName("slide1\(uppercasedFirst(direction.rawValue))", element)
+    let slid = "(\(element.cVector))\(slide)((\(element.cRawVector))a)"
+    return slideFilledLane(slid, slide1FillingLane(direction, for: element), for: element)
+}
+
+func x86Slide1Filling(
+    _ direction: SlideDirection,
+    level: X86Level,
+    for element: Element
+) -> String {
+    let lane = slide1FillingLane(direction, for: element)
+    let shifted = x86SlideBytes(direction, by: 1, for: element)
+    guard level < .sse4 else { return slideFilledLane(shifted, lane, for: element) }
+    let raw = element.cRawVector
+    if element.bits == 8 || isInteger32(element) || isFloat32(element) {
+        let mask = "(\(raw))\(laneMask(lane, for: element))"
+        let filled = "\(cFunctionName("repeating", element))(fill)"
+        let selected = cFunctionName("selecting", element)
+        return "return \(selected)(\(mask), \(filled), (\(raw))\(shifted));"
+    }
+    guard isInteger64(element) else { return slideFilledLane(shifted, lane, for: element) }
+    let (f64, i64) = (x86Vector("f64"), x86Vector("i64"))
+    let asFloat = x86AsFloatName(bits: 64)
+    let operands = lane == 0 ? "inserted, whole, 0, 3" : "whole, inserted, 0, 2"
+    return """
+        const \(f64) inserted = \(asFloat)((\(i64))\(cFunctionName("repeating", element))(fill));
+        const \(f64) whole = \(asFloat)((\(i64))\(shifted));
+        \(vectorResult("__builtin_shufflevector(\(operands))", for: element))
+        """
+}
+
+func slide1FillingTargets(_ direction: SlideDirection) -> TargetBodies<Element> {
+    TargetBodies(
+        sse4: { element in x86Slide1Filling(direction, level: .sse4, for: element) },
+        sse2: { element in x86Slide1Filling(direction, level: .sse2, for: element) }
+    )
 }
 
 func isInteger32(_ element: Element) -> Bool {
@@ -1033,6 +1433,96 @@ func isSignedInteger64(_ element: Element) -> Bool {
 
 func isUnsigned64(_ element: Element) -> Bool {
     element.bits == 64 && element.category == .unsignedInteger
+}
+
+func maskedBitwise(_ symbol: String, for element: Element) -> String {
+    let operation = unsignedBits("(a \(symbol) b)", of: element)
+    let selected = fromUnsignedBits("\(operation) & (\(element.cUnsignedVector))mask", of: element)
+    return vectorResult(selected, for: element)
+}
+
+func maskedBitwiseOtherwise(_ symbol: String, for element: Element) -> String {
+    let selecting = cFunctionName("selecting", element)
+    let raw = element.cRawVector
+    let operands = ["(\(element.cRawMask))mask", "(\(raw))(a \(symbol) b)", "(\(raw))otherwise"]
+    return "return \(selecting)(\(operands.joined(separator: ", ")));"
+}
+
+let multiplyAddedBits = 52
+
+func multiplyAddingLow52Bits(for element: Element) -> String {
+    let raw = element.cRawVector
+    let multiplying = cFunctionName("multiplying", element)
+    let product = "(\(element.cVector))\(multiplying)((\(raw))a, (\(raw))b)"
+    let mask = (UInt64(1) << UInt64(multiplyAddedBits)) - 1
+    let kept = splat("0x\(String(mask, radix: 16))", as: element.cVector, lanes: element.laneCount)
+    return vectorResult("(\(product) & \(kept)) + c", for: element)
+}
+
+func multiplyAddingHighResult(low: String, for element: Element) -> String {
+    let shifted = "(\(low) >> \(multiplyAddedBits)) | (high << \(element.bits - multiplyAddedBits))"
+    return vectorResult("(\(shifted)) + c", for: element)
+}
+
+func multiplyAddingHigh52BitsHalves(flippingSigns: Bool, for element: Element) -> String {
+    let vector = element.cVector
+    let raw = element.cRawVector
+    func multiplying(_ first: String, _ second: String) -> String {
+        let arguments = [first, second].map { "(\(raw))\($0)" }.joined(separator: ", ")
+        return "(\(vector))\(cFunctionName("multiplying", element))(\(arguments))"
+    }
+    func flipped(_ operand: String) -> String {
+        let signBit = "0x\(String(UInt64(1) << UInt64(element.bits - 1), radix: 16))"
+        let sign = "\(cFunctionName("repeating", element))(\(signBit))"
+        return "\(cFunctionName("bitwiseXor", element))((\(raw))\(operand), \(sign))"
+    }
+    let carried =
+        flippingSigns
+        ? "\(x86GreaterThanName(bits: element.bits))(\(flipped("p0")), \(flipped("low")))"
+        : "\(cFunctionName("greaterThan", element))((\(raw))p0, (\(raw))low)"
+    let ones = "\(cFunctionName("repeating", element))(1)"
+    let selected = [carried, ones, "\(cFunctionName("zero", element))()"]
+    let carry = "\(cFunctionName("selecting", element))(\(selected.joined(separator: ", ")))"
+    let halfBits = element.bits / 2
+    let halfMask = splat("0xffffffff", as: vector, lanes: element.laneCount)
+    return """
+        const \(vector) mask = \(halfMask);
+        const \(vector) a0 = a & mask;
+        const \(vector) b0 = b & mask;
+        const \(vector) a1 = a >> \(halfBits);
+        const \(vector) b1 = b >> \(halfBits);
+        const \(vector) p0 = \(multiplying("a0", "b0"));
+        const \(vector) p1Add = \(multiplying("a0", "b1"));
+        const \(vector) p1 = \(multiplying("a1", "b0")) + p1Add;
+        const \(vector) low = p0 + ((p1 & mask) << \(halfBits));
+        const \(vector) carry = (\(vector))\(carry);
+        const \(vector) high = \(multiplying("a1", "b1")) + (p1 >> \(halfBits)) + carry;
+        \(multiplyAddingHighResult(low: "low", for: element))
+        """
+}
+
+func multiplyAddingHigh52BitsWhole(for element: Element) -> String {
+    let vector = element.cVector
+    let lane = element.cUnsignedLane
+    let halfBits = element.bits / 2
+    let wide = "unsigned __int128"
+    return """
+        const \(vector) low = a * b;
+        \(vector) high;
+        for (size_t i = 0; i < \(element.laneCount); ++i) {
+        #if defined(__SIZEOF_INT128__)
+          high[i] = (\(lane))(((\(wide))a[i] * (\(wide))b[i]) >> \(element.bits));
+        #else
+          const \(lane) loLo = (a[i] & 0xffffffff) * (b[i] & 0xffffffff);
+          const \(lane) hiLo = (a[i] >> \(halfBits)) * (b[i] & 0xffffffff);
+          const \(lane) loHi = (a[i] & 0xffffffff) * (b[i] >> \(halfBits));
+          const \(lane) hiHi = (a[i] >> \(halfBits)) * (b[i] >> \(halfBits));
+          const \(lane) t = (loLo >> \(halfBits)) + (hiLo & 0xffffffff) + loHi;
+          high[i] = (hiLo >> \(halfBits)) + (t >> \(halfBits)) + hiHi;
+        #endif
+        }
+        \(multiplyAddingHighResult(low: "low", for: element))
+        """
 }
 
 func x86Multiplying32(for element: Element) -> String {
@@ -1135,8 +1625,7 @@ func x86BitSelect(_ mask: String, _ yes: String, _ no: String, for element: Elem
 }
 
 func x86Slide1Up(for element: Element) -> String {
-    let shifted = "__builtin_ia32_pslldqi128_byteshift((\(x86Vector("i64")))a, \(element.bits / 8))"
-    return vectorResult("(\(element.cVector))\(shifted)", for: element)
+    vectorResult(x86SlideBytes(.up, by: 1, for: element), for: element)
 }
 
 func x86MaskBits(for element: Element) -> String {
@@ -2301,6 +2790,12 @@ func x86InterleaveLowerHelpers() -> [String] {
     }
 }
 
+func laneMask(_ lane: Int, for element: Element) -> String {
+    var lanes = Array(repeating: "0", count: element.laneCount)
+    lanes[lane] = "-1"
+    return compoundLiteral(element.cMask, lanes)
+}
+
 func x86InsertLane(_ lane: Int, for element: Element) -> String {
     let vector = element.cVector
     let inserted = """
@@ -2308,12 +2803,10 @@ func x86InsertLane(_ lane: Int, for element: Element) -> String {
         a[\(lane)] = t;
         \(vectorResult("a", for: element))
         """
-    var lanes = Array(repeating: "0", count: element.laneCount)
-    lanes[lane] = "-1"
     let selected = x86BitSelect("selected", repeatingVector("t", of: element), "a", for: element)
     let blended = """
         const \(vector) a = (\(vector))rawA;
-        const \(element.cMask) selected = \(compoundLiteral(element.cMask, lanes));
+        const \(element.cMask) selected = \(laneMask(lane, for: element));
         \(vectorResult(selected, for: element))
         """
     let levels = TargetBodies<Element>(sse4: { _ in inserted }, sse2: { _ in blended })
@@ -2810,11 +3303,7 @@ let ops: [Op] = [
     },
 
     Op("load", "LoadU", [.tag, .constLanePointer], .vector, .all, span: .vectors(1)) { element in
-        """
-        \(element.cVector) v;
-        __builtin_memcpy(&v, from, sizeof v);
-        \(vectorResult("v", for: element))
-        """
+        loadedVector(from: "from", for: element)
     },
     Op(
         "loadAligned",
@@ -2822,13 +3311,12 @@ let ops: [Op] = [
         [.tag, .constLanePointer],
         .vector,
         .all,
-        span: .vectors(1, aligned: true)
+        span: .vectors(1, aligned: true),
+        targets: TargetBodies(
+            sse2: { element in loadedVector(from: assumedAligned("from"), for: element) }
+        )
     ) { element in
-        """
-        \(element.cVector) v;
-        __builtin_memcpy(&v, __builtin_assume_aligned(from, 16), sizeof v);
-        \(vectorResult("v", for: element))
-        """
+        loadedVector(from: "from", for: element)
     },
     Op(
         "loadFirst",
@@ -2845,13 +3333,13 @@ let ops: [Op] = [
     ) { element in
         let size = "\(clampedCount(to: element.laneCount)) * sizeof(\(element.cType))"
         return """
-            \(element.cVector) v = {0};
+            \(zeroedVector(of: element.cVector))
             __builtin_memcpy(&v, from, \(size));
             \(vectorResult("v", for: element))
             """
     },
     Op("store", "StoreU", [.vector, .tag, .lanePointer], .void, .all, span: .vectors(1)) { _ in
-        "__builtin_memcpy(to, &a, sizeof a);"
+        storedVector(to: "to")
     },
     Op(
         "storeAligned",
@@ -2859,9 +3347,10 @@ let ops: [Op] = [
         [.vector, .tag, .lanePointer],
         .void,
         .all,
-        span: .vectors(1, aligned: true)
+        span: .vectors(1, aligned: true),
+        targets: TargetBodies(sse2: { _ in storedVector(to: assumedAligned("to")) })
     ) { _ in
-        "__builtin_memcpy(__builtin_assume_aligned(to, 16), &a, sizeof a);"
+        storedVector(to: "to")
     },
     Op(
         "storeFirst",
@@ -3060,6 +3549,9 @@ let ops: [Op] = [
     Op("bitwiseAndNot", "AndNot", [.vector, .vector], .vector, .integer) { element in
         vectorResult("~a & b", for: element)
     },
+    Op("bitwiseAndXor", "AndXor", [.vector, .vector, .vector], .vector, .integer) { element in
+        vectorResult("a & (b ^ c)", for: element)
+    },
 
     Op(
         "shiftedLeft",
@@ -3072,14 +3564,7 @@ let ops: [Op] = [
             sse2: { element in x86ShiftedLeft(for: element) }
         )
     ) { element in
-        let zero = compoundLiteral(element.cVector, ["0"])
-        let shifted = fromUnsignedBits("\(unsignedBits("a", of: element)) << bits", of: element)
-        return """
-            if (bits < 0 || bits >= \(element.bits)) {
-              \(vectorResult(zero, for: element))
-            }
-            \(vectorResult(shifted, for: element))
-            """
+        shiftedWithinWidth("<<", for: element)
     },
     Op(
         "shiftedRight",
@@ -3093,16 +3578,13 @@ let ops: [Op] = [
             sse2: { element in x86ShiftedRight(level: .sse2, for: element) }
         )
     ) { element in
-        let outOfRange =
-            element.category == .signedInteger
-            ? "bits = \(element.bits - 1);"
-            : vectorResult(compoundLiteral(element.cVector, ["0"]), for: element)
-        return """
-            if (bits < 0 || bits >= \(element.bits)) {
-              \(outOfRange)
-            }
-            \(vectorResult("a >> bits", for: element))
-            """
+        guard element.category == .unsignedInteger else {
+            return """
+                bits = (unsigned)bits < \(element.bits) ? bits : \(element.bits - 1);
+                \(vectorResult("a >> bits", for: element))
+                """
+        }
+        return shiftedWithinWidth(">>", for: element)
     },
 
     Op("equalTo", "Eq", [.vector, .vector], .mask, .all) { element in
@@ -3180,6 +3662,65 @@ let ops: [Op] = [
         let kept = fromUnsignedBits("~\(mask) & \(unsignedBits("a", of: element))", of: element)
         return vectorResult(kept, for: element)
     },
+    Op("bitwiseAnd", "MaskedAnd", [.whereMask, .vector, .vector], .vector, .integer) { element in
+        maskedBitwise("&", for: element)
+    },
+    Op("bitwiseOr", "MaskedOr", [.whereMask, .vector, .vector], .vector, .integer) { element in
+        maskedBitwise("|", for: element)
+    },
+    Op("bitwiseXor", "MaskedXor", [.whereMask, .vector, .vector], .vector, .integer) { element in
+        maskedBitwise("^", for: element)
+    },
+    Op(
+        "bitwiseAnd",
+        "MaskedAndOr",
+        [.otherwiseVector, .whereMask, .vector, .vector],
+        .vector,
+        .integer
+    ) { element in
+        maskedBitwiseOtherwise("&", for: element)
+    },
+    Op(
+        "bitwiseOr",
+        "MaskedOrOr",
+        [.otherwiseVector, .whereMask, .vector, .vector],
+        .vector,
+        .integer
+    ) { element in
+        maskedBitwiseOtherwise("|", for: element)
+    },
+    Op(
+        "bitwiseXor",
+        "MaskedXorOr",
+        [.otherwiseVector, .whereMask, .vector, .vector],
+        .vector,
+        .integer
+    ) { element in
+        maskedBitwiseOtherwise("^", for: element)
+    },
+    Op(
+        "multiplyAddingLow52Bits",
+        "MulAdd52Lo",
+        [.vector, .vector, .vector],
+        .vector,
+        .unsigned(bits: [64])
+    ) { element in
+        multiplyAddingLow52Bits(for: element)
+    },
+    Op(
+        "multiplyAddingHigh52Bits",
+        "MulAdd52Hi",
+        [.vector, .vector, .vector],
+        .vector,
+        .unsigned(bits: [64]),
+        targets: TargetBodies(
+            neon: { element in multiplyAddingHigh52BitsHalves(flippingSigns: false, for: element) },
+            sse4: { element in multiplyAddingHigh52BitsHalves(flippingSigns: true, for: element) },
+            sse2: { element in multiplyAddingHigh52BitsHalves(flippingSigns: false, for: element) }
+        )
+    ) { element in
+        multiplyAddingHigh52BitsWhole(for: element)
+    },
     Op(
         "firstLanes",
         "FirstN",
@@ -3198,8 +3739,9 @@ let ops: [Op] = [
         let lanes = element.laneCount
         let offsets = iota(as: element.cUnsignedVector, lanes: lanes)
         let limit = splat("n", as: element.cUnsignedVector, lanes: lanes)
+        let count = element.bits == 64 ? "count" : clampedCount(to: lanes)
         return """
-            const \(element.cUnsignedLane) n = (\(element.cUnsignedLane))\(clampedCount(to: lanes));
+            const \(element.cUnsignedLane) n = (\(element.cUnsignedLane))\(count);
             \(maskResult("(\(element.cMask))(\(offsets) < \(limit))", for: element))
             """
     },
@@ -3213,8 +3755,14 @@ let ops: [Op] = [
             neon: { _ in "\(neonNibbles)\nreturn nibbles == ~0ull;" },
             sse2: { element in x86AllTrue(for: element) }
         )
-    ) { _ in
-        "return __builtin_reduce_and(mask) != 0;"
+    ) { element in
+        """
+        \(element.cMaskLane) andSum = -1;
+        for (size_t i = 0; i < \(element.laneCount); ++i) {
+          andSum &= mask[i];
+        }
+        return andSum == -1;
+        """
     },
     Op(
         "allFalse",
@@ -3226,8 +3774,14 @@ let ops: [Op] = [
             neon: { _ in "\(neonNibbles)\nreturn nibbles == 0;" },
             sse2: { element in "return \(x86MaskBits(for: element)) == 0;" }
         )
-    ) { _ in
-        "return __builtin_reduce_or(mask) == 0;"
+    ) { element in
+        """
+        \(element.cMaskLane) orSum = 0;
+        for (size_t i = 0; i < \(element.laneCount); ++i) {
+          orSum |= mask[i];
+        }
+        return orSum == 0;
+        """
     },
     Op(
         "trueCount",
@@ -3278,21 +3832,14 @@ let ops: [Op] = [
         .lane,
         .all(bits: [16, 32, 64]),
         targets: TargetBodies(
-            neon: { element in neonReduction("vaddvq", for: element) },
+            neon: { element in neonReduction("vaddvq", for: element) ?? builtinReduction("add") },
             sse4: { element in x86Reduction(.sum, level: .sse4, for: element) },
             ssse3: { element in x86Reduction(.sum, level: .ssse3, for: element) },
             sse2: { element in x86Reduction(.sum, level: .sse2, for: element) }
         ),
         helpers: x86CombiningHelpers(.sum)
     ) { element in
-        guard element.category == .float else { return "return __builtin_reduce_add(a);" }
-        return """
-            \(element.cType) sum = 0;
-            for (size_t i = 0; i < \(element.laneCount); ++i) {
-              sum += a[i];
-            }
-            return sum;
-            """
+        reducedSum(for: element)
     },
     Op(
         "smallest",
@@ -3303,7 +3850,7 @@ let ops: [Op] = [
         targets: TargetBodies(
             neon: { element in
                 neonReduction("vminvq", for: element)
-                    ?? neonPairExtremum(comparing: "<", for: element)
+                    ?? neonPairExtremum(comparing: "<", for: element) ?? builtinReduction("min")
             },
             sse4: { element in x86Reduction(.minimum, level: .sse4, for: element) },
             ssse3: { element in x86Reduction(.minimum, level: .ssse3, for: element) },
@@ -3311,7 +3858,22 @@ let ops: [Op] = [
         ),
         helpers: x86CombiningHelpers(.minimum)
     ) { element in
-        reducedExtremum("min", comparing: "<", from: infinity(of: element), for: element)
+        reducedExtremum(comparing: "<", from: highestValue(of: element), for: element)
+    },
+    Op(
+        "smallestOrNaN",
+        "ReduceMinOrNaN",
+        [.tag, .vector],
+        .lane,
+        .float,
+        targets: TargetBodies(
+            neon: { element in neonReduction("vminvq", for: element) },
+            sse2: { element in
+                reducedExtremumOrNaN("smallest", isNaN: x86IsNaN(for: element), for: element)
+            }
+        )
+    ) { element in
+        reducedExtremumOrNaN("smallest", isNaN: "(\(element.cMask))(a != a)", for: element)
     },
     Op(
         "largest",
@@ -3322,7 +3884,7 @@ let ops: [Op] = [
         targets: TargetBodies(
             neon: { element in
                 neonReduction("vmaxvq", for: element)
-                    ?? neonPairExtremum(comparing: ">", for: element)
+                    ?? neonPairExtremum(comparing: ">", for: element) ?? builtinReduction("max")
             },
             sse4: { element in x86Reduction(.maximum, level: .sse4, for: element) },
             ssse3: { element in x86Reduction(.maximum, level: .ssse3, for: element) },
@@ -3330,7 +3892,22 @@ let ops: [Op] = [
         ),
         helpers: x86CombiningHelpers(.maximum)
     ) { element in
-        reducedExtremum("max", comparing: ">", from: "-\(infinity(of: element))", for: element)
+        reducedExtremum(comparing: ">", from: lowestValue(of: element), for: element)
+    },
+    Op(
+        "largestOrNaN",
+        "ReduceMaxOrNaN",
+        [.tag, .vector],
+        .lane,
+        .float,
+        targets: TargetBodies(
+            neon: { element in neonReduction("vmaxvq", for: element) },
+            sse2: { element in
+                reducedExtremumOrNaN("largest", isNaN: x86IsNaN(for: element), for: element)
+            }
+        )
+    ) { element in
+        reducedExtremumOrNaN("largest", isNaN: "(\(element.cMask))(a != a)", for: element)
     },
     Op("firstLane", "GetLane", [.vector], .lane, .all) { _ in
         "return a[0];"
@@ -3355,36 +3932,41 @@ let ops: [Op] = [
         [.tag, .vector, .laneAmount],
         .vector,
         .all,
-        targets: TargetBodies(
-            neon: { element in
-                """
-                \(slideUpConstants(for: element))
-                \(slideUpIndices(for: element))
-                \(vectorResult(neonTableLookup("a", "indices", for: element), for: element))
-                """
-            },
-            ssse3: { element in
-                """
-                \(slideUpConstants(for: element))
-                \(slideUpIndices(for: element))
-                \(vectorResult(x86TableLookup("a", "indices", for: element), for: element))
-                """
-            },
-            sse2: { element in
-                """
-                \(slideUpConstants(for: element))
-                \(x86SlideUp(for: element))
-                """
-            }
-        )
+        targets: slideTargets(.up)
     ) { element in
-        """
-        \(element.cVector) result = {0};
-        for (size_t i = lanes; i < \(element.laneCount); ++i) {
-          result[i] = a[i - lanes];
-        }
-        \(vectorResult("result", for: element))
-        """
+        portableSlide(.up, for: element)
+    },
+    Op(
+        "slideUpLanes",
+        "SlideUpLanesOr",
+        [.fillVector, .tag, .vector, .laneAmount],
+        .vector,
+        .all,
+        targets: slideFillingTargets(.up),
+        helpers: TargetBodies(sse2: { element in x86SlideLanes(.up, for: element) })
+    ) { element in
+        slideFilling(.up, sliding: slideLanesName(.up, for: element), for: element)
+    },
+    Op(
+        "slideDownLanes",
+        "SlideDownLanes",
+        [.tag, .vector, .laneAmount],
+        .vector,
+        .all,
+        targets: slideTargets(.down)
+    ) { element in
+        portableSlide(.down, for: element)
+    },
+    Op(
+        "slideDownLanes",
+        "SlideDownLanesOr",
+        [.fillVector, .tag, .vector, .laneAmount],
+        .vector,
+        .all,
+        targets: slideFillingTargets(.down),
+        helpers: TargetBodies(sse2: { element in x86SlideLanes(.down, for: element) })
+    ) { element in
+        slideFilling(.down, sliding: slideLanesName(.down, for: element), for: element)
     },
     Op(
         "slide1Up",
@@ -3393,15 +3975,46 @@ let ops: [Op] = [
         .vector,
         .all,
         targets: TargetBodies(
-            neon: { element in neonSlide1Up(for: element) },
-            sse2: { element in isFloat32(element) ? x86Slide1Up(for: element) : nil }
+            neon: { element in shuffledSlide1(.up, for: element) },
+            sse2: { element in
+                isFloat32(element) ? x86Slide1Up(for: element) : shuffledSlide1(.up, for: element)
+            }
         )
     ) { element in
-        let lanes = element.laneCount
-        let indices = ([lanes] + Array(0..<(lanes - 1))).map(String.init)
-        let zero = compoundLiteral(element.cVector, ["0"])
-        let shifted = "__builtin_shufflevector(a, \(zero), \(indices.joined(separator: ", ")))"
-        return vectorResult(shifted, for: element)
+        portableSlide1(.up, for: element)
+    },
+    Op(
+        "slide1Up",
+        "Slide1UpOr",
+        [.fillLane, .tag, .vector],
+        .vector,
+        .all,
+        targets: slide1FillingTargets(.up)
+    ) { element in
+        slide1Filling(.up, for: element)
+    },
+    Op(
+        "slide1Down",
+        "Slide1Down",
+        [.tag, .vector],
+        .vector,
+        .all,
+        targets: TargetBodies(
+            neon: { element in shuffledSlide1(.down, for: element) },
+            sse2: { element in shuffledSlide1(.down, for: element) }
+        )
+    ) { element in
+        portableSlide1(.down, for: element)
+    },
+    Op(
+        "slide1Down",
+        "Slide1DownOr",
+        [.fillLane, .tag, .vector],
+        .vector,
+        .all,
+        targets: slide1FillingTargets(.down)
+    ) { element in
+        slide1Filling(.down, for: element)
     },
     Op(
         "tableLookupBytes",
@@ -3642,7 +4255,8 @@ func wideningFunctionName(_ op: WideningOp, from narrow: Element, to wide: Eleme
 }
 
 func snakeCased(_ name: String) -> String {
-    name.map { $0.isUppercase ? "_\($0.lowercased())" : String($0) }.joined()
+    name.replacingOccurrences(of: "NaN", with: "Nan")
+        .map { $0.isUppercase ? "_\($0.lowercased())" : String($0) }.joined()
 }
 
 func cFunctionName(_ swiftName: String, _ element: Element) -> String {
@@ -3674,7 +4288,12 @@ struct Binding {
     let isInOut: Bool
 }
 
-func bindings(of op: Op, for element: Element, scope: String = "") -> [Binding] {
+func bindings(
+    of op: Op,
+    for element: Element,
+    scope: String = "",
+    checked: Bool = true
+) -> [Binding] {
     var vectorNames = ["a", "b", "c", "d"].makeIterator()
     var outVectorIndex = 0
     var result: [Binding] = []
@@ -3706,13 +4325,13 @@ func bindings(of op: Op, for element: Element, scope: String = "") -> [Binding] 
                     isInOut: false
                 )
             )
-        case .mask:
+        case .mask, .whereMask:
             result.append(
                 Binding(
                     declaration: "\(element.mask) mask",
                     cDeclaration: "\(element.cRawMask) \(rawName("mask"))",
                     argument: "mask",
-                    swiftLabel: "_",
+                    swiftLabel: parameter.overloading?.label ?? "_",
                     swiftName: "mask",
                     swiftType: "\(scope)Mask",
                     isInOut: false
@@ -3784,7 +4403,7 @@ func bindings(of op: Op, for element: Element, scope: String = "") -> [Binding] 
                     declaration: "size_t lanes",
                     cDeclaration: "size_t lanes",
                     argument: "lanes",
-                    swiftLabel: "by",
+                    swiftLabel: checkedLabel("by", checked: checked),
                     swiftName: "lanes",
                     swiftType: "Int",
                     isInOut: false
@@ -3802,6 +4421,42 @@ func bindings(of op: Op, for element: Element, scope: String = "") -> [Binding] 
                     swiftName: name,
                     swiftType: "\(scope)Vector",
                     isInOut: true
+                )
+            )
+        case .fillVector:
+            result.append(
+                Binding(
+                    declaration: "\(element.vector) fill",
+                    cDeclaration: "\(element.cRawVector) \(rawName("fill"))",
+                    argument: "fill",
+                    swiftLabel: parameter.overloading?.label,
+                    swiftName: "fill",
+                    swiftType: "\(scope)Vector",
+                    isInOut: false
+                )
+            )
+        case .fillLane:
+            result.append(
+                Binding(
+                    declaration: "\(element.cType) fill",
+                    cDeclaration: "\(element.cType) fill",
+                    argument: "fill",
+                    swiftLabel: parameter.overloading?.label,
+                    swiftName: "fill",
+                    swiftType: "\(scope)Lane",
+                    isInOut: false
+                )
+            )
+        case .otherwiseVector:
+            result.append(
+                Binding(
+                    declaration: "\(element.vector) otherwise",
+                    cDeclaration: "\(element.cRawVector) \(rawName("otherwise"))",
+                    argument: "otherwise",
+                    swiftLabel: parameter.overloading?.label,
+                    swiftName: "otherwise",
+                    swiftType: "\(scope)Vector",
+                    isInOut: false
                 )
             )
         }
@@ -3949,7 +4604,7 @@ func generateReferenceHeader() -> String {
             let arguments = parameterBindings.map(\.argument).joined(separator: ", ")
             let returnKeyword = op.returns == .void ? "" : "return "
             output += "HWY_INLINE \(referenceReturnType(op.returns, element)) "
-            output += "\(referenceFunctionName(op.swiftName, element))(\(declarations))"
+            output += "\(referenceFunctionName(op.identifier, element))(\(declarations))"
             output += " { \(returnKeyword)hn::\(op.highwayName)(\(arguments)); }\n"
         }
 
@@ -3987,7 +4642,7 @@ func generateReferenceHeader() -> String {
 func wideningBody(takesCount: Bool, from narrow: Element, to wide: Element) -> String {
     let lanes = wide.laneCount
     let bytes = lanes * narrow.bits / 8
-    let declaration = takesCount ? "narrow_vector v = {0};" : "narrow_vector v;"
+    let declaration = takesCount ? zeroedVector(of: "narrow_vector") : "narrow_vector v;"
     let size =
         takesCount
         ? "\(clampedCount(to: lanes)) * sizeof(\(narrow.cType))"
@@ -3996,7 +4651,11 @@ func wideningBody(takesCount: Bool, from narrow: Element, to wide: Element) -> S
         typedef \(narrow.cType) narrow_vector __attribute__((vector_size(\(bytes))));
         \(declaration)
         __builtin_memcpy(&v, from, \(size));
-        \(vectorResult("__builtin_convertvector(v, \(wide.cVector))", for: wide))
+        \(wide.cVector) result;
+        for (size_t i = 0; i < \(lanes); ++i) {
+          result[i] = v[i];
+        }
+        \(vectorResult("result", for: wide))
         """
 }
 
@@ -4087,7 +4746,7 @@ func x86Helpers() -> String {
         parameters: ["\(i64) mask", "\(i64) yes", "\(i64) no"],
         body: "return (mask & yes) | (~mask & no);"
     )
-    let comparisons = [8, 32].map { bits in
+    let comparisons = [8, 32, 64].map { bits in
         let signed = x86Vector("i\(bits)")
         return cFunction(
             returns: i64,
@@ -4100,6 +4759,30 @@ func x86Helpers() -> String {
         asFloats + [selecting] + comparisons + x86PartialLoadHelpers() + x86InterleaveLowerHelpers()
         + x86PartialStoreHelpers() + x86UpperHalfHelpers()
     return "#if CVECTORIZATION_OPS_X86\n\(helpers.joined())#endif"
+}
+
+func neonTable(named name: String, _ bytes: [Int]) -> String {
+    cFunction(
+        returns: "const uint8_t*",
+        name: name,
+        parameters: [],
+        body: """
+            static const uint8_t table[\(bytes.count)] __attribute__((aligned(16))) = {\(bytes.map(String.init).joined(separator: ", "))};
+            return table;
+            """
+    )
+}
+
+func neonHelpers() -> String {
+    let zeroing = Array(repeating: 255, count: 16)
+    let slideTable = neonTable(named: neonSlideTableName, zeroing + Array(0..<16) + zeroing)
+    let slideFillingTables = [SlideDirection.up, .down].map { direction in
+        neonTable(
+            named: neonSlideFillingTableName(direction),
+            neonSlideFillingTable(direction)
+        )
+    }
+    return "#if CVECTORIZATION_OPS_NEON\n\(([slideTable] + slideFillingTables).joined())#endif"
 }
 
 func rawVectorDeclarations() -> String {
@@ -4141,9 +4824,9 @@ func cPrologue(of op: Op, for element: Element) -> [String] {
         let name = binding.swiftName
         let raw = rawName(name)
         switch parameter {
-        case .vector, .indices:
+        case .vector, .indices, .fillVector, .otherwiseVector:
             return "const \(element.cVector) \(name) = (\(element.cVector))\(raw);"
-        case .mask:
+        case .mask, .whereMask:
             return "const \(element.cMask) \(name) = (\(element.cMask))\(raw);"
         case .outVector:
             return "\(element.cVector)* const \(name) = (\(element.cVector)*)\(raw);"
@@ -4236,6 +4919,8 @@ func generateHeader() -> String {
 
         \(x86Helpers())
 
+        \(neonHelpers())
+
         /// Whether the target only emulates vectors, in which case a caller is better off
         /// with its own scalar code.
         CVECTORIZATION_OPS_INLINE bool cvectorization_ops_is_emulated(void) {
@@ -4295,7 +4980,7 @@ func generateHeader() -> String {
             output += cHelpers(of: op, for: element)
             output += cOpFunction(
                 returns: op.returns,
-                name: cFunctionName(op.swiftName, element),
+                name: cFunctionName(op.identifier, element),
                 parameters: parameters,
                 prologue: cPrologue(of: op, for: element),
                 body: cBody(of: op, for: element),
@@ -4350,8 +5035,9 @@ func swiftArgument(_ binding: Binding, _ parameter: Parameter, for element: Elem
     let name = binding.swiftName
     switch parameter {
     case .tag: return ""
-    case .vector, .indices: return element.hasOpaqueVector ? "\(name).raw" : name
-    case .mask: return "\(name).raw"
+    case .vector, .indices, .fillVector, .otherwiseVector:
+        return element.hasOpaqueVector ? "\(name).raw" : name
+    case .mask, .whereMask: return "\(name).raw"
     case .shiftAmount: return "Int32(truncatingIfNeeded: \(name))"
     case .outVector: return element.hasOpaqueVector ? "&\(name).raw" : "&\(name)"
     default: return name
@@ -4365,9 +5051,10 @@ func vectorFromRaw(_ call: String, of element: Element) -> String {
 func importedType(of parameter: Parameter, for element: Element) -> String {
     switch parameter {
     case .tag: return ""
-    case .vector, .indices, .outVector: return "HighwayReference.\(element.vector)"
-    case .mask: return "HighwayReference.\(element.mask)"
-    case .lane: return element.swiftType
+    case .vector, .indices, .outVector, .fillVector, .otherwiseVector:
+        return "HighwayReference.\(element.vector)"
+    case .mask, .whereMask: return "HighwayReference.\(element.mask)"
+    case .lane, .fillLane: return element.swiftType
     case .constLanePointer: return "UnsafePointer<\(element.swiftType)>"
     case .lanePointer: return "UnsafeMutablePointer<\(element.swiftType)>"
     case .count, .laneAmount: return "Int"
@@ -4394,8 +5081,12 @@ func swiftCallArgument(_ binding: Binding, passing expression: String? = nil) ->
     return label == "_" ? value : "\(label): \(value)"
 }
 
-func swiftSignature(of op: Op, for element: Element) -> (parameters: String, arguments: String) {
-    let parameterBindings = bindings(of: op, for: element)
+func swiftSignature(
+    of op: Op,
+    for element: Element,
+    checked: Bool = true
+) -> (parameters: String, arguments: String) {
+    let parameterBindings = bindings(of: op, for: element, checked: checked)
     var declarations: [String] = []
     var arguments: [String] = []
 
@@ -4405,7 +5096,9 @@ func swiftSignature(of op: Op, for element: Element) -> (parameters: String, arg
         arguments.append(swiftArgument(binding, parameter, for: element))
     }
 
-    return (declarations.joined(separator: ", "), arguments.joined(separator: ", "))
+    return (
+        op.swiftOrdered(declarations).joined(separator: ", "), arguments.joined(separator: ", ")
+    )
 }
 
 /// An op that takes a pointer is the only kind whose call is an unsafe construct, so only those
@@ -4421,7 +5114,7 @@ func isUnsafe(_ op: Op) -> Bool {
 
 func swiftBody(of op: Op, for element: Element, arguments: String) -> String {
     let keyword = isUnsafe(op) ? "unsafe " : ""
-    let call = "\(keyword)\(cFunctionName(op.swiftName, element))(\(arguments))"
+    let call = "\(keyword)\(cFunctionName(op.identifier, element))(\(arguments))"
     switch op.returns {
     case .count, .index: return "Int(\(call))"
     case .vector: return vectorFromRaw(call, of: element)
@@ -4514,9 +5207,12 @@ func spanForms(of op: WideningOp, from narrow: Element, to wide: Element) -> Spa
     )
 }
 
+func checkedLabel(_ label: String, checked: Bool) -> String {
+    checked ? label : "\(label)Unchecked"
+}
+
 func spanLabel(_ forms: SpanForms, checked: Bool) -> String {
-    let preposition = forms.isMutable ? "to" : "from"
-    return checked ? preposition : "\(preposition)Unchecked"
+    checkedLabel(forms.isMutable ? "to" : "from", checked: checked)
 }
 
 func spanSignature(_ forms: SpanForms, label: String) -> (parameters: String, arguments: String) {
@@ -4538,9 +5234,11 @@ func spanSignature(_ forms: SpanForms, label: String) -> (parameters: String, ar
     return (declarations.joined(separator: ", "), arguments.joined(separator: ", "))
 }
 
+typealias Check = (condition: String, message: String)
+
 /// What a span form checks before it touches `count` vectors' worth of lanes, each as a Swift
 /// condition and the message for when it fails.
-func spanChecks(vectors count: Int, aligned: Bool) -> [(condition: String, message: String)] {
+func spanChecks(vectors count: Int, aligned: Bool) -> [Check] {
     var checks = [
         count > 1
             ? (
@@ -4561,10 +5259,41 @@ func spanChecks(vectors count: Int, aligned: Bool) -> [(condition: String, messa
     return checks
 }
 
+/// A checked member that traps when any of `checks` fails, and the `@unsafe` unchecked member it
+/// calls, which only asserts them, like `Span`'s `subscript(_:)` and `subscript(unchecked:)`.
+func checkedMembers(
+    _ name: String,
+    availability: String? = nil,
+    checked: String,
+    unchecked: (parameters: String, arguments: String),
+    returnClause: String,
+    checks: [Check],
+    uncheckedBody: String
+) -> String {
+    let returnKeyword = returnClause.isEmpty ? "" : "return "
+    let attributes = availability.map { "\($0)\n" } ?? ""
+    let preconditions = checks.map { "precondition(\($0.condition), \"\($0.message)\")" }
+    let assertions = checks.map { "assert(\($0.condition), \"\($0.message)\")" }
+    return """
+            \(attributes)@export(implementation) @inline(always)
+            public static func \(name)(\(checked))\(returnClause) {
+                \(preconditions.joined(separator: "\n"))
+                \(returnKeyword)unsafe \(name)(\(unchecked.arguments))
+            }
+
+            \(attributes)@unsafe @export(implementation) @inline(always)
+            public static func \(name)(\(unchecked.parameters))\(returnClause) {
+                \(assertions.joined(separator: "\n"))
+                \(uncheckedBody)
+            }
+
+
+        """
+}
+
 /// The members that take a span where `forms`' op takes a pointer. A `first` op never touches
 /// more than the span has, so it has one form. The others have a checked form that traps when
-/// the span is too short or misaligned, and an `@unsafe` unchecked one that only asserts it, like
-/// `Span`'s `subscript(_:)` and `subscript(unchecked:)`.
+/// the span is too short or misaligned, and an `@unsafe` unchecked one that only asserts it.
 func spanMembers(_ forms: SpanForms) -> String {
     let returnClause = forms.returns == .void ? "" : " -> \(swiftReturnType(forms.returns))"
     let returnKeyword = forms.returns == .void ? "" : "return "
@@ -4584,28 +5313,67 @@ func spanMembers(_ forms: SpanForms) -> String {
     }
 
     let unchecked = spanSignature(forms, label: spanLabel(forms, checked: false))
-    let checks = spanChecks(vectors: count, aligned: aligned)
-    let preconditions = checks.map { "precondition(\($0.condition), \"\($0.message)\")" }
-    let assertions = checks.map { "assert(\($0.condition), \"\($0.message)\")" }
-    return """
-            \(spanAvailability)
-            @export(implementation) @inline(always)
-            public static func \(forms.name)(\(checked.parameters))\(returnClause) {
-                \(preconditions.joined(separator: "\n        "))
-                \(returnKeyword)unsafe \(forms.name)(\(unchecked.arguments))
+    let bridgeCall = forms.bridgeCall("$0.baseAddress.unsafelyUnwrapped", "$0.count")
+    return checkedMembers(
+        forms.name,
+        availability: spanAvailability,
+        checked: checked.parameters,
+        unchecked: unchecked,
+        returnClause: returnClause,
+        checks: spanChecks(vectors: count, aligned: aligned),
+        uncheckedBody: """
+            \(returnKeyword)span.\(accessor) {
+                \(bridgeCall)
             }
+            """
+    )
+}
 
-            \(spanAvailability)
-            @unsafe @export(implementation) @inline(always)
-            public static func \(forms.name)(\(unchecked.parameters))\(returnClause) {
-                \(assertions.joined(separator: "\n        "))
-                \(returnKeyword)span.\(accessor) {
-                    \(forms.bridgeCall("$0.baseAddress.unsafelyUnwrapped", "$0.count"))
-                }
-            }
+func takesLaneAmount(_ op: Op) -> Bool {
+    op.parameters.contains(.laneAmount)
+}
 
+/// What a lane amount form checks before it hands the amount on, as a Swift condition and the
+/// message for when it fails. Highway's NEON slides read their index tables out of bounds above
+/// `laneCount`.
+func laneAmountChecks() -> [Check] {
+    [
+        (
+            "lanes >= 0 && lanes <= laneCount",
+            "Lane amount is negative or more than a vector has lanes"
+        )
+    ]
+}
 
-        """
+/// The members of an op that takes a lane amount: a checked form that traps on an amount outside
+/// `0...laneCount`, and an `@unsafe` unchecked one that only asserts it.
+func laneAmountMembers(of op: Op, for element: Element) -> String {
+    let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
+    let returnKeyword = op.returns == .void ? "" : "return "
+    let checked = swiftSignature(of: op, for: element)
+    let unchecked = swiftSignature(of: op, for: element, checked: false)
+    var uncheckedArguments: [String] = []
+    for (binding, parameter) in zip(bindings(of: op, for: element, checked: false), op.parameters) {
+        if case .tag = parameter { continue }
+        uncheckedArguments.append(swiftCallArgument(binding))
+    }
+    let body = swiftBody(of: op, for: element, arguments: unchecked.arguments)
+    return checkedMembers(
+        op.swiftName,
+        checked: checked.parameters,
+        unchecked: (
+            unchecked.parameters, op.swiftOrdered(uncheckedArguments).joined(separator: ", ")
+        ),
+        returnClause: returnClause,
+        checks: laneAmountChecks(),
+        uncheckedBody: "\(returnKeyword)\(body)"
+    )
+}
+
+func laneAmountRequirements(of op: Op, indent: String) -> String {
+    let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
+    let unchecked = swiftSignature(of: op, for: elements[0], checked: false)
+    return "\(indent)@unsafe static func \(op.swiftName)(\(unchecked.parameters))\(returnClause)\n"
 }
 
 func spanRequirements(_ forms: SpanForms, indent: String) -> String {
@@ -4632,7 +5400,7 @@ func outputSpanSignature(
     _ forms: SpanForms,
     checked: Bool
 ) -> (parameters: String, arguments: String) {
-    let label = checked ? "to" : "toUnchecked"
+    let label = checkedLabel("to", checked: checked)
     let takesCount = if case .first = forms.extent { true } else { false }
     var declarations: [String] = []
     var arguments: [String] = []
@@ -4656,7 +5424,7 @@ func outputSpanSignature(
 /// What an output span form checks before it appends, each as a Swift condition and the message
 /// for when it fails. An `aligned` op also needs the lanes it appends to start at an address
 /// aligned to the vector size.
-func outputSpanChecks(_ extent: SpanExtent) -> [(condition: String, message: String)] {
+func outputSpanChecks(_ extent: SpanExtent) -> [Check] {
     guard case .vectors(let count, let aligned) = extent else {
         return [
             ("addingCount >= 0 && addingCount <= laneCount", "Count out of bounds"),
@@ -4699,9 +5467,6 @@ func outputSpanMembers(_ forms: SpanForms) -> String {
     let name = outputSpanName(forms)
     let checked = outputSpanSignature(forms, checked: true)
     let unchecked = outputSpanSignature(forms, checked: false)
-    let checks = outputSpanChecks(forms.extent)
-    let preconditions = checks.map { "precondition(\($0.condition), \"\($0.message)\")" }
-    let assertions = checks.map { "assert(\($0.condition), \"\($0.message)\")" }
     let (pointer, appendedCount) =
         switch forms.extent {
         case .first:
@@ -4712,26 +5477,20 @@ func outputSpanMembers(_ forms: SpanForms) -> String {
                 count > 1 ? "\(count) * laneCount" : "laneCount"
             )
         }
-    return """
-            \(spanAvailability)
-            @export(implementation) @inline(always)
-            public static func \(name)(\(checked.parameters)) {
-                \(preconditions.joined(separator: "\n        "))
-                unsafe \(name)(\(unchecked.arguments))
+    return checkedMembers(
+        name,
+        availability: spanAvailability,
+        checked: checked.parameters,
+        unchecked: unchecked,
+        returnClause: "",
+        checks: outputSpanChecks(forms.extent),
+        uncheckedBody: """
+            unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
+                \(forms.bridgeCall(pointer, "addingCount"))
+                initializedCount &+= \(appendedCount)
             }
-
-            \(spanAvailability)
-            @unsafe @export(implementation) @inline(always)
-            public static func \(name)(\(unchecked.parameters)) {
-                \(assertions.joined(separator: "\n        "))
-                unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-                    \(forms.bridgeCall(pointer, "addingCount"))
-                    initializedCount &+= \(appendedCount)
-                }
-            }
-
-
-        """
+            """
+    )
 }
 
 func outputSpanRequirements(_ forms: SpanForms, indent: String) -> String {
@@ -4754,9 +5513,9 @@ func opsApplyingToAll(_ candidates: [Element]) -> [Op] {
 
 let universalOps = opsApplyingToAll(elements)
 let integerOnlyOps = opsApplyingToAll(integerElements)
-    .filter { op in !universalOps.contains { $0.swiftName == op.swiftName } }
+    .filter { op in !universalOps.contains { $0.identifier == op.identifier } }
 let floatOnlyOps = opsApplyingToAll(floatElements)
-    .filter { op in !universalOps.contains { $0.swiftName == op.swiftName } }
+    .filter { op in !universalOps.contains { $0.identifier == op.identifier } }
 
 func protocolRequirements(_ requirementOps: [Op], indent: String) -> String {
     var output = ""
@@ -4764,6 +5523,9 @@ func protocolRequirements(_ requirementOps: [Op], indent: String) -> String {
         let signature = swiftSignature(of: op, for: elements[0])
         let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
         output += "\(indent)static func \(op.swiftName)(\(signature.parameters))\(returnClause)\n"
+        if takesLaneAmount(op) {
+            output += laneAmountRequirements(of: op, indent: indent)
+        }
         if let forms = spanForms(of: op, for: elements[0]) {
             output += spanRequirements(forms, indent: indent)
             if forms.isMutable {
@@ -4880,6 +5642,10 @@ func generateElement(_ element: Element) -> String {
         """
 
     for op in ops where op.applies.matches(element) {
+        if takesLaneAmount(op) {
+            output += laneAmountMembers(of: op, for: element)
+            continue
+        }
         let signature = swiftSignature(of: op, for: element)
         let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
         let body = swiftBody(of: op, for: element, arguments: signature.arguments)
@@ -4942,7 +5708,7 @@ struct ReferenceInput {
 
     var description: String {
         switch parameter {
-        case .lane: return "hex(\(name))"
+        case .lane, .fillLane: return "hex(\(name))"
         case .count, .shiftAmount, .laneAmount: return name
         default: return "describe(\(name))"
         }
@@ -4995,13 +5761,13 @@ func referenceInputs(
         switch parameter {
         case .tag, .lanePointer, .outVector:
             continue
-        case .vector:
+        case .vector, .fillVector, .otherwiseVector:
             values = "Inputs.vectors(H.Vector.self, \(seed))"
         case .indices:
             values = "Inputs.tableIndices(H.Vector.self, \(seed), inContract: \(inContract))"
-        case .mask:
+        case .mask, .whereMask:
             values = "Inputs.masks(H.Mask.self, \(seed))"
-        case .lane:
+        case .lane, .fillLane:
             values = "Inputs.lanes(H.Lane.self, \(seed))"
         case .count where op.span != nil:
             values = "Inputs.bufferCounts(lanes: H.laneCount)"
@@ -5069,10 +5835,10 @@ func referenceCalls(
         switch parameter {
         case .tag:
             continue
-        case .vector, .indices, .mask:
+        case .vector, .indices, .mask, .fillVector, .whereMask, .otherwiseVector:
             portArguments.append(swiftCallArgument(binding))
             referenceArguments.append("reference(\(binding.swiftName))")
-        case .lane, .count, .shiftAmount, .laneAmount:
+        case .lane, .fillLane, .count, .shiftAmount, .laneAmount:
             portArguments.append(swiftCallArgument(binding))
             referenceArguments.append(swiftArgument(binding, parameter, for: element))
         case .constLanePointer, .lanePointer:
@@ -5086,9 +5852,10 @@ func referenceCalls(
     }
 
     let keyword = isUnsafe(op) ? "unsafe " : ""
-    let call = referenceCall(referenceFunctionName(op.swiftName, element), referenceArguments)
+    let call = referenceCall(referenceFunctionName(op.identifier, element), referenceArguments)
     let reference = referenceResult(call, returning: op.returns)
-    return ("\(keyword)\(portCall(op.swiftName, portArguments))", "\(keyword)\(reference)")
+    let port = portCall(op.swiftName, op.swiftOrdered(portArguments))
+    return ("\(keyword)\(port)", "\(keyword)\(reference)")
 }
 
 let emulatedShiftAttribute = """
@@ -5205,11 +5972,11 @@ func referenceTest(
 ) -> String {
     let (test, label) =
         if guarded {
-            ("\(op.swiftName)BeforeGuardPage", "\(op.swiftName) before a guard page")
+            ("\(op.identifier)BeforeGuardPage", "\(op.identifier) before a guard page")
         } else if inContract {
-            (op.swiftName, op.swiftName)
+            (op.identifier, op.identifier)
         } else {
-            ("\(op.swiftName)OutOfContract", "\(op.swiftName) out of contract")
+            ("\(op.identifier)OutOfContract", "\(op.identifier) out of contract")
         }
     let inputs = referenceInputs(of: op, for: element, test: test, inContract: inContract)
     let description = referenceDescription(of: inputs)
@@ -5464,12 +6231,13 @@ func codegenFunctions(
     referenceName: String,
     for element: Element,
     returns: ReturnType,
-    isUnsafe: Bool,
+    isUnsafe: (port: Bool, reference: Bool),
     constantParameter: String? = nil,
     port: (parameters: [String], arguments: [String]),
     reference: (parameters: [String], arguments: [String])
 ) -> String {
-    let keyword = isUnsafe ? "unsafe " : ""
+    let portKeyword = isUnsafe.port ? "unsafe " : ""
+    let referenceKeyword = isUnsafe.reference ? "unsafe " : ""
     let hasReturn = returns != .void
     let portReturn = swiftReturnType(returns, scope: "\(element.namespace).")
     let referenceReturn = importedReturnType(returns, element)
@@ -5478,13 +6246,13 @@ func codegenFunctions(
             codegenFunctionName("port", referenceName, constantParameter: constantParameter),
             parameters: port.parameters,
             returnClause: hasReturn ? " -> \(portReturn)" : "",
-            call: keyword + portCall(swiftName, port.arguments, on: element.namespace)
+            call: portKeyword + portCall(swiftName, port.arguments, on: element.namespace)
         ),
         codegenFunction(
             codegenFunctionName("highway", referenceName, constantParameter: constantParameter),
             parameters: reference.parameters,
             returnClause: hasReturn ? " -> \(referenceReturn)" : "",
-            call: keyword + referenceCall(referenceName, reference.arguments)
+            call: referenceKeyword + referenceCall(referenceName, reference.arguments)
         ),
     ]
     return functions.joined(separator: "\n\n")
@@ -5537,21 +6305,26 @@ struct CodegenSide {
         }
     }
 
-    func call(_ swiftName: String, _ arguments: [String]) -> String {
-        let op = codegenOp(swiftName, for: element)
+    func call(_ identifier: String, _ arguments: [String]) -> String {
+        let op = codegenOp(identifier, for: element)
         let callBindings = zip(bindings(of: op, for: element), op.parameters)
             .filter { _, parameter in parameter != .tag }
             .map(\.0)
         guard callBindings.count == arguments.count else {
-            fatalError("\(swiftName) takes \(callBindings.count) arguments, not \(arguments.count)")
+            fatalError(
+                "\(identifier) takes \(callBindings.count) arguments, not \(arguments.count)"
+            )
         }
         let keyword = isUnsafe(op) ? "unsafe " : ""
         switch kind {
         case .port:
-            let labelled = zip(callBindings, arguments).map { swiftCallArgument($0, passing: $1) }
-            return keyword + portCall(swiftName, labelled, on: element.namespace)
+            let labelled = zip(op.swiftOrdered(callBindings), arguments).map {
+                swiftCallArgument($0, passing: $1)
+            }
+            return keyword + portCall(op.swiftName, labelled, on: element.namespace)
         case .highway:
-            return keyword + referenceCall(referenceFunctionName(swiftName, element), arguments)
+            let reference = referenceFunctionName(op.identifier, element)
+            return keyword + referenceCall(reference, op.highwayOrdered(arguments))
         }
     }
 
@@ -5569,10 +6342,10 @@ struct CodegenSide {
     }
 }
 
-func codegenOp(_ swiftName: String, for element: Element) -> Op {
-    guard let op = ops.first(where: { $0.swiftName == swiftName && $0.applies.matches(element) })
+func codegenOp(_ identifier: String, for element: Element) -> Op {
+    guard let op = ops.first(where: { $0.identifier == identifier && $0.applies.matches(element) })
     else {
-        fatalError("\(swiftName) is not an op of \(element.swiftType)")
+        fatalError("\(identifier) is not an op of \(element.swiftType)")
     }
     return op
 }
@@ -5585,12 +6358,13 @@ func codegenConstant(
     let highway = CodegenSide(kind: .highway, element: element)
     let lane = element.category == .float ? "1.5" : "26"
     switch parameter {
-    case .vector: return (port.repeating(lane), highway.repeating(lane))
+    case .vector, .fillVector, .otherwiseVector:
+        return (port.repeating(lane), highway.repeating(lane))
     case .indices: return (port.repeating("3"), highway.repeating("3"))
-    case .lane: return (lane, lane)
+    case .lane, .fillLane: return (lane, lane)
     case .shiftAmount: return ("3", "3")
     case .laneAmount, .count: return ("1", "1")
-    case .tag, .mask, .constLanePointer, .lanePointer, .outVector: return nil
+    case .tag, .mask, .whereMask, .constLanePointer, .lanePointer, .outVector: return nil
     }
 }
 
@@ -5599,8 +6373,9 @@ func codegenFunctions(
     referenceName: String,
     for element: Element,
     returns: ReturnType,
-    isUnsafe: Bool,
-    parameters: [CodegenParameter]
+    isUnsafe: (port: Bool, reference: Bool),
+    parameters: [CodegenParameter],
+    highwayOrdered: ([String]) -> [String] = { $0 }
 ) -> String {
     let constants = parameters.indices.filter {
         codegenConstant(of: parameters[$0].kind, for: element) != nil
@@ -5644,7 +6419,7 @@ func codegenFunctions(
                 isUnsafe: isUnsafe,
                 constantParameter: variant.map { parameters[$0].binding.swiftName },
                 port: (portParameters, portArguments),
-                reference: (referenceParameters, referenceArguments)
+                reference: (referenceParameters, highwayOrdered(referenceArguments))
             )
         )
     }
@@ -5655,7 +6430,12 @@ func codegenFunctions(
 func codegenFunctions(of op: Op, for element: Element) -> String {
     var parameters: [CodegenParameter] = []
 
-    let parameterBindings = bindings(of: op, for: element, scope: "\(element.namespace).")
+    let parameterBindings = bindings(
+        of: op,
+        for: element,
+        scope: "\(element.namespace).",
+        checked: false
+    )
     for (binding, parameter) in zip(parameterBindings, op.parameters) {
         if case .tag = parameter { continue }
         parameters.append(
@@ -5669,11 +6449,12 @@ func codegenFunctions(of op: Op, for element: Element) -> String {
 
     return codegenFunctions(
         op.swiftName,
-        referenceName: referenceFunctionName(op.swiftName, element),
+        referenceName: referenceFunctionName(op.identifier, element),
         for: element,
         returns: op.returns,
-        isUnsafe: isUnsafe(op),
-        parameters: parameters
+        isUnsafe: (port: isUnsafe(op) || takesLaneAmount(op), reference: isUnsafe(op)),
+        parameters: op.swiftOrdered(parameters),
+        highwayOrdered: op.highwayOrdered
     )
 }
 
@@ -5702,7 +6483,7 @@ func codegenFunctions(_ op: WideningOp, from narrow: Element, to wide: Element) 
         referenceName: wideningFunctionName(op, from: narrow, to: wide),
         for: wide,
         returns: .vector,
-        isUnsafe: true,
+        isUnsafe: (port: true, reference: true),
         parameters: parameters
     )
 }
@@ -5714,7 +6495,7 @@ func repeatingBlockCodegenFunctions(for element: Element) -> String {
         referenceName: referenceFunctionName(repeatingBlockName, element),
         for: element,
         returns: .vector,
-        isUnsafe: false,
+        isUnsafe: (port: false, reference: false),
         port: (lanes.map { "_ \($0): \(element.namespace).Lane" }, lanes),
         reference: (lanes.map { "_ \($0): \(element.swiftType)" }, lanes)
     )
@@ -5742,7 +6523,7 @@ func referenceSpanForms(of op: Op, for element: Element) -> SpanForms? {
                 arguments.append(binding.isInOut ? "&\(binding.swiftName)" : binding.swiftName)
             }
         }
-        return "unsafe \(referenceCall(referenceFunctionName(op.swiftName, element), arguments))"
+        return "unsafe \(referenceCall(referenceFunctionName(op.identifier, element), arguments))"
     }
     return forms
 }
