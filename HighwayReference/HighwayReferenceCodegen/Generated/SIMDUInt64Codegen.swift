@@ -2886,6 +2886,142 @@ public func highwaySlide1DownFillingWithU64ConstantFill(_ a: SIMDUInt64.Vector) 
 }
 
 @inline(never)
+public func portTableLookupLanesU64(
+    _ a: SIMDUInt64.Vector,
+    atUnchecked indices: SIMDUInt64.Indices
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.tableLookupLanes(a, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupLanesU64(
+    _ a: SIMDUInt64.Vector,
+    atUnchecked indices: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.tableLookupLanesU64(a.raw, indices.raw))
+}
+
+@inline(never)
+public func portTableLookupLanesU64ConstantA(
+    atUnchecked indices: SIMDUInt64.Indices
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.tableLookupLanes(SIMDUInt64.repeating(26), atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupLanesU64ConstantA(
+    atUnchecked indices: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.tableLookupLanesU64(
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            indices.raw
+        )
+    )
+}
+
+@inline(never)
+public func portTableLookupLanesU64ConstantIndices(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.tableLookupLanes(a, atUnchecked: SIMDUInt64.repeating(1))
+}
+
+@inline(never)
+public func highwayTableLookupLanesU64ConstantIndices(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.tableLookupLanesU64(
+            a.raw,
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portTwoTablesLookupLanesU64(
+    _ a: SIMDUInt64.Vector,
+    _ b: SIMDUInt64.Vector,
+    atUnchecked indices: SIMDUInt64.Indices
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.twoTablesLookupLanes(a, b, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTwoTablesLookupLanesU64(
+    _ a: SIMDUInt64.Vector,
+    _ b: SIMDUInt64.Vector,
+    atUnchecked indices: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.twoTablesLookupLanesU64(a.raw, b.raw, indices.raw)
+    )
+}
+
+@inline(never)
+public func portTwoTablesLookupLanesU64ConstantA(
+    _ b: SIMDUInt64.Vector,
+    atUnchecked indices: SIMDUInt64.Indices
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.twoTablesLookupLanes(SIMDUInt64.repeating(26), b, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTwoTablesLookupLanesU64ConstantA(
+    _ b: SIMDUInt64.Vector,
+    atUnchecked indices: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.twoTablesLookupLanesU64(
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            b.raw,
+            indices.raw
+        )
+    )
+}
+
+@inline(never)
+public func portTwoTablesLookupLanesU64ConstantB(
+    _ a: SIMDUInt64.Vector,
+    atUnchecked indices: SIMDUInt64.Indices
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.twoTablesLookupLanes(a, SIMDUInt64.repeating(26), atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTwoTablesLookupLanesU64ConstantB(
+    _ a: SIMDUInt64.Vector,
+    atUnchecked indices: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.twoTablesLookupLanesU64(
+            a.raw,
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            indices.raw
+        )
+    )
+}
+
+@inline(never)
+public func portTwoTablesLookupLanesU64ConstantIndices(
+    _ a: SIMDUInt64.Vector,
+    _ b: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.twoTablesLookupLanes(a, b, atUnchecked: SIMDUInt64.repeating(1))
+}
+
+@inline(never)
+public func highwayTwoTablesLookupLanesU64ConstantIndices(
+    _ a: SIMDUInt64.Vector,
+    _ b: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.twoTablesLookupLanesU64(
+            a.raw,
+            b.raw,
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(1)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portLoadInterleaved2U64(
     from: UnsafePointer<SIMDUInt64.Lane>,
     _ v0: inout SIMDUInt64.Vector,

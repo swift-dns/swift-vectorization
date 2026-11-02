@@ -100,9 +100,10 @@ Two differences are deliberate:
 - `firstLanes(count:)` on NEON selects every lane for any count of at least `laneCount`, as
   highway's x86 and EMU128 ops do. Highway's NEON op wraps counts above the lane type's signed
   maximum.
-- The slide ops' `by:` forms trap on lane amounts outside `0...laneCount`, and their `@unsafe`
-  `byUnchecked:` forms only assert it. Above `laneCount`, highway's NEON ops read their index
-  tables out of bounds.
+- The slide ops' `by:` forms trap on lane amounts outside `0...laneCount`, and the lookup ops'
+  `at:` forms on indices outside the range highway defines. Their `@unsafe` `byUnchecked:` and
+  `atUnchecked:` forms only assert it. Above `laneCount`, highway's NEON slides read their index
+  tables out of bounds, and its EMU128 `TableLookupLanes` reads outside the vector.
 
 ## What is not wrapped
 

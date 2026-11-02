@@ -50,6 +50,10 @@ HWY_INLINE bool isEmulated() {
 /// The name of the target the ops below were compiled for.
 HWY_INLINE const char* targetName() { return hwy::TargetName(HWY_TARGET); }
 
+/// Whether highway's debug assertions are on, which abort on indices that its lookups
+/// do not accept.
+HWY_INLINE bool hasDebugAssertions() { return HWY_IS_DEBUG_BUILD; }
+
 /// Highway's SVE ops overwrite one operand, so the compiler may swap a commutative op's
 /// operands to save a move, which decides whose NaN comes out when both are NaN. Out of
 /// line, the first operand is already in the register the op overwrites, which is the
@@ -128,7 +132,10 @@ HWY_INLINE cvectorization_ops_raw_vector_u8 slide1UpU8(cvectorization_ops_raw_ve
 HWY_INLINE cvectorization_ops_raw_vector_u8 slide1UpFillingWithU8(uint8_t fill, cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Slide1UpOr(fill, TagU8(), fromPortU8(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 slide1DownU8(cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Slide1Down(TagU8(), fromPortU8(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 slide1DownFillingWithU8(uint8_t fill, cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Slide1DownOr(fill, TagU8(), fromPortU8(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupBytesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::TableLookupBytes(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupBytesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 indices) { return toPortU8(hn::TableLookupBytes(fromPortU8(a), fromPortU8(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupBytesOrZeroU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 indices) { return toPortU8(hn::TableLookupBytesOr0(fromPortU8(a), fromPortU8(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupLanesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 indices) { return toPortU8(hn::TableLookupLanes(fromPortU8(a), hn::IndicesFromVec(TagU8(), fromPortU8(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 twoTablesLookupLanesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, cvectorization_ops_raw_vector_u8 indices) { return toPortU8(hn::TwoTablesLookupLanes(TagU8(), fromPortU8(a), fromPortU8(b), hn::IndicesFromVec(TagU8(), fromPortU8(indices)))); }
 HWY_INLINE void loadInterleaved2U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1) {
 #if HWY_TARGET_IS_SVE
   VectorU8 h0, h1;
@@ -257,6 +264,8 @@ HWY_INLINE cvectorization_ops_raw_vector_u16 slide1UpU16(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_u16 slide1UpFillingWithU16(uint16_t fill, cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Slide1UpOr(fill, TagU16(), fromPortU16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 slide1DownU16(cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Slide1Down(TagU16(), fromPortU16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 slide1DownFillingWithU16(uint16_t fill, cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Slide1DownOr(fill, TagU16(), fromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 tableLookupLanesU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 indices) { return toPortU16(hn::TableLookupLanes(fromPortU16(a), hn::IndicesFromVec(TagU16(), fromPortU16(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 twoTablesLookupLanesU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, cvectorization_ops_raw_vector_u16 indices) { return toPortU16(hn::TwoTablesLookupLanes(TagU16(), fromPortU16(a), fromPortU16(b), hn::IndicesFromVec(TagU16(), fromPortU16(indices)))); }
 HWY_INLINE void loadInterleaved2U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1) {
 #if HWY_TARGET_IS_SVE
   VectorU16 h0, h1;
@@ -384,6 +393,8 @@ HWY_INLINE cvectorization_ops_raw_vector_u32 slide1UpU32(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_u32 slide1UpFillingWithU32(uint32_t fill, cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Slide1UpOr(fill, TagU32(), fromPortU32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 slide1DownU32(cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Slide1Down(TagU32(), fromPortU32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 slide1DownFillingWithU32(uint32_t fill, cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Slide1DownOr(fill, TagU32(), fromPortU32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 tableLookupLanesU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 indices) { return toPortU32(hn::TableLookupLanes(fromPortU32(a), hn::IndicesFromVec(TagU32(), fromPortU32(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 twoTablesLookupLanesU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, cvectorization_ops_raw_vector_u32 indices) { return toPortU32(hn::TwoTablesLookupLanes(TagU32(), fromPortU32(a), fromPortU32(b), hn::IndicesFromVec(TagU32(), fromPortU32(indices)))); }
 HWY_INLINE void loadInterleaved2U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1) {
 #if HWY_TARGET_IS_SVE
   VectorU32 h0, h1;
@@ -515,6 +526,8 @@ HWY_INLINE cvectorization_ops_raw_vector_u64 slide1UpU64(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_u64 slide1UpFillingWithU64(uint64_t fill, cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Slide1UpOr(fill, TagU64(), fromPortU64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 slide1DownU64(cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Slide1Down(TagU64(), fromPortU64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 slide1DownFillingWithU64(uint64_t fill, cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Slide1DownOr(fill, TagU64(), fromPortU64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 tableLookupLanesU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 indices) { return toPortU64(hn::TableLookupLanes(fromPortU64(a), hn::IndicesFromVec(TagU64(), fromPortU64(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 twoTablesLookupLanesU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 indices) { return toPortU64(hn::TwoTablesLookupLanes(TagU64(), fromPortU64(a), fromPortU64(b), hn::IndicesFromVec(TagU64(), fromPortU64(indices)))); }
 HWY_INLINE void loadInterleaved2U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1) {
 #if HWY_TARGET_IS_SVE
   VectorU64 h0, h1;
@@ -646,7 +659,10 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 slide1UpI8(cvectorization_ops_raw_ve
 HWY_INLINE cvectorization_ops_raw_vector_i8 slide1UpFillingWithI8(int8_t fill, cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Slide1UpOr(fill, TagI8(), fromPortI8(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 slide1DownI8(cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Slide1Down(TagI8(), fromPortI8(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 slide1DownFillingWithI8(int8_t fill, cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Slide1DownOr(fill, TagI8(), fromPortI8(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupBytesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::TableLookupBytes(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupBytesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 indices) { return toPortI8(hn::TableLookupBytes(fromPortI8(a), fromPortI8(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupBytesOrZeroI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 indices) { return toPortI8(hn::TableLookupBytesOr0(fromPortI8(a), fromPortI8(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupLanesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 indices) { return toPortI8(hn::TableLookupLanes(fromPortI8(a), hn::IndicesFromVec(TagI8(), fromPortI8(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 twoTablesLookupLanesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, cvectorization_ops_raw_vector_i8 indices) { return toPortI8(hn::TwoTablesLookupLanes(TagI8(), fromPortI8(a), fromPortI8(b), hn::IndicesFromVec(TagI8(), fromPortI8(indices)))); }
 HWY_INLINE void loadInterleaved2I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1) {
 #if HWY_TARGET_IS_SVE
   VectorI8 h0, h1;
@@ -776,6 +792,8 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 slide1UpI16(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_i16 slide1UpFillingWithI16(int16_t fill, cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Slide1UpOr(fill, TagI16(), fromPortI16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 slide1DownI16(cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Slide1Down(TagI16(), fromPortI16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 slide1DownFillingWithI16(int16_t fill, cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Slide1DownOr(fill, TagI16(), fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 tableLookupLanesI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 indices) { return toPortI16(hn::TableLookupLanes(fromPortI16(a), hn::IndicesFromVec(TagI16(), fromPortI16(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 twoTablesLookupLanesI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, cvectorization_ops_raw_vector_i16 indices) { return toPortI16(hn::TwoTablesLookupLanes(TagI16(), fromPortI16(a), fromPortI16(b), hn::IndicesFromVec(TagI16(), fromPortI16(indices)))); }
 HWY_INLINE void loadInterleaved2I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1) {
 #if HWY_TARGET_IS_SVE
   VectorI16 h0, h1;
@@ -905,6 +923,8 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 slide1UpI32(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_i32 slide1UpFillingWithI32(int32_t fill, cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Slide1UpOr(fill, TagI32(), fromPortI32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 slide1DownI32(cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Slide1Down(TagI32(), fromPortI32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 slide1DownFillingWithI32(int32_t fill, cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Slide1DownOr(fill, TagI32(), fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 tableLookupLanesI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 indices) { return toPortI32(hn::TableLookupLanes(fromPortI32(a), hn::IndicesFromVec(TagI32(), fromPortI32(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 twoTablesLookupLanesI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, cvectorization_ops_raw_vector_i32 indices) { return toPortI32(hn::TwoTablesLookupLanes(TagI32(), fromPortI32(a), fromPortI32(b), hn::IndicesFromVec(TagI32(), fromPortI32(indices)))); }
 HWY_INLINE void loadInterleaved2I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1) {
 #if HWY_TARGET_IS_SVE
   VectorI32 h0, h1;
@@ -1036,6 +1056,8 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 slide1UpI64(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_i64 slide1UpFillingWithI64(int64_t fill, cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Slide1UpOr(fill, TagI64(), fromPortI64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 slide1DownI64(cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Slide1Down(TagI64(), fromPortI64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 slide1DownFillingWithI64(int64_t fill, cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Slide1DownOr(fill, TagI64(), fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 tableLookupLanesI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 indices) { return toPortI64(hn::TableLookupLanes(fromPortI64(a), hn::IndicesFromVec(TagI64(), fromPortI64(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 twoTablesLookupLanesI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, cvectorization_ops_raw_vector_i64 indices) { return toPortI64(hn::TwoTablesLookupLanes(TagI64(), fromPortI64(a), fromPortI64(b), hn::IndicesFromVec(TagI64(), fromPortI64(indices)))); }
 HWY_INLINE void loadInterleaved2I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1) {
 #if HWY_TARGET_IS_SVE
   VectorI64 h0, h1;
@@ -1160,6 +1182,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpF32(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1UpOr(fill, TagF32(), fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1Down(TagF32(), fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1DownOr(fill, TagF32(), fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 tableLookupLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_i32 indices) { return toPortF32(hn::TableLookupLanes(fromPortF32(a), hn::IndicesFromVec(TagF32(), fromPortI32(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 twoTablesLookupLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_i32 indices) { return toPortF32(hn::TwoTablesLookupLanes(TagF32(), fromPortF32(a), fromPortF32(b), hn::IndicesFromVec(TagF32(), fromPortI32(indices)))); }
 HWY_INLINE void loadInterleaved2F32(const float* from, OutVectorF32& v0, OutVectorF32& v1) {
 #if HWY_TARGET_IS_SVE
   VectorF32 h0, h1;
@@ -1278,6 +1302,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpF64(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1UpOr(fill, TagF64(), fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1Down(TagF64(), fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1DownOr(fill, TagF64(), fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 tableLookupLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_i64 indices) { return toPortF64(hn::TableLookupLanes(fromPortF64(a), hn::IndicesFromVec(TagF64(), fromPortI64(indices)))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 twoTablesLookupLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_i64 indices) { return toPortF64(hn::TwoTablesLookupLanes(TagF64(), fromPortF64(a), fromPortF64(b), hn::IndicesFromVec(TagF64(), fromPortI64(indices)))); }
 HWY_INLINE void loadInterleaved2F64(const double* from, OutVectorF64& v0, OutVectorF64& v1) {
 #if HWY_TARGET_IS_SVE
   VectorF64 h0, h1;
@@ -1397,7 +1423,10 @@ HWY_INLINE cvectorization_ops_raw_vector_u8 slide1UpU8(cvectorization_ops_raw_ve
 HWY_INLINE cvectorization_ops_raw_vector_u8 slide1UpFillingWithU8(uint8_t fill, cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::slide1UpFillingWithU8(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 slide1DownU8(cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::slide1DownU8(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 slide1DownFillingWithU8(uint8_t fill, cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::slide1DownFillingWithU8(fill, a); }
-HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupBytesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::tableLookupBytesU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupBytesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 indices) noexcept { return ::HighwayReference::tableLookupBytesU8(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupBytesOrZeroU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 indices) noexcept { return ::HighwayReference::tableLookupBytesOrZeroU8(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupLanesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 indices) noexcept { return ::HighwayReference::tableLookupLanesU8(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 twoTablesLookupLanesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, cvectorization_ops_raw_vector_u8 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesU8(a, b, indices); }
 HWY_INLINE void loadInterleaved2U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1) noexcept { ::HighwayReference::loadInterleaved2U8(from, v0, v1); }
 HWY_INLINE void loadInterleaved3U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1, OutVectorU8& v2) noexcept { ::HighwayReference::loadInterleaved3U8(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1, OutVectorU8& v2, OutVectorU8& v3) noexcept { ::HighwayReference::loadInterleaved4U8(from, v0, v1, v2, v3); }
@@ -1462,6 +1491,8 @@ HWY_INLINE cvectorization_ops_raw_vector_u16 slide1UpU16(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_u16 slide1UpFillingWithU16(uint16_t fill, cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::slide1UpFillingWithU16(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 slide1DownU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::slide1DownU16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 slide1DownFillingWithU16(uint16_t fill, cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::slide1DownFillingWithU16(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 tableLookupLanesU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 indices) noexcept { return ::HighwayReference::tableLookupLanesU16(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 twoTablesLookupLanesU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, cvectorization_ops_raw_vector_u16 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesU16(a, b, indices); }
 HWY_INLINE void loadInterleaved2U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1) noexcept { ::HighwayReference::loadInterleaved2U16(from, v0, v1); }
 HWY_INLINE void loadInterleaved3U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1, OutVectorU16& v2) noexcept { ::HighwayReference::loadInterleaved3U16(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1, OutVectorU16& v2, OutVectorU16& v3) noexcept { ::HighwayReference::loadInterleaved4U16(from, v0, v1, v2, v3); }
@@ -1525,6 +1556,8 @@ HWY_INLINE cvectorization_ops_raw_vector_u32 slide1UpU32(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_u32 slide1UpFillingWithU32(uint32_t fill, cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::slide1UpFillingWithU32(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 slide1DownU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::slide1DownU32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 slide1DownFillingWithU32(uint32_t fill, cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::slide1DownFillingWithU32(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 tableLookupLanesU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 indices) noexcept { return ::HighwayReference::tableLookupLanesU32(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 twoTablesLookupLanesU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, cvectorization_ops_raw_vector_u32 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesU32(a, b, indices); }
 HWY_INLINE void loadInterleaved2U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1) noexcept { ::HighwayReference::loadInterleaved2U32(from, v0, v1); }
 HWY_INLINE void loadInterleaved3U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1, OutVectorU32& v2) noexcept { ::HighwayReference::loadInterleaved3U32(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1, OutVectorU32& v2, OutVectorU32& v3) noexcept { ::HighwayReference::loadInterleaved4U32(from, v0, v1, v2, v3); }
@@ -1592,6 +1625,8 @@ HWY_INLINE cvectorization_ops_raw_vector_u64 slide1UpU64(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_u64 slide1UpFillingWithU64(uint64_t fill, cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::slide1UpFillingWithU64(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 slide1DownU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::slide1DownU64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 slide1DownFillingWithU64(uint64_t fill, cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::slide1DownFillingWithU64(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 tableLookupLanesU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 indices) noexcept { return ::HighwayReference::tableLookupLanesU64(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 twoTablesLookupLanesU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesU64(a, b, indices); }
 HWY_INLINE void loadInterleaved2U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1) noexcept { ::HighwayReference::loadInterleaved2U64(from, v0, v1); }
 HWY_INLINE void loadInterleaved3U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1, OutVectorU64& v2) noexcept { ::HighwayReference::loadInterleaved3U64(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1, OutVectorU64& v2, OutVectorU64& v3) noexcept { ::HighwayReference::loadInterleaved4U64(from, v0, v1, v2, v3); }
@@ -1659,7 +1694,10 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 slide1UpI8(cvectorization_ops_raw_ve
 HWY_INLINE cvectorization_ops_raw_vector_i8 slide1UpFillingWithI8(int8_t fill, cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::slide1UpFillingWithI8(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 slide1DownI8(cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::slide1DownI8(a); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 slide1DownFillingWithI8(int8_t fill, cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::slide1DownFillingWithI8(fill, a); }
-HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupBytesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::tableLookupBytesI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupBytesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 indices) noexcept { return ::HighwayReference::tableLookupBytesI8(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupBytesOrZeroI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 indices) noexcept { return ::HighwayReference::tableLookupBytesOrZeroI8(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupLanesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 indices) noexcept { return ::HighwayReference::tableLookupLanesI8(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 twoTablesLookupLanesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, cvectorization_ops_raw_vector_i8 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesI8(a, b, indices); }
 HWY_INLINE void loadInterleaved2I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1) noexcept { ::HighwayReference::loadInterleaved2I8(from, v0, v1); }
 HWY_INLINE void loadInterleaved3I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1, OutVectorI8& v2) noexcept { ::HighwayReference::loadInterleaved3I8(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1, OutVectorI8& v2, OutVectorI8& v3) noexcept { ::HighwayReference::loadInterleaved4I8(from, v0, v1, v2, v3); }
@@ -1725,6 +1763,8 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 slide1UpI16(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_i16 slide1UpFillingWithI16(int16_t fill, cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::slide1UpFillingWithI16(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 slide1DownI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::slide1DownI16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 slide1DownFillingWithI16(int16_t fill, cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::slide1DownFillingWithI16(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 tableLookupLanesI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 indices) noexcept { return ::HighwayReference::tableLookupLanesI16(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 twoTablesLookupLanesI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, cvectorization_ops_raw_vector_i16 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesI16(a, b, indices); }
 HWY_INLINE void loadInterleaved2I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1) noexcept { ::HighwayReference::loadInterleaved2I16(from, v0, v1); }
 HWY_INLINE void loadInterleaved3I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1, OutVectorI16& v2) noexcept { ::HighwayReference::loadInterleaved3I16(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1, OutVectorI16& v2, OutVectorI16& v3) noexcept { ::HighwayReference::loadInterleaved4I16(from, v0, v1, v2, v3); }
@@ -1790,6 +1830,8 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 slide1UpI32(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_i32 slide1UpFillingWithI32(int32_t fill, cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::slide1UpFillingWithI32(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 slide1DownI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::slide1DownI32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 slide1DownFillingWithI32(int32_t fill, cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::slide1DownFillingWithI32(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 tableLookupLanesI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::tableLookupLanesI32(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 twoTablesLookupLanesI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesI32(a, b, indices); }
 HWY_INLINE void loadInterleaved2I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1) noexcept { ::HighwayReference::loadInterleaved2I32(from, v0, v1); }
 HWY_INLINE void loadInterleaved3I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1, OutVectorI32& v2) noexcept { ::HighwayReference::loadInterleaved3I32(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1, OutVectorI32& v2, OutVectorI32& v3) noexcept { ::HighwayReference::loadInterleaved4I32(from, v0, v1, v2, v3); }
@@ -1857,6 +1899,8 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 slide1UpI64(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_i64 slide1UpFillingWithI64(int64_t fill, cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::slide1UpFillingWithI64(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 slide1DownI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::slide1DownI64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 slide1DownFillingWithI64(int64_t fill, cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::slide1DownFillingWithI64(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 tableLookupLanesI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::tableLookupLanesI64(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 twoTablesLookupLanesI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesI64(a, b, indices); }
 HWY_INLINE void loadInterleaved2I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1) noexcept { ::HighwayReference::loadInterleaved2I64(from, v0, v1); }
 HWY_INLINE void loadInterleaved3I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1, OutVectorI64& v2) noexcept { ::HighwayReference::loadInterleaved3I64(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1, OutVectorI64& v2, OutVectorI64& v3) noexcept { ::HighwayReference::loadInterleaved4I64(from, v0, v1, v2, v3); }
@@ -1917,6 +1961,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpF32(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1UpFillingWithF32(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1DownF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1DownFillingWithF32(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 tableLookupLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::tableLookupLanesF32(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 twoTablesLookupLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesF32(a, b, indices); }
 HWY_INLINE void loadInterleaved2F32(const float* from, OutVectorF32& v0, OutVectorF32& v1) noexcept { ::HighwayReference::loadInterleaved2F32(from, v0, v1); }
 HWY_INLINE void loadInterleaved3F32(const float* from, OutVectorF32& v0, OutVectorF32& v1, OutVectorF32& v2) noexcept { ::HighwayReference::loadInterleaved3F32(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4F32(const float* from, OutVectorF32& v0, OutVectorF32& v1, OutVectorF32& v2, OutVectorF32& v3) noexcept { ::HighwayReference::loadInterleaved4F32(from, v0, v1, v2, v3); }
@@ -1971,6 +2017,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpF64(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1UpFillingWithF64(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1DownF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1DownFillingWithF64(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 tableLookupLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::tableLookupLanesF64(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 twoTablesLookupLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesF64(a, b, indices); }
 HWY_INLINE void loadInterleaved2F64(const double* from, OutVectorF64& v0, OutVectorF64& v1) noexcept { ::HighwayReference::loadInterleaved2F64(from, v0, v1); }
 HWY_INLINE void loadInterleaved3F64(const double* from, OutVectorF64& v0, OutVectorF64& v1, OutVectorF64& v2) noexcept { ::HighwayReference::loadInterleaved3F64(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4F64(const double* from, OutVectorF64& v0, OutVectorF64& v1, OutVectorF64& v2, OutVectorF64& v3) noexcept { ::HighwayReference::loadInterleaved4F64(from, v0, v1, v2, v3); }

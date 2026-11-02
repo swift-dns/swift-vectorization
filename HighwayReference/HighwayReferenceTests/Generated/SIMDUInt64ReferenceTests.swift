@@ -1091,6 +1091,146 @@ struct SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func tableLookupLanes() {
+        let mismatches = Mismatches("tableLookupLanes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2610_0F2D_B768_7965)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: H.laneCount,
+            seed: 0x2610_0E2D_B768_77B2,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                H.tableLookupLanes(a, at: indices),
+                H.Vector(raw: HighwayReference.tableLookupLanesU64(a.raw, indices.raw)),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupLanesUnchecked() {
+        let mismatches = Mismatches("tableLookupLanes unchecked")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCEAB_48AB_8F1F_F4C5)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: H.laneCount,
+            seed: 0xCEAB_47AB_8F1F_F312,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                unsafe H.tableLookupLanes(a, atUnchecked: indices),
+                H.Vector(raw: HighwayReference.tableLookupLanesU64(a.raw, indices.raw)),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(
+        .disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"),
+        .disabled(
+            if: SIMDTarget.targetName == "EMU128",
+            "EMU128 reads outside the vector for these indices"
+        )
+    )
+    func tableLookupLanesOutOfContract() {
+        let mismatches = Mismatches("tableLookupLanes out of contract")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB92A_324A_BF10_9C6E)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: H.laneCount,
+            seed: 0xB92A_334A_BF10_9E21,
+            inContract: false
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                unsafe H.tableLookupLanes(a, atUnchecked: indices),
+                H.Vector(raw: HighwayReference.tableLookupLanesU64(a.raw, indices.raw)),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanes() {
+        let mismatches = Mismatches("twoTablesLookupLanes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8401_939F_7135_F6B4)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8401_949F_7135_F867)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0x8401_959F_7135_FA1A,
+            inContract: true
+        )
+        for (a, b, indices) in mixedTriples(
+            aInputs,
+            bInputs,
+            indicesInputs,
+            seed: 0x2A47_9191_7FFC_C7E8
+        ) {
+            mismatches.check(
+                H.twoTablesLookupLanes(a, b, at: indices),
+                H.Vector(raw: HighwayReference.twoTablesLookupLanesU64(a.raw, b.raw, indices.raw)),
+                "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanesUnchecked() {
+        let mismatches = Mismatches("twoTablesLookupLanes unchecked")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA29B_DE9C_1974_B82A)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA29B_DF9C_1974_B9DD)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0xA29B_DC9C_1974_B4C4,
+            inContract: true
+        )
+        for (a, b, indices) in mixedTriples(
+            aInputs,
+            bInputs,
+            indicesInputs,
+            seed: 0x3347_AB5F_6B4E_EEEE
+        ) {
+            mismatches.check(
+                unsafe H.twoTablesLookupLanes(a, b, atUnchecked: indices),
+                H.Vector(raw: HighwayReference.twoTablesLookupLanesU64(a.raw, b.raw, indices.raw)),
+                "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"))
+    func twoTablesLookupLanesOutOfContract() {
+        let mismatches = Mismatches("twoTablesLookupLanes out of contract")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA4F9_3BE3_A65E_B145)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA4F9_3AE3_A65E_AF92)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0xA4F9_39E3_A65E_ADDF,
+            inContract: false
+        )
+        for (a, b, indices) in mixedTriples(
+            aInputs,
+            bInputs,
+            indicesInputs,
+            seed: 0x9ABA_D4FA_2655_80B7
+        ) {
+            mismatches.check(
+                unsafe H.twoTablesLookupLanes(a, b, atUnchecked: indices),
+                H.Vector(raw: HighwayReference.twoTablesLookupLanesU64(a.raw, b.raw, indices.raw)),
+                "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadInterleaved2() {
         let mismatches = Mismatches("loadInterleaved2")
         let fromInputs = Inputs.buffers(

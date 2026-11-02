@@ -2147,6 +2147,133 @@ struct SIMDUInt64CodegenTests {
         mismatches.record()
     }
 
+    @Test func tableLookupLanes() {
+        let mismatches = Mismatches("portTableLookupLanesU64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2610_0F2D_B768_7965)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: H.laneCount,
+            seed: 0x2610_0E2D_B768_77B2,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTableLookupLanesU64(a, atUnchecked: indices),
+                highwayTableLookupLanesU64(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupLanesConstantA() {
+        let mismatches = Mismatches("portTableLookupLanesU64ConstantA")
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: H.laneCount,
+            seed: 0x3489_709E_6FB2_FF49,
+            inContract: true
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                portTableLookupLanesU64ConstantA(atUnchecked: indices),
+                highwayTableLookupLanesU64ConstantA(atUnchecked: indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupLanesConstantIndices() {
+        let mismatches = Mismatches("portTableLookupLanesU64ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3442_D311_70FF_A598)
+        for a in aInputs {
+            mismatches.check(
+                portTableLookupLanesU64ConstantIndices(a),
+                highwayTableLookupLanesU64ConstantIndices(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanes() {
+        let mismatches = Mismatches("portTwoTablesLookupLanesU64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8401_939F_7135_F6B4)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8401_949F_7135_F867)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0x8401_959F_7135_FA1A,
+            inContract: true
+        )
+        for (a, b, indices) in mixedTriples(
+            aInputs,
+            bInputs,
+            indicesInputs,
+            seed: 0x2A47_9191_7FFC_C7E8
+        ) {
+            mismatches.check(
+                portTwoTablesLookupLanesU64(a, b, atUnchecked: indices),
+                highwayTwoTablesLookupLanesU64(a, b, atUnchecked: indices),
+                "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanesConstantA() {
+        let mismatches = Mismatches("portTwoTablesLookupLanesU64ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5C53_3AE6_BDC0_A25A)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0x5C53_39E6_BDC0_A0A7,
+            inContract: true
+        )
+        for (b, indices) in everyPair(bInputs, indicesInputs) {
+            mismatches.check(
+                portTwoTablesLookupLanesU64ConstantA(b, atUnchecked: indices),
+                highwayTwoTablesLookupLanesU64ConstantA(b, atUnchecked: indices),
+                "b: \(describe(b)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanesConstantB() {
+        let mismatches = Mismatches("portTwoTablesLookupLanesU64ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x52E4_84E6_B830_F7B8)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0x52E4_86E6_B830_FB1E,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTwoTablesLookupLanesU64ConstantB(a, atUnchecked: indices),
+                highwayTwoTablesLookupLanesU64ConstantB(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanesConstantIndices() {
+        let mismatches = Mismatches("portTwoTablesLookupLanesU64ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x29A2_CB59_B1CC_647B)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x29A2_CA59_B1CC_62C8)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portTwoTablesLookupLanesU64ConstantIndices(a, b),
+                highwayTwoTablesLookupLanesU64ConstantIndices(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadInterleaved2() {
         let mismatches = Mismatches("portLoadInterleaved2U64")
         let fromInputs = Inputs.buffers(

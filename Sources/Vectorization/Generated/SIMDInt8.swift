@@ -48,6 +48,8 @@ public enum SIMDInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
         }
     }
 
+    public typealias Indices = SIMDInt8.Vector
+
     @export(implementation) @inline(always)
     public static var laneCount: Int { Int(cvectorization_ops_lane_count_i8()) }
 
@@ -625,8 +627,80 @@ public enum SIMDInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
     }
 
     @export(implementation) @inline(always)
-    public static func tableLookupBytes(_ a: Vector, _ b: Vector) -> Vector {
-        Vector(raw: cvectorization_ops_table_lookup_bytes_i8(a.raw, b.raw))
+    public static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return unsafe tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_bytes_i8(a.raw, indices.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return unsafe tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_bytes_or_zero_i8(a.raw, indices.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, laneCount),
+            "Lane index is negative or at least as many as a vector has lanes"
+        )
+        return unsafe tableLookupLanes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupLanes(_ a: Vector, atUnchecked indices: Indices) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, laneCount),
+            "Lane index is negative or at least as many as a vector has lanes"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_lanes_i8(a.raw, indices.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func twoTablesLookupLanes(_ a: Vector, _ b: Vector, at indices: Indices) -> Vector
+    {
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 2 * laneCount),
+            "Lane index is negative or at least twice as many as a vector has lanes"
+        )
+        return unsafe twoTablesLookupLanes(a, b, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func twoTablesLookupLanes(
+        _ a: Vector,
+        _ b: Vector,
+        atUnchecked indices: Indices
+    ) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 2 * laneCount),
+            "Lane index is negative or at least twice as many as a vector has lanes"
+        )
+        return Vector(raw: cvectorization_ops_two_tables_lookup_lanes_i8(a.raw, b.raw, indices.raw))
     }
 
     @export(implementation) @inline(always)

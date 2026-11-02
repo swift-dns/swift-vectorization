@@ -48,6 +48,8 @@ public enum SIMDUInt64: SIMDElement, SIMDIntegerElement, SendableMetatype {
         }
     }
 
+    public typealias Indices = SIMDUInt64.Vector
+
     @export(implementation) @inline(always)
     public static var laneCount: Int { Int(cvectorization_ops_lane_count_u64()) }
 
@@ -634,6 +636,49 @@ public enum SIMDUInt64: SIMDElement, SIMDIntegerElement, SendableMetatype {
     @export(implementation) @inline(always)
     public static func slide1Down(_ a: Vector, fillingWith fill: Lane) -> Vector {
         Vector(raw: cvectorization_ops_slide1_down_filling_with_u64(fill, a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_u64(indices.raw, 0, laneCount),
+            "Lane index is negative or at least as many as a vector has lanes"
+        )
+        return unsafe tableLookupLanes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupLanes(_ a: Vector, atUnchecked indices: Indices) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_u64(indices.raw, 0, laneCount),
+            "Lane index is negative or at least as many as a vector has lanes"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_lanes_u64(a.raw, indices.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func twoTablesLookupLanes(_ a: Vector, _ b: Vector, at indices: Indices) -> Vector
+    {
+        precondition(
+            cvectorization_ops_indices_within_u64(indices.raw, 0, 2 * laneCount),
+            "Lane index is negative or at least twice as many as a vector has lanes"
+        )
+        return unsafe twoTablesLookupLanes(a, b, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func twoTablesLookupLanes(
+        _ a: Vector,
+        _ b: Vector,
+        atUnchecked indices: Indices
+    ) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_u64(indices.raw, 0, 2 * laneCount),
+            "Lane index is negative or at least twice as many as a vector has lanes"
+        )
+        return Vector(
+            raw: cvectorization_ops_two_tables_lookup_lanes_u64(a.raw, b.raw, indices.raw)
+        )
     }
 
     @export(implementation) @inline(always)

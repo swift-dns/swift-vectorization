@@ -140,6 +140,7 @@ enum Parameter {
     case tag
     case vector
     case indices
+    case laneIndices
     case mask
     case lane
     case constLanePointer
@@ -188,6 +189,52 @@ enum ReturnType {
 enum SpanExtent {
     case vectors(Int, aligned: Bool = false)
     case first
+}
+
+// How many indices a lookup op accepts, as a number of lanes of a vector or a fixed number.
+enum IndexCount {
+    case fixed(Int)
+    case lanes(Int)
+
+    func expression(laneCount: String) -> String {
+        switch self {
+        case .fixed(let count): return String(count)
+        case .lanes(1): return laneCount
+        case .lanes(let multiple): return "\(multiple) * \(laneCount)"
+        }
+    }
+}
+
+// The indices a lookup op accepts: those which, as unsigned lanes, are below `count` once `offset`
+// is subtracted from them, wrapping around. So an offset of 128 and a count of 144 accept 128
+// through 255 and 0 through 15.
+struct IndexContract {
+    let offset: Int
+    let count: IndexCount
+    let message: String
+    var isDefinedOnEmulation = true
+
+    static let bytes = IndexContract(
+        offset: 0,
+        count: .fixed(16),
+        message: "Byte index is negative or more than 15"
+    )
+    static let zeroingBytes = IndexContract(
+        offset: 128,
+        count: .fixed(144),
+        message: "Byte index is 16 through 127"
+    )
+    static let lanes = IndexContract(
+        offset: 0,
+        count: .lanes(1),
+        message: "Lane index is negative or at least as many as a vector has lanes",
+        isDefinedOnEmulation: false
+    )
+    static let lanesOfTwoTables = IndexContract(
+        offset: 0,
+        count: .lanes(2),
+        message: "Lane index is negative or at least twice as many as a vector has lanes"
+    )
 }
 
 protocol WidthScaled {
@@ -251,6 +298,7 @@ struct Op {
     var documentation: String = ""
     let span: SpanExtent?
     let constantArgument: ConstantArgument?
+    let indexContract: IndexContract?
     let unorderedNaNs: UnorderedNaNs?
     let targets: TargetBodies<Element>
     let spanTargets: TargetBodies<Element>
@@ -267,6 +315,7 @@ struct Op {
         _ documentation: String = "",
         span: SpanExtent? = nil,
         constantArgument: ConstantArgument? = nil,
+        indexContract: IndexContract? = nil,
         unorderedNaNs: UnorderedNaNs? = nil,
         targets: TargetBodies<Element> = TargetBodies(),
         spanTargets: TargetBodies<Element> = TargetBodies(),
@@ -282,6 +331,7 @@ struct Op {
         self.documentation = documentation
         self.span = span
         self.constantArgument = constantArgument
+        self.indexContract = indexContract
         self.unorderedNaNs = unorderedNaNs
         self.targets = targets
         self.spanTargets = spanTargets
@@ -340,15 +390,17 @@ func clampedCount(_ count: String = "count", to lanes: Int) -> String {
     "(\(count) < \(lanes) ? \(count) : \(lanes))"
 }
 
-func unsignedElement(of element: Element) -> Element {
+func unsignedElement(bits: Int) -> Element {
     guard
-        let unsigned = elements.first(where: {
-            $0.category == .unsignedInteger && $0.bits == element.bits
-        })
+        let unsigned = elements.first(where: { $0.category == .unsignedInteger && $0.bits == bits })
     else {
-        fatalError("There is no unsigned element of \(element.bits) bits")
+        fatalError("There is no unsigned element of \(bits) bits")
     }
     return unsigned
+}
+
+func unsignedElement(of element: Element) -> Element {
+    unsignedElement(bits: element.bits)
 }
 
 func signedElement(of element: Element) -> Element {
@@ -360,6 +412,14 @@ func signedElement(of element: Element) -> Element {
         fatalError("There is no signed element of \(element.bits) bits")
     }
     return signed
+}
+
+func laneIndexElement(of element: Element) -> Element {
+    element.category == .float ? signedElement(of: element) : element
+}
+
+func operandElement(of parameter: Parameter, for element: Element) -> Element {
+    parameter == .laneIndices ? laneIndexElement(of: element) : element
 }
 
 func signedFirstLanesMask(for element: Element) -> String {
@@ -857,6 +917,46 @@ func neonTwoTablesLookup(
     neonBuiltin("vqtbl2q_v", [first, second, indices], code: 48, for: element)
 }
 
+func lookupBroadcastBytes(lane bytes: Int, width: Int) -> [UInt8] {
+    (0..<width).map { UInt8(($0 % 16) / bytes * bytes) }
+}
+
+func lookupByteOffsets(lane bytes: Int, width: Int) -> [UInt8] {
+    (0..<width).map { UInt8($0 % bytes) }
+}
+
+func neonLaneByteIndices(for element: Element) -> (statements: String, indices: String) {
+    guard element.bits > 8 else { return ("", "indices") }
+    let bytes = element.bits / 8
+    let broadcast = lookupBroadcastBytes(lane: bytes, width: element.width).map(String.init)
+    let offsets = lookupByteOffsets(lane: bytes, width: element.width).map(String.init)
+    let byte = unsignedElement(bits: 8)
+    let type = byte.cVector
+    let lanes = neonBuiltin("vqtbl1q_v", ["indices", "broadcast"], code: 48, for: byte)
+    return (
+        """
+        const \(type) broadcast = {\(broadcast.joined(separator: ", "))};
+        const \(type) offsets = {\(offsets.joined(separator: ", "))};
+        const \(type) laneIndices = \(lanes);
+        const \(type) byteIndices = (laneIndices << \(bytes.trailingZeroBitCount)) + offsets;
+        """,
+        "byteIndices"
+    )
+}
+
+func neonTableLookupLanes(for element: Element) -> String {
+    let lookup = neonLaneByteIndices(for: element)
+    let table = vectorResult(neonTableLookup("a", lookup.indices, for: element), for: element)
+    return [lookup.statements, table].filter { !$0.isEmpty }.joined(separator: "\n")
+}
+
+func neonTwoTablesLookupLanes(for element: Element) -> String {
+    let lookup = neonLaneByteIndices(for: element)
+    let tables = neonTwoTablesLookup("a", "b", lookup.indices, for: element)
+    return [lookup.statements, vectorResult(tables, for: element)]
+        .filter { !$0.isEmpty }.joined(separator: "\n")
+}
+
 let neonNibbles = """
     typedef uint16_t wide_vector __attribute__((vector_size(16)));
     typedef uint8_t narrow_vector __attribute__((vector_size(8)));
@@ -1024,6 +1124,23 @@ func sveReversed(for element: Element) -> String? {
     guard element.bits < 64 else { return nil }
     let reversed = sveBuiltin("rev", [sveOperand("a", for: element)], for: element)
     return vectorResult(sveResult(reversed, for: element), for: element)
+}
+
+func sveLaneIndices(for element: Element) -> String {
+    sveOperand("indices", for: unsignedElement(of: element))
+}
+
+func sveTableLookupLanes(for element: Element) -> String {
+    let operands = [sveOperand("a", for: element), sveLaneIndices(for: element)]
+    let lookup = sveBuiltin("tbl", operands, for: element)
+    return vectorResult(sveResult(lookup, for: element), for: element)
+}
+
+func sveTwoTablesLookupLanes(for element: Element) -> String {
+    let operands = [sveOperand("a", for: element), sveOperand("b", for: element)]
+    let tables = sveBuiltin("create2", operands, for: element)
+    let lookup = sveBuiltin("tbl2", [tables, sveLaneIndices(for: element)], for: element)
+    return vectorResult(sveResult(lookup, for: element), for: element)
 }
 
 func sveComparisonSplat(_ name: String, mirrored: String, for element: Element) -> String? {
@@ -2025,6 +2142,41 @@ func portableReverse(for element: Element) -> String {
     )
 }
 
+func portableTableLookupBytes(for element: Element) -> String {
+    let lookups = (0..<16).map { lane in
+        "{\n  const uint8_t index = (uint8_t)indices[\(lane)];\n  result[\(lane)] = index < 16 ? a[index] : 0;\n}"
+    }
+    return """
+        \(element.cVector) result;
+        \(lookups.joined(separator: "\n"))
+        \(vectorResult("result", for: element))
+        """
+}
+
+func portableTableLookupLanes(for element: Element) -> String {
+    """
+    \(element.cVector) result;
+    for (size_t i = 0; i < \(element.laneCount); ++i) {
+      result[i] = a[indices[i]];
+    }
+    \(vectorResult("result", for: element))
+    """
+}
+
+func portableTwoTablesLookupLanes(for element: Element) -> String {
+    let lane = element.cMaskLane
+    let lanes = element.laneCount
+    return """
+        \(element.cVector) result;
+        for (size_t i = 0; i < \(lanes); ++i) {
+          const \(lane) index = (\(lane))indices[i];
+          const \(lane) masked = index & (\(lane))\(lanes - 1);
+          result[i] = index < (\(lane))\(lanes) ? a[masked] : b[masked];
+        }
+        \(vectorResult("result", for: element))
+        """
+}
+
 func x86ReversedBytes(for element: Element) -> String? {
     guard element.bits == 8 else { return nil }
     let i16 = x86Vector("i16")
@@ -2047,6 +2199,345 @@ func x86ReversedBytes(for element: Element) -> String? {
 func x86TableLookup(_ bytes: String, _ indices: String, for element: Element) -> String {
     let name = "pshufb\(x86Bits(element.width))"
     return x86Builtin(name, [bytes, indices], as: "i8", returning: element.cVector)
+}
+
+func x86Sse2TableLookupBytes(for element: Element) -> String {
+    """
+    \(x86EmulatedTableLookupBytes("a", "indices", into: "looked"))
+    \(vectorResult("(\(element.cVector))looked", for: element))
+    """
+}
+
+func x86EmulatedLaneLookup(
+    _ table: String,
+    _ indices: String,
+    into result: String,
+    for element: Element
+) -> String {
+    let type = x86Vector("i64")
+    let lanes = element.blockLaneCount
+    let indexLane = element.bits == 16 ? "uint16_t" : "int32_t"
+    let mask = element.bits == 16 ? "7u" : "3"
+    let lookup = """
+        \(element.cType) resultLanes[\(lanes)] __attribute__((aligned(16)));
+        \(element.cType) tableLanes[\(lanes)] __attribute__((aligned(16)));
+        \(indexLane) indexLanes[\(lanes)] __attribute__((aligned(16)));
+        const \(type) tableVector = (\(type))\(table);
+        const \(type) indexVector = (\(type))\(indices);
+        __builtin_memcpy(tableLanes, &tableVector, 16);
+        __builtin_memcpy(indexLanes, &indexVector, 16);
+        for (int i = 0; i < \(lanes); i++) {
+          resultLanes[i] = tableLanes[indexLanes[i] & \(mask)];
+        }
+        __builtin_memcpy(&\(result), resultLanes, 16);
+        """
+    return "\(type) \(result);\n{\n\(indented(lookup))\n}"
+}
+
+func x86LaneByteIndices(for element: Element) -> String {
+    let bytes = element.bits / 8
+    let int8 = x86Vector("i8")
+    let broadcast = x86ByteTable(
+        "broadcast",
+        lookupBroadcastBytes(lane: bytes, width: element.width)
+    )
+    let offsets = x86ByteTable("offsets", lookupByteOffsets(lane: bytes, width: element.width))
+    let lanes = x86Builtin(
+        "pshufb\(x86Bits(element.width))",
+        ["indices", "broadcast"],
+        as: "i8",
+        returning: int8
+    )
+    let shifted = "(\(x86Vector("i16")))laneIndices << \(bytes.trailingZeroBitCount)"
+    return """
+        \(broadcast)
+        \(offsets)
+        const \(int8) laneIndices = \(lanes);
+        const \(int8) byteIndices = (\(int8))(\(shifted)) + offsets;
+        """
+}
+
+func x86Avx2WordIndices(for element: Element) -> String {
+    let int64 = x86Vector("i64")
+    let float = x86Vector("f32")
+    let indices = "(\(float))indices"
+    let duplicated = "__builtin_shufflevector(\(indices), \(indices), 0, 0, 2, 2, 4, 4, 6, 6)"
+    let carry = splat("4294967296ll", as: int64, lanes: element.laneCount)
+    return """
+        const \(int64) duplicated = (\(int64))\(duplicated);
+        const \(int64) wordIndices = duplicated + duplicated + \(carry);
+        """
+}
+
+func x86Int64LaneLookup(level: X86Level, for element: Element) -> String {
+    let int64 = x86Vector("i64")
+    let selected =
+        level >= .sse4
+        ? x86Builtin("pblendvb128", ["swapped", "table", "same"], as: "i8", returning: int64)
+        : "(same & table) | (~same & swapped)"
+    let iota = compoundLiteral(int64, ["0", "1"])
+    return """
+        const \(int64) table = (\(int64))a;
+        const \(int64) same = ((\(int64))indices ^ \(iota)) - \(splat("1", as: int64, lanes: 2));
+        const \(int64) swapped = __builtin_shufflevector(table, table, 1, 0);
+        \(vectorResult(selected, for: element))
+        """
+}
+
+func x86Permute(_ table: String, _ indices: String, for element: Element) -> String {
+    x86Builtin(
+        "permvar\(x86PermuteName(of: element))\(x86Bits(element.width))",
+        [
+            (value: table, type: x86Vector(x86LaneSuffix(of: element))),
+            (value: indices, type: x86Vector("i\(element.bits)")),
+        ],
+        returning: element.cVector
+    )
+}
+
+func x86Avx2ByteLaneLookup(for element: Element) -> String {
+    let int16 = x86Vector("i16")
+    let lowerTable = x86Avx2Concat(.lowerLower, hi: "a", lo: "a", for: element)
+    let upperTable = x86Avx2Concat(.upperUpper, hi: "a", lo: "a", for: element)
+    return """
+        const \(int16) selector = (\(int16))indices << 3;
+        const \(element.cVector) lower = \(x86TableLookup(lowerTable, "indices", for: element));
+        const \(element.cVector) upper = \(x86TableLookup(upperTable, "indices", for: element));
+        \(vectorResult(x86Selecting("selector", "upper", "lower", for: element), for: element))
+        """
+}
+
+func x86Avx3ByteLaneLookup(for element: Element) -> String {
+    let int16 = x86Vector("i16")
+    let int32 = x86Vector("i32")
+    let maskType = x86MaskType(lanes: element.laneCount)
+    func table(_ name: String, _ control: Int) -> String {
+        let shuffled = x86Builtin(
+            "shuf_i32x4",
+            [
+                (value: "a", type: int32), (value: "a", type: int32),
+                (value: x86Immediate(control), type: "int"),
+            ],
+            returning: int32
+        )
+        return "const \(int32) \(name) = \(shuffled);"
+    }
+    let tables = [
+        table("tableA", 0x00), table("tableB", 0x55), table("tableC", 0xAA), table("tableD", 0xFF),
+    ]
+    func lookup(_ table: String) -> String {
+        x86TableLookup(table, "indices", for: element)
+    }
+    return """
+        const \(int16) shiftedBy3 = (\(int16))indices << 3;
+        const \(int16) shiftedBy2 = (\(int16))indices << 2;
+        const \(maskType) selectsUpperHalves = \(x86Avx3MaskBits("shiftedBy3", for: element));
+        const \(maskType) selectsUpperQuarters = \(x86Avx3MaskBits("shiftedBy2", for: element));
+        \(tables.joined(separator: "\n"))
+        const \(element.cVector) lookedA = \(lookup("tableA"));
+        const \(element.cVector) lookedC = \(lookup("tableC"));
+        const \(element.cVector) lookedAB = \(x86Avx3Select("selectsUpperHalves", lookup("tableB"), "lookedA", for: element));
+        const \(element.cVector) lookedCD = \(x86Avx3Select("selectsUpperHalves", lookup("tableD"), "lookedC", for: element));
+        \(vectorResult(x86Avx3Select("selectsUpperQuarters", "lookedCD", "lookedAB", for: element), for: element))
+        """
+}
+
+func x86TableLookupLanes(level: X86Level, for element: Element) -> String {
+    switch (level, element.bits) {
+    case (.sse2, 8):
+        return x86Sse2TableLookupBytes(for: element)
+    case (.sse2, 16), (.sse2, 32):
+        return """
+            \(x86EmulatedLaneLookup("a", "indices", into: "looked", for: element))
+            \(vectorResult("(\(element.cVector))looked", for: element))
+            """
+    case (.sse2, _), (.ssse3, 64), (.sse4, 64):
+        return x86Int64LaneLookup(level: level, for: element)
+    case (.ssse3, 8), (.sse4, 8):
+        return vectorResult(x86TableLookup("a", "indices", for: element), for: element)
+    case (.ssse3, _), (.sse4, _):
+        return """
+            \(x86LaneByteIndices(for: element))
+            \(vectorResult(x86TableLookup("a", "byteIndices", for: element), for: element))
+            """
+    case (.avx2, 8):
+        return x86Avx2ByteLaneLookup(for: element)
+    case (.avx2, 16):
+        let byte = unsignedElement(bits: 8)
+        let raw = byte.cRawVector
+        let function = cFunctionName("tableLookupLanes", byte)
+        return """
+            \(x86LaneByteIndices(for: element))
+            \(vectorResult("\(function)((\(raw))rawA, (\(raw))byteIndices)", for: element))
+            """
+    case (.avx2, 32):
+        return vectorResult(x86Permute("a", "indices", for: element), for: element)
+    case (.avx2, _):
+        let words = x86Vector("i32")
+        let lookup = x86Builtin(
+            "permvarsi256",
+            [(value: "a", type: words), (value: "wordIndices", type: words)],
+            returning: element.cVector
+        )
+        return """
+            \(x86Avx2WordIndices(for: element))
+            \(vectorResult(lookup, for: element))
+            """
+    case (.avx3, 8):
+        return x86Avx3ByteLaneLookup(for: element)
+    case (.avx3, _), (.avx3dl, _):
+        return vectorResult(x86Permute("a", "indices", for: element), for: element)
+    }
+}
+
+func x86Sse2TableLookupBytesOrZero(for element: Element) -> String {
+    let int8 = x86Vector("i8")
+    return """
+        const \(int8) signedIndices = (\(int8))indices;
+        \(x86TableLookupBytesOr0("a", "signedIndices", into: "zeroed", level: .sse2))
+        \(vectorResult("(\(element.cVector))zeroed", for: element))
+        """
+}
+
+func tableLookupBytesTargets(zeroing: Bool) -> TargetBodies<Element> {
+    func lookup(_ element: Element) -> String {
+        vectorResult(x86TableLookup("a", "indices", for: element), for: element)
+    }
+    return TargetBodies(
+        neon: { element in
+            vectorResult(neonTableLookup("a", "indices", for: element), for: element)
+        },
+        sve2_128: zeroing ? { element in sveTableLookupLanes(for: element) } : nil,
+        avx3: lookup,
+        avx2: lookup,
+        ssse3: lookup,
+        sse2: { element in
+            zeroing
+                ? x86Sse2TableLookupBytesOrZero(for: element)
+                : x86Sse2TableLookupBytes(for: element)
+        }
+    )
+}
+
+func x86TwoTablesLookupLanes(level: X86Level, for element: Element) -> String {
+    let vector = element.cVector
+    let lookup = cFunctionName("tableLookupLanes", element)
+    let indexRaw = laneIndexElement(of: element).cRawVector
+    func lookups(_ indices: String = "rawIndices") -> String {
+        """
+        const \(vector) lower = (\(vector))\(lookup)(rawA, \(indices));
+        const \(vector) upper = (\(vector))\(lookup)(rawB, \(indices));
+        """
+    }
+    func compared(with limit: Int) -> String {
+        let type = x86Vector("i\(element.bits)")
+        let limits = splat("\(limit)", as: type, lanes: element.laneCount)
+        return "const \(type) selector = (\(type))((\(type))indices > \(limits));"
+    }
+    func routed(through route: Element, indices: String) -> String {
+        let function = cFunctionName("twoTablesLookupLanes", route)
+        let raw = route.cRawVector
+        let call = "\(function)((\(raw))rawA, (\(raw))rawB, (\(raw))\(indices))"
+        return vectorResult(call, for: element)
+    }
+    func shifted(by bits: Int, lanes laneBits: Int) -> String {
+        let type = x86Vector("i\(laneBits)")
+        return "const \(type) selector = (\(type))indices << \(bits);"
+    }
+    switch (level, element.bits) {
+    case (.sse2, 8), (.ssse3, 8):
+        return """
+            \(compared(with: 15))
+            \(lookups())
+            \(vectorResult(x86BitSelect("selector", "upper", "lower", for: element), for: element))
+            """
+    case (.sse4, 8):
+        return """
+            \(shifted(by: 3, lanes: 16))
+            \(lookups())
+            \(vectorResult(x86Selecting("selector", "upper", "lower", for: element), for: element))
+            """
+    case (.sse2, 16), (.sse2, 32):
+        return """
+            \(compared(with: element.bits == 16 ? 7 : 3))
+            \(lookups())
+            \(vectorResult(x86BitSelect("selector", "upper", "lower", for: element), for: element))
+            """
+    case (.ssse3, 16), (.ssse3, 32), (.sse4, 16), (.sse4, 32):
+        return """
+            \(x86LaneByteIndices(for: element))
+            \(routed(through: unsignedElement(bits: 8), indices: "byteIndices"))
+            """
+    case (.sse2, _), (.ssse3, _), (.sse4, _):
+        let int64 = x86Vector("i64")
+        let int32 = x86Vector("i32")
+        let ones = splat("1", as: int64, lanes: 2)
+        let modulo = "const \(int64) moduloIndices = (\(int64))indices & \(ones);"
+        let selector: String
+        let selected: String
+        if level == .sse4 {
+            selector = "const \(int64) selector = (\(int64))indices << 62;"
+            selected = x86Builtin(
+                "blendvpd",
+                ["lower", "upper", "selector"],
+                as: "f64",
+                returning: x86Vector("f64")
+            )
+        } else {
+            let indices = "(\(int32))indices"
+            let duplicated = "__builtin_shufflevector(\(indices), \(indices), 0, 0, 2, 2)"
+            selector = """
+                const \(int32) duplicated = \(duplicated);
+                const \(int64) selector = (\(int64))(duplicated > \(splat("1", as: int32, lanes: 4)));
+                """
+            selected = x86BitSelect("selector", "upper", "lower", for: element)
+        }
+        return """
+            \(modulo)
+            \(selector)
+            \(lookups("(\(indexRaw))moduloIndices"))
+            \(vectorResult(selected, for: element))
+            """
+    case (.avx2, 8):
+        return """
+            \(shifted(by: 2, lanes: 16))
+            \(lookups())
+            \(vectorResult(x86Selecting("selector", "upper", "lower", for: element), for: element))
+            """
+    case (.avx2, 16):
+        return """
+            \(x86LaneByteIndices(for: element))
+            \(routed(through: unsignedElement(bits: 8), indices: "byteIndices"))
+            """
+    case (.avx2, 32):
+        let blended = x86Builtin(
+            "blendvps256",
+            ["lower", "upper", "selector"],
+            as: "f32",
+            returning: x86Vector("f32")
+        )
+        return """
+            \(shifted(by: 28, lanes: 32))
+            \(lookups())
+            \(vectorResult(blended, for: element))
+            """
+    case (.avx2, _):
+        return """
+            \(x86Avx2WordIndices(for: element))
+            \(routed(through: unsignedElement(bits: 32), indices: "wordIndices"))
+            """
+    case (.avx3, 8):
+        let int16 = x86Vector("i16")
+        let maskType = x86MaskType(lanes: element.laneCount)
+        return """
+            const \(int16) shifted = (\(int16))indices << 1;
+            const \(maskType) selectsUpper = \(x86Avx3MaskBits("shifted", for: element));
+            \(lookups())
+            \(vectorResult(x86Avx3Select("selectsUpper", "upper", "lower", for: element), for: element))
+            """
+    case (.avx3, _), (.avx3dl, _):
+        return vectorResult(x86TwoTableLookup("a", "indices", "b", for: element), for: element)
+    }
 }
 
 func slideShuffle(_ direction: SlideDirection, by amount: Int, for element: Element) -> String {
@@ -2210,30 +2701,45 @@ func x86WideSlide(_ direction: SlideDirection, for element: Element) -> String {
         ? x86ByteSlide(direction, for: element) : x86WordSlide(direction, for: element)
 }
 
-func x86TwoTableSlide(
-    _ direction: SlideDirection,
-    by amount: String = "lanes",
+func x86TwoTableLookup(
+    _ first: String,
+    _ indices: String,
+    _ second: String,
     for element: Element
 ) -> String {
     guard let suffix = [8: "qi", 16: "hi", 32: "d", 64: "q"][element.bits] else {
         fatalError("There is no x86 two table lookup of \(element.bits)-bit lanes")
     }
+    let name = element.category == .float ? "p\(element.bits == 32 ? "s" : "d")" : suffix
+    let table = x86Vector(x86LaneSuffix(of: element))
+    return x86Builtin(
+        "vpermi2var\(name)\(x86Bits(element.width))",
+        [
+            (value: first, type: table),
+            (value: indices, type: x86Vector("i\(element.bits)")),
+            (value: second, type: table),
+        ],
+        returning: element.cVector
+    )
+}
+
+func x86TwoTableSlide(
+    _ direction: SlideDirection,
+    by amount: String = "lanes",
+    for element: Element
+) -> String {
     guard direction == .up || element.bits == 8 else {
         fatalError("There is no x86 two table slide down of \(element.bits)-bit lanes")
     }
     let lanes = element.laneCount
     let unsigned = element.cUnsignedVector
-    let name = element.category == .float ? "p\(element.bits == 32 ? "s" : "d")" : suffix
     let table = x86Vector(x86LaneSuffix(of: element))
     let isMasked = element.bits > 8
-    let lookup = x86Builtin(
-        "vpermi2var\(name)\(x86Bits(element.width))",
-        [
-            (value: "a", type: table),
-            (value: isMasked ? "masked" : "indices", type: x86Vector("i\(element.bits)")),
-            (value: compoundLiteral(table, ["0"]), type: table),
-        ],
-        returning: element.cVector
+    let lookup = x86TwoTableLookup(
+        "a",
+        isMasked ? "masked" : "indices",
+        compoundLiteral(table, ["0"]),
+        for: element
     )
     let first = direction == .up ? "0 - \(amount)" : amount
     var statements = [
@@ -7545,35 +8051,61 @@ let ops: [Op] = [
         [.vector, .indices],
         .vector,
         .integer(bits: [8]),
+        indexContract: .bytes,
+        targets: tableLookupBytesTargets(zeroing: false)
+    ) { element in
+        portableTableLookupBytes(for: element)
+    },
+    Op(
+        "tableLookupBytesOrZero",
+        "TableLookupBytesOr0",
+        [.vector, .indices],
+        .vector,
+        .integer(bits: [8]),
+        indexContract: .zeroingBytes,
+        targets: tableLookupBytesTargets(zeroing: true)
+    ) { element in
+        portableTableLookupBytes(for: element)
+    },
+    Op(
+        "tableLookupLanes",
+        "TableLookupLanes",
+        [.vector, .laneIndices],
+        .vector,
+        .all,
+        indexContract: .lanes,
         targets: TargetBodies(
-            neon: { element in
-                vectorResult(neonTableLookup("a", "b", for: element), for: element)
-            },
-            avx3: { element in
-                vectorResult(x86TableLookup("a", "b", for: element), for: element)
-            },
-            avx2: { element in
-                vectorResult(x86TableLookup("a", "b", for: element), for: element)
-            },
-            ssse3: { element in
-                vectorResult(x86TableLookup("a", "b", for: element), for: element)
-            },
-            sse2: { element in
-                """
-                \(x86EmulatedTableLookupBytes("a", "b", into: "looked"))
-                \(vectorResult("(\(element.cVector))looked", for: element))
-                """
-            }
+            neon: { element in neonTableLookupLanes(for: element) },
+            sve2_128: { element in sveTableLookupLanes(for: element) },
+            avx3dl: { element in x86TableLookupLanes(level: .avx3dl, for: element) },
+            avx3: { element in x86TableLookupLanes(level: .avx3, for: element) },
+            avx2: { element in x86TableLookupLanes(level: .avx2, for: element) },
+            sse4: { element in x86TableLookupLanes(level: .sse4, for: element) },
+            ssse3: { element in x86TableLookupLanes(level: .ssse3, for: element) },
+            sse2: { element in x86TableLookupLanes(level: .sse2, for: element) }
         )
     ) { element in
-        let lookups = (0..<16).map { lane in
-            "{\n  const uint8_t index = (uint8_t)b[\(lane)];\n  result[\(lane)] = index < 16 ? a[index] : 0;\n}"
-        }
-        return """
-            \(element.cVector) result;
-            \(lookups.joined(separator: "\n"))
-            \(vectorResult("result", for: element))
-            """
+        portableTableLookupLanes(for: element)
+    },
+    Op(
+        "twoTablesLookupLanes",
+        "TwoTablesLookupLanes",
+        [.tag, .vector, .vector, .laneIndices],
+        .vector,
+        .all,
+        indexContract: .lanesOfTwoTables,
+        targets: TargetBodies(
+            neon: { element in neonTwoTablesLookupLanes(for: element) },
+            sve2_128: { element in sveTwoTablesLookupLanes(for: element) },
+            avx3dl: { element in x86TwoTablesLookupLanes(level: .avx3dl, for: element) },
+            avx3: { element in x86TwoTablesLookupLanes(level: .avx3, for: element) },
+            avx2: { element in x86TwoTablesLookupLanes(level: .avx2, for: element) },
+            sse4: { element in x86TwoTablesLookupLanes(level: .sse4, for: element) },
+            ssse3: { element in x86TwoTablesLookupLanes(level: .ssse3, for: element) },
+            sse2: { element in x86TwoTablesLookupLanes(level: .sse2, for: element) }
+        )
+    ) { element in
+        portableTwoTablesLookupLanes(for: element)
     },
 
     Op(
@@ -7866,7 +8398,7 @@ func bindings(
                     isInOut: false
                 )
             )
-        case .vector, .indices:
+        case .vector:
             let name = vectorNames.next() ?? "v"
             result.append(
                 Binding(
@@ -7876,6 +8408,32 @@ func bindings(
                     swiftLabel: "_",
                     swiftName: name,
                     swiftType: "\(scope)Vector",
+                    isInOut: false
+                )
+            )
+        case .indices:
+            result.append(
+                Binding(
+                    declaration: "\(element.cRawVector) indices",
+                    cDeclaration: "\(element.cRawVector) \(rawName("indices"))",
+                    argument: referenceConversion("fromPort", "indices", for: element),
+                    swiftLabel: checkedLabel("at", checked: checked),
+                    swiftName: "indices",
+                    swiftType: "\(scope)Vector",
+                    isInOut: false
+                )
+            )
+        case .laneIndices:
+            let indexElement = laneIndexElement(of: element)
+            let vector = referenceConversion("fromPort", "indices", for: indexElement)
+            result.append(
+                Binding(
+                    declaration: "\(indexElement.cRawVector) indices",
+                    cDeclaration: "\(indexElement.cRawVector) \(rawName("indices"))",
+                    argument: "hn::IndicesFromVec(\(element.tag)(), \(vector))",
+                    swiftLabel: checkedLabel("at", checked: checked),
+                    swiftName: "indices",
+                    swiftType: "\(scope)Indices",
                     isInOut: false
                 )
             )
@@ -8264,6 +8822,10 @@ func generateReferenceHeader() -> String {
         /// The name of the target the ops below were compiled for.
         HWY_INLINE const char* targetName() { return hwy::TargetName(HWY_TARGET); }
 
+        /// Whether highway's debug assertions are on, which abort on indices that its lookups
+        /// do not accept.
+        HWY_INLINE bool hasDebugAssertions() { return HWY_IS_DEBUG_BUILD; }
+
         /// Highway's SVE ops overwrite one operand, so the compiler may swap a commutative op's
         /// operands to save a move, which decides whose NaN comes out when both are NaN. Out of
         /// line, the first operand is already in the register the op overwrites, which is the
@@ -8613,6 +9175,30 @@ func neonHelpers() -> String {
     return "#if CVECTORIZATION_OPS_NEON\n\(([slideTable] + slideFillingTables).joined())#endif"
 }
 
+func indicesWithinBody(for element: Element) -> String {
+    let unsigned = element.cUnsignedVector
+    let first = splat("first", as: unsigned, lanes: element.laneCount)
+    let limit = splat("limit", as: unsigned, lanes: element.laneCount)
+    let exceedsLane = element.bits < 64 ? "count > UINT\(element.bits)_MAX || " : ""
+    return """
+        const \(element.cUnsignedLane) first = (\(element.cUnsignedLane))offset;
+        const \(element.cUnsignedLane) limit = (\(element.cUnsignedLane))count;
+        const \(unsigned) shifted = (\(unsigned))indices - \(first);
+        return \(exceedsLane)__builtin_reduce_and(shifted < \(limit)) != 0;
+        """
+}
+
+func indicesWithinFunction(for element: Element) -> String {
+    cOpFunction(
+        returns: .boolean,
+        name: cFunctionName("indicesWithin", element),
+        parameters: ["\(element.cRawVector) rawIndices", "size_t offset", "size_t count"],
+        prologue: ["const \(element.cVector) indices = (\(element.cVector))rawIndices;"],
+        body: cBody(TargetBodies(), for: element, portable: indicesWithinBody),
+        for: element
+    )
+}
+
 func rawVectorDeclarations() -> String {
     let groups = [
         (neonCondition, neonVectors),
@@ -8656,8 +9242,9 @@ func cPrologue(of op: Op, for element: Element) -> [String] {
         let name = binding.swiftName
         let raw = rawName(name)
         switch parameter {
-        case .vector, .indices, .fillVector, .otherwiseVector:
-            return "const \(element.cVector) \(name) = (\(element.cVector))\(raw);"
+        case .vector, .indices, .laneIndices, .fillVector, .otherwiseVector:
+            let operand = operandElement(of: parameter, for: element)
+            return "const \(operand.cVector) \(name) = (\(operand.cVector))\(raw);"
         case .mask, .whereMask:
             return "const \(element.cMask) \(name) = (\(element.cMask))\(raw);"
         case .outVector:
@@ -8927,6 +9514,9 @@ func generateHeader() -> String {
             body: "return sizeof(\(element.cVector)) / sizeof(\(element.cType));"
         )
         output += cRawConversions(of: element)
+        if element.category != .float {
+            output += indicesWithinFunction(for: element)
+        }
         output += sveConstantFunction(for: element)
         if element.category == .float {
             output += sveConstantNaNFunction(for: element)
@@ -9014,8 +9604,8 @@ func swiftArgument(_ binding: Binding, _ parameter: Parameter, for element: Elem
 
 func rawArgument(_ name: String, _ parameter: Parameter, for element: Element) -> String {
     switch parameter {
-    case .vector, .indices, .fillVector, .otherwiseVector:
-        return element.hasOpaqueVector ? "\(name).raw" : name
+    case .vector, .indices, .laneIndices, .fillVector, .otherwiseVector:
+        return operandElement(of: parameter, for: element).hasOpaqueVector ? "\(name).raw" : name
     case .mask, .whereMask: return "\(name).raw"
     case .outVector: return element.hasOpaqueVector ? "&\(name).raw" : "&\(name)"
     default: return name
@@ -9029,8 +9619,8 @@ func vectorFromRaw(_ call: String, of element: Element) -> String {
 func importedType(of parameter: Parameter, for element: Element) -> String {
     switch parameter {
     case .tag: return ""
-    case .vector, .indices, .outVector, .fillVector, .otherwiseVector:
-        return "\(element.namespace).Vector"
+    case .vector, .indices, .laneIndices, .outVector, .fillVector, .otherwiseVector:
+        return "\(operandElement(of: parameter, for: element).namespace).Vector"
     case .mask, .whereMask: return "\(element.namespace).Mask"
     case .lane, .fillLane: return element.swiftType
     case .constLanePointer: return "UnsafePointer<\(element.swiftType)>"
@@ -9319,6 +9909,14 @@ func takesLaneAmount(_ op: Op) -> Bool {
     op.parameters.contains(.laneAmount)
 }
 
+func takesIndices(_ op: Op) -> Bool {
+    op.indexContract != nil
+}
+
+func hasCheckedForms(_ op: Op) -> Bool {
+    takesLaneAmount(op) || takesIndices(op)
+}
+
 /// What a lane amount form checks before it hands the amount on, as a Swift condition and the
 /// message for when it fails. Highway's NEON slides read their index tables out of bounds above
 /// `laneCount`.
@@ -9331,9 +9929,24 @@ func laneAmountChecks() -> [Check] {
     ]
 }
 
-/// The members of an op that takes a lane amount: a checked form that traps on an amount outside
-/// `0...laneCount`, and an `@unsafe` unchecked one that only asserts it.
-func laneAmountMembers(of op: Op, for element: Element) -> String {
+/// What a lookup form checks before it hands the indices on, as a Swift condition and the message
+/// for when it fails: one unsigned comparison of every index and one reduction of the results.
+func indexChecks(of op: Op, for element: Element) -> [Check] {
+    guard let contract = op.indexContract,
+        let parameter = op.parameters.first(where: { $0 == .indices || $0 == .laneIndices })
+    else { return [] }
+    let function = cFunctionName("indicesWithin", operandElement(of: parameter, for: element))
+    let count = contract.count.expression(laneCount: "laneCount")
+    return [("\(function)(indices.raw, \(contract.offset), \(count))", contract.message)]
+}
+
+func uncheckedFormChecks(of op: Op, for element: Element) -> [Check] {
+    takesIndices(op) ? indexChecks(of: op, for: element) : laneAmountChecks()
+}
+
+/// The members of an op that takes a lane amount or indices: a checked form that traps on those
+/// outside the range its checks accept, and an `@unsafe` unchecked one that only asserts it.
+func checkedFormMembers(of op: Op, for element: Element) -> String {
     let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
     let returnKeyword = op.returns == .void ? "" : "return "
     let checked = swiftSignature(of: op, for: element)
@@ -9351,12 +9964,12 @@ func laneAmountMembers(of op: Op, for element: Element) -> String {
             unchecked.parameters, op.swiftOrdered(uncheckedArguments).joined(separator: ", ")
         ),
         returnClause: returnClause,
-        checks: laneAmountChecks(),
+        checks: uncheckedFormChecks(of: op, for: element),
         uncheckedBody: "\(returnKeyword)\(body)"
     )
 }
 
-func laneAmountRequirements(of op: Op, indent: String) -> String {
+func checkedFormRequirements(of op: Op, indent: String) -> String {
     let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
     let unchecked = swiftSignature(of: op, for: elements[0], checked: false)
     return "\(indent)@unsafe static func \(op.swiftName)(\(unchecked.parameters))\(returnClause)\n"
@@ -9509,8 +10122,8 @@ func protocolRequirements(_ requirementOps: [Op], indent: String) -> String {
         let signature = swiftSignature(of: op, for: elements[0])
         let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
         output += "\(indent)static func \(op.swiftName)(\(signature.parameters))\(returnClause)\n"
-        if takesLaneAmount(op) {
-            output += laneAmountRequirements(of: op, indent: indent)
+        if hasCheckedForms(op) {
+            output += checkedFormRequirements(of: op, indent: indent)
         }
         if let forms = spanForms(of: op, for: elements[0]) {
             output += spanRequirements(forms, indent: indent)
@@ -9532,6 +10145,7 @@ func generateProtocols() -> String {
             associatedtype Lane
             associatedtype Vector
             associatedtype Mask
+            associatedtype Indices
 
             /// How many lanes of `Lane` a `Vector` holds on the target this was compiled for.
             static var laneCount: Int { get }
@@ -9600,13 +10214,18 @@ func maskDeclaration(of element: Element) -> String {
     """
 }
 
+func indicesDeclaration(of element: Element) -> String {
+    "public typealias Indices = \(laneIndexElement(of: element).namespace).Vector"
+}
+
 func typeDeclarations(of element: Element) -> String {
     let lane = "public typealias Lane = \(element.swiftType)"
     let mask = maskDeclaration(of: element)
+    let indices = indicesDeclaration(of: element)
     guard element.hasOpaqueVector else {
-        return "\(lane)\npublic typealias Vector = \(element.cVector)\n\n\(mask)"
+        return "\(lane)\npublic typealias Vector = \(element.cVector)\n\n\(mask)\n\n\(indices)"
     }
-    return "\(lane)\n\n\(vectorDeclaration(of: element))\n\n\(mask)"
+    return "\(lane)\n\n\(vectorDeclaration(of: element))\n\n\(mask)\n\n\(indices)"
 }
 
 func generateElement(_ element: Element) -> String {
@@ -9634,8 +10253,8 @@ func generateElement(_ element: Element) -> String {
         """
 
     for op in ops where op.applies.matches(element) {
-        if takesLaneAmount(op) {
-            output += laneAmountMembers(of: op, for: element)
+        if hasCheckedForms(op) {
+            output += checkedFormMembers(of: op, for: element)
             continue
         }
         let signature = swiftSignature(of: op, for: element)
@@ -9710,7 +10329,7 @@ struct ReferenceInput {
 func hasOutOfContractInputs(_ op: Op) -> Bool {
     op.parameters.contains { parameter in
         switch parameter {
-        case .shiftAmount, .laneAmount, .indices: return true
+        case .shiftAmount, .laneAmount, .indices, .laneIndices: return true
         default: return false
         }
     }
@@ -9740,6 +10359,22 @@ func guardedLanes(of buffer: String, extent: SpanExtent?, count: String = "count
     return "Array(\(buffer).prefix(\(count)))"
 }
 
+func indexInputs(
+    of op: Op,
+    _ parameter: Parameter,
+    seed: String,
+    inContract: Bool
+) -> String {
+    guard let contract = op.indexContract else {
+        fatalError("\(op.swiftName) takes indices but has no index contract")
+    }
+    let type = parameter == .laneIndices ? "H.Indices" : "H.Vector"
+    let offset = contract.offset == 0 ? "" : "offset: \(contract.offset), "
+    let count = contract.count.expression(laneCount: "H.laneCount")
+    let arguments = "\(type).self, \(offset)count: \(count), \(seed), inContract: \(inContract)"
+    return "Inputs.tableIndices(\(arguments))"
+}
+
 func referenceInputs(
     of op: Op,
     for element: Element,
@@ -9755,8 +10390,8 @@ func referenceInputs(
             continue
         case .vector, .fillVector, .otherwiseVector:
             values = "Inputs.vectors(H.Vector.self, \(seed))"
-        case .indices:
-            values = "Inputs.tableIndices(H.Vector.self, \(seed), inContract: \(inContract))"
+        case .indices, .laneIndices:
+            values = indexInputs(of: op, parameter, seed: seed, inContract: inContract)
         case .mask, .whereMask:
             values = "Inputs.masks(H.Mask.self, \(seed))"
         case .lane, .fillLane:
@@ -9849,13 +10484,15 @@ func referenceCalls(
     of op: Op,
     for element: Element,
     pointer: String,
+    checked: Bool = true,
     constants: [String: (port: String, reference: String)] = [:]
 ) -> (port: String, reference: String) {
     var portArguments: [String] = []
     var referenceArguments: [String] = []
     var outVectorIndex = 0
 
-    for (binding, parameter) in zip(bindings(of: op, for: element), op.parameters) {
+    for (binding, parameter) in zip(bindings(of: op, for: element, checked: checked), op.parameters)
+    {
         if let constant = constants[binding.swiftName] {
             portArguments.append(swiftCallArgument(binding, passing: constant.port))
             referenceArguments.append(rawArgument(constant.reference, parameter, for: element))
@@ -9864,8 +10501,8 @@ func referenceCalls(
         switch parameter {
         case .tag:
             continue
-        case .vector, .indices, .mask, .fillVector, .whereMask, .otherwiseVector, .lane,
-            .fillLane, .count, .shiftAmount, .laneAmount:
+        case .vector, .indices, .laneIndices, .mask, .fillVector, .whereMask, .otherwiseVector,
+            .lane, .fillLane, .count, .shiftAmount, .laneAmount:
             portArguments.append(swiftCallArgument(binding))
             referenceArguments.append(swiftArgument(binding, parameter, for: element))
         case .constLanePointer, .lanePointer:
@@ -9881,20 +10518,37 @@ func referenceCalls(
     }
 
     let keyword = isUnsafe(op) ? "unsafe " : ""
+    let portKeyword = isUnsafe(op) || !checked ? "unsafe " : ""
     let call = referenceCall(referenceFunctionName(op.identifier, element), referenceArguments)
     let reference = referenceResult(call, returning: op.returns, for: element)
     let port = portCall(op.swiftName, op.swiftOrdered(portArguments))
-    return ("\(keyword)\(port)", "\(keyword)\(reference)")
+    return ("\(portKeyword)\(port)", "\(keyword)\(reference)")
 }
 
-let emulatedShiftAttribute = """
-    @Test(
-        .disabled(
-            if: SIMDTarget.targetName == "EMU128",
-            "EMU128 has no defined result for these shift counts"
-        )
-    )
-    """
+typealias Disabling = (condition: String, reason: String)
+
+func emulationDisabling(_ reason: String) -> Disabling {
+    ("SIMDTarget.targetName == \"EMU128\"", reason)
+}
+
+let assertionsDisabling: Disabling = (
+    "assertionsAreEnabled", "Assertions abort the test run on these indices"
+)
+
+func outOfContractDisabling(of op: Op) -> [Disabling] {
+    if op.parameters.contains(.shiftAmount) {
+        return [emulationDisabling("EMU128 has no defined result for these shift counts")]
+    }
+    guard let contract = op.indexContract else { return [] }
+    return [assertionsDisabling]
+        + (contract.isDefinedOnEmulation
+            ? [] : [emulationDisabling("EMU128 reads outside the vector for these indices")])
+}
+
+func testAttribute(disabling: [Disabling]) -> String {
+    let traits = disabling.map { ".disabled(if: \($0.condition), \"\($0.reason)\")" }
+    return "@Test(\(traits.joined(separator: ", ")))"
+}
 
 func referenceTestFunction(
     _ test: String,
@@ -9902,16 +10556,16 @@ func referenceTestFunction(
     for element: Element,
     inputs: [ReferenceInput],
     declarations: [String] = [],
-    disabledOnEmulation: Bool = false,
+    disabling: [Disabling] = [],
     signature: String? = nil,
     loopCondition: String? = nil,
     statements: String
 ) -> String {
     let header =
         signature
-        ?? (disabledOnEmulation
-            ? "\(emulatedShiftAttribute)\nfunc \(test)() {"
-            : "@Test func \(test)() {")
+        ?? (disabling.isEmpty
+            ? "@Test func \(test)() {"
+            : "\(testAttribute(disabling: disabling))\nfunc \(test)() {")
     var lines = ["let mismatches = Mismatches(\"\(label)\")"]
     lines += inputs.map { "let \($0.name)Inputs = \($0.values)" }
     lines += declarations
@@ -10074,21 +10728,25 @@ func referenceTest(
     of op: Op,
     for element: Element,
     inContract: Bool,
+    checked: Bool = true,
     guarded: Bool = false
 ) -> String {
     let (test, label) =
         if guarded {
             ("\(op.identifier)BeforeGuardPage", "\(op.identifier) before a guard page")
-        } else if inContract {
+        } else if !inContract {
+            ("\(op.identifier)OutOfContract", "\(op.identifier) out of contract")
+        } else if checked {
             (op.identifier, op.identifier)
         } else {
-            ("\(op.identifier)OutOfContract", "\(op.identifier) out of contract")
+            ("\(op.identifier)Unchecked", "\(op.identifier) unchecked")
         }
     let inputs = referenceInputs(of: op, for: element, test: test, inContract: inContract)
     let calls = referenceCalls(
         of: op,
         for: element,
-        pointer: referencePointer(of: op, guarded: guarded)
+        pointer: referencePointer(of: op, guarded: guarded),
+        checked: checked
     )
     let (declarations, statements) = referenceStatements(
         of: op,
@@ -10104,7 +10762,7 @@ func referenceTest(
         for: element,
         inputs: inputs,
         declarations: declarations,
-        disabledOnEmulation: !inContract && op.parameters.contains(.shiftAmount),
+        disabling: inContract ? [] : outOfContractDisabling(of: op),
         statements: statements
     )
 }
@@ -10225,8 +10883,13 @@ func generateReferenceTests(_ element: Element) -> String {
     var tests = [laneCountReferenceTest(for: element)]
     for op in ops where op.applies.matches(element) {
         tests.append(referenceTest(of: op, for: element, inContract: true))
+        if takesIndices(op) {
+            tests.append(referenceTest(of: op, for: element, inContract: true, checked: false))
+        }
         if hasOutOfContractInputs(op) {
-            tests.append(referenceTest(of: op, for: element, inContract: false))
+            tests.append(
+                referenceTest(of: op, for: element, inContract: false, checked: !takesIndices(op))
+            )
         }
         if op.span != nil {
             tests.append(referenceTest(of: op, for: element, inContract: true, guarded: true))
@@ -10415,7 +11078,8 @@ struct CodegenSide {
 
     func call(_ identifier: String, _ arguments: [String]) -> String {
         let op = codegenOp(identifier, for: element)
-        let callBindings = zip(bindings(of: op, for: element), op.parameters)
+        let operandBindings = bindings(of: op, for: element, checked: !takesIndices(op))
+        let callBindings = zip(operandBindings, op.parameters)
             .filter { _, parameter in parameter != .tag }
             .map(\.0)
         guard callBindings.count == arguments.count else {
@@ -10429,7 +11093,8 @@ struct CodegenSide {
             let labelled = zip(op.swiftOrdered(callBindings), arguments).map {
                 swiftCallArgument($0, passing: $1)
             }
-            return keyword + portCall(op.swiftName, labelled, on: element.namespace)
+            let portKeyword = isUnsafe(op) || takesIndices(op) ? "unsafe " : ""
+            return portKeyword + portCall(op.swiftName, labelled, on: element.namespace)
         case .highway:
             let converted = zip(op.swiftOrdered(op.operands), arguments).map {
                 rawArgument($1, $0, for: element)
@@ -10483,6 +11148,12 @@ func codegenConstant(
     case .vector, .fillVector, .otherwiseVector:
         return (port.repeating(lane), highway.repeating(lane))
     case .indices: return (port.repeating("3"), highway.repeating("3"))
+    case .laneIndices:
+        let indices = laneIndexElement(of: element)
+        return (
+            CodegenSide(kind: .port, element: indices).repeating("1"),
+            CodegenSide(kind: .highway, element: indices).repeating("1")
+        )
     case .lane, .fillLane: return (lane, lane)
     case .shiftAmount: return ("3", "3")
     case .laneAmount, .count: return ("1", "1")
@@ -10583,7 +11254,7 @@ func codegenFunctions(of op: Op, for element: Element) -> String {
         referenceName: referenceFunctionName(op.identifier, element),
         for: element,
         returns: op.returns,
-        isUnsafe: (port: isUnsafe(op) || takesLaneAmount(op), reference: isUnsafe(op)),
+        isUnsafe: (port: isUnsafe(op) || hasCheckedForms(op), reference: isUnsafe(op)),
         parameters: codegenParameters(of: op, for: element),
         highwayOrdered: op.highwayOrdered
     )
@@ -11286,8 +11957,8 @@ func codegenCalls(
         switch parameter.kind {
         case .tag:
             continue
-        case .vector, .indices, .mask, .fillVector, .whereMask, .otherwiseVector, .lane,
-            .fillLane, .laneAmount:
+        case .vector, .indices, .laneIndices, .mask, .fillVector, .whereMask, .otherwiseVector,
+            .lane, .fillLane, .laneAmount:
             portArguments.append(swiftCallArgument(binding))
             referenceArguments.append(swiftCallArgument(binding))
         case .count:
