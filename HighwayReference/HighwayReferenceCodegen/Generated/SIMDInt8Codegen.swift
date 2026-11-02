@@ -5,11 +5,11 @@ public import Vectorization
 
 public enum HighwayReferenceInt8 {
     public typealias Lane = Int8
-    public typealias Vector = HighwayReference.VectorI8
+    public typealias Vector = SIMDInt8.Vector
 
     @export(implementation) @inline(always)
     public static var laneCount: Int {
-        Int(HighwayReference.laneCountI8())
+        Int(HighwayReference.Nothrow.laneCountI8())
     }
 
     @available(SwiftStdlib 5.1, *)
@@ -24,7 +24,9 @@ public enum HighwayReferenceInt8 {
     public static func load(fromUnchecked span: Span<Lane>) -> Vector {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadI8($0.baseAddress.unsafelyUnwrapped)
+            unsafe SIMDInt8.Vector(
+                raw: HighwayReference.Nothrow.loadI8($0.baseAddress.unsafelyUnwrapped)
+            )
         }
     }
 
@@ -52,7 +54,9 @@ public enum HighwayReferenceInt8 {
             "Span does not start at an address aligned to the vector size"
         )
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadAlignedI8($0.baseAddress.unsafelyUnwrapped)
+            unsafe SIMDInt8.Vector(
+                raw: HighwayReference.Nothrow.loadAlignedI8($0.baseAddress.unsafelyUnwrapped)
+            )
         }
     }
 
@@ -60,7 +64,12 @@ public enum HighwayReferenceInt8 {
     @export(implementation) @inline(always)
     public static func loadFirst(from span: Span<Lane>) -> Vector {
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadFirstI8($0.baseAddress, $0.count)
+            unsafe SIMDInt8.Vector(
+                raw: HighwayReference.Nothrow.loadFirstI8(
+                    $0.baseAddress,
+                    HighwayReference.Nothrow.spanCount($0.count, laneCount)
+                )
+            )
         }
     }
 
@@ -76,7 +85,7 @@ public enum HighwayReferenceInt8 {
     public static func store(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeI8(a, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeI8(a.raw, $0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -98,8 +107,8 @@ public enum HighwayReferenceInt8 {
             "OutputSpan has less free capacity than a vector has lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeI8(
-                a,
+            unsafe HighwayReference.Nothrow.storeI8(
+                a.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= laneCount
@@ -130,7 +139,7 @@ public enum HighwayReferenceInt8 {
             "Span does not start at an address aligned to the vector size"
         )
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeAlignedI8(a, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeAlignedI8(a.raw, $0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -166,8 +175,8 @@ public enum HighwayReferenceInt8 {
             "OutputSpan does not continue at an address aligned to the vector size"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeAlignedI8(
-                a,
+            unsafe HighwayReference.Nothrow.storeAlignedI8(
+                a.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= laneCount
@@ -178,7 +187,11 @@ public enum HighwayReferenceInt8 {
     @export(implementation) @inline(always)
     public static func storeFirst(_ a: Vector, to span: inout MutableSpan<Lane>) {
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeFirstI8(a, $0.baseAddress, $0.count)
+            unsafe HighwayReference.Nothrow.storeFirstI8(
+                a.raw,
+                $0.baseAddress,
+                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            )
         }
     }
 
@@ -206,8 +219,8 @@ public enum HighwayReferenceInt8 {
             "OutputSpan has less free capacity than the count"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeFirstI8(
-                a,
+            unsafe HighwayReference.Nothrow.storeFirstI8(
+                a.raw,
                 buffer.baseAddress?.advanced(by: initializedCount),
                 addingCount
             )
@@ -238,7 +251,11 @@ public enum HighwayReferenceInt8 {
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved2I8($0.baseAddress.unsafelyUnwrapped, &v0, &v1)
+            unsafe HighwayReference.Nothrow.loadInterleaved2I8(
+                $0.baseAddress.unsafelyUnwrapped,
+                &v0.raw,
+                &v1.raw
+            )
         }
     }
 
@@ -267,11 +284,11 @@ public enum HighwayReferenceInt8 {
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved3I8(
+            unsafe HighwayReference.Nothrow.loadInterleaved3I8(
                 $0.baseAddress.unsafelyUnwrapped,
-                &v0,
-                &v1,
-                &v2
+                &v0.raw,
+                &v1.raw,
+                &v2.raw
             )
         }
     }
@@ -303,12 +320,12 @@ public enum HighwayReferenceInt8 {
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved4I8(
+            unsafe HighwayReference.Nothrow.loadInterleaved4I8(
                 $0.baseAddress.unsafelyUnwrapped,
-                &v0,
-                &v1,
-                &v2,
-                &v3
+                &v0.raw,
+                &v1.raw,
+                &v2.raw,
+                &v3.raw
             )
         }
     }
@@ -333,7 +350,11 @@ public enum HighwayReferenceInt8 {
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved2I8(a, b, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeInterleaved2I8(
+                a.raw,
+                b.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 
@@ -363,9 +384,9 @@ public enum HighwayReferenceInt8 {
             "OutputSpan has less free capacity than 2 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved2I8(
-                a,
-                b,
+            unsafe HighwayReference.Nothrow.storeInterleaved2I8(
+                a.raw,
+                b.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 2 * laneCount
@@ -397,7 +418,12 @@ public enum HighwayReferenceInt8 {
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved3I8(a, b, c, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeInterleaved3I8(
+                a.raw,
+                b.raw,
+                c.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 
@@ -429,10 +455,10 @@ public enum HighwayReferenceInt8 {
             "OutputSpan has less free capacity than 3 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved3I8(
-                a,
-                b,
-                c,
+            unsafe HighwayReference.Nothrow.storeInterleaved3I8(
+                a.raw,
+                b.raw,
+                c.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 3 * laneCount
@@ -466,11 +492,11 @@ public enum HighwayReferenceInt8 {
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved4I8(
-                a,
-                b,
-                c,
-                d,
+            unsafe HighwayReference.Nothrow.storeInterleaved4I8(
+                a.raw,
+                b.raw,
+                c.raw,
+                d.raw,
                 $0.baseAddress.unsafelyUnwrapped
             )
         }
@@ -506,11 +532,11 @@ public enum HighwayReferenceInt8 {
             "OutputSpan has less free capacity than 4 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved4I8(
-                a,
-                b,
-                c,
-                d,
+            unsafe HighwayReference.Nothrow.storeInterleaved4I8(
+                a.raw,
+                b.raw,
+                c.raw,
+                d.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 4 * laneCount
@@ -525,8 +551,8 @@ public func portZeroI8() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayZeroI8() -> HighwayReference.VectorI8 {
-    HighwayReference.zeroI8()
+public func highwayZeroI8() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.zeroI8())
 }
 
 @inline(never)
@@ -535,8 +561,8 @@ public func portRepeatingI8(_ value: SIMDInt8.Lane) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayRepeatingI8(_ value: Int8) -> HighwayReference.VectorI8 {
-    HighwayReference.repeatingI8(value)
+public func highwayRepeatingI8(_ value: Int8) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(value))
 }
 
 @inline(never)
@@ -545,8 +571,8 @@ public func portRepeatingI8ConstantValue() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayRepeatingI8ConstantValue() -> HighwayReference.VectorI8 {
-    HighwayReference.repeatingI8(26)
+public func highwayRepeatingI8ConstantValue() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26))
 }
 
 @inline(never)
@@ -555,8 +581,8 @@ public func portIotaI8(_ value: SIMDInt8.Lane) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayIotaI8(_ value: Int8) -> HighwayReference.VectorI8 {
-    HighwayReference.iotaI8(value)
+public func highwayIotaI8(_ value: Int8) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.iotaI8(value))
 }
 
 @inline(never)
@@ -565,8 +591,8 @@ public func portIotaI8ConstantValue() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayIotaI8ConstantValue() -> HighwayReference.VectorI8 {
-    HighwayReference.iotaI8(26)
+public func highwayIotaI8ConstantValue() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.iotaI8(26))
 }
 
 @inline(never)
@@ -575,8 +601,8 @@ public func portLoadI8(from: UnsafePointer<SIMDInt8.Lane>) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayLoadI8(from: UnsafePointer<Int8>) -> HighwayReference.VectorI8 {
-    unsafe HighwayReference.loadI8(from)
+public func highwayLoadI8(from: UnsafePointer<Int8>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.loadI8(from))
 }
 
 @inline(never)
@@ -585,8 +611,8 @@ public func portLoadAlignedI8(from: UnsafePointer<SIMDInt8.Lane>) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwayLoadAlignedI8(from: UnsafePointer<Int8>) -> HighwayReference.VectorI8 {
-    unsafe HighwayReference.loadAlignedI8(from)
+public func highwayLoadAlignedI8(from: UnsafePointer<Int8>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.loadAlignedI8(from))
 }
 
 @inline(never)
@@ -595,8 +621,8 @@ public func portLoadFirstI8(from: UnsafePointer<SIMDInt8.Lane>, count: Int) -> S
 }
 
 @inline(never)
-public func highwayLoadFirstI8(from: UnsafePointer<Int8>, count: Int) -> HighwayReference.VectorI8 {
-    unsafe HighwayReference.loadFirstI8(from, count)
+public func highwayLoadFirstI8(from: UnsafePointer<Int8>, count: Int) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.loadFirstI8(from, count))
 }
 
 @inline(never)
@@ -605,9 +631,8 @@ public func portLoadFirstI8ConstantCount(from: UnsafePointer<SIMDInt8.Lane>) -> 
 }
 
 @inline(never)
-public func highwayLoadFirstI8ConstantCount(from: UnsafePointer<Int8>) -> HighwayReference.VectorI8
-{
-    unsafe HighwayReference.loadFirstI8(from, 1)
+public func highwayLoadFirstI8ConstantCount(from: UnsafePointer<Int8>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.loadFirstI8(from, 1))
 }
 
 @inline(never)
@@ -616,8 +641,8 @@ public func portStoreI8(_ a: SIMDInt8.Vector, to: UnsafeMutablePointer<SIMDInt8.
 }
 
 @inline(never)
-public func highwayStoreI8(_ a: HighwayReference.VectorI8, to: UnsafeMutablePointer<Int8>) {
-    unsafe HighwayReference.storeI8(a, to)
+public func highwayStoreI8(_ a: SIMDInt8.Vector, to: UnsafeMutablePointer<Int8>) {
+    unsafe HighwayReference.Nothrow.storeI8(a.raw, to)
 }
 
 @inline(never)
@@ -627,7 +652,10 @@ public func portStoreI8ConstantA(to: UnsafeMutablePointer<SIMDInt8.Lane>) {
 
 @inline(never)
 public func highwayStoreI8ConstantA(to: UnsafeMutablePointer<Int8>) {
-    unsafe HighwayReference.storeI8(HighwayReference.repeatingI8(26), to)
+    unsafe HighwayReference.Nothrow.storeI8(
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -636,8 +664,8 @@ public func portStoreAlignedI8(_ a: SIMDInt8.Vector, to: UnsafeMutablePointer<SI
 }
 
 @inline(never)
-public func highwayStoreAlignedI8(_ a: HighwayReference.VectorI8, to: UnsafeMutablePointer<Int8>) {
-    unsafe HighwayReference.storeAlignedI8(a, to)
+public func highwayStoreAlignedI8(_ a: SIMDInt8.Vector, to: UnsafeMutablePointer<Int8>) {
+    unsafe HighwayReference.Nothrow.storeAlignedI8(a.raw, to)
 }
 
 @inline(never)
@@ -647,7 +675,10 @@ public func portStoreAlignedI8ConstantA(to: UnsafeMutablePointer<SIMDInt8.Lane>)
 
 @inline(never)
 public func highwayStoreAlignedI8ConstantA(to: UnsafeMutablePointer<Int8>) {
-    unsafe HighwayReference.storeAlignedI8(HighwayReference.repeatingI8(26), to)
+    unsafe HighwayReference.Nothrow.storeAlignedI8(
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -660,12 +691,8 @@ public func portStoreFirstI8(
 }
 
 @inline(never)
-public func highwayStoreFirstI8(
-    _ a: HighwayReference.VectorI8,
-    to: UnsafeMutablePointer<Int8>,
-    count: Int
-) {
-    unsafe HighwayReference.storeFirstI8(a, to, count)
+public func highwayStoreFirstI8(_ a: SIMDInt8.Vector, to: UnsafeMutablePointer<Int8>, count: Int) {
+    unsafe HighwayReference.Nothrow.storeFirstI8(a.raw, to, count)
 }
 
 @inline(never)
@@ -675,7 +702,11 @@ public func portStoreFirstI8ConstantA(to: UnsafeMutablePointer<SIMDInt8.Lane>, c
 
 @inline(never)
 public func highwayStoreFirstI8ConstantA(to: UnsafeMutablePointer<Int8>, count: Int) {
-    unsafe HighwayReference.storeFirstI8(HighwayReference.repeatingI8(26), to, count)
+    unsafe HighwayReference.Nothrow.storeFirstI8(
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        to,
+        count
+    )
 }
 
 @inline(never)
@@ -687,11 +718,8 @@ public func portStoreFirstI8ConstantCount(
 }
 
 @inline(never)
-public func highwayStoreFirstI8ConstantCount(
-    _ a: HighwayReference.VectorI8,
-    to: UnsafeMutablePointer<Int8>
-) {
-    unsafe HighwayReference.storeFirstI8(a, to, 1)
+public func highwayStoreFirstI8ConstantCount(_ a: SIMDInt8.Vector, to: UnsafeMutablePointer<Int8>) {
+    unsafe HighwayReference.Nothrow.storeFirstI8(a.raw, to, 1)
 }
 
 @inline(never)
@@ -700,11 +728,8 @@ public func portAddingI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8
 }
 
 @inline(never)
-public func highwayAddingI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.addingI8(a, b)
+public func highwayAddingI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.addingI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -713,8 +738,13 @@ public func portAddingI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayAddingI8ConstantA(_ b: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.addingI8(HighwayReference.repeatingI8(26), b)
+public func highwayAddingI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.addingI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -723,8 +753,13 @@ public func portAddingI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayAddingI8ConstantB(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.addingI8(a, HighwayReference.repeatingI8(26))
+public func highwayAddingI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.addingI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -733,11 +768,8 @@ public func portSubtractingI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIM
 }
 
 @inline(never)
-public func highwaySubtractingI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.subtractingI8(a, b)
+public func highwaySubtractingI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.subtractingI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -746,10 +778,13 @@ public func portSubtractingI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector 
 }
 
 @inline(never)
-public func highwaySubtractingI8ConstantA(
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.subtractingI8(HighwayReference.repeatingI8(26), b)
+public func highwaySubtractingI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.subtractingI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -758,10 +793,13 @@ public func portSubtractingI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector 
 }
 
 @inline(never)
-public func highwaySubtractingI8ConstantB(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.subtractingI8(a, HighwayReference.repeatingI8(26))
+public func highwaySubtractingI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.subtractingI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -770,11 +808,8 @@ public func portMinimumI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt
 }
 
 @inline(never)
-public func highwayMinimumI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.minimumI8(a, b)
+public func highwayMinimumI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.minimumI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -783,8 +818,13 @@ public func portMinimumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayMinimumI8ConstantA(_ b: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.minimumI8(HighwayReference.repeatingI8(26), b)
+public func highwayMinimumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.minimumI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -793,8 +833,13 @@ public func portMinimumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayMinimumI8ConstantB(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.minimumI8(a, HighwayReference.repeatingI8(26))
+public func highwayMinimumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.minimumI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -803,11 +848,8 @@ public func portMaximumI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt
 }
 
 @inline(never)
-public func highwayMaximumI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.maximumI8(a, b)
+public func highwayMaximumI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.maximumI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -816,8 +858,13 @@ public func portMaximumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayMaximumI8ConstantA(_ b: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.maximumI8(HighwayReference.repeatingI8(26), b)
+public func highwayMaximumI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.maximumI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -826,8 +873,13 @@ public func portMaximumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayMaximumI8ConstantB(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.maximumI8(a, HighwayReference.repeatingI8(26))
+public func highwayMaximumI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.maximumI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -836,8 +888,8 @@ public func portNegatedI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayNegatedI8(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.negatedI8(a)
+public func highwayNegatedI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.negatedI8(a.raw))
 }
 
 @inline(never)
@@ -846,8 +898,12 @@ public func portNegatedI8ConstantA() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayNegatedI8ConstantA() -> HighwayReference.VectorI8 {
-    HighwayReference.negatedI8(HighwayReference.repeatingI8(26))
+public func highwayNegatedI8ConstantA() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.negatedI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -856,8 +912,8 @@ public func portMagnitudeI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayMagnitudeI8(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.magnitudeI8(a)
+public func highwayMagnitudeI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.magnitudeI8(a.raw))
 }
 
 @inline(never)
@@ -866,8 +922,12 @@ public func portMagnitudeI8ConstantA() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayMagnitudeI8ConstantA() -> HighwayReference.VectorI8 {
-    HighwayReference.magnitudeI8(HighwayReference.repeatingI8(26))
+public func highwayMagnitudeI8ConstantA() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.magnitudeI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -876,11 +936,9 @@ public func portSaturatingAddingI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -
 }
 
 @inline(never)
-public func highwaySaturatingAddingI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.saturatingAddingI8(a, b)
+public func highwaySaturatingAddingI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector
+{
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.saturatingAddingI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -889,10 +947,13 @@ public func portSaturatingAddingI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwaySaturatingAddingI8ConstantA(
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.saturatingAddingI8(HighwayReference.repeatingI8(26), b)
+public func highwaySaturatingAddingI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.saturatingAddingI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -901,10 +962,13 @@ public func portSaturatingAddingI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwaySaturatingAddingI8ConstantB(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.saturatingAddingI8(a, HighwayReference.repeatingI8(26))
+public func highwaySaturatingAddingI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.saturatingAddingI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -917,10 +981,10 @@ public func portSaturatingSubtractingI8(
 
 @inline(never)
 public func highwaySaturatingSubtractingI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.saturatingSubtractingI8(a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.saturatingSubtractingI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -929,10 +993,13 @@ public func portSaturatingSubtractingI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDIn
 }
 
 @inline(never)
-public func highwaySaturatingSubtractingI8ConstantA(
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.saturatingSubtractingI8(HighwayReference.repeatingI8(26), b)
+public func highwaySaturatingSubtractingI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.saturatingSubtractingI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -941,10 +1008,13 @@ public func portSaturatingSubtractingI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDIn
 }
 
 @inline(never)
-public func highwaySaturatingSubtractingI8ConstantB(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.saturatingSubtractingI8(a, HighwayReference.repeatingI8(26))
+public func highwaySaturatingSubtractingI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.saturatingSubtractingI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -953,11 +1023,8 @@ public func portBitwiseAndI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMD
 }
 
 @inline(never)
-public func highwayBitwiseAndI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndI8(a, b)
+public func highwayBitwiseAndI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseAndI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -966,10 +1033,13 @@ public func portBitwiseAndI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseAndI8ConstantA(
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndI8(HighwayReference.repeatingI8(26), b)
+public func highwayBitwiseAndI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -978,10 +1048,13 @@ public func portBitwiseAndI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseAndI8ConstantB(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndI8(a, HighwayReference.repeatingI8(26))
+public func highwayBitwiseAndI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -990,11 +1063,8 @@ public func portBitwiseOrI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDI
 }
 
 @inline(never)
-public func highwayBitwiseOrI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrI8(a, b)
+public func highwayBitwiseOrI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseOrI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1003,9 +1073,13 @@ public func portBitwiseOrI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseOrI8ConstantA(_ b: HighwayReference.VectorI8) -> HighwayReference.VectorI8
-{
-    HighwayReference.bitwiseOrI8(HighwayReference.repeatingI8(26), b)
+public func highwayBitwiseOrI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1014,9 +1088,13 @@ public func portBitwiseOrI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseOrI8ConstantB(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8
-{
-    HighwayReference.bitwiseOrI8(a, HighwayReference.repeatingI8(26))
+public func highwayBitwiseOrI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1025,11 +1103,8 @@ public func portBitwiseXorI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMD
 }
 
 @inline(never)
-public func highwayBitwiseXorI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorI8(a, b)
+public func highwayBitwiseXorI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseXorI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1038,10 +1113,13 @@ public func portBitwiseXorI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseXorI8ConstantA(
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorI8(HighwayReference.repeatingI8(26), b)
+public func highwayBitwiseXorI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1050,10 +1128,13 @@ public func portBitwiseXorI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseXorI8ConstantB(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorI8(a, HighwayReference.repeatingI8(26))
+public func highwayBitwiseXorI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1062,8 +1143,8 @@ public func portBitwiseNotI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseNotI8(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseNotI8(a)
+public func highwayBitwiseNotI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseNotI8(a.raw))
 }
 
 @inline(never)
@@ -1072,8 +1153,12 @@ public func portBitwiseNotI8ConstantA() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseNotI8ConstantA() -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseNotI8(HighwayReference.repeatingI8(26))
+public func highwayBitwiseNotI8ConstantA() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseNotI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1082,11 +1167,8 @@ public func portBitwiseAndNotI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> S
 }
 
 @inline(never)
-public func highwayBitwiseAndNotI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndNotI8(a, b)
+public func highwayBitwiseAndNotI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseAndNotI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1095,10 +1177,13 @@ public func portBitwiseAndNotI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vecto
 }
 
 @inline(never)
-public func highwayBitwiseAndNotI8ConstantA(
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndNotI8(HighwayReference.repeatingI8(26), b)
+public func highwayBitwiseAndNotI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndNotI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1107,10 +1192,13 @@ public func portBitwiseAndNotI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vecto
 }
 
 @inline(never)
-public func highwayBitwiseAndNotI8ConstantB(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndNotI8(a, HighwayReference.repeatingI8(26))
+public func highwayBitwiseAndNotI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndNotI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1124,11 +1212,11 @@ public func portBitwiseAndXorI8(
 
 @inline(never)
 public func highwayBitwiseAndXorI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndXorI8(a, b, c)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseAndXorI8(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -1141,10 +1229,16 @@ public func portBitwiseAndXorI8ConstantA(
 
 @inline(never)
 public func highwayBitwiseAndXorI8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndXorI8(HighwayReference.repeatingI8(26), b, c)
+    _ b: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndXorI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1157,10 +1251,16 @@ public func portBitwiseAndXorI8ConstantB(
 
 @inline(never)
 public func highwayBitwiseAndXorI8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndXorI8(a, HighwayReference.repeatingI8(26), c)
+    _ a: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndXorI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1173,10 +1273,16 @@ public func portBitwiseAndXorI8ConstantC(
 
 @inline(never)
 public func highwayBitwiseAndXorI8ConstantC(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndXorI8(a, b, HighwayReference.repeatingI8(26))
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndXorI8(
+            a.raw,
+            b.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1185,11 +1291,8 @@ public func portShiftedLeftI8(_ a: SIMDInt8.Vector, by bits: Int32) -> SIMDInt8.
 }
 
 @inline(never)
-public func highwayShiftedLeftI8(
-    _ a: HighwayReference.VectorI8,
-    by bits: Int32
-) -> HighwayReference.VectorI8 {
-    HighwayReference.shiftedLeftI8(a, bits)
+public func highwayShiftedLeftI8(_ a: SIMDInt8.Vector, by bits: Int32) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedLeftI8(a.raw, bits))
 }
 
 @inline(never)
@@ -1198,8 +1301,13 @@ public func portShiftedLeftI8ConstantA(by bits: Int32) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayShiftedLeftI8ConstantA(by bits: Int32) -> HighwayReference.VectorI8 {
-    HighwayReference.shiftedLeftI8(HighwayReference.repeatingI8(26), bits)
+public func highwayShiftedLeftI8ConstantA(by bits: Int32) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.shiftedLeftI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            bits
+        )
+    )
 }
 
 @inline(never)
@@ -1208,10 +1316,8 @@ public func portShiftedLeftI8ConstantBits(_ a: SIMDInt8.Vector) -> SIMDInt8.Vect
 }
 
 @inline(never)
-public func highwayShiftedLeftI8ConstantBits(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.shiftedLeftI8(a, 3)
+public func highwayShiftedLeftI8ConstantBits(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedLeftI8(a.raw, 3))
 }
 
 @inline(never)
@@ -1220,11 +1326,8 @@ public func portShiftedRightI8(_ a: SIMDInt8.Vector, by bits: Int32) -> SIMDInt8
 }
 
 @inline(never)
-public func highwayShiftedRightI8(
-    _ a: HighwayReference.VectorI8,
-    by bits: Int32
-) -> HighwayReference.VectorI8 {
-    HighwayReference.shiftedRightI8(a, bits)
+public func highwayShiftedRightI8(_ a: SIMDInt8.Vector, by bits: Int32) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightI8(a.raw, bits))
 }
 
 @inline(never)
@@ -1233,8 +1336,13 @@ public func portShiftedRightI8ConstantA(by bits: Int32) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayShiftedRightI8ConstantA(by bits: Int32) -> HighwayReference.VectorI8 {
-    HighwayReference.shiftedRightI8(HighwayReference.repeatingI8(26), bits)
+public func highwayShiftedRightI8ConstantA(by bits: Int32) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.shiftedRightI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            bits
+        )
+    )
 }
 
 @inline(never)
@@ -1243,10 +1351,8 @@ public func portShiftedRightI8ConstantBits(_ a: SIMDInt8.Vector) -> SIMDInt8.Vec
 }
 
 @inline(never)
-public func highwayShiftedRightI8ConstantBits(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.shiftedRightI8(a, 3)
+public func highwayShiftedRightI8ConstantBits(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightI8(a.raw, 3))
 }
 
 @inline(never)
@@ -1255,11 +1361,8 @@ public func portEqualToI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt
 }
 
 @inline(never)
-public func highwayEqualToI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.MaskI8 {
-    HighwayReference.equalToI8(a, b)
+public func highwayEqualToI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(raw: HighwayReference.Nothrow.equalToI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1268,8 +1371,13 @@ public func portEqualToI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayEqualToI8ConstantA(_ b: HighwayReference.VectorI8) -> HighwayReference.MaskI8 {
-    HighwayReference.equalToI8(HighwayReference.repeatingI8(26), b)
+public func highwayEqualToI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(
+        raw: HighwayReference.Nothrow.equalToI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1278,8 +1386,13 @@ public func portEqualToI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayEqualToI8ConstantB(_ a: HighwayReference.VectorI8) -> HighwayReference.MaskI8 {
-    HighwayReference.equalToI8(a, HighwayReference.repeatingI8(26))
+public func highwayEqualToI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(
+        raw: HighwayReference.Nothrow.equalToI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1288,11 +1401,8 @@ public func portNotEqualToI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMD
 }
 
 @inline(never)
-public func highwayNotEqualToI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.MaskI8 {
-    HighwayReference.notEqualToI8(a, b)
+public func highwayNotEqualToI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(raw: HighwayReference.Nothrow.notEqualToI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1301,9 +1411,13 @@ public func portNotEqualToI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayNotEqualToI8ConstantA(_ b: HighwayReference.VectorI8) -> HighwayReference.MaskI8
-{
-    HighwayReference.notEqualToI8(HighwayReference.repeatingI8(26), b)
+public func highwayNotEqualToI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(
+        raw: HighwayReference.Nothrow.notEqualToI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1312,9 +1426,13 @@ public func portNotEqualToI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayNotEqualToI8ConstantB(_ a: HighwayReference.VectorI8) -> HighwayReference.MaskI8
-{
-    HighwayReference.notEqualToI8(a, HighwayReference.repeatingI8(26))
+public func highwayNotEqualToI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(
+        raw: HighwayReference.Nothrow.notEqualToI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1323,11 +1441,8 @@ public func portLessThanI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDIn
 }
 
 @inline(never)
-public func highwayLessThanI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.MaskI8 {
-    HighwayReference.lessThanI8(a, b)
+public func highwayLessThanI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(raw: HighwayReference.Nothrow.lessThanI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1336,8 +1451,13 @@ public func portLessThanI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayLessThanI8ConstantA(_ b: HighwayReference.VectorI8) -> HighwayReference.MaskI8 {
-    HighwayReference.lessThanI8(HighwayReference.repeatingI8(26), b)
+public func highwayLessThanI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(
+        raw: HighwayReference.Nothrow.lessThanI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1346,8 +1466,13 @@ public func portLessThanI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayLessThanI8ConstantB(_ a: HighwayReference.VectorI8) -> HighwayReference.MaskI8 {
-    HighwayReference.lessThanI8(a, HighwayReference.repeatingI8(26))
+public func highwayLessThanI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(
+        raw: HighwayReference.Nothrow.lessThanI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1356,11 +1481,8 @@ public func portGreaterThanI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIM
 }
 
 @inline(never)
-public func highwayGreaterThanI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.MaskI8 {
-    HighwayReference.greaterThanI8(a, b)
+public func highwayGreaterThanI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(raw: HighwayReference.Nothrow.greaterThanI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1369,9 +1491,13 @@ public func portGreaterThanI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayGreaterThanI8ConstantA(_ b: HighwayReference.VectorI8) -> HighwayReference.MaskI8
-{
-    HighwayReference.greaterThanI8(HighwayReference.repeatingI8(26), b)
+public func highwayGreaterThanI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(
+        raw: HighwayReference.Nothrow.greaterThanI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1380,9 +1506,13 @@ public func portGreaterThanI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayGreaterThanI8ConstantB(_ a: HighwayReference.VectorI8) -> HighwayReference.MaskI8
-{
-    HighwayReference.greaterThanI8(a, HighwayReference.repeatingI8(26))
+public func highwayGreaterThanI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(
+        raw: HighwayReference.Nothrow.greaterThanI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1396,11 +1526,11 @@ public func portSelectingI8(
 
 @inline(never)
 public func highwaySelectingI8(
-    _ mask: HighwayReference.MaskI8,
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.selectingI8(mask, a, b)
+    _ mask: SIMDInt8.Mask,
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.selectingI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -1411,10 +1541,16 @@ public func portSelectingI8ConstantA(_ mask: SIMDInt8.Mask, _ b: SIMDInt8.Vector
 
 @inline(never)
 public func highwaySelectingI8ConstantA(
-    _ mask: HighwayReference.MaskI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.selectingI8(mask, HighwayReference.repeatingI8(26), b)
+    _ mask: SIMDInt8.Mask,
+    _ b: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.selectingI8(
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1425,10 +1561,16 @@ public func portSelectingI8ConstantB(_ mask: SIMDInt8.Mask, _ a: SIMDInt8.Vector
 
 @inline(never)
 public func highwaySelectingI8ConstantB(
-    _ mask: HighwayReference.MaskI8,
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.selectingI8(mask, a, HighwayReference.repeatingI8(26))
+    _ mask: SIMDInt8.Mask,
+    _ a: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.selectingI8(
+            mask.raw,
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1437,11 +1579,9 @@ public func portSelectingOrZeroI8(_ mask: SIMDInt8.Mask, _ a: SIMDInt8.Vector) -
 }
 
 @inline(never)
-public func highwaySelectingOrZeroI8(
-    _ mask: HighwayReference.MaskI8,
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.selectingOrZeroI8(mask, a)
+public func highwaySelectingOrZeroI8(_ mask: SIMDInt8.Mask, _ a: SIMDInt8.Vector) -> SIMDInt8.Vector
+{
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.selectingOrZeroI8(mask.raw, a.raw))
 }
 
 @inline(never)
@@ -1450,10 +1590,13 @@ public func portSelectingOrZeroI8ConstantA(_ mask: SIMDInt8.Mask) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwaySelectingOrZeroI8ConstantA(
-    _ mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.selectingOrZeroI8(mask, HighwayReference.repeatingI8(26))
+public func highwaySelectingOrZeroI8ConstantA(_ mask: SIMDInt8.Mask) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.selectingOrZeroI8(
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1462,11 +1605,9 @@ public func portZeroingSelectedI8(_ mask: SIMDInt8.Mask, _ a: SIMDInt8.Vector) -
 }
 
 @inline(never)
-public func highwayZeroingSelectedI8(
-    _ mask: HighwayReference.MaskI8,
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.zeroingSelectedI8(mask, a)
+public func highwayZeroingSelectedI8(_ mask: SIMDInt8.Mask, _ a: SIMDInt8.Vector) -> SIMDInt8.Vector
+{
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.zeroingSelectedI8(mask.raw, a.raw))
 }
 
 @inline(never)
@@ -1475,10 +1616,13 @@ public func portZeroingSelectedI8ConstantA(_ mask: SIMDInt8.Mask) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwayZeroingSelectedI8ConstantA(
-    _ mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.zeroingSelectedI8(mask, HighwayReference.repeatingI8(26))
+public func highwayZeroingSelectedI8ConstantA(_ mask: SIMDInt8.Mask) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.zeroingSelectedI8(
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1492,11 +1636,11 @@ public func portBitwiseAndWhereI8(
 
 @inline(never)
 public func highwayBitwiseAndWhereI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndWhereI8(mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseAndWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -1509,10 +1653,16 @@ public func portBitwiseAndWhereI8ConstantA(
 
 @inline(never)
 public func highwayBitwiseAndWhereI8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndWhereI8(mask, HighwayReference.repeatingI8(26), b)
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereI8(
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1525,10 +1675,16 @@ public func portBitwiseAndWhereI8ConstantB(
 
 @inline(never)
 public func highwayBitwiseAndWhereI8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndWhereI8(mask, a, HighwayReference.repeatingI8(26))
+    _ a: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereI8(
+            mask.raw,
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1542,11 +1698,11 @@ public func portBitwiseOrWhereI8(
 
 @inline(never)
 public func highwayBitwiseOrWhereI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrWhereI8(mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseOrWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -1559,10 +1715,16 @@ public func portBitwiseOrWhereI8ConstantA(
 
 @inline(never)
 public func highwayBitwiseOrWhereI8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrWhereI8(mask, HighwayReference.repeatingI8(26), b)
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereI8(
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1575,10 +1737,16 @@ public func portBitwiseOrWhereI8ConstantB(
 
 @inline(never)
 public func highwayBitwiseOrWhereI8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrWhereI8(mask, a, HighwayReference.repeatingI8(26))
+    _ a: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereI8(
+            mask.raw,
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1592,11 +1760,11 @@ public func portBitwiseXorWhereI8(
 
 @inline(never)
 public func highwayBitwiseXorWhereI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorWhereI8(mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitwiseXorWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -1609,10 +1777,16 @@ public func portBitwiseXorWhereI8ConstantA(
 
 @inline(never)
 public func highwayBitwiseXorWhereI8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorWhereI8(mask, HighwayReference.repeatingI8(26), b)
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereI8(
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1625,10 +1799,16 @@ public func portBitwiseXorWhereI8ConstantB(
 
 @inline(never)
 public func highwayBitwiseXorWhereI8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorWhereI8(mask, a, HighwayReference.repeatingI8(26))
+    _ a: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereI8(
+            mask.raw,
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1643,12 +1823,19 @@ public func portBitwiseAndWhereOtherwiseI8(
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndWhereOtherwiseI8(otherwise, mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1662,15 +1849,17 @@ public func portBitwiseAndWhereOtherwiseI8ConstantA(
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndWhereOtherwiseI8(
-        otherwise,
-        mask,
-        HighwayReference.repeatingI8(26),
-        b
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
     )
 }
 
@@ -1685,15 +1874,17 @@ public func portBitwiseAndWhereOtherwiseI8ConstantB(
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndWhereOtherwiseI8(
-        otherwise,
-        mask,
-        a,
-        HighwayReference.repeatingI8(26)
+    _ a: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
     )
 }
 
@@ -1708,11 +1899,18 @@ public func portBitwiseAndWhereOtherwiseI8ConstantOtherwise(
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI8ConstantOtherwise(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseAndWhereOtherwiseI8(HighwayReference.repeatingI8(26), mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1727,12 +1925,19 @@ public func portBitwiseOrWhereOtherwiseI8(
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrWhereOtherwiseI8(otherwise, mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1746,11 +1951,18 @@ public func portBitwiseOrWhereOtherwiseI8ConstantA(
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrWhereOtherwiseI8(otherwise, mask, HighwayReference.repeatingI8(26), b)
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1764,11 +1976,18 @@ public func portBitwiseOrWhereOtherwiseI8ConstantB(
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrWhereOtherwiseI8(otherwise, mask, a, HighwayReference.repeatingI8(26))
+    _ a: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1782,11 +2001,18 @@ public func portBitwiseOrWhereOtherwiseI8ConstantOtherwise(
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI8ConstantOtherwise(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrWhereOtherwiseI8(HighwayReference.repeatingI8(26), mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1801,12 +2027,19 @@ public func portBitwiseXorWhereOtherwiseI8(
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorWhereOtherwiseI8(otherwise, mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1820,15 +2053,17 @@ public func portBitwiseXorWhereOtherwiseI8ConstantA(
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorWhereOtherwiseI8(
-        otherwise,
-        mask,
-        HighwayReference.repeatingI8(26),
-        b
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
     )
 }
 
@@ -1843,15 +2078,17 @@ public func portBitwiseXorWhereOtherwiseI8ConstantB(
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8,
-    otherwise: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorWhereOtherwiseI8(
-        otherwise,
-        mask,
-        a,
-        HighwayReference.repeatingI8(26)
+    _ a: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask,
+    otherwise: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI8(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
     )
 }
 
@@ -1866,11 +2103,18 @@ public func portBitwiseXorWhereOtherwiseI8ConstantOtherwise(
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI8ConstantOtherwise(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    where mask: HighwayReference.MaskI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseXorWhereOtherwiseI8(HighwayReference.repeatingI8(26), mask, a, b)
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    where mask: SIMDInt8.Mask
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1879,8 +2123,8 @@ public func portFirstLanesI8(count: Int) -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayFirstLanesI8(count: Int) -> HighwayReference.MaskI8 {
-    HighwayReference.firstLanesI8(count)
+public func highwayFirstLanesI8(count: Int) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(raw: HighwayReference.Nothrow.firstLanesI8(count))
 }
 
 @inline(never)
@@ -1889,8 +2133,8 @@ public func portFirstLanesI8ConstantCount() -> SIMDInt8.Mask {
 }
 
 @inline(never)
-public func highwayFirstLanesI8ConstantCount() -> HighwayReference.MaskI8 {
-    HighwayReference.firstLanesI8(1)
+public func highwayFirstLanesI8ConstantCount() -> SIMDInt8.Mask {
+    SIMDInt8.Mask(raw: HighwayReference.Nothrow.firstLanesI8(1))
 }
 
 @inline(never)
@@ -1899,8 +2143,8 @@ public func portAllTrueI8(_ mask: SIMDInt8.Mask) -> Bool {
 }
 
 @inline(never)
-public func highwayAllTrueI8(_ mask: HighwayReference.MaskI8) -> Bool {
-    HighwayReference.allTrueI8(mask)
+public func highwayAllTrueI8(_ mask: SIMDInt8.Mask) -> Bool {
+    HighwayReference.Nothrow.allTrueI8(mask.raw)
 }
 
 @inline(never)
@@ -1909,8 +2153,8 @@ public func portAllFalseI8(_ mask: SIMDInt8.Mask) -> Bool {
 }
 
 @inline(never)
-public func highwayAllFalseI8(_ mask: HighwayReference.MaskI8) -> Bool {
-    HighwayReference.allFalseI8(mask)
+public func highwayAllFalseI8(_ mask: SIMDInt8.Mask) -> Bool {
+    HighwayReference.Nothrow.allFalseI8(mask.raw)
 }
 
 @inline(never)
@@ -1919,8 +2163,8 @@ public func portTrueCountI8(_ mask: SIMDInt8.Mask) -> Int {
 }
 
 @inline(never)
-public func highwayTrueCountI8(_ mask: HighwayReference.MaskI8) -> Int {
-    HighwayReference.trueCountI8(mask)
+public func highwayTrueCountI8(_ mask: SIMDInt8.Mask) -> Int {
+    HighwayReference.Nothrow.trueCountI8(mask.raw)
 }
 
 @inline(never)
@@ -1929,8 +2173,8 @@ public func portFirstTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
 }
 
 @inline(never)
-public func highwayFirstTrueIndexI8(_ mask: HighwayReference.MaskI8) -> Int {
-    HighwayReference.firstTrueIndexI8(mask)
+public func highwayFirstTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
+    HighwayReference.Nothrow.firstTrueIndexI8(mask.raw)
 }
 
 @inline(never)
@@ -1939,8 +2183,8 @@ public func portFirstLaneI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Lane {
 }
 
 @inline(never)
-public func highwayFirstLaneI8(_ a: HighwayReference.VectorI8) -> Int8 {
-    HighwayReference.firstLaneI8(a)
+public func highwayFirstLaneI8(_ a: SIMDInt8.Vector) -> Int8 {
+    HighwayReference.Nothrow.firstLaneI8(a.raw)
 }
 
 @inline(never)
@@ -1950,7 +2194,9 @@ public func portFirstLaneI8ConstantA() -> SIMDInt8.Lane {
 
 @inline(never)
 public func highwayFirstLaneI8ConstantA() -> Int8 {
-    HighwayReference.firstLaneI8(HighwayReference.repeatingI8(26))
+    HighwayReference.Nothrow.firstLaneI8(
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+    )
 }
 
 @inline(never)
@@ -1959,8 +2205,8 @@ public func portReversedI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayReversedI8(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.reversedI8(a)
+public func highwayReversedI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.reversedI8(a.raw))
 }
 
 @inline(never)
@@ -1969,8 +2215,12 @@ public func portReversedI8ConstantA() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayReversedI8ConstantA() -> HighwayReference.VectorI8 {
-    HighwayReference.reversedI8(HighwayReference.repeatingI8(26))
+public func highwayReversedI8ConstantA() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.reversedI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1979,11 +2229,8 @@ public func portSlideUpLanesI8(_ a: SIMDInt8.Vector, byUnchecked lanes: Int) -> 
 }
 
 @inline(never)
-public func highwaySlideUpLanesI8(
-    _ a: HighwayReference.VectorI8,
-    byUnchecked lanes: Int
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideUpLanesI8(a, lanes)
+public func highwaySlideUpLanesI8(_ a: SIMDInt8.Vector, byUnchecked lanes: Int) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slideUpLanesI8(a.raw, lanes))
 }
 
 @inline(never)
@@ -1992,8 +2239,13 @@ public func portSlideUpLanesI8ConstantA(byUnchecked lanes: Int) -> SIMDInt8.Vect
 }
 
 @inline(never)
-public func highwaySlideUpLanesI8ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorI8 {
-    HighwayReference.slideUpLanesI8(HighwayReference.repeatingI8(26), lanes)
+public func highwaySlideUpLanesI8ConstantA(byUnchecked lanes: Int) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slideUpLanesI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2002,10 +2254,8 @@ public func portSlideUpLanesI8ConstantLanes(_ a: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwaySlideUpLanesI8ConstantLanes(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideUpLanesI8(a, 1)
+public func highwaySlideUpLanesI8ConstantLanes(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slideUpLanesI8(a.raw, 1))
 }
 
 @inline(never)
@@ -2019,11 +2269,11 @@ public func portSlideUpLanesFillingWithI8(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithI8(
-    _ a: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideUpLanesFillingWithI8(fill, a, lanes)
+    fillingWith fill: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI8(fill.raw, a.raw, lanes))
 }
 
 @inline(never)
@@ -2037,9 +2287,15 @@ public func portSlideUpLanesFillingWithI8ConstantA(
 @inline(never)
 public func highwaySlideUpLanesFillingWithI8ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideUpLanesFillingWithI8(fill, HighwayReference.repeatingI8(26), lanes)
+    fillingWith fill: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slideUpLanesFillingWithI8(
+            fill.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2052,10 +2308,10 @@ public func portSlideUpLanesFillingWithI8ConstantLanes(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithI8ConstantLanes(
-    _ a: HighwayReference.VectorI8,
-    fillingWith fill: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideUpLanesFillingWithI8(fill, a, 1)
+    _ a: SIMDInt8.Vector,
+    fillingWith fill: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI8(fill.raw, a.raw, 1))
 }
 
 @inline(never)
@@ -2068,10 +2324,16 @@ public func portSlideUpLanesFillingWithI8ConstantFill(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithI8ConstantFill(
-    _ a: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideUpLanesFillingWithI8(HighwayReference.repeatingI8(26), a, lanes)
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slideUpLanesFillingWithI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            a.raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2080,11 +2342,9 @@ public func portSlideDownLanesI8(_ a: SIMDInt8.Vector, byUnchecked lanes: Int) -
 }
 
 @inline(never)
-public func highwaySlideDownLanesI8(
-    _ a: HighwayReference.VectorI8,
-    byUnchecked lanes: Int
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideDownLanesI8(a, lanes)
+public func highwaySlideDownLanesI8(_ a: SIMDInt8.Vector, byUnchecked lanes: Int) -> SIMDInt8.Vector
+{
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slideDownLanesI8(a.raw, lanes))
 }
 
 @inline(never)
@@ -2093,8 +2353,13 @@ public func portSlideDownLanesI8ConstantA(byUnchecked lanes: Int) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwaySlideDownLanesI8ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorI8 {
-    HighwayReference.slideDownLanesI8(HighwayReference.repeatingI8(26), lanes)
+public func highwaySlideDownLanesI8ConstantA(byUnchecked lanes: Int) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slideDownLanesI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2103,10 +2368,8 @@ public func portSlideDownLanesI8ConstantLanes(_ a: SIMDInt8.Vector) -> SIMDInt8.
 }
 
 @inline(never)
-public func highwaySlideDownLanesI8ConstantLanes(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideDownLanesI8(a, 1)
+public func highwaySlideDownLanesI8ConstantLanes(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slideDownLanesI8(a.raw, 1))
 }
 
 @inline(never)
@@ -2120,11 +2383,13 @@ public func portSlideDownLanesFillingWithI8(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithI8(
-    _ a: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideDownLanesFillingWithI8(fill, a, lanes)
+    fillingWith fill: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slideDownLanesFillingWithI8(fill.raw, a.raw, lanes)
+    )
 }
 
 @inline(never)
@@ -2138,9 +2403,15 @@ public func portSlideDownLanesFillingWithI8ConstantA(
 @inline(never)
 public func highwaySlideDownLanesFillingWithI8ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideDownLanesFillingWithI8(fill, HighwayReference.repeatingI8(26), lanes)
+    fillingWith fill: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slideDownLanesFillingWithI8(
+            fill.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2153,10 +2424,10 @@ public func portSlideDownLanesFillingWithI8ConstantLanes(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithI8ConstantLanes(
-    _ a: HighwayReference.VectorI8,
-    fillingWith fill: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideDownLanesFillingWithI8(fill, a, 1)
+    _ a: SIMDInt8.Vector,
+    fillingWith fill: SIMDInt8.Vector
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slideDownLanesFillingWithI8(fill.raw, a.raw, 1))
 }
 
 @inline(never)
@@ -2169,10 +2440,16 @@ public func portSlideDownLanesFillingWithI8ConstantFill(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithI8ConstantFill(
-    _ a: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slideDownLanesFillingWithI8(HighwayReference.repeatingI8(26), a, lanes)
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slideDownLanesFillingWithI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            a.raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2181,8 +2458,8 @@ public func portSlide1UpI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwaySlide1UpI8(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.slide1UpI8(a)
+public func highwaySlide1UpI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slide1UpI8(a.raw))
 }
 
 @inline(never)
@@ -2191,8 +2468,12 @@ public func portSlide1UpI8ConstantA() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwaySlide1UpI8ConstantA() -> HighwayReference.VectorI8 {
-    HighwayReference.slide1UpI8(HighwayReference.repeatingI8(26))
+public func highwaySlide1UpI8ConstantA() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slide1UpI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2205,10 +2486,10 @@ public func portSlide1UpFillingWithI8(
 
 @inline(never)
 public func highwaySlide1UpFillingWithI8(
-    _ a: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
     fillingWith fill: Int8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slide1UpFillingWithI8(fill, a)
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slide1UpFillingWithI8(fill, a.raw))
 }
 
 @inline(never)
@@ -2217,10 +2498,13 @@ public func portSlide1UpFillingWithI8ConstantA(fillingWith fill: SIMDInt8.Lane) 
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithI8ConstantA(
-    fillingWith fill: Int8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slide1UpFillingWithI8(fill, HighwayReference.repeatingI8(26))
+public func highwaySlide1UpFillingWithI8ConstantA(fillingWith fill: Int8) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slide1UpFillingWithI8(
+            fill,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2229,10 +2513,8 @@ public func portSlide1UpFillingWithI8ConstantFill(_ a: SIMDInt8.Vector) -> SIMDI
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithI8ConstantFill(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slide1UpFillingWithI8(26, a)
+public func highwaySlide1UpFillingWithI8ConstantFill(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slide1UpFillingWithI8(26, a.raw))
 }
 
 @inline(never)
@@ -2241,8 +2523,8 @@ public func portSlide1DownI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwaySlide1DownI8(_ a: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.slide1DownI8(a)
+public func highwaySlide1DownI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slide1DownI8(a.raw))
 }
 
 @inline(never)
@@ -2251,8 +2533,12 @@ public func portSlide1DownI8ConstantA() -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwaySlide1DownI8ConstantA() -> HighwayReference.VectorI8 {
-    HighwayReference.slide1DownI8(HighwayReference.repeatingI8(26))
+public func highwaySlide1DownI8ConstantA() -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slide1DownI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2265,10 +2551,10 @@ public func portSlide1DownFillingWithI8(
 
 @inline(never)
 public func highwaySlide1DownFillingWithI8(
-    _ a: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
     fillingWith fill: Int8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slide1DownFillingWithI8(fill, a)
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slide1DownFillingWithI8(fill, a.raw))
 }
 
 @inline(never)
@@ -2278,10 +2564,13 @@ public func portSlide1DownFillingWithI8ConstantA(fillingWith fill: SIMDInt8.Lane
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithI8ConstantA(
-    fillingWith fill: Int8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slide1DownFillingWithI8(fill, HighwayReference.repeatingI8(26))
+public func highwaySlide1DownFillingWithI8ConstantA(fillingWith fill: Int8) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.slide1DownFillingWithI8(
+            fill,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2290,10 +2579,8 @@ public func portSlide1DownFillingWithI8ConstantFill(_ a: SIMDInt8.Vector) -> SIM
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithI8ConstantFill(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.slide1DownFillingWithI8(26, a)
+public func highwaySlide1DownFillingWithI8ConstantFill(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.slide1DownFillingWithI8(26, a.raw))
 }
 
 @inline(never)
@@ -2302,11 +2589,9 @@ public func portTableLookupBytesI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -
 }
 
 @inline(never)
-public func highwayTableLookupBytesI8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.tableLookupBytesI8(a, b)
+public func highwayTableLookupBytesI8(_ a: SIMDInt8.Vector, _ b: SIMDInt8.Vector) -> SIMDInt8.Vector
+{
+    SIMDInt8.Vector(raw: HighwayReference.Nothrow.tableLookupBytesI8(a.raw, b.raw))
 }
 
 @inline(never)
@@ -2315,10 +2600,13 @@ public func portTableLookupBytesI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwayTableLookupBytesI8ConstantA(
-    _ b: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.tableLookupBytesI8(HighwayReference.repeatingI8(26), b)
+public func highwayTableLookupBytesI8ConstantA(_ b: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.tableLookupBytesI8(
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -2327,10 +2615,13 @@ public func portTableLookupBytesI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Ve
 }
 
 @inline(never)
-public func highwayTableLookupBytesI8ConstantB(
-    _ a: HighwayReference.VectorI8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.tableLookupBytesI8(a, HighwayReference.repeatingI8(3))
+public func highwayTableLookupBytesI8ConstantB(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.tableLookupBytesI8(
+            a.raw,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2345,10 +2636,10 @@ public func portLoadInterleaved2I8(
 @inline(never)
 public func highwayLoadInterleaved2I8(
     from: UnsafePointer<Int8>,
-    _ v0: inout HighwayReference.VectorI8,
-    _ v1: inout HighwayReference.VectorI8
+    _ v0: inout SIMDInt8.Vector,
+    _ v1: inout SIMDInt8.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved2I8(from, &v0, &v1)
+    unsafe HighwayReference.Nothrow.loadInterleaved2I8(from, &v0.raw, &v1.raw)
 }
 
 @inline(never)
@@ -2364,11 +2655,11 @@ public func portLoadInterleaved3I8(
 @inline(never)
 public func highwayLoadInterleaved3I8(
     from: UnsafePointer<Int8>,
-    _ v0: inout HighwayReference.VectorI8,
-    _ v1: inout HighwayReference.VectorI8,
-    _ v2: inout HighwayReference.VectorI8
+    _ v0: inout SIMDInt8.Vector,
+    _ v1: inout SIMDInt8.Vector,
+    _ v2: inout SIMDInt8.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved3I8(from, &v0, &v1, &v2)
+    unsafe HighwayReference.Nothrow.loadInterleaved3I8(from, &v0.raw, &v1.raw, &v2.raw)
 }
 
 @inline(never)
@@ -2385,12 +2676,12 @@ public func portLoadInterleaved4I8(
 @inline(never)
 public func highwayLoadInterleaved4I8(
     from: UnsafePointer<Int8>,
-    _ v0: inout HighwayReference.VectorI8,
-    _ v1: inout HighwayReference.VectorI8,
-    _ v2: inout HighwayReference.VectorI8,
-    _ v3: inout HighwayReference.VectorI8
+    _ v0: inout SIMDInt8.Vector,
+    _ v1: inout SIMDInt8.Vector,
+    _ v2: inout SIMDInt8.Vector,
+    _ v3: inout SIMDInt8.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved4I8(from, &v0, &v1, &v2, &v3)
+    unsafe HighwayReference.Nothrow.loadInterleaved4I8(from, &v0.raw, &v1.raw, &v2.raw, &v3.raw)
 }
 
 @inline(never)
@@ -2404,11 +2695,11 @@ public func portStoreInterleaved2I8(
 
 @inline(never)
 public func highwayStoreInterleaved2I8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved2I8(a, b, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2I8(a.raw, b.raw, to)
 }
 
 @inline(never)
@@ -2421,10 +2712,14 @@ public func portStoreInterleaved2I8ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved2I8ConstantA(
-    _ b: HighwayReference.VectorI8,
+    _ b: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved2I8(HighwayReference.repeatingI8(26), b, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2I8(
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        b.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2437,10 +2732,14 @@ public func portStoreInterleaved2I8ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved2I8ConstantB(
-    _ a: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved2I8(a, HighwayReference.repeatingI8(26), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2I8(
+        a.raw,
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2455,12 +2754,12 @@ public func portStoreInterleaved3I8(
 
 @inline(never)
 public func highwayStoreInterleaved3I8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved3I8(a, b, c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3I8(a.raw, b.raw, c.raw, to)
 }
 
 @inline(never)
@@ -2474,11 +2773,16 @@ public func portStoreInterleaved3I8ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved3I8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8,
+    _ b: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved3I8(HighwayReference.repeatingI8(26), b, c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3I8(
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        b.raw,
+        c.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2492,11 +2796,16 @@ public func portStoreInterleaved3I8ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved3I8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved3I8(a, HighwayReference.repeatingI8(26), c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3I8(
+        a.raw,
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        c.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2510,11 +2819,16 @@ public func portStoreInterleaved3I8ConstantC(
 
 @inline(never)
 public func highwayStoreInterleaved3I8ConstantC(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved3I8(a, b, HighwayReference.repeatingI8(26), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3I8(
+        a.raw,
+        b.raw,
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2530,13 +2844,13 @@ public func portStoreInterleaved4I8(
 
 @inline(never)
 public func highwayStoreInterleaved4I8(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8,
-    _ d: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector,
+    _ d: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved4I8(a, b, c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I8(a.raw, b.raw, c.raw, d.raw, to)
 }
 
 @inline(never)
@@ -2551,12 +2865,18 @@ public func portStoreInterleaved4I8ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved4I8ConstantA(
-    _ b: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8,
-    _ d: HighwayReference.VectorI8,
+    _ b: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector,
+    _ d: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved4I8(HighwayReference.repeatingI8(26), b, c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I8(
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        b.raw,
+        c.raw,
+        d.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2571,12 +2891,18 @@ public func portStoreInterleaved4I8ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved4I8ConstantB(
-    _ a: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8,
-    _ d: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector,
+    _ d: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved4I8(a, HighwayReference.repeatingI8(26), c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I8(
+        a.raw,
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        c.raw,
+        d.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2591,12 +2917,18 @@ public func portStoreInterleaved4I8ConstantC(
 
 @inline(never)
 public func highwayStoreInterleaved4I8ConstantC(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    _ d: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    _ d: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved4I8(a, b, HighwayReference.repeatingI8(26), d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I8(
+        a.raw,
+        b.raw,
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        d.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2611,12 +2943,18 @@ public func portStoreInterleaved4I8ConstantD(
 
 @inline(never)
 public func highwayStoreInterleaved4I8ConstantD(
-    _ a: HighwayReference.VectorI8,
-    _ b: HighwayReference.VectorI8,
-    _ c: HighwayReference.VectorI8,
+    _ a: SIMDInt8.Vector,
+    _ b: SIMDInt8.Vector,
+    _ c: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.storeInterleaved4I8(a, b, c, HighwayReference.repeatingI8(26), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I8(
+        a.raw,
+        b.raw,
+        c.raw,
+        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2659,24 +2997,26 @@ public func highwayRepeatingBlockI8(
     _ v13: Int8,
     _ v14: Int8,
     _ v15: Int8
-) -> HighwayReference.VectorI8 {
-    HighwayReference.repeatingBlockI8(
-        v0,
-        v1,
-        v2,
-        v3,
-        v4,
-        v5,
-        v6,
-        v7,
-        v8,
-        v9,
-        v10,
-        v11,
-        v12,
-        v13,
-        v14,
-        v15
+) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.repeatingBlockI8(
+            v0,
+            v1,
+            v2,
+            v3,
+            v4,
+            v5,
+            v6,
+            v7,
+            v8,
+            v9,
+            v10,
+            v11,
+            v12,
+            v13,
+            v14,
+            v15
+        )
     )
 }
 
@@ -2695,15 +3035,27 @@ public func portMaskedLowercaseI8(_ v: SIMDInt8.Vector) -> SIMDInt8.Vector {
 }
 
 @inline(never)
-public func highwayMaskedLowercaseI8(_ v: HighwayReference.VectorI8) -> HighwayReference.VectorI8 {
-    HighwayReference.bitwiseOrI8(
-        v,
-        HighwayReference.selectingOrZeroI8(
-            HighwayReference.lessThanI8(
-                HighwayReference.subtractingI8(v, HighwayReference.repeatingI8(0x41)),
-                HighwayReference.repeatingI8(26)
-            ),
-            HighwayReference.repeatingI8(0x20)
+public func highwayMaskedLowercaseI8(_ v: SIMDInt8.Vector) -> SIMDInt8.Vector {
+    SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrI8(
+            v.raw,
+            SIMDInt8.Vector(
+                raw: HighwayReference.Nothrow.selectingOrZeroI8(
+                    SIMDInt8.Mask(
+                        raw: HighwayReference.Nothrow.lessThanI8(
+                            SIMDInt8.Vector(
+                                raw: HighwayReference.Nothrow.subtractingI8(
+                                    v.raw,
+                                    SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(0x41))
+                                        .raw
+                                )
+                            ).raw,
+                            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+                        )
+                    ).raw,
+                    SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(0x20)).raw
+                )
+            ).raw
         )
     )
 }
@@ -2714,6 +3066,13 @@ public func portNoneAboveI8(_ v: SIMDInt8.Vector) -> Bool {
 }
 
 @inline(never)
-public func highwayNoneAboveI8(_ v: HighwayReference.VectorI8) -> Bool {
-    HighwayReference.allFalseI8(HighwayReference.greaterThanI8(v, HighwayReference.repeatingI8(26)))
+public func highwayNoneAboveI8(_ v: SIMDInt8.Vector) -> Bool {
+    HighwayReference.Nothrow.allFalseI8(
+        SIMDInt8.Mask(
+            raw: HighwayReference.Nothrow.greaterThanI8(
+                v.raw,
+                SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            )
+        ).raw
+    )
 }

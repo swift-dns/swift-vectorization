@@ -48,19 +48,17 @@ package.targets += [
     .target(
         name: "CHighway",
         path: "CHighway",
-        publicHeadersPath: "include",
-        cxxSettings: disabledTargets
+        publicHeadersPath: "include"
     ),
     .target(
         name: "CHighwayReference",
         dependencies: ["CHighway", "CVectorizationOps"],
         path: "CHighwayReference",
-        publicHeadersPath: "include",
-        cxxSettings: disabledTargets
+        publicHeadersPath: "include"
     ),
     .testTarget(
         name: "HighwayReferenceTests",
-        dependencies: ["CHighwayReference", "Vectorization"],
+        dependencies: ["CHighwayReference", "HighwayReferenceCodegen", "Vectorization"],
         path: "HighwayReferenceTests",
         swiftSettings: settings + [.interoperabilityMode(.Cxx)]
     ),
@@ -73,13 +71,3 @@ package.targets += [
 ]
 
 package.cxxLanguageStandard = .cxx17
-
-/// A sizeless vector has no Swift type to be imported as, so the targets whose vectors are
-/// sizeless are turned off and their platforms use the widest fixed-size target they have.
-///
-/// This is a compiler define rather than a `#define` in the bridge header, because
-/// `hwy/detect_targets.h` is a modular header that defaults the macro, so a header that set it
-/// afterwards would disagree with the already-built module.
-var disabledTargets: [CXXSetting] {
-    [.define("HWY_DISABLED_TARGETS", to: "(HWY_ALL_SVE | HWY_RVV)")]
-}

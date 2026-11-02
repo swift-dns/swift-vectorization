@@ -57,23 +57,43 @@ func count(of needle: UInt8, in bytes: UnsafeBufferPointer<UInt8>) -> Int {
 
 ## Which target you get
 
-The ops are compiled for a static target, the best one the compiler was told it could use.
+The ops are compiled for highway's static target: the one highway picks for the same compiler flags,
+found by highway's own target detection. So `laneCount` is what highway's `Lanes(ScalableTag<T>())`
+returns under static dispatch, and `Vector.SIMDType` is as wide as the target's vectors.
 
-| Platform | Target | Description                                                                                                                           |
-| -------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| arm64    | NEON   | NEON is baseline, so no flags are needed.                                                                                             |
-| x86_64   | SSE2   | The baseline, or SSSE3 on Apple platforms and Android. For SSE4, pass `-Xcc -march=x86-64-v2`. AVX2 and AVX-512 builds use the SSE4 ops. |
-| Others   | EMU128 | Portable C, which the compiler lowers to the SIMD the platform has, such as WASM SIMD, VSX or RVV, or to scalar code.                |
+| Platform | Target                               | Bytes | Description                                                                                                                 |
+| -------- | ------------------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------- |
+| arm64    | NEON, NEON_WITHOUT_AES, NEON_BF16    | 16    | The baseline: NEON on Apple platforms, elsewhere NEON_WITHOUT_AES unless `-march` enables AES.                              |
+| arm64    | SVE2_128                             | 16    | With `-Xcc -march=armv9-a -Xcc -msve-vector-bits=128`.                                                                      |
+| x86_64   | SSE2, SSSE3, SSE4                    | 16    | SSE2 is the baseline, SSSE3 on Apple platforms and Android. SSE4 needs `-Xcc -march=x86-64-v2 -Xcc -maes -Xcc -mpclmul`.    |
+| x86_64   | AVX2                                 | 32    | With `-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul`, or a CPU such as `-Xcc -march=skylake`.                              |
+| x86_64   | AVX3, AVX3_DL, AVX3_ZEN4, AVX3_SPR   | 64    | With AVX-512 flags, such as `-Xcc -march=skylake-avx512` or `-Xcc -march=icelake-server`.                                   |
+| Others   | EMU128, or WASM, PPC8, Z14 and so on | 16    | Portable C, which the compiler lowers to the SIMD the platform has, or to scalar code. `targetName` names highway's target. |
 
-`SIMDTarget.targetName` reports what was chosen, and `SIMDTarget.isEmulated` is true where the
-portable ops have no SIMD to lower to, so scalar code is faster.
+Like highway, SSE4 and AVX2 also need AES and PCLMUL, so `-Xcc -march=x86-64-v3` alone gives SSSE3.
+A build for which highway would pick a target the port does not support, such as SVE sized at run
+time, AVX10_2 or WASM_EMU256, fails with an error that names the flag to use instead.
+
+Swift's own code generation does not see `-msve-vector-bits`, so SVE2_128 builds should also pass
+`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=128` and
+`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=128`. Without them the ops are still right,
+but some of them spend extra instructions on vector lengths the build cannot have.
+
+Highway can also pick the target at run time with dynamic dispatch. Swift cannot compile one function
+for several CPU levels, so the port matches highway's static dispatch only.
+
+`SIMDTarget.targetName` reports highway's name for the target, and `SIMDTarget.isEmulated` is true on
+EMU128, as highway's is, where scalar code is faster.
 
 ## How it relates to highway
 
 Every op reproduces what highway does on the same target, down to NaN payloads and the results of
 out-of-range inputs, so the ops behave like highway's. `HighwayReference/` holds a copy of highway
-and generated tests that compare every op with highway's, lane for lane, on NEON, SSE2, SSSE3, SSE4
-and highway's EMU128.
+and generated tests that compare every op with highway's, lane for lane, on NEON, NEON_WITHOUT_AES,
+SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and highway's EMU128.
+
+When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or a
+minimum or maximum on SVE, which payload comes out is up to the compiler, in highway as in the port.
 
 Two differences are deliberate:
 

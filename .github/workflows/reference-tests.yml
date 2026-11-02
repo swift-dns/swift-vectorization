@@ -21,37 +21,101 @@ jobs:
       matrix:
         # With SSE3 on, libstdc++'s std module and clang's intrinsics module include each other
         # through mm_malloc.h, which nothing here uses, so its include guard is predefined.
+        # Highway's SVE2_128 target requires BF16 and I8MM, which `-march=armv9-a` does not enable,
+        # so its ops do not inline into a release build without them. Swift's LLVM ignores
+        # `-msve-vector-bits`, so the two `-Xllvm` options tell it the vector length, without which
+        # it pads SVE ops with `ptrue` and `sel` the C compiler would not.
         target:
-          - name: NEON
+          - name: NEON_WITHOUT_AES
+            expected-target: NEON_WITHOUT_AES
             runner: ubuntu-24.04-arm
             flags: ""
             compare-codegen: true
+            sde-cpu: ""
+          - name: SVE2_128
+            expected-target: SVE2_128
+            runner: ubuntu-24.04-arm
+            flags: "-Xcc -march=armv9-a+bf16+i8mm -Xcc -msve-vector-bits=128 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=128 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=128"
+            compare-codegen: true
+            sde-cpu: ""
           - name: SSE2
+            expected-target: SSE2
             runner: ubuntu-latest
             flags: ""
             compare-codegen: true
+            sde-cpu: ""
           - name: SSSE3
+            expected-target: SSSE3
             runner: ubuntu-latest
             flags: "-Xcc -mssse3 -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            sde-cpu: ""
           - name: SSE4
+            expected-target: SSE4
             runner: ubuntu-latest
             flags: "-Xcc -march=x86-64-v2 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
-          - name: EMU128
+            sde-cpu: ""
+          - name: AVX2
+            expected-target: AVX2
             runner: ubuntu-latest
-            flags: "-Xcc -DCVECTORIZATION_OPS_PORTABLE -Xcc -DHWY_COMPILE_ONLY_EMU128"
+            flags: "-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            sde-cpu: ""
+          - name: AVX3
+            expected-target: AVX3
+            runner: ubuntu-latest
+            flags: "-Xcc -march=skylake-avx512 -Xcc -D__MM_MALLOC_H"
+            compare-codegen: true
+            sde-cpu: skx
+          - name: AVX3_DL
+            expected-target: AVX3_DL
+            runner: ubuntu-latest
+            flags: "-Xcc -march=icelake-server -Xcc -D__MM_MALLOC_H"
+            compare-codegen: true
+            sde-cpu: icx
+          - name: AVX3_SPR
+            expected-target: AVX3_SPR
+            runner: ubuntu-latest
+            flags: "-Xcc -march=sapphirerapids -Xcc -D__MM_MALLOC_H"
+            compare-codegen: true
+            sde-cpu: spr
+          - name: AVX3_ZEN4
+            expected-target: AVX3_ZEN4
+            runner: ubuntu-latest
+            flags: "-Xcc -march=znver4 -Xcc -DHWY_WANT_AVX3_ZEN4 -Xcc -D__MM_MALLOC_H"
+            compare-codegen: true
+            sde-cpu: spr
+          - name: EMU128
+            expected-target: EMU128
+            runner: ubuntu-latest
+            flags: "-Xcc -DHWY_COMPILE_ONLY_EMU128"
+            compare-codegen: true
+            sde-cpu: ""
           - name: EMU128-arm64
+            expected-target: EMU128
             runner: ubuntu-24.04-arm
-            flags: "-Xcc -DCVECTORIZATION_OPS_PORTABLE -Xcc -DHWY_COMPILE_ONLY_EMU128"
+            flags: "-Xcc -DHWY_COMPILE_ONLY_EMU128"
             compare-codegen: true
+            sde-cpu: ""
 
     runs-on: ${{ matrix.target.runner }}
 
-    container: swift:6.4-resolute
+    container:
+      image: swift:6.4-resolute
+      # Intel SDE emulates an AVX-512 CPU by tracing the test runners with ptrace.
+      options: ${{ matrix.target.sde-cpu && '--cap-add=SYS_PTRACE --security-opt seccomp=unconfined' || '' }}
 
-    timeout-minutes: 30
+    # Intel SDE emulates both the debug and the release test runners, which is far slower than running them.
+    timeout-minutes: ${{ matrix.target.sde-cpu && 90 || 30 }}
+
+    permissions:
+      contents: read
+
+    env:
+      SDE_VERSION: "10.13.1-2026-07-28"
+      SDE_SHA256: "94E97D623FEC54385686E1E7BA65EBC9941748C05EE451423948334892BF2B50"
+      SDE_CACHE_DIR: "/opt/sde-cache"
 
     steps:
       - name: Check out ${{ github.event.repository.name }}
@@ -59,12 +123,110 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install dependencies
+        if: ${{ matrix.target.sde-cpu }}
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends curl xz-utils
+
+      - name: Restore Intel SDE
+        id: restore-sde
+        if: ${{ matrix.target.sde-cpu }}
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.SDE_CACHE_DIR }}
+          key: "${{ github.event.repository.name }}-sde-${{ env.SDE_VERSION }}-${{ runner.os }}"
+
+      - name: Install Intel SDE
+        if: ${{ matrix.target.sde-cpu }}
+        run: |
+          tarball="${SDE_CACHE_DIR}/sde-external-${SDE_VERSION}-lin.tar.xz"
+          if [[ ! -f "${tarball}" ]]; then
+            mkdir -p "${SDE_CACHE_DIR}"
+            curl --silent --show-error --fail --location --output "${tarball}" \
+              "https://downloadmirror.intel.com/924984/sde-external-${SDE_VERSION}-lin.tar.xz"
+          fi
+          printf '%s  %s\n' "${SDE_SHA256}" "${tarball}" | sha256sum --check
+          mkdir "${RUNNER_TEMP}/sde"
+          tar -xJf "${tarball}" -C "${RUNNER_TEMP}/sde" --strip-components=1
+          printf '%s\n' "${RUNNER_TEMP}/sde" >>"${GITHUB_PATH}"
+
+      - name: Cache Intel SDE
+        if: ${{ matrix.target.sde-cpu && steps.restore-sde.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ env.SDE_CACHE_DIR }}
+          key: "${{ github.event.repository.name }}-sde-${{ env.SDE_VERSION }}-${{ runner.os }}"
+
       - name: Test the ops against highway
+        if: ${{ !matrix.target.sde-cpu }}
+        env:
+          FLAGS: ${{ matrix.target.flags }}
+          SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
+        run: |
+          read -r -a flags <<< "${FLAGS}"
+          swift test --package-path HighwayReference "${flags[@]}"
+
+      - name: Test the ops against highway in release
+        if: ${{ !matrix.target.sde-cpu }}
+        env:
+          FLAGS: ${{ matrix.target.flags }}
+          SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
+        run: |
+          read -r -a flags <<< "${FLAGS}"
+          swift test -c release --package-path HighwayReference "${flags[@]}"
+
+      - name: Build the tests of the ops against highway
+        if: ${{ matrix.target.sde-cpu }}
         env:
           FLAGS: ${{ matrix.target.flags }}
         run: |
           read -r -a flags <<< "${FLAGS}"
-          swift test --package-path HighwayReference "${flags[@]}"
+          swift build --package-path HighwayReference --build-tests "${flags[@]}"
+
+      - name: Test the ops against highway under Intel SDE
+        if: ${{ matrix.target.sde-cpu }}
+        env:
+          SDE_CPU: ${{ matrix.target.sde-cpu }}
+          SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
+        run: |
+          mapfile -d '' -t runners < <(
+            find -L HighwayReference/.build/debug -maxdepth 1 -type f -name '*-test-runner' -print0
+          )
+          if [[ "${#runners[@]}" -eq 0 ]]; then
+            printf '%s\n' "There is no test runner in HighwayReference/.build/debug" >&2
+            exit 1
+          fi
+          for runner in "${runners[@]}"; do
+            sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing
+          done
+
+      - name: Build the tests of the ops against highway in release
+        if: ${{ matrix.target.sde-cpu }}
+        env:
+          FLAGS: ${{ matrix.target.flags }}
+        run: |
+          read -r -a flags <<< "${FLAGS}"
+          swift build -c release --package-path HighwayReference --build-tests "${flags[@]}"
+
+      - name: Test the ops against highway in release under Intel SDE
+        if: ${{ matrix.target.sde-cpu }}
+        env:
+          SDE_CPU: ${{ matrix.target.sde-cpu }}
+          SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
+        run: |
+          mapfile -d '' -t runners < <(
+            find -L HighwayReference/.build/release -maxdepth 1 -type f -name '*-test-runner' -print0
+          )
+          if [[ "${#runners[@]}" -eq 0 ]]; then
+            printf '%s\n' "There is no test runner in HighwayReference/.build/release" >&2
+            exit 1
+          fi
+          for runner in "${runners[@]}"; do
+            sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing
+          done
 
       - name: Compare the codegen of the ops with highway's
         if: ${{ matrix.target.compare-codegen }}
@@ -73,3 +235,82 @@ jobs:
         run: |
           read -r -a flags <<< "${FLAGS}"
           scripts/compare-codegen.sh -- "${flags[@]}"
+
+  macos-reference-tests:
+    name: reference-tests (NEON, macOS)
+
+    runs-on: macos-26
+
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    env:
+      SWIFT_VERSION: "6.4"
+      SWIFTLY_HOME_DIR: "/Users/runner/.swiftly"
+      SWIFTLY_BIN_DIR: "/Users/runner/.swiftly/bin"
+      SWIFTLY_TOOLCHAINS_DIR: "/Users/runner/Library/Developer/Toolchains"
+
+    steps:
+      - name: Check out ${{ github.event.repository.name }}
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Update bash via Homebrew
+        run: brew install bash
+
+      - name: Setup appropriate Xcode version
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+
+      - name: Restore swiftly
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            ${{ env.SWIFTLY_HOME_DIR }}
+            ${{ env.SWIFTLY_TOOLCHAINS_DIR }}
+          key: "${{ github.event.repository.name }}-swiftly-${{ env.SWIFT_VERSION }}-${{ runner.os }}"
+
+      - name: Update swift via Swiftly
+        run: |
+          # Workaround some kind of GitHub caching issue where it struggles to restore or cache the swiftly toolchain
+          if [[ -d '${{ env.SWIFTLY_TOOLCHAINS_DIR }}' ]]; then
+            BLOCK_SIZE="$(du -s '${{ env.SWIFTLY_TOOLCHAINS_DIR }}' | awk '{print $1}')"
+          else
+            BLOCK_SIZE=0
+          fi
+          if [[ "${BLOCK_SIZE}" -lt 1024 ]]; then
+            printf '%s\n' "Toolchain directory is too small (${BLOCK_SIZE} blocks), deleting all swiftly directories for fresh installation"
+            rm -rf '${{ env.SWIFTLY_TOOLCHAINS_DIR }}' '${{ env.SWIFTLY_BIN_DIR }}' '${{ env.SWIFTLY_HOME_DIR }}'
+          else
+            printf '%s\n' "Toolchain directory is large enough (${BLOCK_SIZE} blocks), will use the restored toolchain"
+          fi
+
+          # Installation commands from https://www.swift.org/install/macos
+          curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg
+          installer -pkg swiftly.pkg -target CurrentUserHomeDirectory
+          "${SWIFTLY_BIN_DIR}/swiftly" init --assume-yes --skip-install --quiet-shell-followup
+          . "${SWIFTLY_HOME_DIR}/env.sh"
+
+          # Update GitHub PATH
+          printf '%s\n' "${SWIFTLY_BIN_DIR}" >>"${GITHUB_PATH}"
+
+          # Update swift
+          swiftly install --assume-yes ${{ env.SWIFT_VERSION }}
+          swiftly use --assume-yes ${{ env.SWIFT_VERSION }}
+
+      - name: Test the ops against highway
+        env:
+          SIMD_EXPECTED_TARGET: NEON
+        run: swift test --package-path HighwayReference
+
+      - name: Test the ops against highway in release
+        env:
+          SIMD_EXPECTED_TARGET: NEON
+        run: swift test -c release --package-path HighwayReference
+
+      - name: Compare the codegen of the ops with highway's
+        run: scripts/compare-codegen.sh

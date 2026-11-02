@@ -5,11 +5,11 @@ public import Vectorization
 
 public enum HighwayReferenceDouble {
     public typealias Lane = Double
-    public typealias Vector = HighwayReference.VectorF64
+    public typealias Vector = SIMDDouble.Vector
 
     @export(implementation) @inline(always)
     public static var laneCount: Int {
-        Int(HighwayReference.laneCountF64())
+        Int(HighwayReference.Nothrow.laneCountF64())
     }
 
     @available(SwiftStdlib 5.1, *)
@@ -24,7 +24,7 @@ public enum HighwayReferenceDouble {
     public static func load(fromUnchecked span: Span<Lane>) -> Vector {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadF64($0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.loadF64($0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -52,7 +52,7 @@ public enum HighwayReferenceDouble {
             "Span does not start at an address aligned to the vector size"
         )
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadAlignedF64($0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.loadAlignedF64($0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -60,7 +60,10 @@ public enum HighwayReferenceDouble {
     @export(implementation) @inline(always)
     public static func loadFirst(from span: Span<Lane>) -> Vector {
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadFirstF64($0.baseAddress, $0.count)
+            unsafe HighwayReference.Nothrow.loadFirstF64(
+                $0.baseAddress,
+                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            )
         }
     }
 
@@ -76,7 +79,7 @@ public enum HighwayReferenceDouble {
     public static func store(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeF64(a, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeF64(a, $0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -98,7 +101,7 @@ public enum HighwayReferenceDouble {
             "OutputSpan has less free capacity than a vector has lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeF64(
+            unsafe HighwayReference.Nothrow.storeF64(
                 a,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
@@ -130,7 +133,7 @@ public enum HighwayReferenceDouble {
             "Span does not start at an address aligned to the vector size"
         )
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeAlignedF64(a, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeAlignedF64(a, $0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -166,7 +169,7 @@ public enum HighwayReferenceDouble {
             "OutputSpan does not continue at an address aligned to the vector size"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeAlignedF64(
+            unsafe HighwayReference.Nothrow.storeAlignedF64(
                 a,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
@@ -178,7 +181,11 @@ public enum HighwayReferenceDouble {
     @export(implementation) @inline(always)
     public static func storeFirst(_ a: Vector, to span: inout MutableSpan<Lane>) {
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeFirstF64(a, $0.baseAddress, $0.count)
+            unsafe HighwayReference.Nothrow.storeFirstF64(
+                a,
+                $0.baseAddress,
+                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            )
         }
     }
 
@@ -206,7 +213,7 @@ public enum HighwayReferenceDouble {
             "OutputSpan has less free capacity than the count"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeFirstF64(
+            unsafe HighwayReference.Nothrow.storeFirstF64(
                 a,
                 buffer.baseAddress?.advanced(by: initializedCount),
                 addingCount
@@ -238,7 +245,11 @@ public enum HighwayReferenceDouble {
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved2F64($0.baseAddress.unsafelyUnwrapped, &v0, &v1)
+            unsafe HighwayReference.Nothrow.loadInterleaved2F64(
+                $0.baseAddress.unsafelyUnwrapped,
+                &v0,
+                &v1
+            )
         }
     }
 
@@ -267,7 +278,7 @@ public enum HighwayReferenceDouble {
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved3F64(
+            unsafe HighwayReference.Nothrow.loadInterleaved3F64(
                 $0.baseAddress.unsafelyUnwrapped,
                 &v0,
                 &v1,
@@ -303,7 +314,7 @@ public enum HighwayReferenceDouble {
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved4F64(
+            unsafe HighwayReference.Nothrow.loadInterleaved4F64(
                 $0.baseAddress.unsafelyUnwrapped,
                 &v0,
                 &v1,
@@ -333,7 +344,11 @@ public enum HighwayReferenceDouble {
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved2F64(a, b, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeInterleaved2F64(
+                a,
+                b,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 
@@ -363,7 +378,7 @@ public enum HighwayReferenceDouble {
             "OutputSpan has less free capacity than 2 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved2F64(
+            unsafe HighwayReference.Nothrow.storeInterleaved2F64(
                 a,
                 b,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
@@ -397,7 +412,12 @@ public enum HighwayReferenceDouble {
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved3F64(a, b, c, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeInterleaved3F64(
+                a,
+                b,
+                c,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 
@@ -429,7 +449,7 @@ public enum HighwayReferenceDouble {
             "OutputSpan has less free capacity than 3 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved3F64(
+            unsafe HighwayReference.Nothrow.storeInterleaved3F64(
                 a,
                 b,
                 c,
@@ -466,7 +486,7 @@ public enum HighwayReferenceDouble {
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved4F64(
+            unsafe HighwayReference.Nothrow.storeInterleaved4F64(
                 a,
                 b,
                 c,
@@ -506,7 +526,7 @@ public enum HighwayReferenceDouble {
             "OutputSpan has less free capacity than 4 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved4F64(
+            unsafe HighwayReference.Nothrow.storeInterleaved4F64(
                 a,
                 b,
                 c,
@@ -529,7 +549,7 @@ public enum HighwayReferenceDouble {
     public static func loadWidening(fromUnchecked span: Span<Float>) -> Vector {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadWideningF32ToF64($0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.loadWideningF32ToF64($0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -537,7 +557,10 @@ public enum HighwayReferenceDouble {
     @export(implementation) @inline(always)
     public static func loadFirstWidening(from span: Span<Float>) -> Vector {
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadFirstWideningF32ToF64($0.baseAddress, $0.count)
+            unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(
+                $0.baseAddress,
+                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            )
         }
     }
 
@@ -549,8 +572,8 @@ public func portZeroF64() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayZeroF64() -> HighwayReference.VectorF64 {
-    HighwayReference.zeroF64()
+public func highwayZeroF64() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.zeroF64()
 }
 
 @inline(never)
@@ -559,8 +582,8 @@ public func portRepeatingF64(_ value: SIMDDouble.Lane) -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayRepeatingF64(_ value: Double) -> HighwayReference.VectorF64 {
-    HighwayReference.repeatingF64(value)
+public func highwayRepeatingF64(_ value: Double) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.repeatingF64(value)
 }
 
 @inline(never)
@@ -569,8 +592,8 @@ public func portRepeatingF64ConstantValue() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayRepeatingF64ConstantValue() -> HighwayReference.VectorF64 {
-    HighwayReference.repeatingF64(1.5)
+public func highwayRepeatingF64ConstantValue() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.repeatingF64(1.5)
 }
 
 @inline(never)
@@ -579,8 +602,8 @@ public func portIotaF64(_ value: SIMDDouble.Lane) -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayIotaF64(_ value: Double) -> HighwayReference.VectorF64 {
-    HighwayReference.iotaF64(value)
+public func highwayIotaF64(_ value: Double) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.iotaF64(value)
 }
 
 @inline(never)
@@ -589,8 +612,8 @@ public func portIotaF64ConstantValue() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayIotaF64ConstantValue() -> HighwayReference.VectorF64 {
-    HighwayReference.iotaF64(1.5)
+public func highwayIotaF64ConstantValue() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.iotaF64(1.5)
 }
 
 @inline(never)
@@ -599,8 +622,8 @@ public func portLoadF64(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDouble.Vect
 }
 
 @inline(never)
-public func highwayLoadF64(from: UnsafePointer<Double>) -> HighwayReference.VectorF64 {
-    unsafe HighwayReference.loadF64(from)
+public func highwayLoadF64(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.loadF64(from)
 }
 
 @inline(never)
@@ -609,8 +632,8 @@ public func portLoadAlignedF64(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDoub
 }
 
 @inline(never)
-public func highwayLoadAlignedF64(from: UnsafePointer<Double>) -> HighwayReference.VectorF64 {
-    unsafe HighwayReference.loadAlignedF64(from)
+public func highwayLoadAlignedF64(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.loadAlignedF64(from)
 }
 
 @inline(never)
@@ -620,11 +643,8 @@ public func portLoadFirstF64(from: UnsafePointer<SIMDDouble.Lane>, count: Int) -
 }
 
 @inline(never)
-public func highwayLoadFirstF64(
-    from: UnsafePointer<Double>,
-    count: Int
-) -> HighwayReference.VectorF64 {
-    unsafe HighwayReference.loadFirstF64(from, count)
+public func highwayLoadFirstF64(from: UnsafePointer<Double>, count: Int) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstF64(from, count)
 }
 
 @inline(never)
@@ -634,10 +654,8 @@ public func portLoadFirstF64ConstantCount(from: UnsafePointer<SIMDDouble.Lane>) 
 }
 
 @inline(never)
-public func highwayLoadFirstF64ConstantCount(
-    from: UnsafePointer<Double>
-) -> HighwayReference.VectorF64 {
-    unsafe HighwayReference.loadFirstF64(from, 1)
+public func highwayLoadFirstF64ConstantCount(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstF64(from, 1)
 }
 
 @inline(never)
@@ -646,8 +664,8 @@ public func portStoreF64(_ a: SIMDDouble.Vector, to: UnsafeMutablePointer<SIMDDo
 }
 
 @inline(never)
-public func highwayStoreF64(_ a: HighwayReference.VectorF64, to: UnsafeMutablePointer<Double>) {
-    unsafe HighwayReference.storeF64(a, to)
+public func highwayStoreF64(_ a: SIMDDouble.Vector, to: UnsafeMutablePointer<Double>) {
+    unsafe HighwayReference.Nothrow.storeF64(a, to)
 }
 
 @inline(never)
@@ -657,7 +675,7 @@ public func portStoreF64ConstantA(to: UnsafeMutablePointer<SIMDDouble.Lane>) {
 
 @inline(never)
 public func highwayStoreF64ConstantA(to: UnsafeMutablePointer<Double>) {
-    unsafe HighwayReference.storeF64(HighwayReference.repeatingF64(1.5), to)
+    unsafe HighwayReference.Nothrow.storeF64(HighwayReference.Nothrow.repeatingF64(1.5), to)
 }
 
 @inline(never)
@@ -666,11 +684,8 @@ public func portStoreAlignedF64(_ a: SIMDDouble.Vector, to: UnsafeMutablePointer
 }
 
 @inline(never)
-public func highwayStoreAlignedF64(
-    _ a: HighwayReference.VectorF64,
-    to: UnsafeMutablePointer<Double>
-) {
-    unsafe HighwayReference.storeAlignedF64(a, to)
+public func highwayStoreAlignedF64(_ a: SIMDDouble.Vector, to: UnsafeMutablePointer<Double>) {
+    unsafe HighwayReference.Nothrow.storeAlignedF64(a, to)
 }
 
 @inline(never)
@@ -680,7 +695,7 @@ public func portStoreAlignedF64ConstantA(to: UnsafeMutablePointer<SIMDDouble.Lan
 
 @inline(never)
 public func highwayStoreAlignedF64ConstantA(to: UnsafeMutablePointer<Double>) {
-    unsafe HighwayReference.storeAlignedF64(HighwayReference.repeatingF64(1.5), to)
+    unsafe HighwayReference.Nothrow.storeAlignedF64(HighwayReference.Nothrow.repeatingF64(1.5), to)
 }
 
 @inline(never)
@@ -694,11 +709,11 @@ public func portStoreFirstF64(
 
 @inline(never)
 public func highwayStoreFirstF64(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>,
     count: Int
 ) {
-    unsafe HighwayReference.storeFirstF64(a, to, count)
+    unsafe HighwayReference.Nothrow.storeFirstF64(a, to, count)
 }
 
 @inline(never)
@@ -708,7 +723,11 @@ public func portStoreFirstF64ConstantA(to: UnsafeMutablePointer<SIMDDouble.Lane>
 
 @inline(never)
 public func highwayStoreFirstF64ConstantA(to: UnsafeMutablePointer<Double>, count: Int) {
-    unsafe HighwayReference.storeFirstF64(HighwayReference.repeatingF64(1.5), to, count)
+    unsafe HighwayReference.Nothrow.storeFirstF64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        to,
+        count
+    )
 }
 
 @inline(never)
@@ -721,10 +740,10 @@ public func portStoreFirstF64ConstantCount(
 
 @inline(never)
 public func highwayStoreFirstF64ConstantCount(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeFirstF64(a, to, 1)
+    unsafe HighwayReference.Nothrow.storeFirstF64(a, to, 1)
 }
 
 @inline(never)
@@ -733,11 +752,8 @@ public func portAddingF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIM
 }
 
 @inline(never)
-public func highwayAddingF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.addingF64(a, b)
+public func highwayAddingF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.addingF64(a, b)
 }
 
 @inline(never)
@@ -746,9 +762,8 @@ public func portAddingF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector 
 }
 
 @inline(never)
-public func highwayAddingF64ConstantA(_ b: HighwayReference.VectorF64) -> HighwayReference.VectorF64
-{
-    HighwayReference.addingF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayAddingF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.addingF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
 }
 
 @inline(never)
@@ -757,9 +772,8 @@ public func portAddingF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector 
 }
 
 @inline(never)
-public func highwayAddingF64ConstantB(_ a: HighwayReference.VectorF64) -> HighwayReference.VectorF64
-{
-    HighwayReference.addingF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayAddingF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.addingF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -770,10 +784,10 @@ public func portSubtractingF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -
 
 @inline(never)
 public func highwaySubtractingF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.subtractingF64(a, b)
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.subtractingF64(a, b)
 }
 
 @inline(never)
@@ -782,10 +796,8 @@ public func portSubtractingF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Ve
 }
 
 @inline(never)
-public func highwaySubtractingF64ConstantA(
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.subtractingF64(HighwayReference.repeatingF64(1.5), b)
+public func highwaySubtractingF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.subtractingF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
 }
 
 @inline(never)
@@ -794,10 +806,8 @@ public func portSubtractingF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Ve
 }
 
 @inline(never)
-public func highwaySubtractingF64ConstantB(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.subtractingF64(a, HighwayReference.repeatingF64(1.5))
+public func highwaySubtractingF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.subtractingF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -808,10 +818,10 @@ public func portMultiplyingF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -
 
 @inline(never)
 public func highwayMultiplyingF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.multiplyingF64(a, b)
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.multiplyingF64(a, b)
 }
 
 @inline(never)
@@ -820,10 +830,8 @@ public func portMultiplyingF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Ve
 }
 
 @inline(never)
-public func highwayMultiplyingF64ConstantA(
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.multiplyingF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayMultiplyingF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.multiplyingF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
 }
 
 @inline(never)
@@ -832,10 +840,8 @@ public func portMultiplyingF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Ve
 }
 
 @inline(never)
-public func highwayMultiplyingF64ConstantB(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.multiplyingF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayMultiplyingF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.multiplyingF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -844,11 +850,9 @@ public func portDividingF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> S
 }
 
 @inline(never)
-public func highwayDividingF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.dividingF64(a, b)
+public func highwayDividingF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIMDDouble.Vector
+{
+    HighwayReference.Nothrow.dividingF64(a, b)
 }
 
 @inline(never)
@@ -857,10 +861,8 @@ public func portDividingF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vecto
 }
 
 @inline(never)
-public func highwayDividingF64ConstantA(
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.dividingF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayDividingF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.dividingF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
 }
 
 @inline(never)
@@ -869,10 +871,8 @@ public func portDividingF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vecto
 }
 
 @inline(never)
-public func highwayDividingF64ConstantB(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.dividingF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayDividingF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.dividingF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -881,11 +881,8 @@ public func portMinimumF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SI
 }
 
 @inline(never)
-public func highwayMinimumF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.minimumF64(a, b)
+public func highwayMinimumF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.minimumF64(a, b)
 }
 
 @inline(never)
@@ -894,10 +891,8 @@ public func portMinimumF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector
 }
 
 @inline(never)
-public func highwayMinimumF64ConstantA(
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.minimumF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayMinimumF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.minimumF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
 }
 
 @inline(never)
@@ -906,10 +901,8 @@ public func portMinimumF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector
 }
 
 @inline(never)
-public func highwayMinimumF64ConstantB(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.minimumF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayMinimumF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.minimumF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -918,11 +911,8 @@ public func portMaximumF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SI
 }
 
 @inline(never)
-public func highwayMaximumF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.maximumF64(a, b)
+public func highwayMaximumF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.maximumF64(a, b)
 }
 
 @inline(never)
@@ -931,10 +921,8 @@ public func portMaximumF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector
 }
 
 @inline(never)
-public func highwayMaximumF64ConstantA(
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.maximumF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayMaximumF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.maximumF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
 }
 
 @inline(never)
@@ -943,10 +931,8 @@ public func portMaximumF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector
 }
 
 @inline(never)
-public func highwayMaximumF64ConstantB(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.maximumF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayMaximumF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.maximumF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -955,8 +941,8 @@ public func portNegatedF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayNegatedF64(_ a: HighwayReference.VectorF64) -> HighwayReference.VectorF64 {
-    HighwayReference.negatedF64(a)
+public func highwayNegatedF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.negatedF64(a)
 }
 
 @inline(never)
@@ -965,8 +951,8 @@ public func portNegatedF64ConstantA() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayNegatedF64ConstantA() -> HighwayReference.VectorF64 {
-    HighwayReference.negatedF64(HighwayReference.repeatingF64(1.5))
+public func highwayNegatedF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.negatedF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -975,8 +961,8 @@ public func portMagnitudeF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayMagnitudeF64(_ a: HighwayReference.VectorF64) -> HighwayReference.VectorF64 {
-    HighwayReference.magnitudeF64(a)
+public func highwayMagnitudeF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.magnitudeF64(a)
 }
 
 @inline(never)
@@ -985,8 +971,8 @@ public func portMagnitudeF64ConstantA() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayMagnitudeF64ConstantA() -> HighwayReference.VectorF64 {
-    HighwayReference.magnitudeF64(HighwayReference.repeatingF64(1.5))
+public func highwayMagnitudeF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.magnitudeF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -995,8 +981,8 @@ public func portSquareRootF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwaySquareRootF64(_ a: HighwayReference.VectorF64) -> HighwayReference.VectorF64 {
-    HighwayReference.squareRootF64(a)
+public func highwaySquareRootF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.squareRootF64(a)
 }
 
 @inline(never)
@@ -1005,8 +991,8 @@ public func portSquareRootF64ConstantA() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwaySquareRootF64ConstantA() -> HighwayReference.VectorF64 {
-    HighwayReference.squareRootF64(HighwayReference.repeatingF64(1.5))
+public func highwaySquareRootF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.squareRootF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1020,11 +1006,11 @@ public func portMultiplyAddingF64(
 
 @inline(never)
 public func highwayMultiplyAddingF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.multiplyAddingF64(a, b, c)
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.multiplyAddingF64(a, b, c)
 }
 
 @inline(never)
@@ -1037,10 +1023,10 @@ public func portMultiplyAddingF64ConstantA(
 
 @inline(never)
 public func highwayMultiplyAddingF64ConstantA(
-    _ b: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.multiplyAddingF64(HighwayReference.repeatingF64(1.5), b, c)
+    _ b: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.multiplyAddingF64(HighwayReference.Nothrow.repeatingF64(1.5), b, c)
 }
 
 @inline(never)
@@ -1053,10 +1039,10 @@ public func portMultiplyAddingF64ConstantB(
 
 @inline(never)
 public func highwayMultiplyAddingF64ConstantB(
-    _ a: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.multiplyAddingF64(a, HighwayReference.repeatingF64(1.5), c)
+    _ a: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.multiplyAddingF64(a, HighwayReference.Nothrow.repeatingF64(1.5), c)
 }
 
 @inline(never)
@@ -1069,10 +1055,10 @@ public func portMultiplyAddingF64ConstantC(
 
 @inline(never)
 public func highwayMultiplyAddingF64ConstantC(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.multiplyAddingF64(a, b, HighwayReference.repeatingF64(1.5))
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.multiplyAddingF64(a, b, HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1081,11 +1067,8 @@ public func portEqualToF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SI
 }
 
 @inline(never)
-public func highwayEqualToF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.MaskF64 {
-    HighwayReference.equalToF64(a, b)
+public func highwayEqualToF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(raw: HighwayReference.Nothrow.equalToF64(a, b))
 }
 
 @inline(never)
@@ -1094,9 +1077,10 @@ public func portEqualToF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Mask {
 }
 
 @inline(never)
-public func highwayEqualToF64ConstantA(_ b: HighwayReference.VectorF64) -> HighwayReference.MaskF64
-{
-    HighwayReference.equalToF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayEqualToF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(
+        raw: HighwayReference.Nothrow.equalToF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+    )
 }
 
 @inline(never)
@@ -1105,9 +1089,10 @@ public func portEqualToF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Mask {
 }
 
 @inline(never)
-public func highwayEqualToF64ConstantB(_ a: HighwayReference.VectorF64) -> HighwayReference.MaskF64
-{
-    HighwayReference.equalToF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayEqualToF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(
+        raw: HighwayReference.Nothrow.equalToF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+    )
 }
 
 @inline(never)
@@ -1116,11 +1101,9 @@ public func portNotEqualToF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) ->
 }
 
 @inline(never)
-public func highwayNotEqualToF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.MaskF64 {
-    HighwayReference.notEqualToF64(a, b)
+public func highwayNotEqualToF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIMDDouble.Mask
+{
+    SIMDDouble.Mask(raw: HighwayReference.Nothrow.notEqualToF64(a, b))
 }
 
 @inline(never)
@@ -1129,10 +1112,10 @@ public func portNotEqualToF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Mas
 }
 
 @inline(never)
-public func highwayNotEqualToF64ConstantA(
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.MaskF64 {
-    HighwayReference.notEqualToF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayNotEqualToF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(
+        raw: HighwayReference.Nothrow.notEqualToF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+    )
 }
 
 @inline(never)
@@ -1141,10 +1124,10 @@ public func portNotEqualToF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Mas
 }
 
 @inline(never)
-public func highwayNotEqualToF64ConstantB(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.MaskF64 {
-    HighwayReference.notEqualToF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayNotEqualToF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(
+        raw: HighwayReference.Nothrow.notEqualToF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+    )
 }
 
 @inline(never)
@@ -1153,11 +1136,8 @@ public func portLessThanF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> S
 }
 
 @inline(never)
-public func highwayLessThanF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.MaskF64 {
-    HighwayReference.lessThanF64(a, b)
+public func highwayLessThanF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(raw: HighwayReference.Nothrow.lessThanF64(a, b))
 }
 
 @inline(never)
@@ -1166,9 +1146,10 @@ public func portLessThanF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Mask 
 }
 
 @inline(never)
-public func highwayLessThanF64ConstantA(_ b: HighwayReference.VectorF64) -> HighwayReference.MaskF64
-{
-    HighwayReference.lessThanF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayLessThanF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(
+        raw: HighwayReference.Nothrow.lessThanF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+    )
 }
 
 @inline(never)
@@ -1177,9 +1158,10 @@ public func portLessThanF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Mask 
 }
 
 @inline(never)
-public func highwayLessThanF64ConstantB(_ a: HighwayReference.VectorF64) -> HighwayReference.MaskF64
-{
-    HighwayReference.lessThanF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayLessThanF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(
+        raw: HighwayReference.Nothrow.lessThanF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+    )
 }
 
 @inline(never)
@@ -1188,11 +1170,9 @@ public func portGreaterThanF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -
 }
 
 @inline(never)
-public func highwayGreaterThanF64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.MaskF64 {
-    HighwayReference.greaterThanF64(a, b)
+public func highwayGreaterThanF64(_ a: SIMDDouble.Vector, _ b: SIMDDouble.Vector) -> SIMDDouble.Mask
+{
+    SIMDDouble.Mask(raw: HighwayReference.Nothrow.greaterThanF64(a, b))
 }
 
 @inline(never)
@@ -1201,10 +1181,10 @@ public func portGreaterThanF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Ma
 }
 
 @inline(never)
-public func highwayGreaterThanF64ConstantA(
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.MaskF64 {
-    HighwayReference.greaterThanF64(HighwayReference.repeatingF64(1.5), b)
+public func highwayGreaterThanF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(
+        raw: HighwayReference.Nothrow.greaterThanF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+    )
 }
 
 @inline(never)
@@ -1213,10 +1193,10 @@ public func portGreaterThanF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Ma
 }
 
 @inline(never)
-public func highwayGreaterThanF64ConstantB(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.MaskF64 {
-    HighwayReference.greaterThanF64(a, HighwayReference.repeatingF64(1.5))
+public func highwayGreaterThanF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(
+        raw: HighwayReference.Nothrow.greaterThanF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+    )
 }
 
 @inline(never)
@@ -1230,11 +1210,11 @@ public func portSelectingF64(
 
 @inline(never)
 public func highwaySelectingF64(
-    _ mask: HighwayReference.MaskF64,
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.selectingF64(mask, a, b)
+    _ mask: SIMDDouble.Mask,
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.selectingF64(mask.raw, a, b)
 }
 
 @inline(never)
@@ -1247,10 +1227,10 @@ public func portSelectingF64ConstantA(
 
 @inline(never)
 public func highwaySelectingF64ConstantA(
-    _ mask: HighwayReference.MaskF64,
-    _ b: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.selectingF64(mask, HighwayReference.repeatingF64(1.5), b)
+    _ mask: SIMDDouble.Mask,
+    _ b: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.selectingF64(mask.raw, HighwayReference.Nothrow.repeatingF64(1.5), b)
 }
 
 @inline(never)
@@ -1263,10 +1243,10 @@ public func portSelectingF64ConstantB(
 
 @inline(never)
 public func highwaySelectingF64ConstantB(
-    _ mask: HighwayReference.MaskF64,
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.selectingF64(mask, a, HighwayReference.repeatingF64(1.5))
+    _ mask: SIMDDouble.Mask,
+    _ a: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.selectingF64(mask.raw, a, HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1279,10 +1259,10 @@ public func portSelectingOrZeroF64(
 
 @inline(never)
 public func highwaySelectingOrZeroF64(
-    _ mask: HighwayReference.MaskF64,
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.selectingOrZeroF64(mask, a)
+    _ mask: SIMDDouble.Mask,
+    _ a: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.selectingOrZeroF64(mask.raw, a)
 }
 
 @inline(never)
@@ -1291,10 +1271,11 @@ public func portSelectingOrZeroF64ConstantA(_ mask: SIMDDouble.Mask) -> SIMDDoub
 }
 
 @inline(never)
-public func highwaySelectingOrZeroF64ConstantA(
-    _ mask: HighwayReference.MaskF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.selectingOrZeroF64(mask, HighwayReference.repeatingF64(1.5))
+public func highwaySelectingOrZeroF64ConstantA(_ mask: SIMDDouble.Mask) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.selectingOrZeroF64(
+        mask.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5)
+    )
 }
 
 @inline(never)
@@ -1307,10 +1288,10 @@ public func portZeroingSelectedF64(
 
 @inline(never)
 public func highwayZeroingSelectedF64(
-    _ mask: HighwayReference.MaskF64,
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.zeroingSelectedF64(mask, a)
+    _ mask: SIMDDouble.Mask,
+    _ a: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.zeroingSelectedF64(mask.raw, a)
 }
 
 @inline(never)
@@ -1319,10 +1300,11 @@ public func portZeroingSelectedF64ConstantA(_ mask: SIMDDouble.Mask) -> SIMDDoub
 }
 
 @inline(never)
-public func highwayZeroingSelectedF64ConstantA(
-    _ mask: HighwayReference.MaskF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.zeroingSelectedF64(mask, HighwayReference.repeatingF64(1.5))
+public func highwayZeroingSelectedF64ConstantA(_ mask: SIMDDouble.Mask) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.zeroingSelectedF64(
+        mask.raw,
+        HighwayReference.Nothrow.repeatingF64(1.5)
+    )
 }
 
 @inline(never)
@@ -1331,8 +1313,8 @@ public func portFirstLanesF64(count: Int) -> SIMDDouble.Mask {
 }
 
 @inline(never)
-public func highwayFirstLanesF64(count: Int) -> HighwayReference.MaskF64 {
-    HighwayReference.firstLanesF64(count)
+public func highwayFirstLanesF64(count: Int) -> SIMDDouble.Mask {
+    SIMDDouble.Mask(raw: HighwayReference.Nothrow.firstLanesF64(count))
 }
 
 @inline(never)
@@ -1341,8 +1323,8 @@ public func portFirstLanesF64ConstantCount() -> SIMDDouble.Mask {
 }
 
 @inline(never)
-public func highwayFirstLanesF64ConstantCount() -> HighwayReference.MaskF64 {
-    HighwayReference.firstLanesF64(1)
+public func highwayFirstLanesF64ConstantCount() -> SIMDDouble.Mask {
+    SIMDDouble.Mask(raw: HighwayReference.Nothrow.firstLanesF64(1))
 }
 
 @inline(never)
@@ -1351,8 +1333,8 @@ public func portAllTrueF64(_ mask: SIMDDouble.Mask) -> Bool {
 }
 
 @inline(never)
-public func highwayAllTrueF64(_ mask: HighwayReference.MaskF64) -> Bool {
-    HighwayReference.allTrueF64(mask)
+public func highwayAllTrueF64(_ mask: SIMDDouble.Mask) -> Bool {
+    HighwayReference.Nothrow.allTrueF64(mask.raw)
 }
 
 @inline(never)
@@ -1361,8 +1343,8 @@ public func portAllFalseF64(_ mask: SIMDDouble.Mask) -> Bool {
 }
 
 @inline(never)
-public func highwayAllFalseF64(_ mask: HighwayReference.MaskF64) -> Bool {
-    HighwayReference.allFalseF64(mask)
+public func highwayAllFalseF64(_ mask: SIMDDouble.Mask) -> Bool {
+    HighwayReference.Nothrow.allFalseF64(mask.raw)
 }
 
 @inline(never)
@@ -1371,8 +1353,8 @@ public func portTrueCountF64(_ mask: SIMDDouble.Mask) -> Int {
 }
 
 @inline(never)
-public func highwayTrueCountF64(_ mask: HighwayReference.MaskF64) -> Int {
-    HighwayReference.trueCountF64(mask)
+public func highwayTrueCountF64(_ mask: SIMDDouble.Mask) -> Int {
+    HighwayReference.Nothrow.trueCountF64(mask.raw)
 }
 
 @inline(never)
@@ -1381,8 +1363,8 @@ public func portFirstTrueIndexF64(_ mask: SIMDDouble.Mask) -> Int {
 }
 
 @inline(never)
-public func highwayFirstTrueIndexF64(_ mask: HighwayReference.MaskF64) -> Int {
-    HighwayReference.firstTrueIndexF64(mask)
+public func highwayFirstTrueIndexF64(_ mask: SIMDDouble.Mask) -> Int {
+    HighwayReference.Nothrow.firstTrueIndexF64(mask.raw)
 }
 
 @inline(never)
@@ -1391,8 +1373,8 @@ public func portSumF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Lane {
 }
 
 @inline(never)
-public func highwaySumF64(_ a: HighwayReference.VectorF64) -> Double {
-    HighwayReference.sumF64(a)
+public func highwaySumF64(_ a: SIMDDouble.Vector) -> Double {
+    HighwayReference.Nothrow.sumF64(a)
 }
 
 @inline(never)
@@ -1402,7 +1384,7 @@ public func portSumF64ConstantA() -> SIMDDouble.Lane {
 
 @inline(never)
 public func highwaySumF64ConstantA() -> Double {
-    HighwayReference.sumF64(HighwayReference.repeatingF64(1.5))
+    HighwayReference.Nothrow.sumF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1411,8 +1393,8 @@ public func portSmallestF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Lane {
 }
 
 @inline(never)
-public func highwaySmallestF64(_ a: HighwayReference.VectorF64) -> Double {
-    HighwayReference.smallestF64(a)
+public func highwaySmallestF64(_ a: SIMDDouble.Vector) -> Double {
+    HighwayReference.Nothrow.smallestF64(a)
 }
 
 @inline(never)
@@ -1422,7 +1404,7 @@ public func portSmallestF64ConstantA() -> SIMDDouble.Lane {
 
 @inline(never)
 public func highwaySmallestF64ConstantA() -> Double {
-    HighwayReference.smallestF64(HighwayReference.repeatingF64(1.5))
+    HighwayReference.Nothrow.smallestF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1431,8 +1413,8 @@ public func portSmallestOrNaNF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Lane {
 }
 
 @inline(never)
-public func highwaySmallestOrNaNF64(_ a: HighwayReference.VectorF64) -> Double {
-    HighwayReference.smallestOrNaNF64(a)
+public func highwaySmallestOrNaNF64(_ a: SIMDDouble.Vector) -> Double {
+    HighwayReference.Nothrow.smallestOrNaNF64(a)
 }
 
 @inline(never)
@@ -1442,7 +1424,7 @@ public func portSmallestOrNaNF64ConstantA() -> SIMDDouble.Lane {
 
 @inline(never)
 public func highwaySmallestOrNaNF64ConstantA() -> Double {
-    HighwayReference.smallestOrNaNF64(HighwayReference.repeatingF64(1.5))
+    HighwayReference.Nothrow.smallestOrNaNF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1451,8 +1433,8 @@ public func portLargestF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Lane {
 }
 
 @inline(never)
-public func highwayLargestF64(_ a: HighwayReference.VectorF64) -> Double {
-    HighwayReference.largestF64(a)
+public func highwayLargestF64(_ a: SIMDDouble.Vector) -> Double {
+    HighwayReference.Nothrow.largestF64(a)
 }
 
 @inline(never)
@@ -1462,7 +1444,7 @@ public func portLargestF64ConstantA() -> SIMDDouble.Lane {
 
 @inline(never)
 public func highwayLargestF64ConstantA() -> Double {
-    HighwayReference.largestF64(HighwayReference.repeatingF64(1.5))
+    HighwayReference.Nothrow.largestF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1471,8 +1453,8 @@ public func portLargestOrNaNF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Lane {
 }
 
 @inline(never)
-public func highwayLargestOrNaNF64(_ a: HighwayReference.VectorF64) -> Double {
-    HighwayReference.largestOrNaNF64(a)
+public func highwayLargestOrNaNF64(_ a: SIMDDouble.Vector) -> Double {
+    HighwayReference.Nothrow.largestOrNaNF64(a)
 }
 
 @inline(never)
@@ -1482,7 +1464,7 @@ public func portLargestOrNaNF64ConstantA() -> SIMDDouble.Lane {
 
 @inline(never)
 public func highwayLargestOrNaNF64ConstantA() -> Double {
-    HighwayReference.largestOrNaNF64(HighwayReference.repeatingF64(1.5))
+    HighwayReference.Nothrow.largestOrNaNF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1491,8 +1473,8 @@ public func portFirstLaneF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Lane {
 }
 
 @inline(never)
-public func highwayFirstLaneF64(_ a: HighwayReference.VectorF64) -> Double {
-    HighwayReference.firstLaneF64(a)
+public func highwayFirstLaneF64(_ a: SIMDDouble.Vector) -> Double {
+    HighwayReference.Nothrow.firstLaneF64(a)
 }
 
 @inline(never)
@@ -1502,7 +1484,7 @@ public func portFirstLaneF64ConstantA() -> SIMDDouble.Lane {
 
 @inline(never)
 public func highwayFirstLaneF64ConstantA() -> Double {
-    HighwayReference.firstLaneF64(HighwayReference.repeatingF64(1.5))
+    HighwayReference.Nothrow.firstLaneF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1511,8 +1493,8 @@ public func portReversedF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayReversedF64(_ a: HighwayReference.VectorF64) -> HighwayReference.VectorF64 {
-    HighwayReference.reversedF64(a)
+public func highwayReversedF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.reversedF64(a)
 }
 
 @inline(never)
@@ -1521,8 +1503,8 @@ public func portReversedF64ConstantA() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwayReversedF64ConstantA() -> HighwayReference.VectorF64 {
-    HighwayReference.reversedF64(HighwayReference.repeatingF64(1.5))
+public func highwayReversedF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.reversedF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1533,10 +1515,10 @@ public func portSlideUpLanesF64(_ a: SIMDDouble.Vector, byUnchecked lanes: Int) 
 
 @inline(never)
 public func highwaySlideUpLanesF64(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideUpLanesF64(a, lanes)
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideUpLanesF64(a, lanes)
 }
 
 @inline(never)
@@ -1545,8 +1527,8 @@ public func portSlideUpLanesF64ConstantA(byUnchecked lanes: Int) -> SIMDDouble.V
 }
 
 @inline(never)
-public func highwaySlideUpLanesF64ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorF64 {
-    HighwayReference.slideUpLanesF64(HighwayReference.repeatingF64(1.5), lanes)
+public func highwaySlideUpLanesF64ConstantA(byUnchecked lanes: Int) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideUpLanesF64(HighwayReference.Nothrow.repeatingF64(1.5), lanes)
 }
 
 @inline(never)
@@ -1555,10 +1537,8 @@ public func portSlideUpLanesF64ConstantLanes(_ a: SIMDDouble.Vector) -> SIMDDoub
 }
 
 @inline(never)
-public func highwaySlideUpLanesF64ConstantLanes(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideUpLanesF64(a, 1)
+public func highwaySlideUpLanesF64ConstantLanes(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideUpLanesF64(a, 1)
 }
 
 @inline(never)
@@ -1572,11 +1552,11 @@ public func portSlideUpLanesFillingWithF64(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithF64(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideUpLanesFillingWithF64(fill, a, lanes)
+    fillingWith fill: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideUpLanesFillingWithF64(fill, a, lanes)
 }
 
 @inline(never)
@@ -1590,9 +1570,13 @@ public func portSlideUpLanesFillingWithF64ConstantA(
 @inline(never)
 public func highwaySlideUpLanesFillingWithF64ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideUpLanesFillingWithF64(fill, HighwayReference.repeatingF64(1.5), lanes)
+    fillingWith fill: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideUpLanesFillingWithF64(
+        fill,
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        lanes
+    )
 }
 
 @inline(never)
@@ -1605,10 +1589,10 @@ public func portSlideUpLanesFillingWithF64ConstantLanes(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithF64ConstantLanes(
-    _ a: HighwayReference.VectorF64,
-    fillingWith fill: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideUpLanesFillingWithF64(fill, a, 1)
+    _ a: SIMDDouble.Vector,
+    fillingWith fill: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideUpLanesFillingWithF64(fill, a, 1)
 }
 
 @inline(never)
@@ -1621,10 +1605,14 @@ public func portSlideUpLanesFillingWithF64ConstantFill(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithF64ConstantFill(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideUpLanesFillingWithF64(HighwayReference.repeatingF64(1.5), a, lanes)
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideUpLanesFillingWithF64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        a,
+        lanes
+    )
 }
 
 @inline(never)
@@ -1637,10 +1625,10 @@ public func portSlideDownLanesF64(
 
 @inline(never)
 public func highwaySlideDownLanesF64(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideDownLanesF64(a, lanes)
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideDownLanesF64(a, lanes)
 }
 
 @inline(never)
@@ -1649,9 +1637,8 @@ public func portSlideDownLanesF64ConstantA(byUnchecked lanes: Int) -> SIMDDouble
 }
 
 @inline(never)
-public func highwaySlideDownLanesF64ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorF64
-{
-    HighwayReference.slideDownLanesF64(HighwayReference.repeatingF64(1.5), lanes)
+public func highwaySlideDownLanesF64ConstantA(byUnchecked lanes: Int) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideDownLanesF64(HighwayReference.Nothrow.repeatingF64(1.5), lanes)
 }
 
 @inline(never)
@@ -1660,10 +1647,8 @@ public func portSlideDownLanesF64ConstantLanes(_ a: SIMDDouble.Vector) -> SIMDDo
 }
 
 @inline(never)
-public func highwaySlideDownLanesF64ConstantLanes(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideDownLanesF64(a, 1)
+public func highwaySlideDownLanesF64ConstantLanes(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideDownLanesF64(a, 1)
 }
 
 @inline(never)
@@ -1677,11 +1662,11 @@ public func portSlideDownLanesFillingWithF64(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithF64(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideDownLanesFillingWithF64(fill, a, lanes)
+    fillingWith fill: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideDownLanesFillingWithF64(fill, a, lanes)
 }
 
 @inline(never)
@@ -1699,9 +1684,13 @@ public func portSlideDownLanesFillingWithF64ConstantA(
 @inline(never)
 public func highwaySlideDownLanesFillingWithF64ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideDownLanesFillingWithF64(fill, HighwayReference.repeatingF64(1.5), lanes)
+    fillingWith fill: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideDownLanesFillingWithF64(
+        fill,
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        lanes
+    )
 }
 
 @inline(never)
@@ -1714,10 +1703,10 @@ public func portSlideDownLanesFillingWithF64ConstantLanes(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithF64ConstantLanes(
-    _ a: HighwayReference.VectorF64,
-    fillingWith fill: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideDownLanesFillingWithF64(fill, a, 1)
+    _ a: SIMDDouble.Vector,
+    fillingWith fill: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideDownLanesFillingWithF64(fill, a, 1)
 }
 
 @inline(never)
@@ -1730,10 +1719,14 @@ public func portSlideDownLanesFillingWithF64ConstantFill(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithF64ConstantFill(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slideDownLanesFillingWithF64(HighwayReference.repeatingF64(1.5), a, lanes)
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slideDownLanesFillingWithF64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        a,
+        lanes
+    )
 }
 
 @inline(never)
@@ -1742,8 +1735,8 @@ public func portSlide1UpF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwaySlide1UpF64(_ a: HighwayReference.VectorF64) -> HighwayReference.VectorF64 {
-    HighwayReference.slide1UpF64(a)
+public func highwaySlide1UpF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slide1UpF64(a)
 }
 
 @inline(never)
@@ -1752,8 +1745,8 @@ public func portSlide1UpF64ConstantA() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwaySlide1UpF64ConstantA() -> HighwayReference.VectorF64 {
-    HighwayReference.slide1UpF64(HighwayReference.repeatingF64(1.5))
+public func highwaySlide1UpF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slide1UpF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1766,10 +1759,10 @@ public func portSlide1UpFillingWithF64(
 
 @inline(never)
 public func highwaySlide1UpFillingWithF64(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     fillingWith fill: Double
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slide1UpFillingWithF64(fill, a)
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slide1UpFillingWithF64(fill, a)
 }
 
 @inline(never)
@@ -1780,10 +1773,11 @@ public func portSlide1UpFillingWithF64ConstantA(
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithF64ConstantA(
-    fillingWith fill: Double
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slide1UpFillingWithF64(fill, HighwayReference.repeatingF64(1.5))
+public func highwaySlide1UpFillingWithF64ConstantA(fillingWith fill: Double) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slide1UpFillingWithF64(
+        fill,
+        HighwayReference.Nothrow.repeatingF64(1.5)
+    )
 }
 
 @inline(never)
@@ -1792,10 +1786,8 @@ public func portSlide1UpFillingWithF64ConstantFill(_ a: SIMDDouble.Vector) -> SI
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithF64ConstantFill(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slide1UpFillingWithF64(1.5, a)
+public func highwaySlide1UpFillingWithF64ConstantFill(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slide1UpFillingWithF64(1.5, a)
 }
 
 @inline(never)
@@ -1804,8 +1796,8 @@ public func portSlide1DownF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwaySlide1DownF64(_ a: HighwayReference.VectorF64) -> HighwayReference.VectorF64 {
-    HighwayReference.slide1DownF64(a)
+public func highwaySlide1DownF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slide1DownF64(a)
 }
 
 @inline(never)
@@ -1814,8 +1806,8 @@ public func portSlide1DownF64ConstantA() -> SIMDDouble.Vector {
 }
 
 @inline(never)
-public func highwaySlide1DownF64ConstantA() -> HighwayReference.VectorF64 {
-    HighwayReference.slide1DownF64(HighwayReference.repeatingF64(1.5))
+public func highwaySlide1DownF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slide1DownF64(HighwayReference.Nothrow.repeatingF64(1.5))
 }
 
 @inline(never)
@@ -1828,10 +1820,10 @@ public func portSlide1DownFillingWithF64(
 
 @inline(never)
 public func highwaySlide1DownFillingWithF64(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     fillingWith fill: Double
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slide1DownFillingWithF64(fill, a)
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.slide1DownFillingWithF64(fill, a)
 }
 
 @inline(never)
@@ -1842,10 +1834,12 @@ public func portSlide1DownFillingWithF64ConstantA(
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithF64ConstantA(
-    fillingWith fill: Double
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slide1DownFillingWithF64(fill, HighwayReference.repeatingF64(1.5))
+public func highwaySlide1DownFillingWithF64ConstantA(fillingWith fill: Double) -> SIMDDouble.Vector
+{
+    HighwayReference.Nothrow.slide1DownFillingWithF64(
+        fill,
+        HighwayReference.Nothrow.repeatingF64(1.5)
+    )
 }
 
 @inline(never)
@@ -1854,10 +1848,9 @@ public func portSlide1DownFillingWithF64ConstantFill(_ a: SIMDDouble.Vector) -> 
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithF64ConstantFill(
-    _ a: HighwayReference.VectorF64
-) -> HighwayReference.VectorF64 {
-    HighwayReference.slide1DownFillingWithF64(1.5, a)
+public func highwaySlide1DownFillingWithF64ConstantFill(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector
+{
+    HighwayReference.Nothrow.slide1DownFillingWithF64(1.5, a)
 }
 
 @inline(never)
@@ -1872,10 +1865,10 @@ public func portLoadInterleaved2F64(
 @inline(never)
 public func highwayLoadInterleaved2F64(
     from: UnsafePointer<Double>,
-    _ v0: inout HighwayReference.VectorF64,
-    _ v1: inout HighwayReference.VectorF64
+    _ v0: inout SIMDDouble.Vector,
+    _ v1: inout SIMDDouble.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved2F64(from, &v0, &v1)
+    unsafe HighwayReference.Nothrow.loadInterleaved2F64(from, &v0, &v1)
 }
 
 @inline(never)
@@ -1891,11 +1884,11 @@ public func portLoadInterleaved3F64(
 @inline(never)
 public func highwayLoadInterleaved3F64(
     from: UnsafePointer<Double>,
-    _ v0: inout HighwayReference.VectorF64,
-    _ v1: inout HighwayReference.VectorF64,
-    _ v2: inout HighwayReference.VectorF64
+    _ v0: inout SIMDDouble.Vector,
+    _ v1: inout SIMDDouble.Vector,
+    _ v2: inout SIMDDouble.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved3F64(from, &v0, &v1, &v2)
+    unsafe HighwayReference.Nothrow.loadInterleaved3F64(from, &v0, &v1, &v2)
 }
 
 @inline(never)
@@ -1912,12 +1905,12 @@ public func portLoadInterleaved4F64(
 @inline(never)
 public func highwayLoadInterleaved4F64(
     from: UnsafePointer<Double>,
-    _ v0: inout HighwayReference.VectorF64,
-    _ v1: inout HighwayReference.VectorF64,
-    _ v2: inout HighwayReference.VectorF64,
-    _ v3: inout HighwayReference.VectorF64
+    _ v0: inout SIMDDouble.Vector,
+    _ v1: inout SIMDDouble.Vector,
+    _ v2: inout SIMDDouble.Vector,
+    _ v3: inout SIMDDouble.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved4F64(from, &v0, &v1, &v2, &v3)
+    unsafe HighwayReference.Nothrow.loadInterleaved4F64(from, &v0, &v1, &v2, &v3)
 }
 
 @inline(never)
@@ -1931,11 +1924,11 @@ public func portStoreInterleaved2F64(
 
 @inline(never)
 public func highwayStoreInterleaved2F64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved2F64(a, b, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2F64(a, b, to)
 }
 
 @inline(never)
@@ -1948,10 +1941,14 @@ public func portStoreInterleaved2F64ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved2F64ConstantA(
-    _ b: HighwayReference.VectorF64,
+    _ b: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved2F64(HighwayReference.repeatingF64(1.5), b, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2F64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        b,
+        to
+    )
 }
 
 @inline(never)
@@ -1964,10 +1961,14 @@ public func portStoreInterleaved2F64ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved2F64ConstantB(
-    _ a: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved2F64(a, HighwayReference.repeatingF64(1.5), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2F64(
+        a,
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        to
+    )
 }
 
 @inline(never)
@@ -1982,12 +1983,12 @@ public func portStoreInterleaved3F64(
 
 @inline(never)
 public func highwayStoreInterleaved3F64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved3F64(a, b, c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3F64(a, b, c, to)
 }
 
 @inline(never)
@@ -2001,11 +2002,16 @@ public func portStoreInterleaved3F64ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved3F64ConstantA(
-    _ b: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64,
+    _ b: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved3F64(HighwayReference.repeatingF64(1.5), b, c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3F64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        b,
+        c,
+        to
+    )
 }
 
 @inline(never)
@@ -2019,11 +2025,16 @@ public func portStoreInterleaved3F64ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved3F64ConstantB(
-    _ a: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved3F64(a, HighwayReference.repeatingF64(1.5), c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3F64(
+        a,
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        c,
+        to
+    )
 }
 
 @inline(never)
@@ -2037,11 +2048,16 @@ public func portStoreInterleaved3F64ConstantC(
 
 @inline(never)
 public func highwayStoreInterleaved3F64ConstantC(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved3F64(a, b, HighwayReference.repeatingF64(1.5), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3F64(
+        a,
+        b,
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        to
+    )
 }
 
 @inline(never)
@@ -2057,13 +2073,13 @@ public func portStoreInterleaved4F64(
 
 @inline(never)
 public func highwayStoreInterleaved4F64(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64,
-    _ d: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector,
+    _ d: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved4F64(a, b, c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4F64(a, b, c, d, to)
 }
 
 @inline(never)
@@ -2078,12 +2094,18 @@ public func portStoreInterleaved4F64ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved4F64ConstantA(
-    _ b: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64,
-    _ d: HighwayReference.VectorF64,
+    _ b: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector,
+    _ d: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved4F64(HighwayReference.repeatingF64(1.5), b, c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4F64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        b,
+        c,
+        d,
+        to
+    )
 }
 
 @inline(never)
@@ -2098,12 +2120,18 @@ public func portStoreInterleaved4F64ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved4F64ConstantB(
-    _ a: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64,
-    _ d: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector,
+    _ d: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved4F64(a, HighwayReference.repeatingF64(1.5), c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4F64(
+        a,
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        c,
+        d,
+        to
+    )
 }
 
 @inline(never)
@@ -2118,12 +2146,18 @@ public func portStoreInterleaved4F64ConstantC(
 
 @inline(never)
 public func highwayStoreInterleaved4F64ConstantC(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64,
-    _ d: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector,
+    _ d: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved4F64(a, b, HighwayReference.repeatingF64(1.5), d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4F64(
+        a,
+        b,
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        d,
+        to
+    )
 }
 
 @inline(never)
@@ -2138,12 +2172,18 @@ public func portStoreInterleaved4F64ConstantD(
 
 @inline(never)
 public func highwayStoreInterleaved4F64ConstantD(
-    _ a: HighwayReference.VectorF64,
-    _ b: HighwayReference.VectorF64,
-    _ c: HighwayReference.VectorF64,
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector,
+    _ c: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.storeInterleaved4F64(a, b, c, HighwayReference.repeatingF64(1.5), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4F64(
+        a,
+        b,
+        c,
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        to
+    )
 }
 
 @inline(never)
@@ -2152,8 +2192,8 @@ public func portLoadWideningF32ToF64(from: UnsafePointer<Float>) -> SIMDDouble.V
 }
 
 @inline(never)
-public func highwayLoadWideningF32ToF64(from: UnsafePointer<Float>) -> HighwayReference.VectorF64 {
-    unsafe HighwayReference.loadWideningF32ToF64(from)
+public func highwayLoadWideningF32ToF64(from: UnsafePointer<Float>) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.loadWideningF32ToF64(from)
 }
 
 @inline(never)
@@ -2168,8 +2208,8 @@ public func portLoadFirstWideningF32ToF64(
 public func highwayLoadFirstWideningF32ToF64(
     from: UnsafePointer<Float>,
     count: Int
-) -> HighwayReference.VectorF64 {
-    unsafe HighwayReference.loadFirstWideningF32ToF64(from, count)
+) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(from, count)
 }
 
 @inline(never)
@@ -2182,8 +2222,8 @@ public func portLoadFirstWideningF32ToF64ConstantCount(
 @inline(never)
 public func highwayLoadFirstWideningF32ToF64ConstantCount(
     from: UnsafePointer<Float>
-) -> HighwayReference.VectorF64 {
-    unsafe HighwayReference.loadFirstWideningF32ToF64(from, 1)
+) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(from, 1)
 }
 
 @inline(never)
@@ -2193,6 +2233,6 @@ public func portRepeatingBlockF64(_ v0: SIMDDouble.Lane, _ v1: SIMDDouble.Lane) 
 }
 
 @inline(never)
-public func highwayRepeatingBlockF64(_ v0: Double, _ v1: Double) -> HighwayReference.VectorF64 {
-    HighwayReference.repeatingBlockF64(v0, v1)
+public func highwayRepeatingBlockF64(_ v0: Double, _ v1: Double) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.repeatingBlockF64(v0, v1)
 }

@@ -5,9 +5,12 @@ public import CVectorizationOps
 /// Vectors of `Float`, and the ops over them.
 public enum SIMDFloat: SIMDElement, SIMDFloatElement, SendableMetatype {
     public typealias Lane = Float
-    public typealias Vector = SIMD4<Float>
+    public typealias Vector = cvectorization_ops_vector_f32
 
     public struct Mask: Sendable {
+        /// The SIMD mask type a `Mask` converts to and from, whose width is the target's.
+        public typealias SIMDType = SIMDMask<cvectorization_ops_mask_f32>
+
         public var raw: cvectorization_ops_raw_mask_f32
 
         @export(implementation) @inline(always)
@@ -16,13 +19,13 @@ public enum SIMDFloat: SIMDElement, SIMDFloatElement, SendableMetatype {
         }
 
         @export(implementation) @inline(always)
-        public init(_ simd: SIMDMask<SIMD4<Int32>>) {
+        public init(_ simd: SIMDType) {
             raw = cvectorization_ops_to_raw_mask_f32(simd._storage)
         }
 
         @export(implementation) @inline(always)
-        public var simd: SIMDMask<SIMD4<Int32>> {
-            SIMDMask<SIMD4<Int32>>(cvectorization_ops_from_raw_mask_f32(raw))
+        public var simd: SIMDType {
+            SIMDType(cvectorization_ops_from_raw_mask_f32(raw))
         }
     }
 
@@ -107,7 +110,7 @@ public enum SIMDFloat: SIMDElement, SIMDFloatElement, SendableMetatype {
     @export(implementation) @inline(always)
     public static func loadFirst(from span: Span<Lane>) -> Vector {
         span.withUnsafeBufferPointer {
-            unsafe cvectorization_ops_load_first_f32($0.baseAddress, $0.count)
+            unsafe cvectorization_ops_load_first_span_f32($0.baseAddress, $0.count)
         }
     }
 

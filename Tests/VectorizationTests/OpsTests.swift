@@ -1,6 +1,14 @@
 import Testing
 import Vectorization
 
+#if canImport(Glibc)
+import Glibc
+#elseif canImport(Musl)
+import Musl
+#elseif canImport(Android)
+import Android
+#endif
+
 @Suite("Ops")
 struct OpsTests {
     @Test("A vector survives a store after a load")
@@ -717,6 +725,53 @@ struct OpsTests {
         #expect(H.allTrue(H.equalTo(vector, H.zero())))
         #expect(output.isEmpty)
     }
+
+    #if (os(Linux) || os(Android)) && _pointerBitWidth(_64)
+    @Test("A partial span load and store of a span of 2^32 or more elements use a whole vector")
+    func hugeSpanLoadStore() {
+        guard SIMDTarget.targetName == "SVE2_128" else { return }
+        typealias H = SIMDUInt8
+        typealias W = SIMDUInt16
+        let lanes = H.laneCount
+        let wrapped = 1 << 32
+        let byteCount = wrapped + lanes
+        let mapped = unsafe mmap(
+            nil,
+            byteCount,
+            PROT_READ | PROT_WRITE,
+            MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
+            -1,
+            0
+        )
+        guard let mapped = unsafe mapped, unsafe mapped != UnsafeMutableRawPointer(bitPattern: -1)
+        else { return }
+        defer { unsafe _ = munmap(mapped, byteCount) }
+        let bytes = unsafe mapped.bindMemory(to: UInt8.self, capacity: byteCount)
+        let input = ContiguousArray((0..<lanes).map { UInt8($0 &+ 1) })
+
+        for count in [wrapped, wrapped + 1, wrapped + lanes] {
+            for lane in 0..<lanes { unsafe bytes[lane] = input[lane] }
+            for lane in lanes..<(lanes + 4) { unsafe bytes[lane] = 0xEE }
+            let readable = unsafe UnsafeBufferPointer(start: bytes, count: count)
+            var loaded = ContiguousArray<UInt8>(repeating: 0, count: lanes)
+            var widened = ContiguousArray<UInt16>(repeating: 0, count: W.laneCount)
+
+            var loadedDestination = loaded.mutableSpan
+            H.store(H.loadFirst(from: unsafe readable.span), to: &loadedDestination)
+            var widenedDestination = widened.mutableSpan
+            W.store(W.loadFirstWidening(from: unsafe readable.span), to: &widenedDestination)
+            #expect(Array(loaded) == Array(input))
+            #expect(Array(widened) == input.prefix(W.laneCount).map(UInt16.init))
+
+            for lane in 0..<lanes { unsafe bytes[lane] = 0 }
+            let writable = unsafe UnsafeMutableBufferPointer(start: bytes, count: count)
+            var destination = unsafe writable.mutableSpan
+            H.storeFirst(H.load(from: input.span), to: &destination)
+            #expect((0..<lanes).allSatisfy { unsafe bytes[$0] == input[$0] })
+            #expect((lanes..<(lanes + 4)).allSatisfy { unsafe bytes[$0] == 0xEE })
+        }
+    }
+    #endif
 
     @Test("A widening span load promotes every lane it reads")
     func spanWideningLoad() {
