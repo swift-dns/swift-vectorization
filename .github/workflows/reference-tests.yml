@@ -3,7 +3,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 on:
-  pull_request: { types: [opened, reopened, synchronize] }
+  pull_request: { types: [opened, ready_for_review, reopened, synchronize] }
   push: { branches: [main] }
   schedule:
     - cron: "0 6 * * 6"
@@ -100,6 +100,8 @@ jobs:
             sde-cpu: ""
 
     runs-on: ${{ matrix.target.runner }}
+
+    if: ${{ !github.event.pull_request.draft }}
 
     container:
       image: swift:6.4-resolute
@@ -240,6 +242,8 @@ jobs:
     name: reference-tests (NEON, macOS)
 
     runs-on: macos-26
+
+    if: ${{ !github.event.pull_request.draft }}
 
     timeout-minutes: 30
 
