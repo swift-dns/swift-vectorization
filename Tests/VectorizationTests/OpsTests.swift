@@ -735,7 +735,7 @@ struct OpsTests {
         let lanes = H.laneCount
         let wrapped = 1 << 32
         let byteCount = wrapped + lanes
-        let mapped = unsafe mmap(
+        let mapped: UnsafeMutableRawPointer? = unsafe mmap(
             nil,
             byteCount,
             PROT_READ | PROT_WRITE,
