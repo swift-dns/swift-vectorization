@@ -277,7 +277,8 @@ compare_functions() {
       if (base_name ~ /^(port|highway)[A-Z]/) {
         function_of_symbol[$1] = base_name
       }
-      if (highway_target == "" && base_name ~ /^highway/ && match($1, /N_[A-Z0-9_]+O[0-9]/)) {
+      if (highway_target == "" && base_name == "targetOfHighway" &&
+          match($1, /N_[A-Z0-9_]+O[0-9]/)) {
         highway_target = substr($1, RSTART + 2, RLENGTH - 2)
         sub(/O[0-9]+$/, "", highway_target)
       }
@@ -395,6 +396,10 @@ compare_functions() {
       }
       if (port_total == 0) {
         printf "** ERROR: found no port functions to compare\n" > "/dev/stderr"
+        failed = 1
+      }
+      if (highway_target == "") {
+        printf "** ERROR: found no targetOfHighway to read the target from\n" > "/dev/stderr"
         failed = 1
       }
 

@@ -13,6 +13,7 @@ readonly repository_root
 readonly version_file="${repository_root}/highway-version.json"
 readonly vendor_root="${repository_root}/HighwayReference/CHighway"
 readonly include_root="${vendor_root}/include"
+readonly port_vendor_root="${repository_root}/Sources/CVectorizationOps/vendor"
 readonly module_map="${include_root}/module.modulemap"
 readonly patch_root="${repository_root}/patches"
 
@@ -20,6 +21,13 @@ readonly patch_root="${repository_root}/patches"
 # headers reach.
 readonly -a module_seed_headers=(
   hwy/highway.h
+)
+
+# The headers the product itself includes to pick its target the way highway does, by their
+# path upstream and their path under the vendor root of the product.
+readonly -A port_headers=(
+  ["hwy/detect_targets.h"]="detect_targets.h"
+  ["hwy/detect_compiler_arch.h"]="hwy/detect_compiler_arch.h"
 )
 
 clone_dir=""
@@ -236,6 +244,26 @@ copy_sources() {
   return 0
 }
 
+copy_port_headers() {
+  local clone_dir="${1:?copy_port_headers requires the clone directory}"
+
+  log "Copying ${#port_headers[@]} headers for the product..."
+  local upstream_path destination
+  for upstream_path in "${!port_headers[@]}"; do
+    destination="${port_vendor_root}/${port_headers["${upstream_path}"]}"
+
+    if [[ ! -f "${clone_dir}/${upstream_path}" ]]; then
+      fatal "The product needs '${upstream_path}' but the clone does not have it"
+    fi
+
+    mkdir -p -- "$(dirname -- "${destination}")"
+    if ! cp -- "${clone_dir}/${upstream_path}" "${destination}"; then
+      fatal "Failed to copy '${upstream_path}' into '${port_vendor_root}'"
+    fi
+  done
+  return 0
+}
+
 copy_license() {
   local clone_dir="${1:?copy_license requires the clone directory}"
 
@@ -413,12 +441,13 @@ main() {
     fatal "Parsed no library sources out of '${clone_dir}/CMakeLists.txt'"
   fi
 
-  log "Removing the previously vendored tree..."
-  rm -rf -- "${include_root}/hwy"
+  log "Removing the previously vendored trees..."
+  rm -rf -- "${include_root}/hwy" "${port_vendor_root}"
   mkdir -p -- "${include_root}"
 
   copy_headers "${clone_dir}"
   copy_sources "${clone_dir}" source_paths
+  copy_port_headers "${clone_dir}"
   copy_license "${clone_dir}"
   copy_quick_reference "${clone_dir}"
   apply_patches "${ref}" "${commit}"

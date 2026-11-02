@@ -7,6 +7,9 @@ public enum SIMDInt64: SIMDElement, SIMDIntegerElement, SendableMetatype {
     public typealias Lane = Int64
 
     public struct Vector: Sendable {
+        /// The SIMD type a `Vector` converts to and from, whose width is the target's.
+        public typealias SIMDType = cvectorization_ops_vector_i64
+
         public var raw: cvectorization_ops_raw_vector_i64
 
         @export(implementation) @inline(always)
@@ -15,15 +18,18 @@ public enum SIMDInt64: SIMDElement, SIMDIntegerElement, SendableMetatype {
         }
 
         @export(implementation) @inline(always)
-        public init(_ simd: SIMD2<Int64>) {
+        public init(_ simd: SIMDType) {
             raw = cvectorization_ops_to_raw_vector_i64(simd)
         }
 
         @export(implementation) @inline(always)
-        public var simd: SIMD2<Int64> { cvectorization_ops_from_raw_vector_i64(raw) }
+        public var simd: SIMDType { cvectorization_ops_from_raw_vector_i64(raw) }
     }
 
     public struct Mask: Sendable {
+        /// The SIMD mask type a `Mask` converts to and from, whose width is the target's.
+        public typealias SIMDType = SIMDMask<cvectorization_ops_mask_i64>
+
         public var raw: cvectorization_ops_raw_mask_i64
 
         @export(implementation) @inline(always)
@@ -32,13 +38,13 @@ public enum SIMDInt64: SIMDElement, SIMDIntegerElement, SendableMetatype {
         }
 
         @export(implementation) @inline(always)
-        public init(_ simd: SIMDMask<SIMD2<Int64>>) {
+        public init(_ simd: SIMDType) {
             raw = cvectorization_ops_to_raw_mask_i64(simd._storage)
         }
 
         @export(implementation) @inline(always)
-        public var simd: SIMDMask<SIMD2<Int64>> {
-            SIMDMask<SIMD2<Int64>>(cvectorization_ops_from_raw_mask_i64(raw))
+        public var simd: SIMDType {
+            SIMDType(cvectorization_ops_from_raw_mask_i64(raw))
         }
     }
 
@@ -125,7 +131,7 @@ public enum SIMDInt64: SIMDElement, SIMDIntegerElement, SendableMetatype {
     @export(implementation) @inline(always)
     public static func loadFirst(from span: Span<Lane>) -> Vector {
         span.withUnsafeBufferPointer {
-            Vector(raw: unsafe cvectorization_ops_load_first_i64($0.baseAddress, $0.count))
+            Vector(raw: unsafe cvectorization_ops_load_first_span_i64($0.baseAddress, $0.count))
         }
     }
 

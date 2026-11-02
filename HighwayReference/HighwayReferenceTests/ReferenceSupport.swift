@@ -188,6 +188,41 @@ enum Inputs {
         return rotations + random
     }
 
+    static func byteBuffers(count: Int, seed: UInt64) -> [[UInt8]] {
+        var generator = SplitMix64(seed: seed)
+        let digits = Array(UInt8(ascii: "0")...UInt8(ascii: "9"))
+        let lowercase = Array(UInt8(ascii: "a")...UInt8(ascii: "z"))
+        let uppercase = Array(UInt8(ascii: "A")...UInt8(ascii: "Z"))
+        let alphabets = [
+            digits, lowercase, uppercase, digits + lowercase, digits + lowercase + uppercase,
+            Array(0...0x7F), Array(0...0xFF),
+        ]
+        let texts = alphabets.flatMap { alphabet in
+            (0..<(randomCount / 4)).map { _ in
+                (0..<count).map { _ in alphabet[Int(generator.next() % UInt64(alphabet.count))] }
+            }
+        }
+        let scalarRanges: [ClosedRange<UInt32>] = [
+            0...0x7F, 0x80...0x7FF, 0x800...0xD7FF, 0xE000...0xFFFF, 0x1_0000...0x10_FFFF,
+        ]
+        let encodings = (0..<(randomCount / 4)).map { _ in
+            var bytes: [UInt8] = []
+            while bytes.count < count {
+                let range = scalarRanges[Int(generator.next() % UInt64(scalarRanges.count))]
+                let value = range.lowerBound + UInt32(generator.next() % UInt64(range.count))
+                bytes += Array(String(Unicode.Scalar(value)!).utf8)
+            }
+            return Array(bytes.prefix(count))
+        }
+        let corruptions = encodings.map { encoding in
+            var corrupted = encoding
+            let index = Int(generator.next() % UInt64(count))
+            corrupted[index] = UInt8(truncatingIfNeeded: generator.next())
+            return corrupted
+        }
+        return buffers(UInt8.self, count: count, seed: seed) + texts + encodings + corruptions
+    }
+
     static func sentinel<Lane: ReferenceLane>(_ type: Lane.Type, count: Int) -> [Lane] {
         let edges = Lane.edges
         return (0..<count).map { edges[($0 * 7 + 3) % edges.count] }
@@ -232,17 +267,26 @@ enum Inputs {
         }
     }
 
+    static func counts(through limit: Int) -> [Int] {
+        Array(0...limit)
+    }
+
     static func laneAmounts(lanes: Int, inContract: Bool) -> [Int] {
         inContract ? Array(0..<lanes) : [lanes]
     }
 
+    static func countsBeyond32Bits(lanes: Int) -> [Int] {
+        [1 << 32, (1 << 32) + 1, (1 << 32) + lanes]
+    }
+
     static func bufferCounts(lanes: Int) -> [Int] {
-        Array(0...(lanes + 1)) + [2 * lanes, 1000]
+        Array(0...(lanes + 1)) + [2 * lanes, 1000] + countsBeyond32Bits(lanes: lanes)
     }
 
     static func maskCounts<Lane: FixedWidthInteger>(lanes: Int, lane: Lane.Type) -> [Int] {
         let limit = Lane.bitWidth >= Int.bitWidth ? Int.max : (1 << (Lane.bitWidth - 1)) - 1
-        return Array(0...(lanes + 1)) + [limit]
+        let beyond32Bits = countsBeyond32Bits(lanes: lanes).filter { $0 <= limit }
+        return Array(0...(lanes + 1)) + [limit] + beyond32Bits
     }
 }
 
@@ -280,14 +324,31 @@ func mixedQuadruples<A, B, C, D>(
 
 func withAlignedLanes<Lane: ReferenceLane, Result>(
     _ lanes: [Lane],
+    laneCount: Int,
     _ body: (UnsafeMutablePointer<Lane>) -> Result
 ) -> (result: Result, lanes: [Lane]) {
     let byteCount = max(lanes.count, 1) * MemoryLayout<Lane>.stride
-    let raw = UnsafeMutableRawPointer.allocate(byteCount: byteCount, alignment: 16)
+    let alignment = laneCount * MemoryLayout<Lane>.stride
+    let raw = UnsafeMutableRawPointer.allocate(byteCount: byteCount, alignment: alignment)
     defer { unsafe raw.deallocate() }
     let pointer = unsafe raw.initializeMemory(as: Lane.self, from: lanes, count: lanes.count)
     let result = unsafe body(pointer)
     return (result, unsafe Array(UnsafeBufferPointer(start: pointer, count: lanes.count)))
+}
+
+func withOutputSpan<Lane: ReferenceLane, Result>(
+    capacity: Int,
+    _ body: (inout OutputSpan<Lane>) -> Result
+) -> (result: Result, lanes: [Lane]) {
+    let sentinel = Inputs.sentinel(Lane.self, count: capacity + 4)
+    let buffer = UnsafeMutableBufferPointer<Lane>.allocate(capacity: sentinel.count)
+    defer { unsafe buffer.deallocate() }
+    _ = unsafe buffer.initialize(from: sentinel)
+    let region = unsafe UnsafeMutableBufferPointer(rebasing: buffer[0..<capacity])
+    var output = unsafe OutputSpan(buffer: region, initializedCount: 0)
+    let result = body(&output)
+    _ = unsafe output.finalize(for: region)
+    return (result, unsafe Array(buffer))
 }
 
 func withGuardedLanes<Lane: ReferenceLane, Result>(
@@ -311,6 +372,34 @@ func withGuardedLanes<Lane: ReferenceLane, Result>(
     unsafe pointer.initialize(from: lanes, count: lanes.count)
     let result = unsafe body(pointer)
     return (result, unsafe Array(UnsafeBufferPointer(start: pointer, count: lanes.count)))
+}
+
+func hasUnorderedNaNs<V: SIMD>(_ operands: V...) -> Bool
+where V.Scalar: ReferenceLane & BinaryFloatingPoint {
+    (0..<V.scalarCount).contains { lane in
+        Set(operands.map { $0[lane] }.filter(\.isNaN).map(\.bits)).count > 1
+    }
+}
+
+func hasUnorderedNaNs<V: SIMD>(multiplying a: V, _ b: V, adding c: V) -> Bool
+where V.Scalar: ReferenceLane & BinaryFloatingPoint {
+    (0..<V.scalarCount).contains { lane in
+        let (first, second, addend) = (a[lane], b[lane], c[lane])
+        let hasInvalidProduct =
+            (first.isInfinite && second == 0) || (second.isInfinite && first == 0)
+        let multiplicandsDiffer = first.isNaN && second.isNaN && first.bits != second.bits
+        let productMeetsAddend =
+            addend.isNaN && (first.isNaN || second.isNaN || hasInvalidProduct)
+        return multiplicandsDiffer || productMeetsAddend
+    }
+}
+
+func hasUnorderedNaNs<V: SIMD>(lanesOf vector: V) -> Bool
+where V.Scalar: ReferenceLane & BinaryFloatingPoint {
+    let lanes = (0..<V.scalarCount).map { vector[$0] }
+    let payloads = Set(lanes.filter(\.isNaN).map(\.bits))
+    let hasOppositeInfinities = lanes.contains(.infinity) && lanes.contains(-.infinity)
+    return payloads.count > 1 || (!payloads.isEmpty && hasOppositeInfinities)
 }
 
 func hex<Lane: ReferenceLane>(_ lane: Lane) -> String {
@@ -401,6 +490,10 @@ final class Mismatches {
     }
 
     func check(_ port: Bool, _ reference: Bool, _ inputs: @autoclosure () -> String) {
+        note(port == reference, "port \(port), Highway \(reference)", inputs)
+    }
+
+    func check(_ port: String, _ reference: String, _ inputs: @autoclosure () -> String) {
         note(port == reference, "port \(port), Highway \(reference)", inputs)
     }
 

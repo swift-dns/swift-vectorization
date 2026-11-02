@@ -17,7 +17,11 @@ readonly vendor_root="${repository_root}/HighwayReference/CHighway"
 # The upstream files whose implementation of each op the generated C ops reproduce.
 readonly -a followed_implementations=(
   "${vendor_root}/include/hwy/ops/arm_neon-inl.h"
+  "${vendor_root}/include/hwy/ops/arm_sve-inl.h"
   "${vendor_root}/include/hwy/ops/x86_128-inl.h"
+  "${vendor_root}/include/hwy/ops/x86_256-inl.h"
+  "${vendor_root}/include/hwy/ops/x86_512-inl.h"
+  "${vendor_root}/include/hwy/ops/x86_avx3-inl.h"
   "${vendor_root}/include/hwy/ops/emu128-inl.h"
   "${vendor_root}/include/hwy/ops/generic_ops-inl.h"
 )

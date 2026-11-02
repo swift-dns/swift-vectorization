@@ -10,22 +10,6 @@ extension SIMDFloat.Mask: ReferenceMask {}
 struct SIMDFloatReferenceTests {
     typealias H = SIMDFloat
 
-    func reference(_ vector: H.Vector) -> HighwayReference.VectorF32 {
-        HighwayReference.fromPortF32(vector)
-    }
-
-    func port(_ vector: HighwayReference.VectorF32) -> H.Vector {
-        HighwayReference.toPortF32(vector)
-    }
-
-    func reference(_ mask: H.Mask) -> HighwayReference.MaskF32 {
-        HighwayReference.maskFromPortF32(mask.simd._storage)
-    }
-
-    func port(_ mask: HighwayReference.MaskF32) -> H.Mask {
-        H.Mask(SIMDMask<SIMD4<Int32>>(HighwayReference.maskToPortF32(mask)))
-    }
-
     @Test func laneCount() {
         let mismatches = Mismatches("laneCount")
         mismatches.check(H.laneCount, HighwayReference.laneCountF32(), "")
@@ -34,7 +18,7 @@ struct SIMDFloatReferenceTests {
 
     @Test func zero() {
         let mismatches = Mismatches("zero")
-        mismatches.check(H.zero(), port(HighwayReference.zeroF32()), "")
+        mismatches.check(H.zero(), HighwayReference.zeroF32(), "")
         mismatches.record()
     }
 
@@ -44,7 +28,7 @@ struct SIMDFloatReferenceTests {
         for value in valueInputs {
             mismatches.check(
                 H.repeating(value),
-                port(HighwayReference.repeatingF32(value)),
+                HighwayReference.repeatingF32(value),
                 "value: \(hex(value))"
             )
         }
@@ -55,23 +39,23 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("iota")
         let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x042E_153E_76F5_AD61)
         for value in valueInputs {
-            mismatches.check(
-                H.iota(value),
-                port(HighwayReference.iotaF32(value)),
-                "value: \(hex(value))"
-            )
+            mismatches.check(H.iota(value), HighwayReference.iotaF32(value), "value: \(hex(value))")
         }
         mismatches.record()
     }
 
     @Test func load() {
         let mismatches = Mismatches("load")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 4, seed: 0x8DF2_FD1F_B336_3AE2)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x8DF2_FD1F_B336_3AE2
+        )
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.load(from: source.baseAddress!),
-                    unsafe port(HighwayReference.loadF32(source.baseAddress!))
+                    unsafe HighwayReference.loadF32(source.baseAddress!)
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -81,10 +65,14 @@ struct SIMDFloatReferenceTests {
 
     @Test func loadBeforeGuardPage() {
         let mismatches = Mismatches("load before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 4, seed: 0xAB77_79E3_5307_7FA3)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xAB77_79E3_5307_7FA3
+        )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
-                (unsafe H.load(from: source), unsafe port(HighwayReference.loadF32(source)))
+                (unsafe H.load(from: source), unsafe HighwayReference.loadF32(source))
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
@@ -93,13 +81,17 @@ struct SIMDFloatReferenceTests {
 
     @Test func loadAligned() {
         let mismatches = Mismatches("loadAligned")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 4, seed: 0x6BEF_2726_391B_F418)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x6BEF_2726_391B_F418
+        )
         for from in fromInputs {
-            let (portResult, referenceResult) = unsafe withAlignedLanes(from) { source in
-                (
-                    unsafe H.loadAligned(from: source),
-                    unsafe port(HighwayReference.loadAlignedF32(source))
-                )
+            let (portResult, referenceResult) = unsafe withAlignedLanes(
+                from,
+                laneCount: H.laneCount
+            ) { source in
+                (unsafe H.loadAligned(from: source), unsafe HighwayReference.loadAlignedF32(source))
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
@@ -108,13 +100,14 @@ struct SIMDFloatReferenceTests {
 
     @Test func loadAlignedBeforeGuardPage() {
         let mismatches = Mismatches("loadAligned before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 4, seed: 0x9919_3323_5D77_3571)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x9919_3323_5D77_3571
+        )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
-                (
-                    unsafe H.loadAligned(from: source),
-                    unsafe port(HighwayReference.loadAlignedF32(source))
-                )
+                (unsafe H.loadAligned(from: source), unsafe HighwayReference.loadAlignedF32(source))
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
@@ -123,13 +116,17 @@ struct SIMDFloatReferenceTests {
 
     @Test func loadFirst() {
         let mismatches = Mismatches("loadFirst")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 4, seed: 0x2C0D_75DE_4098_D0A6)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x2C0D_75DE_4098_D0A6
+        )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirst(from: source.baseAddress!, count: count),
-                    unsafe port(HighwayReference.loadFirstF32(source.baseAddress!, count))
+                    unsafe HighwayReference.loadFirstF32(source.baseAddress!, count)
                 )
             }
             mismatches.check(
@@ -143,14 +140,18 @@ struct SIMDFloatReferenceTests {
 
     @Test func loadFirstBeforeGuardPage() {
         let mismatches = Mismatches("loadFirst before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 4, seed: 0x460F_6B78_1153_4F57)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x460F_6B78_1153_4F57
+        )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count),
-                    unsafe port(HighwayReference.loadFirstF32(source, count))
+                    unsafe HighwayReference.loadFirstF32(source, count)
                 )
             }.result
             mismatches.check(
@@ -165,7 +166,7 @@ struct SIMDFloatReferenceTests {
     @Test func store() {
         let mismatches = Mismatches("store")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC2EE_15A5_D0A3_859D)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -173,7 +174,7 @@ struct SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeF32(reference(a), destination.baseAddress!)
+                unsafe HighwayReference.storeF32(a, destination.baseAddress!)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -183,13 +184,13 @@ struct SIMDFloatReferenceTests {
     @Test func storeBeforeGuardPage() {
         let mismatches = Mismatches("store before a guard page")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x50B0_D6CD_444D_148A)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
         for a in aInputs {
             let portLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeF32(reference(a), destination)
+                unsafe HighwayReference.storeF32(a, destination)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -199,13 +200,13 @@ struct SIMDFloatReferenceTests {
     @Test func storeAligned() {
         let mismatches = Mismatches("storeAligned")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2202_A492_C454_C3CD)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
         for a in aInputs {
-            let portLanes = unsafe withAlignedLanes(sentinel) { destination in
-                unsafe H.storeAligned(a, to: destination)
+            let portLanes = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
+                destination in unsafe H.storeAligned(a, to: destination)
             }.lanes
-            let referenceLanes = unsafe withAlignedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeAlignedF32(reference(a), destination)
+            let referenceLanes = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
+                destination in unsafe HighwayReference.storeAlignedF32(a, destination)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -215,13 +216,13 @@ struct SIMDFloatReferenceTests {
     @Test func storeAlignedBeforeGuardPage() {
         let mismatches = Mismatches("storeAligned before a guard page")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1ABA_6A0C_2152_18DA)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
         for a in aInputs {
             let portLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeAligned(a, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeAlignedF32(reference(a), destination)
+                unsafe HighwayReference.storeAlignedF32(a, destination)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -232,7 +233,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("storeFirst")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x97A2_AA0E_F514_F127)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
         for (a, count) in everyPair(aInputs, countInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -240,7 +241,7 @@ struct SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeFirstF32(reference(a), destination.baseAddress!, count)
+                unsafe HighwayReference.storeFirstF32(a, destination.baseAddress!, count)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
         }
@@ -251,14 +252,13 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("storeFirst before a guard page")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD96_5766_B400_062C)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
         for (a, count) in everyPair(aInputs, countInputs) {
             let portLanes = unsafe withGuardedLanes(Array(sentinel.prefix(count))) { destination in
                 unsafe H.storeFirst(a, to: destination, count: count)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
-                destination in
-                unsafe HighwayReference.storeFirstF32(reference(a), destination, count)
+                destination in unsafe HighwayReference.storeFirstF32(a, destination, count)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
         }
@@ -272,7 +272,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.adding(a, b),
-                port(HighwayReference.addingF32(reference(a), reference(b))),
+                HighwayReference.addingF32(a, b),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -286,7 +286,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.subtracting(a, b),
-                port(HighwayReference.subtractingF32(reference(a), reference(b))),
+                HighwayReference.subtractingF32(a, b),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -300,7 +300,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                port(HighwayReference.multiplyingF32(reference(a), reference(b))),
+                HighwayReference.multiplyingF32(a, b),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -314,7 +314,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.dividing(a, b),
-                port(HighwayReference.dividingF32(reference(a), reference(b))),
+                HighwayReference.dividingF32(a, b),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -328,7 +328,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimum(a, b),
-                port(HighwayReference.minimumF32(reference(a), reference(b))),
+                HighwayReference.minimumF32(a, b),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -342,7 +342,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximum(a, b),
-                port(HighwayReference.maximumF32(reference(a), reference(b))),
+                HighwayReference.maximumF32(a, b),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -353,11 +353,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("negated")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8746_E74C_180B_589E)
         for a in aInputs {
-            mismatches.check(
-                H.negated(a),
-                port(HighwayReference.negatedF32(reference(a))),
-                "a: \(describe(a))"
-            )
+            mismatches.check(H.negated(a), HighwayReference.negatedF32(a), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -366,11 +362,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("magnitude")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5FFE_A7F8_B18C_617E)
         for a in aInputs {
-            mismatches.check(
-                H.magnitude(a),
-                port(HighwayReference.magnitudeF32(reference(a))),
-                "a: \(describe(a))"
-            )
+            mismatches.check(H.magnitude(a), HighwayReference.magnitudeF32(a), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -381,7 +373,7 @@ struct SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.squareRoot(a),
-                port(HighwayReference.squareRootF32(reference(a))),
+                HighwayReference.squareRootF32(a),
                 "a: \(describe(a))"
             )
         }
@@ -396,7 +388,7 @@ struct SIMDFloatReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7407_DBB7_7944_5749) {
             mismatches.check(
                 H.multiplyAdding(a, b, c),
-                port(HighwayReference.multiplyAddingF32(reference(a), reference(b), reference(c))),
+                HighwayReference.multiplyAddingF32(a, b, c),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -410,7 +402,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
-                port(HighwayReference.equalToF32(reference(a), reference(b))),
+                H.Mask(raw: HighwayReference.equalToF32(a, b)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -424,7 +416,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
-                port(HighwayReference.notEqualToF32(reference(a), reference(b))),
+                H.Mask(raw: HighwayReference.notEqualToF32(a, b)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -438,7 +430,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
-                port(HighwayReference.lessThanF32(reference(a), reference(b))),
+                H.Mask(raw: HighwayReference.lessThanF32(a, b)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -452,7 +444,7 @@ struct SIMDFloatReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
-                port(HighwayReference.greaterThanF32(reference(a), reference(b))),
+                H.Mask(raw: HighwayReference.greaterThanF32(a, b)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -468,7 +460,7 @@ struct SIMDFloatReferenceTests {
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                port(HighwayReference.selectingF32(reference(mask), reference(a), reference(b))),
+                HighwayReference.selectingF32(mask.raw, a, b),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -482,7 +474,7 @@ struct SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                port(HighwayReference.selectingOrZeroF32(reference(mask), reference(a))),
+                HighwayReference.selectingOrZeroF32(mask.raw, a),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -496,7 +488,7 @@ struct SIMDFloatReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                port(HighwayReference.zeroingSelectedF32(reference(mask), reference(a))),
+                HighwayReference.zeroingSelectedF32(mask.raw, a),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -509,7 +501,7 @@ struct SIMDFloatReferenceTests {
         for count in countInputs {
             mismatches.check(
                 H.firstLanes(count: count),
-                port(HighwayReference.firstLanesF32(count)),
+                H.Mask(raw: HighwayReference.firstLanesF32(count)),
                 "count: \(count)"
             )
         }
@@ -522,7 +514,7 @@ struct SIMDFloatReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.allTrue(mask),
-                HighwayReference.allTrueF32(reference(mask)),
+                HighwayReference.allTrueF32(mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -535,7 +527,7 @@ struct SIMDFloatReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.allFalse(mask),
-                HighwayReference.allFalseF32(reference(mask)),
+                HighwayReference.allFalseF32(mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -548,7 +540,7 @@ struct SIMDFloatReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.trueCount(mask),
-                HighwayReference.trueCountF32(reference(mask)),
+                HighwayReference.trueCountF32(mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -561,7 +553,7 @@ struct SIMDFloatReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.firstTrueIndex(mask),
-                HighwayReference.firstTrueIndexF32(reference(mask)),
+                HighwayReference.firstTrueIndexF32(mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -572,7 +564,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("sum")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDF4F_8089_1FE7_126B)
         for a in aInputs {
-            mismatches.check(H.sum(a), HighwayReference.sumF32(reference(a)), "a: \(describe(a))")
+            mismatches.check(H.sum(a), HighwayReference.sumF32(a), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -581,11 +573,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("smallest")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x42C2_432F_5335_A5CF)
         for a in aInputs {
-            mismatches.check(
-                H.smallest(a),
-                HighwayReference.smallestF32(reference(a)),
-                "a: \(describe(a))"
-            )
+            mismatches.check(H.smallest(a), HighwayReference.smallestF32(a), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -596,7 +584,7 @@ struct SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.smallestOrNaN(a),
-                HighwayReference.smallestOrNaNF32(reference(a)),
+                HighwayReference.smallestOrNaNF32(a),
                 "a: \(describe(a))"
             )
         }
@@ -607,11 +595,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("largest")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4AFC_26B0_A5FA_9598)
         for a in aInputs {
-            mismatches.check(
-                H.largest(a),
-                HighwayReference.largestF32(reference(a)),
-                "a: \(describe(a))"
-            )
+            mismatches.check(H.largest(a), HighwayReference.largestF32(a), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -622,7 +606,7 @@ struct SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.largestOrNaN(a),
-                HighwayReference.largestOrNaNF32(reference(a)),
+                HighwayReference.largestOrNaNF32(a),
                 "a: \(describe(a))"
             )
         }
@@ -633,11 +617,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("firstLane")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1DEB_915F_D5C9_8C10)
         for a in aInputs {
-            mismatches.check(
-                H.firstLane(a),
-                HighwayReference.firstLaneF32(reference(a)),
-                "a: \(describe(a))"
-            )
+            mismatches.check(H.firstLane(a), HighwayReference.firstLaneF32(a), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -646,11 +626,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("reversed")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1727_80A8_FF51_8818)
         for a in aInputs {
-            mismatches.check(
-                H.reversed(a),
-                port(HighwayReference.reversedF32(reference(a))),
-                "a: \(describe(a))"
-            )
+            mismatches.check(H.reversed(a), HighwayReference.reversedF32(a), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -662,7 +638,7 @@ struct SIMDFloatReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                port(HighwayReference.slideUpLanesF32(reference(a), lanes)),
+                HighwayReference.slideUpLanesF32(a, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -676,7 +652,7 @@ struct SIMDFloatReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                port(HighwayReference.slideUpLanesF32(reference(a), lanes)),
+                HighwayReference.slideUpLanesF32(a, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -696,13 +672,7 @@ struct SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                port(
-                    HighwayReference.slideUpLanesFillingWithF32(
-                        reference(fill),
-                        reference(a),
-                        lanes
-                    )
-                ),
+                HighwayReference.slideUpLanesFillingWithF32(fill, a, lanes),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -722,13 +692,7 @@ struct SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                port(
-                    HighwayReference.slideUpLanesFillingWithF32(
-                        reference(fill),
-                        reference(a),
-                        lanes
-                    )
-                ),
+                HighwayReference.slideUpLanesFillingWithF32(fill, a, lanes),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -742,7 +706,7 @@ struct SIMDFloatReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                port(HighwayReference.slideDownLanesF32(reference(a), lanes)),
+                HighwayReference.slideDownLanesF32(a, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -756,7 +720,7 @@ struct SIMDFloatReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                port(HighwayReference.slideDownLanesF32(reference(a), lanes)),
+                HighwayReference.slideDownLanesF32(a, lanes),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -776,13 +740,7 @@ struct SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                port(
-                    HighwayReference.slideDownLanesFillingWithF32(
-                        reference(fill),
-                        reference(a),
-                        lanes
-                    )
-                ),
+                HighwayReference.slideDownLanesFillingWithF32(fill, a, lanes),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -802,13 +760,7 @@ struct SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                port(
-                    HighwayReference.slideDownLanesFillingWithF32(
-                        reference(fill),
-                        reference(a),
-                        lanes
-                    )
-                ),
+                HighwayReference.slideDownLanesFillingWithF32(fill, a, lanes),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -819,11 +771,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("slide1Up")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA78A_4C88_C25F_AC3B)
         for a in aInputs {
-            mismatches.check(
-                H.slide1Up(a),
-                port(HighwayReference.slide1UpF32(reference(a))),
-                "a: \(describe(a))"
-            )
+            mismatches.check(H.slide1Up(a), HighwayReference.slide1UpF32(a), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -835,7 +783,7 @@ struct SIMDFloatReferenceTests {
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slide1Up(a, fillingWith: fill),
-                port(HighwayReference.slide1UpFillingWithF32(fill, reference(a))),
+                HighwayReference.slide1UpFillingWithF32(fill, a),
                 "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
@@ -848,7 +796,7 @@ struct SIMDFloatReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.slide1Down(a),
-                port(HighwayReference.slide1DownF32(reference(a))),
+                HighwayReference.slide1DownF32(a),
                 "a: \(describe(a))"
             )
         }
@@ -862,7 +810,7 @@ struct SIMDFloatReferenceTests {
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slide1Down(a, fillingWith: fill),
-                port(HighwayReference.slide1DownFillingWithF32(fill, reference(a))),
+                HighwayReference.slide1DownFillingWithF32(fill, a),
                 "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
@@ -871,7 +819,11 @@ struct SIMDFloatReferenceTests {
 
     @Test func loadInterleaved2() {
         let mismatches = Mismatches("loadInterleaved2")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0xC861_AB6E_BA0E_E521)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0xC861_AB6E_BA0E_E521
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
@@ -881,15 +833,19 @@ struct SIMDFloatReferenceTests {
                 unsafe H.loadInterleaved2(from: source.baseAddress!, &p0, &p1)
                 unsafe HighwayReference.loadInterleaved2F32(source.baseAddress!, &r0, &r1)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved2BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved2 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x8124_6A00_CB9B_761E)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x8124_6A00_CB9B_761E
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
@@ -899,15 +855,19 @@ struct SIMDFloatReferenceTests {
                 unsafe H.loadInterleaved2(from: source, &p0, &p1)
                 unsafe HighwayReference.loadInterleaved2F32(source, &r0, &r1)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved3() {
         let mismatches = Mismatches("loadInterleaved3")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 12, seed: 0xD01D_426E_BE2C_C696)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 3 * H.laneCount,
+            seed: 0xD01D_426E_BE2C_C696
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
@@ -919,16 +879,20 @@ struct SIMDFloatReferenceTests {
                 unsafe H.loadInterleaved3(from: source.baseAddress!, &p0, &p1, &p2)
                 unsafe HighwayReference.loadInterleaved3F32(source.baseAddress!, &r0, &r1, &r2)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
-            mismatches.check(p2, port(r2), "from: \(describe(from)), v2")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved3BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved3 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 12, seed: 0xFD19_A0D4_B721_4A67)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 3 * H.laneCount,
+            seed: 0xFD19_A0D4_B721_4A67
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
@@ -940,16 +904,20 @@ struct SIMDFloatReferenceTests {
                 unsafe H.loadInterleaved3(from: source, &p0, &p1, &p2)
                 unsafe HighwayReference.loadInterleaved3F32(source, &r0, &r1, &r2)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
-            mismatches.check(p2, port(r2), "from: \(describe(from)), v2")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved4() {
         let mismatches = Mismatches("loadInterleaved4")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0xD8B2_796E_C303_A8AB)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 4 * H.laneCount,
+            seed: 0xD8B2_796E_C303_A8AB
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
@@ -963,17 +931,21 @@ struct SIMDFloatReferenceTests {
                 unsafe H.loadInterleaved4(from: source.baseAddress!, &p0, &p1, &p2, &p3)
                 unsafe HighwayReference.loadInterleaved4F32(source.baseAddress!, &r0, &r1, &r2, &r3)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
-            mismatches.check(p2, port(r2), "from: \(describe(from)), v2")
-            mismatches.check(p3, port(r3), "from: \(describe(from)), v3")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+            mismatches.check(p3, r3, "from: \(describe(from)), v3")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved4BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved4 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0x207B_862E_9777_65B0)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 4 * H.laneCount,
+            seed: 0x207B_862E_9777_65B0
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
@@ -987,10 +959,10 @@ struct SIMDFloatReferenceTests {
                 unsafe H.loadInterleaved4(from: source, &p0, &p1, &p2, &p3)
                 unsafe HighwayReference.loadInterleaved4F32(source, &r0, &r1, &r2, &r3)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
-            mismatches.check(p2, port(r2), "from: \(describe(from)), v2")
-            mismatches.check(p3, port(r3), "from: \(describe(from)), v3")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+            mismatches.check(p3, r3, "from: \(describe(from)), v3")
         }
         mismatches.record()
     }
@@ -999,7 +971,7 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("storeInterleaved2")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x168F_B4D8_65A2_54D6)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x168F_B5D8_65A2_5689)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 8 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
         for (a, b) in everyPair(aInputs, bInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1007,11 +979,7 @@ struct SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeInterleaved2F32(
-                    reference(a),
-                    reference(b),
-                    destination.baseAddress!
-                )
+                unsafe HighwayReference.storeInterleaved2F32(a, b, destination.baseAddress!)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
         }
@@ -1022,17 +990,13 @@ struct SIMDFloatReferenceTests {
         let mismatches = Mismatches("storeInterleaved2 before a guard page")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1E0B_1FCC_DDE5_2FA7)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1E0B_1ECC_DDE5_2DF4)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 8)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
         for (a, b) in everyPair(aInputs, bInputs) {
             let portLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeInterleaved2(a, b, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeInterleaved2F32(
-                    reference(a),
-                    reference(b),
-                    destination
-                )
+                unsafe HighwayReference.storeInterleaved2F32(a, b, destination)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
         }
@@ -1044,7 +1008,7 @@ struct SIMDFloatReferenceTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0ED4_1DD8_6184_7361)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0ED4_1CD8_6184_71AE)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x0ED4_1BD8_6184_6FFB)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 12 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x0987_E1D0_987F_BA5B) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1052,12 +1016,7 @@ struct SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeInterleaved3F32(
-                    reference(a),
-                    reference(b),
-                    reference(c),
-                    destination.baseAddress!
-                )
+                unsafe HighwayReference.storeInterleaved3F32(a, b, c, destination.baseAddress!)
             }
             mismatches.check(
                 portLanes,
@@ -1073,18 +1032,13 @@ struct SIMDFloatReferenceTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x94EF_67C8_988C_655E)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x94EF_68C8_988C_6711)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x94EF_65C8_988C_61F8)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 12)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7032_C48B_7DBF_F47A) {
             let portLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeInterleaved3(a, b, c, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeInterleaved3F32(
-                    reference(a),
-                    reference(b),
-                    reference(c),
-                    destination
-                )
+                unsafe HighwayReference.storeInterleaved3F32(a, b, c, destination)
             }.lanes
             mismatches.check(
                 portLanes,
@@ -1101,7 +1055,7 @@ struct SIMDFloatReferenceTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2893_83D8_7008_AE93)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2893_84D8_7008_B046)
         let dInputs = Inputs.vectors(H.Vector.self, seed: 0x2893_85D8_7008_B1F9)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -1115,13 +1069,7 @@ struct SIMDFloatReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeInterleaved4F32(
-                    reference(a),
-                    reference(b),
-                    reference(c),
-                    reference(d),
-                    destination.baseAddress!
-                )
+                unsafe HighwayReference.storeInterleaved4F32(a, b, c, d, destination.baseAddress!)
             }
             mismatches.check(
                 portLanes,
@@ -1138,7 +1086,7 @@ struct SIMDFloatReferenceTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x01DB_776D_9635_94A6)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x01DB_766D_9635_92F3)
         let dInputs = Inputs.vectors(H.Vector.self, seed: 0x01DB_756D_9635_9140)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -1150,13 +1098,7 @@ struct SIMDFloatReferenceTests {
                 unsafe H.storeInterleaved4(a, b, c, d, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeInterleaved4F32(
-                    reference(a),
-                    reference(b),
-                    reference(c),
-                    reference(d),
-                    destination
-                )
+                unsafe HighwayReference.storeInterleaved4F32(a, b, c, d, destination)
             }.lanes
             mismatches.check(
                 portLanes,
@@ -1173,9 +1115,7 @@ struct SIMDFloatReferenceTests {
         for vector in vectorInputs {
             mismatches.check(
                 H.repeatingBlock(vector[0], vector[1], vector[2], vector[3]),
-                port(
-                    HighwayReference.repeatingBlockF32(vector[0], vector[1], vector[2], vector[3])
-                ),
+                HighwayReference.repeatingBlockF32(vector[0], vector[1], vector[2], vector[3]),
                 "lanes: \(describe(vector))"
             )
         }

@@ -12,22 +12,6 @@ extension SIMDUInt64.Mask: ReferenceMask {}
 struct SIMDUInt64ReferenceTests {
     typealias H = SIMDUInt64
 
-    func reference(_ vector: H.Vector) -> HighwayReference.VectorU64 {
-        HighwayReference.fromPortU64(vector.simd)
-    }
-
-    func port(_ vector: HighwayReference.VectorU64) -> H.Vector {
-        H.Vector(HighwayReference.toPortU64(vector))
-    }
-
-    func reference(_ mask: H.Mask) -> HighwayReference.MaskU64 {
-        HighwayReference.maskFromPortU64(mask.simd._storage)
-    }
-
-    func port(_ mask: HighwayReference.MaskU64) -> H.Mask {
-        H.Mask(SIMDMask<SIMD2<Int64>>(HighwayReference.maskToPortU64(mask)))
-    }
-
     @Test func laneCount() {
         let mismatches = Mismatches("laneCount")
         mismatches.check(H.laneCount, HighwayReference.laneCountU64(), "")
@@ -36,7 +20,7 @@ struct SIMDUInt64ReferenceTests {
 
     @Test func zero() {
         let mismatches = Mismatches("zero")
-        mismatches.check(H.zero(), port(HighwayReference.zeroU64()), "")
+        mismatches.check(H.zero(), H.Vector(raw: HighwayReference.zeroU64()), "")
         mismatches.record()
     }
 
@@ -46,7 +30,7 @@ struct SIMDUInt64ReferenceTests {
         for value in valueInputs {
             mismatches.check(
                 H.repeating(value),
-                port(HighwayReference.repeatingU64(value)),
+                H.Vector(raw: HighwayReference.repeatingU64(value)),
                 "value: \(hex(value))"
             )
         }
@@ -59,7 +43,7 @@ struct SIMDUInt64ReferenceTests {
         for value in valueInputs {
             mismatches.check(
                 H.iota(value),
-                port(HighwayReference.iotaU64(value)),
+                H.Vector(raw: HighwayReference.iotaU64(value)),
                 "value: \(hex(value))"
             )
         }
@@ -68,12 +52,16 @@ struct SIMDUInt64ReferenceTests {
 
     @Test func load() {
         let mismatches = Mismatches("load")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 2, seed: 0xA900_D20D_491F_E580)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xA900_D20D_491F_E580
+        )
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.load(from: source.baseAddress!),
-                    unsafe port(HighwayReference.loadU64(source.baseAddress!))
+                    unsafe H.Vector(raw: HighwayReference.loadU64(source.baseAddress!))
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -83,10 +71,17 @@ struct SIMDUInt64ReferenceTests {
 
     @Test func loadBeforeGuardPage() {
         let mismatches = Mismatches("load before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 2, seed: 0x4EDE_4DA9_BE77_CD39)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x4EDE_4DA9_BE77_CD39
+        )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
-                (unsafe H.load(from: source), unsafe port(HighwayReference.loadU64(source)))
+                (
+                    unsafe H.load(from: source),
+                    unsafe H.Vector(raw: HighwayReference.loadU64(source))
+                )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
@@ -95,12 +90,19 @@ struct SIMDUInt64ReferenceTests {
 
     @Test func loadAligned() {
         let mismatches = Mismatches("loadAligned")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 2, seed: 0xB5E7_FBFD_0A05_AC7A)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xB5E7_FBFD_0A05_AC7A
+        )
         for from in fromInputs {
-            let (portResult, referenceResult) = unsafe withAlignedLanes(from) { source in
+            let (portResult, referenceResult) = unsafe withAlignedLanes(
+                from,
+                laneCount: H.laneCount
+            ) { source in
                 (
                     unsafe H.loadAligned(from: source),
-                    unsafe port(HighwayReference.loadAlignedU64(source))
+                    unsafe H.Vector(raw: HighwayReference.loadAlignedU64(source))
                 )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -110,12 +112,16 @@ struct SIMDUInt64ReferenceTests {
 
     @Test func loadAlignedBeforeGuardPage() {
         let mismatches = Mismatches("loadAligned before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 2, seed: 0x5188_6D05_EB52_0B7B)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x5188_6D05_EB52_0B7B
+        )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.loadAligned(from: source),
-                    unsafe port(HighwayReference.loadAlignedU64(source))
+                    unsafe H.Vector(raw: HighwayReference.loadAlignedU64(source))
                 )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -125,13 +131,17 @@ struct SIMDUInt64ReferenceTests {
 
     @Test func loadFirst() {
         let mismatches = Mismatches("loadFirst")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 2, seed: 0x6A3B_A6FA_0BE1_AFC4)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x6A3B_A6FA_0BE1_AFC4
+        )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirst(from: source.baseAddress!, count: count),
-                    unsafe port(HighwayReference.loadFirstU64(source.baseAddress!, count))
+                    unsafe H.Vector(raw: HighwayReference.loadFirstU64(source.baseAddress!, count))
                 )
             }
             mismatches.check(
@@ -145,14 +155,18 @@ struct SIMDUInt64ReferenceTests {
 
     @Test func loadFirstBeforeGuardPage() {
         let mismatches = Mismatches("loadFirst before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 2, seed: 0x756C_A8B0_09DF_08DD)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x756C_A8B0_09DF_08DD
+        )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count),
-                    unsafe port(HighwayReference.loadFirstU64(source, count))
+                    unsafe H.Vector(raw: HighwayReference.loadFirstU64(source, count))
                 )
             }.result
             mismatches.check(
@@ -167,7 +181,7 @@ struct SIMDUInt64ReferenceTests {
     @Test func store() {
         let mismatches = Mismatches("store")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD697_241E_322E_3EF7)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -175,7 +189,7 @@ struct SIMDUInt64ReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeU64(reference(a), destination.baseAddress!)
+                unsafe HighwayReference.storeU64(a.raw, destination.baseAddress!)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -185,13 +199,13 @@ struct SIMDUInt64ReferenceTests {
     @Test func storeBeforeGuardPage() {
         let mismatches = Mismatches("store before a guard page")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEBE2_2BB8_B930_1E9C)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
         for a in aInputs {
             let portLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeU64(reference(a), destination)
+                unsafe HighwayReference.storeU64(a.raw, destination)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -201,13 +215,13 @@ struct SIMDUInt64ReferenceTests {
     @Test func storeAligned() {
         let mismatches = Mismatches("storeAligned")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4A0A_0CB5_A4C2_AE83)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
         for a in aInputs {
-            let portLanes = unsafe withAlignedLanes(sentinel) { destination in
-                unsafe H.storeAligned(a, to: destination)
+            let portLanes = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
+                destination in unsafe H.storeAligned(a, to: destination)
             }.lanes
-            let referenceLanes = unsafe withAlignedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeAlignedU64(reference(a), destination)
+            let referenceLanes = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
+                destination in unsafe HighwayReference.storeAlignedU64(a.raw, destination)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -217,13 +231,13 @@ struct SIMDUInt64ReferenceTests {
     @Test func storeAlignedBeforeGuardPage() {
         let mismatches = Mismatches("storeAligned before a guard page")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4DE0_7B8F_77F9_2C08)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
         for a in aInputs {
             let portLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeAligned(a, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeAlignedU64(reference(a), destination)
+                unsafe HighwayReference.storeAlignedU64(a.raw, destination)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
@@ -234,7 +248,7 @@ struct SIMDUInt64ReferenceTests {
         let mismatches = Mismatches("storeFirst")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1933_5436_693A_9479)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
         for (a, count) in everyPair(aInputs, countInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -242,7 +256,7 @@ struct SIMDUInt64ReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeFirstU64(reference(a), destination.baseAddress!, count)
+                unsafe HighwayReference.storeFirstU64(a.raw, destination.baseAddress!, count)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
         }
@@ -253,14 +267,13 @@ struct SIMDUInt64ReferenceTests {
         let mismatches = Mismatches("storeFirst before a guard page")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5475_509D_D23E_BCB6)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
         for (a, count) in everyPair(aInputs, countInputs) {
             let portLanes = unsafe withGuardedLanes(Array(sentinel.prefix(count))) { destination in
                 unsafe H.storeFirst(a, to: destination, count: count)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
-                destination in
-                unsafe HighwayReference.storeFirstU64(reference(a), destination, count)
+                destination in unsafe HighwayReference.storeFirstU64(a.raw, destination, count)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
         }
@@ -274,7 +287,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.adding(a, b),
-                port(HighwayReference.addingU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.addingU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -288,7 +301,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.subtracting(a, b),
-                port(HighwayReference.subtractingU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.subtractingU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -302,7 +315,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                port(HighwayReference.multiplyingU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.multiplyingU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -316,7 +329,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.minimum(a, b),
-                port(HighwayReference.minimumU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.minimumU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -330,7 +343,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.maximum(a, b),
-                port(HighwayReference.maximumU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.maximumU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -344,7 +357,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAnd(a, b),
-                port(HighwayReference.bitwiseAndU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.bitwiseAndU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -358,7 +371,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(a, b),
-                port(HighwayReference.bitwiseOrU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.bitwiseOrU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -372,7 +385,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXor(a, b),
-                port(HighwayReference.bitwiseXorU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.bitwiseXorU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -385,7 +398,7 @@ struct SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.bitwiseNot(a),
-                port(HighwayReference.bitwiseNotU64(reference(a))),
+                H.Vector(raw: HighwayReference.bitwiseNotU64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -399,7 +412,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAndNot(a, b),
-                port(HighwayReference.bitwiseAndNotU64(reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.bitwiseAndNotU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -414,7 +427,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xD3E1_7E2D_088C_B049) {
             mismatches.check(
                 H.bitwiseAndXor(a, b, c),
-                port(HighwayReference.bitwiseAndXorU64(reference(a), reference(b), reference(c))),
+                H.Vector(raw: HighwayReference.bitwiseAndXorU64(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -428,8 +441,8 @@ struct SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                port(
-                    HighwayReference.shiftedLeftU64(reference(a), Int32(truncatingIfNeeded: bits))
+                H.Vector(
+                    raw: HighwayReference.shiftedLeftU64(a.raw, Int32(truncatingIfNeeded: bits))
                 ),
                 "a: \(describe(a)), bits: \(bits)"
             )
@@ -450,8 +463,8 @@ struct SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                port(
-                    HighwayReference.shiftedLeftU64(reference(a), Int32(truncatingIfNeeded: bits))
+                H.Vector(
+                    raw: HighwayReference.shiftedLeftU64(a.raw, Int32(truncatingIfNeeded: bits))
                 ),
                 "a: \(describe(a)), bits: \(bits)"
             )
@@ -466,8 +479,8 @@ struct SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                port(
-                    HighwayReference.shiftedRightU64(reference(a), Int32(truncatingIfNeeded: bits))
+                H.Vector(
+                    raw: HighwayReference.shiftedRightU64(a.raw, Int32(truncatingIfNeeded: bits))
                 ),
                 "a: \(describe(a)), bits: \(bits)"
             )
@@ -488,8 +501,8 @@ struct SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                port(
-                    HighwayReference.shiftedRightU64(reference(a), Int32(truncatingIfNeeded: bits))
+                H.Vector(
+                    raw: HighwayReference.shiftedRightU64(a.raw, Int32(truncatingIfNeeded: bits))
                 ),
                 "a: \(describe(a)), bits: \(bits)"
             )
@@ -504,7 +517,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
-                port(HighwayReference.equalToU64(reference(a), reference(b))),
+                H.Mask(raw: HighwayReference.equalToU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -518,7 +531,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
-                port(HighwayReference.notEqualToU64(reference(a), reference(b))),
+                H.Mask(raw: HighwayReference.notEqualToU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -532,7 +545,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
-                port(HighwayReference.lessThanU64(reference(a), reference(b))),
+                H.Mask(raw: HighwayReference.lessThanU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -546,7 +559,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
-                port(HighwayReference.greaterThanU64(reference(a), reference(b))),
+                H.Mask(raw: HighwayReference.greaterThanU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -562,7 +575,7 @@ struct SIMDUInt64ReferenceTests {
         {
             mismatches.check(
                 H.selecting(mask, a, b),
-                port(HighwayReference.selectingU64(reference(mask), reference(a), reference(b))),
+                H.Vector(raw: HighwayReference.selectingU64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -576,7 +589,7 @@ struct SIMDUInt64ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.selectingOrZero(mask, a),
-                port(HighwayReference.selectingOrZeroU64(reference(mask), reference(a))),
+                H.Vector(raw: HighwayReference.selectingOrZeroU64(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -590,7 +603,7 @@ struct SIMDUInt64ReferenceTests {
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),
-                port(HighwayReference.zeroingSelectedU64(reference(mask), reference(a))),
+                H.Vector(raw: HighwayReference.zeroingSelectedU64(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -606,9 +619,7 @@ struct SIMDUInt64ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask),
-                port(
-                    HighwayReference.bitwiseAndWhereU64(reference(mask), reference(a), reference(b))
-                ),
+                H.Vector(raw: HighwayReference.bitwiseAndWhereU64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -624,9 +635,7 @@ struct SIMDUInt64ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask),
-                port(
-                    HighwayReference.bitwiseOrWhereU64(reference(mask), reference(a), reference(b))
-                ),
+                H.Vector(raw: HighwayReference.bitwiseOrWhereU64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -642,9 +651,7 @@ struct SIMDUInt64ReferenceTests {
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask),
-                port(
-                    HighwayReference.bitwiseXorWhereU64(reference(mask), reference(a), reference(b))
-                ),
+                H.Vector(raw: HighwayReference.bitwiseXorWhereU64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -666,12 +673,12 @@ struct SIMDUInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
-                port(
-                    HighwayReference.bitwiseAndWhereOtherwiseU64(
-                        reference(otherwise),
-                        reference(mask),
-                        reference(a),
-                        reference(b)
+                H.Vector(
+                    raw: HighwayReference.bitwiseAndWhereOtherwiseU64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
@@ -695,12 +702,12 @@ struct SIMDUInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
-                port(
-                    HighwayReference.bitwiseOrWhereOtherwiseU64(
-                        reference(otherwise),
-                        reference(mask),
-                        reference(a),
-                        reference(b)
+                H.Vector(
+                    raw: HighwayReference.bitwiseOrWhereOtherwiseU64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
@@ -724,12 +731,12 @@ struct SIMDUInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
-                port(
-                    HighwayReference.bitwiseXorWhereOtherwiseU64(
-                        reference(otherwise),
-                        reference(mask),
-                        reference(a),
-                        reference(b)
+                H.Vector(
+                    raw: HighwayReference.bitwiseXorWhereOtherwiseU64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
@@ -746,13 +753,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5488_F353_3568_B3F4) {
             mismatches.check(
                 H.multiplyAddingLow52Bits(a, b, c),
-                port(
-                    HighwayReference.multiplyAddingLow52BitsU64(
-                        reference(a),
-                        reference(b),
-                        reference(c)
-                    )
-                ),
+                H.Vector(raw: HighwayReference.multiplyAddingLow52BitsU64(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -767,13 +768,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xBF6E_4C15_BA13_251E) {
             mismatches.check(
                 H.multiplyAddingHigh52Bits(a, b, c),
-                port(
-                    HighwayReference.multiplyAddingHigh52BitsU64(
-                        reference(a),
-                        reference(b),
-                        reference(c)
-                    )
-                ),
+                H.Vector(raw: HighwayReference.multiplyAddingHigh52BitsU64(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -786,7 +781,7 @@ struct SIMDUInt64ReferenceTests {
         for count in countInputs {
             mismatches.check(
                 H.firstLanes(count: count),
-                port(HighwayReference.firstLanesU64(count)),
+                H.Mask(raw: HighwayReference.firstLanesU64(count)),
                 "count: \(count)"
             )
         }
@@ -799,7 +794,7 @@ struct SIMDUInt64ReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.allTrue(mask),
-                HighwayReference.allTrueU64(reference(mask)),
+                HighwayReference.allTrueU64(mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -812,7 +807,7 @@ struct SIMDUInt64ReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.allFalse(mask),
-                HighwayReference.allFalseU64(reference(mask)),
+                HighwayReference.allFalseU64(mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -825,7 +820,7 @@ struct SIMDUInt64ReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.trueCount(mask),
-                HighwayReference.trueCountU64(reference(mask)),
+                HighwayReference.trueCountU64(mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -838,7 +833,7 @@ struct SIMDUInt64ReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.firstTrueIndex(mask),
-                HighwayReference.firstTrueIndexU64(reference(mask)),
+                HighwayReference.firstTrueIndexU64(mask.raw),
                 "mask: \(describe(mask))"
             )
         }
@@ -849,7 +844,7 @@ struct SIMDUInt64ReferenceTests {
         let mismatches = Mismatches("sum")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFD31_7741_EAC0_6F95)
         for a in aInputs {
-            mismatches.check(H.sum(a), HighwayReference.sumU64(reference(a)), "a: \(describe(a))")
+            mismatches.check(H.sum(a), HighwayReference.sumU64(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -860,7 +855,7 @@ struct SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.smallest(a),
-                HighwayReference.smallestU64(reference(a)),
+                HighwayReference.smallestU64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -871,11 +866,7 @@ struct SIMDUInt64ReferenceTests {
         let mismatches = Mismatches("largest")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x818B_797D_10A3_509A)
         for a in aInputs {
-            mismatches.check(
-                H.largest(a),
-                HighwayReference.largestU64(reference(a)),
-                "a: \(describe(a))"
-            )
+            mismatches.check(H.largest(a), HighwayReference.largestU64(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
@@ -886,7 +877,7 @@ struct SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.firstLane(a),
-                HighwayReference.firstLaneU64(reference(a)),
+                HighwayReference.firstLaneU64(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -899,7 +890,7 @@ struct SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.reversed(a),
-                port(HighwayReference.reversedU64(reference(a))),
+                H.Vector(raw: HighwayReference.reversedU64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -913,7 +904,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                port(HighwayReference.slideUpLanesU64(reference(a), lanes)),
+                H.Vector(raw: HighwayReference.slideUpLanesU64(a.raw, lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -927,7 +918,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                port(HighwayReference.slideUpLanesU64(reference(a), lanes)),
+                H.Vector(raw: HighwayReference.slideUpLanesU64(a.raw, lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -947,13 +938,7 @@ struct SIMDUInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                port(
-                    HighwayReference.slideUpLanesFillingWithU64(
-                        reference(fill),
-                        reference(a),
-                        lanes
-                    )
-                ),
+                H.Vector(raw: HighwayReference.slideUpLanesFillingWithU64(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -973,13 +958,7 @@ struct SIMDUInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                port(
-                    HighwayReference.slideUpLanesFillingWithU64(
-                        reference(fill),
-                        reference(a),
-                        lanes
-                    )
-                ),
+                H.Vector(raw: HighwayReference.slideUpLanesFillingWithU64(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -993,7 +972,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                port(HighwayReference.slideDownLanesU64(reference(a), lanes)),
+                H.Vector(raw: HighwayReference.slideDownLanesU64(a.raw, lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -1007,7 +986,7 @@ struct SIMDUInt64ReferenceTests {
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                port(HighwayReference.slideDownLanesU64(reference(a), lanes)),
+                H.Vector(raw: HighwayReference.slideDownLanesU64(a.raw, lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -1027,12 +1006,8 @@ struct SIMDUInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                port(
-                    HighwayReference.slideDownLanesFillingWithU64(
-                        reference(fill),
-                        reference(a),
-                        lanes
-                    )
+                H.Vector(
+                    raw: HighwayReference.slideDownLanesFillingWithU64(fill.raw, a.raw, lanes)
                 ),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
@@ -1053,12 +1028,8 @@ struct SIMDUInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                port(
-                    HighwayReference.slideDownLanesFillingWithU64(
-                        reference(fill),
-                        reference(a),
-                        lanes
-                    )
+                H.Vector(
+                    raw: HighwayReference.slideDownLanesFillingWithU64(fill.raw, a.raw, lanes)
                 ),
                 "fill: \(describe(fill)), a: \(describe(a)), lanes: \(lanes)"
             )
@@ -1072,7 +1043,7 @@ struct SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.slide1Up(a),
-                port(HighwayReference.slide1UpU64(reference(a))),
+                H.Vector(raw: HighwayReference.slide1UpU64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -1086,7 +1057,7 @@ struct SIMDUInt64ReferenceTests {
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slide1Up(a, fillingWith: fill),
-                port(HighwayReference.slide1UpFillingWithU64(fill, reference(a))),
+                H.Vector(raw: HighwayReference.slide1UpFillingWithU64(fill, a.raw)),
                 "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
@@ -1099,7 +1070,7 @@ struct SIMDUInt64ReferenceTests {
         for a in aInputs {
             mismatches.check(
                 H.slide1Down(a),
-                port(HighwayReference.slide1DownU64(reference(a))),
+                H.Vector(raw: HighwayReference.slide1DownU64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -1113,7 +1084,7 @@ struct SIMDUInt64ReferenceTests {
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slide1Down(a, fillingWith: fill),
-                port(HighwayReference.slide1DownFillingWithU64(fill, reference(a))),
+                H.Vector(raw: HighwayReference.slide1DownFillingWithU64(fill, a.raw)),
                 "fill: \(hex(fill)), a: \(describe(a))"
             )
         }
@@ -1122,126 +1093,167 @@ struct SIMDUInt64ReferenceTests {
 
     @Test func loadInterleaved2() {
         let mismatches = Mismatches("loadInterleaved2")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 4, seed: 0x665B_42F3_D307_89E7)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x665B_42F3_D307_89E7
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
-            var r0 = HighwayReference.zeroU64()
-            var r1 = HighwayReference.zeroU64()
+            var r0 = H.Vector(raw: HighwayReference.zeroU64())
+            var r1 = H.Vector(raw: HighwayReference.zeroU64())
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved2(from: source.baseAddress!, &p0, &p1)
-                unsafe HighwayReference.loadInterleaved2U64(source.baseAddress!, &r0, &r1)
+                unsafe HighwayReference.loadInterleaved2U64(source.baseAddress!, &r0.raw, &r1.raw)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved2BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved2 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 4, seed: 0xC4FF_535F_F1AC_FEEC)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0xC4FF_535F_F1AC_FEEC
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
-            var r0 = HighwayReference.zeroU64()
-            var r1 = HighwayReference.zeroU64()
+            var r0 = H.Vector(raw: HighwayReference.zeroU64())
+            var r1 = H.Vector(raw: HighwayReference.zeroU64())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved2(from: source, &p0, &p1)
-                unsafe HighwayReference.loadInterleaved2U64(source, &r0, &r1)
+                unsafe HighwayReference.loadInterleaved2U64(source, &r0.raw, &r1.raw)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved3() {
         let mismatches = Mismatches("loadInterleaved3")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 6, seed: 0x6EF0_59F3_D7DE_359C)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 3 * H.laneCount,
+            seed: 0x6EF0_59F3_D7DE_359C
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
-            var r0 = HighwayReference.zeroU64()
-            var r1 = HighwayReference.zeroU64()
-            var r2 = HighwayReference.zeroU64()
+            var r0 = H.Vector(raw: HighwayReference.zeroU64())
+            var r1 = H.Vector(raw: HighwayReference.zeroU64())
+            var r2 = H.Vector(raw: HighwayReference.zeroU64())
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved3(from: source.baseAddress!, &p0, &p1, &p2)
-                unsafe HighwayReference.loadInterleaved3U64(source.baseAddress!, &r0, &r1, &r2)
+                unsafe HighwayReference.loadInterleaved3U64(
+                    source.baseAddress!,
+                    &r0.raw,
+                    &r1.raw,
+                    &r2.raw
+                )
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
-            mismatches.check(p2, port(r2), "from: \(describe(from)), v2")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved3BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved3 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 6, seed: 0x6E9D_64BD_B987_B2F5)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 3 * H.laneCount,
+            seed: 0x6E9D_64BD_B987_B2F5
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
-            var r0 = HighwayReference.zeroU64()
-            var r1 = HighwayReference.zeroU64()
-            var r2 = HighwayReference.zeroU64()
+            var r0 = H.Vector(raw: HighwayReference.zeroU64())
+            var r1 = H.Vector(raw: HighwayReference.zeroU64())
+            var r2 = H.Vector(raw: HighwayReference.zeroU64())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved3(from: source, &p0, &p1, &p2)
-                unsafe HighwayReference.loadInterleaved3U64(source, &r0, &r1, &r2)
+                unsafe HighwayReference.loadInterleaved3U64(source, &r0.raw, &r1.raw, &r2.raw)
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
-            mismatches.check(p2, port(r2), "from: \(describe(from)), v2")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved4() {
         let mismatches = Mismatches("loadInterleaved4")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x9A46_2CF3_F06B_5225)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 4 * H.laneCount,
+            seed: 0x9A46_2CF3_F06B_5225
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
             var p3 = H.zero()
-            var r0 = HighwayReference.zeroU64()
-            var r1 = HighwayReference.zeroU64()
-            var r2 = HighwayReference.zeroU64()
-            var r3 = HighwayReference.zeroU64()
+            var r0 = H.Vector(raw: HighwayReference.zeroU64())
+            var r1 = H.Vector(raw: HighwayReference.zeroU64())
+            var r2 = H.Vector(raw: HighwayReference.zeroU64())
+            var r3 = H.Vector(raw: HighwayReference.zeroU64())
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved4(from: source.baseAddress!, &p0, &p1, &p2, &p3)
-                unsafe HighwayReference.loadInterleaved4U64(source.baseAddress!, &r0, &r1, &r2, &r3)
+                unsafe HighwayReference.loadInterleaved4U64(
+                    source.baseAddress!,
+                    &r0.raw,
+                    &r1.raw,
+                    &r2.raw,
+                    &r3.raw
+                )
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
-            mismatches.check(p2, port(r2), "from: \(describe(from)), v2")
-            mismatches.check(p3, port(r3), "from: \(describe(from)), v3")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+            mismatches.check(p3, r3, "from: \(describe(from)), v3")
         }
         mismatches.record()
     }
 
     @Test func loadInterleaved4BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved4 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x65D0_CC9B_7150_46F2)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 4 * H.laneCount,
+            seed: 0x65D0_CC9B_7150_46F2
+        )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
             var p3 = H.zero()
-            var r0 = HighwayReference.zeroU64()
-            var r1 = HighwayReference.zeroU64()
-            var r2 = HighwayReference.zeroU64()
-            var r3 = HighwayReference.zeroU64()
+            var r0 = H.Vector(raw: HighwayReference.zeroU64())
+            var r1 = H.Vector(raw: HighwayReference.zeroU64())
+            var r2 = H.Vector(raw: HighwayReference.zeroU64())
+            var r3 = H.Vector(raw: HighwayReference.zeroU64())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved4(from: source, &p0, &p1, &p2, &p3)
-                unsafe HighwayReference.loadInterleaved4U64(source, &r0, &r1, &r2, &r3)
+                unsafe HighwayReference.loadInterleaved4U64(
+                    source,
+                    &r0.raw,
+                    &r1.raw,
+                    &r2.raw,
+                    &r3.raw
+                )
             }
-            mismatches.check(p0, port(r0), "from: \(describe(from)), v0")
-            mismatches.check(p1, port(r1), "from: \(describe(from)), v1")
-            mismatches.check(p2, port(r2), "from: \(describe(from)), v2")
-            mismatches.check(p3, port(r3), "from: \(describe(from)), v3")
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+            mismatches.check(p3, r3, "from: \(describe(from)), v3")
         }
         mismatches.record()
     }
@@ -1250,7 +1262,7 @@ struct SIMDUInt64ReferenceTests {
         let mismatches = Mismatches("storeInterleaved2")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9913_E4BB_84FD_0768)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9913_E5BB_84FD_091B)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
         for (a, b) in everyPair(aInputs, bInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1258,11 +1270,7 @@ struct SIMDUInt64ReferenceTests {
             }
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe HighwayReference.storeInterleaved2U64(
-                    reference(a),
-                    reference(b),
-                    destination.baseAddress!
-                )
+                unsafe HighwayReference.storeInterleaved2U64(a.raw, b.raw, destination.baseAddress!)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
         }
@@ -1273,17 +1281,13 @@ struct SIMDUInt64ReferenceTests {
         let mismatches = Mismatches("storeInterleaved2 before a guard page")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x406E_0C24_1C13_1B61)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x406E_0B24_1C13_19AE)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
         for (a, b) in everyPair(aInputs, bInputs) {
             let portLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeInterleaved2(a, b, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeInterleaved2U64(
-                    reference(a),
-                    reference(b),
-                    destination
-                )
+                unsafe HighwayReference.storeInterleaved2U64(a.raw, b.raw, destination)
             }.lanes
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
         }
@@ -1295,7 +1299,7 @@ struct SIMDUInt64ReferenceTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9158_2DBB_80DE_EF93)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9158_2CBB_80DE_EDE0)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x9158_2FBB_80DE_F2F9)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 6 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5C23_B8C4_4208_B1D5) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1304,9 +1308,9 @@ struct SIMDUInt64ReferenceTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved3U64(
-                    reference(a),
-                    reference(b),
-                    reference(c),
+                    a.raw,
+                    b.raw,
+                    c.raw,
                     destination.baseAddress!
                 )
             }
@@ -1324,18 +1328,13 @@ struct SIMDUInt64ReferenceTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF543_D461_DC1A_52F8)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF543_D561_DC1A_54AB)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF543_D661_DC1A_565E)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 6)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x510F_8582_E590_4FB4) {
             let portLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeInterleaved3(a, b, c, to: destination)
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe HighwayReference.storeInterleaved3U64(
-                    reference(a),
-                    reference(b),
-                    reference(c),
-                    destination
-                )
+                unsafe HighwayReference.storeInterleaved3U64(a.raw, b.raw, c.raw, destination)
             }.lanes
             mismatches.check(
                 portLanes,
@@ -1352,7 +1351,7 @@ struct SIMDUInt64ReferenceTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x88C3_17BB_7C08_4591)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x88C3_14BB_7C08_4078)
         let dInputs = Inputs.vectors(H.Vector.self, seed: 0x88C3_15BB_7C08_422B)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 8 + 4)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -1367,10 +1366,10 @@ struct SIMDUInt64ReferenceTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeInterleaved4U64(
-                    reference(a),
-                    reference(b),
-                    reference(c),
-                    reference(d),
+                    a.raw,
+                    b.raw,
+                    c.raw,
+                    d.raw,
                     destination.baseAddress!
                 )
             }
@@ -1389,7 +1388,7 @@ struct SIMDUInt64ReferenceTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1011_0629_263E_57BC)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x1011_0929_263E_5CD5)
         let dInputs = Inputs.vectors(H.Vector.self, seed: 0x1011_0829_263E_5B22)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 8)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -1402,10 +1401,10 @@ struct SIMDUInt64ReferenceTests {
             }.lanes
             let referenceLanes = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe HighwayReference.storeInterleaved4U64(
-                    reference(a),
-                    reference(b),
-                    reference(c),
-                    reference(d),
+                    a.raw,
+                    b.raw,
+                    c.raw,
+                    d.raw,
                     destination
                 )
             }.lanes
@@ -1425,7 +1424,7 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadWidening(from: source.baseAddress!),
-                    unsafe port(HighwayReference.loadWideningU8ToU64(source.baseAddress!))
+                    unsafe H.Vector(raw: HighwayReference.loadWideningU8ToU64(source.baseAddress!))
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -1440,7 +1439,7 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.loadWidening(from: source),
-                    unsafe port(HighwayReference.loadWideningU8ToU64(source))
+                    unsafe H.Vector(raw: HighwayReference.loadWideningU8ToU64(source))
                 )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -1459,7 +1458,7 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadWidening(from: source.baseAddress!),
-                    unsafe port(HighwayReference.loadWideningU16ToU64(source.baseAddress!))
+                    unsafe H.Vector(raw: HighwayReference.loadWideningU16ToU64(source.baseAddress!))
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -1478,7 +1477,7 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.loadWidening(from: source),
-                    unsafe port(HighwayReference.loadWideningU16ToU64(source))
+                    unsafe H.Vector(raw: HighwayReference.loadWideningU16ToU64(source))
                 )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -1497,7 +1496,7 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadWidening(from: source.baseAddress!),
-                    unsafe port(HighwayReference.loadWideningU32ToU64(source.baseAddress!))
+                    unsafe H.Vector(raw: HighwayReference.loadWideningU32ToU64(source.baseAddress!))
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -1516,7 +1515,7 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.loadWidening(from: source),
-                    unsafe port(HighwayReference.loadWideningU32ToU64(source))
+                    unsafe H.Vector(raw: HighwayReference.loadWideningU32ToU64(source))
                 )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -1532,8 +1531,8 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe port(
-                        HighwayReference.loadFirstWideningU8ToU64(source.baseAddress!, count)
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU8ToU64(source.baseAddress!, count)
                     )
                 )
             }
@@ -1555,7 +1554,12 @@ struct SIMDUInt64ReferenceTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe port(HighwayReference.loadFirstWideningU8ToU64(source, count))
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU8ToU64(
+                            source,
+                            min(count, H.laneCount)
+                        )
+                    )
                 )
             }.result
             mismatches.check(
@@ -1579,8 +1583,8 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe port(
-                        HighwayReference.loadFirstWideningU16ToU64(source.baseAddress!, count)
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU16ToU64(source.baseAddress!, count)
                     )
                 )
             }
@@ -1606,7 +1610,12 @@ struct SIMDUInt64ReferenceTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe port(HighwayReference.loadFirstWideningU16ToU64(source, count))
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU16ToU64(
+                            source,
+                            min(count, H.laneCount)
+                        )
+                    )
                 )
             }.result
             mismatches.check(
@@ -1630,8 +1639,8 @@ struct SIMDUInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe port(
-                        HighwayReference.loadFirstWideningU32ToU64(source.baseAddress!, count)
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU32ToU64(source.baseAddress!, count)
                     )
                 )
             }
@@ -1657,7 +1666,12 @@ struct SIMDUInt64ReferenceTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe port(HighwayReference.loadFirstWideningU32ToU64(source, count))
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU32ToU64(
+                            source,
+                            min(count, H.laneCount)
+                        )
+                    )
                 )
             }.result
             mismatches.check(
@@ -1675,7 +1689,7 @@ struct SIMDUInt64ReferenceTests {
         for vector in vectorInputs {
             mismatches.check(
                 H.repeatingBlock(vector.simd[0], vector.simd[1]),
-                port(HighwayReference.repeatingBlockU64(vector.simd[0], vector.simd[1])),
+                H.Vector(raw: HighwayReference.repeatingBlockU64(vector.simd[0], vector.simd[1])),
                 "lanes: \(describe(vector))"
             )
         }

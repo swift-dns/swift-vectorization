@@ -81,9 +81,14 @@ jobs:
             [SSE2]=""
             [SSSE3]="-Xcc -mssse3 -Xcc -D__MM_MALLOC_H"
             [SSE4]="-Xcc -march=x86-64-v2 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
+            [AVX2]="-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
+            [AVX3]="-Xcc -march=skylake-avx512 -Xcc -D__MM_MALLOC_H"
+            [AVX3_DL]="-Xcc -march=icelake-server -Xcc -D__MM_MALLOC_H"
+            [AVX3_SPR]="-Xcc -march=sapphirerapids -Xcc -D__MM_MALLOC_H"
+            [AVX3_ZEN4]="-Xcc -march=znver4 -Xcc -DHWY_WANT_AVX3_ZEN4 -Xcc -D__MM_MALLOC_H"
           )
           mkdir -p "${RUNNER_TEMP}/codegen"
-          for TARGET in SSE2 SSSE3 SSE4; do
+          for TARGET in SSE2 SSSE3 SSE4 AVX2 AVX3 AVX3_DL AVX3_SPR AVX3_ZEN4; do
             read -r -a TARGET_FLAGS <<< "${FLAGS[${TARGET}]}"
             EXIT_STATUS=0
             scripts/compare-codegen.sh -- "${TARGET_FLAGS[@]}" \

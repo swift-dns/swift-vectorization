@@ -5,28 +5,41 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <new>
 #include "CVectorizationOps.h"
 
-// HWY_DISABLED_TARGETS is set by the build, see HighwayReference/Package.swift.
 #include "hwy/highway.h"
+#if HWY_TARGET_IS_SVE
+#include <arm_neon_sve_bridge.h>
+#endif
 
-#if CVECTORIZATION_OPS_NEON
-#define CHIGHWAY_REFERENCE_TARGETS HWY_ALL_NEON
-#elif CVECTORIZATION_OPS_X86 == 3
-#define CHIGHWAY_REFERENCE_TARGETS HWY_SSE4
-#elif CVECTORIZATION_OPS_X86 == 2
-#define CHIGHWAY_REFERENCE_TARGETS HWY_SSSE3
-#elif CVECTORIZATION_OPS_X86 == 1
-#define CHIGHWAY_REFERENCE_TARGETS HWY_SSE2
-#else
-#define CHIGHWAY_REFERENCE_TARGETS HWY_EMU128
-#endif
-#if !(HWY_TARGET & CHIGHWAY_REFERENCE_TARGETS)
-#error "highway's static target is not the port's"
-#endif
+namespace hwy {
+namespace HWY_NAMESPACE {
+struct ReferenceTarget {};
+}  // namespace HWY_NAMESPACE
+}  // namespace hwy
 
 namespace HighwayReference {
 namespace hn = hwy::HWY_NAMESPACE;
+
+/// Names the static target in the mangled name of a Swift function that takes it, which
+/// scripts/compare-codegen.sh reads the target from.
+using Target = hn::ReferenceTarget;
+
+/// Lets Highway write an out-parameter in place, so that its stores happen where the
+/// port's do, rather than all at once as a copy of a local would have them.
+template <typename Highway, typename Port>
+HWY_INLINE Highway& inPlace(Port& port) {
+  static_assert(sizeof(Highway) == sizeof(Port), "the port's vector has Highway's size");
+  static_assert(alignof(Highway) <= 16, "Swift aligns the port's vector to at most 16 bytes");
+  return *new (&port) Highway;
+}
+
+/// The count a span form hands to an op that takes one. Highway's SVE2_128 ops truncate a
+/// count to 32 bits, so they get at most `lanes`, while the other targets take any.
+HWY_INLINE size_t spanCount(size_t count, size_t lanes) {
+  return HWY_TARGET == HWY_SVE2_128 && count > lanes ? lanes : count;
+}
 
 /// Whether the static target only emulates vectors, in which case a caller is better off
 /// with its own scalar code.
@@ -37,721 +50,1937 @@ HWY_INLINE bool isEmulated() {
 /// The name of the target the ops below were compiled for.
 HWY_INLINE const char* targetName() { return hwy::TargetName(HWY_TARGET); }
 
+/// Highway's SVE ops overwrite one operand, so the compiler may swap a commutative op's
+/// operands to save a move, which decides whose NaN comes out when both are NaN. Out of
+/// line, the first operand is already in the register the op overwrites, which is the
+/// order Highway's call has.
+#if HWY_TARGET_IS_SVE
+#define SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED inline HWY_NOINLINE
+#else
+#define SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED HWY_INLINE
+#endif
+
 using TagU8 = hn::ScalableTag<uint8_t>;
 using VectorU8 = hn::VFromD<TagU8>;
 using MaskU8 = hn::MFromD<TagU8>;
+typedef cvectorization_ops_raw_vector_u8 OutVectorU8 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountU8() { return hn::Lanes(TagU8()); }
-HWY_INLINE VectorU8 fromPortU8(cvectorization_ops_vector_u8 v) { return hn::LoadU(TagU8(), reinterpret_cast<const uint8_t*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_u8 toPortU8(VectorU8 v) { cvectorization_ops_vector_u8 port; hn::StoreU(v, TagU8(), reinterpret_cast<uint8_t*>(&port)); return port; }
-HWY_INLINE MaskU8 maskFromPortU8(cvectorization_ops_mask_u8 m) { const hn::RebindToSigned<TagU8> di; return hn::MaskFromVec(hn::BitCast(TagU8(), hn::LoadU(di, reinterpret_cast<const int8_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_u8 maskToPortU8(MaskU8 m) { const hn::RebindToSigned<TagU8> di; cvectorization_ops_mask_u8 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagU8(), m)), di, reinterpret_cast<int8_t*>(&port)); return port; }
-HWY_INLINE VectorU8 zeroU8() { return hn::Zero(TagU8()); }
-HWY_INLINE VectorU8 repeatingU8(uint8_t value) { return hn::Set(TagU8(), value); }
-HWY_INLINE VectorU8 iotaU8(uint8_t value) { return hn::Iota(TagU8(), value); }
-HWY_INLINE VectorU8 loadU8(const uint8_t* from) { return hn::LoadU(TagU8(), from); }
-HWY_INLINE VectorU8 loadAlignedU8(const uint8_t* from) { return hn::Load(TagU8(), from); }
-HWY_INLINE VectorU8 loadFirstU8(const uint8_t* from, size_t count) { return hn::LoadN(TagU8(), from, count); }
-HWY_INLINE void storeU8(VectorU8 a, uint8_t* to) { hn::StoreU(a, TagU8(), to); }
-HWY_INLINE void storeAlignedU8(VectorU8 a, uint8_t* to) { hn::Store(a, TagU8(), to); }
-HWY_INLINE void storeFirstU8(VectorU8 a, uint8_t* to, size_t count) { hn::StoreN(a, TagU8(), to, count); }
-HWY_INLINE VectorU8 addingU8(VectorU8 a, VectorU8 b) { return hn::Add(a, b); }
-HWY_INLINE VectorU8 subtractingU8(VectorU8 a, VectorU8 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorU8 minimumU8(VectorU8 a, VectorU8 b) { return hn::Min(a, b); }
-HWY_INLINE VectorU8 maximumU8(VectorU8 a, VectorU8 b) { return hn::Max(a, b); }
-HWY_INLINE VectorU8 saturatingAddingU8(VectorU8 a, VectorU8 b) { return hn::SaturatedAdd(a, b); }
-HWY_INLINE VectorU8 saturatingSubtractingU8(VectorU8 a, VectorU8 b) { return hn::SaturatedSub(a, b); }
-HWY_INLINE VectorU8 roundedAverageU8(VectorU8 a, VectorU8 b) { return hn::AverageRound(a, b); }
-HWY_INLINE VectorU8 bitwiseAndU8(VectorU8 a, VectorU8 b) { return hn::And(a, b); }
-HWY_INLINE VectorU8 bitwiseOrU8(VectorU8 a, VectorU8 b) { return hn::Or(a, b); }
-HWY_INLINE VectorU8 bitwiseXorU8(VectorU8 a, VectorU8 b) { return hn::Xor(a, b); }
-HWY_INLINE VectorU8 bitwiseNotU8(VectorU8 a) { return hn::Not(a); }
-HWY_INLINE VectorU8 bitwiseAndNotU8(VectorU8 a, VectorU8 b) { return hn::AndNot(a, b); }
-HWY_INLINE VectorU8 bitwiseAndXorU8(VectorU8 a, VectorU8 b, VectorU8 c) { return hn::AndXor(a, b, c); }
-HWY_INLINE VectorU8 shiftedLeftU8(VectorU8 a, int bits) { return hn::ShiftLeftSame(a, bits); }
-HWY_INLINE VectorU8 shiftedRightU8(VectorU8 a, int bits) { return hn::ShiftRightSame(a, bits); }
-HWY_INLINE MaskU8 equalToU8(VectorU8 a, VectorU8 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskU8 notEqualToU8(VectorU8 a, VectorU8 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskU8 lessThanU8(VectorU8 a, VectorU8 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskU8 greaterThanU8(VectorU8 a, VectorU8 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorU8 selectingU8(MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorU8 selectingOrZeroU8(MaskU8 mask, VectorU8 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorU8 zeroingSelectedU8(MaskU8 mask, VectorU8 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE VectorU8 bitwiseAndWhereU8(MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedAnd(mask, a, b); }
-HWY_INLINE VectorU8 bitwiseOrWhereU8(MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedOr(mask, a, b); }
-HWY_INLINE VectorU8 bitwiseXorWhereU8(MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedXor(mask, a, b); }
-HWY_INLINE VectorU8 bitwiseAndWhereOtherwiseU8(VectorU8 otherwise, MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU8 bitwiseOrWhereOtherwiseU8(VectorU8 otherwise, MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU8 bitwiseXorWhereOtherwiseU8(VectorU8 otherwise, MaskU8 mask, VectorU8 a, VectorU8 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
-HWY_INLINE MaskU8 firstLanesU8(size_t count) { return hn::FirstN(TagU8(), count); }
-HWY_INLINE bool allTrueU8(MaskU8 mask) { return hn::AllTrue(TagU8(), mask); }
-HWY_INLINE bool allFalseU8(MaskU8 mask) { return hn::AllFalse(TagU8(), mask); }
-HWY_INLINE size_t trueCountU8(MaskU8 mask) { return hn::CountTrue(TagU8(), mask); }
-HWY_INLINE intptr_t firstTrueIndexU8(MaskU8 mask) { return hn::FindFirstTrue(TagU8(), mask); }
-HWY_INLINE uint8_t firstLaneU8(VectorU8 a) { return hn::GetLane(a); }
-HWY_INLINE VectorU8 reversedU8(VectorU8 a) { return hn::Reverse(TagU8(), a); }
-HWY_INLINE VectorU8 slideUpLanesU8(VectorU8 a, size_t lanes) { return hn::SlideUpLanes(TagU8(), a, lanes); }
-HWY_INLINE VectorU8 slideUpLanesFillingWithU8(VectorU8 fill, VectorU8 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagU8(), a, lanes); }
-HWY_INLINE VectorU8 slideDownLanesU8(VectorU8 a, size_t lanes) { return hn::SlideDownLanes(TagU8(), a, lanes); }
-HWY_INLINE VectorU8 slideDownLanesFillingWithU8(VectorU8 fill, VectorU8 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagU8(), a, lanes); }
-HWY_INLINE VectorU8 slide1UpU8(VectorU8 a) { return hn::Slide1Up(TagU8(), a); }
-HWY_INLINE VectorU8 slide1UpFillingWithU8(uint8_t fill, VectorU8 a) { return hn::Slide1UpOr(fill, TagU8(), a); }
-HWY_INLINE VectorU8 slide1DownU8(VectorU8 a) { return hn::Slide1Down(TagU8(), a); }
-HWY_INLINE VectorU8 slide1DownFillingWithU8(uint8_t fill, VectorU8 a) { return hn::Slide1DownOr(fill, TagU8(), a); }
-HWY_INLINE VectorU8 tableLookupBytesU8(VectorU8 a, VectorU8 b) { return hn::TableLookupBytes(a, b); }
-HWY_INLINE void loadInterleaved2U8(const uint8_t* from, VectorU8& v0, VectorU8& v1) { hn::LoadInterleaved2(TagU8(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3U8(const uint8_t* from, VectorU8& v0, VectorU8& v1, VectorU8& v2) { hn::LoadInterleaved3(TagU8(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4U8(const uint8_t* from, VectorU8& v0, VectorU8& v1, VectorU8& v2, VectorU8& v3) { hn::LoadInterleaved4(TagU8(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2U8(VectorU8 a, VectorU8 b, uint8_t* to) { hn::StoreInterleaved2(a, b, TagU8(), to); }
-HWY_INLINE void storeInterleaved3U8(VectorU8 a, VectorU8 b, VectorU8 c, uint8_t* to) { hn::StoreInterleaved3(a, b, c, TagU8(), to); }
-HWY_INLINE void storeInterleaved4U8(VectorU8 a, VectorU8 b, VectorU8 c, VectorU8 d, uint8_t* to) { hn::StoreInterleaved4(a, b, c, d, TagU8(), to); }
-HWY_INLINE VectorU8 repeatingBlockU8(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5, uint8_t v6, uint8_t v7, uint8_t v8, uint8_t v9, uint8_t v10, uint8_t v11, uint8_t v12, uint8_t v13, uint8_t v14, uint8_t v15) { return hn::Dup128VecFromValues(TagU8(), v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorU8 fromPortU8(cvectorization_ops_raw_vector_u8 v) { return svset_neonq_u8(svundef_u8(), (uint8x16_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 toPortU8(VectorU8 v) { return (cvectorization_ops_raw_vector_u8)svget_neonq_u8(v); }
+HWY_INLINE MaskU8 maskFromPortU8(cvectorization_ops_raw_mask_u8 m) { return hn::MaskFromVec(hn::BitCast(TagU8(), svset_neonq_s8(svundef_s8(), (int8x16_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 maskToPortU8(MaskU8 m) { const hn::RebindToSigned<TagU8> di; return (cvectorization_ops_raw_mask_u8)svget_neonq_s8(hn::BitCast(di, hn::VecFromMask(TagU8(), m))); }
+#else
+HWY_INLINE VectorU8 fromPortU8(cvectorization_ops_raw_vector_u8 v) { return hn::LoadU(TagU8(), reinterpret_cast<const uint8_t*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 toPortU8(VectorU8 v) { cvectorization_ops_raw_vector_u8 port; hn::StoreU(v, TagU8(), reinterpret_cast<uint8_t*>(&port)); return port; }
+HWY_INLINE MaskU8 maskFromPortU8(cvectorization_ops_raw_mask_u8 m) { const hn::RebindToSigned<TagU8> di; return hn::MaskFromVec(hn::BitCast(TagU8(), hn::LoadU(di, reinterpret_cast<const int8_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 maskToPortU8(MaskU8 m) { const hn::RebindToSigned<TagU8> di; cvectorization_ops_raw_mask_u8 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagU8(), m)), di, reinterpret_cast<int8_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_u8 zeroU8() { return toPortU8(hn::Zero(TagU8())); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 repeatingU8(uint8_t value) { return toPortU8(hn::Set(TagU8(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 iotaU8(uint8_t value) { return toPortU8(hn::Iota(TagU8(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 loadU8(const uint8_t* from) { return toPortU8(hn::LoadU(TagU8(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 loadAlignedU8(const uint8_t* from) { return toPortU8(hn::Load(TagU8(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 loadFirstU8(const uint8_t* from, size_t count) { return toPortU8(hn::LoadN(TagU8(), from, count)); }
+HWY_INLINE void storeU8(cvectorization_ops_raw_vector_u8 a, uint8_t* to) { hn::StoreU(fromPortU8(a), TagU8(), to); }
+HWY_INLINE void storeAlignedU8(cvectorization_ops_raw_vector_u8 a, uint8_t* to) { hn::Store(fromPortU8(a), TagU8(), to); }
+HWY_INLINE void storeFirstU8(cvectorization_ops_raw_vector_u8 a, uint8_t* to, size_t count) { hn::StoreN(fromPortU8(a), TagU8(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 addingU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::Add(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 subtractingU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::Sub(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 minimumU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::Min(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 maximumU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::Max(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 saturatingAddingU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::SaturatedAdd(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 saturatingSubtractingU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::SaturatedSub(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 roundedAverageU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::AverageRound(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::And(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseOrU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::Or(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseXorU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::Xor(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseNotU8(cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Not(fromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndNotU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::AndNot(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndXorU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, cvectorization_ops_raw_vector_u8 c) { return toPortU8(hn::AndXor(fromPortU8(a), fromPortU8(b), fromPortU8(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 shiftedLeftU8(cvectorization_ops_raw_vector_u8 a, int bits) { return toPortU8(hn::ShiftLeftSame(fromPortU8(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 shiftedRightU8(cvectorization_ops_raw_vector_u8 a, int bits) { return toPortU8(hn::ShiftRightSame(fromPortU8(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 equalToU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return maskToPortU8(hn::Eq(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 notEqualToU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return maskToPortU8(hn::Ne(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 lessThanU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return maskToPortU8(hn::Lt(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 greaterThanU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return maskToPortU8(hn::Gt(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 selectingU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::IfThenElse(maskFromPortU8(mask), fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 selectingOrZeroU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::IfThenElseZero(maskFromPortU8(mask), fromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 zeroingSelectedU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::IfThenZeroElse(maskFromPortU8(mask), fromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndWhereU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::MaskedAnd(maskFromPortU8(mask), fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseOrWhereU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::MaskedOr(maskFromPortU8(mask), fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseXorWhereU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::MaskedXor(maskFromPortU8(mask), fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndWhereOtherwiseU8(cvectorization_ops_raw_vector_u8 otherwise, cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::MaskedAndOr(fromPortU8(otherwise), maskFromPortU8(mask), fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseOrWhereOtherwiseU8(cvectorization_ops_raw_vector_u8 otherwise, cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::MaskedOrOr(fromPortU8(otherwise), maskFromPortU8(mask), fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseXorWhereOtherwiseU8(cvectorization_ops_raw_vector_u8 otherwise, cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::MaskedXorOr(fromPortU8(otherwise), maskFromPortU8(mask), fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 firstLanesU8(size_t count) { return maskToPortU8(hn::FirstN(TagU8(), count)); }
+HWY_INLINE bool allTrueU8(cvectorization_ops_raw_mask_u8 mask) { return hn::AllTrue(TagU8(), maskFromPortU8(mask)); }
+HWY_INLINE bool allFalseU8(cvectorization_ops_raw_mask_u8 mask) { return hn::AllFalse(TagU8(), maskFromPortU8(mask)); }
+HWY_INLINE size_t trueCountU8(cvectorization_ops_raw_mask_u8 mask) { return hn::CountTrue(TagU8(), maskFromPortU8(mask)); }
+HWY_INLINE intptr_t firstTrueIndexU8(cvectorization_ops_raw_mask_u8 mask) { return hn::FindFirstTrue(TagU8(), maskFromPortU8(mask)); }
+HWY_INLINE uint8_t firstLaneU8(cvectorization_ops_raw_vector_u8 a) { return hn::GetLane(fromPortU8(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 reversedU8(cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Reverse(TagU8(), fromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slideUpLanesU8(cvectorization_ops_raw_vector_u8 a, size_t lanes) { return toPortU8(hn::SlideUpLanes(TagU8(), fromPortU8(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slideUpLanesFillingWithU8(cvectorization_ops_raw_vector_u8 fill, cvectorization_ops_raw_vector_u8 a, size_t lanes) { return toPortU8(hn::SlideUpLanesOr(fromPortU8(fill), TagU8(), fromPortU8(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slideDownLanesU8(cvectorization_ops_raw_vector_u8 a, size_t lanes) { return toPortU8(hn::SlideDownLanes(TagU8(), fromPortU8(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slideDownLanesFillingWithU8(cvectorization_ops_raw_vector_u8 fill, cvectorization_ops_raw_vector_u8 a, size_t lanes) { return toPortU8(hn::SlideDownLanesOr(fromPortU8(fill), TagU8(), fromPortU8(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slide1UpU8(cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Slide1Up(TagU8(), fromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slide1UpFillingWithU8(uint8_t fill, cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Slide1UpOr(fill, TagU8(), fromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slide1DownU8(cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Slide1Down(TagU8(), fromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slide1DownFillingWithU8(uint8_t fill, cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::Slide1DownOr(fill, TagU8(), fromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupBytesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::TableLookupBytes(fromPortU8(a), fromPortU8(b))); }
+HWY_INLINE void loadInterleaved2U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorU8 h0, h1;
+  hn::LoadInterleaved2(TagU8(), from, h0, h1);
+  v0 = toPortU8(h0);
+  v1 = toPortU8(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorU8 h0, h1;
+  hn::LoadInterleaved2(TagU8(), from, h0, h1);
+  hn::StoreU(h0, TagU8(), reinterpret_cast<uint8_t*>(&v0));
+  hn::StoreU(h1, TagU8(), reinterpret_cast<uint8_t*>(&v1));
+#else
+  hn::LoadInterleaved2(TagU8(), from, inPlace<VectorU8>(v0), inPlace<VectorU8>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1, OutVectorU8& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorU8 h0, h1, h2;
+  hn::LoadInterleaved3(TagU8(), from, h0, h1, h2);
+  v0 = toPortU8(h0);
+  v1 = toPortU8(h1);
+  v2 = toPortU8(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorU8 h0, h1, h2;
+  hn::LoadInterleaved3(TagU8(), from, h0, h1, h2);
+  hn::StoreU(h0, TagU8(), reinterpret_cast<uint8_t*>(&v0));
+  hn::StoreU(h1, TagU8(), reinterpret_cast<uint8_t*>(&v1));
+  hn::StoreU(h2, TagU8(), reinterpret_cast<uint8_t*>(&v2));
+#else
+  hn::LoadInterleaved3(TagU8(), from, inPlace<VectorU8>(v0), inPlace<VectorU8>(v1), inPlace<VectorU8>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1, OutVectorU8& v2, OutVectorU8& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorU8 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagU8(), from, h0, h1, h2, h3);
+  v0 = toPortU8(h0);
+  v1 = toPortU8(h1);
+  v2 = toPortU8(h2);
+  v3 = toPortU8(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorU8 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagU8(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagU8(), reinterpret_cast<uint8_t*>(&v0));
+  hn::StoreU(h1, TagU8(), reinterpret_cast<uint8_t*>(&v1));
+  hn::StoreU(h2, TagU8(), reinterpret_cast<uint8_t*>(&v2));
+  hn::StoreU(h3, TagU8(), reinterpret_cast<uint8_t*>(&v3));
+#else
+  hn::LoadInterleaved4(TagU8(), from, inPlace<VectorU8>(v0), inPlace<VectorU8>(v1), inPlace<VectorU8>(v2), inPlace<VectorU8>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2U8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, uint8_t* to) { hn::StoreInterleaved2(fromPortU8(a), fromPortU8(b), TagU8(), to); }
+HWY_INLINE void storeInterleaved3U8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, cvectorization_ops_raw_vector_u8 c, uint8_t* to) { hn::StoreInterleaved3(fromPortU8(a), fromPortU8(b), fromPortU8(c), TagU8(), to); }
+HWY_INLINE void storeInterleaved4U8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, cvectorization_ops_raw_vector_u8 c, cvectorization_ops_raw_vector_u8 d, uint8_t* to) { hn::StoreInterleaved4(fromPortU8(a), fromPortU8(b), fromPortU8(c), fromPortU8(d), TagU8(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 repeatingBlockU8(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5, uint8_t v6, uint8_t v7, uint8_t v8, uint8_t v9, uint8_t v10, uint8_t v11, uint8_t v12, uint8_t v13, uint8_t v14, uint8_t v15) { return toPortU8(hn::Dup128VecFromValues(TagU8(), v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15)); }
 
 using TagU16 = hn::ScalableTag<uint16_t>;
 using VectorU16 = hn::VFromD<TagU16>;
 using MaskU16 = hn::MFromD<TagU16>;
+typedef cvectorization_ops_raw_vector_u16 OutVectorU16 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountU16() { return hn::Lanes(TagU16()); }
-HWY_INLINE VectorU16 fromPortU16(cvectorization_ops_vector_u16 v) { return hn::LoadU(TagU16(), reinterpret_cast<const uint16_t*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_u16 toPortU16(VectorU16 v) { cvectorization_ops_vector_u16 port; hn::StoreU(v, TagU16(), reinterpret_cast<uint16_t*>(&port)); return port; }
-HWY_INLINE MaskU16 maskFromPortU16(cvectorization_ops_mask_u16 m) { const hn::RebindToSigned<TagU16> di; return hn::MaskFromVec(hn::BitCast(TagU16(), hn::LoadU(di, reinterpret_cast<const int16_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_u16 maskToPortU16(MaskU16 m) { const hn::RebindToSigned<TagU16> di; cvectorization_ops_mask_u16 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagU16(), m)), di, reinterpret_cast<int16_t*>(&port)); return port; }
-HWY_INLINE VectorU16 zeroU16() { return hn::Zero(TagU16()); }
-HWY_INLINE VectorU16 repeatingU16(uint16_t value) { return hn::Set(TagU16(), value); }
-HWY_INLINE VectorU16 iotaU16(uint16_t value) { return hn::Iota(TagU16(), value); }
-HWY_INLINE VectorU16 loadU16(const uint16_t* from) { return hn::LoadU(TagU16(), from); }
-HWY_INLINE VectorU16 loadAlignedU16(const uint16_t* from) { return hn::Load(TagU16(), from); }
-HWY_INLINE VectorU16 loadFirstU16(const uint16_t* from, size_t count) { return hn::LoadN(TagU16(), from, count); }
-HWY_INLINE void storeU16(VectorU16 a, uint16_t* to) { hn::StoreU(a, TagU16(), to); }
-HWY_INLINE void storeAlignedU16(VectorU16 a, uint16_t* to) { hn::Store(a, TagU16(), to); }
-HWY_INLINE void storeFirstU16(VectorU16 a, uint16_t* to, size_t count) { hn::StoreN(a, TagU16(), to, count); }
-HWY_INLINE VectorU16 addingU16(VectorU16 a, VectorU16 b) { return hn::Add(a, b); }
-HWY_INLINE VectorU16 subtractingU16(VectorU16 a, VectorU16 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorU16 multiplyingU16(VectorU16 a, VectorU16 b) { return hn::Mul(a, b); }
-HWY_INLINE VectorU16 minimumU16(VectorU16 a, VectorU16 b) { return hn::Min(a, b); }
-HWY_INLINE VectorU16 maximumU16(VectorU16 a, VectorU16 b) { return hn::Max(a, b); }
-HWY_INLINE VectorU16 saturatingAddingU16(VectorU16 a, VectorU16 b) { return hn::SaturatedAdd(a, b); }
-HWY_INLINE VectorU16 saturatingSubtractingU16(VectorU16 a, VectorU16 b) { return hn::SaturatedSub(a, b); }
-HWY_INLINE VectorU16 roundedAverageU16(VectorU16 a, VectorU16 b) { return hn::AverageRound(a, b); }
-HWY_INLINE VectorU16 bitwiseAndU16(VectorU16 a, VectorU16 b) { return hn::And(a, b); }
-HWY_INLINE VectorU16 bitwiseOrU16(VectorU16 a, VectorU16 b) { return hn::Or(a, b); }
-HWY_INLINE VectorU16 bitwiseXorU16(VectorU16 a, VectorU16 b) { return hn::Xor(a, b); }
-HWY_INLINE VectorU16 bitwiseNotU16(VectorU16 a) { return hn::Not(a); }
-HWY_INLINE VectorU16 bitwiseAndNotU16(VectorU16 a, VectorU16 b) { return hn::AndNot(a, b); }
-HWY_INLINE VectorU16 bitwiseAndXorU16(VectorU16 a, VectorU16 b, VectorU16 c) { return hn::AndXor(a, b, c); }
-HWY_INLINE VectorU16 shiftedLeftU16(VectorU16 a, int bits) { return hn::ShiftLeftSame(a, bits); }
-HWY_INLINE VectorU16 shiftedRightU16(VectorU16 a, int bits) { return hn::ShiftRightSame(a, bits); }
-HWY_INLINE MaskU16 equalToU16(VectorU16 a, VectorU16 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskU16 notEqualToU16(VectorU16 a, VectorU16 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskU16 lessThanU16(VectorU16 a, VectorU16 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskU16 greaterThanU16(VectorU16 a, VectorU16 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorU16 selectingU16(MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorU16 selectingOrZeroU16(MaskU16 mask, VectorU16 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorU16 zeroingSelectedU16(MaskU16 mask, VectorU16 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE VectorU16 bitwiseAndWhereU16(MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedAnd(mask, a, b); }
-HWY_INLINE VectorU16 bitwiseOrWhereU16(MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedOr(mask, a, b); }
-HWY_INLINE VectorU16 bitwiseXorWhereU16(MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedXor(mask, a, b); }
-HWY_INLINE VectorU16 bitwiseAndWhereOtherwiseU16(VectorU16 otherwise, MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU16 bitwiseOrWhereOtherwiseU16(VectorU16 otherwise, MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU16 bitwiseXorWhereOtherwiseU16(VectorU16 otherwise, MaskU16 mask, VectorU16 a, VectorU16 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
-HWY_INLINE MaskU16 firstLanesU16(size_t count) { return hn::FirstN(TagU16(), count); }
-HWY_INLINE bool allTrueU16(MaskU16 mask) { return hn::AllTrue(TagU16(), mask); }
-HWY_INLINE bool allFalseU16(MaskU16 mask) { return hn::AllFalse(TagU16(), mask); }
-HWY_INLINE size_t trueCountU16(MaskU16 mask) { return hn::CountTrue(TagU16(), mask); }
-HWY_INLINE intptr_t firstTrueIndexU16(MaskU16 mask) { return hn::FindFirstTrue(TagU16(), mask); }
-HWY_INLINE uint16_t sumU16(VectorU16 a) { return hn::ReduceSum(TagU16(), a); }
-HWY_INLINE uint16_t smallestU16(VectorU16 a) { return hn::ReduceMin(TagU16(), a); }
-HWY_INLINE uint16_t largestU16(VectorU16 a) { return hn::ReduceMax(TagU16(), a); }
-HWY_INLINE uint16_t firstLaneU16(VectorU16 a) { return hn::GetLane(a); }
-HWY_INLINE VectorU16 reversedU16(VectorU16 a) { return hn::Reverse(TagU16(), a); }
-HWY_INLINE VectorU16 slideUpLanesU16(VectorU16 a, size_t lanes) { return hn::SlideUpLanes(TagU16(), a, lanes); }
-HWY_INLINE VectorU16 slideUpLanesFillingWithU16(VectorU16 fill, VectorU16 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagU16(), a, lanes); }
-HWY_INLINE VectorU16 slideDownLanesU16(VectorU16 a, size_t lanes) { return hn::SlideDownLanes(TagU16(), a, lanes); }
-HWY_INLINE VectorU16 slideDownLanesFillingWithU16(VectorU16 fill, VectorU16 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagU16(), a, lanes); }
-HWY_INLINE VectorU16 slide1UpU16(VectorU16 a) { return hn::Slide1Up(TagU16(), a); }
-HWY_INLINE VectorU16 slide1UpFillingWithU16(uint16_t fill, VectorU16 a) { return hn::Slide1UpOr(fill, TagU16(), a); }
-HWY_INLINE VectorU16 slide1DownU16(VectorU16 a) { return hn::Slide1Down(TagU16(), a); }
-HWY_INLINE VectorU16 slide1DownFillingWithU16(uint16_t fill, VectorU16 a) { return hn::Slide1DownOr(fill, TagU16(), a); }
-HWY_INLINE void loadInterleaved2U16(const uint16_t* from, VectorU16& v0, VectorU16& v1) { hn::LoadInterleaved2(TagU16(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3U16(const uint16_t* from, VectorU16& v0, VectorU16& v1, VectorU16& v2) { hn::LoadInterleaved3(TagU16(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4U16(const uint16_t* from, VectorU16& v0, VectorU16& v1, VectorU16& v2, VectorU16& v3) { hn::LoadInterleaved4(TagU16(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2U16(VectorU16 a, VectorU16 b, uint16_t* to) { hn::StoreInterleaved2(a, b, TagU16(), to); }
-HWY_INLINE void storeInterleaved3U16(VectorU16 a, VectorU16 b, VectorU16 c, uint16_t* to) { hn::StoreInterleaved3(a, b, c, TagU16(), to); }
-HWY_INLINE void storeInterleaved4U16(VectorU16 a, VectorU16 b, VectorU16 c, VectorU16 d, uint16_t* to) { hn::StoreInterleaved4(a, b, c, d, TagU16(), to); }
-HWY_INLINE VectorU16 loadWideningU8ToU16(const uint8_t* from) { return hn::PromoteTo(TagU16(), hn::LoadU(hn::Rebind<uint8_t, TagU16>(), from)); }
-HWY_INLINE VectorU16 loadFirstWideningU8ToU16(const uint8_t* from, size_t count) { return hn::PromoteTo(TagU16(), hn::LoadN(hn::Rebind<uint8_t, TagU16>(), from, count)); }
-HWY_INLINE VectorU16 repeatingBlockU16(uint16_t v0, uint16_t v1, uint16_t v2, uint16_t v3, uint16_t v4, uint16_t v5, uint16_t v6, uint16_t v7) { return hn::Dup128VecFromValues(TagU16(), v0, v1, v2, v3, v4, v5, v6, v7); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorU16 fromPortU16(cvectorization_ops_raw_vector_u16 v) { return svset_neonq_u16(svundef_u16(), (uint16x8_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 toPortU16(VectorU16 v) { return (cvectorization_ops_raw_vector_u16)svget_neonq_u16(v); }
+HWY_INLINE MaskU16 maskFromPortU16(cvectorization_ops_raw_mask_u16 m) { return hn::MaskFromVec(hn::BitCast(TagU16(), svset_neonq_s16(svundef_s16(), (int16x8_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 maskToPortU16(MaskU16 m) { const hn::RebindToSigned<TagU16> di; return (cvectorization_ops_raw_mask_u16)svget_neonq_s16(hn::BitCast(di, hn::VecFromMask(TagU16(), m))); }
+#else
+HWY_INLINE VectorU16 fromPortU16(cvectorization_ops_raw_vector_u16 v) { return hn::LoadU(TagU16(), reinterpret_cast<const uint16_t*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 toPortU16(VectorU16 v) { cvectorization_ops_raw_vector_u16 port; hn::StoreU(v, TagU16(), reinterpret_cast<uint16_t*>(&port)); return port; }
+HWY_INLINE MaskU16 maskFromPortU16(cvectorization_ops_raw_mask_u16 m) { const hn::RebindToSigned<TagU16> di; return hn::MaskFromVec(hn::BitCast(TagU16(), hn::LoadU(di, reinterpret_cast<const int16_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 maskToPortU16(MaskU16 m) { const hn::RebindToSigned<TagU16> di; cvectorization_ops_raw_mask_u16 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagU16(), m)), di, reinterpret_cast<int16_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_u16 zeroU16() { return toPortU16(hn::Zero(TagU16())); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 repeatingU16(uint16_t value) { return toPortU16(hn::Set(TagU16(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 iotaU16(uint16_t value) { return toPortU16(hn::Iota(TagU16(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadU16(const uint16_t* from) { return toPortU16(hn::LoadU(TagU16(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadAlignedU16(const uint16_t* from) { return toPortU16(hn::Load(TagU16(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadFirstU16(const uint16_t* from, size_t count) { return toPortU16(hn::LoadN(TagU16(), from, count)); }
+HWY_INLINE void storeU16(cvectorization_ops_raw_vector_u16 a, uint16_t* to) { hn::StoreU(fromPortU16(a), TagU16(), to); }
+HWY_INLINE void storeAlignedU16(cvectorization_ops_raw_vector_u16 a, uint16_t* to) { hn::Store(fromPortU16(a), TagU16(), to); }
+HWY_INLINE void storeFirstU16(cvectorization_ops_raw_vector_u16 a, uint16_t* to, size_t count) { hn::StoreN(fromPortU16(a), TagU16(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 addingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::Add(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 subtractingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::Sub(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 multiplyingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::Mul(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 minimumU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::Min(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 maximumU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::Max(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 saturatingAddingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::SaturatedAdd(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 saturatingSubtractingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::SaturatedSub(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 roundedAverageU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::AverageRound(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::And(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseOrU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::Or(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseXorU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::Xor(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseNotU16(cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Not(fromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndNotU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::AndNot(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndXorU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, cvectorization_ops_raw_vector_u16 c) { return toPortU16(hn::AndXor(fromPortU16(a), fromPortU16(b), fromPortU16(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 shiftedLeftU16(cvectorization_ops_raw_vector_u16 a, int bits) { return toPortU16(hn::ShiftLeftSame(fromPortU16(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 shiftedRightU16(cvectorization_ops_raw_vector_u16 a, int bits) { return toPortU16(hn::ShiftRightSame(fromPortU16(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 equalToU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return maskToPortU16(hn::Eq(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 notEqualToU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return maskToPortU16(hn::Ne(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 lessThanU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return maskToPortU16(hn::Lt(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 greaterThanU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return maskToPortU16(hn::Gt(fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 selectingU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::IfThenElse(maskFromPortU16(mask), fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 selectingOrZeroU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::IfThenElseZero(maskFromPortU16(mask), fromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 zeroingSelectedU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::IfThenZeroElse(maskFromPortU16(mask), fromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndWhereU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::MaskedAnd(maskFromPortU16(mask), fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseOrWhereU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::MaskedOr(maskFromPortU16(mask), fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseXorWhereU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::MaskedXor(maskFromPortU16(mask), fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndWhereOtherwiseU16(cvectorization_ops_raw_vector_u16 otherwise, cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::MaskedAndOr(fromPortU16(otherwise), maskFromPortU16(mask), fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseOrWhereOtherwiseU16(cvectorization_ops_raw_vector_u16 otherwise, cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::MaskedOrOr(fromPortU16(otherwise), maskFromPortU16(mask), fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseXorWhereOtherwiseU16(cvectorization_ops_raw_vector_u16 otherwise, cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU16(hn::MaskedXorOr(fromPortU16(otherwise), maskFromPortU16(mask), fromPortU16(a), fromPortU16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 firstLanesU16(size_t count) { return maskToPortU16(hn::FirstN(TagU16(), count)); }
+HWY_INLINE bool allTrueU16(cvectorization_ops_raw_mask_u16 mask) { return hn::AllTrue(TagU16(), maskFromPortU16(mask)); }
+HWY_INLINE bool allFalseU16(cvectorization_ops_raw_mask_u16 mask) { return hn::AllFalse(TagU16(), maskFromPortU16(mask)); }
+HWY_INLINE size_t trueCountU16(cvectorization_ops_raw_mask_u16 mask) { return hn::CountTrue(TagU16(), maskFromPortU16(mask)); }
+HWY_INLINE intptr_t firstTrueIndexU16(cvectorization_ops_raw_mask_u16 mask) { return hn::FindFirstTrue(TagU16(), maskFromPortU16(mask)); }
+HWY_INLINE uint16_t sumU16(cvectorization_ops_raw_vector_u16 a) { return hn::ReduceSum(TagU16(), fromPortU16(a)); }
+HWY_INLINE uint16_t smallestU16(cvectorization_ops_raw_vector_u16 a) { return hn::ReduceMin(TagU16(), fromPortU16(a)); }
+HWY_INLINE uint16_t largestU16(cvectorization_ops_raw_vector_u16 a) { return hn::ReduceMax(TagU16(), fromPortU16(a)); }
+HWY_INLINE uint16_t firstLaneU16(cvectorization_ops_raw_vector_u16 a) { return hn::GetLane(fromPortU16(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 reversedU16(cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Reverse(TagU16(), fromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slideUpLanesU16(cvectorization_ops_raw_vector_u16 a, size_t lanes) { return toPortU16(hn::SlideUpLanes(TagU16(), fromPortU16(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slideUpLanesFillingWithU16(cvectorization_ops_raw_vector_u16 fill, cvectorization_ops_raw_vector_u16 a, size_t lanes) { return toPortU16(hn::SlideUpLanesOr(fromPortU16(fill), TagU16(), fromPortU16(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slideDownLanesU16(cvectorization_ops_raw_vector_u16 a, size_t lanes) { return toPortU16(hn::SlideDownLanes(TagU16(), fromPortU16(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slideDownLanesFillingWithU16(cvectorization_ops_raw_vector_u16 fill, cvectorization_ops_raw_vector_u16 a, size_t lanes) { return toPortU16(hn::SlideDownLanesOr(fromPortU16(fill), TagU16(), fromPortU16(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slide1UpU16(cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Slide1Up(TagU16(), fromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slide1UpFillingWithU16(uint16_t fill, cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Slide1UpOr(fill, TagU16(), fromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slide1DownU16(cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Slide1Down(TagU16(), fromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slide1DownFillingWithU16(uint16_t fill, cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::Slide1DownOr(fill, TagU16(), fromPortU16(a))); }
+HWY_INLINE void loadInterleaved2U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorU16 h0, h1;
+  hn::LoadInterleaved2(TagU16(), from, h0, h1);
+  v0 = toPortU16(h0);
+  v1 = toPortU16(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorU16 h0, h1;
+  hn::LoadInterleaved2(TagU16(), from, h0, h1);
+  hn::StoreU(h0, TagU16(), reinterpret_cast<uint16_t*>(&v0));
+  hn::StoreU(h1, TagU16(), reinterpret_cast<uint16_t*>(&v1));
+#else
+  hn::LoadInterleaved2(TagU16(), from, inPlace<VectorU16>(v0), inPlace<VectorU16>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1, OutVectorU16& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorU16 h0, h1, h2;
+  hn::LoadInterleaved3(TagU16(), from, h0, h1, h2);
+  v0 = toPortU16(h0);
+  v1 = toPortU16(h1);
+  v2 = toPortU16(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorU16 h0, h1, h2;
+  hn::LoadInterleaved3(TagU16(), from, h0, h1, h2);
+  hn::StoreU(h0, TagU16(), reinterpret_cast<uint16_t*>(&v0));
+  hn::StoreU(h1, TagU16(), reinterpret_cast<uint16_t*>(&v1));
+  hn::StoreU(h2, TagU16(), reinterpret_cast<uint16_t*>(&v2));
+#else
+  hn::LoadInterleaved3(TagU16(), from, inPlace<VectorU16>(v0), inPlace<VectorU16>(v1), inPlace<VectorU16>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1, OutVectorU16& v2, OutVectorU16& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorU16 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagU16(), from, h0, h1, h2, h3);
+  v0 = toPortU16(h0);
+  v1 = toPortU16(h1);
+  v2 = toPortU16(h2);
+  v3 = toPortU16(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorU16 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagU16(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagU16(), reinterpret_cast<uint16_t*>(&v0));
+  hn::StoreU(h1, TagU16(), reinterpret_cast<uint16_t*>(&v1));
+  hn::StoreU(h2, TagU16(), reinterpret_cast<uint16_t*>(&v2));
+  hn::StoreU(h3, TagU16(), reinterpret_cast<uint16_t*>(&v3));
+#else
+  hn::LoadInterleaved4(TagU16(), from, inPlace<VectorU16>(v0), inPlace<VectorU16>(v1), inPlace<VectorU16>(v2), inPlace<VectorU16>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2U16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, uint16_t* to) { hn::StoreInterleaved2(fromPortU16(a), fromPortU16(b), TagU16(), to); }
+HWY_INLINE void storeInterleaved3U16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, cvectorization_ops_raw_vector_u16 c, uint16_t* to) { hn::StoreInterleaved3(fromPortU16(a), fromPortU16(b), fromPortU16(c), TagU16(), to); }
+HWY_INLINE void storeInterleaved4U16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, cvectorization_ops_raw_vector_u16 c, cvectorization_ops_raw_vector_u16 d, uint16_t* to) { hn::StoreInterleaved4(fromPortU16(a), fromPortU16(b), fromPortU16(c), fromPortU16(d), TagU16(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadWideningU8ToU16(const uint8_t* from) { return toPortU16(hn::PromoteTo(TagU16(), hn::LoadU(hn::Rebind<uint8_t, TagU16>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadFirstWideningU8ToU16(const uint8_t* from, size_t count) { return toPortU16(hn::PromoteTo(TagU16(), hn::LoadN(hn::Rebind<uint8_t, TagU16>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 repeatingBlockU16(uint16_t v0, uint16_t v1, uint16_t v2, uint16_t v3, uint16_t v4, uint16_t v5, uint16_t v6, uint16_t v7) { return toPortU16(hn::Dup128VecFromValues(TagU16(), v0, v1, v2, v3, v4, v5, v6, v7)); }
 
 using TagU32 = hn::ScalableTag<uint32_t>;
 using VectorU32 = hn::VFromD<TagU32>;
 using MaskU32 = hn::MFromD<TagU32>;
+typedef cvectorization_ops_raw_vector_u32 OutVectorU32 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountU32() { return hn::Lanes(TagU32()); }
-HWY_INLINE VectorU32 fromPortU32(cvectorization_ops_vector_u32 v) { return hn::LoadU(TagU32(), reinterpret_cast<const uint32_t*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_u32 toPortU32(VectorU32 v) { cvectorization_ops_vector_u32 port; hn::StoreU(v, TagU32(), reinterpret_cast<uint32_t*>(&port)); return port; }
-HWY_INLINE MaskU32 maskFromPortU32(cvectorization_ops_mask_u32 m) { const hn::RebindToSigned<TagU32> di; return hn::MaskFromVec(hn::BitCast(TagU32(), hn::LoadU(di, reinterpret_cast<const int32_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_u32 maskToPortU32(MaskU32 m) { const hn::RebindToSigned<TagU32> di; cvectorization_ops_mask_u32 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagU32(), m)), di, reinterpret_cast<int32_t*>(&port)); return port; }
-HWY_INLINE VectorU32 zeroU32() { return hn::Zero(TagU32()); }
-HWY_INLINE VectorU32 repeatingU32(uint32_t value) { return hn::Set(TagU32(), value); }
-HWY_INLINE VectorU32 iotaU32(uint32_t value) { return hn::Iota(TagU32(), value); }
-HWY_INLINE VectorU32 loadU32(const uint32_t* from) { return hn::LoadU(TagU32(), from); }
-HWY_INLINE VectorU32 loadAlignedU32(const uint32_t* from) { return hn::Load(TagU32(), from); }
-HWY_INLINE VectorU32 loadFirstU32(const uint32_t* from, size_t count) { return hn::LoadN(TagU32(), from, count); }
-HWY_INLINE void storeU32(VectorU32 a, uint32_t* to) { hn::StoreU(a, TagU32(), to); }
-HWY_INLINE void storeAlignedU32(VectorU32 a, uint32_t* to) { hn::Store(a, TagU32(), to); }
-HWY_INLINE void storeFirstU32(VectorU32 a, uint32_t* to, size_t count) { hn::StoreN(a, TagU32(), to, count); }
-HWY_INLINE VectorU32 addingU32(VectorU32 a, VectorU32 b) { return hn::Add(a, b); }
-HWY_INLINE VectorU32 subtractingU32(VectorU32 a, VectorU32 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorU32 multiplyingU32(VectorU32 a, VectorU32 b) { return hn::Mul(a, b); }
-HWY_INLINE VectorU32 minimumU32(VectorU32 a, VectorU32 b) { return hn::Min(a, b); }
-HWY_INLINE VectorU32 maximumU32(VectorU32 a, VectorU32 b) { return hn::Max(a, b); }
-HWY_INLINE VectorU32 bitwiseAndU32(VectorU32 a, VectorU32 b) { return hn::And(a, b); }
-HWY_INLINE VectorU32 bitwiseOrU32(VectorU32 a, VectorU32 b) { return hn::Or(a, b); }
-HWY_INLINE VectorU32 bitwiseXorU32(VectorU32 a, VectorU32 b) { return hn::Xor(a, b); }
-HWY_INLINE VectorU32 bitwiseNotU32(VectorU32 a) { return hn::Not(a); }
-HWY_INLINE VectorU32 bitwiseAndNotU32(VectorU32 a, VectorU32 b) { return hn::AndNot(a, b); }
-HWY_INLINE VectorU32 bitwiseAndXorU32(VectorU32 a, VectorU32 b, VectorU32 c) { return hn::AndXor(a, b, c); }
-HWY_INLINE VectorU32 shiftedLeftU32(VectorU32 a, int bits) { return hn::ShiftLeftSame(a, bits); }
-HWY_INLINE VectorU32 shiftedRightU32(VectorU32 a, int bits) { return hn::ShiftRightSame(a, bits); }
-HWY_INLINE MaskU32 equalToU32(VectorU32 a, VectorU32 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskU32 notEqualToU32(VectorU32 a, VectorU32 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskU32 lessThanU32(VectorU32 a, VectorU32 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskU32 greaterThanU32(VectorU32 a, VectorU32 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorU32 selectingU32(MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorU32 selectingOrZeroU32(MaskU32 mask, VectorU32 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorU32 zeroingSelectedU32(MaskU32 mask, VectorU32 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE VectorU32 bitwiseAndWhereU32(MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedAnd(mask, a, b); }
-HWY_INLINE VectorU32 bitwiseOrWhereU32(MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedOr(mask, a, b); }
-HWY_INLINE VectorU32 bitwiseXorWhereU32(MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedXor(mask, a, b); }
-HWY_INLINE VectorU32 bitwiseAndWhereOtherwiseU32(VectorU32 otherwise, MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU32 bitwiseOrWhereOtherwiseU32(VectorU32 otherwise, MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU32 bitwiseXorWhereOtherwiseU32(VectorU32 otherwise, MaskU32 mask, VectorU32 a, VectorU32 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
-HWY_INLINE MaskU32 firstLanesU32(size_t count) { return hn::FirstN(TagU32(), count); }
-HWY_INLINE bool allTrueU32(MaskU32 mask) { return hn::AllTrue(TagU32(), mask); }
-HWY_INLINE bool allFalseU32(MaskU32 mask) { return hn::AllFalse(TagU32(), mask); }
-HWY_INLINE size_t trueCountU32(MaskU32 mask) { return hn::CountTrue(TagU32(), mask); }
-HWY_INLINE intptr_t firstTrueIndexU32(MaskU32 mask) { return hn::FindFirstTrue(TagU32(), mask); }
-HWY_INLINE uint32_t sumU32(VectorU32 a) { return hn::ReduceSum(TagU32(), a); }
-HWY_INLINE uint32_t smallestU32(VectorU32 a) { return hn::ReduceMin(TagU32(), a); }
-HWY_INLINE uint32_t largestU32(VectorU32 a) { return hn::ReduceMax(TagU32(), a); }
-HWY_INLINE uint32_t firstLaneU32(VectorU32 a) { return hn::GetLane(a); }
-HWY_INLINE VectorU32 reversedU32(VectorU32 a) { return hn::Reverse(TagU32(), a); }
-HWY_INLINE VectorU32 slideUpLanesU32(VectorU32 a, size_t lanes) { return hn::SlideUpLanes(TagU32(), a, lanes); }
-HWY_INLINE VectorU32 slideUpLanesFillingWithU32(VectorU32 fill, VectorU32 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagU32(), a, lanes); }
-HWY_INLINE VectorU32 slideDownLanesU32(VectorU32 a, size_t lanes) { return hn::SlideDownLanes(TagU32(), a, lanes); }
-HWY_INLINE VectorU32 slideDownLanesFillingWithU32(VectorU32 fill, VectorU32 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagU32(), a, lanes); }
-HWY_INLINE VectorU32 slide1UpU32(VectorU32 a) { return hn::Slide1Up(TagU32(), a); }
-HWY_INLINE VectorU32 slide1UpFillingWithU32(uint32_t fill, VectorU32 a) { return hn::Slide1UpOr(fill, TagU32(), a); }
-HWY_INLINE VectorU32 slide1DownU32(VectorU32 a) { return hn::Slide1Down(TagU32(), a); }
-HWY_INLINE VectorU32 slide1DownFillingWithU32(uint32_t fill, VectorU32 a) { return hn::Slide1DownOr(fill, TagU32(), a); }
-HWY_INLINE void loadInterleaved2U32(const uint32_t* from, VectorU32& v0, VectorU32& v1) { hn::LoadInterleaved2(TagU32(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3U32(const uint32_t* from, VectorU32& v0, VectorU32& v1, VectorU32& v2) { hn::LoadInterleaved3(TagU32(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4U32(const uint32_t* from, VectorU32& v0, VectorU32& v1, VectorU32& v2, VectorU32& v3) { hn::LoadInterleaved4(TagU32(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2U32(VectorU32 a, VectorU32 b, uint32_t* to) { hn::StoreInterleaved2(a, b, TagU32(), to); }
-HWY_INLINE void storeInterleaved3U32(VectorU32 a, VectorU32 b, VectorU32 c, uint32_t* to) { hn::StoreInterleaved3(a, b, c, TagU32(), to); }
-HWY_INLINE void storeInterleaved4U32(VectorU32 a, VectorU32 b, VectorU32 c, VectorU32 d, uint32_t* to) { hn::StoreInterleaved4(a, b, c, d, TagU32(), to); }
-HWY_INLINE VectorU32 loadWideningU8ToU32(const uint8_t* from) { return hn::PromoteTo(TagU32(), hn::LoadU(hn::Rebind<uint8_t, TagU32>(), from)); }
-HWY_INLINE VectorU32 loadWideningU16ToU32(const uint16_t* from) { return hn::PromoteTo(TagU32(), hn::LoadU(hn::Rebind<uint16_t, TagU32>(), from)); }
-HWY_INLINE VectorU32 loadFirstWideningU8ToU32(const uint8_t* from, size_t count) { return hn::PromoteTo(TagU32(), hn::LoadN(hn::Rebind<uint8_t, TagU32>(), from, count)); }
-HWY_INLINE VectorU32 loadFirstWideningU16ToU32(const uint16_t* from, size_t count) { return hn::PromoteTo(TagU32(), hn::LoadN(hn::Rebind<uint16_t, TagU32>(), from, count)); }
-HWY_INLINE VectorU32 repeatingBlockU32(uint32_t v0, uint32_t v1, uint32_t v2, uint32_t v3) { return hn::Dup128VecFromValues(TagU32(), v0, v1, v2, v3); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorU32 fromPortU32(cvectorization_ops_raw_vector_u32 v) { return svset_neonq_u32(svundef_u32(), (uint32x4_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 toPortU32(VectorU32 v) { return (cvectorization_ops_raw_vector_u32)svget_neonq_u32(v); }
+HWY_INLINE MaskU32 maskFromPortU32(cvectorization_ops_raw_mask_u32 m) { return hn::MaskFromVec(hn::BitCast(TagU32(), svset_neonq_s32(svundef_s32(), (int32x4_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 maskToPortU32(MaskU32 m) { const hn::RebindToSigned<TagU32> di; return (cvectorization_ops_raw_mask_u32)svget_neonq_s32(hn::BitCast(di, hn::VecFromMask(TagU32(), m))); }
+#else
+HWY_INLINE VectorU32 fromPortU32(cvectorization_ops_raw_vector_u32 v) { return hn::LoadU(TagU32(), reinterpret_cast<const uint32_t*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 toPortU32(VectorU32 v) { cvectorization_ops_raw_vector_u32 port; hn::StoreU(v, TagU32(), reinterpret_cast<uint32_t*>(&port)); return port; }
+HWY_INLINE MaskU32 maskFromPortU32(cvectorization_ops_raw_mask_u32 m) { const hn::RebindToSigned<TagU32> di; return hn::MaskFromVec(hn::BitCast(TagU32(), hn::LoadU(di, reinterpret_cast<const int32_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 maskToPortU32(MaskU32 m) { const hn::RebindToSigned<TagU32> di; cvectorization_ops_raw_mask_u32 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagU32(), m)), di, reinterpret_cast<int32_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_u32 zeroU32() { return toPortU32(hn::Zero(TagU32())); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 repeatingU32(uint32_t value) { return toPortU32(hn::Set(TagU32(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 iotaU32(uint32_t value) { return toPortU32(hn::Iota(TagU32(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadU32(const uint32_t* from) { return toPortU32(hn::LoadU(TagU32(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadAlignedU32(const uint32_t* from) { return toPortU32(hn::Load(TagU32(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstU32(const uint32_t* from, size_t count) { return toPortU32(hn::LoadN(TagU32(), from, count)); }
+HWY_INLINE void storeU32(cvectorization_ops_raw_vector_u32 a, uint32_t* to) { hn::StoreU(fromPortU32(a), TagU32(), to); }
+HWY_INLINE void storeAlignedU32(cvectorization_ops_raw_vector_u32 a, uint32_t* to) { hn::Store(fromPortU32(a), TagU32(), to); }
+HWY_INLINE void storeFirstU32(cvectorization_ops_raw_vector_u32 a, uint32_t* to, size_t count) { hn::StoreN(fromPortU32(a), TagU32(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 addingU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::Add(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 subtractingU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::Sub(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 multiplyingU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::Mul(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 minimumU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::Min(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 maximumU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::Max(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::And(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseOrU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::Or(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseXorU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::Xor(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseNotU32(cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Not(fromPortU32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndNotU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::AndNot(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndXorU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, cvectorization_ops_raw_vector_u32 c) { return toPortU32(hn::AndXor(fromPortU32(a), fromPortU32(b), fromPortU32(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 shiftedLeftU32(cvectorization_ops_raw_vector_u32 a, int bits) { return toPortU32(hn::ShiftLeftSame(fromPortU32(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 shiftedRightU32(cvectorization_ops_raw_vector_u32 a, int bits) { return toPortU32(hn::ShiftRightSame(fromPortU32(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 equalToU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return maskToPortU32(hn::Eq(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 notEqualToU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return maskToPortU32(hn::Ne(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 lessThanU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return maskToPortU32(hn::Lt(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 greaterThanU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return maskToPortU32(hn::Gt(fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 selectingU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::IfThenElse(maskFromPortU32(mask), fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 selectingOrZeroU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::IfThenElseZero(maskFromPortU32(mask), fromPortU32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 zeroingSelectedU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::IfThenZeroElse(maskFromPortU32(mask), fromPortU32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndWhereU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::MaskedAnd(maskFromPortU32(mask), fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseOrWhereU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::MaskedOr(maskFromPortU32(mask), fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseXorWhereU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::MaskedXor(maskFromPortU32(mask), fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndWhereOtherwiseU32(cvectorization_ops_raw_vector_u32 otherwise, cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::MaskedAndOr(fromPortU32(otherwise), maskFromPortU32(mask), fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseOrWhereOtherwiseU32(cvectorization_ops_raw_vector_u32 otherwise, cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::MaskedOrOr(fromPortU32(otherwise), maskFromPortU32(mask), fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseXorWhereOtherwiseU32(cvectorization_ops_raw_vector_u32 otherwise, cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU32(hn::MaskedXorOr(fromPortU32(otherwise), maskFromPortU32(mask), fromPortU32(a), fromPortU32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 firstLanesU32(size_t count) { return maskToPortU32(hn::FirstN(TagU32(), count)); }
+HWY_INLINE bool allTrueU32(cvectorization_ops_raw_mask_u32 mask) { return hn::AllTrue(TagU32(), maskFromPortU32(mask)); }
+HWY_INLINE bool allFalseU32(cvectorization_ops_raw_mask_u32 mask) { return hn::AllFalse(TagU32(), maskFromPortU32(mask)); }
+HWY_INLINE size_t trueCountU32(cvectorization_ops_raw_mask_u32 mask) { return hn::CountTrue(TagU32(), maskFromPortU32(mask)); }
+HWY_INLINE intptr_t firstTrueIndexU32(cvectorization_ops_raw_mask_u32 mask) { return hn::FindFirstTrue(TagU32(), maskFromPortU32(mask)); }
+HWY_INLINE uint32_t sumU32(cvectorization_ops_raw_vector_u32 a) { return hn::ReduceSum(TagU32(), fromPortU32(a)); }
+HWY_INLINE uint32_t smallestU32(cvectorization_ops_raw_vector_u32 a) { return hn::ReduceMin(TagU32(), fromPortU32(a)); }
+HWY_INLINE uint32_t largestU32(cvectorization_ops_raw_vector_u32 a) { return hn::ReduceMax(TagU32(), fromPortU32(a)); }
+HWY_INLINE uint32_t firstLaneU32(cvectorization_ops_raw_vector_u32 a) { return hn::GetLane(fromPortU32(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 reversedU32(cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Reverse(TagU32(), fromPortU32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slideUpLanesU32(cvectorization_ops_raw_vector_u32 a, size_t lanes) { return toPortU32(hn::SlideUpLanes(TagU32(), fromPortU32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slideUpLanesFillingWithU32(cvectorization_ops_raw_vector_u32 fill, cvectorization_ops_raw_vector_u32 a, size_t lanes) { return toPortU32(hn::SlideUpLanesOr(fromPortU32(fill), TagU32(), fromPortU32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slideDownLanesU32(cvectorization_ops_raw_vector_u32 a, size_t lanes) { return toPortU32(hn::SlideDownLanes(TagU32(), fromPortU32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slideDownLanesFillingWithU32(cvectorization_ops_raw_vector_u32 fill, cvectorization_ops_raw_vector_u32 a, size_t lanes) { return toPortU32(hn::SlideDownLanesOr(fromPortU32(fill), TagU32(), fromPortU32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slide1UpU32(cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Slide1Up(TagU32(), fromPortU32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slide1UpFillingWithU32(uint32_t fill, cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Slide1UpOr(fill, TagU32(), fromPortU32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slide1DownU32(cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Slide1Down(TagU32(), fromPortU32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slide1DownFillingWithU32(uint32_t fill, cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::Slide1DownOr(fill, TagU32(), fromPortU32(a))); }
+HWY_INLINE void loadInterleaved2U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorU32 h0, h1;
+  hn::LoadInterleaved2(TagU32(), from, h0, h1);
+  v0 = toPortU32(h0);
+  v1 = toPortU32(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorU32 h0, h1;
+  hn::LoadInterleaved2(TagU32(), from, h0, h1);
+  hn::StoreU(h0, TagU32(), reinterpret_cast<uint32_t*>(&v0));
+  hn::StoreU(h1, TagU32(), reinterpret_cast<uint32_t*>(&v1));
+#else
+  hn::LoadInterleaved2(TagU32(), from, inPlace<VectorU32>(v0), inPlace<VectorU32>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1, OutVectorU32& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorU32 h0, h1, h2;
+  hn::LoadInterleaved3(TagU32(), from, h0, h1, h2);
+  v0 = toPortU32(h0);
+  v1 = toPortU32(h1);
+  v2 = toPortU32(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorU32 h0, h1, h2;
+  hn::LoadInterleaved3(TagU32(), from, h0, h1, h2);
+  hn::StoreU(h0, TagU32(), reinterpret_cast<uint32_t*>(&v0));
+  hn::StoreU(h1, TagU32(), reinterpret_cast<uint32_t*>(&v1));
+  hn::StoreU(h2, TagU32(), reinterpret_cast<uint32_t*>(&v2));
+#else
+  hn::LoadInterleaved3(TagU32(), from, inPlace<VectorU32>(v0), inPlace<VectorU32>(v1), inPlace<VectorU32>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1, OutVectorU32& v2, OutVectorU32& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorU32 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagU32(), from, h0, h1, h2, h3);
+  v0 = toPortU32(h0);
+  v1 = toPortU32(h1);
+  v2 = toPortU32(h2);
+  v3 = toPortU32(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorU32 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagU32(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagU32(), reinterpret_cast<uint32_t*>(&v0));
+  hn::StoreU(h1, TagU32(), reinterpret_cast<uint32_t*>(&v1));
+  hn::StoreU(h2, TagU32(), reinterpret_cast<uint32_t*>(&v2));
+  hn::StoreU(h3, TagU32(), reinterpret_cast<uint32_t*>(&v3));
+#else
+  hn::LoadInterleaved4(TagU32(), from, inPlace<VectorU32>(v0), inPlace<VectorU32>(v1), inPlace<VectorU32>(v2), inPlace<VectorU32>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2U32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, uint32_t* to) { hn::StoreInterleaved2(fromPortU32(a), fromPortU32(b), TagU32(), to); }
+HWY_INLINE void storeInterleaved3U32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, cvectorization_ops_raw_vector_u32 c, uint32_t* to) { hn::StoreInterleaved3(fromPortU32(a), fromPortU32(b), fromPortU32(c), TagU32(), to); }
+HWY_INLINE void storeInterleaved4U32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, cvectorization_ops_raw_vector_u32 c, cvectorization_ops_raw_vector_u32 d, uint32_t* to) { hn::StoreInterleaved4(fromPortU32(a), fromPortU32(b), fromPortU32(c), fromPortU32(d), TagU32(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadWideningU8ToU32(const uint8_t* from) { return toPortU32(hn::PromoteTo(TagU32(), hn::LoadU(hn::Rebind<uint8_t, TagU32>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadWideningU16ToU32(const uint16_t* from) { return toPortU32(hn::PromoteTo(TagU32(), hn::LoadU(hn::Rebind<uint16_t, TagU32>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstWideningU8ToU32(const uint8_t* from, size_t count) { return toPortU32(hn::PromoteTo(TagU32(), hn::LoadN(hn::Rebind<uint8_t, TagU32>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstWideningU16ToU32(const uint16_t* from, size_t count) { return toPortU32(hn::PromoteTo(TagU32(), hn::LoadN(hn::Rebind<uint16_t, TagU32>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 repeatingBlockU32(uint32_t v0, uint32_t v1, uint32_t v2, uint32_t v3) { return toPortU32(hn::Dup128VecFromValues(TagU32(), v0, v1, v2, v3)); }
 
 using TagU64 = hn::ScalableTag<uint64_t>;
 using VectorU64 = hn::VFromD<TagU64>;
 using MaskU64 = hn::MFromD<TagU64>;
+typedef cvectorization_ops_raw_vector_u64 OutVectorU64 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountU64() { return hn::Lanes(TagU64()); }
-HWY_INLINE VectorU64 fromPortU64(cvectorization_ops_vector_u64 v) { return hn::LoadU(TagU64(), reinterpret_cast<const uint64_t*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_u64 toPortU64(VectorU64 v) { cvectorization_ops_vector_u64 port; hn::StoreU(v, TagU64(), reinterpret_cast<uint64_t*>(&port)); return port; }
-HWY_INLINE MaskU64 maskFromPortU64(cvectorization_ops_mask_u64 m) { const hn::RebindToSigned<TagU64> di; return hn::MaskFromVec(hn::BitCast(TagU64(), hn::LoadU(di, reinterpret_cast<const int64_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_u64 maskToPortU64(MaskU64 m) { const hn::RebindToSigned<TagU64> di; cvectorization_ops_mask_u64 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagU64(), m)), di, reinterpret_cast<int64_t*>(&port)); return port; }
-HWY_INLINE VectorU64 zeroU64() { return hn::Zero(TagU64()); }
-HWY_INLINE VectorU64 repeatingU64(uint64_t value) { return hn::Set(TagU64(), value); }
-HWY_INLINE VectorU64 iotaU64(uint64_t value) { return hn::Iota(TagU64(), value); }
-HWY_INLINE VectorU64 loadU64(const uint64_t* from) { return hn::LoadU(TagU64(), from); }
-HWY_INLINE VectorU64 loadAlignedU64(const uint64_t* from) { return hn::Load(TagU64(), from); }
-HWY_INLINE VectorU64 loadFirstU64(const uint64_t* from, size_t count) { return hn::LoadN(TagU64(), from, count); }
-HWY_INLINE void storeU64(VectorU64 a, uint64_t* to) { hn::StoreU(a, TagU64(), to); }
-HWY_INLINE void storeAlignedU64(VectorU64 a, uint64_t* to) { hn::Store(a, TagU64(), to); }
-HWY_INLINE void storeFirstU64(VectorU64 a, uint64_t* to, size_t count) { hn::StoreN(a, TagU64(), to, count); }
-HWY_INLINE VectorU64 addingU64(VectorU64 a, VectorU64 b) { return hn::Add(a, b); }
-HWY_INLINE VectorU64 subtractingU64(VectorU64 a, VectorU64 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorU64 multiplyingU64(VectorU64 a, VectorU64 b) { return hn::Mul(a, b); }
-HWY_INLINE VectorU64 minimumU64(VectorU64 a, VectorU64 b) { return hn::Min(a, b); }
-HWY_INLINE VectorU64 maximumU64(VectorU64 a, VectorU64 b) { return hn::Max(a, b); }
-HWY_INLINE VectorU64 bitwiseAndU64(VectorU64 a, VectorU64 b) { return hn::And(a, b); }
-HWY_INLINE VectorU64 bitwiseOrU64(VectorU64 a, VectorU64 b) { return hn::Or(a, b); }
-HWY_INLINE VectorU64 bitwiseXorU64(VectorU64 a, VectorU64 b) { return hn::Xor(a, b); }
-HWY_INLINE VectorU64 bitwiseNotU64(VectorU64 a) { return hn::Not(a); }
-HWY_INLINE VectorU64 bitwiseAndNotU64(VectorU64 a, VectorU64 b) { return hn::AndNot(a, b); }
-HWY_INLINE VectorU64 bitwiseAndXorU64(VectorU64 a, VectorU64 b, VectorU64 c) { return hn::AndXor(a, b, c); }
-HWY_INLINE VectorU64 shiftedLeftU64(VectorU64 a, int bits) { return hn::ShiftLeftSame(a, bits); }
-HWY_INLINE VectorU64 shiftedRightU64(VectorU64 a, int bits) { return hn::ShiftRightSame(a, bits); }
-HWY_INLINE MaskU64 equalToU64(VectorU64 a, VectorU64 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskU64 notEqualToU64(VectorU64 a, VectorU64 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskU64 lessThanU64(VectorU64 a, VectorU64 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskU64 greaterThanU64(VectorU64 a, VectorU64 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorU64 selectingU64(MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorU64 selectingOrZeroU64(MaskU64 mask, VectorU64 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorU64 zeroingSelectedU64(MaskU64 mask, VectorU64 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE VectorU64 bitwiseAndWhereU64(MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedAnd(mask, a, b); }
-HWY_INLINE VectorU64 bitwiseOrWhereU64(MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedOr(mask, a, b); }
-HWY_INLINE VectorU64 bitwiseXorWhereU64(MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedXor(mask, a, b); }
-HWY_INLINE VectorU64 bitwiseAndWhereOtherwiseU64(VectorU64 otherwise, MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU64 bitwiseOrWhereOtherwiseU64(VectorU64 otherwise, MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU64 bitwiseXorWhereOtherwiseU64(VectorU64 otherwise, MaskU64 mask, VectorU64 a, VectorU64 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
-HWY_INLINE VectorU64 multiplyAddingLow52BitsU64(VectorU64 a, VectorU64 b, VectorU64 c) { return hn::MulAdd52Lo(a, b, c); }
-HWY_INLINE VectorU64 multiplyAddingHigh52BitsU64(VectorU64 a, VectorU64 b, VectorU64 c) { return hn::MulAdd52Hi(a, b, c); }
-HWY_INLINE MaskU64 firstLanesU64(size_t count) { return hn::FirstN(TagU64(), count); }
-HWY_INLINE bool allTrueU64(MaskU64 mask) { return hn::AllTrue(TagU64(), mask); }
-HWY_INLINE bool allFalseU64(MaskU64 mask) { return hn::AllFalse(TagU64(), mask); }
-HWY_INLINE size_t trueCountU64(MaskU64 mask) { return hn::CountTrue(TagU64(), mask); }
-HWY_INLINE intptr_t firstTrueIndexU64(MaskU64 mask) { return hn::FindFirstTrue(TagU64(), mask); }
-HWY_INLINE uint64_t sumU64(VectorU64 a) { return hn::ReduceSum(TagU64(), a); }
-HWY_INLINE uint64_t smallestU64(VectorU64 a) { return hn::ReduceMin(TagU64(), a); }
-HWY_INLINE uint64_t largestU64(VectorU64 a) { return hn::ReduceMax(TagU64(), a); }
-HWY_INLINE uint64_t firstLaneU64(VectorU64 a) { return hn::GetLane(a); }
-HWY_INLINE VectorU64 reversedU64(VectorU64 a) { return hn::Reverse(TagU64(), a); }
-HWY_INLINE VectorU64 slideUpLanesU64(VectorU64 a, size_t lanes) { return hn::SlideUpLanes(TagU64(), a, lanes); }
-HWY_INLINE VectorU64 slideUpLanesFillingWithU64(VectorU64 fill, VectorU64 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagU64(), a, lanes); }
-HWY_INLINE VectorU64 slideDownLanesU64(VectorU64 a, size_t lanes) { return hn::SlideDownLanes(TagU64(), a, lanes); }
-HWY_INLINE VectorU64 slideDownLanesFillingWithU64(VectorU64 fill, VectorU64 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagU64(), a, lanes); }
-HWY_INLINE VectorU64 slide1UpU64(VectorU64 a) { return hn::Slide1Up(TagU64(), a); }
-HWY_INLINE VectorU64 slide1UpFillingWithU64(uint64_t fill, VectorU64 a) { return hn::Slide1UpOr(fill, TagU64(), a); }
-HWY_INLINE VectorU64 slide1DownU64(VectorU64 a) { return hn::Slide1Down(TagU64(), a); }
-HWY_INLINE VectorU64 slide1DownFillingWithU64(uint64_t fill, VectorU64 a) { return hn::Slide1DownOr(fill, TagU64(), a); }
-HWY_INLINE void loadInterleaved2U64(const uint64_t* from, VectorU64& v0, VectorU64& v1) { hn::LoadInterleaved2(TagU64(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3U64(const uint64_t* from, VectorU64& v0, VectorU64& v1, VectorU64& v2) { hn::LoadInterleaved3(TagU64(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4U64(const uint64_t* from, VectorU64& v0, VectorU64& v1, VectorU64& v2, VectorU64& v3) { hn::LoadInterleaved4(TagU64(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2U64(VectorU64 a, VectorU64 b, uint64_t* to) { hn::StoreInterleaved2(a, b, TagU64(), to); }
-HWY_INLINE void storeInterleaved3U64(VectorU64 a, VectorU64 b, VectorU64 c, uint64_t* to) { hn::StoreInterleaved3(a, b, c, TagU64(), to); }
-HWY_INLINE void storeInterleaved4U64(VectorU64 a, VectorU64 b, VectorU64 c, VectorU64 d, uint64_t* to) { hn::StoreInterleaved4(a, b, c, d, TagU64(), to); }
-HWY_INLINE VectorU64 loadWideningU8ToU64(const uint8_t* from) { return hn::PromoteTo(TagU64(), hn::LoadU(hn::Rebind<uint8_t, TagU64>(), from)); }
-HWY_INLINE VectorU64 loadWideningU16ToU64(const uint16_t* from) { return hn::PromoteTo(TagU64(), hn::LoadU(hn::Rebind<uint16_t, TagU64>(), from)); }
-HWY_INLINE VectorU64 loadWideningU32ToU64(const uint32_t* from) { return hn::PromoteTo(TagU64(), hn::LoadU(hn::Rebind<uint32_t, TagU64>(), from)); }
-HWY_INLINE VectorU64 loadFirstWideningU8ToU64(const uint8_t* from, size_t count) { return hn::PromoteTo(TagU64(), hn::LoadN(hn::Rebind<uint8_t, TagU64>(), from, count)); }
-HWY_INLINE VectorU64 loadFirstWideningU16ToU64(const uint16_t* from, size_t count) { return hn::PromoteTo(TagU64(), hn::LoadN(hn::Rebind<uint16_t, TagU64>(), from, count)); }
-HWY_INLINE VectorU64 loadFirstWideningU32ToU64(const uint32_t* from, size_t count) { return hn::PromoteTo(TagU64(), hn::LoadN(hn::Rebind<uint32_t, TagU64>(), from, count)); }
-HWY_INLINE VectorU64 repeatingBlockU64(uint64_t v0, uint64_t v1) { return hn::Dup128VecFromValues(TagU64(), v0, v1); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorU64 fromPortU64(cvectorization_ops_raw_vector_u64 v) { return svset_neonq_u64(svundef_u64(), (uint64x2_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 toPortU64(VectorU64 v) { return (cvectorization_ops_raw_vector_u64)svget_neonq_u64(v); }
+HWY_INLINE MaskU64 maskFromPortU64(cvectorization_ops_raw_mask_u64 m) { return hn::MaskFromVec(hn::BitCast(TagU64(), svset_neonq_s64(svundef_s64(), (int64x2_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 maskToPortU64(MaskU64 m) { const hn::RebindToSigned<TagU64> di; return (cvectorization_ops_raw_mask_u64)svget_neonq_s64(hn::BitCast(di, hn::VecFromMask(TagU64(), m))); }
+#else
+HWY_INLINE VectorU64 fromPortU64(cvectorization_ops_raw_vector_u64 v) { return hn::LoadU(TagU64(), reinterpret_cast<const uint64_t*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 toPortU64(VectorU64 v) { cvectorization_ops_raw_vector_u64 port; hn::StoreU(v, TagU64(), reinterpret_cast<uint64_t*>(&port)); return port; }
+HWY_INLINE MaskU64 maskFromPortU64(cvectorization_ops_raw_mask_u64 m) { const hn::RebindToSigned<TagU64> di; return hn::MaskFromVec(hn::BitCast(TagU64(), hn::LoadU(di, reinterpret_cast<const int64_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 maskToPortU64(MaskU64 m) { const hn::RebindToSigned<TagU64> di; cvectorization_ops_raw_mask_u64 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagU64(), m)), di, reinterpret_cast<int64_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_u64 zeroU64() { return toPortU64(hn::Zero(TagU64())); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 repeatingU64(uint64_t value) { return toPortU64(hn::Set(TagU64(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 iotaU64(uint64_t value) { return toPortU64(hn::Iota(TagU64(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadU64(const uint64_t* from) { return toPortU64(hn::LoadU(TagU64(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadAlignedU64(const uint64_t* from) { return toPortU64(hn::Load(TagU64(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstU64(const uint64_t* from, size_t count) { return toPortU64(hn::LoadN(TagU64(), from, count)); }
+HWY_INLINE void storeU64(cvectorization_ops_raw_vector_u64 a, uint64_t* to) { hn::StoreU(fromPortU64(a), TagU64(), to); }
+HWY_INLINE void storeAlignedU64(cvectorization_ops_raw_vector_u64 a, uint64_t* to) { hn::Store(fromPortU64(a), TagU64(), to); }
+HWY_INLINE void storeFirstU64(cvectorization_ops_raw_vector_u64 a, uint64_t* to, size_t count) { hn::StoreN(fromPortU64(a), TagU64(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 addingU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::Add(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 subtractingU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::Sub(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 multiplyingU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::Mul(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 minimumU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::Min(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 maximumU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::Max(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::And(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseOrU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::Or(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseXorU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::Xor(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseNotU64(cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Not(fromPortU64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndNotU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::AndNot(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndXorU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c) { return toPortU64(hn::AndXor(fromPortU64(a), fromPortU64(b), fromPortU64(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 shiftedLeftU64(cvectorization_ops_raw_vector_u64 a, int bits) { return toPortU64(hn::ShiftLeftSame(fromPortU64(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 shiftedRightU64(cvectorization_ops_raw_vector_u64 a, int bits) { return toPortU64(hn::ShiftRightSame(fromPortU64(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 equalToU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return maskToPortU64(hn::Eq(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 notEqualToU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return maskToPortU64(hn::Ne(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 lessThanU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return maskToPortU64(hn::Lt(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 greaterThanU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return maskToPortU64(hn::Gt(fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 selectingU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::IfThenElse(maskFromPortU64(mask), fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 selectingOrZeroU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::IfThenElseZero(maskFromPortU64(mask), fromPortU64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 zeroingSelectedU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::IfThenZeroElse(maskFromPortU64(mask), fromPortU64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndWhereU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::MaskedAnd(maskFromPortU64(mask), fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseOrWhereU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::MaskedOr(maskFromPortU64(mask), fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseXorWhereU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::MaskedXor(maskFromPortU64(mask), fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndWhereOtherwiseU64(cvectorization_ops_raw_vector_u64 otherwise, cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::MaskedAndOr(fromPortU64(otherwise), maskFromPortU64(mask), fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseOrWhereOtherwiseU64(cvectorization_ops_raw_vector_u64 otherwise, cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::MaskedOrOr(fromPortU64(otherwise), maskFromPortU64(mask), fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseXorWhereOtherwiseU64(cvectorization_ops_raw_vector_u64 otherwise, cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) { return toPortU64(hn::MaskedXorOr(fromPortU64(otherwise), maskFromPortU64(mask), fromPortU64(a), fromPortU64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 multiplyAddingLow52BitsU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c) { return toPortU64(hn::MulAdd52Lo(fromPortU64(a), fromPortU64(b), fromPortU64(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 multiplyAddingHigh52BitsU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c) { return toPortU64(hn::MulAdd52Hi(fromPortU64(a), fromPortU64(b), fromPortU64(c))); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 firstLanesU64(size_t count) { return maskToPortU64(hn::FirstN(TagU64(), count)); }
+HWY_INLINE bool allTrueU64(cvectorization_ops_raw_mask_u64 mask) { return hn::AllTrue(TagU64(), maskFromPortU64(mask)); }
+HWY_INLINE bool allFalseU64(cvectorization_ops_raw_mask_u64 mask) { return hn::AllFalse(TagU64(), maskFromPortU64(mask)); }
+HWY_INLINE size_t trueCountU64(cvectorization_ops_raw_mask_u64 mask) { return hn::CountTrue(TagU64(), maskFromPortU64(mask)); }
+HWY_INLINE intptr_t firstTrueIndexU64(cvectorization_ops_raw_mask_u64 mask) { return hn::FindFirstTrue(TagU64(), maskFromPortU64(mask)); }
+HWY_INLINE uint64_t sumU64(cvectorization_ops_raw_vector_u64 a) { return hn::ReduceSum(TagU64(), fromPortU64(a)); }
+HWY_INLINE uint64_t smallestU64(cvectorization_ops_raw_vector_u64 a) { return hn::ReduceMin(TagU64(), fromPortU64(a)); }
+HWY_INLINE uint64_t largestU64(cvectorization_ops_raw_vector_u64 a) { return hn::ReduceMax(TagU64(), fromPortU64(a)); }
+HWY_INLINE uint64_t firstLaneU64(cvectorization_ops_raw_vector_u64 a) { return hn::GetLane(fromPortU64(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 reversedU64(cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Reverse(TagU64(), fromPortU64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slideUpLanesU64(cvectorization_ops_raw_vector_u64 a, size_t lanes) { return toPortU64(hn::SlideUpLanes(TagU64(), fromPortU64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slideUpLanesFillingWithU64(cvectorization_ops_raw_vector_u64 fill, cvectorization_ops_raw_vector_u64 a, size_t lanes) { return toPortU64(hn::SlideUpLanesOr(fromPortU64(fill), TagU64(), fromPortU64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slideDownLanesU64(cvectorization_ops_raw_vector_u64 a, size_t lanes) { return toPortU64(hn::SlideDownLanes(TagU64(), fromPortU64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slideDownLanesFillingWithU64(cvectorization_ops_raw_vector_u64 fill, cvectorization_ops_raw_vector_u64 a, size_t lanes) { return toPortU64(hn::SlideDownLanesOr(fromPortU64(fill), TagU64(), fromPortU64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slide1UpU64(cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Slide1Up(TagU64(), fromPortU64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slide1UpFillingWithU64(uint64_t fill, cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Slide1UpOr(fill, TagU64(), fromPortU64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slide1DownU64(cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Slide1Down(TagU64(), fromPortU64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slide1DownFillingWithU64(uint64_t fill, cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::Slide1DownOr(fill, TagU64(), fromPortU64(a))); }
+HWY_INLINE void loadInterleaved2U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorU64 h0, h1;
+  hn::LoadInterleaved2(TagU64(), from, h0, h1);
+  v0 = toPortU64(h0);
+  v1 = toPortU64(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorU64 h0, h1;
+  hn::LoadInterleaved2(TagU64(), from, h0, h1);
+  hn::StoreU(h0, TagU64(), reinterpret_cast<uint64_t*>(&v0));
+  hn::StoreU(h1, TagU64(), reinterpret_cast<uint64_t*>(&v1));
+#else
+  hn::LoadInterleaved2(TagU64(), from, inPlace<VectorU64>(v0), inPlace<VectorU64>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1, OutVectorU64& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorU64 h0, h1, h2;
+  hn::LoadInterleaved3(TagU64(), from, h0, h1, h2);
+  v0 = toPortU64(h0);
+  v1 = toPortU64(h1);
+  v2 = toPortU64(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorU64 h0, h1, h2;
+  hn::LoadInterleaved3(TagU64(), from, h0, h1, h2);
+  hn::StoreU(h0, TagU64(), reinterpret_cast<uint64_t*>(&v0));
+  hn::StoreU(h1, TagU64(), reinterpret_cast<uint64_t*>(&v1));
+  hn::StoreU(h2, TagU64(), reinterpret_cast<uint64_t*>(&v2));
+#else
+  hn::LoadInterleaved3(TagU64(), from, inPlace<VectorU64>(v0), inPlace<VectorU64>(v1), inPlace<VectorU64>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1, OutVectorU64& v2, OutVectorU64& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorU64 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagU64(), from, h0, h1, h2, h3);
+  v0 = toPortU64(h0);
+  v1 = toPortU64(h1);
+  v2 = toPortU64(h2);
+  v3 = toPortU64(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorU64 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagU64(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagU64(), reinterpret_cast<uint64_t*>(&v0));
+  hn::StoreU(h1, TagU64(), reinterpret_cast<uint64_t*>(&v1));
+  hn::StoreU(h2, TagU64(), reinterpret_cast<uint64_t*>(&v2));
+  hn::StoreU(h3, TagU64(), reinterpret_cast<uint64_t*>(&v3));
+#else
+  hn::LoadInterleaved4(TagU64(), from, inPlace<VectorU64>(v0), inPlace<VectorU64>(v1), inPlace<VectorU64>(v2), inPlace<VectorU64>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2U64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, uint64_t* to) { hn::StoreInterleaved2(fromPortU64(a), fromPortU64(b), TagU64(), to); }
+HWY_INLINE void storeInterleaved3U64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c, uint64_t* to) { hn::StoreInterleaved3(fromPortU64(a), fromPortU64(b), fromPortU64(c), TagU64(), to); }
+HWY_INLINE void storeInterleaved4U64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c, cvectorization_ops_raw_vector_u64 d, uint64_t* to) { hn::StoreInterleaved4(fromPortU64(a), fromPortU64(b), fromPortU64(c), fromPortU64(d), TagU64(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadWideningU8ToU64(const uint8_t* from) { return toPortU64(hn::PromoteTo(TagU64(), hn::LoadU(hn::Rebind<uint8_t, TagU64>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadWideningU16ToU64(const uint16_t* from) { return toPortU64(hn::PromoteTo(TagU64(), hn::LoadU(hn::Rebind<uint16_t, TagU64>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadWideningU32ToU64(const uint32_t* from) { return toPortU64(hn::PromoteTo(TagU64(), hn::LoadU(hn::Rebind<uint32_t, TagU64>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU8ToU64(const uint8_t* from, size_t count) { return toPortU64(hn::PromoteTo(TagU64(), hn::LoadN(hn::Rebind<uint8_t, TagU64>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU16ToU64(const uint16_t* from, size_t count) { return toPortU64(hn::PromoteTo(TagU64(), hn::LoadN(hn::Rebind<uint16_t, TagU64>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU32ToU64(const uint32_t* from, size_t count) { return toPortU64(hn::PromoteTo(TagU64(), hn::LoadN(hn::Rebind<uint32_t, TagU64>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 repeatingBlockU64(uint64_t v0, uint64_t v1) { return toPortU64(hn::Dup128VecFromValues(TagU64(), v0, v1)); }
 
 using TagI8 = hn::ScalableTag<int8_t>;
 using VectorI8 = hn::VFromD<TagI8>;
 using MaskI8 = hn::MFromD<TagI8>;
+typedef cvectorization_ops_raw_vector_i8 OutVectorI8 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountI8() { return hn::Lanes(TagI8()); }
-HWY_INLINE VectorI8 fromPortI8(cvectorization_ops_vector_i8 v) { return hn::LoadU(TagI8(), reinterpret_cast<const int8_t*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_i8 toPortI8(VectorI8 v) { cvectorization_ops_vector_i8 port; hn::StoreU(v, TagI8(), reinterpret_cast<int8_t*>(&port)); return port; }
-HWY_INLINE MaskI8 maskFromPortI8(cvectorization_ops_mask_i8 m) { const hn::RebindToSigned<TagI8> di; return hn::MaskFromVec(hn::BitCast(TagI8(), hn::LoadU(di, reinterpret_cast<const int8_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_i8 maskToPortI8(MaskI8 m) { const hn::RebindToSigned<TagI8> di; cvectorization_ops_mask_i8 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagI8(), m)), di, reinterpret_cast<int8_t*>(&port)); return port; }
-HWY_INLINE VectorI8 zeroI8() { return hn::Zero(TagI8()); }
-HWY_INLINE VectorI8 repeatingI8(int8_t value) { return hn::Set(TagI8(), value); }
-HWY_INLINE VectorI8 iotaI8(int8_t value) { return hn::Iota(TagI8(), value); }
-HWY_INLINE VectorI8 loadI8(const int8_t* from) { return hn::LoadU(TagI8(), from); }
-HWY_INLINE VectorI8 loadAlignedI8(const int8_t* from) { return hn::Load(TagI8(), from); }
-HWY_INLINE VectorI8 loadFirstI8(const int8_t* from, size_t count) { return hn::LoadN(TagI8(), from, count); }
-HWY_INLINE void storeI8(VectorI8 a, int8_t* to) { hn::StoreU(a, TagI8(), to); }
-HWY_INLINE void storeAlignedI8(VectorI8 a, int8_t* to) { hn::Store(a, TagI8(), to); }
-HWY_INLINE void storeFirstI8(VectorI8 a, int8_t* to, size_t count) { hn::StoreN(a, TagI8(), to, count); }
-HWY_INLINE VectorI8 addingI8(VectorI8 a, VectorI8 b) { return hn::Add(a, b); }
-HWY_INLINE VectorI8 subtractingI8(VectorI8 a, VectorI8 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorI8 minimumI8(VectorI8 a, VectorI8 b) { return hn::Min(a, b); }
-HWY_INLINE VectorI8 maximumI8(VectorI8 a, VectorI8 b) { return hn::Max(a, b); }
-HWY_INLINE VectorI8 negatedI8(VectorI8 a) { return hn::Neg(a); }
-HWY_INLINE VectorI8 magnitudeI8(VectorI8 a) { return hn::Abs(a); }
-HWY_INLINE VectorI8 saturatingAddingI8(VectorI8 a, VectorI8 b) { return hn::SaturatedAdd(a, b); }
-HWY_INLINE VectorI8 saturatingSubtractingI8(VectorI8 a, VectorI8 b) { return hn::SaturatedSub(a, b); }
-HWY_INLINE VectorI8 bitwiseAndI8(VectorI8 a, VectorI8 b) { return hn::And(a, b); }
-HWY_INLINE VectorI8 bitwiseOrI8(VectorI8 a, VectorI8 b) { return hn::Or(a, b); }
-HWY_INLINE VectorI8 bitwiseXorI8(VectorI8 a, VectorI8 b) { return hn::Xor(a, b); }
-HWY_INLINE VectorI8 bitwiseNotI8(VectorI8 a) { return hn::Not(a); }
-HWY_INLINE VectorI8 bitwiseAndNotI8(VectorI8 a, VectorI8 b) { return hn::AndNot(a, b); }
-HWY_INLINE VectorI8 bitwiseAndXorI8(VectorI8 a, VectorI8 b, VectorI8 c) { return hn::AndXor(a, b, c); }
-HWY_INLINE VectorI8 shiftedLeftI8(VectorI8 a, int bits) { return hn::ShiftLeftSame(a, bits); }
-HWY_INLINE VectorI8 shiftedRightI8(VectorI8 a, int bits) { return hn::ShiftRightSame(a, bits); }
-HWY_INLINE MaskI8 equalToI8(VectorI8 a, VectorI8 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskI8 notEqualToI8(VectorI8 a, VectorI8 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskI8 lessThanI8(VectorI8 a, VectorI8 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskI8 greaterThanI8(VectorI8 a, VectorI8 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorI8 selectingI8(MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorI8 selectingOrZeroI8(MaskI8 mask, VectorI8 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorI8 zeroingSelectedI8(MaskI8 mask, VectorI8 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE VectorI8 bitwiseAndWhereI8(MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedAnd(mask, a, b); }
-HWY_INLINE VectorI8 bitwiseOrWhereI8(MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedOr(mask, a, b); }
-HWY_INLINE VectorI8 bitwiseXorWhereI8(MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedXor(mask, a, b); }
-HWY_INLINE VectorI8 bitwiseAndWhereOtherwiseI8(VectorI8 otherwise, MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
-HWY_INLINE VectorI8 bitwiseOrWhereOtherwiseI8(VectorI8 otherwise, MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
-HWY_INLINE VectorI8 bitwiseXorWhereOtherwiseI8(VectorI8 otherwise, MaskI8 mask, VectorI8 a, VectorI8 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
-HWY_INLINE MaskI8 firstLanesI8(size_t count) { return hn::FirstN(TagI8(), count); }
-HWY_INLINE bool allTrueI8(MaskI8 mask) { return hn::AllTrue(TagI8(), mask); }
-HWY_INLINE bool allFalseI8(MaskI8 mask) { return hn::AllFalse(TagI8(), mask); }
-HWY_INLINE size_t trueCountI8(MaskI8 mask) { return hn::CountTrue(TagI8(), mask); }
-HWY_INLINE intptr_t firstTrueIndexI8(MaskI8 mask) { return hn::FindFirstTrue(TagI8(), mask); }
-HWY_INLINE int8_t firstLaneI8(VectorI8 a) { return hn::GetLane(a); }
-HWY_INLINE VectorI8 reversedI8(VectorI8 a) { return hn::Reverse(TagI8(), a); }
-HWY_INLINE VectorI8 slideUpLanesI8(VectorI8 a, size_t lanes) { return hn::SlideUpLanes(TagI8(), a, lanes); }
-HWY_INLINE VectorI8 slideUpLanesFillingWithI8(VectorI8 fill, VectorI8 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagI8(), a, lanes); }
-HWY_INLINE VectorI8 slideDownLanesI8(VectorI8 a, size_t lanes) { return hn::SlideDownLanes(TagI8(), a, lanes); }
-HWY_INLINE VectorI8 slideDownLanesFillingWithI8(VectorI8 fill, VectorI8 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagI8(), a, lanes); }
-HWY_INLINE VectorI8 slide1UpI8(VectorI8 a) { return hn::Slide1Up(TagI8(), a); }
-HWY_INLINE VectorI8 slide1UpFillingWithI8(int8_t fill, VectorI8 a) { return hn::Slide1UpOr(fill, TagI8(), a); }
-HWY_INLINE VectorI8 slide1DownI8(VectorI8 a) { return hn::Slide1Down(TagI8(), a); }
-HWY_INLINE VectorI8 slide1DownFillingWithI8(int8_t fill, VectorI8 a) { return hn::Slide1DownOr(fill, TagI8(), a); }
-HWY_INLINE VectorI8 tableLookupBytesI8(VectorI8 a, VectorI8 b) { return hn::TableLookupBytes(a, b); }
-HWY_INLINE void loadInterleaved2I8(const int8_t* from, VectorI8& v0, VectorI8& v1) { hn::LoadInterleaved2(TagI8(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3I8(const int8_t* from, VectorI8& v0, VectorI8& v1, VectorI8& v2) { hn::LoadInterleaved3(TagI8(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4I8(const int8_t* from, VectorI8& v0, VectorI8& v1, VectorI8& v2, VectorI8& v3) { hn::LoadInterleaved4(TagI8(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2I8(VectorI8 a, VectorI8 b, int8_t* to) { hn::StoreInterleaved2(a, b, TagI8(), to); }
-HWY_INLINE void storeInterleaved3I8(VectorI8 a, VectorI8 b, VectorI8 c, int8_t* to) { hn::StoreInterleaved3(a, b, c, TagI8(), to); }
-HWY_INLINE void storeInterleaved4I8(VectorI8 a, VectorI8 b, VectorI8 c, VectorI8 d, int8_t* to) { hn::StoreInterleaved4(a, b, c, d, TagI8(), to); }
-HWY_INLINE VectorI8 repeatingBlockI8(int8_t v0, int8_t v1, int8_t v2, int8_t v3, int8_t v4, int8_t v5, int8_t v6, int8_t v7, int8_t v8, int8_t v9, int8_t v10, int8_t v11, int8_t v12, int8_t v13, int8_t v14, int8_t v15) { return hn::Dup128VecFromValues(TagI8(), v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorI8 fromPortI8(cvectorization_ops_raw_vector_i8 v) { return svset_neonq_s8(svundef_s8(), (int8x16_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 toPortI8(VectorI8 v) { return (cvectorization_ops_raw_vector_i8)svget_neonq_s8(v); }
+HWY_INLINE MaskI8 maskFromPortI8(cvectorization_ops_raw_mask_i8 m) { return hn::MaskFromVec(hn::BitCast(TagI8(), svset_neonq_s8(svundef_s8(), (int8x16_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 maskToPortI8(MaskI8 m) { const hn::RebindToSigned<TagI8> di; return (cvectorization_ops_raw_mask_i8)svget_neonq_s8(hn::BitCast(di, hn::VecFromMask(TagI8(), m))); }
+#else
+HWY_INLINE VectorI8 fromPortI8(cvectorization_ops_raw_vector_i8 v) { return hn::LoadU(TagI8(), reinterpret_cast<const int8_t*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 toPortI8(VectorI8 v) { cvectorization_ops_raw_vector_i8 port; hn::StoreU(v, TagI8(), reinterpret_cast<int8_t*>(&port)); return port; }
+HWY_INLINE MaskI8 maskFromPortI8(cvectorization_ops_raw_mask_i8 m) { const hn::RebindToSigned<TagI8> di; return hn::MaskFromVec(hn::BitCast(TagI8(), hn::LoadU(di, reinterpret_cast<const int8_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 maskToPortI8(MaskI8 m) { const hn::RebindToSigned<TagI8> di; cvectorization_ops_raw_mask_i8 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagI8(), m)), di, reinterpret_cast<int8_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_i8 zeroI8() { return toPortI8(hn::Zero(TagI8())); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 repeatingI8(int8_t value) { return toPortI8(hn::Set(TagI8(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 iotaI8(int8_t value) { return toPortI8(hn::Iota(TagI8(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 loadI8(const int8_t* from) { return toPortI8(hn::LoadU(TagI8(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 loadAlignedI8(const int8_t* from) { return toPortI8(hn::Load(TagI8(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 loadFirstI8(const int8_t* from, size_t count) { return toPortI8(hn::LoadN(TagI8(), from, count)); }
+HWY_INLINE void storeI8(cvectorization_ops_raw_vector_i8 a, int8_t* to) { hn::StoreU(fromPortI8(a), TagI8(), to); }
+HWY_INLINE void storeAlignedI8(cvectorization_ops_raw_vector_i8 a, int8_t* to) { hn::Store(fromPortI8(a), TagI8(), to); }
+HWY_INLINE void storeFirstI8(cvectorization_ops_raw_vector_i8 a, int8_t* to, size_t count) { hn::StoreN(fromPortI8(a), TagI8(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 addingI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::Add(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 subtractingI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::Sub(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 minimumI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::Min(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 maximumI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::Max(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 negatedI8(cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Neg(fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 magnitudeI8(cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Abs(fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 saturatingAddingI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::SaturatedAdd(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 saturatingSubtractingI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::SaturatedSub(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::And(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseOrI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::Or(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseXorI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::Xor(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseNotI8(cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Not(fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndNotI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::AndNot(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndXorI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, cvectorization_ops_raw_vector_i8 c) { return toPortI8(hn::AndXor(fromPortI8(a), fromPortI8(b), fromPortI8(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 shiftedLeftI8(cvectorization_ops_raw_vector_i8 a, int bits) { return toPortI8(hn::ShiftLeftSame(fromPortI8(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 shiftedRightI8(cvectorization_ops_raw_vector_i8 a, int bits) { return toPortI8(hn::ShiftRightSame(fromPortI8(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 equalToI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return maskToPortI8(hn::Eq(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 notEqualToI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return maskToPortI8(hn::Ne(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 lessThanI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return maskToPortI8(hn::Lt(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 greaterThanI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return maskToPortI8(hn::Gt(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 selectingI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::IfThenElse(maskFromPortI8(mask), fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 selectingOrZeroI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::IfThenElseZero(maskFromPortI8(mask), fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 zeroingSelectedI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::IfThenZeroElse(maskFromPortI8(mask), fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndWhereI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::MaskedAnd(maskFromPortI8(mask), fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseOrWhereI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::MaskedOr(maskFromPortI8(mask), fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseXorWhereI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::MaskedXor(maskFromPortI8(mask), fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndWhereOtherwiseI8(cvectorization_ops_raw_vector_i8 otherwise, cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::MaskedAndOr(fromPortI8(otherwise), maskFromPortI8(mask), fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseOrWhereOtherwiseI8(cvectorization_ops_raw_vector_i8 otherwise, cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::MaskedOrOr(fromPortI8(otherwise), maskFromPortI8(mask), fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseXorWhereOtherwiseI8(cvectorization_ops_raw_vector_i8 otherwise, cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::MaskedXorOr(fromPortI8(otherwise), maskFromPortI8(mask), fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 firstLanesI8(size_t count) { return maskToPortI8(hn::FirstN(TagI8(), count)); }
+HWY_INLINE bool allTrueI8(cvectorization_ops_raw_mask_i8 mask) { return hn::AllTrue(TagI8(), maskFromPortI8(mask)); }
+HWY_INLINE bool allFalseI8(cvectorization_ops_raw_mask_i8 mask) { return hn::AllFalse(TagI8(), maskFromPortI8(mask)); }
+HWY_INLINE size_t trueCountI8(cvectorization_ops_raw_mask_i8 mask) { return hn::CountTrue(TagI8(), maskFromPortI8(mask)); }
+HWY_INLINE intptr_t firstTrueIndexI8(cvectorization_ops_raw_mask_i8 mask) { return hn::FindFirstTrue(TagI8(), maskFromPortI8(mask)); }
+HWY_INLINE int8_t firstLaneI8(cvectorization_ops_raw_vector_i8 a) { return hn::GetLane(fromPortI8(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 reversedI8(cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Reverse(TagI8(), fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slideUpLanesI8(cvectorization_ops_raw_vector_i8 a, size_t lanes) { return toPortI8(hn::SlideUpLanes(TagI8(), fromPortI8(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slideUpLanesFillingWithI8(cvectorization_ops_raw_vector_i8 fill, cvectorization_ops_raw_vector_i8 a, size_t lanes) { return toPortI8(hn::SlideUpLanesOr(fromPortI8(fill), TagI8(), fromPortI8(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slideDownLanesI8(cvectorization_ops_raw_vector_i8 a, size_t lanes) { return toPortI8(hn::SlideDownLanes(TagI8(), fromPortI8(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slideDownLanesFillingWithI8(cvectorization_ops_raw_vector_i8 fill, cvectorization_ops_raw_vector_i8 a, size_t lanes) { return toPortI8(hn::SlideDownLanesOr(fromPortI8(fill), TagI8(), fromPortI8(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slide1UpI8(cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Slide1Up(TagI8(), fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slide1UpFillingWithI8(int8_t fill, cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Slide1UpOr(fill, TagI8(), fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slide1DownI8(cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Slide1Down(TagI8(), fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slide1DownFillingWithI8(int8_t fill, cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::Slide1DownOr(fill, TagI8(), fromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupBytesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::TableLookupBytes(fromPortI8(a), fromPortI8(b))); }
+HWY_INLINE void loadInterleaved2I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorI8 h0, h1;
+  hn::LoadInterleaved2(TagI8(), from, h0, h1);
+  v0 = toPortI8(h0);
+  v1 = toPortI8(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorI8 h0, h1;
+  hn::LoadInterleaved2(TagI8(), from, h0, h1);
+  hn::StoreU(h0, TagI8(), reinterpret_cast<int8_t*>(&v0));
+  hn::StoreU(h1, TagI8(), reinterpret_cast<int8_t*>(&v1));
+#else
+  hn::LoadInterleaved2(TagI8(), from, inPlace<VectorI8>(v0), inPlace<VectorI8>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1, OutVectorI8& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorI8 h0, h1, h2;
+  hn::LoadInterleaved3(TagI8(), from, h0, h1, h2);
+  v0 = toPortI8(h0);
+  v1 = toPortI8(h1);
+  v2 = toPortI8(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorI8 h0, h1, h2;
+  hn::LoadInterleaved3(TagI8(), from, h0, h1, h2);
+  hn::StoreU(h0, TagI8(), reinterpret_cast<int8_t*>(&v0));
+  hn::StoreU(h1, TagI8(), reinterpret_cast<int8_t*>(&v1));
+  hn::StoreU(h2, TagI8(), reinterpret_cast<int8_t*>(&v2));
+#else
+  hn::LoadInterleaved3(TagI8(), from, inPlace<VectorI8>(v0), inPlace<VectorI8>(v1), inPlace<VectorI8>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1, OutVectorI8& v2, OutVectorI8& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorI8 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagI8(), from, h0, h1, h2, h3);
+  v0 = toPortI8(h0);
+  v1 = toPortI8(h1);
+  v2 = toPortI8(h2);
+  v3 = toPortI8(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorI8 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagI8(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagI8(), reinterpret_cast<int8_t*>(&v0));
+  hn::StoreU(h1, TagI8(), reinterpret_cast<int8_t*>(&v1));
+  hn::StoreU(h2, TagI8(), reinterpret_cast<int8_t*>(&v2));
+  hn::StoreU(h3, TagI8(), reinterpret_cast<int8_t*>(&v3));
+#else
+  hn::LoadInterleaved4(TagI8(), from, inPlace<VectorI8>(v0), inPlace<VectorI8>(v1), inPlace<VectorI8>(v2), inPlace<VectorI8>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2I8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, int8_t* to) { hn::StoreInterleaved2(fromPortI8(a), fromPortI8(b), TagI8(), to); }
+HWY_INLINE void storeInterleaved3I8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, cvectorization_ops_raw_vector_i8 c, int8_t* to) { hn::StoreInterleaved3(fromPortI8(a), fromPortI8(b), fromPortI8(c), TagI8(), to); }
+HWY_INLINE void storeInterleaved4I8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, cvectorization_ops_raw_vector_i8 c, cvectorization_ops_raw_vector_i8 d, int8_t* to) { hn::StoreInterleaved4(fromPortI8(a), fromPortI8(b), fromPortI8(c), fromPortI8(d), TagI8(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 repeatingBlockI8(int8_t v0, int8_t v1, int8_t v2, int8_t v3, int8_t v4, int8_t v5, int8_t v6, int8_t v7, int8_t v8, int8_t v9, int8_t v10, int8_t v11, int8_t v12, int8_t v13, int8_t v14, int8_t v15) { return toPortI8(hn::Dup128VecFromValues(TagI8(), v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15)); }
 
 using TagI16 = hn::ScalableTag<int16_t>;
 using VectorI16 = hn::VFromD<TagI16>;
 using MaskI16 = hn::MFromD<TagI16>;
+typedef cvectorization_ops_raw_vector_i16 OutVectorI16 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountI16() { return hn::Lanes(TagI16()); }
-HWY_INLINE VectorI16 fromPortI16(cvectorization_ops_vector_i16 v) { return hn::LoadU(TagI16(), reinterpret_cast<const int16_t*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_i16 toPortI16(VectorI16 v) { cvectorization_ops_vector_i16 port; hn::StoreU(v, TagI16(), reinterpret_cast<int16_t*>(&port)); return port; }
-HWY_INLINE MaskI16 maskFromPortI16(cvectorization_ops_mask_i16 m) { const hn::RebindToSigned<TagI16> di; return hn::MaskFromVec(hn::BitCast(TagI16(), hn::LoadU(di, reinterpret_cast<const int16_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_i16 maskToPortI16(MaskI16 m) { const hn::RebindToSigned<TagI16> di; cvectorization_ops_mask_i16 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagI16(), m)), di, reinterpret_cast<int16_t*>(&port)); return port; }
-HWY_INLINE VectorI16 zeroI16() { return hn::Zero(TagI16()); }
-HWY_INLINE VectorI16 repeatingI16(int16_t value) { return hn::Set(TagI16(), value); }
-HWY_INLINE VectorI16 iotaI16(int16_t value) { return hn::Iota(TagI16(), value); }
-HWY_INLINE VectorI16 loadI16(const int16_t* from) { return hn::LoadU(TagI16(), from); }
-HWY_INLINE VectorI16 loadAlignedI16(const int16_t* from) { return hn::Load(TagI16(), from); }
-HWY_INLINE VectorI16 loadFirstI16(const int16_t* from, size_t count) { return hn::LoadN(TagI16(), from, count); }
-HWY_INLINE void storeI16(VectorI16 a, int16_t* to) { hn::StoreU(a, TagI16(), to); }
-HWY_INLINE void storeAlignedI16(VectorI16 a, int16_t* to) { hn::Store(a, TagI16(), to); }
-HWY_INLINE void storeFirstI16(VectorI16 a, int16_t* to, size_t count) { hn::StoreN(a, TagI16(), to, count); }
-HWY_INLINE VectorI16 addingI16(VectorI16 a, VectorI16 b) { return hn::Add(a, b); }
-HWY_INLINE VectorI16 subtractingI16(VectorI16 a, VectorI16 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorI16 multiplyingI16(VectorI16 a, VectorI16 b) { return hn::Mul(a, b); }
-HWY_INLINE VectorI16 minimumI16(VectorI16 a, VectorI16 b) { return hn::Min(a, b); }
-HWY_INLINE VectorI16 maximumI16(VectorI16 a, VectorI16 b) { return hn::Max(a, b); }
-HWY_INLINE VectorI16 negatedI16(VectorI16 a) { return hn::Neg(a); }
-HWY_INLINE VectorI16 magnitudeI16(VectorI16 a) { return hn::Abs(a); }
-HWY_INLINE VectorI16 saturatingAddingI16(VectorI16 a, VectorI16 b) { return hn::SaturatedAdd(a, b); }
-HWY_INLINE VectorI16 saturatingSubtractingI16(VectorI16 a, VectorI16 b) { return hn::SaturatedSub(a, b); }
-HWY_INLINE VectorI16 bitwiseAndI16(VectorI16 a, VectorI16 b) { return hn::And(a, b); }
-HWY_INLINE VectorI16 bitwiseOrI16(VectorI16 a, VectorI16 b) { return hn::Or(a, b); }
-HWY_INLINE VectorI16 bitwiseXorI16(VectorI16 a, VectorI16 b) { return hn::Xor(a, b); }
-HWY_INLINE VectorI16 bitwiseNotI16(VectorI16 a) { return hn::Not(a); }
-HWY_INLINE VectorI16 bitwiseAndNotI16(VectorI16 a, VectorI16 b) { return hn::AndNot(a, b); }
-HWY_INLINE VectorI16 bitwiseAndXorI16(VectorI16 a, VectorI16 b, VectorI16 c) { return hn::AndXor(a, b, c); }
-HWY_INLINE VectorI16 shiftedLeftI16(VectorI16 a, int bits) { return hn::ShiftLeftSame(a, bits); }
-HWY_INLINE VectorI16 shiftedRightI16(VectorI16 a, int bits) { return hn::ShiftRightSame(a, bits); }
-HWY_INLINE MaskI16 equalToI16(VectorI16 a, VectorI16 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskI16 notEqualToI16(VectorI16 a, VectorI16 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskI16 lessThanI16(VectorI16 a, VectorI16 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskI16 greaterThanI16(VectorI16 a, VectorI16 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorI16 selectingI16(MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorI16 selectingOrZeroI16(MaskI16 mask, VectorI16 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorI16 zeroingSelectedI16(MaskI16 mask, VectorI16 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE VectorI16 bitwiseAndWhereI16(MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedAnd(mask, a, b); }
-HWY_INLINE VectorI16 bitwiseOrWhereI16(MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedOr(mask, a, b); }
-HWY_INLINE VectorI16 bitwiseXorWhereI16(MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedXor(mask, a, b); }
-HWY_INLINE VectorI16 bitwiseAndWhereOtherwiseI16(VectorI16 otherwise, MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
-HWY_INLINE VectorI16 bitwiseOrWhereOtherwiseI16(VectorI16 otherwise, MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
-HWY_INLINE VectorI16 bitwiseXorWhereOtherwiseI16(VectorI16 otherwise, MaskI16 mask, VectorI16 a, VectorI16 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
-HWY_INLINE MaskI16 firstLanesI16(size_t count) { return hn::FirstN(TagI16(), count); }
-HWY_INLINE bool allTrueI16(MaskI16 mask) { return hn::AllTrue(TagI16(), mask); }
-HWY_INLINE bool allFalseI16(MaskI16 mask) { return hn::AllFalse(TagI16(), mask); }
-HWY_INLINE size_t trueCountI16(MaskI16 mask) { return hn::CountTrue(TagI16(), mask); }
-HWY_INLINE intptr_t firstTrueIndexI16(MaskI16 mask) { return hn::FindFirstTrue(TagI16(), mask); }
-HWY_INLINE int16_t sumI16(VectorI16 a) { return hn::ReduceSum(TagI16(), a); }
-HWY_INLINE int16_t smallestI16(VectorI16 a) { return hn::ReduceMin(TagI16(), a); }
-HWY_INLINE int16_t largestI16(VectorI16 a) { return hn::ReduceMax(TagI16(), a); }
-HWY_INLINE int16_t firstLaneI16(VectorI16 a) { return hn::GetLane(a); }
-HWY_INLINE VectorI16 reversedI16(VectorI16 a) { return hn::Reverse(TagI16(), a); }
-HWY_INLINE VectorI16 slideUpLanesI16(VectorI16 a, size_t lanes) { return hn::SlideUpLanes(TagI16(), a, lanes); }
-HWY_INLINE VectorI16 slideUpLanesFillingWithI16(VectorI16 fill, VectorI16 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagI16(), a, lanes); }
-HWY_INLINE VectorI16 slideDownLanesI16(VectorI16 a, size_t lanes) { return hn::SlideDownLanes(TagI16(), a, lanes); }
-HWY_INLINE VectorI16 slideDownLanesFillingWithI16(VectorI16 fill, VectorI16 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagI16(), a, lanes); }
-HWY_INLINE VectorI16 slide1UpI16(VectorI16 a) { return hn::Slide1Up(TagI16(), a); }
-HWY_INLINE VectorI16 slide1UpFillingWithI16(int16_t fill, VectorI16 a) { return hn::Slide1UpOr(fill, TagI16(), a); }
-HWY_INLINE VectorI16 slide1DownI16(VectorI16 a) { return hn::Slide1Down(TagI16(), a); }
-HWY_INLINE VectorI16 slide1DownFillingWithI16(int16_t fill, VectorI16 a) { return hn::Slide1DownOr(fill, TagI16(), a); }
-HWY_INLINE void loadInterleaved2I16(const int16_t* from, VectorI16& v0, VectorI16& v1) { hn::LoadInterleaved2(TagI16(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3I16(const int16_t* from, VectorI16& v0, VectorI16& v1, VectorI16& v2) { hn::LoadInterleaved3(TagI16(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4I16(const int16_t* from, VectorI16& v0, VectorI16& v1, VectorI16& v2, VectorI16& v3) { hn::LoadInterleaved4(TagI16(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2I16(VectorI16 a, VectorI16 b, int16_t* to) { hn::StoreInterleaved2(a, b, TagI16(), to); }
-HWY_INLINE void storeInterleaved3I16(VectorI16 a, VectorI16 b, VectorI16 c, int16_t* to) { hn::StoreInterleaved3(a, b, c, TagI16(), to); }
-HWY_INLINE void storeInterleaved4I16(VectorI16 a, VectorI16 b, VectorI16 c, VectorI16 d, int16_t* to) { hn::StoreInterleaved4(a, b, c, d, TagI16(), to); }
-HWY_INLINE VectorI16 loadWideningI8ToI16(const int8_t* from) { return hn::PromoteTo(TagI16(), hn::LoadU(hn::Rebind<int8_t, TagI16>(), from)); }
-HWY_INLINE VectorI16 loadFirstWideningI8ToI16(const int8_t* from, size_t count) { return hn::PromoteTo(TagI16(), hn::LoadN(hn::Rebind<int8_t, TagI16>(), from, count)); }
-HWY_INLINE VectorI16 repeatingBlockI16(int16_t v0, int16_t v1, int16_t v2, int16_t v3, int16_t v4, int16_t v5, int16_t v6, int16_t v7) { return hn::Dup128VecFromValues(TagI16(), v0, v1, v2, v3, v4, v5, v6, v7); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorI16 fromPortI16(cvectorization_ops_raw_vector_i16 v) { return svset_neonq_s16(svundef_s16(), (int16x8_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 toPortI16(VectorI16 v) { return (cvectorization_ops_raw_vector_i16)svget_neonq_s16(v); }
+HWY_INLINE MaskI16 maskFromPortI16(cvectorization_ops_raw_mask_i16 m) { return hn::MaskFromVec(hn::BitCast(TagI16(), svset_neonq_s16(svundef_s16(), (int16x8_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 maskToPortI16(MaskI16 m) { const hn::RebindToSigned<TagI16> di; return (cvectorization_ops_raw_mask_i16)svget_neonq_s16(hn::BitCast(di, hn::VecFromMask(TagI16(), m))); }
+#else
+HWY_INLINE VectorI16 fromPortI16(cvectorization_ops_raw_vector_i16 v) { return hn::LoadU(TagI16(), reinterpret_cast<const int16_t*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 toPortI16(VectorI16 v) { cvectorization_ops_raw_vector_i16 port; hn::StoreU(v, TagI16(), reinterpret_cast<int16_t*>(&port)); return port; }
+HWY_INLINE MaskI16 maskFromPortI16(cvectorization_ops_raw_mask_i16 m) { const hn::RebindToSigned<TagI16> di; return hn::MaskFromVec(hn::BitCast(TagI16(), hn::LoadU(di, reinterpret_cast<const int16_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 maskToPortI16(MaskI16 m) { const hn::RebindToSigned<TagI16> di; cvectorization_ops_raw_mask_i16 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagI16(), m)), di, reinterpret_cast<int16_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_i16 zeroI16() { return toPortI16(hn::Zero(TagI16())); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 repeatingI16(int16_t value) { return toPortI16(hn::Set(TagI16(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 iotaI16(int16_t value) { return toPortI16(hn::Iota(TagI16(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadI16(const int16_t* from) { return toPortI16(hn::LoadU(TagI16(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadAlignedI16(const int16_t* from) { return toPortI16(hn::Load(TagI16(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadFirstI16(const int16_t* from, size_t count) { return toPortI16(hn::LoadN(TagI16(), from, count)); }
+HWY_INLINE void storeI16(cvectorization_ops_raw_vector_i16 a, int16_t* to) { hn::StoreU(fromPortI16(a), TagI16(), to); }
+HWY_INLINE void storeAlignedI16(cvectorization_ops_raw_vector_i16 a, int16_t* to) { hn::Store(fromPortI16(a), TagI16(), to); }
+HWY_INLINE void storeFirstI16(cvectorization_ops_raw_vector_i16 a, int16_t* to, size_t count) { hn::StoreN(fromPortI16(a), TagI16(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 addingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::Add(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 subtractingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::Sub(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 multiplyingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::Mul(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 minimumI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::Min(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 maximumI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::Max(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 negatedI16(cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Neg(fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 magnitudeI16(cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Abs(fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 saturatingAddingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::SaturatedAdd(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 saturatingSubtractingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::SaturatedSub(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::And(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseOrI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::Or(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseXorI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::Xor(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseNotI16(cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Not(fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndNotI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::AndNot(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndXorI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, cvectorization_ops_raw_vector_i16 c) { return toPortI16(hn::AndXor(fromPortI16(a), fromPortI16(b), fromPortI16(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 shiftedLeftI16(cvectorization_ops_raw_vector_i16 a, int bits) { return toPortI16(hn::ShiftLeftSame(fromPortI16(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 shiftedRightI16(cvectorization_ops_raw_vector_i16 a, int bits) { return toPortI16(hn::ShiftRightSame(fromPortI16(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 equalToI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return maskToPortI16(hn::Eq(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 notEqualToI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return maskToPortI16(hn::Ne(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 lessThanI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return maskToPortI16(hn::Lt(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 greaterThanI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return maskToPortI16(hn::Gt(fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 selectingI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::IfThenElse(maskFromPortI16(mask), fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 selectingOrZeroI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::IfThenElseZero(maskFromPortI16(mask), fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 zeroingSelectedI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::IfThenZeroElse(maskFromPortI16(mask), fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndWhereI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::MaskedAnd(maskFromPortI16(mask), fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseOrWhereI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::MaskedOr(maskFromPortI16(mask), fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseXorWhereI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::MaskedXor(maskFromPortI16(mask), fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndWhereOtherwiseI16(cvectorization_ops_raw_vector_i16 otherwise, cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::MaskedAndOr(fromPortI16(otherwise), maskFromPortI16(mask), fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseOrWhereOtherwiseI16(cvectorization_ops_raw_vector_i16 otherwise, cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::MaskedOrOr(fromPortI16(otherwise), maskFromPortI16(mask), fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseXorWhereOtherwiseI16(cvectorization_ops_raw_vector_i16 otherwise, cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI16(hn::MaskedXorOr(fromPortI16(otherwise), maskFromPortI16(mask), fromPortI16(a), fromPortI16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 firstLanesI16(size_t count) { return maskToPortI16(hn::FirstN(TagI16(), count)); }
+HWY_INLINE bool allTrueI16(cvectorization_ops_raw_mask_i16 mask) { return hn::AllTrue(TagI16(), maskFromPortI16(mask)); }
+HWY_INLINE bool allFalseI16(cvectorization_ops_raw_mask_i16 mask) { return hn::AllFalse(TagI16(), maskFromPortI16(mask)); }
+HWY_INLINE size_t trueCountI16(cvectorization_ops_raw_mask_i16 mask) { return hn::CountTrue(TagI16(), maskFromPortI16(mask)); }
+HWY_INLINE intptr_t firstTrueIndexI16(cvectorization_ops_raw_mask_i16 mask) { return hn::FindFirstTrue(TagI16(), maskFromPortI16(mask)); }
+HWY_INLINE int16_t sumI16(cvectorization_ops_raw_vector_i16 a) { return hn::ReduceSum(TagI16(), fromPortI16(a)); }
+HWY_INLINE int16_t smallestI16(cvectorization_ops_raw_vector_i16 a) { return hn::ReduceMin(TagI16(), fromPortI16(a)); }
+HWY_INLINE int16_t largestI16(cvectorization_ops_raw_vector_i16 a) { return hn::ReduceMax(TagI16(), fromPortI16(a)); }
+HWY_INLINE int16_t firstLaneI16(cvectorization_ops_raw_vector_i16 a) { return hn::GetLane(fromPortI16(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 reversedI16(cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Reverse(TagI16(), fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slideUpLanesI16(cvectorization_ops_raw_vector_i16 a, size_t lanes) { return toPortI16(hn::SlideUpLanes(TagI16(), fromPortI16(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slideUpLanesFillingWithI16(cvectorization_ops_raw_vector_i16 fill, cvectorization_ops_raw_vector_i16 a, size_t lanes) { return toPortI16(hn::SlideUpLanesOr(fromPortI16(fill), TagI16(), fromPortI16(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slideDownLanesI16(cvectorization_ops_raw_vector_i16 a, size_t lanes) { return toPortI16(hn::SlideDownLanes(TagI16(), fromPortI16(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slideDownLanesFillingWithI16(cvectorization_ops_raw_vector_i16 fill, cvectorization_ops_raw_vector_i16 a, size_t lanes) { return toPortI16(hn::SlideDownLanesOr(fromPortI16(fill), TagI16(), fromPortI16(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slide1UpI16(cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Slide1Up(TagI16(), fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slide1UpFillingWithI16(int16_t fill, cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Slide1UpOr(fill, TagI16(), fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slide1DownI16(cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Slide1Down(TagI16(), fromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slide1DownFillingWithI16(int16_t fill, cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::Slide1DownOr(fill, TagI16(), fromPortI16(a))); }
+HWY_INLINE void loadInterleaved2I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorI16 h0, h1;
+  hn::LoadInterleaved2(TagI16(), from, h0, h1);
+  v0 = toPortI16(h0);
+  v1 = toPortI16(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorI16 h0, h1;
+  hn::LoadInterleaved2(TagI16(), from, h0, h1);
+  hn::StoreU(h0, TagI16(), reinterpret_cast<int16_t*>(&v0));
+  hn::StoreU(h1, TagI16(), reinterpret_cast<int16_t*>(&v1));
+#else
+  hn::LoadInterleaved2(TagI16(), from, inPlace<VectorI16>(v0), inPlace<VectorI16>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1, OutVectorI16& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorI16 h0, h1, h2;
+  hn::LoadInterleaved3(TagI16(), from, h0, h1, h2);
+  v0 = toPortI16(h0);
+  v1 = toPortI16(h1);
+  v2 = toPortI16(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorI16 h0, h1, h2;
+  hn::LoadInterleaved3(TagI16(), from, h0, h1, h2);
+  hn::StoreU(h0, TagI16(), reinterpret_cast<int16_t*>(&v0));
+  hn::StoreU(h1, TagI16(), reinterpret_cast<int16_t*>(&v1));
+  hn::StoreU(h2, TagI16(), reinterpret_cast<int16_t*>(&v2));
+#else
+  hn::LoadInterleaved3(TagI16(), from, inPlace<VectorI16>(v0), inPlace<VectorI16>(v1), inPlace<VectorI16>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1, OutVectorI16& v2, OutVectorI16& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorI16 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagI16(), from, h0, h1, h2, h3);
+  v0 = toPortI16(h0);
+  v1 = toPortI16(h1);
+  v2 = toPortI16(h2);
+  v3 = toPortI16(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorI16 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagI16(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagI16(), reinterpret_cast<int16_t*>(&v0));
+  hn::StoreU(h1, TagI16(), reinterpret_cast<int16_t*>(&v1));
+  hn::StoreU(h2, TagI16(), reinterpret_cast<int16_t*>(&v2));
+  hn::StoreU(h3, TagI16(), reinterpret_cast<int16_t*>(&v3));
+#else
+  hn::LoadInterleaved4(TagI16(), from, inPlace<VectorI16>(v0), inPlace<VectorI16>(v1), inPlace<VectorI16>(v2), inPlace<VectorI16>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2I16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, int16_t* to) { hn::StoreInterleaved2(fromPortI16(a), fromPortI16(b), TagI16(), to); }
+HWY_INLINE void storeInterleaved3I16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, cvectorization_ops_raw_vector_i16 c, int16_t* to) { hn::StoreInterleaved3(fromPortI16(a), fromPortI16(b), fromPortI16(c), TagI16(), to); }
+HWY_INLINE void storeInterleaved4I16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, cvectorization_ops_raw_vector_i16 c, cvectorization_ops_raw_vector_i16 d, int16_t* to) { hn::StoreInterleaved4(fromPortI16(a), fromPortI16(b), fromPortI16(c), fromPortI16(d), TagI16(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadWideningI8ToI16(const int8_t* from) { return toPortI16(hn::PromoteTo(TagI16(), hn::LoadU(hn::Rebind<int8_t, TagI16>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadFirstWideningI8ToI16(const int8_t* from, size_t count) { return toPortI16(hn::PromoteTo(TagI16(), hn::LoadN(hn::Rebind<int8_t, TagI16>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 repeatingBlockI16(int16_t v0, int16_t v1, int16_t v2, int16_t v3, int16_t v4, int16_t v5, int16_t v6, int16_t v7) { return toPortI16(hn::Dup128VecFromValues(TagI16(), v0, v1, v2, v3, v4, v5, v6, v7)); }
 
 using TagI32 = hn::ScalableTag<int32_t>;
 using VectorI32 = hn::VFromD<TagI32>;
 using MaskI32 = hn::MFromD<TagI32>;
+typedef cvectorization_ops_raw_vector_i32 OutVectorI32 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountI32() { return hn::Lanes(TagI32()); }
-HWY_INLINE VectorI32 fromPortI32(cvectorization_ops_vector_i32 v) { return hn::LoadU(TagI32(), reinterpret_cast<const int32_t*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_i32 toPortI32(VectorI32 v) { cvectorization_ops_vector_i32 port; hn::StoreU(v, TagI32(), reinterpret_cast<int32_t*>(&port)); return port; }
-HWY_INLINE MaskI32 maskFromPortI32(cvectorization_ops_mask_i32 m) { const hn::RebindToSigned<TagI32> di; return hn::MaskFromVec(hn::BitCast(TagI32(), hn::LoadU(di, reinterpret_cast<const int32_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_i32 maskToPortI32(MaskI32 m) { const hn::RebindToSigned<TagI32> di; cvectorization_ops_mask_i32 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagI32(), m)), di, reinterpret_cast<int32_t*>(&port)); return port; }
-HWY_INLINE VectorI32 zeroI32() { return hn::Zero(TagI32()); }
-HWY_INLINE VectorI32 repeatingI32(int32_t value) { return hn::Set(TagI32(), value); }
-HWY_INLINE VectorI32 iotaI32(int32_t value) { return hn::Iota(TagI32(), value); }
-HWY_INLINE VectorI32 loadI32(const int32_t* from) { return hn::LoadU(TagI32(), from); }
-HWY_INLINE VectorI32 loadAlignedI32(const int32_t* from) { return hn::Load(TagI32(), from); }
-HWY_INLINE VectorI32 loadFirstI32(const int32_t* from, size_t count) { return hn::LoadN(TagI32(), from, count); }
-HWY_INLINE void storeI32(VectorI32 a, int32_t* to) { hn::StoreU(a, TagI32(), to); }
-HWY_INLINE void storeAlignedI32(VectorI32 a, int32_t* to) { hn::Store(a, TagI32(), to); }
-HWY_INLINE void storeFirstI32(VectorI32 a, int32_t* to, size_t count) { hn::StoreN(a, TagI32(), to, count); }
-HWY_INLINE VectorI32 addingI32(VectorI32 a, VectorI32 b) { return hn::Add(a, b); }
-HWY_INLINE VectorI32 subtractingI32(VectorI32 a, VectorI32 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorI32 multiplyingI32(VectorI32 a, VectorI32 b) { return hn::Mul(a, b); }
-HWY_INLINE VectorI32 minimumI32(VectorI32 a, VectorI32 b) { return hn::Min(a, b); }
-HWY_INLINE VectorI32 maximumI32(VectorI32 a, VectorI32 b) { return hn::Max(a, b); }
-HWY_INLINE VectorI32 negatedI32(VectorI32 a) { return hn::Neg(a); }
-HWY_INLINE VectorI32 magnitudeI32(VectorI32 a) { return hn::Abs(a); }
-HWY_INLINE VectorI32 bitwiseAndI32(VectorI32 a, VectorI32 b) { return hn::And(a, b); }
-HWY_INLINE VectorI32 bitwiseOrI32(VectorI32 a, VectorI32 b) { return hn::Or(a, b); }
-HWY_INLINE VectorI32 bitwiseXorI32(VectorI32 a, VectorI32 b) { return hn::Xor(a, b); }
-HWY_INLINE VectorI32 bitwiseNotI32(VectorI32 a) { return hn::Not(a); }
-HWY_INLINE VectorI32 bitwiseAndNotI32(VectorI32 a, VectorI32 b) { return hn::AndNot(a, b); }
-HWY_INLINE VectorI32 bitwiseAndXorI32(VectorI32 a, VectorI32 b, VectorI32 c) { return hn::AndXor(a, b, c); }
-HWY_INLINE VectorI32 shiftedLeftI32(VectorI32 a, int bits) { return hn::ShiftLeftSame(a, bits); }
-HWY_INLINE VectorI32 shiftedRightI32(VectorI32 a, int bits) { return hn::ShiftRightSame(a, bits); }
-HWY_INLINE MaskI32 equalToI32(VectorI32 a, VectorI32 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskI32 notEqualToI32(VectorI32 a, VectorI32 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskI32 lessThanI32(VectorI32 a, VectorI32 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskI32 greaterThanI32(VectorI32 a, VectorI32 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorI32 selectingI32(MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorI32 selectingOrZeroI32(MaskI32 mask, VectorI32 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorI32 zeroingSelectedI32(MaskI32 mask, VectorI32 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE VectorI32 bitwiseAndWhereI32(MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedAnd(mask, a, b); }
-HWY_INLINE VectorI32 bitwiseOrWhereI32(MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedOr(mask, a, b); }
-HWY_INLINE VectorI32 bitwiseXorWhereI32(MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedXor(mask, a, b); }
-HWY_INLINE VectorI32 bitwiseAndWhereOtherwiseI32(VectorI32 otherwise, MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
-HWY_INLINE VectorI32 bitwiseOrWhereOtherwiseI32(VectorI32 otherwise, MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
-HWY_INLINE VectorI32 bitwiseXorWhereOtherwiseI32(VectorI32 otherwise, MaskI32 mask, VectorI32 a, VectorI32 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
-HWY_INLINE MaskI32 firstLanesI32(size_t count) { return hn::FirstN(TagI32(), count); }
-HWY_INLINE bool allTrueI32(MaskI32 mask) { return hn::AllTrue(TagI32(), mask); }
-HWY_INLINE bool allFalseI32(MaskI32 mask) { return hn::AllFalse(TagI32(), mask); }
-HWY_INLINE size_t trueCountI32(MaskI32 mask) { return hn::CountTrue(TagI32(), mask); }
-HWY_INLINE intptr_t firstTrueIndexI32(MaskI32 mask) { return hn::FindFirstTrue(TagI32(), mask); }
-HWY_INLINE int32_t sumI32(VectorI32 a) { return hn::ReduceSum(TagI32(), a); }
-HWY_INLINE int32_t smallestI32(VectorI32 a) { return hn::ReduceMin(TagI32(), a); }
-HWY_INLINE int32_t largestI32(VectorI32 a) { return hn::ReduceMax(TagI32(), a); }
-HWY_INLINE int32_t firstLaneI32(VectorI32 a) { return hn::GetLane(a); }
-HWY_INLINE VectorI32 reversedI32(VectorI32 a) { return hn::Reverse(TagI32(), a); }
-HWY_INLINE VectorI32 slideUpLanesI32(VectorI32 a, size_t lanes) { return hn::SlideUpLanes(TagI32(), a, lanes); }
-HWY_INLINE VectorI32 slideUpLanesFillingWithI32(VectorI32 fill, VectorI32 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagI32(), a, lanes); }
-HWY_INLINE VectorI32 slideDownLanesI32(VectorI32 a, size_t lanes) { return hn::SlideDownLanes(TagI32(), a, lanes); }
-HWY_INLINE VectorI32 slideDownLanesFillingWithI32(VectorI32 fill, VectorI32 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagI32(), a, lanes); }
-HWY_INLINE VectorI32 slide1UpI32(VectorI32 a) { return hn::Slide1Up(TagI32(), a); }
-HWY_INLINE VectorI32 slide1UpFillingWithI32(int32_t fill, VectorI32 a) { return hn::Slide1UpOr(fill, TagI32(), a); }
-HWY_INLINE VectorI32 slide1DownI32(VectorI32 a) { return hn::Slide1Down(TagI32(), a); }
-HWY_INLINE VectorI32 slide1DownFillingWithI32(int32_t fill, VectorI32 a) { return hn::Slide1DownOr(fill, TagI32(), a); }
-HWY_INLINE void loadInterleaved2I32(const int32_t* from, VectorI32& v0, VectorI32& v1) { hn::LoadInterleaved2(TagI32(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3I32(const int32_t* from, VectorI32& v0, VectorI32& v1, VectorI32& v2) { hn::LoadInterleaved3(TagI32(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4I32(const int32_t* from, VectorI32& v0, VectorI32& v1, VectorI32& v2, VectorI32& v3) { hn::LoadInterleaved4(TagI32(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2I32(VectorI32 a, VectorI32 b, int32_t* to) { hn::StoreInterleaved2(a, b, TagI32(), to); }
-HWY_INLINE void storeInterleaved3I32(VectorI32 a, VectorI32 b, VectorI32 c, int32_t* to) { hn::StoreInterleaved3(a, b, c, TagI32(), to); }
-HWY_INLINE void storeInterleaved4I32(VectorI32 a, VectorI32 b, VectorI32 c, VectorI32 d, int32_t* to) { hn::StoreInterleaved4(a, b, c, d, TagI32(), to); }
-HWY_INLINE VectorI32 loadWideningI8ToI32(const int8_t* from) { return hn::PromoteTo(TagI32(), hn::LoadU(hn::Rebind<int8_t, TagI32>(), from)); }
-HWY_INLINE VectorI32 loadWideningI16ToI32(const int16_t* from) { return hn::PromoteTo(TagI32(), hn::LoadU(hn::Rebind<int16_t, TagI32>(), from)); }
-HWY_INLINE VectorI32 loadFirstWideningI8ToI32(const int8_t* from, size_t count) { return hn::PromoteTo(TagI32(), hn::LoadN(hn::Rebind<int8_t, TagI32>(), from, count)); }
-HWY_INLINE VectorI32 loadFirstWideningI16ToI32(const int16_t* from, size_t count) { return hn::PromoteTo(TagI32(), hn::LoadN(hn::Rebind<int16_t, TagI32>(), from, count)); }
-HWY_INLINE VectorI32 repeatingBlockI32(int32_t v0, int32_t v1, int32_t v2, int32_t v3) { return hn::Dup128VecFromValues(TagI32(), v0, v1, v2, v3); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorI32 fromPortI32(cvectorization_ops_raw_vector_i32 v) { return svset_neonq_s32(svundef_s32(), (int32x4_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 toPortI32(VectorI32 v) { return (cvectorization_ops_raw_vector_i32)svget_neonq_s32(v); }
+HWY_INLINE MaskI32 maskFromPortI32(cvectorization_ops_raw_mask_i32 m) { return hn::MaskFromVec(hn::BitCast(TagI32(), svset_neonq_s32(svundef_s32(), (int32x4_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 maskToPortI32(MaskI32 m) { const hn::RebindToSigned<TagI32> di; return (cvectorization_ops_raw_mask_i32)svget_neonq_s32(hn::BitCast(di, hn::VecFromMask(TagI32(), m))); }
+#else
+HWY_INLINE VectorI32 fromPortI32(cvectorization_ops_raw_vector_i32 v) { return hn::LoadU(TagI32(), reinterpret_cast<const int32_t*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 toPortI32(VectorI32 v) { cvectorization_ops_raw_vector_i32 port; hn::StoreU(v, TagI32(), reinterpret_cast<int32_t*>(&port)); return port; }
+HWY_INLINE MaskI32 maskFromPortI32(cvectorization_ops_raw_mask_i32 m) { const hn::RebindToSigned<TagI32> di; return hn::MaskFromVec(hn::BitCast(TagI32(), hn::LoadU(di, reinterpret_cast<const int32_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 maskToPortI32(MaskI32 m) { const hn::RebindToSigned<TagI32> di; cvectorization_ops_raw_mask_i32 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagI32(), m)), di, reinterpret_cast<int32_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_i32 zeroI32() { return toPortI32(hn::Zero(TagI32())); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 repeatingI32(int32_t value) { return toPortI32(hn::Set(TagI32(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 iotaI32(int32_t value) { return toPortI32(hn::Iota(TagI32(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadI32(const int32_t* from) { return toPortI32(hn::LoadU(TagI32(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadAlignedI32(const int32_t* from) { return toPortI32(hn::Load(TagI32(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstI32(const int32_t* from, size_t count) { return toPortI32(hn::LoadN(TagI32(), from, count)); }
+HWY_INLINE void storeI32(cvectorization_ops_raw_vector_i32 a, int32_t* to) { hn::StoreU(fromPortI32(a), TagI32(), to); }
+HWY_INLINE void storeAlignedI32(cvectorization_ops_raw_vector_i32 a, int32_t* to) { hn::Store(fromPortI32(a), TagI32(), to); }
+HWY_INLINE void storeFirstI32(cvectorization_ops_raw_vector_i32 a, int32_t* to, size_t count) { hn::StoreN(fromPortI32(a), TagI32(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 addingI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::Add(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 subtractingI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::Sub(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 multiplyingI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::Mul(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 minimumI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::Min(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 maximumI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::Max(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 negatedI32(cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Neg(fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 magnitudeI32(cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Abs(fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::And(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseOrI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::Or(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseXorI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::Xor(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseNotI32(cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Not(fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndNotI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::AndNot(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndXorI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, cvectorization_ops_raw_vector_i32 c) { return toPortI32(hn::AndXor(fromPortI32(a), fromPortI32(b), fromPortI32(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 shiftedLeftI32(cvectorization_ops_raw_vector_i32 a, int bits) { return toPortI32(hn::ShiftLeftSame(fromPortI32(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 shiftedRightI32(cvectorization_ops_raw_vector_i32 a, int bits) { return toPortI32(hn::ShiftRightSame(fromPortI32(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 equalToI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return maskToPortI32(hn::Eq(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 notEqualToI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return maskToPortI32(hn::Ne(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 lessThanI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return maskToPortI32(hn::Lt(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 greaterThanI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return maskToPortI32(hn::Gt(fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 selectingI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::IfThenElse(maskFromPortI32(mask), fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 selectingOrZeroI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::IfThenElseZero(maskFromPortI32(mask), fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 zeroingSelectedI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::IfThenZeroElse(maskFromPortI32(mask), fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndWhereI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::MaskedAnd(maskFromPortI32(mask), fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseOrWhereI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::MaskedOr(maskFromPortI32(mask), fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseXorWhereI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::MaskedXor(maskFromPortI32(mask), fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndWhereOtherwiseI32(cvectorization_ops_raw_vector_i32 otherwise, cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::MaskedAndOr(fromPortI32(otherwise), maskFromPortI32(mask), fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseOrWhereOtherwiseI32(cvectorization_ops_raw_vector_i32 otherwise, cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::MaskedOrOr(fromPortI32(otherwise), maskFromPortI32(mask), fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseXorWhereOtherwiseI32(cvectorization_ops_raw_vector_i32 otherwise, cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI32(hn::MaskedXorOr(fromPortI32(otherwise), maskFromPortI32(mask), fromPortI32(a), fromPortI32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 firstLanesI32(size_t count) { return maskToPortI32(hn::FirstN(TagI32(), count)); }
+HWY_INLINE bool allTrueI32(cvectorization_ops_raw_mask_i32 mask) { return hn::AllTrue(TagI32(), maskFromPortI32(mask)); }
+HWY_INLINE bool allFalseI32(cvectorization_ops_raw_mask_i32 mask) { return hn::AllFalse(TagI32(), maskFromPortI32(mask)); }
+HWY_INLINE size_t trueCountI32(cvectorization_ops_raw_mask_i32 mask) { return hn::CountTrue(TagI32(), maskFromPortI32(mask)); }
+HWY_INLINE intptr_t firstTrueIndexI32(cvectorization_ops_raw_mask_i32 mask) { return hn::FindFirstTrue(TagI32(), maskFromPortI32(mask)); }
+HWY_INLINE int32_t sumI32(cvectorization_ops_raw_vector_i32 a) { return hn::ReduceSum(TagI32(), fromPortI32(a)); }
+HWY_INLINE int32_t smallestI32(cvectorization_ops_raw_vector_i32 a) { return hn::ReduceMin(TagI32(), fromPortI32(a)); }
+HWY_INLINE int32_t largestI32(cvectorization_ops_raw_vector_i32 a) { return hn::ReduceMax(TagI32(), fromPortI32(a)); }
+HWY_INLINE int32_t firstLaneI32(cvectorization_ops_raw_vector_i32 a) { return hn::GetLane(fromPortI32(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 reversedI32(cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Reverse(TagI32(), fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slideUpLanesI32(cvectorization_ops_raw_vector_i32 a, size_t lanes) { return toPortI32(hn::SlideUpLanes(TagI32(), fromPortI32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slideUpLanesFillingWithI32(cvectorization_ops_raw_vector_i32 fill, cvectorization_ops_raw_vector_i32 a, size_t lanes) { return toPortI32(hn::SlideUpLanesOr(fromPortI32(fill), TagI32(), fromPortI32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slideDownLanesI32(cvectorization_ops_raw_vector_i32 a, size_t lanes) { return toPortI32(hn::SlideDownLanes(TagI32(), fromPortI32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slideDownLanesFillingWithI32(cvectorization_ops_raw_vector_i32 fill, cvectorization_ops_raw_vector_i32 a, size_t lanes) { return toPortI32(hn::SlideDownLanesOr(fromPortI32(fill), TagI32(), fromPortI32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slide1UpI32(cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Slide1Up(TagI32(), fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slide1UpFillingWithI32(int32_t fill, cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Slide1UpOr(fill, TagI32(), fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slide1DownI32(cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Slide1Down(TagI32(), fromPortI32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slide1DownFillingWithI32(int32_t fill, cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::Slide1DownOr(fill, TagI32(), fromPortI32(a))); }
+HWY_INLINE void loadInterleaved2I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorI32 h0, h1;
+  hn::LoadInterleaved2(TagI32(), from, h0, h1);
+  v0 = toPortI32(h0);
+  v1 = toPortI32(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorI32 h0, h1;
+  hn::LoadInterleaved2(TagI32(), from, h0, h1);
+  hn::StoreU(h0, TagI32(), reinterpret_cast<int32_t*>(&v0));
+  hn::StoreU(h1, TagI32(), reinterpret_cast<int32_t*>(&v1));
+#else
+  hn::LoadInterleaved2(TagI32(), from, inPlace<VectorI32>(v0), inPlace<VectorI32>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1, OutVectorI32& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorI32 h0, h1, h2;
+  hn::LoadInterleaved3(TagI32(), from, h0, h1, h2);
+  v0 = toPortI32(h0);
+  v1 = toPortI32(h1);
+  v2 = toPortI32(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorI32 h0, h1, h2;
+  hn::LoadInterleaved3(TagI32(), from, h0, h1, h2);
+  hn::StoreU(h0, TagI32(), reinterpret_cast<int32_t*>(&v0));
+  hn::StoreU(h1, TagI32(), reinterpret_cast<int32_t*>(&v1));
+  hn::StoreU(h2, TagI32(), reinterpret_cast<int32_t*>(&v2));
+#else
+  hn::LoadInterleaved3(TagI32(), from, inPlace<VectorI32>(v0), inPlace<VectorI32>(v1), inPlace<VectorI32>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1, OutVectorI32& v2, OutVectorI32& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorI32 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagI32(), from, h0, h1, h2, h3);
+  v0 = toPortI32(h0);
+  v1 = toPortI32(h1);
+  v2 = toPortI32(h2);
+  v3 = toPortI32(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorI32 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagI32(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagI32(), reinterpret_cast<int32_t*>(&v0));
+  hn::StoreU(h1, TagI32(), reinterpret_cast<int32_t*>(&v1));
+  hn::StoreU(h2, TagI32(), reinterpret_cast<int32_t*>(&v2));
+  hn::StoreU(h3, TagI32(), reinterpret_cast<int32_t*>(&v3));
+#else
+  hn::LoadInterleaved4(TagI32(), from, inPlace<VectorI32>(v0), inPlace<VectorI32>(v1), inPlace<VectorI32>(v2), inPlace<VectorI32>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2I32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, int32_t* to) { hn::StoreInterleaved2(fromPortI32(a), fromPortI32(b), TagI32(), to); }
+HWY_INLINE void storeInterleaved3I32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, cvectorization_ops_raw_vector_i32 c, int32_t* to) { hn::StoreInterleaved3(fromPortI32(a), fromPortI32(b), fromPortI32(c), TagI32(), to); }
+HWY_INLINE void storeInterleaved4I32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, cvectorization_ops_raw_vector_i32 c, cvectorization_ops_raw_vector_i32 d, int32_t* to) { hn::StoreInterleaved4(fromPortI32(a), fromPortI32(b), fromPortI32(c), fromPortI32(d), TagI32(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadWideningI8ToI32(const int8_t* from) { return toPortI32(hn::PromoteTo(TagI32(), hn::LoadU(hn::Rebind<int8_t, TagI32>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadWideningI16ToI32(const int16_t* from) { return toPortI32(hn::PromoteTo(TagI32(), hn::LoadU(hn::Rebind<int16_t, TagI32>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstWideningI8ToI32(const int8_t* from, size_t count) { return toPortI32(hn::PromoteTo(TagI32(), hn::LoadN(hn::Rebind<int8_t, TagI32>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstWideningI16ToI32(const int16_t* from, size_t count) { return toPortI32(hn::PromoteTo(TagI32(), hn::LoadN(hn::Rebind<int16_t, TagI32>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 repeatingBlockI32(int32_t v0, int32_t v1, int32_t v2, int32_t v3) { return toPortI32(hn::Dup128VecFromValues(TagI32(), v0, v1, v2, v3)); }
 
 using TagI64 = hn::ScalableTag<int64_t>;
 using VectorI64 = hn::VFromD<TagI64>;
 using MaskI64 = hn::MFromD<TagI64>;
+typedef cvectorization_ops_raw_vector_i64 OutVectorI64 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountI64() { return hn::Lanes(TagI64()); }
-HWY_INLINE VectorI64 fromPortI64(cvectorization_ops_vector_i64 v) { return hn::LoadU(TagI64(), reinterpret_cast<const int64_t*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_i64 toPortI64(VectorI64 v) { cvectorization_ops_vector_i64 port; hn::StoreU(v, TagI64(), reinterpret_cast<int64_t*>(&port)); return port; }
-HWY_INLINE MaskI64 maskFromPortI64(cvectorization_ops_mask_i64 m) { const hn::RebindToSigned<TagI64> di; return hn::MaskFromVec(hn::BitCast(TagI64(), hn::LoadU(di, reinterpret_cast<const int64_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_i64 maskToPortI64(MaskI64 m) { const hn::RebindToSigned<TagI64> di; cvectorization_ops_mask_i64 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagI64(), m)), di, reinterpret_cast<int64_t*>(&port)); return port; }
-HWY_INLINE VectorI64 zeroI64() { return hn::Zero(TagI64()); }
-HWY_INLINE VectorI64 repeatingI64(int64_t value) { return hn::Set(TagI64(), value); }
-HWY_INLINE VectorI64 iotaI64(int64_t value) { return hn::Iota(TagI64(), value); }
-HWY_INLINE VectorI64 loadI64(const int64_t* from) { return hn::LoadU(TagI64(), from); }
-HWY_INLINE VectorI64 loadAlignedI64(const int64_t* from) { return hn::Load(TagI64(), from); }
-HWY_INLINE VectorI64 loadFirstI64(const int64_t* from, size_t count) { return hn::LoadN(TagI64(), from, count); }
-HWY_INLINE void storeI64(VectorI64 a, int64_t* to) { hn::StoreU(a, TagI64(), to); }
-HWY_INLINE void storeAlignedI64(VectorI64 a, int64_t* to) { hn::Store(a, TagI64(), to); }
-HWY_INLINE void storeFirstI64(VectorI64 a, int64_t* to, size_t count) { hn::StoreN(a, TagI64(), to, count); }
-HWY_INLINE VectorI64 addingI64(VectorI64 a, VectorI64 b) { return hn::Add(a, b); }
-HWY_INLINE VectorI64 subtractingI64(VectorI64 a, VectorI64 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorI64 multiplyingI64(VectorI64 a, VectorI64 b) { return hn::Mul(a, b); }
-HWY_INLINE VectorI64 minimumI64(VectorI64 a, VectorI64 b) { return hn::Min(a, b); }
-HWY_INLINE VectorI64 maximumI64(VectorI64 a, VectorI64 b) { return hn::Max(a, b); }
-HWY_INLINE VectorI64 negatedI64(VectorI64 a) { return hn::Neg(a); }
-HWY_INLINE VectorI64 magnitudeI64(VectorI64 a) { return hn::Abs(a); }
-HWY_INLINE VectorI64 bitwiseAndI64(VectorI64 a, VectorI64 b) { return hn::And(a, b); }
-HWY_INLINE VectorI64 bitwiseOrI64(VectorI64 a, VectorI64 b) { return hn::Or(a, b); }
-HWY_INLINE VectorI64 bitwiseXorI64(VectorI64 a, VectorI64 b) { return hn::Xor(a, b); }
-HWY_INLINE VectorI64 bitwiseNotI64(VectorI64 a) { return hn::Not(a); }
-HWY_INLINE VectorI64 bitwiseAndNotI64(VectorI64 a, VectorI64 b) { return hn::AndNot(a, b); }
-HWY_INLINE VectorI64 bitwiseAndXorI64(VectorI64 a, VectorI64 b, VectorI64 c) { return hn::AndXor(a, b, c); }
-HWY_INLINE VectorI64 shiftedLeftI64(VectorI64 a, int bits) { return hn::ShiftLeftSame(a, bits); }
-HWY_INLINE VectorI64 shiftedRightI64(VectorI64 a, int bits) { return hn::ShiftRightSame(a, bits); }
-HWY_INLINE MaskI64 equalToI64(VectorI64 a, VectorI64 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskI64 notEqualToI64(VectorI64 a, VectorI64 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskI64 lessThanI64(VectorI64 a, VectorI64 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskI64 greaterThanI64(VectorI64 a, VectorI64 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorI64 selectingI64(MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorI64 selectingOrZeroI64(MaskI64 mask, VectorI64 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorI64 zeroingSelectedI64(MaskI64 mask, VectorI64 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE VectorI64 bitwiseAndWhereI64(MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedAnd(mask, a, b); }
-HWY_INLINE VectorI64 bitwiseOrWhereI64(MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedOr(mask, a, b); }
-HWY_INLINE VectorI64 bitwiseXorWhereI64(MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedXor(mask, a, b); }
-HWY_INLINE VectorI64 bitwiseAndWhereOtherwiseI64(VectorI64 otherwise, MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedAndOr(otherwise, mask, a, b); }
-HWY_INLINE VectorI64 bitwiseOrWhereOtherwiseI64(VectorI64 otherwise, MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedOrOr(otherwise, mask, a, b); }
-HWY_INLINE VectorI64 bitwiseXorWhereOtherwiseI64(VectorI64 otherwise, MaskI64 mask, VectorI64 a, VectorI64 b) { return hn::MaskedXorOr(otherwise, mask, a, b); }
-HWY_INLINE MaskI64 firstLanesI64(size_t count) { return hn::FirstN(TagI64(), count); }
-HWY_INLINE bool allTrueI64(MaskI64 mask) { return hn::AllTrue(TagI64(), mask); }
-HWY_INLINE bool allFalseI64(MaskI64 mask) { return hn::AllFalse(TagI64(), mask); }
-HWY_INLINE size_t trueCountI64(MaskI64 mask) { return hn::CountTrue(TagI64(), mask); }
-HWY_INLINE intptr_t firstTrueIndexI64(MaskI64 mask) { return hn::FindFirstTrue(TagI64(), mask); }
-HWY_INLINE int64_t sumI64(VectorI64 a) { return hn::ReduceSum(TagI64(), a); }
-HWY_INLINE int64_t smallestI64(VectorI64 a) { return hn::ReduceMin(TagI64(), a); }
-HWY_INLINE int64_t largestI64(VectorI64 a) { return hn::ReduceMax(TagI64(), a); }
-HWY_INLINE int64_t firstLaneI64(VectorI64 a) { return hn::GetLane(a); }
-HWY_INLINE VectorI64 reversedI64(VectorI64 a) { return hn::Reverse(TagI64(), a); }
-HWY_INLINE VectorI64 slideUpLanesI64(VectorI64 a, size_t lanes) { return hn::SlideUpLanes(TagI64(), a, lanes); }
-HWY_INLINE VectorI64 slideUpLanesFillingWithI64(VectorI64 fill, VectorI64 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagI64(), a, lanes); }
-HWY_INLINE VectorI64 slideDownLanesI64(VectorI64 a, size_t lanes) { return hn::SlideDownLanes(TagI64(), a, lanes); }
-HWY_INLINE VectorI64 slideDownLanesFillingWithI64(VectorI64 fill, VectorI64 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagI64(), a, lanes); }
-HWY_INLINE VectorI64 slide1UpI64(VectorI64 a) { return hn::Slide1Up(TagI64(), a); }
-HWY_INLINE VectorI64 slide1UpFillingWithI64(int64_t fill, VectorI64 a) { return hn::Slide1UpOr(fill, TagI64(), a); }
-HWY_INLINE VectorI64 slide1DownI64(VectorI64 a) { return hn::Slide1Down(TagI64(), a); }
-HWY_INLINE VectorI64 slide1DownFillingWithI64(int64_t fill, VectorI64 a) { return hn::Slide1DownOr(fill, TagI64(), a); }
-HWY_INLINE void loadInterleaved2I64(const int64_t* from, VectorI64& v0, VectorI64& v1) { hn::LoadInterleaved2(TagI64(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3I64(const int64_t* from, VectorI64& v0, VectorI64& v1, VectorI64& v2) { hn::LoadInterleaved3(TagI64(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4I64(const int64_t* from, VectorI64& v0, VectorI64& v1, VectorI64& v2, VectorI64& v3) { hn::LoadInterleaved4(TagI64(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2I64(VectorI64 a, VectorI64 b, int64_t* to) { hn::StoreInterleaved2(a, b, TagI64(), to); }
-HWY_INLINE void storeInterleaved3I64(VectorI64 a, VectorI64 b, VectorI64 c, int64_t* to) { hn::StoreInterleaved3(a, b, c, TagI64(), to); }
-HWY_INLINE void storeInterleaved4I64(VectorI64 a, VectorI64 b, VectorI64 c, VectorI64 d, int64_t* to) { hn::StoreInterleaved4(a, b, c, d, TagI64(), to); }
-HWY_INLINE VectorI64 loadWideningI8ToI64(const int8_t* from) { return hn::PromoteTo(TagI64(), hn::LoadU(hn::Rebind<int8_t, TagI64>(), from)); }
-HWY_INLINE VectorI64 loadWideningI16ToI64(const int16_t* from) { return hn::PromoteTo(TagI64(), hn::LoadU(hn::Rebind<int16_t, TagI64>(), from)); }
-HWY_INLINE VectorI64 loadWideningI32ToI64(const int32_t* from) { return hn::PromoteTo(TagI64(), hn::LoadU(hn::Rebind<int32_t, TagI64>(), from)); }
-HWY_INLINE VectorI64 loadFirstWideningI8ToI64(const int8_t* from, size_t count) { return hn::PromoteTo(TagI64(), hn::LoadN(hn::Rebind<int8_t, TagI64>(), from, count)); }
-HWY_INLINE VectorI64 loadFirstWideningI16ToI64(const int16_t* from, size_t count) { return hn::PromoteTo(TagI64(), hn::LoadN(hn::Rebind<int16_t, TagI64>(), from, count)); }
-HWY_INLINE VectorI64 loadFirstWideningI32ToI64(const int32_t* from, size_t count) { return hn::PromoteTo(TagI64(), hn::LoadN(hn::Rebind<int32_t, TagI64>(), from, count)); }
-HWY_INLINE VectorI64 repeatingBlockI64(int64_t v0, int64_t v1) { return hn::Dup128VecFromValues(TagI64(), v0, v1); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorI64 fromPortI64(cvectorization_ops_raw_vector_i64 v) { return svset_neonq_s64(svundef_s64(), (int64x2_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 toPortI64(VectorI64 v) { return (cvectorization_ops_raw_vector_i64)svget_neonq_s64(v); }
+HWY_INLINE MaskI64 maskFromPortI64(cvectorization_ops_raw_mask_i64 m) { return hn::MaskFromVec(hn::BitCast(TagI64(), svset_neonq_s64(svundef_s64(), (int64x2_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 maskToPortI64(MaskI64 m) { const hn::RebindToSigned<TagI64> di; return (cvectorization_ops_raw_mask_i64)svget_neonq_s64(hn::BitCast(di, hn::VecFromMask(TagI64(), m))); }
+#else
+HWY_INLINE VectorI64 fromPortI64(cvectorization_ops_raw_vector_i64 v) { return hn::LoadU(TagI64(), reinterpret_cast<const int64_t*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 toPortI64(VectorI64 v) { cvectorization_ops_raw_vector_i64 port; hn::StoreU(v, TagI64(), reinterpret_cast<int64_t*>(&port)); return port; }
+HWY_INLINE MaskI64 maskFromPortI64(cvectorization_ops_raw_mask_i64 m) { const hn::RebindToSigned<TagI64> di; return hn::MaskFromVec(hn::BitCast(TagI64(), hn::LoadU(di, reinterpret_cast<const int64_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 maskToPortI64(MaskI64 m) { const hn::RebindToSigned<TagI64> di; cvectorization_ops_raw_mask_i64 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagI64(), m)), di, reinterpret_cast<int64_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_i64 zeroI64() { return toPortI64(hn::Zero(TagI64())); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 repeatingI64(int64_t value) { return toPortI64(hn::Set(TagI64(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 iotaI64(int64_t value) { return toPortI64(hn::Iota(TagI64(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadI64(const int64_t* from) { return toPortI64(hn::LoadU(TagI64(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadAlignedI64(const int64_t* from) { return toPortI64(hn::Load(TagI64(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstI64(const int64_t* from, size_t count) { return toPortI64(hn::LoadN(TagI64(), from, count)); }
+HWY_INLINE void storeI64(cvectorization_ops_raw_vector_i64 a, int64_t* to) { hn::StoreU(fromPortI64(a), TagI64(), to); }
+HWY_INLINE void storeAlignedI64(cvectorization_ops_raw_vector_i64 a, int64_t* to) { hn::Store(fromPortI64(a), TagI64(), to); }
+HWY_INLINE void storeFirstI64(cvectorization_ops_raw_vector_i64 a, int64_t* to, size_t count) { hn::StoreN(fromPortI64(a), TagI64(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 addingI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::Add(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 subtractingI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::Sub(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 multiplyingI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::Mul(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 minimumI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::Min(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 maximumI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::Max(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 negatedI64(cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Neg(fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 magnitudeI64(cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Abs(fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::And(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseOrI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::Or(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseXorI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::Xor(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseNotI64(cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Not(fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndNotI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::AndNot(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndXorI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, cvectorization_ops_raw_vector_i64 c) { return toPortI64(hn::AndXor(fromPortI64(a), fromPortI64(b), fromPortI64(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 shiftedLeftI64(cvectorization_ops_raw_vector_i64 a, int bits) { return toPortI64(hn::ShiftLeftSame(fromPortI64(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 shiftedRightI64(cvectorization_ops_raw_vector_i64 a, int bits) { return toPortI64(hn::ShiftRightSame(fromPortI64(a), bits)); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 equalToI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return maskToPortI64(hn::Eq(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 notEqualToI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return maskToPortI64(hn::Ne(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 lessThanI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return maskToPortI64(hn::Lt(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 greaterThanI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return maskToPortI64(hn::Gt(fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 selectingI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::IfThenElse(maskFromPortI64(mask), fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 selectingOrZeroI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::IfThenElseZero(maskFromPortI64(mask), fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 zeroingSelectedI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::IfThenZeroElse(maskFromPortI64(mask), fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndWhereI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::MaskedAnd(maskFromPortI64(mask), fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseOrWhereI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::MaskedOr(maskFromPortI64(mask), fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseXorWhereI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::MaskedXor(maskFromPortI64(mask), fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndWhereOtherwiseI64(cvectorization_ops_raw_vector_i64 otherwise, cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::MaskedAndOr(fromPortI64(otherwise), maskFromPortI64(mask), fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseOrWhereOtherwiseI64(cvectorization_ops_raw_vector_i64 otherwise, cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::MaskedOrOr(fromPortI64(otherwise), maskFromPortI64(mask), fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseXorWhereOtherwiseI64(cvectorization_ops_raw_vector_i64 otherwise, cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) { return toPortI64(hn::MaskedXorOr(fromPortI64(otherwise), maskFromPortI64(mask), fromPortI64(a), fromPortI64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 firstLanesI64(size_t count) { return maskToPortI64(hn::FirstN(TagI64(), count)); }
+HWY_INLINE bool allTrueI64(cvectorization_ops_raw_mask_i64 mask) { return hn::AllTrue(TagI64(), maskFromPortI64(mask)); }
+HWY_INLINE bool allFalseI64(cvectorization_ops_raw_mask_i64 mask) { return hn::AllFalse(TagI64(), maskFromPortI64(mask)); }
+HWY_INLINE size_t trueCountI64(cvectorization_ops_raw_mask_i64 mask) { return hn::CountTrue(TagI64(), maskFromPortI64(mask)); }
+HWY_INLINE intptr_t firstTrueIndexI64(cvectorization_ops_raw_mask_i64 mask) { return hn::FindFirstTrue(TagI64(), maskFromPortI64(mask)); }
+HWY_INLINE int64_t sumI64(cvectorization_ops_raw_vector_i64 a) { return hn::ReduceSum(TagI64(), fromPortI64(a)); }
+HWY_INLINE int64_t smallestI64(cvectorization_ops_raw_vector_i64 a) { return hn::ReduceMin(TagI64(), fromPortI64(a)); }
+HWY_INLINE int64_t largestI64(cvectorization_ops_raw_vector_i64 a) { return hn::ReduceMax(TagI64(), fromPortI64(a)); }
+HWY_INLINE int64_t firstLaneI64(cvectorization_ops_raw_vector_i64 a) { return hn::GetLane(fromPortI64(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 reversedI64(cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Reverse(TagI64(), fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slideUpLanesI64(cvectorization_ops_raw_vector_i64 a, size_t lanes) { return toPortI64(hn::SlideUpLanes(TagI64(), fromPortI64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slideUpLanesFillingWithI64(cvectorization_ops_raw_vector_i64 fill, cvectorization_ops_raw_vector_i64 a, size_t lanes) { return toPortI64(hn::SlideUpLanesOr(fromPortI64(fill), TagI64(), fromPortI64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slideDownLanesI64(cvectorization_ops_raw_vector_i64 a, size_t lanes) { return toPortI64(hn::SlideDownLanes(TagI64(), fromPortI64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slideDownLanesFillingWithI64(cvectorization_ops_raw_vector_i64 fill, cvectorization_ops_raw_vector_i64 a, size_t lanes) { return toPortI64(hn::SlideDownLanesOr(fromPortI64(fill), TagI64(), fromPortI64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slide1UpI64(cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Slide1Up(TagI64(), fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slide1UpFillingWithI64(int64_t fill, cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Slide1UpOr(fill, TagI64(), fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slide1DownI64(cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Slide1Down(TagI64(), fromPortI64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slide1DownFillingWithI64(int64_t fill, cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::Slide1DownOr(fill, TagI64(), fromPortI64(a))); }
+HWY_INLINE void loadInterleaved2I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorI64 h0, h1;
+  hn::LoadInterleaved2(TagI64(), from, h0, h1);
+  v0 = toPortI64(h0);
+  v1 = toPortI64(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorI64 h0, h1;
+  hn::LoadInterleaved2(TagI64(), from, h0, h1);
+  hn::StoreU(h0, TagI64(), reinterpret_cast<int64_t*>(&v0));
+  hn::StoreU(h1, TagI64(), reinterpret_cast<int64_t*>(&v1));
+#else
+  hn::LoadInterleaved2(TagI64(), from, inPlace<VectorI64>(v0), inPlace<VectorI64>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1, OutVectorI64& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorI64 h0, h1, h2;
+  hn::LoadInterleaved3(TagI64(), from, h0, h1, h2);
+  v0 = toPortI64(h0);
+  v1 = toPortI64(h1);
+  v2 = toPortI64(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorI64 h0, h1, h2;
+  hn::LoadInterleaved3(TagI64(), from, h0, h1, h2);
+  hn::StoreU(h0, TagI64(), reinterpret_cast<int64_t*>(&v0));
+  hn::StoreU(h1, TagI64(), reinterpret_cast<int64_t*>(&v1));
+  hn::StoreU(h2, TagI64(), reinterpret_cast<int64_t*>(&v2));
+#else
+  hn::LoadInterleaved3(TagI64(), from, inPlace<VectorI64>(v0), inPlace<VectorI64>(v1), inPlace<VectorI64>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1, OutVectorI64& v2, OutVectorI64& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorI64 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagI64(), from, h0, h1, h2, h3);
+  v0 = toPortI64(h0);
+  v1 = toPortI64(h1);
+  v2 = toPortI64(h2);
+  v3 = toPortI64(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorI64 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagI64(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagI64(), reinterpret_cast<int64_t*>(&v0));
+  hn::StoreU(h1, TagI64(), reinterpret_cast<int64_t*>(&v1));
+  hn::StoreU(h2, TagI64(), reinterpret_cast<int64_t*>(&v2));
+  hn::StoreU(h3, TagI64(), reinterpret_cast<int64_t*>(&v3));
+#else
+  hn::LoadInterleaved4(TagI64(), from, inPlace<VectorI64>(v0), inPlace<VectorI64>(v1), inPlace<VectorI64>(v2), inPlace<VectorI64>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2I64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, int64_t* to) { hn::StoreInterleaved2(fromPortI64(a), fromPortI64(b), TagI64(), to); }
+HWY_INLINE void storeInterleaved3I64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, cvectorization_ops_raw_vector_i64 c, int64_t* to) { hn::StoreInterleaved3(fromPortI64(a), fromPortI64(b), fromPortI64(c), TagI64(), to); }
+HWY_INLINE void storeInterleaved4I64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, cvectorization_ops_raw_vector_i64 c, cvectorization_ops_raw_vector_i64 d, int64_t* to) { hn::StoreInterleaved4(fromPortI64(a), fromPortI64(b), fromPortI64(c), fromPortI64(d), TagI64(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadWideningI8ToI64(const int8_t* from) { return toPortI64(hn::PromoteTo(TagI64(), hn::LoadU(hn::Rebind<int8_t, TagI64>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadWideningI16ToI64(const int16_t* from) { return toPortI64(hn::PromoteTo(TagI64(), hn::LoadU(hn::Rebind<int16_t, TagI64>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadWideningI32ToI64(const int32_t* from) { return toPortI64(hn::PromoteTo(TagI64(), hn::LoadU(hn::Rebind<int32_t, TagI64>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstWideningI8ToI64(const int8_t* from, size_t count) { return toPortI64(hn::PromoteTo(TagI64(), hn::LoadN(hn::Rebind<int8_t, TagI64>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstWideningI16ToI64(const int16_t* from, size_t count) { return toPortI64(hn::PromoteTo(TagI64(), hn::LoadN(hn::Rebind<int16_t, TagI64>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstWideningI32ToI64(const int32_t* from, size_t count) { return toPortI64(hn::PromoteTo(TagI64(), hn::LoadN(hn::Rebind<int32_t, TagI64>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 repeatingBlockI64(int64_t v0, int64_t v1) { return toPortI64(hn::Dup128VecFromValues(TagI64(), v0, v1)); }
 
 using TagF32 = hn::ScalableTag<float>;
 using VectorF32 = hn::VFromD<TagF32>;
 using MaskF32 = hn::MFromD<TagF32>;
+typedef cvectorization_ops_raw_vector_f32 OutVectorF32 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountF32() { return hn::Lanes(TagF32()); }
-HWY_INLINE VectorF32 fromPortF32(cvectorization_ops_vector_f32 v) { return hn::LoadU(TagF32(), reinterpret_cast<const float*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_f32 toPortF32(VectorF32 v) { cvectorization_ops_vector_f32 port; hn::StoreU(v, TagF32(), reinterpret_cast<float*>(&port)); return port; }
-HWY_INLINE MaskF32 maskFromPortF32(cvectorization_ops_mask_f32 m) { const hn::RebindToSigned<TagF32> di; return hn::MaskFromVec(hn::BitCast(TagF32(), hn::LoadU(di, reinterpret_cast<const int32_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_f32 maskToPortF32(MaskF32 m) { const hn::RebindToSigned<TagF32> di; cvectorization_ops_mask_f32 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagF32(), m)), di, reinterpret_cast<int32_t*>(&port)); return port; }
-HWY_INLINE VectorF32 zeroF32() { return hn::Zero(TagF32()); }
-HWY_INLINE VectorF32 repeatingF32(float value) { return hn::Set(TagF32(), value); }
-HWY_INLINE VectorF32 iotaF32(float value) { return hn::Iota(TagF32(), value); }
-HWY_INLINE VectorF32 loadF32(const float* from) { return hn::LoadU(TagF32(), from); }
-HWY_INLINE VectorF32 loadAlignedF32(const float* from) { return hn::Load(TagF32(), from); }
-HWY_INLINE VectorF32 loadFirstF32(const float* from, size_t count) { return hn::LoadN(TagF32(), from, count); }
-HWY_INLINE void storeF32(VectorF32 a, float* to) { hn::StoreU(a, TagF32(), to); }
-HWY_INLINE void storeAlignedF32(VectorF32 a, float* to) { hn::Store(a, TagF32(), to); }
-HWY_INLINE void storeFirstF32(VectorF32 a, float* to, size_t count) { hn::StoreN(a, TagF32(), to, count); }
-HWY_INLINE VectorF32 addingF32(VectorF32 a, VectorF32 b) { return hn::Add(a, b); }
-HWY_INLINE VectorF32 subtractingF32(VectorF32 a, VectorF32 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorF32 multiplyingF32(VectorF32 a, VectorF32 b) { return hn::Mul(a, b); }
-HWY_INLINE VectorF32 dividingF32(VectorF32 a, VectorF32 b) { return hn::Div(a, b); }
-HWY_INLINE VectorF32 minimumF32(VectorF32 a, VectorF32 b) { return hn::Min(a, b); }
-HWY_INLINE VectorF32 maximumF32(VectorF32 a, VectorF32 b) { return hn::Max(a, b); }
-HWY_INLINE VectorF32 negatedF32(VectorF32 a) { return hn::Neg(a); }
-HWY_INLINE VectorF32 magnitudeF32(VectorF32 a) { return hn::Abs(a); }
-HWY_INLINE VectorF32 squareRootF32(VectorF32 a) { return hn::Sqrt(a); }
-HWY_INLINE VectorF32 multiplyAddingF32(VectorF32 a, VectorF32 b, VectorF32 c) { return hn::MulAdd(a, b, c); }
-HWY_INLINE MaskF32 equalToF32(VectorF32 a, VectorF32 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskF32 notEqualToF32(VectorF32 a, VectorF32 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskF32 lessThanF32(VectorF32 a, VectorF32 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskF32 greaterThanF32(VectorF32 a, VectorF32 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorF32 selectingF32(MaskF32 mask, VectorF32 a, VectorF32 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorF32 selectingOrZeroF32(MaskF32 mask, VectorF32 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorF32 zeroingSelectedF32(MaskF32 mask, VectorF32 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE MaskF32 firstLanesF32(size_t count) { return hn::FirstN(TagF32(), count); }
-HWY_INLINE bool allTrueF32(MaskF32 mask) { return hn::AllTrue(TagF32(), mask); }
-HWY_INLINE bool allFalseF32(MaskF32 mask) { return hn::AllFalse(TagF32(), mask); }
-HWY_INLINE size_t trueCountF32(MaskF32 mask) { return hn::CountTrue(TagF32(), mask); }
-HWY_INLINE intptr_t firstTrueIndexF32(MaskF32 mask) { return hn::FindFirstTrue(TagF32(), mask); }
-HWY_INLINE float sumF32(VectorF32 a) { return hn::ReduceSum(TagF32(), a); }
-HWY_INLINE float smallestF32(VectorF32 a) { return hn::ReduceMin(TagF32(), a); }
-HWY_INLINE float smallestOrNaNF32(VectorF32 a) { return hn::ReduceMinOrNaN(TagF32(), a); }
-HWY_INLINE float largestF32(VectorF32 a) { return hn::ReduceMax(TagF32(), a); }
-HWY_INLINE float largestOrNaNF32(VectorF32 a) { return hn::ReduceMaxOrNaN(TagF32(), a); }
-HWY_INLINE float firstLaneF32(VectorF32 a) { return hn::GetLane(a); }
-HWY_INLINE VectorF32 reversedF32(VectorF32 a) { return hn::Reverse(TagF32(), a); }
-HWY_INLINE VectorF32 slideUpLanesF32(VectorF32 a, size_t lanes) { return hn::SlideUpLanes(TagF32(), a, lanes); }
-HWY_INLINE VectorF32 slideUpLanesFillingWithF32(VectorF32 fill, VectorF32 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagF32(), a, lanes); }
-HWY_INLINE VectorF32 slideDownLanesF32(VectorF32 a, size_t lanes) { return hn::SlideDownLanes(TagF32(), a, lanes); }
-HWY_INLINE VectorF32 slideDownLanesFillingWithF32(VectorF32 fill, VectorF32 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagF32(), a, lanes); }
-HWY_INLINE VectorF32 slide1UpF32(VectorF32 a) { return hn::Slide1Up(TagF32(), a); }
-HWY_INLINE VectorF32 slide1UpFillingWithF32(float fill, VectorF32 a) { return hn::Slide1UpOr(fill, TagF32(), a); }
-HWY_INLINE VectorF32 slide1DownF32(VectorF32 a) { return hn::Slide1Down(TagF32(), a); }
-HWY_INLINE VectorF32 slide1DownFillingWithF32(float fill, VectorF32 a) { return hn::Slide1DownOr(fill, TagF32(), a); }
-HWY_INLINE void loadInterleaved2F32(const float* from, VectorF32& v0, VectorF32& v1) { hn::LoadInterleaved2(TagF32(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3F32(const float* from, VectorF32& v0, VectorF32& v1, VectorF32& v2) { hn::LoadInterleaved3(TagF32(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4F32(const float* from, VectorF32& v0, VectorF32& v1, VectorF32& v2, VectorF32& v3) { hn::LoadInterleaved4(TagF32(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2F32(VectorF32 a, VectorF32 b, float* to) { hn::StoreInterleaved2(a, b, TagF32(), to); }
-HWY_INLINE void storeInterleaved3F32(VectorF32 a, VectorF32 b, VectorF32 c, float* to) { hn::StoreInterleaved3(a, b, c, TagF32(), to); }
-HWY_INLINE void storeInterleaved4F32(VectorF32 a, VectorF32 b, VectorF32 c, VectorF32 d, float* to) { hn::StoreInterleaved4(a, b, c, d, TagF32(), to); }
-HWY_INLINE VectorF32 repeatingBlockF32(float v0, float v1, float v2, float v3) { return hn::Dup128VecFromValues(TagF32(), v0, v1, v2, v3); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorF32 fromPortF32(cvectorization_ops_raw_vector_f32 v) { return svset_neonq_f32(svundef_f32(), (float32x4_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 toPortF32(VectorF32 v) { return (cvectorization_ops_raw_vector_f32)svget_neonq_f32(v); }
+HWY_INLINE MaskF32 maskFromPortF32(cvectorization_ops_raw_mask_f32 m) { return hn::MaskFromVec(hn::BitCast(TagF32(), svset_neonq_s32(svundef_s32(), (int32x4_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 maskToPortF32(MaskF32 m) { const hn::RebindToSigned<TagF32> di; return (cvectorization_ops_raw_mask_f32)svget_neonq_s32(hn::BitCast(di, hn::VecFromMask(TagF32(), m))); }
+#else
+HWY_INLINE VectorF32 fromPortF32(cvectorization_ops_raw_vector_f32 v) { return hn::LoadU(TagF32(), reinterpret_cast<const float*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 toPortF32(VectorF32 v) { cvectorization_ops_raw_vector_f32 port; hn::StoreU(v, TagF32(), reinterpret_cast<float*>(&port)); return port; }
+HWY_INLINE MaskF32 maskFromPortF32(cvectorization_ops_raw_mask_f32 m) { const hn::RebindToSigned<TagF32> di; return hn::MaskFromVec(hn::BitCast(TagF32(), hn::LoadU(di, reinterpret_cast<const int32_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 maskToPortF32(MaskF32 m) { const hn::RebindToSigned<TagF32> di; cvectorization_ops_raw_mask_f32 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagF32(), m)), di, reinterpret_cast<int32_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_f32 zeroF32() { return toPortF32(hn::Zero(TagF32())); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingF32(float value) { return toPortF32(hn::Set(TagF32(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 iotaF32(float value) { return toPortF32(hn::Iota(TagF32(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 loadF32(const float* from) { return toPortF32(hn::LoadU(TagF32(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 loadAlignedF32(const float* from) { return toPortF32(hn::Load(TagF32(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 loadFirstF32(const float* from, size_t count) { return toPortF32(hn::LoadN(TagF32(), from, count)); }
+HWY_INLINE void storeF32(cvectorization_ops_raw_vector_f32 a, float* to) { hn::StoreU(fromPortF32(a), TagF32(), to); }
+HWY_INLINE void storeAlignedF32(cvectorization_ops_raw_vector_f32 a, float* to) { hn::Store(fromPortF32(a), TagF32(), to); }
+HWY_INLINE void storeFirstF32(cvectorization_ops_raw_vector_f32 a, float* to, size_t count) { hn::StoreN(fromPortF32(a), TagF32(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 addingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::Add(fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 subtractingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::Sub(fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::Mul(fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 dividingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::Div(fromPortF32(a), fromPortF32(b))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f32 minimumF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::Min(fromPortF32(a), fromPortF32(b))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f32 maximumF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::Max(fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 negatedF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Neg(fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 magnitudeF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Abs(fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 squareRootF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Sqrt(fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::MulAdd(fromPortF32(a), fromPortF32(b), fromPortF32(c))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 equalToF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return maskToPortF32(hn::Eq(fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 notEqualToF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return maskToPortF32(hn::Ne(fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 lessThanF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return maskToPortF32(hn::Lt(fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 greaterThanF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return maskToPortF32(hn::Gt(fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 selectingF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::IfThenElse(maskFromPortF32(mask), fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 selectingOrZeroF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::IfThenElseZero(maskFromPortF32(mask), fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 zeroingSelectedF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::IfThenZeroElse(maskFromPortF32(mask), fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 firstLanesF32(size_t count) { return maskToPortF32(hn::FirstN(TagF32(), count)); }
+HWY_INLINE bool allTrueF32(cvectorization_ops_raw_mask_f32 mask) { return hn::AllTrue(TagF32(), maskFromPortF32(mask)); }
+HWY_INLINE bool allFalseF32(cvectorization_ops_raw_mask_f32 mask) { return hn::AllFalse(TagF32(), maskFromPortF32(mask)); }
+HWY_INLINE size_t trueCountF32(cvectorization_ops_raw_mask_f32 mask) { return hn::CountTrue(TagF32(), maskFromPortF32(mask)); }
+HWY_INLINE intptr_t firstTrueIndexF32(cvectorization_ops_raw_mask_f32 mask) { return hn::FindFirstTrue(TagF32(), maskFromPortF32(mask)); }
+HWY_INLINE float sumF32(cvectorization_ops_raw_vector_f32 a) { return hn::ReduceSum(TagF32(), fromPortF32(a)); }
+HWY_INLINE float smallestF32(cvectorization_ops_raw_vector_f32 a) { return hn::ReduceMin(TagF32(), fromPortF32(a)); }
+HWY_INLINE float smallestOrNaNF32(cvectorization_ops_raw_vector_f32 a) { return hn::ReduceMinOrNaN(TagF32(), fromPortF32(a)); }
+HWY_INLINE float largestF32(cvectorization_ops_raw_vector_f32 a) { return hn::ReduceMax(TagF32(), fromPortF32(a)); }
+HWY_INLINE float largestOrNaNF32(cvectorization_ops_raw_vector_f32 a) { return hn::ReduceMaxOrNaN(TagF32(), fromPortF32(a)); }
+HWY_INLINE float firstLaneF32(cvectorization_ops_raw_vector_f32 a) { return hn::GetLane(fromPortF32(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 reversedF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Reverse(TagF32(), fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slideUpLanesF32(cvectorization_ops_raw_vector_f32 a, size_t lanes) { return toPortF32(hn::SlideUpLanes(TagF32(), fromPortF32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slideUpLanesFillingWithF32(cvectorization_ops_raw_vector_f32 fill, cvectorization_ops_raw_vector_f32 a, size_t lanes) { return toPortF32(hn::SlideUpLanesOr(fromPortF32(fill), TagF32(), fromPortF32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slideDownLanesF32(cvectorization_ops_raw_vector_f32 a, size_t lanes) { return toPortF32(hn::SlideDownLanes(TagF32(), fromPortF32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slideDownLanesFillingWithF32(cvectorization_ops_raw_vector_f32 fill, cvectorization_ops_raw_vector_f32 a, size_t lanes) { return toPortF32(hn::SlideDownLanesOr(fromPortF32(fill), TagF32(), fromPortF32(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1Up(TagF32(), fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1UpOr(fill, TagF32(), fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1Down(TagF32(), fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1DownOr(fill, TagF32(), fromPortF32(a))); }
+HWY_INLINE void loadInterleaved2F32(const float* from, OutVectorF32& v0, OutVectorF32& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorF32 h0, h1;
+  hn::LoadInterleaved2(TagF32(), from, h0, h1);
+  v0 = toPortF32(h0);
+  v1 = toPortF32(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorF32 h0, h1;
+  hn::LoadInterleaved2(TagF32(), from, h0, h1);
+  hn::StoreU(h0, TagF32(), reinterpret_cast<float*>(&v0));
+  hn::StoreU(h1, TagF32(), reinterpret_cast<float*>(&v1));
+#else
+  hn::LoadInterleaved2(TagF32(), from, inPlace<VectorF32>(v0), inPlace<VectorF32>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3F32(const float* from, OutVectorF32& v0, OutVectorF32& v1, OutVectorF32& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorF32 h0, h1, h2;
+  hn::LoadInterleaved3(TagF32(), from, h0, h1, h2);
+  v0 = toPortF32(h0);
+  v1 = toPortF32(h1);
+  v2 = toPortF32(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorF32 h0, h1, h2;
+  hn::LoadInterleaved3(TagF32(), from, h0, h1, h2);
+  hn::StoreU(h0, TagF32(), reinterpret_cast<float*>(&v0));
+  hn::StoreU(h1, TagF32(), reinterpret_cast<float*>(&v1));
+  hn::StoreU(h2, TagF32(), reinterpret_cast<float*>(&v2));
+#else
+  hn::LoadInterleaved3(TagF32(), from, inPlace<VectorF32>(v0), inPlace<VectorF32>(v1), inPlace<VectorF32>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4F32(const float* from, OutVectorF32& v0, OutVectorF32& v1, OutVectorF32& v2, OutVectorF32& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorF32 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagF32(), from, h0, h1, h2, h3);
+  v0 = toPortF32(h0);
+  v1 = toPortF32(h1);
+  v2 = toPortF32(h2);
+  v3 = toPortF32(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorF32 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagF32(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagF32(), reinterpret_cast<float*>(&v0));
+  hn::StoreU(h1, TagF32(), reinterpret_cast<float*>(&v1));
+  hn::StoreU(h2, TagF32(), reinterpret_cast<float*>(&v2));
+  hn::StoreU(h3, TagF32(), reinterpret_cast<float*>(&v3));
+#else
+  hn::LoadInterleaved4(TagF32(), from, inPlace<VectorF32>(v0), inPlace<VectorF32>(v1), inPlace<VectorF32>(v2), inPlace<VectorF32>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, float* to) { hn::StoreInterleaved2(fromPortF32(a), fromPortF32(b), TagF32(), to); }
+HWY_INLINE void storeInterleaved3F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c, float* to) { hn::StoreInterleaved3(fromPortF32(a), fromPortF32(b), fromPortF32(c), TagF32(), to); }
+HWY_INLINE void storeInterleaved4F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c, cvectorization_ops_raw_vector_f32 d, float* to) { hn::StoreInterleaved4(fromPortF32(a), fromPortF32(b), fromPortF32(c), fromPortF32(d), TagF32(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingBlockF32(float v0, float v1, float v2, float v3) { return toPortF32(hn::Dup128VecFromValues(TagF32(), v0, v1, v2, v3)); }
 
 using TagF64 = hn::ScalableTag<double>;
 using VectorF64 = hn::VFromD<TagF64>;
 using MaskF64 = hn::MFromD<TagF64>;
+typedef cvectorization_ops_raw_vector_f64 OutVectorF64 __attribute__((aligned(16)));
 HWY_INLINE size_t laneCountF64() { return hn::Lanes(TagF64()); }
-HWY_INLINE VectorF64 fromPortF64(cvectorization_ops_vector_f64 v) { return hn::LoadU(TagF64(), reinterpret_cast<const double*>(&v)); }
-HWY_INLINE cvectorization_ops_vector_f64 toPortF64(VectorF64 v) { cvectorization_ops_vector_f64 port; hn::StoreU(v, TagF64(), reinterpret_cast<double*>(&port)); return port; }
-HWY_INLINE MaskF64 maskFromPortF64(cvectorization_ops_mask_f64 m) { const hn::RebindToSigned<TagF64> di; return hn::MaskFromVec(hn::BitCast(TagF64(), hn::LoadU(di, reinterpret_cast<const int64_t*>(&m)))); }
-HWY_INLINE cvectorization_ops_mask_f64 maskToPortF64(MaskF64 m) { const hn::RebindToSigned<TagF64> di; cvectorization_ops_mask_f64 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagF64(), m)), di, reinterpret_cast<int64_t*>(&port)); return port; }
-HWY_INLINE VectorF64 zeroF64() { return hn::Zero(TagF64()); }
-HWY_INLINE VectorF64 repeatingF64(double value) { return hn::Set(TagF64(), value); }
-HWY_INLINE VectorF64 iotaF64(double value) { return hn::Iota(TagF64(), value); }
-HWY_INLINE VectorF64 loadF64(const double* from) { return hn::LoadU(TagF64(), from); }
-HWY_INLINE VectorF64 loadAlignedF64(const double* from) { return hn::Load(TagF64(), from); }
-HWY_INLINE VectorF64 loadFirstF64(const double* from, size_t count) { return hn::LoadN(TagF64(), from, count); }
-HWY_INLINE void storeF64(VectorF64 a, double* to) { hn::StoreU(a, TagF64(), to); }
-HWY_INLINE void storeAlignedF64(VectorF64 a, double* to) { hn::Store(a, TagF64(), to); }
-HWY_INLINE void storeFirstF64(VectorF64 a, double* to, size_t count) { hn::StoreN(a, TagF64(), to, count); }
-HWY_INLINE VectorF64 addingF64(VectorF64 a, VectorF64 b) { return hn::Add(a, b); }
-HWY_INLINE VectorF64 subtractingF64(VectorF64 a, VectorF64 b) { return hn::Sub(a, b); }
-HWY_INLINE VectorF64 multiplyingF64(VectorF64 a, VectorF64 b) { return hn::Mul(a, b); }
-HWY_INLINE VectorF64 dividingF64(VectorF64 a, VectorF64 b) { return hn::Div(a, b); }
-HWY_INLINE VectorF64 minimumF64(VectorF64 a, VectorF64 b) { return hn::Min(a, b); }
-HWY_INLINE VectorF64 maximumF64(VectorF64 a, VectorF64 b) { return hn::Max(a, b); }
-HWY_INLINE VectorF64 negatedF64(VectorF64 a) { return hn::Neg(a); }
-HWY_INLINE VectorF64 magnitudeF64(VectorF64 a) { return hn::Abs(a); }
-HWY_INLINE VectorF64 squareRootF64(VectorF64 a) { return hn::Sqrt(a); }
-HWY_INLINE VectorF64 multiplyAddingF64(VectorF64 a, VectorF64 b, VectorF64 c) { return hn::MulAdd(a, b, c); }
-HWY_INLINE MaskF64 equalToF64(VectorF64 a, VectorF64 b) { return hn::Eq(a, b); }
-HWY_INLINE MaskF64 notEqualToF64(VectorF64 a, VectorF64 b) { return hn::Ne(a, b); }
-HWY_INLINE MaskF64 lessThanF64(VectorF64 a, VectorF64 b) { return hn::Lt(a, b); }
-HWY_INLINE MaskF64 greaterThanF64(VectorF64 a, VectorF64 b) { return hn::Gt(a, b); }
-HWY_INLINE VectorF64 selectingF64(MaskF64 mask, VectorF64 a, VectorF64 b) { return hn::IfThenElse(mask, a, b); }
-HWY_INLINE VectorF64 selectingOrZeroF64(MaskF64 mask, VectorF64 a) { return hn::IfThenElseZero(mask, a); }
-HWY_INLINE VectorF64 zeroingSelectedF64(MaskF64 mask, VectorF64 a) { return hn::IfThenZeroElse(mask, a); }
-HWY_INLINE MaskF64 firstLanesF64(size_t count) { return hn::FirstN(TagF64(), count); }
-HWY_INLINE bool allTrueF64(MaskF64 mask) { return hn::AllTrue(TagF64(), mask); }
-HWY_INLINE bool allFalseF64(MaskF64 mask) { return hn::AllFalse(TagF64(), mask); }
-HWY_INLINE size_t trueCountF64(MaskF64 mask) { return hn::CountTrue(TagF64(), mask); }
-HWY_INLINE intptr_t firstTrueIndexF64(MaskF64 mask) { return hn::FindFirstTrue(TagF64(), mask); }
-HWY_INLINE double sumF64(VectorF64 a) { return hn::ReduceSum(TagF64(), a); }
-HWY_INLINE double smallestF64(VectorF64 a) { return hn::ReduceMin(TagF64(), a); }
-HWY_INLINE double smallestOrNaNF64(VectorF64 a) { return hn::ReduceMinOrNaN(TagF64(), a); }
-HWY_INLINE double largestF64(VectorF64 a) { return hn::ReduceMax(TagF64(), a); }
-HWY_INLINE double largestOrNaNF64(VectorF64 a) { return hn::ReduceMaxOrNaN(TagF64(), a); }
-HWY_INLINE double firstLaneF64(VectorF64 a) { return hn::GetLane(a); }
-HWY_INLINE VectorF64 reversedF64(VectorF64 a) { return hn::Reverse(TagF64(), a); }
-HWY_INLINE VectorF64 slideUpLanesF64(VectorF64 a, size_t lanes) { return hn::SlideUpLanes(TagF64(), a, lanes); }
-HWY_INLINE VectorF64 slideUpLanesFillingWithF64(VectorF64 fill, VectorF64 a, size_t lanes) { return hn::SlideUpLanesOr(fill, TagF64(), a, lanes); }
-HWY_INLINE VectorF64 slideDownLanesF64(VectorF64 a, size_t lanes) { return hn::SlideDownLanes(TagF64(), a, lanes); }
-HWY_INLINE VectorF64 slideDownLanesFillingWithF64(VectorF64 fill, VectorF64 a, size_t lanes) { return hn::SlideDownLanesOr(fill, TagF64(), a, lanes); }
-HWY_INLINE VectorF64 slide1UpF64(VectorF64 a) { return hn::Slide1Up(TagF64(), a); }
-HWY_INLINE VectorF64 slide1UpFillingWithF64(double fill, VectorF64 a) { return hn::Slide1UpOr(fill, TagF64(), a); }
-HWY_INLINE VectorF64 slide1DownF64(VectorF64 a) { return hn::Slide1Down(TagF64(), a); }
-HWY_INLINE VectorF64 slide1DownFillingWithF64(double fill, VectorF64 a) { return hn::Slide1DownOr(fill, TagF64(), a); }
-HWY_INLINE void loadInterleaved2F64(const double* from, VectorF64& v0, VectorF64& v1) { hn::LoadInterleaved2(TagF64(), from, v0, v1); }
-HWY_INLINE void loadInterleaved3F64(const double* from, VectorF64& v0, VectorF64& v1, VectorF64& v2) { hn::LoadInterleaved3(TagF64(), from, v0, v1, v2); }
-HWY_INLINE void loadInterleaved4F64(const double* from, VectorF64& v0, VectorF64& v1, VectorF64& v2, VectorF64& v3) { hn::LoadInterleaved4(TagF64(), from, v0, v1, v2, v3); }
-HWY_INLINE void storeInterleaved2F64(VectorF64 a, VectorF64 b, double* to) { hn::StoreInterleaved2(a, b, TagF64(), to); }
-HWY_INLINE void storeInterleaved3F64(VectorF64 a, VectorF64 b, VectorF64 c, double* to) { hn::StoreInterleaved3(a, b, c, TagF64(), to); }
-HWY_INLINE void storeInterleaved4F64(VectorF64 a, VectorF64 b, VectorF64 c, VectorF64 d, double* to) { hn::StoreInterleaved4(a, b, c, d, TagF64(), to); }
-HWY_INLINE VectorF64 loadWideningF32ToF64(const float* from) { return hn::PromoteTo(TagF64(), hn::LoadU(hn::Rebind<float, TagF64>(), from)); }
-HWY_INLINE VectorF64 loadFirstWideningF32ToF64(const float* from, size_t count) { return hn::PromoteTo(TagF64(), hn::LoadN(hn::Rebind<float, TagF64>(), from, count)); }
-HWY_INLINE VectorF64 repeatingBlockF64(double v0, double v1) { return hn::Dup128VecFromValues(TagF64(), v0, v1); }
+#if HWY_TARGET_IS_SVE
+HWY_INLINE VectorF64 fromPortF64(cvectorization_ops_raw_vector_f64 v) { return svset_neonq_f64(svundef_f64(), (float64x2_t)v); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 toPortF64(VectorF64 v) { return (cvectorization_ops_raw_vector_f64)svget_neonq_f64(v); }
+HWY_INLINE MaskF64 maskFromPortF64(cvectorization_ops_raw_mask_f64 m) { return hn::MaskFromVec(hn::BitCast(TagF64(), svset_neonq_s64(svundef_s64(), (int64x2_t)m))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 maskToPortF64(MaskF64 m) { const hn::RebindToSigned<TagF64> di; return (cvectorization_ops_raw_mask_f64)svget_neonq_s64(hn::BitCast(di, hn::VecFromMask(TagF64(), m))); }
+#else
+HWY_INLINE VectorF64 fromPortF64(cvectorization_ops_raw_vector_f64 v) { return hn::LoadU(TagF64(), reinterpret_cast<const double*>(&v)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 toPortF64(VectorF64 v) { cvectorization_ops_raw_vector_f64 port; hn::StoreU(v, TagF64(), reinterpret_cast<double*>(&port)); return port; }
+HWY_INLINE MaskF64 maskFromPortF64(cvectorization_ops_raw_mask_f64 m) { const hn::RebindToSigned<TagF64> di; return hn::MaskFromVec(hn::BitCast(TagF64(), hn::LoadU(di, reinterpret_cast<const int64_t*>(&m)))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 maskToPortF64(MaskF64 m) { const hn::RebindToSigned<TagF64> di; cvectorization_ops_raw_mask_f64 port; hn::StoreU(hn::BitCast(di, hn::VecFromMask(TagF64(), m)), di, reinterpret_cast<int64_t*>(&port)); return port; }
+#endif
+HWY_INLINE cvectorization_ops_raw_vector_f64 zeroF64() { return toPortF64(hn::Zero(TagF64())); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingF64(double value) { return toPortF64(hn::Set(TagF64(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 iotaF64(double value) { return toPortF64(hn::Iota(TagF64(), value)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadF64(const double* from) { return toPortF64(hn::LoadU(TagF64(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadAlignedF64(const double* from) { return toPortF64(hn::Load(TagF64(), from)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadFirstF64(const double* from, size_t count) { return toPortF64(hn::LoadN(TagF64(), from, count)); }
+HWY_INLINE void storeF64(cvectorization_ops_raw_vector_f64 a, double* to) { hn::StoreU(fromPortF64(a), TagF64(), to); }
+HWY_INLINE void storeAlignedF64(cvectorization_ops_raw_vector_f64 a, double* to) { hn::Store(fromPortF64(a), TagF64(), to); }
+HWY_INLINE void storeFirstF64(cvectorization_ops_raw_vector_f64 a, double* to, size_t count) { hn::StoreN(fromPortF64(a), TagF64(), to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 addingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::Add(fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 subtractingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::Sub(fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 multiplyingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::Mul(fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 dividingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::Div(fromPortF64(a), fromPortF64(b))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f64 minimumF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::Min(fromPortF64(a), fromPortF64(b))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f64 maximumF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::Max(fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 negatedF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Neg(fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 magnitudeF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Abs(fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 squareRootF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Sqrt(fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 multiplyAddingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) { return toPortF64(hn::MulAdd(fromPortF64(a), fromPortF64(b), fromPortF64(c))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 equalToF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return maskToPortF64(hn::Eq(fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 notEqualToF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return maskToPortF64(hn::Ne(fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 lessThanF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return maskToPortF64(hn::Lt(fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 greaterThanF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return maskToPortF64(hn::Gt(fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 selectingF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::IfThenElse(maskFromPortF64(mask), fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 selectingOrZeroF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::IfThenElseZero(maskFromPortF64(mask), fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 zeroingSelectedF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::IfThenZeroElse(maskFromPortF64(mask), fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 firstLanesF64(size_t count) { return maskToPortF64(hn::FirstN(TagF64(), count)); }
+HWY_INLINE bool allTrueF64(cvectorization_ops_raw_mask_f64 mask) { return hn::AllTrue(TagF64(), maskFromPortF64(mask)); }
+HWY_INLINE bool allFalseF64(cvectorization_ops_raw_mask_f64 mask) { return hn::AllFalse(TagF64(), maskFromPortF64(mask)); }
+HWY_INLINE size_t trueCountF64(cvectorization_ops_raw_mask_f64 mask) { return hn::CountTrue(TagF64(), maskFromPortF64(mask)); }
+HWY_INLINE intptr_t firstTrueIndexF64(cvectorization_ops_raw_mask_f64 mask) { return hn::FindFirstTrue(TagF64(), maskFromPortF64(mask)); }
+HWY_INLINE double sumF64(cvectorization_ops_raw_vector_f64 a) { return hn::ReduceSum(TagF64(), fromPortF64(a)); }
+HWY_INLINE double smallestF64(cvectorization_ops_raw_vector_f64 a) { return hn::ReduceMin(TagF64(), fromPortF64(a)); }
+HWY_INLINE double smallestOrNaNF64(cvectorization_ops_raw_vector_f64 a) { return hn::ReduceMinOrNaN(TagF64(), fromPortF64(a)); }
+HWY_INLINE double largestF64(cvectorization_ops_raw_vector_f64 a) { return hn::ReduceMax(TagF64(), fromPortF64(a)); }
+HWY_INLINE double largestOrNaNF64(cvectorization_ops_raw_vector_f64 a) { return hn::ReduceMaxOrNaN(TagF64(), fromPortF64(a)); }
+HWY_INLINE double firstLaneF64(cvectorization_ops_raw_vector_f64 a) { return hn::GetLane(fromPortF64(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 reversedF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Reverse(TagF64(), fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slideUpLanesF64(cvectorization_ops_raw_vector_f64 a, size_t lanes) { return toPortF64(hn::SlideUpLanes(TagF64(), fromPortF64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slideUpLanesFillingWithF64(cvectorization_ops_raw_vector_f64 fill, cvectorization_ops_raw_vector_f64 a, size_t lanes) { return toPortF64(hn::SlideUpLanesOr(fromPortF64(fill), TagF64(), fromPortF64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slideDownLanesF64(cvectorization_ops_raw_vector_f64 a, size_t lanes) { return toPortF64(hn::SlideDownLanes(TagF64(), fromPortF64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slideDownLanesFillingWithF64(cvectorization_ops_raw_vector_f64 fill, cvectorization_ops_raw_vector_f64 a, size_t lanes) { return toPortF64(hn::SlideDownLanesOr(fromPortF64(fill), TagF64(), fromPortF64(a), lanes)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1Up(TagF64(), fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1UpOr(fill, TagF64(), fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1Down(TagF64(), fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1DownOr(fill, TagF64(), fromPortF64(a))); }
+HWY_INLINE void loadInterleaved2F64(const double* from, OutVectorF64& v0, OutVectorF64& v1) {
+#if HWY_TARGET_IS_SVE
+  VectorF64 h0, h1;
+  hn::LoadInterleaved2(TagF64(), from, h0, h1);
+  v0 = toPortF64(h0);
+  v1 = toPortF64(h1);
+#elif HWY_MAX_BYTES > 16
+  VectorF64 h0, h1;
+  hn::LoadInterleaved2(TagF64(), from, h0, h1);
+  hn::StoreU(h0, TagF64(), reinterpret_cast<double*>(&v0));
+  hn::StoreU(h1, TagF64(), reinterpret_cast<double*>(&v1));
+#else
+  hn::LoadInterleaved2(TagF64(), from, inPlace<VectorF64>(v0), inPlace<VectorF64>(v1));
+#endif
+}
+HWY_INLINE void loadInterleaved3F64(const double* from, OutVectorF64& v0, OutVectorF64& v1, OutVectorF64& v2) {
+#if HWY_TARGET_IS_SVE
+  VectorF64 h0, h1, h2;
+  hn::LoadInterleaved3(TagF64(), from, h0, h1, h2);
+  v0 = toPortF64(h0);
+  v1 = toPortF64(h1);
+  v2 = toPortF64(h2);
+#elif HWY_MAX_BYTES > 16
+  VectorF64 h0, h1, h2;
+  hn::LoadInterleaved3(TagF64(), from, h0, h1, h2);
+  hn::StoreU(h0, TagF64(), reinterpret_cast<double*>(&v0));
+  hn::StoreU(h1, TagF64(), reinterpret_cast<double*>(&v1));
+  hn::StoreU(h2, TagF64(), reinterpret_cast<double*>(&v2));
+#else
+  hn::LoadInterleaved3(TagF64(), from, inPlace<VectorF64>(v0), inPlace<VectorF64>(v1), inPlace<VectorF64>(v2));
+#endif
+}
+HWY_INLINE void loadInterleaved4F64(const double* from, OutVectorF64& v0, OutVectorF64& v1, OutVectorF64& v2, OutVectorF64& v3) {
+#if HWY_TARGET_IS_SVE
+  VectorF64 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagF64(), from, h0, h1, h2, h3);
+  v0 = toPortF64(h0);
+  v1 = toPortF64(h1);
+  v2 = toPortF64(h2);
+  v3 = toPortF64(h3);
+#elif HWY_MAX_BYTES > 16
+  VectorF64 h0, h1, h2, h3;
+  hn::LoadInterleaved4(TagF64(), from, h0, h1, h2, h3);
+  hn::StoreU(h0, TagF64(), reinterpret_cast<double*>(&v0));
+  hn::StoreU(h1, TagF64(), reinterpret_cast<double*>(&v1));
+  hn::StoreU(h2, TagF64(), reinterpret_cast<double*>(&v2));
+  hn::StoreU(h3, TagF64(), reinterpret_cast<double*>(&v3));
+#else
+  hn::LoadInterleaved4(TagF64(), from, inPlace<VectorF64>(v0), inPlace<VectorF64>(v1), inPlace<VectorF64>(v2), inPlace<VectorF64>(v3));
+#endif
+}
+HWY_INLINE void storeInterleaved2F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, double* to) { hn::StoreInterleaved2(fromPortF64(a), fromPortF64(b), TagF64(), to); }
+HWY_INLINE void storeInterleaved3F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c, double* to) { hn::StoreInterleaved3(fromPortF64(a), fromPortF64(b), fromPortF64(c), TagF64(), to); }
+HWY_INLINE void storeInterleaved4F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c, cvectorization_ops_raw_vector_f64 d, double* to) { hn::StoreInterleaved4(fromPortF64(a), fromPortF64(b), fromPortF64(c), fromPortF64(d), TagF64(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadWideningF32ToF64(const float* from) { return toPortF64(hn::PromoteTo(TagF64(), hn::LoadU(hn::Rebind<float, TagF64>(), from))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadFirstWideningF32ToF64(const float* from, size_t count) { return toPortF64(hn::PromoteTo(TagF64(), hn::LoadN(hn::Rebind<float, TagF64>(), from, count))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingBlockF64(double v0, double v1) { return toPortF64(hn::Dup128VecFromValues(TagF64(), v0, v1)); }
+
+/// Swift calls a C++ function that might throw as an `invoke` with a landing pad, which makes
+/// LLVM schedule the code around the call differently from the code around the port's C
+/// functions. The codegen comparison calls these `noexcept` forwarders instead, which the
+/// tests do not: with them LLVM would no longer inline the ops into the tests' code.
+namespace Nothrow {
+HWY_INLINE size_t spanCount(size_t count, size_t lanes) noexcept {
+  return ::HighwayReference::spanCount(count, lanes);
+}
+HWY_INLINE size_t laneCountU8() noexcept { return ::HighwayReference::laneCountU8(); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 zeroU8() noexcept { return ::HighwayReference::zeroU8(); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 repeatingU8(uint8_t value) noexcept { return ::HighwayReference::repeatingU8(value); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 iotaU8(uint8_t value) noexcept { return ::HighwayReference::iotaU8(value); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 loadU8(const uint8_t* from) noexcept { return ::HighwayReference::loadU8(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 loadAlignedU8(const uint8_t* from) noexcept { return ::HighwayReference::loadAlignedU8(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 loadFirstU8(const uint8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstU8(from, count); }
+HWY_INLINE void storeU8(cvectorization_ops_raw_vector_u8 a, uint8_t* to) noexcept { ::HighwayReference::storeU8(a, to); }
+HWY_INLINE void storeAlignedU8(cvectorization_ops_raw_vector_u8 a, uint8_t* to) noexcept { ::HighwayReference::storeAlignedU8(a, to); }
+HWY_INLINE void storeFirstU8(cvectorization_ops_raw_vector_u8 a, uint8_t* to, size_t count) noexcept { ::HighwayReference::storeFirstU8(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 addingU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::addingU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 subtractingU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::subtractingU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 minimumU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::minimumU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 maximumU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::maximumU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 saturatingAddingU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::saturatingAddingU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 saturatingSubtractingU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::saturatingSubtractingU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 roundedAverageU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::roundedAverageU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseAndU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseOrU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseOrU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseXorU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseXorU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseNotU8(cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::bitwiseNotU8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndNotU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseAndNotU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndXorU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, cvectorization_ops_raw_vector_u8 c) noexcept { return ::HighwayReference::bitwiseAndXorU8(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 shiftedLeftU8(cvectorization_ops_raw_vector_u8 a, int bits) noexcept { return ::HighwayReference::shiftedLeftU8(a, bits); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 shiftedRightU8(cvectorization_ops_raw_vector_u8 a, int bits) noexcept { return ::HighwayReference::shiftedRightU8(a, bits); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 equalToU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::equalToU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 notEqualToU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::notEqualToU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 lessThanU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::lessThanU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 greaterThanU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::greaterThanU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 selectingU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::selectingU8(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 selectingOrZeroU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::selectingOrZeroU8(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 zeroingSelectedU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::zeroingSelectedU8(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndWhereU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseAndWhereU8(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseOrWhereU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseOrWhereU8(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseXorWhereU8(cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseXorWhereU8(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseAndWhereOtherwiseU8(cvectorization_ops_raw_vector_u8 otherwise, cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseAndWhereOtherwiseU8(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseOrWhereOtherwiseU8(cvectorization_ops_raw_vector_u8 otherwise, cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseOrWhereOtherwiseU8(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 bitwiseXorWhereOtherwiseU8(cvectorization_ops_raw_vector_u8 otherwise, cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::bitwiseXorWhereOtherwiseU8(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 firstLanesU8(size_t count) noexcept { return ::HighwayReference::firstLanesU8(count); }
+HWY_INLINE bool allTrueU8(cvectorization_ops_raw_mask_u8 mask) noexcept { return ::HighwayReference::allTrueU8(mask); }
+HWY_INLINE bool allFalseU8(cvectorization_ops_raw_mask_u8 mask) noexcept { return ::HighwayReference::allFalseU8(mask); }
+HWY_INLINE size_t trueCountU8(cvectorization_ops_raw_mask_u8 mask) noexcept { return ::HighwayReference::trueCountU8(mask); }
+HWY_INLINE intptr_t firstTrueIndexU8(cvectorization_ops_raw_mask_u8 mask) noexcept { return ::HighwayReference::firstTrueIndexU8(mask); }
+HWY_INLINE uint8_t firstLaneU8(cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::firstLaneU8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 reversedU8(cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::reversedU8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slideUpLanesU8(cvectorization_ops_raw_vector_u8 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesU8(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slideUpLanesFillingWithU8(cvectorization_ops_raw_vector_u8 fill, cvectorization_ops_raw_vector_u8 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithU8(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slideDownLanesU8(cvectorization_ops_raw_vector_u8 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesU8(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slideDownLanesFillingWithU8(cvectorization_ops_raw_vector_u8 fill, cvectorization_ops_raw_vector_u8 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithU8(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slide1UpU8(cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::slide1UpU8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slide1UpFillingWithU8(uint8_t fill, cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::slide1UpFillingWithU8(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slide1DownU8(cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::slide1DownU8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 slide1DownFillingWithU8(uint8_t fill, cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::slide1DownFillingWithU8(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 tableLookupBytesU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::tableLookupBytesU8(a, b); }
+HWY_INLINE void loadInterleaved2U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1) noexcept { ::HighwayReference::loadInterleaved2U8(from, v0, v1); }
+HWY_INLINE void loadInterleaved3U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1, OutVectorU8& v2) noexcept { ::HighwayReference::loadInterleaved3U8(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4U8(const uint8_t* from, OutVectorU8& v0, OutVectorU8& v1, OutVectorU8& v2, OutVectorU8& v3) noexcept { ::HighwayReference::loadInterleaved4U8(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2U8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, uint8_t* to) noexcept { ::HighwayReference::storeInterleaved2U8(a, b, to); }
+HWY_INLINE void storeInterleaved3U8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, cvectorization_ops_raw_vector_u8 c, uint8_t* to) noexcept { ::HighwayReference::storeInterleaved3U8(a, b, c, to); }
+HWY_INLINE void storeInterleaved4U8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b, cvectorization_ops_raw_vector_u8 c, cvectorization_ops_raw_vector_u8 d, uint8_t* to) noexcept { ::HighwayReference::storeInterleaved4U8(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 repeatingBlockU8(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5, uint8_t v6, uint8_t v7, uint8_t v8, uint8_t v9, uint8_t v10, uint8_t v11, uint8_t v12, uint8_t v13, uint8_t v14, uint8_t v15) noexcept { return ::HighwayReference::repeatingBlockU8(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15); }
+HWY_INLINE size_t laneCountU16() noexcept { return ::HighwayReference::laneCountU16(); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 zeroU16() noexcept { return ::HighwayReference::zeroU16(); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 repeatingU16(uint16_t value) noexcept { return ::HighwayReference::repeatingU16(value); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 iotaU16(uint16_t value) noexcept { return ::HighwayReference::iotaU16(value); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadU16(const uint16_t* from) noexcept { return ::HighwayReference::loadU16(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadAlignedU16(const uint16_t* from) noexcept { return ::HighwayReference::loadAlignedU16(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadFirstU16(const uint16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstU16(from, count); }
+HWY_INLINE void storeU16(cvectorization_ops_raw_vector_u16 a, uint16_t* to) noexcept { ::HighwayReference::storeU16(a, to); }
+HWY_INLINE void storeAlignedU16(cvectorization_ops_raw_vector_u16 a, uint16_t* to) noexcept { ::HighwayReference::storeAlignedU16(a, to); }
+HWY_INLINE void storeFirstU16(cvectorization_ops_raw_vector_u16 a, uint16_t* to, size_t count) noexcept { ::HighwayReference::storeFirstU16(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 addingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::addingU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 subtractingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::subtractingU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 multiplyingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::multiplyingU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 minimumU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::minimumU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 maximumU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::maximumU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 saturatingAddingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::saturatingAddingU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 saturatingSubtractingU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::saturatingSubtractingU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 roundedAverageU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::roundedAverageU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseAndU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseOrU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseOrU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseXorU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseXorU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseNotU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::bitwiseNotU16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndNotU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseAndNotU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndXorU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, cvectorization_ops_raw_vector_u16 c) noexcept { return ::HighwayReference::bitwiseAndXorU16(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 shiftedLeftU16(cvectorization_ops_raw_vector_u16 a, int bits) noexcept { return ::HighwayReference::shiftedLeftU16(a, bits); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 shiftedRightU16(cvectorization_ops_raw_vector_u16 a, int bits) noexcept { return ::HighwayReference::shiftedRightU16(a, bits); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 equalToU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::equalToU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 notEqualToU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::notEqualToU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 lessThanU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::lessThanU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 greaterThanU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::greaterThanU16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 selectingU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::selectingU16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 selectingOrZeroU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::selectingOrZeroU16(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 zeroingSelectedU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::zeroingSelectedU16(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndWhereU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseAndWhereU16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseOrWhereU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseOrWhereU16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseXorWhereU16(cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseXorWhereU16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseAndWhereOtherwiseU16(cvectorization_ops_raw_vector_u16 otherwise, cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseAndWhereOtherwiseU16(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseOrWhereOtherwiseU16(cvectorization_ops_raw_vector_u16 otherwise, cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseOrWhereOtherwiseU16(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 bitwiseXorWhereOtherwiseU16(cvectorization_ops_raw_vector_u16 otherwise, cvectorization_ops_raw_mask_u16 mask, cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::bitwiseXorWhereOtherwiseU16(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u16 firstLanesU16(size_t count) noexcept { return ::HighwayReference::firstLanesU16(count); }
+HWY_INLINE bool allTrueU16(cvectorization_ops_raw_mask_u16 mask) noexcept { return ::HighwayReference::allTrueU16(mask); }
+HWY_INLINE bool allFalseU16(cvectorization_ops_raw_mask_u16 mask) noexcept { return ::HighwayReference::allFalseU16(mask); }
+HWY_INLINE size_t trueCountU16(cvectorization_ops_raw_mask_u16 mask) noexcept { return ::HighwayReference::trueCountU16(mask); }
+HWY_INLINE intptr_t firstTrueIndexU16(cvectorization_ops_raw_mask_u16 mask) noexcept { return ::HighwayReference::firstTrueIndexU16(mask); }
+HWY_INLINE uint16_t sumU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::sumU16(a); }
+HWY_INLINE uint16_t smallestU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::smallestU16(a); }
+HWY_INLINE uint16_t largestU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::largestU16(a); }
+HWY_INLINE uint16_t firstLaneU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::firstLaneU16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 reversedU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::reversedU16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slideUpLanesU16(cvectorization_ops_raw_vector_u16 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesU16(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slideUpLanesFillingWithU16(cvectorization_ops_raw_vector_u16 fill, cvectorization_ops_raw_vector_u16 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithU16(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slideDownLanesU16(cvectorization_ops_raw_vector_u16 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesU16(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slideDownLanesFillingWithU16(cvectorization_ops_raw_vector_u16 fill, cvectorization_ops_raw_vector_u16 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithU16(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slide1UpU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::slide1UpU16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slide1UpFillingWithU16(uint16_t fill, cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::slide1UpFillingWithU16(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slide1DownU16(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::slide1DownU16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 slide1DownFillingWithU16(uint16_t fill, cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::slide1DownFillingWithU16(fill, a); }
+HWY_INLINE void loadInterleaved2U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1) noexcept { ::HighwayReference::loadInterleaved2U16(from, v0, v1); }
+HWY_INLINE void loadInterleaved3U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1, OutVectorU16& v2) noexcept { ::HighwayReference::loadInterleaved3U16(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4U16(const uint16_t* from, OutVectorU16& v0, OutVectorU16& v1, OutVectorU16& v2, OutVectorU16& v3) noexcept { ::HighwayReference::loadInterleaved4U16(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2U16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, uint16_t* to) noexcept { ::HighwayReference::storeInterleaved2U16(a, b, to); }
+HWY_INLINE void storeInterleaved3U16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, cvectorization_ops_raw_vector_u16 c, uint16_t* to) noexcept { ::HighwayReference::storeInterleaved3U16(a, b, c, to); }
+HWY_INLINE void storeInterleaved4U16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b, cvectorization_ops_raw_vector_u16 c, cvectorization_ops_raw_vector_u16 d, uint16_t* to) noexcept { ::HighwayReference::storeInterleaved4U16(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadWideningU8ToU16(const uint8_t* from) noexcept { return ::HighwayReference::loadWideningU8ToU16(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 loadFirstWideningU8ToU16(const uint8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU8ToU16(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u16 repeatingBlockU16(uint16_t v0, uint16_t v1, uint16_t v2, uint16_t v3, uint16_t v4, uint16_t v5, uint16_t v6, uint16_t v7) noexcept { return ::HighwayReference::repeatingBlockU16(v0, v1, v2, v3, v4, v5, v6, v7); }
+HWY_INLINE size_t laneCountU32() noexcept { return ::HighwayReference::laneCountU32(); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 zeroU32() noexcept { return ::HighwayReference::zeroU32(); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 repeatingU32(uint32_t value) noexcept { return ::HighwayReference::repeatingU32(value); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 iotaU32(uint32_t value) noexcept { return ::HighwayReference::iotaU32(value); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadU32(const uint32_t* from) noexcept { return ::HighwayReference::loadU32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadAlignedU32(const uint32_t* from) noexcept { return ::HighwayReference::loadAlignedU32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstU32(const uint32_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstU32(from, count); }
+HWY_INLINE void storeU32(cvectorization_ops_raw_vector_u32 a, uint32_t* to) noexcept { ::HighwayReference::storeU32(a, to); }
+HWY_INLINE void storeAlignedU32(cvectorization_ops_raw_vector_u32 a, uint32_t* to) noexcept { ::HighwayReference::storeAlignedU32(a, to); }
+HWY_INLINE void storeFirstU32(cvectorization_ops_raw_vector_u32 a, uint32_t* to, size_t count) noexcept { ::HighwayReference::storeFirstU32(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 addingU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::addingU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 subtractingU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::subtractingU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 multiplyingU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::multiplyingU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 minimumU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::minimumU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 maximumU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::maximumU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseAndU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseOrU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseOrU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseXorU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseXorU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseNotU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::bitwiseNotU32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndNotU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseAndNotU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndXorU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, cvectorization_ops_raw_vector_u32 c) noexcept { return ::HighwayReference::bitwiseAndXorU32(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 shiftedLeftU32(cvectorization_ops_raw_vector_u32 a, int bits) noexcept { return ::HighwayReference::shiftedLeftU32(a, bits); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 shiftedRightU32(cvectorization_ops_raw_vector_u32 a, int bits) noexcept { return ::HighwayReference::shiftedRightU32(a, bits); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 equalToU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::equalToU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 notEqualToU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::notEqualToU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 lessThanU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::lessThanU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 greaterThanU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::greaterThanU32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 selectingU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::selectingU32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 selectingOrZeroU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::selectingOrZeroU32(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 zeroingSelectedU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::zeroingSelectedU32(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndWhereU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseAndWhereU32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseOrWhereU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseOrWhereU32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseXorWhereU32(cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseXorWhereU32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseAndWhereOtherwiseU32(cvectorization_ops_raw_vector_u32 otherwise, cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseAndWhereOtherwiseU32(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseOrWhereOtherwiseU32(cvectorization_ops_raw_vector_u32 otherwise, cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseOrWhereOtherwiseU32(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 bitwiseXorWhereOtherwiseU32(cvectorization_ops_raw_vector_u32 otherwise, cvectorization_ops_raw_mask_u32 mask, cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::bitwiseXorWhereOtherwiseU32(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 firstLanesU32(size_t count) noexcept { return ::HighwayReference::firstLanesU32(count); }
+HWY_INLINE bool allTrueU32(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::allTrueU32(mask); }
+HWY_INLINE bool allFalseU32(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::allFalseU32(mask); }
+HWY_INLINE size_t trueCountU32(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::trueCountU32(mask); }
+HWY_INLINE intptr_t firstTrueIndexU32(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::firstTrueIndexU32(mask); }
+HWY_INLINE uint32_t sumU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::sumU32(a); }
+HWY_INLINE uint32_t smallestU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::smallestU32(a); }
+HWY_INLINE uint32_t largestU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::largestU32(a); }
+HWY_INLINE uint32_t firstLaneU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::firstLaneU32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 reversedU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::reversedU32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slideUpLanesU32(cvectorization_ops_raw_vector_u32 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesU32(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slideUpLanesFillingWithU32(cvectorization_ops_raw_vector_u32 fill, cvectorization_ops_raw_vector_u32 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithU32(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slideDownLanesU32(cvectorization_ops_raw_vector_u32 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesU32(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slideDownLanesFillingWithU32(cvectorization_ops_raw_vector_u32 fill, cvectorization_ops_raw_vector_u32 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithU32(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slide1UpU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::slide1UpU32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slide1UpFillingWithU32(uint32_t fill, cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::slide1UpFillingWithU32(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slide1DownU32(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::slide1DownU32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 slide1DownFillingWithU32(uint32_t fill, cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::slide1DownFillingWithU32(fill, a); }
+HWY_INLINE void loadInterleaved2U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1) noexcept { ::HighwayReference::loadInterleaved2U32(from, v0, v1); }
+HWY_INLINE void loadInterleaved3U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1, OutVectorU32& v2) noexcept { ::HighwayReference::loadInterleaved3U32(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4U32(const uint32_t* from, OutVectorU32& v0, OutVectorU32& v1, OutVectorU32& v2, OutVectorU32& v3) noexcept { ::HighwayReference::loadInterleaved4U32(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2U32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, uint32_t* to) noexcept { ::HighwayReference::storeInterleaved2U32(a, b, to); }
+HWY_INLINE void storeInterleaved3U32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, cvectorization_ops_raw_vector_u32 c, uint32_t* to) noexcept { ::HighwayReference::storeInterleaved3U32(a, b, c, to); }
+HWY_INLINE void storeInterleaved4U32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b, cvectorization_ops_raw_vector_u32 c, cvectorization_ops_raw_vector_u32 d, uint32_t* to) noexcept { ::HighwayReference::storeInterleaved4U32(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadWideningU8ToU32(const uint8_t* from) noexcept { return ::HighwayReference::loadWideningU8ToU32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadWideningU16ToU32(const uint16_t* from) noexcept { return ::HighwayReference::loadWideningU16ToU32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstWideningU8ToU32(const uint8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU8ToU32(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstWideningU16ToU32(const uint16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU16ToU32(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 repeatingBlockU32(uint32_t v0, uint32_t v1, uint32_t v2, uint32_t v3) noexcept { return ::HighwayReference::repeatingBlockU32(v0, v1, v2, v3); }
+HWY_INLINE size_t laneCountU64() noexcept { return ::HighwayReference::laneCountU64(); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 zeroU64() noexcept { return ::HighwayReference::zeroU64(); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 repeatingU64(uint64_t value) noexcept { return ::HighwayReference::repeatingU64(value); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 iotaU64(uint64_t value) noexcept { return ::HighwayReference::iotaU64(value); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadU64(const uint64_t* from) noexcept { return ::HighwayReference::loadU64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadAlignedU64(const uint64_t* from) noexcept { return ::HighwayReference::loadAlignedU64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstU64(const uint64_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstU64(from, count); }
+HWY_INLINE void storeU64(cvectorization_ops_raw_vector_u64 a, uint64_t* to) noexcept { ::HighwayReference::storeU64(a, to); }
+HWY_INLINE void storeAlignedU64(cvectorization_ops_raw_vector_u64 a, uint64_t* to) noexcept { ::HighwayReference::storeAlignedU64(a, to); }
+HWY_INLINE void storeFirstU64(cvectorization_ops_raw_vector_u64 a, uint64_t* to, size_t count) noexcept { ::HighwayReference::storeFirstU64(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 addingU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::addingU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 subtractingU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::subtractingU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 multiplyingU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::multiplyingU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 minimumU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::minimumU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 maximumU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::maximumU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseAndU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseOrU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseOrU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseXorU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseXorU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseNotU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::bitwiseNotU64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndNotU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseAndNotU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndXorU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c) noexcept { return ::HighwayReference::bitwiseAndXorU64(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 shiftedLeftU64(cvectorization_ops_raw_vector_u64 a, int bits) noexcept { return ::HighwayReference::shiftedLeftU64(a, bits); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 shiftedRightU64(cvectorization_ops_raw_vector_u64 a, int bits) noexcept { return ::HighwayReference::shiftedRightU64(a, bits); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 equalToU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::equalToU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 notEqualToU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::notEqualToU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 lessThanU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::lessThanU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 greaterThanU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::greaterThanU64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 selectingU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::selectingU64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 selectingOrZeroU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::selectingOrZeroU64(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 zeroingSelectedU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::zeroingSelectedU64(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndWhereU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseAndWhereU64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseOrWhereU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseOrWhereU64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseXorWhereU64(cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseXorWhereU64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseAndWhereOtherwiseU64(cvectorization_ops_raw_vector_u64 otherwise, cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseAndWhereOtherwiseU64(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseOrWhereOtherwiseU64(cvectorization_ops_raw_vector_u64 otherwise, cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseOrWhereOtherwiseU64(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 bitwiseXorWhereOtherwiseU64(cvectorization_ops_raw_vector_u64 otherwise, cvectorization_ops_raw_mask_u64 mask, cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b) noexcept { return ::HighwayReference::bitwiseXorWhereOtherwiseU64(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 multiplyAddingLow52BitsU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c) noexcept { return ::HighwayReference::multiplyAddingLow52BitsU64(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 multiplyAddingHigh52BitsU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c) noexcept { return ::HighwayReference::multiplyAddingHigh52BitsU64(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 firstLanesU64(size_t count) noexcept { return ::HighwayReference::firstLanesU64(count); }
+HWY_INLINE bool allTrueU64(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::allTrueU64(mask); }
+HWY_INLINE bool allFalseU64(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::allFalseU64(mask); }
+HWY_INLINE size_t trueCountU64(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::trueCountU64(mask); }
+HWY_INLINE intptr_t firstTrueIndexU64(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::firstTrueIndexU64(mask); }
+HWY_INLINE uint64_t sumU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::sumU64(a); }
+HWY_INLINE uint64_t smallestU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::smallestU64(a); }
+HWY_INLINE uint64_t largestU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::largestU64(a); }
+HWY_INLINE uint64_t firstLaneU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::firstLaneU64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 reversedU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::reversedU64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slideUpLanesU64(cvectorization_ops_raw_vector_u64 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesU64(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slideUpLanesFillingWithU64(cvectorization_ops_raw_vector_u64 fill, cvectorization_ops_raw_vector_u64 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithU64(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slideDownLanesU64(cvectorization_ops_raw_vector_u64 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesU64(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slideDownLanesFillingWithU64(cvectorization_ops_raw_vector_u64 fill, cvectorization_ops_raw_vector_u64 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithU64(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slide1UpU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::slide1UpU64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slide1UpFillingWithU64(uint64_t fill, cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::slide1UpFillingWithU64(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slide1DownU64(cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::slide1DownU64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 slide1DownFillingWithU64(uint64_t fill, cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::slide1DownFillingWithU64(fill, a); }
+HWY_INLINE void loadInterleaved2U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1) noexcept { ::HighwayReference::loadInterleaved2U64(from, v0, v1); }
+HWY_INLINE void loadInterleaved3U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1, OutVectorU64& v2) noexcept { ::HighwayReference::loadInterleaved3U64(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4U64(const uint64_t* from, OutVectorU64& v0, OutVectorU64& v1, OutVectorU64& v2, OutVectorU64& v3) noexcept { ::HighwayReference::loadInterleaved4U64(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2U64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, uint64_t* to) noexcept { ::HighwayReference::storeInterleaved2U64(a, b, to); }
+HWY_INLINE void storeInterleaved3U64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c, uint64_t* to) noexcept { ::HighwayReference::storeInterleaved3U64(a, b, c, to); }
+HWY_INLINE void storeInterleaved4U64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_vector_u64 b, cvectorization_ops_raw_vector_u64 c, cvectorization_ops_raw_vector_u64 d, uint64_t* to) noexcept { ::HighwayReference::storeInterleaved4U64(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadWideningU8ToU64(const uint8_t* from) noexcept { return ::HighwayReference::loadWideningU8ToU64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadWideningU16ToU64(const uint16_t* from) noexcept { return ::HighwayReference::loadWideningU16ToU64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadWideningU32ToU64(const uint32_t* from) noexcept { return ::HighwayReference::loadWideningU32ToU64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU8ToU64(const uint8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU8ToU64(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU16ToU64(const uint16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU16ToU64(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU32ToU64(const uint32_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU32ToU64(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 repeatingBlockU64(uint64_t v0, uint64_t v1) noexcept { return ::HighwayReference::repeatingBlockU64(v0, v1); }
+HWY_INLINE size_t laneCountI8() noexcept { return ::HighwayReference::laneCountI8(); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 zeroI8() noexcept { return ::HighwayReference::zeroI8(); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 repeatingI8(int8_t value) noexcept { return ::HighwayReference::repeatingI8(value); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 iotaI8(int8_t value) noexcept { return ::HighwayReference::iotaI8(value); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 loadI8(const int8_t* from) noexcept { return ::HighwayReference::loadI8(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 loadAlignedI8(const int8_t* from) noexcept { return ::HighwayReference::loadAlignedI8(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 loadFirstI8(const int8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstI8(from, count); }
+HWY_INLINE void storeI8(cvectorization_ops_raw_vector_i8 a, int8_t* to) noexcept { ::HighwayReference::storeI8(a, to); }
+HWY_INLINE void storeAlignedI8(cvectorization_ops_raw_vector_i8 a, int8_t* to) noexcept { ::HighwayReference::storeAlignedI8(a, to); }
+HWY_INLINE void storeFirstI8(cvectorization_ops_raw_vector_i8 a, int8_t* to, size_t count) noexcept { ::HighwayReference::storeFirstI8(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 addingI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::addingI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 subtractingI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::subtractingI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 minimumI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::minimumI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 maximumI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::maximumI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 negatedI8(cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::negatedI8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 magnitudeI8(cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::magnitudeI8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 saturatingAddingI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::saturatingAddingI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 saturatingSubtractingI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::saturatingSubtractingI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseAndI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseOrI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseOrI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseXorI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseXorI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseNotI8(cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::bitwiseNotI8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndNotI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseAndNotI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndXorI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, cvectorization_ops_raw_vector_i8 c) noexcept { return ::HighwayReference::bitwiseAndXorI8(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 shiftedLeftI8(cvectorization_ops_raw_vector_i8 a, int bits) noexcept { return ::HighwayReference::shiftedLeftI8(a, bits); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 shiftedRightI8(cvectorization_ops_raw_vector_i8 a, int bits) noexcept { return ::HighwayReference::shiftedRightI8(a, bits); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 equalToI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::equalToI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 notEqualToI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::notEqualToI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 lessThanI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::lessThanI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 greaterThanI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::greaterThanI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 selectingI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::selectingI8(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 selectingOrZeroI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::selectingOrZeroI8(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 zeroingSelectedI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::zeroingSelectedI8(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndWhereI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseAndWhereI8(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseOrWhereI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseOrWhereI8(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseXorWhereI8(cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseXorWhereI8(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseAndWhereOtherwiseI8(cvectorization_ops_raw_vector_i8 otherwise, cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseAndWhereOtherwiseI8(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseOrWhereOtherwiseI8(cvectorization_ops_raw_vector_i8 otherwise, cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseOrWhereOtherwiseI8(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 bitwiseXorWhereOtherwiseI8(cvectorization_ops_raw_vector_i8 otherwise, cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::bitwiseXorWhereOtherwiseI8(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 firstLanesI8(size_t count) noexcept { return ::HighwayReference::firstLanesI8(count); }
+HWY_INLINE bool allTrueI8(cvectorization_ops_raw_mask_i8 mask) noexcept { return ::HighwayReference::allTrueI8(mask); }
+HWY_INLINE bool allFalseI8(cvectorization_ops_raw_mask_i8 mask) noexcept { return ::HighwayReference::allFalseI8(mask); }
+HWY_INLINE size_t trueCountI8(cvectorization_ops_raw_mask_i8 mask) noexcept { return ::HighwayReference::trueCountI8(mask); }
+HWY_INLINE intptr_t firstTrueIndexI8(cvectorization_ops_raw_mask_i8 mask) noexcept { return ::HighwayReference::firstTrueIndexI8(mask); }
+HWY_INLINE int8_t firstLaneI8(cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::firstLaneI8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 reversedI8(cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::reversedI8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slideUpLanesI8(cvectorization_ops_raw_vector_i8 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesI8(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slideUpLanesFillingWithI8(cvectorization_ops_raw_vector_i8 fill, cvectorization_ops_raw_vector_i8 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithI8(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slideDownLanesI8(cvectorization_ops_raw_vector_i8 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesI8(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slideDownLanesFillingWithI8(cvectorization_ops_raw_vector_i8 fill, cvectorization_ops_raw_vector_i8 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithI8(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slide1UpI8(cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::slide1UpI8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slide1UpFillingWithI8(int8_t fill, cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::slide1UpFillingWithI8(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slide1DownI8(cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::slide1DownI8(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 slide1DownFillingWithI8(int8_t fill, cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::slide1DownFillingWithI8(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 tableLookupBytesI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::tableLookupBytesI8(a, b); }
+HWY_INLINE void loadInterleaved2I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1) noexcept { ::HighwayReference::loadInterleaved2I8(from, v0, v1); }
+HWY_INLINE void loadInterleaved3I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1, OutVectorI8& v2) noexcept { ::HighwayReference::loadInterleaved3I8(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4I8(const int8_t* from, OutVectorI8& v0, OutVectorI8& v1, OutVectorI8& v2, OutVectorI8& v3) noexcept { ::HighwayReference::loadInterleaved4I8(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2I8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, int8_t* to) noexcept { ::HighwayReference::storeInterleaved2I8(a, b, to); }
+HWY_INLINE void storeInterleaved3I8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, cvectorization_ops_raw_vector_i8 c, int8_t* to) noexcept { ::HighwayReference::storeInterleaved3I8(a, b, c, to); }
+HWY_INLINE void storeInterleaved4I8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b, cvectorization_ops_raw_vector_i8 c, cvectorization_ops_raw_vector_i8 d, int8_t* to) noexcept { ::HighwayReference::storeInterleaved4I8(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 repeatingBlockI8(int8_t v0, int8_t v1, int8_t v2, int8_t v3, int8_t v4, int8_t v5, int8_t v6, int8_t v7, int8_t v8, int8_t v9, int8_t v10, int8_t v11, int8_t v12, int8_t v13, int8_t v14, int8_t v15) noexcept { return ::HighwayReference::repeatingBlockI8(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15); }
+HWY_INLINE size_t laneCountI16() noexcept { return ::HighwayReference::laneCountI16(); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 zeroI16() noexcept { return ::HighwayReference::zeroI16(); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 repeatingI16(int16_t value) noexcept { return ::HighwayReference::repeatingI16(value); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 iotaI16(int16_t value) noexcept { return ::HighwayReference::iotaI16(value); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadI16(const int16_t* from) noexcept { return ::HighwayReference::loadI16(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadAlignedI16(const int16_t* from) noexcept { return ::HighwayReference::loadAlignedI16(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadFirstI16(const int16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstI16(from, count); }
+HWY_INLINE void storeI16(cvectorization_ops_raw_vector_i16 a, int16_t* to) noexcept { ::HighwayReference::storeI16(a, to); }
+HWY_INLINE void storeAlignedI16(cvectorization_ops_raw_vector_i16 a, int16_t* to) noexcept { ::HighwayReference::storeAlignedI16(a, to); }
+HWY_INLINE void storeFirstI16(cvectorization_ops_raw_vector_i16 a, int16_t* to, size_t count) noexcept { ::HighwayReference::storeFirstI16(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 addingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::addingI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 subtractingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::subtractingI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 multiplyingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::multiplyingI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 minimumI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::minimumI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 maximumI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::maximumI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 negatedI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::negatedI16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 magnitudeI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::magnitudeI16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 saturatingAddingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::saturatingAddingI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 saturatingSubtractingI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::saturatingSubtractingI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseAndI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseOrI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseOrI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseXorI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseXorI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseNotI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::bitwiseNotI16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndNotI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseAndNotI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndXorI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, cvectorization_ops_raw_vector_i16 c) noexcept { return ::HighwayReference::bitwiseAndXorI16(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 shiftedLeftI16(cvectorization_ops_raw_vector_i16 a, int bits) noexcept { return ::HighwayReference::shiftedLeftI16(a, bits); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 shiftedRightI16(cvectorization_ops_raw_vector_i16 a, int bits) noexcept { return ::HighwayReference::shiftedRightI16(a, bits); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 equalToI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::equalToI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 notEqualToI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::notEqualToI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 lessThanI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::lessThanI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 greaterThanI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::greaterThanI16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 selectingI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::selectingI16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 selectingOrZeroI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::selectingOrZeroI16(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 zeroingSelectedI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::zeroingSelectedI16(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndWhereI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseAndWhereI16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseOrWhereI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseOrWhereI16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseXorWhereI16(cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseXorWhereI16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseAndWhereOtherwiseI16(cvectorization_ops_raw_vector_i16 otherwise, cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseAndWhereOtherwiseI16(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseOrWhereOtherwiseI16(cvectorization_ops_raw_vector_i16 otherwise, cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseOrWhereOtherwiseI16(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 bitwiseXorWhereOtherwiseI16(cvectorization_ops_raw_vector_i16 otherwise, cvectorization_ops_raw_mask_i16 mask, cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::bitwiseXorWhereOtherwiseI16(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i16 firstLanesI16(size_t count) noexcept { return ::HighwayReference::firstLanesI16(count); }
+HWY_INLINE bool allTrueI16(cvectorization_ops_raw_mask_i16 mask) noexcept { return ::HighwayReference::allTrueI16(mask); }
+HWY_INLINE bool allFalseI16(cvectorization_ops_raw_mask_i16 mask) noexcept { return ::HighwayReference::allFalseI16(mask); }
+HWY_INLINE size_t trueCountI16(cvectorization_ops_raw_mask_i16 mask) noexcept { return ::HighwayReference::trueCountI16(mask); }
+HWY_INLINE intptr_t firstTrueIndexI16(cvectorization_ops_raw_mask_i16 mask) noexcept { return ::HighwayReference::firstTrueIndexI16(mask); }
+HWY_INLINE int16_t sumI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::sumI16(a); }
+HWY_INLINE int16_t smallestI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::smallestI16(a); }
+HWY_INLINE int16_t largestI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::largestI16(a); }
+HWY_INLINE int16_t firstLaneI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::firstLaneI16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 reversedI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::reversedI16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slideUpLanesI16(cvectorization_ops_raw_vector_i16 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesI16(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slideUpLanesFillingWithI16(cvectorization_ops_raw_vector_i16 fill, cvectorization_ops_raw_vector_i16 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithI16(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slideDownLanesI16(cvectorization_ops_raw_vector_i16 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesI16(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slideDownLanesFillingWithI16(cvectorization_ops_raw_vector_i16 fill, cvectorization_ops_raw_vector_i16 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithI16(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slide1UpI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::slide1UpI16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slide1UpFillingWithI16(int16_t fill, cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::slide1UpFillingWithI16(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slide1DownI16(cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::slide1DownI16(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 slide1DownFillingWithI16(int16_t fill, cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::slide1DownFillingWithI16(fill, a); }
+HWY_INLINE void loadInterleaved2I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1) noexcept { ::HighwayReference::loadInterleaved2I16(from, v0, v1); }
+HWY_INLINE void loadInterleaved3I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1, OutVectorI16& v2) noexcept { ::HighwayReference::loadInterleaved3I16(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4I16(const int16_t* from, OutVectorI16& v0, OutVectorI16& v1, OutVectorI16& v2, OutVectorI16& v3) noexcept { ::HighwayReference::loadInterleaved4I16(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2I16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, int16_t* to) noexcept { ::HighwayReference::storeInterleaved2I16(a, b, to); }
+HWY_INLINE void storeInterleaved3I16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, cvectorization_ops_raw_vector_i16 c, int16_t* to) noexcept { ::HighwayReference::storeInterleaved3I16(a, b, c, to); }
+HWY_INLINE void storeInterleaved4I16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b, cvectorization_ops_raw_vector_i16 c, cvectorization_ops_raw_vector_i16 d, int16_t* to) noexcept { ::HighwayReference::storeInterleaved4I16(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadWideningI8ToI16(const int8_t* from) noexcept { return ::HighwayReference::loadWideningI8ToI16(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadFirstWideningI8ToI16(const int8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningI8ToI16(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 repeatingBlockI16(int16_t v0, int16_t v1, int16_t v2, int16_t v3, int16_t v4, int16_t v5, int16_t v6, int16_t v7) noexcept { return ::HighwayReference::repeatingBlockI16(v0, v1, v2, v3, v4, v5, v6, v7); }
+HWY_INLINE size_t laneCountI32() noexcept { return ::HighwayReference::laneCountI32(); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 zeroI32() noexcept { return ::HighwayReference::zeroI32(); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 repeatingI32(int32_t value) noexcept { return ::HighwayReference::repeatingI32(value); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 iotaI32(int32_t value) noexcept { return ::HighwayReference::iotaI32(value); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadI32(const int32_t* from) noexcept { return ::HighwayReference::loadI32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadAlignedI32(const int32_t* from) noexcept { return ::HighwayReference::loadAlignedI32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstI32(const int32_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstI32(from, count); }
+HWY_INLINE void storeI32(cvectorization_ops_raw_vector_i32 a, int32_t* to) noexcept { ::HighwayReference::storeI32(a, to); }
+HWY_INLINE void storeAlignedI32(cvectorization_ops_raw_vector_i32 a, int32_t* to) noexcept { ::HighwayReference::storeAlignedI32(a, to); }
+HWY_INLINE void storeFirstI32(cvectorization_ops_raw_vector_i32 a, int32_t* to, size_t count) noexcept { ::HighwayReference::storeFirstI32(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 addingI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::addingI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 subtractingI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::subtractingI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 multiplyingI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::multiplyingI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 minimumI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::minimumI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 maximumI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::maximumI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 negatedI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::negatedI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 magnitudeI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::magnitudeI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseAndI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseOrI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseOrI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseXorI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseXorI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseNotI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::bitwiseNotI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndNotI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseAndNotI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndXorI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, cvectorization_ops_raw_vector_i32 c) noexcept { return ::HighwayReference::bitwiseAndXorI32(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 shiftedLeftI32(cvectorization_ops_raw_vector_i32 a, int bits) noexcept { return ::HighwayReference::shiftedLeftI32(a, bits); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 shiftedRightI32(cvectorization_ops_raw_vector_i32 a, int bits) noexcept { return ::HighwayReference::shiftedRightI32(a, bits); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 equalToI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::equalToI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 notEqualToI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::notEqualToI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 lessThanI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::lessThanI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 greaterThanI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::greaterThanI32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 selectingI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::selectingI32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 selectingOrZeroI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::selectingOrZeroI32(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 zeroingSelectedI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::zeroingSelectedI32(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndWhereI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseAndWhereI32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseOrWhereI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseOrWhereI32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseXorWhereI32(cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseXorWhereI32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseAndWhereOtherwiseI32(cvectorization_ops_raw_vector_i32 otherwise, cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseAndWhereOtherwiseI32(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseOrWhereOtherwiseI32(cvectorization_ops_raw_vector_i32 otherwise, cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseOrWhereOtherwiseI32(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 bitwiseXorWhereOtherwiseI32(cvectorization_ops_raw_vector_i32 otherwise, cvectorization_ops_raw_mask_i32 mask, cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::bitwiseXorWhereOtherwiseI32(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 firstLanesI32(size_t count) noexcept { return ::HighwayReference::firstLanesI32(count); }
+HWY_INLINE bool allTrueI32(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::allTrueI32(mask); }
+HWY_INLINE bool allFalseI32(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::allFalseI32(mask); }
+HWY_INLINE size_t trueCountI32(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::trueCountI32(mask); }
+HWY_INLINE intptr_t firstTrueIndexI32(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::firstTrueIndexI32(mask); }
+HWY_INLINE int32_t sumI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::sumI32(a); }
+HWY_INLINE int32_t smallestI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::smallestI32(a); }
+HWY_INLINE int32_t largestI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::largestI32(a); }
+HWY_INLINE int32_t firstLaneI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::firstLaneI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 reversedI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::reversedI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slideUpLanesI32(cvectorization_ops_raw_vector_i32 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesI32(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slideUpLanesFillingWithI32(cvectorization_ops_raw_vector_i32 fill, cvectorization_ops_raw_vector_i32 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithI32(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slideDownLanesI32(cvectorization_ops_raw_vector_i32 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesI32(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slideDownLanesFillingWithI32(cvectorization_ops_raw_vector_i32 fill, cvectorization_ops_raw_vector_i32 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithI32(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slide1UpI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::slide1UpI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slide1UpFillingWithI32(int32_t fill, cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::slide1UpFillingWithI32(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slide1DownI32(cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::slide1DownI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 slide1DownFillingWithI32(int32_t fill, cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::slide1DownFillingWithI32(fill, a); }
+HWY_INLINE void loadInterleaved2I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1) noexcept { ::HighwayReference::loadInterleaved2I32(from, v0, v1); }
+HWY_INLINE void loadInterleaved3I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1, OutVectorI32& v2) noexcept { ::HighwayReference::loadInterleaved3I32(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4I32(const int32_t* from, OutVectorI32& v0, OutVectorI32& v1, OutVectorI32& v2, OutVectorI32& v3) noexcept { ::HighwayReference::loadInterleaved4I32(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2I32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, int32_t* to) noexcept { ::HighwayReference::storeInterleaved2I32(a, b, to); }
+HWY_INLINE void storeInterleaved3I32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, cvectorization_ops_raw_vector_i32 c, int32_t* to) noexcept { ::HighwayReference::storeInterleaved3I32(a, b, c, to); }
+HWY_INLINE void storeInterleaved4I32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b, cvectorization_ops_raw_vector_i32 c, cvectorization_ops_raw_vector_i32 d, int32_t* to) noexcept { ::HighwayReference::storeInterleaved4I32(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadWideningI8ToI32(const int8_t* from) noexcept { return ::HighwayReference::loadWideningI8ToI32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadWideningI16ToI32(const int16_t* from) noexcept { return ::HighwayReference::loadWideningI16ToI32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstWideningI8ToI32(const int8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningI8ToI32(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstWideningI16ToI32(const int16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningI16ToI32(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 repeatingBlockI32(int32_t v0, int32_t v1, int32_t v2, int32_t v3) noexcept { return ::HighwayReference::repeatingBlockI32(v0, v1, v2, v3); }
+HWY_INLINE size_t laneCountI64() noexcept { return ::HighwayReference::laneCountI64(); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 zeroI64() noexcept { return ::HighwayReference::zeroI64(); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 repeatingI64(int64_t value) noexcept { return ::HighwayReference::repeatingI64(value); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 iotaI64(int64_t value) noexcept { return ::HighwayReference::iotaI64(value); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadI64(const int64_t* from) noexcept { return ::HighwayReference::loadI64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadAlignedI64(const int64_t* from) noexcept { return ::HighwayReference::loadAlignedI64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstI64(const int64_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstI64(from, count); }
+HWY_INLINE void storeI64(cvectorization_ops_raw_vector_i64 a, int64_t* to) noexcept { ::HighwayReference::storeI64(a, to); }
+HWY_INLINE void storeAlignedI64(cvectorization_ops_raw_vector_i64 a, int64_t* to) noexcept { ::HighwayReference::storeAlignedI64(a, to); }
+HWY_INLINE void storeFirstI64(cvectorization_ops_raw_vector_i64 a, int64_t* to, size_t count) noexcept { ::HighwayReference::storeFirstI64(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 addingI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::addingI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 subtractingI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::subtractingI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 multiplyingI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::multiplyingI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 minimumI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::minimumI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 maximumI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::maximumI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 negatedI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::negatedI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 magnitudeI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::magnitudeI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseAndI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseOrI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseOrI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseXorI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseXorI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseNotI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::bitwiseNotI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndNotI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseAndNotI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndXorI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, cvectorization_ops_raw_vector_i64 c) noexcept { return ::HighwayReference::bitwiseAndXorI64(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 shiftedLeftI64(cvectorization_ops_raw_vector_i64 a, int bits) noexcept { return ::HighwayReference::shiftedLeftI64(a, bits); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 shiftedRightI64(cvectorization_ops_raw_vector_i64 a, int bits) noexcept { return ::HighwayReference::shiftedRightI64(a, bits); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 equalToI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::equalToI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 notEqualToI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::notEqualToI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 lessThanI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::lessThanI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 greaterThanI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::greaterThanI64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 selectingI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::selectingI64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 selectingOrZeroI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::selectingOrZeroI64(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 zeroingSelectedI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::zeroingSelectedI64(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndWhereI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseAndWhereI64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseOrWhereI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseOrWhereI64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseXorWhereI64(cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseXorWhereI64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseAndWhereOtherwiseI64(cvectorization_ops_raw_vector_i64 otherwise, cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseAndWhereOtherwiseI64(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseOrWhereOtherwiseI64(cvectorization_ops_raw_vector_i64 otherwise, cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseOrWhereOtherwiseI64(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 bitwiseXorWhereOtherwiseI64(cvectorization_ops_raw_vector_i64 otherwise, cvectorization_ops_raw_mask_i64 mask, cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b) noexcept { return ::HighwayReference::bitwiseXorWhereOtherwiseI64(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 firstLanesI64(size_t count) noexcept { return ::HighwayReference::firstLanesI64(count); }
+HWY_INLINE bool allTrueI64(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::allTrueI64(mask); }
+HWY_INLINE bool allFalseI64(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::allFalseI64(mask); }
+HWY_INLINE size_t trueCountI64(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::trueCountI64(mask); }
+HWY_INLINE intptr_t firstTrueIndexI64(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::firstTrueIndexI64(mask); }
+HWY_INLINE int64_t sumI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::sumI64(a); }
+HWY_INLINE int64_t smallestI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::smallestI64(a); }
+HWY_INLINE int64_t largestI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::largestI64(a); }
+HWY_INLINE int64_t firstLaneI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::firstLaneI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 reversedI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::reversedI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slideUpLanesI64(cvectorization_ops_raw_vector_i64 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesI64(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slideUpLanesFillingWithI64(cvectorization_ops_raw_vector_i64 fill, cvectorization_ops_raw_vector_i64 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithI64(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slideDownLanesI64(cvectorization_ops_raw_vector_i64 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesI64(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slideDownLanesFillingWithI64(cvectorization_ops_raw_vector_i64 fill, cvectorization_ops_raw_vector_i64 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithI64(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slide1UpI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::slide1UpI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slide1UpFillingWithI64(int64_t fill, cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::slide1UpFillingWithI64(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slide1DownI64(cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::slide1DownI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 slide1DownFillingWithI64(int64_t fill, cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::slide1DownFillingWithI64(fill, a); }
+HWY_INLINE void loadInterleaved2I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1) noexcept { ::HighwayReference::loadInterleaved2I64(from, v0, v1); }
+HWY_INLINE void loadInterleaved3I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1, OutVectorI64& v2) noexcept { ::HighwayReference::loadInterleaved3I64(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4I64(const int64_t* from, OutVectorI64& v0, OutVectorI64& v1, OutVectorI64& v2, OutVectorI64& v3) noexcept { ::HighwayReference::loadInterleaved4I64(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2I64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, int64_t* to) noexcept { ::HighwayReference::storeInterleaved2I64(a, b, to); }
+HWY_INLINE void storeInterleaved3I64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, cvectorization_ops_raw_vector_i64 c, int64_t* to) noexcept { ::HighwayReference::storeInterleaved3I64(a, b, c, to); }
+HWY_INLINE void storeInterleaved4I64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_vector_i64 b, cvectorization_ops_raw_vector_i64 c, cvectorization_ops_raw_vector_i64 d, int64_t* to) noexcept { ::HighwayReference::storeInterleaved4I64(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadWideningI8ToI64(const int8_t* from) noexcept { return ::HighwayReference::loadWideningI8ToI64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadWideningI16ToI64(const int16_t* from) noexcept { return ::HighwayReference::loadWideningI16ToI64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadWideningI32ToI64(const int32_t* from) noexcept { return ::HighwayReference::loadWideningI32ToI64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstWideningI8ToI64(const int8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningI8ToI64(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstWideningI16ToI64(const int16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningI16ToI64(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstWideningI32ToI64(const int32_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningI32ToI64(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 repeatingBlockI64(int64_t v0, int64_t v1) noexcept { return ::HighwayReference::repeatingBlockI64(v0, v1); }
+HWY_INLINE size_t laneCountF32() noexcept { return ::HighwayReference::laneCountF32(); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 zeroF32() noexcept { return ::HighwayReference::zeroF32(); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingF32(float value) noexcept { return ::HighwayReference::repeatingF32(value); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 iotaF32(float value) noexcept { return ::HighwayReference::iotaF32(value); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 loadF32(const float* from) noexcept { return ::HighwayReference::loadF32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 loadAlignedF32(const float* from) noexcept { return ::HighwayReference::loadAlignedF32(from); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 loadFirstF32(const float* from, size_t count) noexcept { return ::HighwayReference::loadFirstF32(from, count); }
+HWY_INLINE void storeF32(cvectorization_ops_raw_vector_f32 a, float* to) noexcept { ::HighwayReference::storeF32(a, to); }
+HWY_INLINE void storeAlignedF32(cvectorization_ops_raw_vector_f32 a, float* to) noexcept { ::HighwayReference::storeAlignedF32(a, to); }
+HWY_INLINE void storeFirstF32(cvectorization_ops_raw_vector_f32 a, float* to, size_t count) noexcept { ::HighwayReference::storeFirstF32(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 addingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::addingF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 subtractingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::subtractingF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::multiplyingF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 dividingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::dividingF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 minimumF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::minimumF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 maximumF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::maximumF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 negatedF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::negatedF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 magnitudeF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::magnitudeF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 squareRootF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::squareRootF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) noexcept { return ::HighwayReference::multiplyAddingF32(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 equalToF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::equalToF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 notEqualToF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::notEqualToF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 lessThanF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::lessThanF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 greaterThanF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::greaterThanF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 selectingF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::selectingF32(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 selectingOrZeroF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::selectingOrZeroF32(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 zeroingSelectedF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::zeroingSelectedF32(mask, a); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 firstLanesF32(size_t count) noexcept { return ::HighwayReference::firstLanesF32(count); }
+HWY_INLINE bool allTrueF32(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::allTrueF32(mask); }
+HWY_INLINE bool allFalseF32(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::allFalseF32(mask); }
+HWY_INLINE size_t trueCountF32(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::trueCountF32(mask); }
+HWY_INLINE intptr_t firstTrueIndexF32(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::firstTrueIndexF32(mask); }
+HWY_INLINE float sumF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::sumF32(a); }
+HWY_INLINE float smallestF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::smallestF32(a); }
+HWY_INLINE float smallestOrNaNF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::smallestOrNaNF32(a); }
+HWY_INLINE float largestF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::largestF32(a); }
+HWY_INLINE float largestOrNaNF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::largestOrNaNF32(a); }
+HWY_INLINE float firstLaneF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::firstLaneF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 reversedF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::reversedF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slideUpLanesF32(cvectorization_ops_raw_vector_f32 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesF32(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slideUpLanesFillingWithF32(cvectorization_ops_raw_vector_f32 fill, cvectorization_ops_raw_vector_f32 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithF32(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slideDownLanesF32(cvectorization_ops_raw_vector_f32 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesF32(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slideDownLanesFillingWithF32(cvectorization_ops_raw_vector_f32 fill, cvectorization_ops_raw_vector_f32 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithF32(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1UpF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1UpFillingWithF32(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1DownF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1DownFillingWithF32(fill, a); }
+HWY_INLINE void loadInterleaved2F32(const float* from, OutVectorF32& v0, OutVectorF32& v1) noexcept { ::HighwayReference::loadInterleaved2F32(from, v0, v1); }
+HWY_INLINE void loadInterleaved3F32(const float* from, OutVectorF32& v0, OutVectorF32& v1, OutVectorF32& v2) noexcept { ::HighwayReference::loadInterleaved3F32(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4F32(const float* from, OutVectorF32& v0, OutVectorF32& v1, OutVectorF32& v2, OutVectorF32& v3) noexcept { ::HighwayReference::loadInterleaved4F32(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, float* to) noexcept { ::HighwayReference::storeInterleaved2F32(a, b, to); }
+HWY_INLINE void storeInterleaved3F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c, float* to) noexcept { ::HighwayReference::storeInterleaved3F32(a, b, c, to); }
+HWY_INLINE void storeInterleaved4F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c, cvectorization_ops_raw_vector_f32 d, float* to) noexcept { ::HighwayReference::storeInterleaved4F32(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingBlockF32(float v0, float v1, float v2, float v3) noexcept { return ::HighwayReference::repeatingBlockF32(v0, v1, v2, v3); }
+HWY_INLINE size_t laneCountF64() noexcept { return ::HighwayReference::laneCountF64(); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 zeroF64() noexcept { return ::HighwayReference::zeroF64(); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingF64(double value) noexcept { return ::HighwayReference::repeatingF64(value); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 iotaF64(double value) noexcept { return ::HighwayReference::iotaF64(value); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadF64(const double* from) noexcept { return ::HighwayReference::loadF64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadAlignedF64(const double* from) noexcept { return ::HighwayReference::loadAlignedF64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadFirstF64(const double* from, size_t count) noexcept { return ::HighwayReference::loadFirstF64(from, count); }
+HWY_INLINE void storeF64(cvectorization_ops_raw_vector_f64 a, double* to) noexcept { ::HighwayReference::storeF64(a, to); }
+HWY_INLINE void storeAlignedF64(cvectorization_ops_raw_vector_f64 a, double* to) noexcept { ::HighwayReference::storeAlignedF64(a, to); }
+HWY_INLINE void storeFirstF64(cvectorization_ops_raw_vector_f64 a, double* to, size_t count) noexcept { ::HighwayReference::storeFirstF64(a, to, count); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 addingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::addingF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 subtractingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::subtractingF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 multiplyingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::multiplyingF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 dividingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::dividingF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 minimumF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::minimumF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 maximumF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::maximumF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 negatedF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::negatedF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 magnitudeF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::magnitudeF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 squareRootF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::squareRootF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 multiplyAddingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) noexcept { return ::HighwayReference::multiplyAddingF64(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 equalToF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::equalToF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 notEqualToF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::notEqualToF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 lessThanF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::lessThanF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 greaterThanF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::greaterThanF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 selectingF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::selectingF64(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 selectingOrZeroF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::selectingOrZeroF64(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 zeroingSelectedF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::zeroingSelectedF64(mask, a); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 firstLanesF64(size_t count) noexcept { return ::HighwayReference::firstLanesF64(count); }
+HWY_INLINE bool allTrueF64(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::allTrueF64(mask); }
+HWY_INLINE bool allFalseF64(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::allFalseF64(mask); }
+HWY_INLINE size_t trueCountF64(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::trueCountF64(mask); }
+HWY_INLINE intptr_t firstTrueIndexF64(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::firstTrueIndexF64(mask); }
+HWY_INLINE double sumF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::sumF64(a); }
+HWY_INLINE double smallestF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::smallestF64(a); }
+HWY_INLINE double smallestOrNaNF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::smallestOrNaNF64(a); }
+HWY_INLINE double largestF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::largestF64(a); }
+HWY_INLINE double largestOrNaNF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::largestOrNaNF64(a); }
+HWY_INLINE double firstLaneF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::firstLaneF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 reversedF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::reversedF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slideUpLanesF64(cvectorization_ops_raw_vector_f64 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesF64(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slideUpLanesFillingWithF64(cvectorization_ops_raw_vector_f64 fill, cvectorization_ops_raw_vector_f64 a, size_t lanes) noexcept { return ::HighwayReference::slideUpLanesFillingWithF64(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slideDownLanesF64(cvectorization_ops_raw_vector_f64 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesF64(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slideDownLanesFillingWithF64(cvectorization_ops_raw_vector_f64 fill, cvectorization_ops_raw_vector_f64 a, size_t lanes) noexcept { return ::HighwayReference::slideDownLanesFillingWithF64(fill, a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1UpF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1UpFillingWithF64(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1DownF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1DownFillingWithF64(fill, a); }
+HWY_INLINE void loadInterleaved2F64(const double* from, OutVectorF64& v0, OutVectorF64& v1) noexcept { ::HighwayReference::loadInterleaved2F64(from, v0, v1); }
+HWY_INLINE void loadInterleaved3F64(const double* from, OutVectorF64& v0, OutVectorF64& v1, OutVectorF64& v2) noexcept { ::HighwayReference::loadInterleaved3F64(from, v0, v1, v2); }
+HWY_INLINE void loadInterleaved4F64(const double* from, OutVectorF64& v0, OutVectorF64& v1, OutVectorF64& v2, OutVectorF64& v3) noexcept { ::HighwayReference::loadInterleaved4F64(from, v0, v1, v2, v3); }
+HWY_INLINE void storeInterleaved2F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, double* to) noexcept { ::HighwayReference::storeInterleaved2F64(a, b, to); }
+HWY_INLINE void storeInterleaved3F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c, double* to) noexcept { ::HighwayReference::storeInterleaved3F64(a, b, c, to); }
+HWY_INLINE void storeInterleaved4F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c, cvectorization_ops_raw_vector_f64 d, double* to) noexcept { ::HighwayReference::storeInterleaved4F64(a, b, c, d, to); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadWideningF32ToF64(const float* from) noexcept { return ::HighwayReference::loadWideningF32ToF64(from); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 loadFirstWideningF32ToF64(const float* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningF32ToF64(from, count); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingBlockF64(double v0, double v1) noexcept { return ::HighwayReference::repeatingBlockF64(v0, v1); }
+}  // namespace Nothrow
 
 }  // namespace HighwayReference
 

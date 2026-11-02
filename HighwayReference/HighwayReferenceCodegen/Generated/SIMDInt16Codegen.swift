@@ -5,11 +5,11 @@ public import Vectorization
 
 public enum HighwayReferenceInt16 {
     public typealias Lane = Int16
-    public typealias Vector = HighwayReference.VectorI16
+    public typealias Vector = SIMDInt16.Vector
 
     @export(implementation) @inline(always)
     public static var laneCount: Int {
-        Int(HighwayReference.laneCountI16())
+        Int(HighwayReference.Nothrow.laneCountI16())
     }
 
     @available(SwiftStdlib 5.1, *)
@@ -24,7 +24,9 @@ public enum HighwayReferenceInt16 {
     public static func load(fromUnchecked span: Span<Lane>) -> Vector {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadI16($0.baseAddress.unsafelyUnwrapped)
+            unsafe SIMDInt16.Vector(
+                raw: HighwayReference.Nothrow.loadI16($0.baseAddress.unsafelyUnwrapped)
+            )
         }
     }
 
@@ -52,7 +54,9 @@ public enum HighwayReferenceInt16 {
             "Span does not start at an address aligned to the vector size"
         )
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadAlignedI16($0.baseAddress.unsafelyUnwrapped)
+            unsafe SIMDInt16.Vector(
+                raw: HighwayReference.Nothrow.loadAlignedI16($0.baseAddress.unsafelyUnwrapped)
+            )
         }
     }
 
@@ -60,7 +64,12 @@ public enum HighwayReferenceInt16 {
     @export(implementation) @inline(always)
     public static func loadFirst(from span: Span<Lane>) -> Vector {
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadFirstI16($0.baseAddress, $0.count)
+            unsafe SIMDInt16.Vector(
+                raw: HighwayReference.Nothrow.loadFirstI16(
+                    $0.baseAddress,
+                    HighwayReference.Nothrow.spanCount($0.count, laneCount)
+                )
+            )
         }
     }
 
@@ -76,7 +85,7 @@ public enum HighwayReferenceInt16 {
     public static func store(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeI16(a, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeI16(a.raw, $0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -98,8 +107,8 @@ public enum HighwayReferenceInt16 {
             "OutputSpan has less free capacity than a vector has lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeI16(
-                a,
+            unsafe HighwayReference.Nothrow.storeI16(
+                a.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= laneCount
@@ -130,7 +139,7 @@ public enum HighwayReferenceInt16 {
             "Span does not start at an address aligned to the vector size"
         )
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeAlignedI16(a, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeAlignedI16(a.raw, $0.baseAddress.unsafelyUnwrapped)
         }
     }
 
@@ -166,8 +175,8 @@ public enum HighwayReferenceInt16 {
             "OutputSpan does not continue at an address aligned to the vector size"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeAlignedI16(
-                a,
+            unsafe HighwayReference.Nothrow.storeAlignedI16(
+                a.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= laneCount
@@ -178,7 +187,11 @@ public enum HighwayReferenceInt16 {
     @export(implementation) @inline(always)
     public static func storeFirst(_ a: Vector, to span: inout MutableSpan<Lane>) {
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeFirstI16(a, $0.baseAddress, $0.count)
+            unsafe HighwayReference.Nothrow.storeFirstI16(
+                a.raw,
+                $0.baseAddress,
+                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            )
         }
     }
 
@@ -206,8 +219,8 @@ public enum HighwayReferenceInt16 {
             "OutputSpan has less free capacity than the count"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeFirstI16(
-                a,
+            unsafe HighwayReference.Nothrow.storeFirstI16(
+                a.raw,
                 buffer.baseAddress?.advanced(by: initializedCount),
                 addingCount
             )
@@ -238,7 +251,11 @@ public enum HighwayReferenceInt16 {
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved2I16($0.baseAddress.unsafelyUnwrapped, &v0, &v1)
+            unsafe HighwayReference.Nothrow.loadInterleaved2I16(
+                $0.baseAddress.unsafelyUnwrapped,
+                &v0.raw,
+                &v1.raw
+            )
         }
     }
 
@@ -267,11 +284,11 @@ public enum HighwayReferenceInt16 {
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved3I16(
+            unsafe HighwayReference.Nothrow.loadInterleaved3I16(
                 $0.baseAddress.unsafelyUnwrapped,
-                &v0,
-                &v1,
-                &v2
+                &v0.raw,
+                &v1.raw,
+                &v2.raw
             )
         }
     }
@@ -303,12 +320,12 @@ public enum HighwayReferenceInt16 {
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadInterleaved4I16(
+            unsafe HighwayReference.Nothrow.loadInterleaved4I16(
                 $0.baseAddress.unsafelyUnwrapped,
-                &v0,
-                &v1,
-                &v2,
-                &v3
+                &v0.raw,
+                &v1.raw,
+                &v2.raw,
+                &v3.raw
             )
         }
     }
@@ -333,7 +350,11 @@ public enum HighwayReferenceInt16 {
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved2I16(a, b, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeInterleaved2I16(
+                a.raw,
+                b.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 
@@ -363,9 +384,9 @@ public enum HighwayReferenceInt16 {
             "OutputSpan has less free capacity than 2 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved2I16(
-                a,
-                b,
+            unsafe HighwayReference.Nothrow.storeInterleaved2I16(
+                a.raw,
+                b.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 2 * laneCount
@@ -397,7 +418,12 @@ public enum HighwayReferenceInt16 {
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved3I16(a, b, c, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeInterleaved3I16(
+                a.raw,
+                b.raw,
+                c.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 
@@ -429,10 +455,10 @@ public enum HighwayReferenceInt16 {
             "OutputSpan has less free capacity than 3 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved3I16(
-                a,
-                b,
-                c,
+            unsafe HighwayReference.Nothrow.storeInterleaved3I16(
+                a.raw,
+                b.raw,
+                c.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 3 * laneCount
@@ -466,11 +492,11 @@ public enum HighwayReferenceInt16 {
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.storeInterleaved4I16(
-                a,
-                b,
-                c,
-                d,
+            unsafe HighwayReference.Nothrow.storeInterleaved4I16(
+                a.raw,
+                b.raw,
+                c.raw,
+                d.raw,
                 $0.baseAddress.unsafelyUnwrapped
             )
         }
@@ -506,11 +532,11 @@ public enum HighwayReferenceInt16 {
             "OutputSpan has less free capacity than 4 vectors have lanes"
         )
         unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe HighwayReference.storeInterleaved4I16(
-                a,
-                b,
-                c,
-                d,
+            unsafe HighwayReference.Nothrow.storeInterleaved4I16(
+                a.raw,
+                b.raw,
+                c.raw,
+                d.raw,
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 4 * laneCount
@@ -529,7 +555,9 @@ public enum HighwayReferenceInt16 {
     public static func loadWidening(fromUnchecked span: Span<Int8>) -> Vector {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadWideningI8ToI16($0.baseAddress.unsafelyUnwrapped)
+            unsafe SIMDInt16.Vector(
+                raw: HighwayReference.Nothrow.loadWideningI8ToI16($0.baseAddress.unsafelyUnwrapped)
+            )
         }
     }
 
@@ -537,7 +565,12 @@ public enum HighwayReferenceInt16 {
     @export(implementation) @inline(always)
     public static func loadFirstWidening(from span: Span<Int8>) -> Vector {
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.loadFirstWideningI8ToI16($0.baseAddress, $0.count)
+            unsafe SIMDInt16.Vector(
+                raw: HighwayReference.Nothrow.loadFirstWideningI8ToI16(
+                    $0.baseAddress,
+                    HighwayReference.Nothrow.spanCount($0.count, laneCount)
+                )
+            )
         }
     }
 
@@ -549,8 +582,8 @@ public func portZeroI16() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayZeroI16() -> HighwayReference.VectorI16 {
-    HighwayReference.zeroI16()
+public func highwayZeroI16() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.zeroI16())
 }
 
 @inline(never)
@@ -559,8 +592,8 @@ public func portRepeatingI16(_ value: SIMDInt16.Lane) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayRepeatingI16(_ value: Int16) -> HighwayReference.VectorI16 {
-    HighwayReference.repeatingI16(value)
+public func highwayRepeatingI16(_ value: Int16) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(value))
 }
 
 @inline(never)
@@ -569,8 +602,8 @@ public func portRepeatingI16ConstantValue() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayRepeatingI16ConstantValue() -> HighwayReference.VectorI16 {
-    HighwayReference.repeatingI16(26)
+public func highwayRepeatingI16ConstantValue() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26))
 }
 
 @inline(never)
@@ -579,8 +612,8 @@ public func portIotaI16(_ value: SIMDInt16.Lane) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayIotaI16(_ value: Int16) -> HighwayReference.VectorI16 {
-    HighwayReference.iotaI16(value)
+public func highwayIotaI16(_ value: Int16) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.iotaI16(value))
 }
 
 @inline(never)
@@ -589,8 +622,8 @@ public func portIotaI16ConstantValue() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayIotaI16ConstantValue() -> HighwayReference.VectorI16 {
-    HighwayReference.iotaI16(26)
+public func highwayIotaI16ConstantValue() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.iotaI16(26))
 }
 
 @inline(never)
@@ -599,8 +632,8 @@ public func portLoadI16(from: UnsafePointer<SIMDInt16.Lane>) -> SIMDInt16.Vector
 }
 
 @inline(never)
-public func highwayLoadI16(from: UnsafePointer<Int16>) -> HighwayReference.VectorI16 {
-    unsafe HighwayReference.loadI16(from)
+public func highwayLoadI16(from: UnsafePointer<Int16>) -> SIMDInt16.Vector {
+    unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.loadI16(from))
 }
 
 @inline(never)
@@ -609,8 +642,8 @@ public func portLoadAlignedI16(from: UnsafePointer<SIMDInt16.Lane>) -> SIMDInt16
 }
 
 @inline(never)
-public func highwayLoadAlignedI16(from: UnsafePointer<Int16>) -> HighwayReference.VectorI16 {
-    unsafe HighwayReference.loadAlignedI16(from)
+public func highwayLoadAlignedI16(from: UnsafePointer<Int16>) -> SIMDInt16.Vector {
+    unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.loadAlignedI16(from))
 }
 
 @inline(never)
@@ -619,11 +652,8 @@ public func portLoadFirstI16(from: UnsafePointer<SIMDInt16.Lane>, count: Int) ->
 }
 
 @inline(never)
-public func highwayLoadFirstI16(
-    from: UnsafePointer<Int16>,
-    count: Int
-) -> HighwayReference.VectorI16 {
-    unsafe HighwayReference.loadFirstI16(from, count)
+public func highwayLoadFirstI16(from: UnsafePointer<Int16>, count: Int) -> SIMDInt16.Vector {
+    unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.loadFirstI16(from, count))
 }
 
 @inline(never)
@@ -632,10 +662,8 @@ public func portLoadFirstI16ConstantCount(from: UnsafePointer<SIMDInt16.Lane>) -
 }
 
 @inline(never)
-public func highwayLoadFirstI16ConstantCount(
-    from: UnsafePointer<Int16>
-) -> HighwayReference.VectorI16 {
-    unsafe HighwayReference.loadFirstI16(from, 1)
+public func highwayLoadFirstI16ConstantCount(from: UnsafePointer<Int16>) -> SIMDInt16.Vector {
+    unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.loadFirstI16(from, 1))
 }
 
 @inline(never)
@@ -644,8 +672,8 @@ public func portStoreI16(_ a: SIMDInt16.Vector, to: UnsafeMutablePointer<SIMDInt
 }
 
 @inline(never)
-public func highwayStoreI16(_ a: HighwayReference.VectorI16, to: UnsafeMutablePointer<Int16>) {
-    unsafe HighwayReference.storeI16(a, to)
+public func highwayStoreI16(_ a: SIMDInt16.Vector, to: UnsafeMutablePointer<Int16>) {
+    unsafe HighwayReference.Nothrow.storeI16(a.raw, to)
 }
 
 @inline(never)
@@ -655,7 +683,10 @@ public func portStoreI16ConstantA(to: UnsafeMutablePointer<SIMDInt16.Lane>) {
 
 @inline(never)
 public func highwayStoreI16ConstantA(to: UnsafeMutablePointer<Int16>) {
-    unsafe HighwayReference.storeI16(HighwayReference.repeatingI16(26), to)
+    unsafe HighwayReference.Nothrow.storeI16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -664,9 +695,8 @@ public func portStoreAlignedI16(_ a: SIMDInt16.Vector, to: UnsafeMutablePointer<
 }
 
 @inline(never)
-public func highwayStoreAlignedI16(_ a: HighwayReference.VectorI16, to: UnsafeMutablePointer<Int16>)
-{
-    unsafe HighwayReference.storeAlignedI16(a, to)
+public func highwayStoreAlignedI16(_ a: SIMDInt16.Vector, to: UnsafeMutablePointer<Int16>) {
+    unsafe HighwayReference.Nothrow.storeAlignedI16(a.raw, to)
 }
 
 @inline(never)
@@ -676,7 +706,10 @@ public func portStoreAlignedI16ConstantA(to: UnsafeMutablePointer<SIMDInt16.Lane
 
 @inline(never)
 public func highwayStoreAlignedI16ConstantA(to: UnsafeMutablePointer<Int16>) {
-    unsafe HighwayReference.storeAlignedI16(HighwayReference.repeatingI16(26), to)
+    unsafe HighwayReference.Nothrow.storeAlignedI16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -689,12 +722,9 @@ public func portStoreFirstI16(
 }
 
 @inline(never)
-public func highwayStoreFirstI16(
-    _ a: HighwayReference.VectorI16,
-    to: UnsafeMutablePointer<Int16>,
-    count: Int
-) {
-    unsafe HighwayReference.storeFirstI16(a, to, count)
+public func highwayStoreFirstI16(_ a: SIMDInt16.Vector, to: UnsafeMutablePointer<Int16>, count: Int)
+{
+    unsafe HighwayReference.Nothrow.storeFirstI16(a.raw, to, count)
 }
 
 @inline(never)
@@ -704,7 +734,11 @@ public func portStoreFirstI16ConstantA(to: UnsafeMutablePointer<SIMDInt16.Lane>,
 
 @inline(never)
 public func highwayStoreFirstI16ConstantA(to: UnsafeMutablePointer<Int16>, count: Int) {
-    unsafe HighwayReference.storeFirstI16(HighwayReference.repeatingI16(26), to, count)
+    unsafe HighwayReference.Nothrow.storeFirstI16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        to,
+        count
+    )
 }
 
 @inline(never)
@@ -717,10 +751,10 @@ public func portStoreFirstI16ConstantCount(
 
 @inline(never)
 public func highwayStoreFirstI16ConstantCount(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeFirstI16(a, to, 1)
+    unsafe HighwayReference.Nothrow.storeFirstI16(a.raw, to, 1)
 }
 
 @inline(never)
@@ -729,11 +763,8 @@ public func portAddingI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDI
 }
 
 @inline(never)
-public func highwayAddingI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.addingI16(a, b)
+public func highwayAddingI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.addingI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -742,9 +773,13 @@ public func portAddingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayAddingI16ConstantA(_ b: HighwayReference.VectorI16) -> HighwayReference.VectorI16
-{
-    HighwayReference.addingI16(HighwayReference.repeatingI16(26), b)
+public func highwayAddingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.addingI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -753,9 +788,13 @@ public func portAddingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayAddingI16ConstantB(_ a: HighwayReference.VectorI16) -> HighwayReference.VectorI16
-{
-    HighwayReference.addingI16(a, HighwayReference.repeatingI16(26))
+public func highwayAddingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.addingI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -764,11 +803,9 @@ public func portSubtractingI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> 
 }
 
 @inline(never)
-public func highwaySubtractingI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.subtractingI16(a, b)
+public func highwaySubtractingI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Vector
+{
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.subtractingI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -777,10 +814,13 @@ public func portSubtractingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vect
 }
 
 @inline(never)
-public func highwaySubtractingI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.subtractingI16(HighwayReference.repeatingI16(26), b)
+public func highwaySubtractingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.subtractingI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -789,10 +829,13 @@ public func portSubtractingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vect
 }
 
 @inline(never)
-public func highwaySubtractingI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.subtractingI16(a, HighwayReference.repeatingI16(26))
+public func highwaySubtractingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.subtractingI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -801,11 +844,9 @@ public func portMultiplyingI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> 
 }
 
 @inline(never)
-public func highwayMultiplyingI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.multiplyingI16(a, b)
+public func highwayMultiplyingI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Vector
+{
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.multiplyingI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -814,10 +855,13 @@ public func portMultiplyingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vect
 }
 
 @inline(never)
-public func highwayMultiplyingI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.multiplyingI16(HighwayReference.repeatingI16(26), b)
+public func highwayMultiplyingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.multiplyingI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -826,10 +870,13 @@ public func portMultiplyingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vect
 }
 
 @inline(never)
-public func highwayMultiplyingI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.multiplyingI16(a, HighwayReference.repeatingI16(26))
+public func highwayMultiplyingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.multiplyingI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -838,11 +885,8 @@ public func portMinimumI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMD
 }
 
 @inline(never)
-public func highwayMinimumI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.minimumI16(a, b)
+public func highwayMinimumI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.minimumI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -851,10 +895,13 @@ public func portMinimumI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayMinimumI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.minimumI16(HighwayReference.repeatingI16(26), b)
+public func highwayMinimumI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.minimumI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -863,10 +910,13 @@ public func portMinimumI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayMinimumI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.minimumI16(a, HighwayReference.repeatingI16(26))
+public func highwayMinimumI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.minimumI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -875,11 +925,8 @@ public func portMaximumI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMD
 }
 
 @inline(never)
-public func highwayMaximumI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.maximumI16(a, b)
+public func highwayMaximumI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.maximumI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -888,10 +935,13 @@ public func portMaximumI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayMaximumI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.maximumI16(HighwayReference.repeatingI16(26), b)
+public func highwayMaximumI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.maximumI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -900,10 +950,13 @@ public func portMaximumI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayMaximumI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.maximumI16(a, HighwayReference.repeatingI16(26))
+public func highwayMaximumI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.maximumI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -912,8 +965,8 @@ public func portNegatedI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayNegatedI16(_ a: HighwayReference.VectorI16) -> HighwayReference.VectorI16 {
-    HighwayReference.negatedI16(a)
+public func highwayNegatedI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.negatedI16(a.raw))
 }
 
 @inline(never)
@@ -922,8 +975,12 @@ public func portNegatedI16ConstantA() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayNegatedI16ConstantA() -> HighwayReference.VectorI16 {
-    HighwayReference.negatedI16(HighwayReference.repeatingI16(26))
+public func highwayNegatedI16ConstantA() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.negatedI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -932,8 +989,8 @@ public func portMagnitudeI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayMagnitudeI16(_ a: HighwayReference.VectorI16) -> HighwayReference.VectorI16 {
-    HighwayReference.magnitudeI16(a)
+public func highwayMagnitudeI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.magnitudeI16(a.raw))
 }
 
 @inline(never)
@@ -942,8 +999,12 @@ public func portMagnitudeI16ConstantA() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayMagnitudeI16ConstantA() -> HighwayReference.VectorI16 {
-    HighwayReference.magnitudeI16(HighwayReference.repeatingI16(26))
+public func highwayMagnitudeI16ConstantA() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.magnitudeI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -956,10 +1017,10 @@ public func portSaturatingAddingI16(
 
 @inline(never)
 public func highwaySaturatingAddingI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.saturatingAddingI16(a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.saturatingAddingI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -968,10 +1029,13 @@ public func portSaturatingAddingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16
 }
 
 @inline(never)
-public func highwaySaturatingAddingI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.saturatingAddingI16(HighwayReference.repeatingI16(26), b)
+public func highwaySaturatingAddingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.saturatingAddingI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -980,10 +1044,13 @@ public func portSaturatingAddingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16
 }
 
 @inline(never)
-public func highwaySaturatingAddingI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.saturatingAddingI16(a, HighwayReference.repeatingI16(26))
+public func highwaySaturatingAddingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.saturatingAddingI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -996,10 +1063,10 @@ public func portSaturatingSubtractingI16(
 
 @inline(never)
 public func highwaySaturatingSubtractingI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.saturatingSubtractingI16(a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.saturatingSubtractingI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1008,10 +1075,13 @@ public func portSaturatingSubtractingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMD
 }
 
 @inline(never)
-public func highwaySaturatingSubtractingI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.saturatingSubtractingI16(HighwayReference.repeatingI16(26), b)
+public func highwaySaturatingSubtractingI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.saturatingSubtractingI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1020,10 +1090,13 @@ public func portSaturatingSubtractingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMD
 }
 
 @inline(never)
-public func highwaySaturatingSubtractingI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.saturatingSubtractingI16(a, HighwayReference.repeatingI16(26))
+public func highwaySaturatingSubtractingI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.saturatingSubtractingI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1032,11 +1105,8 @@ public func portBitwiseAndI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> S
 }
 
 @inline(never)
-public func highwayBitwiseAndI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndI16(a, b)
+public func highwayBitwiseAndI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseAndI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1045,10 +1115,13 @@ public func portBitwiseAndI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vecto
 }
 
 @inline(never)
-public func highwayBitwiseAndI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndI16(HighwayReference.repeatingI16(26), b)
+public func highwayBitwiseAndI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1057,10 +1130,13 @@ public func portBitwiseAndI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vecto
 }
 
 @inline(never)
-public func highwayBitwiseAndI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndI16(a, HighwayReference.repeatingI16(26))
+public func highwayBitwiseAndI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1069,11 +1145,8 @@ public func portBitwiseOrI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SI
 }
 
 @inline(never)
-public func highwayBitwiseOrI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrI16(a, b)
+public func highwayBitwiseOrI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseOrI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1082,10 +1155,13 @@ public func portBitwiseOrI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector
 }
 
 @inline(never)
-public func highwayBitwiseOrI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrI16(HighwayReference.repeatingI16(26), b)
+public func highwayBitwiseOrI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1094,10 +1170,13 @@ public func portBitwiseOrI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector
 }
 
 @inline(never)
-public func highwayBitwiseOrI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrI16(a, HighwayReference.repeatingI16(26))
+public func highwayBitwiseOrI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1106,11 +1185,8 @@ public func portBitwiseXorI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> S
 }
 
 @inline(never)
-public func highwayBitwiseXorI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorI16(a, b)
+public func highwayBitwiseXorI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseXorI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1119,10 +1195,13 @@ public func portBitwiseXorI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vecto
 }
 
 @inline(never)
-public func highwayBitwiseXorI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorI16(HighwayReference.repeatingI16(26), b)
+public func highwayBitwiseXorI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1131,10 +1210,13 @@ public func portBitwiseXorI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vecto
 }
 
 @inline(never)
-public func highwayBitwiseXorI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorI16(a, HighwayReference.repeatingI16(26))
+public func highwayBitwiseXorI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1143,8 +1225,8 @@ public func portBitwiseNotI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseNotI16(_ a: HighwayReference.VectorI16) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseNotI16(a)
+public func highwayBitwiseNotI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseNotI16(a.raw))
 }
 
 @inline(never)
@@ -1153,8 +1235,12 @@ public func portBitwiseNotI16ConstantA() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayBitwiseNotI16ConstantA() -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseNotI16(HighwayReference.repeatingI16(26))
+public func highwayBitwiseNotI16ConstantA() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseNotI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1164,10 +1250,10 @@ public func portBitwiseAndNotI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -
 
 @inline(never)
 public func highwayBitwiseAndNotI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndNotI16(a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseAndNotI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1176,10 +1262,13 @@ public func portBitwiseAndNotI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Ve
 }
 
 @inline(never)
-public func highwayBitwiseAndNotI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndNotI16(HighwayReference.repeatingI16(26), b)
+public func highwayBitwiseAndNotI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndNotI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1188,10 +1277,13 @@ public func portBitwiseAndNotI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Ve
 }
 
 @inline(never)
-public func highwayBitwiseAndNotI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndNotI16(a, HighwayReference.repeatingI16(26))
+public func highwayBitwiseAndNotI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndNotI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1205,11 +1297,11 @@ public func portBitwiseAndXorI16(
 
 @inline(never)
 public func highwayBitwiseAndXorI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndXorI16(a, b, c)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseAndXorI16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
@@ -1222,10 +1314,16 @@ public func portBitwiseAndXorI16ConstantA(
 
 @inline(never)
 public func highwayBitwiseAndXorI16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndXorI16(HighwayReference.repeatingI16(26), b, c)
+    _ b: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndXorI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1238,10 +1336,16 @@ public func portBitwiseAndXorI16ConstantB(
 
 @inline(never)
 public func highwayBitwiseAndXorI16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndXorI16(a, HighwayReference.repeatingI16(26), c)
+    _ a: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndXorI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1254,10 +1358,16 @@ public func portBitwiseAndXorI16ConstantC(
 
 @inline(never)
 public func highwayBitwiseAndXorI16ConstantC(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndXorI16(a, b, HighwayReference.repeatingI16(26))
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndXorI16(
+            a.raw,
+            b.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1266,11 +1376,8 @@ public func portShiftedLeftI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt
 }
 
 @inline(never)
-public func highwayShiftedLeftI16(
-    _ a: HighwayReference.VectorI16,
-    by bits: Int32
-) -> HighwayReference.VectorI16 {
-    HighwayReference.shiftedLeftI16(a, bits)
+public func highwayShiftedLeftI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedLeftI16(a.raw, bits))
 }
 
 @inline(never)
@@ -1279,8 +1386,13 @@ public func portShiftedLeftI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayShiftedLeftI16ConstantA(by bits: Int32) -> HighwayReference.VectorI16 {
-    HighwayReference.shiftedLeftI16(HighwayReference.repeatingI16(26), bits)
+public func highwayShiftedLeftI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.shiftedLeftI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            bits
+        )
+    )
 }
 
 @inline(never)
@@ -1289,10 +1401,8 @@ public func portShiftedLeftI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.V
 }
 
 @inline(never)
-public func highwayShiftedLeftI16ConstantBits(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.shiftedLeftI16(a, 3)
+public func highwayShiftedLeftI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedLeftI16(a.raw, 3))
 }
 
 @inline(never)
@@ -1301,11 +1411,8 @@ public func portShiftedRightI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDIn
 }
 
 @inline(never)
-public func highwayShiftedRightI16(
-    _ a: HighwayReference.VectorI16,
-    by bits: Int32
-) -> HighwayReference.VectorI16 {
-    HighwayReference.shiftedRightI16(a, bits)
+public func highwayShiftedRightI16(_ a: SIMDInt16.Vector, by bits: Int32) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedRightI16(a.raw, bits))
 }
 
 @inline(never)
@@ -1314,8 +1421,13 @@ public func portShiftedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayShiftedRightI16ConstantA(by bits: Int32) -> HighwayReference.VectorI16 {
-    HighwayReference.shiftedRightI16(HighwayReference.repeatingI16(26), bits)
+public func highwayShiftedRightI16ConstantA(by bits: Int32) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.shiftedRightI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            bits
+        )
+    )
 }
 
 @inline(never)
@@ -1324,10 +1436,8 @@ public func portShiftedRightI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.
 }
 
 @inline(never)
-public func highwayShiftedRightI16ConstantBits(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.shiftedRightI16(a, 3)
+public func highwayShiftedRightI16ConstantBits(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.shiftedRightI16(a.raw, 3))
 }
 
 @inline(never)
@@ -1336,11 +1446,8 @@ public func portEqualToI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMD
 }
 
 @inline(never)
-public func highwayEqualToI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.MaskI16 {
-    HighwayReference.equalToI16(a, b)
+public func highwayEqualToI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(raw: HighwayReference.Nothrow.equalToI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1349,9 +1456,13 @@ public func portEqualToI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
 }
 
 @inline(never)
-public func highwayEqualToI16ConstantA(_ b: HighwayReference.VectorI16) -> HighwayReference.MaskI16
-{
-    HighwayReference.equalToI16(HighwayReference.repeatingI16(26), b)
+public func highwayEqualToI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(
+        raw: HighwayReference.Nothrow.equalToI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1360,9 +1471,13 @@ public func portEqualToI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Mask {
 }
 
 @inline(never)
-public func highwayEqualToI16ConstantB(_ a: HighwayReference.VectorI16) -> HighwayReference.MaskI16
-{
-    HighwayReference.equalToI16(a, HighwayReference.repeatingI16(26))
+public func highwayEqualToI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(
+        raw: HighwayReference.Nothrow.equalToI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1371,11 +1486,8 @@ public func portNotEqualToI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> S
 }
 
 @inline(never)
-public func highwayNotEqualToI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.MaskI16 {
-    HighwayReference.notEqualToI16(a, b)
+public func highwayNotEqualToI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(raw: HighwayReference.Nothrow.notEqualToI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1384,10 +1496,13 @@ public func portNotEqualToI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Mask 
 }
 
 @inline(never)
-public func highwayNotEqualToI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.MaskI16 {
-    HighwayReference.notEqualToI16(HighwayReference.repeatingI16(26), b)
+public func highwayNotEqualToI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(
+        raw: HighwayReference.Nothrow.notEqualToI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1396,10 +1511,13 @@ public func portNotEqualToI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Mask 
 }
 
 @inline(never)
-public func highwayNotEqualToI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.MaskI16 {
-    HighwayReference.notEqualToI16(a, HighwayReference.repeatingI16(26))
+public func highwayNotEqualToI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(
+        raw: HighwayReference.Nothrow.notEqualToI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1408,11 +1526,8 @@ public func portLessThanI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIM
 }
 
 @inline(never)
-public func highwayLessThanI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.MaskI16 {
-    HighwayReference.lessThanI16(a, b)
+public func highwayLessThanI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(raw: HighwayReference.Nothrow.lessThanI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1421,9 +1536,13 @@ public func portLessThanI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
 }
 
 @inline(never)
-public func highwayLessThanI16ConstantA(_ b: HighwayReference.VectorI16) -> HighwayReference.MaskI16
-{
-    HighwayReference.lessThanI16(HighwayReference.repeatingI16(26), b)
+public func highwayLessThanI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(
+        raw: HighwayReference.Nothrow.lessThanI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1432,9 +1551,13 @@ public func portLessThanI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Mask {
 }
 
 @inline(never)
-public func highwayLessThanI16ConstantB(_ a: HighwayReference.VectorI16) -> HighwayReference.MaskI16
-{
-    HighwayReference.lessThanI16(a, HighwayReference.repeatingI16(26))
+public func highwayLessThanI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(
+        raw: HighwayReference.Nothrow.lessThanI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1443,11 +1566,8 @@ public func portGreaterThanI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> 
 }
 
 @inline(never)
-public func highwayGreaterThanI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.MaskI16 {
-    HighwayReference.greaterThanI16(a, b)
+public func highwayGreaterThanI16(_ a: SIMDInt16.Vector, _ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(raw: HighwayReference.Nothrow.greaterThanI16(a.raw, b.raw))
 }
 
 @inline(never)
@@ -1456,10 +1576,13 @@ public func portGreaterThanI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Mask
 }
 
 @inline(never)
-public func highwayGreaterThanI16ConstantA(
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.MaskI16 {
-    HighwayReference.greaterThanI16(HighwayReference.repeatingI16(26), b)
+public func highwayGreaterThanI16ConstantA(_ b: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(
+        raw: HighwayReference.Nothrow.greaterThanI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1468,10 +1591,13 @@ public func portGreaterThanI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Mask
 }
 
 @inline(never)
-public func highwayGreaterThanI16ConstantB(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.MaskI16 {
-    HighwayReference.greaterThanI16(a, HighwayReference.repeatingI16(26))
+public func highwayGreaterThanI16ConstantB(_ a: SIMDInt16.Vector) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(
+        raw: HighwayReference.Nothrow.greaterThanI16(
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1485,11 +1611,11 @@ public func portSelectingI16(
 
 @inline(never)
 public func highwaySelectingI16(
-    _ mask: HighwayReference.MaskI16,
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.selectingI16(mask, a, b)
+    _ mask: SIMDInt16.Mask,
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.selectingI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -1502,10 +1628,16 @@ public func portSelectingI16ConstantA(
 
 @inline(never)
 public func highwaySelectingI16ConstantA(
-    _ mask: HighwayReference.MaskI16,
-    _ b: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.selectingI16(mask, HighwayReference.repeatingI16(26), b)
+    _ mask: SIMDInt16.Mask,
+    _ b: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.selectingI16(
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1518,10 +1650,16 @@ public func portSelectingI16ConstantB(
 
 @inline(never)
 public func highwaySelectingI16ConstantB(
-    _ mask: HighwayReference.MaskI16,
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.selectingI16(mask, a, HighwayReference.repeatingI16(26))
+    _ mask: SIMDInt16.Mask,
+    _ a: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.selectingI16(
+            mask.raw,
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1534,10 +1672,10 @@ public func portSelectingOrZeroI16(
 
 @inline(never)
 public func highwaySelectingOrZeroI16(
-    _ mask: HighwayReference.MaskI16,
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.selectingOrZeroI16(mask, a)
+    _ mask: SIMDInt16.Mask,
+    _ a: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.selectingOrZeroI16(mask.raw, a.raw))
 }
 
 @inline(never)
@@ -1546,10 +1684,13 @@ public func portSelectingOrZeroI16ConstantA(_ mask: SIMDInt16.Mask) -> SIMDInt16
 }
 
 @inline(never)
-public func highwaySelectingOrZeroI16ConstantA(
-    _ mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.selectingOrZeroI16(mask, HighwayReference.repeatingI16(26))
+public func highwaySelectingOrZeroI16ConstantA(_ mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.selectingOrZeroI16(
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1562,10 +1703,10 @@ public func portZeroingSelectedI16(
 
 @inline(never)
 public func highwayZeroingSelectedI16(
-    _ mask: HighwayReference.MaskI16,
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.zeroingSelectedI16(mask, a)
+    _ mask: SIMDInt16.Mask,
+    _ a: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.zeroingSelectedI16(mask.raw, a.raw))
 }
 
 @inline(never)
@@ -1574,10 +1715,13 @@ public func portZeroingSelectedI16ConstantA(_ mask: SIMDInt16.Mask) -> SIMDInt16
 }
 
 @inline(never)
-public func highwayZeroingSelectedI16ConstantA(
-    _ mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.zeroingSelectedI16(mask, HighwayReference.repeatingI16(26))
+public func highwayZeroingSelectedI16ConstantA(_ mask: SIMDInt16.Mask) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.zeroingSelectedI16(
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1591,11 +1735,11 @@ public func portBitwiseAndWhereI16(
 
 @inline(never)
 public func highwayBitwiseAndWhereI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndWhereI16(mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseAndWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -1608,10 +1752,16 @@ public func portBitwiseAndWhereI16ConstantA(
 
 @inline(never)
 public func highwayBitwiseAndWhereI16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndWhereI16(mask, HighwayReference.repeatingI16(26), b)
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereI16(
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1624,10 +1774,16 @@ public func portBitwiseAndWhereI16ConstantB(
 
 @inline(never)
 public func highwayBitwiseAndWhereI16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndWhereI16(mask, a, HighwayReference.repeatingI16(26))
+    _ a: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereI16(
+            mask.raw,
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1641,11 +1797,11 @@ public func portBitwiseOrWhereI16(
 
 @inline(never)
 public func highwayBitwiseOrWhereI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrWhereI16(mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseOrWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -1658,10 +1814,16 @@ public func portBitwiseOrWhereI16ConstantA(
 
 @inline(never)
 public func highwayBitwiseOrWhereI16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrWhereI16(mask, HighwayReference.repeatingI16(26), b)
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereI16(
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1674,10 +1836,16 @@ public func portBitwiseOrWhereI16ConstantB(
 
 @inline(never)
 public func highwayBitwiseOrWhereI16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrWhereI16(mask, a, HighwayReference.repeatingI16(26))
+    _ a: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereI16(
+            mask.raw,
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1691,11 +1859,11 @@ public func portBitwiseXorWhereI16(
 
 @inline(never)
 public func highwayBitwiseXorWhereI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorWhereI16(mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.bitwiseXorWhereI16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
@@ -1708,10 +1876,16 @@ public func portBitwiseXorWhereI16ConstantA(
 
 @inline(never)
 public func highwayBitwiseXorWhereI16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorWhereI16(mask, HighwayReference.repeatingI16(26), b)
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereI16(
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1724,10 +1898,16 @@ public func portBitwiseXorWhereI16ConstantB(
 
 @inline(never)
 public func highwayBitwiseXorWhereI16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorWhereI16(mask, a, HighwayReference.repeatingI16(26))
+    _ a: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereI16(
+            mask.raw,
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -1742,12 +1922,19 @@ public func portBitwiseAndWhereOtherwiseI16(
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndWhereOtherwiseI16(otherwise, mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1761,15 +1948,17 @@ public func portBitwiseAndWhereOtherwiseI16ConstantA(
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndWhereOtherwiseI16(
-        otherwise,
-        mask,
-        HighwayReference.repeatingI16(26),
-        b
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
     )
 }
 
@@ -1784,15 +1973,17 @@ public func portBitwiseAndWhereOtherwiseI16ConstantB(
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndWhereOtherwiseI16(
-        otherwise,
-        mask,
-        a,
-        HighwayReference.repeatingI16(26)
+    _ a: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
     )
 }
 
@@ -1807,11 +1998,18 @@ public func portBitwiseAndWhereOtherwiseI16ConstantOtherwise(
 
 @inline(never)
 public func highwayBitwiseAndWhereOtherwiseI16ConstantOtherwise(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseAndWhereOtherwiseI16(HighwayReference.repeatingI16(26), mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseAndWhereOtherwiseI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1826,12 +2024,19 @@ public func portBitwiseOrWhereOtherwiseI16(
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrWhereOtherwiseI16(otherwise, mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1845,15 +2050,17 @@ public func portBitwiseOrWhereOtherwiseI16ConstantA(
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrWhereOtherwiseI16(
-        otherwise,
-        mask,
-        HighwayReference.repeatingI16(26),
-        b
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
     )
 }
 
@@ -1868,15 +2075,17 @@ public func portBitwiseOrWhereOtherwiseI16ConstantB(
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrWhereOtherwiseI16(
-        otherwise,
-        mask,
-        a,
-        HighwayReference.repeatingI16(26)
+    _ a: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
     )
 }
 
@@ -1891,11 +2100,18 @@ public func portBitwiseOrWhereOtherwiseI16ConstantOtherwise(
 
 @inline(never)
 public func highwayBitwiseOrWhereOtherwiseI16ConstantOtherwise(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseOrWhereOtherwiseI16(HighwayReference.repeatingI16(26), mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseOrWhereOtherwiseI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1910,12 +2126,19 @@ public func portBitwiseXorWhereOtherwiseI16(
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorWhereOtherwiseI16(otherwise, mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1929,15 +2152,17 @@ public func portBitwiseXorWhereOtherwiseI16ConstantA(
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorWhereOtherwiseI16(
-        otherwise,
-        mask,
-        HighwayReference.repeatingI16(26),
-        b
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            b.raw
+        )
     )
 }
 
@@ -1952,15 +2177,17 @@ public func portBitwiseXorWhereOtherwiseI16ConstantB(
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16,
-    otherwise: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorWhereOtherwiseI16(
-        otherwise,
-        mask,
-        a,
-        HighwayReference.repeatingI16(26)
+    _ a: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask,
+    otherwise: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
     )
 }
 
@@ -1975,11 +2202,18 @@ public func portBitwiseXorWhereOtherwiseI16ConstantOtherwise(
 
 @inline(never)
 public func highwayBitwiseXorWhereOtherwiseI16ConstantOtherwise(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    where mask: HighwayReference.MaskI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.bitwiseXorWhereOtherwiseI16(HighwayReference.repeatingI16(26), mask, a, b)
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    where mask: SIMDInt16.Mask
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.bitwiseXorWhereOtherwiseI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
@@ -1988,8 +2222,8 @@ public func portFirstLanesI16(count: Int) -> SIMDInt16.Mask {
 }
 
 @inline(never)
-public func highwayFirstLanesI16(count: Int) -> HighwayReference.MaskI16 {
-    HighwayReference.firstLanesI16(count)
+public func highwayFirstLanesI16(count: Int) -> SIMDInt16.Mask {
+    SIMDInt16.Mask(raw: HighwayReference.Nothrow.firstLanesI16(count))
 }
 
 @inline(never)
@@ -1998,8 +2232,8 @@ public func portFirstLanesI16ConstantCount() -> SIMDInt16.Mask {
 }
 
 @inline(never)
-public func highwayFirstLanesI16ConstantCount() -> HighwayReference.MaskI16 {
-    HighwayReference.firstLanesI16(1)
+public func highwayFirstLanesI16ConstantCount() -> SIMDInt16.Mask {
+    SIMDInt16.Mask(raw: HighwayReference.Nothrow.firstLanesI16(1))
 }
 
 @inline(never)
@@ -2008,8 +2242,8 @@ public func portAllTrueI16(_ mask: SIMDInt16.Mask) -> Bool {
 }
 
 @inline(never)
-public func highwayAllTrueI16(_ mask: HighwayReference.MaskI16) -> Bool {
-    HighwayReference.allTrueI16(mask)
+public func highwayAllTrueI16(_ mask: SIMDInt16.Mask) -> Bool {
+    HighwayReference.Nothrow.allTrueI16(mask.raw)
 }
 
 @inline(never)
@@ -2018,8 +2252,8 @@ public func portAllFalseI16(_ mask: SIMDInt16.Mask) -> Bool {
 }
 
 @inline(never)
-public func highwayAllFalseI16(_ mask: HighwayReference.MaskI16) -> Bool {
-    HighwayReference.allFalseI16(mask)
+public func highwayAllFalseI16(_ mask: SIMDInt16.Mask) -> Bool {
+    HighwayReference.Nothrow.allFalseI16(mask.raw)
 }
 
 @inline(never)
@@ -2028,8 +2262,8 @@ public func portTrueCountI16(_ mask: SIMDInt16.Mask) -> Int {
 }
 
 @inline(never)
-public func highwayTrueCountI16(_ mask: HighwayReference.MaskI16) -> Int {
-    HighwayReference.trueCountI16(mask)
+public func highwayTrueCountI16(_ mask: SIMDInt16.Mask) -> Int {
+    HighwayReference.Nothrow.trueCountI16(mask.raw)
 }
 
 @inline(never)
@@ -2038,8 +2272,8 @@ public func portFirstTrueIndexI16(_ mask: SIMDInt16.Mask) -> Int {
 }
 
 @inline(never)
-public func highwayFirstTrueIndexI16(_ mask: HighwayReference.MaskI16) -> Int {
-    HighwayReference.firstTrueIndexI16(mask)
+public func highwayFirstTrueIndexI16(_ mask: SIMDInt16.Mask) -> Int {
+    HighwayReference.Nothrow.firstTrueIndexI16(mask.raw)
 }
 
 @inline(never)
@@ -2048,8 +2282,8 @@ public func portSumI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Lane {
 }
 
 @inline(never)
-public func highwaySumI16(_ a: HighwayReference.VectorI16) -> Int16 {
-    HighwayReference.sumI16(a)
+public func highwaySumI16(_ a: SIMDInt16.Vector) -> Int16 {
+    HighwayReference.Nothrow.sumI16(a.raw)
 }
 
 @inline(never)
@@ -2059,7 +2293,9 @@ public func portSumI16ConstantA() -> SIMDInt16.Lane {
 
 @inline(never)
 public func highwaySumI16ConstantA() -> Int16 {
-    HighwayReference.sumI16(HighwayReference.repeatingI16(26))
+    HighwayReference.Nothrow.sumI16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+    )
 }
 
 @inline(never)
@@ -2068,8 +2304,8 @@ public func portSmallestI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Lane {
 }
 
 @inline(never)
-public func highwaySmallestI16(_ a: HighwayReference.VectorI16) -> Int16 {
-    HighwayReference.smallestI16(a)
+public func highwaySmallestI16(_ a: SIMDInt16.Vector) -> Int16 {
+    HighwayReference.Nothrow.smallestI16(a.raw)
 }
 
 @inline(never)
@@ -2079,7 +2315,9 @@ public func portSmallestI16ConstantA() -> SIMDInt16.Lane {
 
 @inline(never)
 public func highwaySmallestI16ConstantA() -> Int16 {
-    HighwayReference.smallestI16(HighwayReference.repeatingI16(26))
+    HighwayReference.Nothrow.smallestI16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+    )
 }
 
 @inline(never)
@@ -2088,8 +2326,8 @@ public func portLargestI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Lane {
 }
 
 @inline(never)
-public func highwayLargestI16(_ a: HighwayReference.VectorI16) -> Int16 {
-    HighwayReference.largestI16(a)
+public func highwayLargestI16(_ a: SIMDInt16.Vector) -> Int16 {
+    HighwayReference.Nothrow.largestI16(a.raw)
 }
 
 @inline(never)
@@ -2099,7 +2337,9 @@ public func portLargestI16ConstantA() -> SIMDInt16.Lane {
 
 @inline(never)
 public func highwayLargestI16ConstantA() -> Int16 {
-    HighwayReference.largestI16(HighwayReference.repeatingI16(26))
+    HighwayReference.Nothrow.largestI16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+    )
 }
 
 @inline(never)
@@ -2108,8 +2348,8 @@ public func portFirstLaneI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Lane {
 }
 
 @inline(never)
-public func highwayFirstLaneI16(_ a: HighwayReference.VectorI16) -> Int16 {
-    HighwayReference.firstLaneI16(a)
+public func highwayFirstLaneI16(_ a: SIMDInt16.Vector) -> Int16 {
+    HighwayReference.Nothrow.firstLaneI16(a.raw)
 }
 
 @inline(never)
@@ -2119,7 +2359,9 @@ public func portFirstLaneI16ConstantA() -> SIMDInt16.Lane {
 
 @inline(never)
 public func highwayFirstLaneI16ConstantA() -> Int16 {
-    HighwayReference.firstLaneI16(HighwayReference.repeatingI16(26))
+    HighwayReference.Nothrow.firstLaneI16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+    )
 }
 
 @inline(never)
@@ -2128,8 +2370,8 @@ public func portReversedI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayReversedI16(_ a: HighwayReference.VectorI16) -> HighwayReference.VectorI16 {
-    HighwayReference.reversedI16(a)
+public func highwayReversedI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.reversedI16(a.raw))
 }
 
 @inline(never)
@@ -2138,8 +2380,12 @@ public func portReversedI16ConstantA() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwayReversedI16ConstantA() -> HighwayReference.VectorI16 {
-    HighwayReference.reversedI16(HighwayReference.repeatingI16(26))
+public func highwayReversedI16ConstantA() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.reversedI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2149,10 +2395,10 @@ public func portSlideUpLanesI16(_ a: SIMDInt16.Vector, byUnchecked lanes: Int) -
 
 @inline(never)
 public func highwaySlideUpLanesI16(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideUpLanesI16(a, lanes)
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideUpLanesI16(a.raw, lanes))
 }
 
 @inline(never)
@@ -2161,8 +2407,13 @@ public func portSlideUpLanesI16ConstantA(byUnchecked lanes: Int) -> SIMDInt16.Ve
 }
 
 @inline(never)
-public func highwaySlideUpLanesI16ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorI16 {
-    HighwayReference.slideUpLanesI16(HighwayReference.repeatingI16(26), lanes)
+public func highwaySlideUpLanesI16ConstantA(byUnchecked lanes: Int) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slideUpLanesI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2171,10 +2422,8 @@ public func portSlideUpLanesI16ConstantLanes(_ a: SIMDInt16.Vector) -> SIMDInt16
 }
 
 @inline(never)
-public func highwaySlideUpLanesI16ConstantLanes(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideUpLanesI16(a, 1)
+public func highwaySlideUpLanesI16ConstantLanes(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideUpLanesI16(a.raw, 1))
 }
 
 @inline(never)
@@ -2188,11 +2437,13 @@ public func portSlideUpLanesFillingWithI16(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithI16(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideUpLanesFillingWithI16(fill, a, lanes)
+    fillingWith fill: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(fill.raw, a.raw, lanes)
+    )
 }
 
 @inline(never)
@@ -2206,9 +2457,15 @@ public func portSlideUpLanesFillingWithI16ConstantA(
 @inline(never)
 public func highwaySlideUpLanesFillingWithI16ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideUpLanesFillingWithI16(fill, HighwayReference.repeatingI16(26), lanes)
+    fillingWith fill: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(
+            fill.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2221,10 +2478,10 @@ public func portSlideUpLanesFillingWithI16ConstantLanes(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithI16ConstantLanes(
-    _ a: HighwayReference.VectorI16,
-    fillingWith fill: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideUpLanesFillingWithI16(fill, a, 1)
+    _ a: SIMDInt16.Vector,
+    fillingWith fill: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(fill.raw, a.raw, 1))
 }
 
 @inline(never)
@@ -2237,10 +2494,16 @@ public func portSlideUpLanesFillingWithI16ConstantFill(
 
 @inline(never)
 public func highwaySlideUpLanesFillingWithI16ConstantFill(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideUpLanesFillingWithI16(HighwayReference.repeatingI16(26), a, lanes)
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slideUpLanesFillingWithI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            a.raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2251,10 +2514,10 @@ public func portSlideDownLanesI16(_ a: SIMDInt16.Vector, byUnchecked lanes: Int)
 
 @inline(never)
 public func highwaySlideDownLanesI16(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideDownLanesI16(a, lanes)
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideDownLanesI16(a.raw, lanes))
 }
 
 @inline(never)
@@ -2263,9 +2526,13 @@ public func portSlideDownLanesI16ConstantA(byUnchecked lanes: Int) -> SIMDInt16.
 }
 
 @inline(never)
-public func highwaySlideDownLanesI16ConstantA(byUnchecked lanes: Int) -> HighwayReference.VectorI16
-{
-    HighwayReference.slideDownLanesI16(HighwayReference.repeatingI16(26), lanes)
+public func highwaySlideDownLanesI16ConstantA(byUnchecked lanes: Int) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slideDownLanesI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2274,10 +2541,8 @@ public func portSlideDownLanesI16ConstantLanes(_ a: SIMDInt16.Vector) -> SIMDInt
 }
 
 @inline(never)
-public func highwaySlideDownLanesI16ConstantLanes(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideDownLanesI16(a, 1)
+public func highwaySlideDownLanesI16ConstantLanes(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideDownLanesI16(a.raw, 1))
 }
 
 @inline(never)
@@ -2291,11 +2556,13 @@ public func portSlideDownLanesFillingWithI16(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithI16(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideDownLanesFillingWithI16(fill, a, lanes)
+    fillingWith fill: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(fill.raw, a.raw, lanes)
+    )
 }
 
 @inline(never)
@@ -2309,9 +2576,15 @@ public func portSlideDownLanesFillingWithI16ConstantA(
 @inline(never)
 public func highwaySlideDownLanesFillingWithI16ConstantA(
     byUnchecked lanes: Int,
-    fillingWith fill: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideDownLanesFillingWithI16(fill, HighwayReference.repeatingI16(26), lanes)
+    fillingWith fill: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(
+            fill.raw,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2324,10 +2597,10 @@ public func portSlideDownLanesFillingWithI16ConstantLanes(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithI16ConstantLanes(
-    _ a: HighwayReference.VectorI16,
-    fillingWith fill: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideDownLanesFillingWithI16(fill, a, 1)
+    _ a: SIMDInt16.Vector,
+    fillingWith fill: SIMDInt16.Vector
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(fill.raw, a.raw, 1))
 }
 
 @inline(never)
@@ -2340,10 +2613,16 @@ public func portSlideDownLanesFillingWithI16ConstantFill(
 
 @inline(never)
 public func highwaySlideDownLanesFillingWithI16ConstantFill(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     byUnchecked lanes: Int
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slideDownLanesFillingWithI16(HighwayReference.repeatingI16(26), a, lanes)
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slideDownLanesFillingWithI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            a.raw,
+            lanes
+        )
+    )
 }
 
 @inline(never)
@@ -2352,8 +2631,8 @@ public func portSlide1UpI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwaySlide1UpI16(_ a: HighwayReference.VectorI16) -> HighwayReference.VectorI16 {
-    HighwayReference.slide1UpI16(a)
+public func highwaySlide1UpI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1UpI16(a.raw))
 }
 
 @inline(never)
@@ -2362,8 +2641,12 @@ public func portSlide1UpI16ConstantA() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwaySlide1UpI16ConstantA() -> HighwayReference.VectorI16 {
-    HighwayReference.slide1UpI16(HighwayReference.repeatingI16(26))
+public func highwaySlide1UpI16ConstantA() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slide1UpI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2376,10 +2659,10 @@ public func portSlide1UpFillingWithI16(
 
 @inline(never)
 public func highwaySlide1UpFillingWithI16(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     fillingWith fill: Int16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slide1UpFillingWithI16(fill, a)
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1UpFillingWithI16(fill, a.raw))
 }
 
 @inline(never)
@@ -2390,10 +2673,13 @@ public func portSlide1UpFillingWithI16ConstantA(
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithI16ConstantA(
-    fillingWith fill: Int16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slide1UpFillingWithI16(fill, HighwayReference.repeatingI16(26))
+public func highwaySlide1UpFillingWithI16ConstantA(fillingWith fill: Int16) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slide1UpFillingWithI16(
+            fill,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2402,10 +2688,8 @@ public func portSlide1UpFillingWithI16ConstantFill(_ a: SIMDInt16.Vector) -> SIM
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithI16ConstantFill(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slide1UpFillingWithI16(26, a)
+public func highwaySlide1UpFillingWithI16ConstantFill(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1UpFillingWithI16(26, a.raw))
 }
 
 @inline(never)
@@ -2414,8 +2698,8 @@ public func portSlide1DownI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwaySlide1DownI16(_ a: HighwayReference.VectorI16) -> HighwayReference.VectorI16 {
-    HighwayReference.slide1DownI16(a)
+public func highwaySlide1DownI16(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1DownI16(a.raw))
 }
 
 @inline(never)
@@ -2424,8 +2708,12 @@ public func portSlide1DownI16ConstantA() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func highwaySlide1DownI16ConstantA() -> HighwayReference.VectorI16 {
-    HighwayReference.slide1DownI16(HighwayReference.repeatingI16(26))
+public func highwaySlide1DownI16ConstantA() -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slide1DownI16(
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2438,10 +2726,10 @@ public func portSlide1DownFillingWithI16(
 
 @inline(never)
 public func highwaySlide1DownFillingWithI16(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     fillingWith fill: Int16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slide1DownFillingWithI16(fill, a)
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1DownFillingWithI16(fill, a.raw))
 }
 
 @inline(never)
@@ -2452,10 +2740,13 @@ public func portSlide1DownFillingWithI16ConstantA(
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithI16ConstantA(
-    fillingWith fill: Int16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slide1DownFillingWithI16(fill, HighwayReference.repeatingI16(26))
+public func highwaySlide1DownFillingWithI16ConstantA(fillingWith fill: Int16) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.slide1DownFillingWithI16(
+            fill,
+            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+        )
+    )
 }
 
 @inline(never)
@@ -2464,10 +2755,8 @@ public func portSlide1DownFillingWithI16ConstantFill(_ a: SIMDInt16.Vector) -> S
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithI16ConstantFill(
-    _ a: HighwayReference.VectorI16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.slide1DownFillingWithI16(26, a)
+public func highwaySlide1DownFillingWithI16ConstantFill(_ a: SIMDInt16.Vector) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(raw: HighwayReference.Nothrow.slide1DownFillingWithI16(26, a.raw))
 }
 
 @inline(never)
@@ -2482,10 +2771,10 @@ public func portLoadInterleaved2I16(
 @inline(never)
 public func highwayLoadInterleaved2I16(
     from: UnsafePointer<Int16>,
-    _ v0: inout HighwayReference.VectorI16,
-    _ v1: inout HighwayReference.VectorI16
+    _ v0: inout SIMDInt16.Vector,
+    _ v1: inout SIMDInt16.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved2I16(from, &v0, &v1)
+    unsafe HighwayReference.Nothrow.loadInterleaved2I16(from, &v0.raw, &v1.raw)
 }
 
 @inline(never)
@@ -2501,11 +2790,11 @@ public func portLoadInterleaved3I16(
 @inline(never)
 public func highwayLoadInterleaved3I16(
     from: UnsafePointer<Int16>,
-    _ v0: inout HighwayReference.VectorI16,
-    _ v1: inout HighwayReference.VectorI16,
-    _ v2: inout HighwayReference.VectorI16
+    _ v0: inout SIMDInt16.Vector,
+    _ v1: inout SIMDInt16.Vector,
+    _ v2: inout SIMDInt16.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved3I16(from, &v0, &v1, &v2)
+    unsafe HighwayReference.Nothrow.loadInterleaved3I16(from, &v0.raw, &v1.raw, &v2.raw)
 }
 
 @inline(never)
@@ -2522,12 +2811,12 @@ public func portLoadInterleaved4I16(
 @inline(never)
 public func highwayLoadInterleaved4I16(
     from: UnsafePointer<Int16>,
-    _ v0: inout HighwayReference.VectorI16,
-    _ v1: inout HighwayReference.VectorI16,
-    _ v2: inout HighwayReference.VectorI16,
-    _ v3: inout HighwayReference.VectorI16
+    _ v0: inout SIMDInt16.Vector,
+    _ v1: inout SIMDInt16.Vector,
+    _ v2: inout SIMDInt16.Vector,
+    _ v3: inout SIMDInt16.Vector
 ) {
-    unsafe HighwayReference.loadInterleaved4I16(from, &v0, &v1, &v2, &v3)
+    unsafe HighwayReference.Nothrow.loadInterleaved4I16(from, &v0.raw, &v1.raw, &v2.raw, &v3.raw)
 }
 
 @inline(never)
@@ -2541,11 +2830,11 @@ public func portStoreInterleaved2I16(
 
 @inline(never)
 public func highwayStoreInterleaved2I16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved2I16(a, b, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2I16(a.raw, b.raw, to)
 }
 
 @inline(never)
@@ -2558,10 +2847,14 @@ public func portStoreInterleaved2I16ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved2I16ConstantA(
-    _ b: HighwayReference.VectorI16,
+    _ b: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved2I16(HighwayReference.repeatingI16(26), b, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2I16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        b.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2574,10 +2867,14 @@ public func portStoreInterleaved2I16ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved2I16ConstantB(
-    _ a: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved2I16(a, HighwayReference.repeatingI16(26), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved2I16(
+        a.raw,
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2592,12 +2889,12 @@ public func portStoreInterleaved3I16(
 
 @inline(never)
 public func highwayStoreInterleaved3I16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved3I16(a, b, c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3I16(a.raw, b.raw, c.raw, to)
 }
 
 @inline(never)
@@ -2611,11 +2908,16 @@ public func portStoreInterleaved3I16ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved3I16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16,
+    _ b: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved3I16(HighwayReference.repeatingI16(26), b, c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3I16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        b.raw,
+        c.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2629,11 +2931,16 @@ public func portStoreInterleaved3I16ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved3I16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved3I16(a, HighwayReference.repeatingI16(26), c, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3I16(
+        a.raw,
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        c.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2647,11 +2954,16 @@ public func portStoreInterleaved3I16ConstantC(
 
 @inline(never)
 public func highwayStoreInterleaved3I16ConstantC(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved3I16(a, b, HighwayReference.repeatingI16(26), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved3I16(
+        a.raw,
+        b.raw,
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2667,13 +2979,13 @@ public func portStoreInterleaved4I16(
 
 @inline(never)
 public func highwayStoreInterleaved4I16(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16,
-    _ d: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector,
+    _ d: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved4I16(a, b, c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I16(a.raw, b.raw, c.raw, d.raw, to)
 }
 
 @inline(never)
@@ -2688,12 +3000,18 @@ public func portStoreInterleaved4I16ConstantA(
 
 @inline(never)
 public func highwayStoreInterleaved4I16ConstantA(
-    _ b: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16,
-    _ d: HighwayReference.VectorI16,
+    _ b: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector,
+    _ d: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved4I16(HighwayReference.repeatingI16(26), b, c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I16(
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        b.raw,
+        c.raw,
+        d.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2708,12 +3026,18 @@ public func portStoreInterleaved4I16ConstantB(
 
 @inline(never)
 public func highwayStoreInterleaved4I16ConstantB(
-    _ a: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16,
-    _ d: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector,
+    _ d: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved4I16(a, HighwayReference.repeatingI16(26), c, d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I16(
+        a.raw,
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        c.raw,
+        d.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2728,12 +3052,18 @@ public func portStoreInterleaved4I16ConstantC(
 
 @inline(never)
 public func highwayStoreInterleaved4I16ConstantC(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    _ d: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    _ d: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved4I16(a, b, HighwayReference.repeatingI16(26), d, to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I16(
+        a.raw,
+        b.raw,
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        d.raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2748,12 +3078,18 @@ public func portStoreInterleaved4I16ConstantD(
 
 @inline(never)
 public func highwayStoreInterleaved4I16ConstantD(
-    _ a: HighwayReference.VectorI16,
-    _ b: HighwayReference.VectorI16,
-    _ c: HighwayReference.VectorI16,
+    _ a: SIMDInt16.Vector,
+    _ b: SIMDInt16.Vector,
+    _ c: SIMDInt16.Vector,
     to: UnsafeMutablePointer<Int16>
 ) {
-    unsafe HighwayReference.storeInterleaved4I16(a, b, c, HighwayReference.repeatingI16(26), to)
+    unsafe HighwayReference.Nothrow.storeInterleaved4I16(
+        a.raw,
+        b.raw,
+        c.raw,
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+        to
+    )
 }
 
 @inline(never)
@@ -2762,8 +3098,8 @@ public func portLoadWideningI8ToI16(from: UnsafePointer<Int8>) -> SIMDInt16.Vect
 }
 
 @inline(never)
-public func highwayLoadWideningI8ToI16(from: UnsafePointer<Int8>) -> HighwayReference.VectorI16 {
-    unsafe HighwayReference.loadWideningI8ToI16(from)
+public func highwayLoadWideningI8ToI16(from: UnsafePointer<Int8>) -> SIMDInt16.Vector {
+    unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.loadWideningI8ToI16(from))
 }
 
 @inline(never)
@@ -2776,8 +3112,8 @@ public func portLoadFirstWideningI8ToI16(from: UnsafePointer<Int8>, count: Int) 
 public func highwayLoadFirstWideningI8ToI16(
     from: UnsafePointer<Int8>,
     count: Int
-) -> HighwayReference.VectorI16 {
-    unsafe HighwayReference.loadFirstWideningI8ToI16(from, count)
+) -> SIMDInt16.Vector {
+    unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.loadFirstWideningI8ToI16(from, count))
 }
 
 @inline(never)
@@ -2789,8 +3125,8 @@ public func portLoadFirstWideningI8ToI16ConstantCount(from: UnsafePointer<Int8>)
 @inline(never)
 public func highwayLoadFirstWideningI8ToI16ConstantCount(
     from: UnsafePointer<Int8>
-) -> HighwayReference.VectorI16 {
-    unsafe HighwayReference.loadFirstWideningI8ToI16(from, 1)
+) -> SIMDInt16.Vector {
+    unsafe SIMDInt16.Vector(raw: HighwayReference.Nothrow.loadFirstWideningI8ToI16(from, 1))
 }
 
 @inline(never)
@@ -2817,8 +3153,10 @@ public func highwayRepeatingBlockI16(
     _ v5: Int16,
     _ v6: Int16,
     _ v7: Int16
-) -> HighwayReference.VectorI16 {
-    HighwayReference.repeatingBlockI16(v0, v1, v2, v3, v4, v5, v6, v7)
+) -> SIMDInt16.Vector {
+    SIMDInt16.Vector(
+        raw: HighwayReference.Nothrow.repeatingBlockI16(v0, v1, v2, v3, v4, v5, v6, v7)
+    )
 }
 
 @inline(never)
@@ -2827,8 +3165,13 @@ public func portNoneAboveI16(_ v: SIMDInt16.Vector) -> Bool {
 }
 
 @inline(never)
-public func highwayNoneAboveI16(_ v: HighwayReference.VectorI16) -> Bool {
-    HighwayReference.allFalseI16(
-        HighwayReference.greaterThanI16(v, HighwayReference.repeatingI16(26))
+public func highwayNoneAboveI16(_ v: SIMDInt16.Vector) -> Bool {
+    HighwayReference.Nothrow.allFalseI16(
+        SIMDInt16.Mask(
+            raw: HighwayReference.Nothrow.greaterThanI16(
+                v.raw,
+                SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            )
+        ).raw
     )
 }
