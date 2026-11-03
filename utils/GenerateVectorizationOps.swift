@@ -2175,27 +2175,57 @@ func portableTableLookupBytes(for element: Element) -> String {
         """
 }
 
-func portableTableLookupLanes(for element: Element) -> String {
-    """
-    \(element.cVector) result;
-    for (size_t i = 0; i < \(element.laneCount); ++i) {
-      result[i] = a[indices[i]];
+func portableLookupSource(for element: Element) -> String {
+    element.bits == 16 ? element.cUnsignedLane : element.cType
+}
+
+func portableLookup(of lane: String, for element: Element) -> String {
+    let lanes = element.laneCount
+    guard element.bits == 16 else {
+        return """
+            \(element.cVector) result;
+            for (size_t i = 0; i < \(lanes); ++i) {
+              result[i] = \(lane);
+            }
+            \(vectorResult("result", for: element))
+            """
     }
-    \(vectorResult("result", for: element))
-    """
+    return """
+        uint64_t words[\(lanes / 4)] = {0};
+        for (size_t i = 0; i < \(lanes); ++i) {
+          words[i / 4] |= (uint64_t)(\(lane)) << (16 * (i % 4));
+        }
+        \(element.cVector) result;
+        __builtin_memcpy(&result, words, sizeof result);
+        \(vectorResult("result", for: element))
+        """
+}
+
+func portableTableLookupLanes(for element: Element) -> String {
+    let lanes = element.laneCount
+    return """
+        \(portableLookupSource(for: element)) source[\(lanes)];
+        \(element.cMaskLane) index[\(lanes)];
+        __builtin_memcpy(source, &a, sizeof a);
+        __builtin_memcpy(index, &indices, sizeof indices);
+        \(portableLookup(of: "source[index[i]]", for: element))
+        """
 }
 
 func portableTwoTablesLookupLanes(for element: Element) -> String {
+    let source = portableLookupSource(for: element)
     let lane = element.cMaskLane
     let lanes = element.laneCount
+    let masked = "index[i] & (\(lane))\(lanes - 1)"
+    let selected = "index[i] < (\(lane))\(lanes) ? first[\(masked)] : second[\(masked)]"
     return """
-        \(element.cVector) result;
-        for (size_t i = 0; i < \(lanes); ++i) {
-          const \(lane) index = (\(lane))indices[i];
-          const \(lane) masked = index & (\(lane))\(lanes - 1);
-          result[i] = index < (\(lane))\(lanes) ? a[masked] : b[masked];
-        }
-        \(vectorResult("result", for: element))
+        \(source) first[\(lanes)];
+        \(source) second[\(lanes)];
+        \(lane) index[\(lanes)];
+        __builtin_memcpy(first, &a, sizeof a);
+        __builtin_memcpy(second, &b, sizeof b);
+        __builtin_memcpy(index, &indices, sizeof indices);
+        \(portableLookup(of: selected, for: element))
         """
 }
 
@@ -2293,6 +2323,7 @@ func x86Avx2WordIndices(for element: Element) -> String {
 
 func x86Int64LaneLookup(level: X86Level, for element: Element) -> String {
     let int64 = x86Vector("i64")
+    let asInt32 = "(\(x86Vector("i32")))"
     let selected =
         level >= .sse4
         ? x86Builtin("pblendvb128", ["swapped", "table", "same"], as: "i8", returning: int64)
@@ -2301,7 +2332,7 @@ func x86Int64LaneLookup(level: X86Level, for element: Element) -> String {
     return """
         const \(int64) table = (\(int64))a;
         const \(int64) same = ((\(int64))indices ^ \(iota)) - \(splat("1", as: int64, lanes: 2));
-        const \(int64) swapped = __builtin_shufflevector(table, table, 1, 0);
+        const \(int64) swapped = (\(int64))__builtin_shufflevector(\(asInt32)table, \(asInt32)table, 2, 3, 0, 1);
         \(vectorResult(selected, for: element))
         """
 }
@@ -2445,11 +2476,10 @@ func x86TwoTablesLookupLanes(level: X86Level, for element: Element) -> String {
     let vector = element.cVector
     let lookup = cFunctionName("tableLookupLanes", element)
     let indexRaw = laneIndexElement(of: element).cRawVector
-    func lookups(_ indices: String = "rawIndices") -> String {
-        """
-        const \(vector) lower = (\(vector))\(lookup)(rawA, \(indices));
-        const \(vector) upper = (\(vector))\(lookup)(rawB, \(indices));
-        """
+    func lookups(_ indices: String = "rawIndices", upperFirst: Bool = false) -> String {
+        let lower = "const \(vector) lower = (\(vector))\(lookup)(rawA, \(indices));"
+        let upper = "const \(vector) upper = (\(vector))\(lookup)(rawB, \(indices));"
+        return upperFirst ? "\(upper)\n\(lower)" : "\(lower)\n\(upper)"
     }
     func compared(with limit: Int) -> String {
         let type = x86Vector("i\(element.bits)")
@@ -2554,7 +2584,7 @@ func x86TwoTablesLookupLanes(level: X86Level, for element: Element) -> String {
         return """
             const \(int16) shifted = (\(int16))indices << 1;
             const \(maskType) selectsUpper = \(x86Avx3MaskBits("shifted", for: element));
-            \(lookups())
+            \(lookups(upperFirst: true))
             \(vectorResult(x86Avx3Select("selectsUpper", "upper", "lower", for: element), for: element))
             """
     case (.avx3, _), (.avx3dl, _):
@@ -7108,11 +7138,29 @@ func lookupBody(lanes: Int, aligned: Bool, for element: Element) -> String {
     }
     let bytes = lanes * element.bits / 8
     let function = cFunctionName("tableLookupLanes", element)
-    let zeroing = bytes < element.width ? "__builtin_memset(&table, 0, sizeof table);\n" : ""
+    let table = pointer("from", alignment: bytes)
+    let load =
+        bytes < element.width
+        ? zeroExtendedLoad(from: table, bytes: bytes, for: element)
+        : "\(vector) table;\n__builtin_memcpy(&table, \(table), \(bytes));"
     return """
-        \(vector) table;
-        \(zeroing)__builtin_memcpy(&table, \(pointer("from", alignment: bytes)), \(bytes));
+        \(load)
         return \(function)((\(raw))table, rawIndices);
+        """
+}
+
+func zeroExtendedLoad(from pointer: String, bytes: Int, for element: Element) -> String {
+    let words = bytes / 8
+    let part = bytes == 16 ? x86Block("i64") : "half_vector"
+    let size = "vector_size(\(bytes))"
+    let typedef = bytes == 16 ? "" : "typedef long long half_vector __attribute__((\(size)));\n"
+    let zeros = compoundLiteral(part, Array(repeating: "0", count: words))
+    let indices = (0..<element.width / 8).map { $0 < words ? $0 : words + ($0 - words) % words }
+    let extended = "__builtin_shufflevector(loaded, \(zeros), \(laneIndices(indices)))"
+    return """
+        \(typedef)\(part) loaded;
+        __builtin_memcpy(&loaded, \(pointer), \(bytes));
+        const \(element.cVector) table = (\(element.cVector))\(extended);
         """
 }
 
