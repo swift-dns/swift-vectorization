@@ -141,6 +141,7 @@ enum Parameter {
     case vector
     case indices
     case laneIndices
+    case lookupIndices
     case mask
     case lane
     case constLanePointer
@@ -165,6 +166,16 @@ enum Parameter {
         default: return nil
         }
     }
+
+    var isLaneIndices: Bool {
+        self == .laneIndices || self == .lookupIndices
+    }
+
+    /// Where Swift declares a parameter among the others, the lowest rank first. Highway takes a
+    /// lookup's table before its indices, while Swift takes the indices first.
+    var swiftRank: Int {
+        self == .lookupIndices ? -1 : overloading?.rank ?? 0
+    }
 }
 
 enum UnorderedNaNs {
@@ -186,9 +197,12 @@ enum ReturnType {
 // How much of a span the span form of a pointer op reads or writes, from the span's start.
 // `first` is as many lanes as the span has, up to a vector, which a pointer op takes as `count`.
 // An `aligned` op also needs the span to start at an address aligned to the vector size.
+// A `table` is that many lanes, from an address aligned to their size, however many lanes a vector
+// has.
 enum SpanExtent {
     case vectors(Int, aligned: Bool = false)
     case first
+    case table(lanes: Int)
 }
 
 // How many indices a lookup op accepts, as a number of lanes of a vector or a fixed number.
@@ -230,6 +244,14 @@ struct IndexContract {
         message: "Lane index is negative or at least as many as a vector has lanes",
         isDefinedOnEmulation: false
     )
+    static func table(lanes: Int) -> IndexContract {
+        IndexContract(
+            offset: 0,
+            count: .fixed(lanes),
+            message: "Lane index is negative or at least as many as the table has lanes",
+            isDefinedOnEmulation: false
+        )
+    }
     static let lanesOfTwoTables = IndexContract(
         offset: 0,
         count: .lanes(2),
@@ -348,7 +370,7 @@ struct Op {
     var swiftOrder: [Int] {
         let operands = self.operands
         return operands.indices.sorted {
-            (operands[$0].overloading?.rank ?? 0, $0) < (operands[$1].overloading?.rank ?? 0, $1)
+            (operands[$0].swiftRank, $0) < (operands[$1].swiftRank, $1)
         }
     }
 
@@ -419,7 +441,7 @@ func laneIndexElement(of element: Element) -> Element {
 }
 
 func operandElement(of parameter: Parameter, for element: Element) -> Element {
-    parameter == .laneIndices ? laneIndexElement(of: element) : element
+    parameter.isLaneIndices ? laneIndexElement(of: element) : element
 }
 
 func signedFirstLanesMask(for element: Element) -> String {
@@ -7019,7 +7041,119 @@ func x86Avx3StoreInterleaved4Body(for element: Element) -> String {
     }
 }
 
-let ops: [Op] = [
+struct LookupSize {
+    let lanes: Int
+    let applies: Applies
+}
+
+let lookupSizes = [
+    LookupSize(lanes: 8, applies: .all(bits: [16, 32, 64])),
+    LookupSize(lanes: 16, applies: .all(bits: [16, 32, 64])),
+    LookupSize(lanes: 32, applies: .integer(bits: [8])),
+    LookupSize(lanes: 64, applies: .integer(bits: [8])),
+]
+
+func canLookupName(_ lanes: Int) -> String {
+    "canLookup\(lanes)"
+}
+
+func canLookupBody(_ lanes: Int, for element: Element) -> String {
+    let enough = "return sizeof(\(element.cVector)) / sizeof(\(element.cType)) >= \(lanes / 2);"
+    guard lanes == 64 else { return enough }
+    return """
+        #if \(neonCondition) == \(ArmLevel.neon.rawValue)
+        return true;
+        #else
+        \(enough)
+        #endif
+        """
+}
+
+func lookupChecks(of op: Op, for element: Element) -> [Check] {
+    guard takesLookupIndices(op), case .table(let lanes)? = op.span else { return [] }
+    return indexChecks(of: op, for: element)
+        + [(canLookupName(lanes), "Vector has too few lanes for this lookup")]
+}
+
+func lookupAssertions(of op: Op, for element: Element) -> String {
+    lookupChecks(of: op, for: element)
+        .map { "        assert(\($0.condition), \"\($0.message)\")\n" }.joined()
+}
+
+func canLookupMembers(for element: Element) -> String {
+    var output = ""
+    for size in lookupSizes where size.applies.matches(element) {
+        let name = canLookupName(size.lanes)
+        output += "    @export(implementation) @inline(always)\n"
+        output += "    public static var \(name): Bool { \(cFunctionName(name, element))() }\n\n"
+    }
+    return output
+}
+
+func lookupBody(lanes: Int, aligned: Bool, for element: Element) -> String {
+    let vector = element.cVector
+    let raw = element.cRawVector
+    func pointer(_ expression: String, alignment: Int) -> String {
+        aligned ? "__builtin_assume_aligned(\(expression), \(alignment))" : expression
+    }
+    guard element.laneCount >= lanes else {
+        let function = cFunctionName("twoTablesLookupLanes", element)
+        return """
+            \(vector) first;
+            \(vector) second;
+            __builtin_memcpy(&first, \(pointer("from", alignment: element.width)), sizeof first);
+            __builtin_memcpy(&second, \(pointer("from + \(lanes / 2)", alignment: element.width)), sizeof second);
+            return \(function)((\(raw))first, (\(raw))second, rawIndices);
+            """
+    }
+    let bytes = lanes * element.bits / 8
+    let function = cFunctionName("tableLookupLanes", element)
+    let zeroing = bytes < element.width ? "__builtin_memset(&table, 0, sizeof table);\n" : ""
+    return """
+        \(vector) table;
+        \(zeroing)__builtin_memcpy(&table, \(pointer("from", alignment: bytes)), \(bytes));
+        return \(function)((\(raw))table, rawIndices);
+        """
+}
+
+func neonLookup64(for element: Element) -> String {
+    let tables = (0..<4).map { block in
+        "\(element.cVector) table\(block);\n"
+            + "__builtin_memcpy(&table\(block), from + \(16 * block), 16);"
+    }
+    let names = (0..<4).map { "table\($0)" } + ["indices"]
+    let lookup = neonBuiltin("vqtbl4q_v", names, code: 48, for: element)
+    return "\(tables.joined(separator: "\n"))\n\(vectorResult(lookup, for: element))"
+}
+
+func lookupOp(_ size: LookupSize) -> Op {
+    let lanes = size.lanes
+    func aligned(_ element: Element) -> String {
+        lookupBody(lanes: lanes, aligned: true, for: element)
+    }
+    return Op(
+        "lookup\(lanes)",
+        "Lookup\(lanes)",
+        [.tag, .constLanePointer, .lookupIndices],
+        .vector,
+        size.applies,
+        span: .table(lanes: lanes),
+        indexContract: .table(lanes: lanes),
+        targets: TargetBodies(
+            neon: { element in lanes == 64 ? neonLookup64(for: element) : nil },
+            sve2_128: { element in
+                lanes == 64 ? lookupBody(lanes: lanes, aligned: false, for: element) : nil
+            },
+            avx3: aligned,
+            avx2: aligned,
+            sse2: aligned
+        )
+    ) { element in
+        lookupBody(lanes: lanes, aligned: false, for: element)
+    }
+}
+
+let basicOps: [Op] = [
     Op("zero", "Zero", [.tag], .vector, .all) { element in
         vectorResult(compoundLiteral(element.cVector, ["0"]), for: element)
     },
@@ -8293,6 +8427,8 @@ let ops: [Op] = [
     },
 ]
 
+let ops = basicOps + lookupSizes.map(lookupOp)
+
 // A widening load reads lanes of a narrower element type and promotes each of them to the
 // element type of the vector it returns. It is two Highway ops rather than one, and its pointer
 // is not a `Lane` pointer, so it does not fit `Op` and is generated on its own below.
@@ -8432,6 +8568,19 @@ func bindings(
                     cDeclaration: "\(indexElement.cRawVector) \(rawName("indices"))",
                     argument: "hn::IndicesFromVec(\(element.tag)(), \(vector))",
                     swiftLabel: checkedLabel("at", checked: checked),
+                    swiftName: "indices",
+                    swiftType: "\(scope)Indices",
+                    isInOut: false
+                )
+            )
+        case .lookupIndices:
+            let indexElement = laneIndexElement(of: element)
+            result.append(
+                Binding(
+                    declaration: "\(indexElement.cRawVector) indices",
+                    cDeclaration: "\(indexElement.cRawVector) \(rawName("indices"))",
+                    argument: referenceConversion("fromPort", "indices", for: indexElement),
+                    swiftLabel: "at",
                     swiftName: "indices",
                     swiftType: "\(scope)Indices",
                     isInOut: false
@@ -8853,6 +9002,11 @@ func generateReferenceHeader() -> String {
             named: referenceFunctionName("laneCount", element),
             declarations: ""
         )
+        for size in lookupSizes where size.applies.matches(element) {
+            let name = canLookupName(size.lanes)
+            output += "HWY_INLINE bool \(referenceFunctionName(name, element))()"
+            output += " { return hn::CanLookup\(size.lanes)(\(element.tag)()); }\n"
+        }
         output += portConversions(of: element)
 
         for op in ops where op.applies.matches(element) {
@@ -9242,7 +9396,7 @@ func cPrologue(of op: Op, for element: Element) -> [String] {
         let name = binding.swiftName
         let raw = rawName(name)
         switch parameter {
-        case .vector, .indices, .laneIndices, .fillVector, .otherwiseVector:
+        case .vector, .indices, .laneIndices, .lookupIndices, .fillVector, .otherwiseVector:
             let operand = operandElement(of: parameter, for: element)
             return "const \(operand.cVector) \(name) = (\(operand.cVector))\(raw);"
         case .mask, .whereMask:
@@ -9514,6 +9668,14 @@ func generateHeader() -> String {
             body: "return sizeof(\(element.cVector)) / sizeof(\(element.cType));"
         )
         output += cRawConversions(of: element)
+        for size in lookupSizes where size.applies.matches(element) {
+            output += cFunction(
+                returns: "bool",
+                name: cFunctionName(canLookupName(size.lanes), element),
+                parameters: [],
+                body: canLookupBody(size.lanes, for: element)
+            )
+        }
         if element.category != .float {
             output += indicesWithinFunction(for: element)
         }
@@ -9604,7 +9766,7 @@ func swiftArgument(_ binding: Binding, _ parameter: Parameter, for element: Elem
 
 func rawArgument(_ name: String, _ parameter: Parameter, for element: Element) -> String {
     switch parameter {
-    case .vector, .indices, .laneIndices, .fillVector, .otherwiseVector:
+    case .vector, .indices, .laneIndices, .lookupIndices, .fillVector, .otherwiseVector:
         return operandElement(of: parameter, for: element).hasOpaqueVector ? "\(name).raw" : name
     case .mask, .whereMask: return "\(name).raw"
     case .outVector: return element.hasOpaqueVector ? "&\(name).raw" : "&\(name)"
@@ -9619,7 +9781,8 @@ func vectorFromRaw(_ call: String, of element: Element) -> String {
 func importedType(of parameter: Parameter, for element: Element) -> String {
     switch parameter {
     case .tag: return ""
-    case .vector, .indices, .laneIndices, .outVector, .fillVector, .otherwiseVector:
+    case .vector, .indices, .laneIndices, .lookupIndices, .outVector, .fillVector,
+        .otherwiseVector:
         return "\(operandElement(of: parameter, for: element).namespace).Vector"
     case .mask, .whereMask: return "\(element.namespace).Mask"
     case .lane, .fillLane: return element.swiftType
@@ -9712,6 +9875,7 @@ struct SpanForms {
     let element: String
     let isMutable: Bool
     var count = "$0.count"
+    var checks: [Check] = []
     var bridgeCall: (_ pointer: String, _ count: String) -> String
 }
 
@@ -9720,13 +9884,13 @@ func spanForms(of op: Op, for element: Element) -> SpanForms? {
     let parameterBindings = bindings(of: op, for: element)
     let takesCountFromSpan = if case .first = extent { true } else { false }
 
-    var parameters: [SpanParameter] = []
+    var parameters: [SpanParameter?] = []
     for (binding, parameter) in zip(parameterBindings, op.parameters) {
         switch parameter {
         case .tag:
             continue
         case .count where takesCountFromSpan:
-            continue
+            parameters.append(nil)
         case .constLanePointer, .lanePointer:
             parameters.append(.span)
         default:
@@ -9738,11 +9902,12 @@ func spanForms(of op: Op, for element: Element) -> SpanForms? {
 
     return SpanForms(
         name: op.swiftName,
-        parameters: parameters,
+        parameters: op.swiftOrdered(parameters).compactMap { $0 },
         returns: op.returns,
         extent: extent,
         element: "Lane",
         isMutable: op.parameters.contains(.lanePointer),
+        checks: lookupChecks(of: op, for: element),
         bridgeCall: { pointer, count in
             var arguments: [String] = []
             for (binding, parameter) in zip(parameterBindings, op.parameters) {
@@ -9835,6 +10000,19 @@ func spanChecks(vectors count: Int, aligned: Bool) -> [Check] {
     return checks
 }
 
+/// What a span form checks before it touches the `lanes` of a table, each as a Swift condition and
+/// the message for when it fails. The span must start at an address aligned to the table's size.
+func spanChecks(table lanes: Int) -> [Check] {
+    [
+        ("span.count >= \(lanes)", "Span has fewer elements than the table has lanes"),
+        (
+            "span.withUnsafeBufferPointer { UInt(bitPattern: $0.baseAddress) "
+                + "% UInt(\(lanes) * MemoryLayout<Lane>.stride) == 0 }",
+            "Span does not start at an address aligned to the table size"
+        ),
+    ]
+}
+
 /// A checked member that traps when any of `checks` fails, and the `@unsafe` unchecked member it
 /// calls, which only asserts them, like `Span`'s `subscript(_:)` and `subscript(unchecked:)`.
 func checkedMembers(
@@ -9876,7 +10054,9 @@ func spanMembers(_ forms: SpanForms) -> String {
     let accessor = forms.isMutable ? "withUnsafeMutableBufferPointer" : "withUnsafeBufferPointer"
     let checked = spanSignature(forms, label: spanLabel(forms, checked: true))
 
-    guard case .vectors(let count, let aligned) = forms.extent else {
+    let checks: [Check]
+    switch forms.extent {
+    case .first:
         return """
                 \(spanAvailability)
                 @export(implementation) @inline(always)
@@ -9886,6 +10066,10 @@ func spanMembers(_ forms: SpanForms) -> String {
 
 
             """
+    case .vectors(let count, let aligned):
+        checks = spanChecks(vectors: count, aligned: aligned)
+    case .table(let lanes):
+        checks = spanChecks(table: lanes)
     }
 
     let unchecked = spanSignature(forms, label: spanLabel(forms, checked: false))
@@ -9896,7 +10080,7 @@ func spanMembers(_ forms: SpanForms) -> String {
         checked: checked.parameters,
         unchecked: unchecked,
         returnClause: returnClause,
-        checks: spanChecks(vectors: count, aligned: aligned),
+        checks: checks + forms.checks,
         uncheckedBody: """
             \(returnKeyword)span.\(accessor) {
                 \(bridgeCall)
@@ -9910,7 +10094,11 @@ func takesLaneAmount(_ op: Op) -> Bool {
 }
 
 func takesIndices(_ op: Op) -> Bool {
-    op.indexContract != nil
+    op.parameters.contains { $0 == .indices || $0 == .laneIndices }
+}
+
+func takesLookupIndices(_ op: Op) -> Bool {
+    op.parameters.contains(.lookupIndices)
 }
 
 func hasCheckedForms(_ op: Op) -> Bool {
@@ -9933,7 +10121,7 @@ func laneAmountChecks() -> [Check] {
 /// for when it fails: one unsigned comparison of every index and one reduction of the results.
 func indexChecks(of op: Op, for element: Element) -> [Check] {
     guard let contract = op.indexContract,
-        let parameter = op.parameters.first(where: { $0 == .indices || $0 == .laneIndices })
+        let parameter = op.parameters.first(where: { $0 == .indices || $0.isLaneIndices })
     else { return [] }
     let function = cFunctionName("indicesWithin", operandElement(of: parameter, for: element))
     let count = contract.count.expression(laneCount: "laneCount")
@@ -9980,7 +10168,7 @@ func spanRequirements(_ forms: SpanForms, indent: String) -> String {
     let checked = spanSignature(forms, label: spanLabel(forms, checked: true))
     var output = "\(indent)\(spanAvailability)\n"
     output += "\(indent)static func \(forms.name)(\(checked.parameters))\(returnClause)\n"
-    guard case .vectors = forms.extent else { return output }
+    if case .first = forms.extent { return output }
     let unchecked = spanSignature(forms, label: spanLabel(forms, checked: false))
     output += "\(indent)\(spanAvailability)\n"
     output += "\(indent)@unsafe static func \(forms.name)(\(unchecked.parameters))\(returnClause)\n"
@@ -10075,6 +10263,8 @@ func outputSpanMembers(_ forms: SpanForms) -> String {
                 "buffer.baseAddress.unsafelyUnwrapped + initializedCount",
                 count > 1 ? "\(count) * laneCount" : "laneCount"
             )
+        case .table:
+            fatalError("A table is not an output")
         }
     return checkedMembers(
         name,
@@ -10251,6 +10441,7 @@ func generateElement(_ element: Element) -> String {
 
 
         """
+    output += canLookupMembers(for: element)
 
     for op in ops where op.applies.matches(element) {
         if hasCheckedForms(op) {
@@ -10263,7 +10454,9 @@ func generateElement(_ element: Element) -> String {
         output += "    @export(implementation) @inline(always)\n"
         output +=
             "    public static func \(op.swiftName)(\(signature.parameters))\(returnClause) {\n"
-        output += "        \(body)\n"
+        let assertions = lookupAssertions(of: op, for: element)
+        output += assertions
+        output += "        \(assertions.isEmpty ? "" : "return ")\(body)\n"
         output += "    }\n\n"
         if let forms = spanForms(of: op, for: element) {
             output += spanMembers(forms)
@@ -10329,21 +10522,31 @@ struct ReferenceInput {
 func hasOutOfContractInputs(_ op: Op) -> Bool {
     op.parameters.contains { parameter in
         switch parameter {
-        case .shiftAmount, .laneAmount, .indices, .laneIndices: return true
+        case .shiftAmount, .laneAmount, .indices, .laneIndices, .lookupIndices: return true
         default: return false
         }
     }
 }
 
 func isAligned(_ op: Op) -> Bool {
-    guard case .vectors(_, let aligned)? = op.span else { return false }
-    return aligned
+    switch op.span {
+    case .vectors(_, let aligned)?: return aligned
+    case .table?: return true
+    case .first?, nil: return false
+    }
+}
+
+/// The lanes whose size a pointer op's address must be aligned to.
+func alignmentLanes(of op: Op) -> String {
+    if case .table(let lanes)? = op.span { return String(lanes) }
+    return "H.laneCount"
 }
 
 func pointerLanes(of op: Op) -> String {
     switch op.span {
     case .vectors(let count, _)?: return count == 1 ? "H.laneCount" : "\(count) * H.laneCount"
     case .first?: return "H.laneCount"
+    case .table(let lanes)?: return String(lanes)
     case nil: fatalError("\(op.swiftName) takes a pointer but has no span extent")
     }
 }
@@ -10368,7 +10571,7 @@ func indexInputs(
     guard let contract = op.indexContract else {
         fatalError("\(op.swiftName) takes indices but has no index contract")
     }
-    let type = parameter == .laneIndices ? "H.Indices" : "H.Vector"
+    let type = parameter.isLaneIndices ? "H.Indices" : "H.Vector"
     let offset = contract.offset == 0 ? "" : "offset: \(contract.offset), "
     let count = contract.count.expression(laneCount: "H.laneCount")
     let arguments = "\(type).self, \(offset)count: \(count), \(seed), inContract: \(inContract)"
@@ -10390,7 +10593,7 @@ func referenceInputs(
             continue
         case .vector, .fillVector, .otherwiseVector:
             values = "Inputs.vectors(H.Vector.self, \(seed))"
-        case .indices, .laneIndices:
+        case .indices, .laneIndices, .lookupIndices:
             values = indexInputs(of: op, parameter, seed: seed, inContract: inContract)
         case .mask, .whereMask:
             values = "Inputs.masks(H.Mask.self, \(seed))"
@@ -10501,8 +10704,8 @@ func referenceCalls(
         switch parameter {
         case .tag:
             continue
-        case .vector, .indices, .laneIndices, .mask, .fillVector, .whereMask, .otherwiseVector,
-            .lane, .fillLane, .count, .shiftAmount, .laneAmount:
+        case .vector, .indices, .laneIndices, .lookupIndices, .mask, .fillVector, .whereMask,
+            .otherwiseVector, .lane, .fillLane, .count, .shiftAmount, .laneAmount:
             portArguments.append(swiftCallArgument(binding))
             referenceArguments.append(swiftArgument(binding, parameter, for: element))
         case .constLanePointer, .lanePointer:
@@ -10543,6 +10746,12 @@ func outOfContractDisabling(of op: Op) -> [Disabling] {
     return [assertionsDisabling]
         + (contract.isDefinedOnEmulation
             ? [] : [emulationDisabling("EMU128 reads outside the vector for these indices")])
+}
+
+func lookupDisabling(of op: Op) -> [Disabling] {
+    guard case .table(let lanes)? = op.span else { return [] }
+    let reason = "Highway's lookup needs more lanes than this target has"
+    return [("!H.\(canLookupName(lanes))", reason)]
 }
 
 func testAttribute(disabling: [Disabling]) -> String {
@@ -10587,13 +10796,14 @@ func referenceTestFunction(
         """
 }
 
-func alignedLanes(_ lanes: String) -> String {
-    "withAlignedLanes(\(lanes), laneCount: H.laneCount)"
+func alignedLanes(_ lanes: String, to laneCount: String = "H.laneCount") -> String {
+    "withAlignedLanes(\(lanes), laneCount: \(laneCount))"
 }
 
 func referenceLoadStatements(
     of source: String,
     aligned: Bool,
+    alignedTo laneCount: String = "H.laneCount",
     guardedLanes: String?,
     port: String,
     reference: String,
@@ -10604,7 +10814,7 @@ func referenceLoadStatements(
         if let guardedLanes {
             "unsafe withGuardedLanes(\(guardedLanes)) { source in \(results) }.result"
         } else if aligned {
-            "unsafe \(alignedLanes(source)) { source in \(results) }.result"
+            "unsafe \(alignedLanes(source, to: laneCount)) { source in \(results) }.result"
         } else {
             "\(source).withUnsafeBufferPointer { source in \(results) }"
         }
@@ -10689,6 +10899,7 @@ func referenceStatements(
             ? referenceLoadStatements(
                 of: source,
                 aligned: aligned,
+                alignedTo: alignmentLanes(of: op),
                 guardedLanes: guarded
                     ? guardedLanes(of: source, extent: op.span, count: count) : nil,
                 port: calls.port,
@@ -10762,7 +10973,7 @@ func referenceTest(
         for: element,
         inputs: inputs,
         declarations: declarations,
-        disabling: inContract ? [] : outOfContractDisabling(of: op),
+        disabling: lookupDisabling(of: op) + (inContract ? [] : outOfContractDisabling(of: op)),
         statements: statements
     )
 }
@@ -10854,6 +11065,18 @@ func repeatingBlockReferenceTest(for element: Element) -> String {
     )
 }
 
+func canLookupReferenceTest(_ size: LookupSize, for element: Element) -> String {
+    let name = canLookupName(size.lanes)
+    let call = referenceCall(referenceFunctionName(name, element), [])
+    return referenceTestFunction(
+        name,
+        label: name,
+        for: element,
+        inputs: [],
+        statements: "mismatches.check(H.\(name), \(call), \"\")"
+    )
+}
+
 func laneCountReferenceTest(for element: Element) -> String {
     let call = referenceCall(referenceFunctionName("laneCount", element), [])
     return referenceTestFunction(
@@ -10881,6 +11104,9 @@ func referenceConformances(of element: Element) -> String {
 
 func generateReferenceTests(_ element: Element) -> String {
     var tests = [laneCountReferenceTest(for: element)]
+    for size in lookupSizes where size.applies.matches(element) {
+        tests.append(canLookupReferenceTest(size, for: element))
+    }
     for op in ops where op.applies.matches(element) {
         tests.append(referenceTest(of: op, for: element, inContract: true))
         if takesIndices(op) {
@@ -11148,7 +11374,7 @@ func codegenConstant(
     case .vector, .fillVector, .otherwiseVector:
         return (port.repeating(lane), highway.repeating(lane))
     case .indices: return (port.repeating("3"), highway.repeating("3"))
-    case .laneIndices:
+    case .laneIndices, .lookupIndices:
         let indices = laneIndexElement(of: element)
         return (
             CodegenSide(kind: .port, element: indices).repeating("1"),
@@ -11375,7 +11601,7 @@ func referenceSpanNamespace(of element: Element) -> String {
 
 
         """
-    for op in ops where op.applies.matches(element) {
+    for op in ops where op.applies.matches(element) && !takesLookupIndices(op) {
         guard let forms = referenceSpanForms(of: op, for: element) else { continue }
         output += spanMembers(forms)
         if forms.isMutable {
@@ -11957,8 +12183,8 @@ func codegenCalls(
         switch parameter.kind {
         case .tag:
             continue
-        case .vector, .indices, .laneIndices, .mask, .fillVector, .whereMask, .otherwiseVector,
-            .lane, .fillLane, .laneAmount:
+        case .vector, .indices, .laneIndices, .lookupIndices, .mask, .fillVector, .whereMask,
+            .otherwiseVector, .lane, .fillLane, .laneAmount:
             portArguments.append(swiftCallArgument(binding))
             referenceArguments.append(swiftCallArgument(binding))
         case .count:
@@ -12064,6 +12290,7 @@ func codegenTest(
         for: element,
         inputs: inputs,
         declarations: declarations,
+        disabling: lookupDisabling(of: op),
         loopCondition: unorderedNaNsCondition(of: op, for: element, inputs: inputs),
         statements: statements
     )

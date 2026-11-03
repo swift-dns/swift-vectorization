@@ -3151,6 +3151,68 @@ public func highwayStoreInterleaved4I8ConstantD(
 }
 
 @inline(never)
+public func portLookup32I8(
+    at indices: SIMDInt8.Indices,
+    from: UnsafePointer<SIMDInt8.Lane>
+) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.lookup32(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup32I8(
+    at indices: SIMDInt8.Vector,
+    from: UnsafePointer<Int8>
+) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.lookup32I8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup32I8ConstantIndices(from: UnsafePointer<SIMDInt8.Lane>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.lookup32(at: SIMDInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup32I8ConstantIndices(from: UnsafePointer<Int8>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup32I8(
+            from,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portLookup64I8(
+    at indices: SIMDInt8.Indices,
+    from: UnsafePointer<SIMDInt8.Lane>
+) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.lookup64(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup64I8(
+    at indices: SIMDInt8.Vector,
+    from: UnsafePointer<Int8>
+) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.lookup64I8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup64I8ConstantIndices(from: UnsafePointer<SIMDInt8.Lane>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.lookup64(at: SIMDInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup64I8ConstantIndices(from: UnsafePointer<Int8>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup64I8(
+            from,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(1)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portRepeatingBlockI8(
     _ v0: SIMDInt8.Lane,
     _ v1: SIMDInt8.Lane,

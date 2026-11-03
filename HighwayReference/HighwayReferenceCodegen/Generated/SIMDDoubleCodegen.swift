@@ -2311,6 +2311,67 @@ public func highwayStoreInterleaved4F64ConstantD(
 }
 
 @inline(never)
+public func portLookup8F64(
+    at indices: SIMDDouble.Indices,
+    from: UnsafePointer<SIMDDouble.Lane>
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.lookup8(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup8F64(
+    at indices: SIMDInt64.Vector,
+    from: UnsafePointer<Double>
+) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.lookup8F64(from, indices.raw)
+}
+
+@inline(never)
+public func portLookup8F64ConstantIndices(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDouble.Vector
+{
+    unsafe SIMDDouble.lookup8(at: SIMDInt64.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup8F64ConstantIndices(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.lookup8F64(
+        from,
+        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+    )
+}
+
+@inline(never)
+public func portLookup16F64(
+    at indices: SIMDDouble.Indices,
+    from: UnsafePointer<SIMDDouble.Lane>
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.lookup16(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup16F64(
+    at indices: SIMDInt64.Vector,
+    from: UnsafePointer<Double>
+) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.lookup16F64(from, indices.raw)
+}
+
+@inline(never)
+public func portLookup16F64ConstantIndices(
+    from: UnsafePointer<SIMDDouble.Lane>
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.lookup16(at: SIMDInt64.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup16F64ConstantIndices(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.lookup16F64(
+        from,
+        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+    )
+}
+
+@inline(never)
 public func portLoadWideningF32ToF64(from: UnsafePointer<Float>) -> SIMDDouble.Vector {
     unsafe SIMDDouble.loadWidening(from: from)
 }

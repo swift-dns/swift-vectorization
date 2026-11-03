@@ -336,6 +336,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_to_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_u8 cvectorization_ops_from_raw_mask_u8(cvectorization_ops_raw_mask_u8 v) {
   return (cvectorization_ops_mask_u8)v;
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup32_u8(void) {
+  return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 16;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup64_u8(void) {
+#if CVECTORIZATION_OPS_NEON == 1
+  return true;
+#else
+  return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 32;
+#endif
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_u8(cvectorization_ops_raw_vector_u8 rawIndices, size_t offset, size_t count) {
   const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -4044,6 +4054,73 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u8(cvectori
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lookup32_u8(const uint8_t* from, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u8 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 16, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#else
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 16, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lookup64_u8(const uint8_t* from, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 32, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#elif CVECTORIZATION_OPS_NEON
+  cvectorization_ops_vector_u8 table0;
+  __builtin_memcpy(&table0, from + 0, 16);
+  cvectorization_ops_vector_u8 table1;
+  __builtin_memcpy(&table1, from + 16, 16);
+  cvectorization_ops_vector_u8 table2;
+  __builtin_memcpy(&table2, from + 32, 16);
+  cvectorization_ops_vector_u8 table3;
+  __builtin_memcpy(&table3, from + 48, 16);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vqtbl4q_v((cvectorization_ops_neon_i8)table0, (cvectorization_ops_neon_i8)table1, (cvectorization_ops_neon_i8)table2, (cvectorization_ops_neon_i8)table3, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 32, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 32, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#else
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 32, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_repeating_block_u8(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5, uint8_t v6, uint8_t v7, uint8_t v8, uint8_t v9, uint8_t v10, uint8_t v11, uint8_t v12, uint8_t v13, uint8_t v14, uint8_t v15) {
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8){v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15});
@@ -4078,6 +4155,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_u16 cvectorization_ops_from_raw_mask_u16(cvectorization_ops_raw_mask_u16 v) {
   return (cvectorization_ops_mask_u16)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u16(void) {
+  return sizeof(cvectorization_ops_vector_u16) / sizeof(uint16_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u16(void) {
+  return sizeof(cvectorization_ops_vector_u16) / sizeof(uint16_t) >= 8;
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_u16(cvectorization_ops_raw_vector_u16 rawIndices, size_t offset, size_t count) {
   const cvectorization_ops_vector_u16 indices = (cvectorization_ops_vector_u16)rawIndices;
@@ -6671,6 +6754,48 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u16(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_lookup8_u16(const uint16_t* from, cvectorization_ops_raw_vector_u16 rawIndices) {
+  const cvectorization_ops_vector_u16 indices = (cvectorization_ops_vector_u16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 4 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u16 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 16), 16);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u16 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 16), 16);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#else
+  cvectorization_ops_vector_u16 table;
+  __builtin_memcpy(&table, from, 16);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_lookup16_u16(const uint16_t* from, cvectorization_ops_raw_vector_u16 rawIndices) {
+  const cvectorization_ops_vector_u16 indices = (cvectorization_ops_vector_u16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u16 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u16 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u16 first;
+  cvectorization_ops_vector_u16 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)first, (cvectorization_ops_raw_vector_u16)second, rawIndices);
+#else
+  cvectorization_ops_vector_u16 first;
+  cvectorization_ops_vector_u16 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)first, (cvectorization_ops_raw_vector_u16)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_x86_promote_u8_to_u16(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_u8 a = (cvectorization_ops_block_u8)v;
@@ -6817,6 +6942,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_u32 cvectorization_ops_from_raw_mask_u32(cvectorization_ops_raw_mask_u32 v) {
   return (cvectorization_ops_mask_u32)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u32(void) {
+  return sizeof(cvectorization_ops_vector_u32) / sizeof(uint32_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u32(void) {
+  return sizeof(cvectorization_ops_vector_u32) / sizeof(uint32_t) >= 8;
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_u32(cvectorization_ops_raw_vector_u32 rawIndices, size_t offset, size_t count) {
   const cvectorization_ops_vector_u32 indices = (cvectorization_ops_vector_u32)rawIndices;
@@ -8704,6 +8835,57 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u32(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_lookup8_u32(const uint32_t* from, cvectorization_ops_raw_vector_u32 rawIndices) {
+  const cvectorization_ops_vector_u32 indices = (cvectorization_ops_vector_u32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u32 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#else
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_lookup16_u32(const uint32_t* from, cvectorization_ops_raw_vector_u32 rawIndices) {
+  const cvectorization_ops_vector_u32 indices = (cvectorization_ops_vector_u32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#else
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_x86_promote_u8_to_u32(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_u8 a = (cvectorization_ops_block_u8)v;
@@ -8919,6 +9101,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u64 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_u64 cvectorization_ops_from_raw_mask_u64(cvectorization_ops_raw_mask_u64 v) {
   return (cvectorization_ops_mask_u64)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u64(void) {
+  return sizeof(cvectorization_ops_vector_u64) / sizeof(uint64_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u64(void) {
+  return sizeof(cvectorization_ops_vector_u64) / sizeof(uint64_t) >= 8;
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_u64(cvectorization_ops_raw_vector_u64 rawIndices, size_t offset, size_t count) {
   const cvectorization_ops_vector_u64 indices = (cvectorization_ops_vector_u64)rawIndices;
@@ -10803,6 +10991,60 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u64(cvector
   *to++ = d1;
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_lookup8_u64(const uint64_t* from, cvectorization_ops_raw_vector_u64 rawIndices) {
+  const cvectorization_ops_vector_u64 indices = (cvectorization_ops_vector_u64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u64 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#else
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_lookup16_u64(const uint64_t* from, cvectorization_ops_raw_vector_u64 rawIndices) {
+  const cvectorization_ops_vector_u64 indices = (cvectorization_ops_vector_u64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 64), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 64), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#else
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_x86_promote_u8_to_u64(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_u8 a = (cvectorization_ops_block_u8)v;
@@ -11100,6 +11342,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_to_r
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_i8 cvectorization_ops_from_raw_mask_i8(cvectorization_ops_raw_mask_i8 v) {
   return (cvectorization_ops_mask_i8)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup32_i8(void) {
+  return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 16;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup64_i8(void) {
+#if CVECTORIZATION_OPS_NEON == 1
+  return true;
+#else
+  return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 32;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_i8(cvectorization_ops_raw_vector_i8 rawIndices, size_t offset, size_t count) {
   const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
@@ -14797,6 +15049,73 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i8(cvectori
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lookup32_i8(const int8_t* from, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i8 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 16, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#else
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 16, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lookup64_i8(const int8_t* from, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 32, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#elif CVECTORIZATION_OPS_NEON
+  cvectorization_ops_vector_i8 table0;
+  __builtin_memcpy(&table0, from + 0, 16);
+  cvectorization_ops_vector_i8 table1;
+  __builtin_memcpy(&table1, from + 16, 16);
+  cvectorization_ops_vector_i8 table2;
+  __builtin_memcpy(&table2, from + 32, 16);
+  cvectorization_ops_vector_i8 table3;
+  __builtin_memcpy(&table3, from + 48, 16);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_neon_vqtbl4q_v((cvectorization_ops_neon_i8)table0, (cvectorization_ops_neon_i8)table1, (cvectorization_ops_neon_i8)table2, (cvectorization_ops_neon_i8)table3, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 32, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 32, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#else
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 32, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_repeating_block_i8(int8_t v0, int8_t v1, int8_t v2, int8_t v3, int8_t v4, int8_t v5, int8_t v6, int8_t v7, int8_t v8, int8_t v9, int8_t v10, int8_t v11, int8_t v12, int8_t v13, int8_t v14, int8_t v15) {
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8){v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15});
@@ -14831,6 +15150,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_i16 cvectorization_ops_from_raw_mask_i16(cvectorization_ops_raw_mask_i16 v) {
   return (cvectorization_ops_mask_i16)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i16(void) {
+  return sizeof(cvectorization_ops_vector_i16) / sizeof(int16_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i16(void) {
+  return sizeof(cvectorization_ops_vector_i16) / sizeof(int16_t) >= 8;
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_i16(cvectorization_ops_raw_vector_i16 rawIndices, size_t offset, size_t count) {
   const cvectorization_ops_vector_i16 indices = (cvectorization_ops_vector_i16)rawIndices;
@@ -17380,6 +17705,48 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i16(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_lookup8_i16(const int16_t* from, cvectorization_ops_raw_vector_i16 rawIndices) {
+  const cvectorization_ops_vector_i16 indices = (cvectorization_ops_vector_i16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 4 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i16 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 16), 16);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i16 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 16), 16);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#else
+  cvectorization_ops_vector_i16 table;
+  __builtin_memcpy(&table, from, 16);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_lookup16_i16(const int16_t* from, cvectorization_ops_raw_vector_i16 rawIndices) {
+  const cvectorization_ops_vector_i16 indices = (cvectorization_ops_vector_i16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i16 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i16 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i16 first;
+  cvectorization_ops_vector_i16 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)first, (cvectorization_ops_raw_vector_i16)second, rawIndices);
+#else
+  cvectorization_ops_vector_i16 first;
+  cvectorization_ops_vector_i16 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)first, (cvectorization_ops_raw_vector_i16)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_x86_promote_i8_to_i16(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_i8 a = (cvectorization_ops_block_i8)v;
@@ -17526,6 +17893,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_i32 cvectorization_ops_from_raw_mask_i32(cvectorization_ops_raw_mask_i32 v) {
   return (cvectorization_ops_mask_i32)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i32(void) {
+  return sizeof(cvectorization_ops_vector_i32) / sizeof(int32_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i32(void) {
+  return sizeof(cvectorization_ops_vector_i32) / sizeof(int32_t) >= 8;
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_i32(cvectorization_ops_raw_vector_i32 rawIndices, size_t offset, size_t count) {
   const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
@@ -19405,6 +19778,57 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i32(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_lookup8_i32(const int32_t* from, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i32 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#else
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_lookup16_i32(const int32_t* from, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#else
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_x86_promote_i8_to_i32(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_i8 a = (cvectorization_ops_block_i8)v;
@@ -19620,6 +20044,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i64 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_i64 cvectorization_ops_from_raw_mask_i64(cvectorization_ops_raw_mask_i64 v) {
   return (cvectorization_ops_mask_i64)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i64(void) {
+  return sizeof(cvectorization_ops_vector_i64) / sizeof(int64_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i64(void) {
+  return sizeof(cvectorization_ops_vector_i64) / sizeof(int64_t) >= 8;
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_i64(cvectorization_ops_raw_vector_i64 rawIndices, size_t offset, size_t count) {
   const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
@@ -21447,6 +21877,60 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i64(cvector
   *to++ = d1;
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_lookup8_i64(const int64_t* from, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i64 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#else
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_lookup16_i64(const int64_t* from, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 64), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 64), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#else
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_x86_promote_i8_to_i64(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_i8 a = (cvectorization_ops_block_i8)v;
@@ -21734,6 +22218,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_f32 cvectorization_ops_from_raw_mask_f32(cvectorization_ops_raw_mask_f32 v) {
   return (cvectorization_ops_mask_f32)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_f32(void) {
+  return sizeof(cvectorization_ops_vector_f32) / sizeof(float) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_f32(void) {
+  return sizeof(cvectorization_ops_vector_f32) / sizeof(float) >= 8;
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_f32(cvectorization_ops_vector_f32 v) {
@@ -23565,6 +24055,57 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_f32(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_lookup8_f32(const float* from, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_f32 table;
+  __builtin_memset(&table, 0, sizeof table);
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_f32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#else
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_lookup16_f32(const float* from, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_f32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#else
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_repeating_block_f32(float v0, float v1, float v2, float v3) {
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32){v0, v1, v2, v3, v0, v1, v2, v3, v0, v1, v2, v3, v0, v1, v2, v3});
@@ -23593,6 +24134,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f64 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_f64 cvectorization_ops_from_raw_mask_f64(cvectorization_ops_raw_mask_f64 v) {
   return (cvectorization_ops_mask_f64)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_f64(void) {
+  return sizeof(cvectorization_ops_vector_f64) / sizeof(double) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_f64(void) {
+  return sizeof(cvectorization_ops_vector_f64) / sizeof(double) >= 8;
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_f64(cvectorization_ops_vector_f64 v) {
@@ -25177,6 +25724,60 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_f64(cvector
   *to++ = b1;
   *to++ = c1;
   *to++ = d1;
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_lookup8_f64(const double* from, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_f64 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#else
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_lookup16_f64(const double* from, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 64), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 64), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#else
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
 #endif
 }
 #if CVECTORIZATION_OPS_X86 == 4

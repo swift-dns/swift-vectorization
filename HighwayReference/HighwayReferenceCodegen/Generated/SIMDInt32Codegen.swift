@@ -3168,6 +3168,69 @@ public func highwayStoreInterleaved4I32ConstantD(
 }
 
 @inline(never)
+public func portLookup8I32(
+    at indices: SIMDInt32.Indices,
+    from: UnsafePointer<SIMDInt32.Lane>
+) -> SIMDInt32.Vector {
+    unsafe SIMDInt32.lookup8(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup8I32(
+    at indices: SIMDInt32.Vector,
+    from: UnsafePointer<Int32>
+) -> SIMDInt32.Vector {
+    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.lookup8I32(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup8I32ConstantIndices(from: UnsafePointer<SIMDInt32.Lane>) -> SIMDInt32.Vector {
+    unsafe SIMDInt32.lookup8(at: SIMDInt32.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup8I32ConstantIndices(from: UnsafePointer<Int32>) -> SIMDInt32.Vector {
+    unsafe SIMDInt32.Vector(
+        raw: HighwayReference.Nothrow.lookup8I32(
+            from,
+            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portLookup16I32(
+    at indices: SIMDInt32.Indices,
+    from: UnsafePointer<SIMDInt32.Lane>
+) -> SIMDInt32.Vector {
+    unsafe SIMDInt32.lookup16(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup16I32(
+    at indices: SIMDInt32.Vector,
+    from: UnsafePointer<Int32>
+) -> SIMDInt32.Vector {
+    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.lookup16I32(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup16I32ConstantIndices(from: UnsafePointer<SIMDInt32.Lane>) -> SIMDInt32.Vector
+{
+    unsafe SIMDInt32.lookup16(at: SIMDInt32.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup16I32ConstantIndices(from: UnsafePointer<Int32>) -> SIMDInt32.Vector {
+    unsafe SIMDInt32.Vector(
+        raw: HighwayReference.Nothrow.lookup16I32(
+            from,
+            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portLoadWideningI8ToI32(from: UnsafePointer<Int8>) -> SIMDInt32.Vector {
     unsafe SIMDInt32.loadWidening(from: from)
 }

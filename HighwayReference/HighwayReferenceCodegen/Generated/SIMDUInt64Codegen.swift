@@ -3355,6 +3355,71 @@ public func highwayStoreInterleaved4U64ConstantD(
 }
 
 @inline(never)
+public func portLookup8U64(
+    at indices: SIMDUInt64.Indices,
+    from: UnsafePointer<SIMDUInt64.Lane>
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.lookup8(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup8U64(
+    at indices: SIMDUInt64.Vector,
+    from: UnsafePointer<UInt64>
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.Vector(raw: HighwayReference.Nothrow.lookup8U64(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup8U64ConstantIndices(from: UnsafePointer<SIMDUInt64.Lane>) -> SIMDUInt64.Vector
+{
+    unsafe SIMDUInt64.lookup8(at: SIMDUInt64.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup8U64ConstantIndices(from: UnsafePointer<UInt64>) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.lookup8U64(
+            from,
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portLookup16U64(
+    at indices: SIMDUInt64.Indices,
+    from: UnsafePointer<SIMDUInt64.Lane>
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.lookup16(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup16U64(
+    at indices: SIMDUInt64.Vector,
+    from: UnsafePointer<UInt64>
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.Vector(raw: HighwayReference.Nothrow.lookup16U64(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup16U64ConstantIndices(
+    from: UnsafePointer<SIMDUInt64.Lane>
+) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.lookup16(at: SIMDUInt64.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup16U64ConstantIndices(from: UnsafePointer<UInt64>) -> SIMDUInt64.Vector {
+    unsafe SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.lookup16U64(
+            from,
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(1)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portLoadWideningU8ToU64(from: UnsafePointer<UInt8>) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.loadWidening(from: from)
 }

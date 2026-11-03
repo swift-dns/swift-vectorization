@@ -3174,6 +3174,68 @@ public func highwayStoreInterleaved4U8ConstantD(
 }
 
 @inline(never)
+public func portLookup32U8(
+    at indices: SIMDUInt8.Indices,
+    from: UnsafePointer<SIMDUInt8.Lane>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup32(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup32U8(
+    at indices: SIMDUInt8.Vector,
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.lookup32U8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup32U8ConstantIndices(from: UnsafePointer<SIMDUInt8.Lane>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup32(at: SIMDUInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup32U8ConstantIndices(from: UnsafePointer<UInt8>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup32U8(
+            from,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portLookup64U8(
+    at indices: SIMDUInt8.Indices,
+    from: UnsafePointer<SIMDUInt8.Lane>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup64(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup64U8(
+    at indices: SIMDUInt8.Vector,
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.lookup64U8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup64U8ConstantIndices(from: UnsafePointer<SIMDUInt8.Lane>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup64(at: SIMDUInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup64U8ConstantIndices(from: UnsafePointer<UInt8>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup64U8(
+            from,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(1)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portRepeatingBlockU8(
     _ v0: SIMDUInt8.Lane,
     _ v1: SIMDUInt8.Lane,

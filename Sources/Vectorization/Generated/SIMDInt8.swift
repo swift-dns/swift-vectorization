@@ -54,6 +54,12 @@ public enum SIMDInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
     public static var laneCount: Int { Int(cvectorization_ops_lane_count_i8()) }
 
     @export(implementation) @inline(always)
+    public static var canLookup32: Bool { cvectorization_ops_can_lookup32_i8() }
+
+    @export(implementation) @inline(always)
+    public static var canLookup64: Bool { cvectorization_ops_can_lookup64_i8() }
+
+    @export(implementation) @inline(always)
     public static func zero() -> Vector {
         Vector(raw: cvectorization_ops_zero_i8())
     }
@@ -1071,6 +1077,112 @@ public enum SIMDInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 4 * laneCount
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func lookup32(at indices: Indices, from: UnsafePointer<Lane>) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 32),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        assert(canLookup32, "Vector has too few lanes for this lookup")
+        return Vector(raw: unsafe cvectorization_ops_lookup32_i8(from, indices.raw))
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func lookup32(at indices: Indices, from span: Span<Lane>) -> Vector {
+        precondition(span.count >= 32, "Span has fewer elements than the table has lanes")
+        precondition(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(32 * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the table size"
+        )
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 32),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        precondition(canLookup32, "Vector has too few lanes for this lookup")
+        return unsafe lookup32(at: indices, fromUnchecked: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func lookup32(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector {
+        assert(span.count >= 32, "Span has fewer elements than the table has lanes")
+        assert(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(32 * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the table size"
+        )
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 32),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        assert(canLookup32, "Vector has too few lanes for this lookup")
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_lookup32_i8(
+                    $0.baseAddress.unsafelyUnwrapped,
+                    indices.raw
+                )
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func lookup64(at indices: Indices, from: UnsafePointer<Lane>) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 64),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        assert(canLookup64, "Vector has too few lanes for this lookup")
+        return Vector(raw: unsafe cvectorization_ops_lookup64_i8(from, indices.raw))
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func lookup64(at indices: Indices, from span: Span<Lane>) -> Vector {
+        precondition(span.count >= 64, "Span has fewer elements than the table has lanes")
+        precondition(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(64 * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the table size"
+        )
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 64),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        precondition(canLookup64, "Vector has too few lanes for this lookup")
+        return unsafe lookup64(at: indices, fromUnchecked: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func lookup64(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector {
+        assert(span.count >= 64, "Span has fewer elements than the table has lanes")
+        assert(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(64 * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the table size"
+        )
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 64),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        assert(canLookup64, "Vector has too few lanes for this lookup")
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_lookup64_i8(
+                    $0.baseAddress.unsafelyUnwrapped,
+                    indices.raw
+                )
+            )
         }
     }
 

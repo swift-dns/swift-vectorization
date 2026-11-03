@@ -996,6 +996,52 @@ struct OpsTests {
         }
     }
 
+    @Test("A lookup reads the table at the indices through every form")
+    func lookupReadsTable() {
+        typealias H = SIMDUInt32
+        guard H.canLookup8 else { return }
+        let table = (0..<8).map { UInt32($0 &* 7) &+ 100 }
+        let indices = ContiguousArray((0..<H.laneCount).map { UInt32(($0 &* 3) % 8) })
+        let expected = indices.map { table[Int($0)] }
+        let vector = H.load(from: indices.span)
+
+        func lanes(_ result: H.Vector) -> [UInt32] {
+            var output = ContiguousArray<UInt32>(repeating: 0, count: H.laneCount)
+            var destination = output.mutableSpan
+            H.store(result, to: &destination)
+            return Array(output)
+        }
+
+        withAlignedTable(table) { span in
+            #expect(lanes(H.lookup8(at: vector, from: span)) == expected)
+            #expect(lanes(unsafe H.lookup8(at: vector, fromUnchecked: span)) == expected)
+            span.withUnsafeBufferPointer { pointer in
+                #expect(lanes(unsafe H.lookup8(at: vector, from: pointer.baseAddress!)) == expected)
+            }
+        }
+    }
+
+    @Test("Checked lookups trap on a short or misaligned table or an index outside it")
+    func checkedLookupsTrap() async {
+        await #expect(processExitsWith: .failure) {
+            withAlignedTable([UInt32](repeating: 0, count: 7)) { span in
+                _ = SIMDUInt32.lookup8(at: SIMDUInt32.zero(), from: span)
+            }
+        }
+        await #expect(processExitsWith: .failure) {
+            let table = ContiguousArray<UInt32>(repeating: 0, count: 16)
+            _ = SIMDUInt32.lookup8(
+                at: SIMDUInt32.zero(),
+                from: table.span.extracting(droppingFirst: 1)
+            )
+        }
+        await #expect(processExitsWith: .failure) {
+            withAlignedTable([UInt32](repeating: 0, count: 8)) { span in
+                _ = SIMDUInt32.lookup8(at: SIMDUInt32.repeating(8), from: span)
+            }
+        }
+    }
+
     @Test("Checked output span ops trap on too little free capacity or a count out of bounds")
     func checkedOutputSpanOpsTrap() async {
         await #expect(processExitsWith: .failure) {
@@ -1078,4 +1124,16 @@ struct OpsTests {
         }
     }
     #endif
+}
+
+private func withAlignedTable<Result>(
+    _ lanes: [UInt32],
+    _ body: (Span<UInt32>) -> Result
+) -> Result {
+    let table =
+        unsafe UnsafeMutableRawBufferPointer
+        .allocate(byteCount: lanes.count * MemoryLayout<UInt32>.stride, alignment: 32)
+        .initializeMemory(as: UInt32.self, fromContentsOf: lanes)
+    defer { unsafe table.deallocate() }
+    return body(unsafe table.span)
 }

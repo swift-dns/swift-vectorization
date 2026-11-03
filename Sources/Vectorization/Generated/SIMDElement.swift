@@ -279,4 +279,14 @@ public protocol SIMDFloatElement: SIMDElement {
     static func smallestOrNaN(_ a: Vector) -> Lane
     static func largest(_ a: Vector) -> Lane
     static func largestOrNaN(_ a: Vector) -> Lane
+    static func lookup8(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func lookup8(at indices: Indices, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func lookup8(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
+    static func lookup16(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func lookup16(at indices: Indices, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func lookup16(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
 }

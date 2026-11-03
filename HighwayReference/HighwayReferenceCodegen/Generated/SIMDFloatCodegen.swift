@@ -2261,6 +2261,65 @@ public func highwayStoreInterleaved4F32ConstantD(
 }
 
 @inline(never)
+public func portLookup8F32(
+    at indices: SIMDFloat.Indices,
+    from: UnsafePointer<SIMDFloat.Lane>
+) -> SIMDFloat.Vector {
+    unsafe SIMDFloat.lookup8(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup8F32(
+    at indices: SIMDInt32.Vector,
+    from: UnsafePointer<Float>
+) -> SIMDFloat.Vector {
+    unsafe HighwayReference.Nothrow.lookup8F32(from, indices.raw)
+}
+
+@inline(never)
+public func portLookup8F32ConstantIndices(from: UnsafePointer<SIMDFloat.Lane>) -> SIMDFloat.Vector {
+    unsafe SIMDFloat.lookup8(at: SIMDInt32.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup8F32ConstantIndices(from: UnsafePointer<Float>) -> SIMDFloat.Vector {
+    unsafe HighwayReference.Nothrow.lookup8F32(
+        from,
+        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+    )
+}
+
+@inline(never)
+public func portLookup16F32(
+    at indices: SIMDFloat.Indices,
+    from: UnsafePointer<SIMDFloat.Lane>
+) -> SIMDFloat.Vector {
+    unsafe SIMDFloat.lookup16(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup16F32(
+    at indices: SIMDInt32.Vector,
+    from: UnsafePointer<Float>
+) -> SIMDFloat.Vector {
+    unsafe HighwayReference.Nothrow.lookup16F32(from, indices.raw)
+}
+
+@inline(never)
+public func portLookup16F32ConstantIndices(from: UnsafePointer<SIMDFloat.Lane>) -> SIMDFloat.Vector
+{
+    unsafe SIMDFloat.lookup16(at: SIMDInt32.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup16F32ConstantIndices(from: UnsafePointer<Float>) -> SIMDFloat.Vector {
+    unsafe HighwayReference.Nothrow.lookup16F32(
+        from,
+        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+    )
+}
+
+@inline(never)
 public func portRepeatingBlockF32(
     _ v0: SIMDFloat.Lane,
     _ v1: SIMDFloat.Lane,
