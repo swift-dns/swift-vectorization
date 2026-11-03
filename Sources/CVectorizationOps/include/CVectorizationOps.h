@@ -336,6 +336,35 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_to_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_u8 cvectorization_ops_from_raw_mask_u8(cvectorization_ops_raw_mask_u8 v) {
   return (cvectorization_ops_mask_u8)v;
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup32_u8(void) {
+  return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 16;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup64_u8(void) {
+#if CVECTORIZATION_OPS_NEON == 1
+  return true;
+#else
+  return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 32;
+#endif
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_u8(cvectorization_ops_raw_vector_u8 rawIndices, size_t offset, size_t count) {
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint8_t first = (uint8_t)offset;
+  const uint8_t limit = (uint8_t)count;
+  const cvectorization_ops_vector_u8 shifted = (cvectorization_ops_vector_u8)indices - (cvectorization_ops_vector_u8){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint8_t first = (uint8_t)offset;
+  const uint8_t limit = (uint8_t)count;
+  const cvectorization_ops_vector_u8 shifted = (cvectorization_ops_vector_u8)indices - (cvectorization_ops_vector_u8){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#else
+  const uint8_t first = (uint8_t)offset;
+  const uint8_t limit = (uint8_t)count;
+  const cvectorization_ops_vector_u8 shifted = (cvectorization_ops_vector_u8)indices - (cvectorization_ops_vector_u8){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#endif
+}
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_u8(cvectorization_ops_vector_u8 v) {
   return __builtin_constant_p(__builtin_reduce_or(v));
@@ -2900,17 +2929,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sl
   return (cvectorization_ops_raw_vector_u8)(result);
 #endif
 }
-CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_table_lookup_bytes_u8(cvectorization_ops_raw_vector_u8 rawA, cvectorization_ops_raw_vector_u8 rawB) {
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_table_lookup_bytes_u8(cvectorization_ops_raw_vector_u8 rawA, cvectorization_ops_raw_vector_u8 rawIndices) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
-  const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
 #if CVECTORIZATION_OPS_NEON
-  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 48));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)indices, 48));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
-  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)b));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)b));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
 #elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
-  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)b));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
 #elif CVECTORIZATION_OPS_X86 == 1
   cvectorization_ops_x86_i64 looked;
   {
@@ -2918,7 +2947,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ta
     uint8_t tableBytes[16] __attribute__((aligned(16)));
     uint8_t indexBytes[16] __attribute__((aligned(16)));
     *(cvectorization_ops_x86_i64*)tableBytes = (cvectorization_ops_x86_i64)a;
-    *(cvectorization_ops_x86_i64*)indexBytes = (cvectorization_ops_x86_i64)b;
+    *(cvectorization_ops_x86_i64*)indexBytes = (cvectorization_ops_x86_i64)indices;
     for (int i = 0; i < 16; i++) {
       resultBytes[i] = tableBytes[indexBytes[i] & 15];
     }
@@ -2928,68 +2957,273 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ta
 #else
   cvectorization_ops_vector_u8 result;
   {
-    const uint8_t index = (uint8_t)b[0];
+    const uint8_t index = (uint8_t)indices[0];
     result[0] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[1];
+    const uint8_t index = (uint8_t)indices[1];
     result[1] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[2];
+    const uint8_t index = (uint8_t)indices[2];
     result[2] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[3];
+    const uint8_t index = (uint8_t)indices[3];
     result[3] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[4];
+    const uint8_t index = (uint8_t)indices[4];
     result[4] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[5];
+    const uint8_t index = (uint8_t)indices[5];
     result[5] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[6];
+    const uint8_t index = (uint8_t)indices[6];
     result[6] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[7];
+    const uint8_t index = (uint8_t)indices[7];
     result[7] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[8];
+    const uint8_t index = (uint8_t)indices[8];
     result[8] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[9];
+    const uint8_t index = (uint8_t)indices[9];
     result[9] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[10];
+    const uint8_t index = (uint8_t)indices[10];
     result[10] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[11];
+    const uint8_t index = (uint8_t)indices[11];
     result[11] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[12];
+    const uint8_t index = (uint8_t)indices[12];
     result[12] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[13];
+    const uint8_t index = (uint8_t)indices[13];
     result[13] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[14];
+    const uint8_t index = (uint8_t)indices[14];
     result[14] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[15];
+    const uint8_t index = (uint8_t)indices[15];
     result[15] = index < 16 ? a[index] : 0;
+  }
+  return (cvectorization_ops_raw_vector_u8)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_table_lookup_bytes_or_zero_u8(cvectorization_ops_raw_vector_u8 rawA, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtbl_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)indices));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i8 signedIndices = (cvectorization_ops_x86_i8)indices;
+  const cvectorization_ops_x86_i8 zeroedZeroed = (cvectorization_ops_x86_i8){0} > signedIndices;
+  cvectorization_ops_x86_i64 zeroedLooked;
+  {
+    uint8_t resultBytes[16] __attribute__((aligned(16)));
+    uint8_t tableBytes[16] __attribute__((aligned(16)));
+    uint8_t indexBytes[16] __attribute__((aligned(16)));
+    *(cvectorization_ops_x86_i64*)tableBytes = (cvectorization_ops_x86_i64)a;
+    *(cvectorization_ops_x86_i64*)indexBytes = (cvectorization_ops_x86_i64)signedIndices;
+    for (int i = 0; i < 16; i++) {
+      resultBytes[i] = tableBytes[indexBytes[i] & 15];
+    }
+    zeroedLooked = *(cvectorization_ops_x86_i64*)resultBytes;
+  }
+  const cvectorization_ops_x86_i64 zeroed = ~(cvectorization_ops_x86_i64)zeroedZeroed & zeroedLooked;
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)zeroed);
+#else
+  cvectorization_ops_vector_u8 result;
+  {
+    const uint8_t index = (uint8_t)indices[0];
+    result[0] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[1];
+    result[1] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[2];
+    result[2] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[3];
+    result[3] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[4];
+    result[4] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[5];
+    result[5] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[6];
+    result[6] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[7];
+    result[7] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[8];
+    result[8] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[9];
+    result[9] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[10];
+    result[10] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[11];
+    result[11] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[12];
+    result[12] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[13];
+    result[13] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[14];
+    result[14] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[15];
+    result[15] = index < 16 ? a[index] : 0;
+  }
+  return (cvectorization_ops_raw_vector_u8)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_table_lookup_lanes_u8(cvectorization_ops_raw_vector_u8 rawA, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtbl_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)indices));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 == 6
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_permvarqi512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 == 5
+  const cvectorization_ops_x86_i16 shiftedBy3 = (cvectorization_ops_x86_i16)indices << 3;
+  const unsigned long long selectsUpperHalves = (unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)shiftedBy3);
+  const cvectorization_ops_x86_i16 shiftedBy2 = (cvectorization_ops_x86_i16)indices << 2;
+  const unsigned long long selectsUpperQuarters = (unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)shiftedBy2);
+  const cvectorization_ops_x86_i32 tableA = (cvectorization_ops_x86_i32)__builtin_ia32_shuf_i32x4((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)a, (int)0);
+  const cvectorization_ops_x86_i32 tableB = (cvectorization_ops_x86_i32)__builtin_ia32_shuf_i32x4((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)a, (int)0x55);
+  const cvectorization_ops_x86_i32 tableC = (cvectorization_ops_x86_i32)__builtin_ia32_shuf_i32x4((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)a, (int)0xAA);
+  const cvectorization_ops_x86_i32 tableD = (cvectorization_ops_x86_i32)__builtin_ia32_shuf_i32x4((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)a, (int)0xFF);
+  const cvectorization_ops_vector_u8 lookedA = (cvectorization_ops_vector_u8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)tableA, (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_u8 lookedC = (cvectorization_ops_vector_u8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)tableC, (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_u8 lookedAB = (cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)selectsUpperHalves, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)tableB, (cvectorization_ops_x86_i8)indices), (cvectorization_ops_x86_i8)lookedA);
+  const cvectorization_ops_vector_u8 lookedCD = (cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)selectsUpperHalves, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)tableD, (cvectorization_ops_x86_i8)indices), (cvectorization_ops_x86_i8)lookedC);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)selectsUpperQuarters, (cvectorization_ops_x86_i8)lookedCD, (cvectorization_ops_x86_i8)lookedAB));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)indices << 3;
+  const cvectorization_ops_vector_u8 lower = (cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i64)__builtin_ia32_insert128i256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_block_i64)__builtin_shufflevector((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, 0, 1), (int)1), (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_u8 upper = (cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i64)__builtin_ia32_permti256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, (int)0x31), (cvectorization_ops_x86_i8)indices);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)lower, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)selector));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  cvectorization_ops_x86_i64 looked;
+  {
+    uint8_t resultBytes[16] __attribute__((aligned(16)));
+    uint8_t tableBytes[16] __attribute__((aligned(16)));
+    uint8_t indexBytes[16] __attribute__((aligned(16)));
+    *(cvectorization_ops_x86_i64*)tableBytes = (cvectorization_ops_x86_i64)a;
+    *(cvectorization_ops_x86_i64*)indexBytes = (cvectorization_ops_x86_i64)indices;
+    for (int i = 0; i < 16; i++) {
+      resultBytes[i] = tableBytes[indexBytes[i] & 15];
+    }
+    looked = *(cvectorization_ops_x86_i64*)resultBytes;
+  }
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)looked);
+#else
+  uint8_t source[16];
+  int8_t index[16];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_u8 result;
+  for (size_t i = 0; i < 16; ++i) {
+    result[i] = source[index[i]];
+  }
+  return (cvectorization_ops_raw_vector_u8)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_two_tables_lookup_lanes_u8(cvectorization_ops_raw_vector_u8 rawA, cvectorization_ops_raw_vector_u8 rawB, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
+  const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtbl2_u8(__builtin_sve_svcreate2_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b), (cvectorization_ops_sve_u8)indices));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 == 6
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_vpermi2varqi512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)b));
+#elif CVECTORIZATION_OPS_X86 == 5
+  const cvectorization_ops_x86_i16 shifted = (cvectorization_ops_x86_i16)indices << 1;
+  const unsigned long long selectsUpper = (unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)shifted);
+  const cvectorization_ops_vector_u8 upper = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawB, rawIndices);
+  const cvectorization_ops_vector_u8 lower = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawA, rawIndices);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)selectsUpper, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)lower));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)indices << 2;
+  const cvectorization_ops_vector_u8 lower = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawA, rawIndices);
+  const cvectorization_ops_vector_u8 upper = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)lower, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)selector));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)indices << 3;
+  const cvectorization_ops_vector_u8 lower = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawA, rawIndices);
+  const cvectorization_ops_vector_u8 upper = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)lower, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)selector));
+#elif CVECTORIZATION_OPS_X86 == 2
+  const cvectorization_ops_x86_i8 selector = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)indices < (cvectorization_ops_x86_i8){16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16});
+  const cvectorization_ops_vector_u8 lower = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawA, rawIndices);
+  const cvectorization_ops_vector_u8 upper = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper)));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i8 selector = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)indices > (cvectorization_ops_x86_i8){15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15});
+  const cvectorization_ops_vector_u8 lower = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawA, rawIndices);
+  const cvectorization_ops_vector_u8 upper = (cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_lanes_u8(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower)));
+#else
+  uint8_t first[16];
+  uint8_t second[16];
+  int8_t index[16];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_u8 result;
+  for (size_t i = 0; i < 16; ++i) {
+    result[i] = index[i] < (int8_t)16 ? first[index[i] & (int8_t)15] : second[index[i] & (int8_t)15];
   }
   return (cvectorization_ops_raw_vector_u8)(result);
 #endif
@@ -3833,6 +4067,74 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u8(cvectori
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lookup32_u8(const uint8_t* from, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long half_vector __attribute__((vector_size(32)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 32), 32);
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (half_vector){0, 0, 0, 0}, 0, 1, 2, 3, 4, 5, 6, 7);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 16, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#else
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 16, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lookup64_u8(const uint8_t* from, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 32, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#elif CVECTORIZATION_OPS_NEON
+  cvectorization_ops_vector_u8 table0;
+  __builtin_memcpy(&table0, from + 0, 16);
+  cvectorization_ops_vector_u8 table1;
+  __builtin_memcpy(&table1, from + 16, 16);
+  cvectorization_ops_vector_u8 table2;
+  __builtin_memcpy(&table2, from + 32, 16);
+  cvectorization_ops_vector_u8 table3;
+  __builtin_memcpy(&table3, from + 48, 16);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vqtbl4q_v((cvectorization_ops_neon_i8)table0, (cvectorization_ops_neon_i8)table1, (cvectorization_ops_neon_i8)table2, (cvectorization_ops_neon_i8)table3, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 32, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 32, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#else
+  cvectorization_ops_vector_u8 first;
+  cvectorization_ops_vector_u8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 32, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)first, (cvectorization_ops_raw_vector_u8)second, rawIndices);
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_repeating_block_u8(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5, uint8_t v6, uint8_t v7, uint8_t v8, uint8_t v9, uint8_t v10, uint8_t v11, uint8_t v12, uint8_t v13, uint8_t v14, uint8_t v15) {
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8){v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15});
@@ -3867,6 +4169,31 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_u16 cvectorization_ops_from_raw_mask_u16(cvectorization_ops_raw_mask_u16 v) {
   return (cvectorization_ops_mask_u16)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u16(void) {
+  return sizeof(cvectorization_ops_vector_u16) / sizeof(uint16_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u16(void) {
+  return sizeof(cvectorization_ops_vector_u16) / sizeof(uint16_t) >= 8;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_u16(cvectorization_ops_raw_vector_u16 rawIndices, size_t offset, size_t count) {
+  const cvectorization_ops_vector_u16 indices = (cvectorization_ops_vector_u16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint16_t first = (uint16_t)offset;
+  const uint16_t limit = (uint16_t)count;
+  const cvectorization_ops_vector_u16 shifted = (cvectorization_ops_vector_u16)indices - (cvectorization_ops_vector_u16){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT16_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u16){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint16_t first = (uint16_t)offset;
+  const uint16_t limit = (uint16_t)count;
+  const cvectorization_ops_vector_u16 shifted = (cvectorization_ops_vector_u16)indices - (cvectorization_ops_vector_u16){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT16_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u16){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#else
+  const uint16_t first = (uint16_t)offset;
+  const uint16_t limit = (uint16_t)count;
+  const cvectorization_ops_vector_u16 shifted = (cvectorization_ops_vector_u16)indices - (cvectorization_ops_vector_u16){first, first, first, first, first, first, first, first};
+  return count > UINT16_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u16){limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_u16(cvectorization_ops_vector_u16 v) {
@@ -5565,6 +5892,108 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_u16)(result);
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_table_lookup_lanes_u16(cvectorization_ops_raw_vector_u16 rawA, cvectorization_ops_raw_vector_u16 rawIndices) {
+  const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
+  const cvectorization_ops_vector_u16 indices = (cvectorization_ops_vector_u16)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtbl_u16((cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_permvarhi512((cvectorization_ops_x86_i16)a, (cvectorization_ops_x86_i16)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_u16)(cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  cvectorization_ops_x86_i64 looked;
+  {
+    uint16_t resultLanes[8] __attribute__((aligned(16)));
+    uint16_t tableLanes[8] __attribute__((aligned(16)));
+    uint16_t indexLanes[8] __attribute__((aligned(16)));
+    const cvectorization_ops_x86_i64 tableVector = (cvectorization_ops_x86_i64)a;
+    const cvectorization_ops_x86_i64 indexVector = (cvectorization_ops_x86_i64)indices;
+    __builtin_memcpy(tableLanes, &tableVector, 16);
+    __builtin_memcpy(indexLanes, &indexVector, 16);
+    for (int i = 0; i < 8; i++) {
+      resultLanes[i] = tableLanes[indexLanes[i] & 7u];
+    }
+    __builtin_memcpy(&looked, resultLanes, 16);
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)looked);
+#else
+  uint16_t source[8];
+  int16_t index[8];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  uint64_t words[2] = {0};
+  for (size_t i = 0; i < 8; ++i) {
+    words[i / 4] |= (uint64_t)(source[index[i]]) << (16 * (i % 4));
+  }
+  cvectorization_ops_vector_u16 result;
+  __builtin_memcpy(&result, words, sizeof result);
+  return (cvectorization_ops_raw_vector_u16)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_two_tables_lookup_lanes_u16(cvectorization_ops_raw_vector_u16 rawA, cvectorization_ops_raw_vector_u16 rawB, cvectorization_ops_raw_vector_u16 rawIndices) {
+  const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
+  const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
+  const cvectorization_ops_vector_u16 indices = (cvectorization_ops_vector_u16)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtbl2_u16(__builtin_sve_svcreate2_u16((cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b), (cvectorization_ops_sve_u16)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_vpermi2varhi512((cvectorization_ops_x86_i16)a, (cvectorization_ops_x86_i16)indices, (cvectorization_ops_x86_i16)b));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_u16)(cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)rawB, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_u16)(cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)rawB, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)((cvectorization_ops_x86_i16)indices > (cvectorization_ops_x86_i16){7, 7, 7, 7, 7, 7, 7, 7});
+  const cvectorization_ops_vector_u16 lower = (cvectorization_ops_vector_u16)cvectorization_ops_table_lookup_lanes_u16(rawA, rawIndices);
+  const cvectorization_ops_vector_u16 upper = (cvectorization_ops_vector_u16)cvectorization_ops_table_lookup_lanes_u16(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower)));
+#else
+  uint16_t first[8];
+  uint16_t second[8];
+  int16_t index[8];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  uint64_t words[2] = {0};
+  for (size_t i = 0; i < 8; ++i) {
+    words[i / 4] |= (uint64_t)(index[i] < (int16_t)8 ? first[index[i] & (int16_t)7] : second[index[i] & (int16_t)7]) << (16 * (i % 4));
+  }
+  cvectorization_ops_vector_u16 result;
+  __builtin_memcpy(&result, words, sizeof result);
+  return (cvectorization_ops_raw_vector_u16)(result);
+#endif
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_u16(const uint16_t* from, void* rawV0, void* rawV1) {
   cvectorization_ops_block_u16* const v0 = (cvectorization_ops_block_u16*)rawV0;
   cvectorization_ops_block_u16* const v1 = (cvectorization_ops_block_u16*)rawV1;
@@ -6351,6 +6780,54 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u16(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_lookup8_u16(const uint16_t* from, cvectorization_ops_raw_vector_u16 rawIndices) {
+  const cvectorization_ops_vector_u16 indices = (cvectorization_ops_vector_u16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_x86_block_i64 loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 16), 16);
+  const cvectorization_ops_vector_u16 table = (cvectorization_ops_vector_u16)__builtin_shufflevector(loaded, (cvectorization_ops_x86_block_i64){0, 0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_x86_block_i64 loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 16), 16);
+  const cvectorization_ops_vector_u16 table = (cvectorization_ops_vector_u16)__builtin_shufflevector(loaded, (cvectorization_ops_x86_block_i64){0, 0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u16 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 16), 16);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#else
+  cvectorization_ops_vector_u16 table;
+  __builtin_memcpy(&table, from, 16);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_lookup16_u16(const uint16_t* from, cvectorization_ops_raw_vector_u16 rawIndices) {
+  const cvectorization_ops_vector_u16 indices = (cvectorization_ops_vector_u16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long half_vector __attribute__((vector_size(32)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 32), 32);
+  const cvectorization_ops_vector_u16 table = (cvectorization_ops_vector_u16)__builtin_shufflevector(loaded, (half_vector){0, 0, 0, 0}, 0, 1, 2, 3, 4, 5, 6, 7);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u16 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u16 first;
+  cvectorization_ops_vector_u16 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)first, (cvectorization_ops_raw_vector_u16)second, rawIndices);
+#else
+  cvectorization_ops_vector_u16 first;
+  cvectorization_ops_vector_u16 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u16((cvectorization_ops_raw_vector_u16)first, (cvectorization_ops_raw_vector_u16)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_x86_promote_u8_to_u16(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_u8 a = (cvectorization_ops_block_u8)v;
@@ -6497,6 +6974,31 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_u32 cvectorization_ops_from_raw_mask_u32(cvectorization_ops_raw_mask_u32 v) {
   return (cvectorization_ops_mask_u32)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u32(void) {
+  return sizeof(cvectorization_ops_vector_u32) / sizeof(uint32_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u32(void) {
+  return sizeof(cvectorization_ops_vector_u32) / sizeof(uint32_t) >= 8;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_u32(cvectorization_ops_raw_vector_u32 rawIndices, size_t offset, size_t count) {
+  const cvectorization_ops_vector_u32 indices = (cvectorization_ops_vector_u32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint32_t first = (uint32_t)offset;
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_vector_u32 shifted = (cvectorization_ops_vector_u32)indices - (cvectorization_ops_vector_u32){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT32_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint32_t first = (uint32_t)offset;
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_vector_u32 shifted = (cvectorization_ops_vector_u32)indices - (cvectorization_ops_vector_u32){first, first, first, first, first, first, first, first};
+  return count > UINT32_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#else
+  const uint32_t first = (uint32_t)offset;
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_vector_u32 shifted = (cvectorization_ops_vector_u32)indices - (cvectorization_ops_vector_u32){first, first, first, first};
+  return count > UINT32_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u32){limit, limit, limit, limit}) != 0;
+#endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_u32(cvectorization_ops_vector_u32 v) {
@@ -7846,6 +8348,99 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_u32)(result);
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_table_lookup_lanes_u32(cvectorization_ops_raw_vector_u32 rawA, cvectorization_ops_raw_vector_u32 rawIndices) {
+  const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
+  const cvectorization_ops_vector_u32 indices = (cvectorization_ops_vector_u32)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtbl_u32((cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_permvarsi512((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_permvarsi256((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)indices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  cvectorization_ops_x86_i64 looked;
+  {
+    uint32_t resultLanes[4] __attribute__((aligned(16)));
+    uint32_t tableLanes[4] __attribute__((aligned(16)));
+    int32_t indexLanes[4] __attribute__((aligned(16)));
+    const cvectorization_ops_x86_i64 tableVector = (cvectorization_ops_x86_i64)a;
+    const cvectorization_ops_x86_i64 indexVector = (cvectorization_ops_x86_i64)indices;
+    __builtin_memcpy(tableLanes, &tableVector, 16);
+    __builtin_memcpy(indexLanes, &indexVector, 16);
+    for (int i = 0; i < 4; i++) {
+      resultLanes[i] = tableLanes[indexLanes[i] & 3];
+    }
+    __builtin_memcpy(&looked, resultLanes, 16);
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)looked);
+#else
+  uint32_t source[4];
+  int32_t index[4];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_u32 result;
+  for (size_t i = 0; i < 4; ++i) {
+    result[i] = source[index[i]];
+  }
+  return (cvectorization_ops_raw_vector_u32)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_two_tables_lookup_lanes_u32(cvectorization_ops_raw_vector_u32 rawA, cvectorization_ops_raw_vector_u32 rawB, cvectorization_ops_raw_vector_u32 rawIndices) {
+  const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
+  const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
+  const cvectorization_ops_vector_u32 indices = (cvectorization_ops_vector_u32)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtbl2_u32(__builtin_sve_svcreate2_u32((cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b), (cvectorization_ops_sve_u32)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_vpermi2vard512((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_i32)b));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i32 selector = (cvectorization_ops_x86_i32)indices << 28;
+  const cvectorization_ops_vector_u32 lower = (cvectorization_ops_vector_u32)cvectorization_ops_table_lookup_lanes_u32(rawA, rawIndices);
+  const cvectorization_ops_vector_u32 upper = (cvectorization_ops_vector_u32)cvectorization_ops_table_lookup_lanes_u32(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_x86_f32)__builtin_ia32_blendvps256((cvectorization_ops_x86_f32)lower, (cvectorization_ops_x86_f32)upper, (cvectorization_ops_x86_f32)selector));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_u32)(cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)rawB, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i32 selector = (cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)indices > (cvectorization_ops_x86_i32){3, 3, 3, 3});
+  const cvectorization_ops_vector_u32 lower = (cvectorization_ops_vector_u32)cvectorization_ops_table_lookup_lanes_u32(rawA, rawIndices);
+  const cvectorization_ops_vector_u32 upper = (cvectorization_ops_vector_u32)cvectorization_ops_table_lookup_lanes_u32(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower)));
+#else
+  uint32_t first[4];
+  uint32_t second[4];
+  int32_t index[4];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_u32 result;
+  for (size_t i = 0; i < 4; ++i) {
+    result[i] = index[i] < (int32_t)4 ? first[index[i] & (int32_t)3] : second[index[i] & (int32_t)3];
+  }
+  return (cvectorization_ops_raw_vector_u32)(result);
+#endif
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_u32(const uint32_t* from, void* rawV0, void* rawV1) {
   cvectorization_ops_block_u32* const v0 = (cvectorization_ops_block_u32*)rawV0;
   cvectorization_ops_block_u32* const v1 = (cvectorization_ops_block_u32*)rawV1;
@@ -8280,6 +8875,58 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u32(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_lookup8_u32(const uint32_t* from, cvectorization_ops_raw_vector_u32 rawIndices) {
+  const cvectorization_ops_vector_u32 indices = (cvectorization_ops_vector_u32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long half_vector __attribute__((vector_size(32)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 32), 32);
+  const cvectorization_ops_vector_u32 table = (cvectorization_ops_vector_u32)__builtin_shufflevector(loaded, (half_vector){0, 0, 0, 0}, 0, 1, 2, 3, 4, 5, 6, 7);
+  return cvectorization_ops_table_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#else
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_lookup16_u32(const uint32_t* from, cvectorization_ops_raw_vector_u32 rawIndices) {
+  const cvectorization_ops_vector_u32 indices = (cvectorization_ops_vector_u32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#else
+  cvectorization_ops_vector_u32 first;
+  cvectorization_ops_vector_u32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)first, (cvectorization_ops_raw_vector_u32)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_x86_promote_u8_to_u32(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_u8 a = (cvectorization_ops_block_u8)v;
@@ -8495,6 +9142,31 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u64 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_u64 cvectorization_ops_from_raw_mask_u64(cvectorization_ops_raw_mask_u64 v) {
   return (cvectorization_ops_mask_u64)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u64(void) {
+  return sizeof(cvectorization_ops_vector_u64) / sizeof(uint64_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u64(void) {
+  return sizeof(cvectorization_ops_vector_u64) / sizeof(uint64_t) >= 8;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_u64(cvectorization_ops_raw_vector_u64 rawIndices, size_t offset, size_t count) {
+  const cvectorization_ops_vector_u64 indices = (cvectorization_ops_vector_u64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint64_t first = (uint64_t)offset;
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_vector_u64 shifted = (cvectorization_ops_vector_u64)indices - (cvectorization_ops_vector_u64){first, first, first, first, first, first, first, first};
+  return __builtin_reduce_and(shifted < (cvectorization_ops_vector_u64){limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint64_t first = (uint64_t)offset;
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_vector_u64 shifted = (cvectorization_ops_vector_u64)indices - (cvectorization_ops_vector_u64){first, first, first, first};
+  return __builtin_reduce_and(shifted < (cvectorization_ops_vector_u64){limit, limit, limit, limit}) != 0;
+#else
+  const uint64_t first = (uint64_t)offset;
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_vector_u64 shifted = (cvectorization_ops_vector_u64)indices - (cvectorization_ops_vector_u64){first, first};
+  return __builtin_reduce_and(shifted < (cvectorization_ops_vector_u64){limit, limit}) != 0;
+#endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_u64(cvectorization_ops_vector_u64 v) {
@@ -9898,6 +10570,90 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_u64)(result);
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_table_lookup_lanes_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawIndices) {
+  const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
+  const cvectorization_ops_vector_u64 indices = (cvectorization_ops_vector_u64)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svtbl_u64((cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 3) + offsets;
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_permvardi512((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i64 duplicated = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_f32)indices, (cvectorization_ops_x86_f32)indices, 0, 0, 2, 2, 4, 4, 6, 6);
+  const cvectorization_ops_x86_i64 wordIndices = duplicated + duplicated + (cvectorization_ops_x86_i64){4294967296ll, 4294967296ll, 4294967296ll, 4294967296ll};
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_permvarsi256((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)wordIndices));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_x86_i64 table = (cvectorization_ops_x86_i64)a;
+  const cvectorization_ops_x86_i64 same = ((cvectorization_ops_x86_i64)indices ^ (cvectorization_ops_x86_i64){0, 1}) - (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 swapped = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_i32)table, (cvectorization_ops_x86_i32)table, 2, 3, 0, 1);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_x86_i64)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)swapped, (cvectorization_ops_x86_i8)table, (cvectorization_ops_x86_i8)same));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_x86_i64 table = (cvectorization_ops_x86_i64)a;
+  const cvectorization_ops_x86_i64 same = ((cvectorization_ops_x86_i64)indices ^ (cvectorization_ops_x86_i64){0, 1}) - (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 swapped = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_i32)table, (cvectorization_ops_x86_i32)table, 2, 3, 0, 1);
+  return (cvectorization_ops_raw_vector_u64)((same & table) | (~same & swapped));
+#else
+  uint64_t source[2];
+  int64_t index[2];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_u64 result;
+  for (size_t i = 0; i < 2; ++i) {
+    result[i] = source[index[i]];
+  }
+  return (cvectorization_ops_raw_vector_u64)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_two_tables_lookup_lanes_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB, cvectorization_ops_raw_vector_u64 rawIndices) {
+  const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
+  const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
+  const cvectorization_ops_vector_u64 indices = (cvectorization_ops_vector_u64)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svtbl2_u64(__builtin_sve_svcreate2_u64((cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_u64)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 3) + offsets;
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_vpermi2varq512((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)indices, (cvectorization_ops_x86_i64)b));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i64 duplicated = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_f32)indices, (cvectorization_ops_x86_f32)indices, 0, 0, 2, 2, 4, 4, 6, 6);
+  const cvectorization_ops_x86_i64 wordIndices = duplicated + duplicated + (cvectorization_ops_x86_i64){4294967296ll, 4294967296ll, 4294967296ll, 4294967296ll};
+  return (cvectorization_ops_raw_vector_u64)(cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)rawA, (cvectorization_ops_raw_vector_u32)rawB, (cvectorization_ops_raw_vector_u32)wordIndices));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_x86_i64 moduloIndices = (cvectorization_ops_x86_i64)indices & (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 selector = (cvectorization_ops_x86_i64)indices << 62;
+  const cvectorization_ops_vector_u64 lower = (cvectorization_ops_vector_u64)cvectorization_ops_table_lookup_lanes_u64(rawA, (cvectorization_ops_raw_vector_u64)moduloIndices);
+  const cvectorization_ops_vector_u64 upper = (cvectorization_ops_vector_u64)cvectorization_ops_table_lookup_lanes_u64(rawB, (cvectorization_ops_raw_vector_u64)moduloIndices);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_x86_f64)__builtin_ia32_blendvpd((cvectorization_ops_x86_f64)lower, (cvectorization_ops_x86_f64)upper, (cvectorization_ops_x86_f64)selector));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_x86_i64 moduloIndices = (cvectorization_ops_x86_i64)indices & (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i32 duplicated = __builtin_shufflevector((cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_i32)indices, 0, 0, 2, 2);
+  const cvectorization_ops_x86_i64 selector = (cvectorization_ops_x86_i64)(duplicated > (cvectorization_ops_x86_i32){1, 1, 1, 1});
+  const cvectorization_ops_vector_u64 lower = (cvectorization_ops_vector_u64)cvectorization_ops_table_lookup_lanes_u64(rawA, (cvectorization_ops_raw_vector_u64)moduloIndices);
+  const cvectorization_ops_vector_u64 upper = (cvectorization_ops_vector_u64)cvectorization_ops_table_lookup_lanes_u64(rawB, (cvectorization_ops_raw_vector_u64)moduloIndices);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower)));
+#else
+  uint64_t first[2];
+  uint64_t second[2];
+  int64_t index[2];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_u64 result;
+  for (size_t i = 0; i < 2; ++i) {
+    result[i] = index[i] < (int64_t)2 ? first[index[i] & (int64_t)1] : second[index[i] & (int64_t)1];
+  }
+  return (cvectorization_ops_raw_vector_u64)(result);
+#endif
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_u64(const uint64_t* from, void* rawV0, void* rawV1) {
   cvectorization_ops_block_u64* const v0 = (cvectorization_ops_block_u64*)rawV0;
   cvectorization_ops_block_u64* const v1 = (cvectorization_ops_block_u64*)rawV1;
@@ -10284,6 +11040,60 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u64(cvector
   *to++ = d1;
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_lookup8_u64(const uint64_t* from, cvectorization_ops_raw_vector_u64 rawIndices) {
+  const cvectorization_ops_vector_u64 indices = (cvectorization_ops_vector_u64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u64 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#else
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_lookup16_u64(const uint64_t* from, cvectorization_ops_raw_vector_u64 rawIndices) {
+  const cvectorization_ops_vector_u64 indices = (cvectorization_ops_vector_u64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 64), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 64), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#else
+  cvectorization_ops_vector_u64 first;
+  cvectorization_ops_vector_u64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_u64((cvectorization_ops_raw_vector_u64)first, (cvectorization_ops_raw_vector_u64)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_x86_promote_u8_to_u64(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_u8 a = (cvectorization_ops_block_u8)v;
@@ -10581,6 +11391,35 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_to_r
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_i8 cvectorization_ops_from_raw_mask_i8(cvectorization_ops_raw_mask_i8 v) {
   return (cvectorization_ops_mask_i8)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup32_i8(void) {
+  return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 16;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup64_i8(void) {
+#if CVECTORIZATION_OPS_NEON == 1
+  return true;
+#else
+  return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 32;
+#endif
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_i8(cvectorization_ops_raw_vector_i8 rawIndices, size_t offset, size_t count) {
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint8_t first = (uint8_t)offset;
+  const uint8_t limit = (uint8_t)count;
+  const cvectorization_ops_vector_u8 shifted = (cvectorization_ops_vector_u8)indices - (cvectorization_ops_vector_u8){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint8_t first = (uint8_t)offset;
+  const uint8_t limit = (uint8_t)count;
+  const cvectorization_ops_vector_u8 shifted = (cvectorization_ops_vector_u8)indices - (cvectorization_ops_vector_u8){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#else
+  const uint8_t first = (uint8_t)offset;
+  const uint8_t limit = (uint8_t)count;
+  const cvectorization_ops_vector_u8 shifted = (cvectorization_ops_vector_u8)indices - (cvectorization_ops_vector_u8){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_i8(cvectorization_ops_vector_i8 v) {
@@ -13134,17 +13973,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sl
   return (cvectorization_ops_raw_vector_i8)(result);
 #endif
 }
-CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_table_lookup_bytes_i8(cvectorization_ops_raw_vector_i8 rawA, cvectorization_ops_raw_vector_i8 rawB) {
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_table_lookup_bytes_i8(cvectorization_ops_raw_vector_i8 rawA, cvectorization_ops_raw_vector_i8 rawIndices) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
-  const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
 #if CVECTORIZATION_OPS_NEON
-  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 48));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)indices, 48));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
-  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)b));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)b));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
 #elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
-  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)b));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
 #elif CVECTORIZATION_OPS_X86 == 1
   cvectorization_ops_x86_i64 looked;
   {
@@ -13152,7 +13991,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ta
     uint8_t tableBytes[16] __attribute__((aligned(16)));
     uint8_t indexBytes[16] __attribute__((aligned(16)));
     *(cvectorization_ops_x86_i64*)tableBytes = (cvectorization_ops_x86_i64)a;
-    *(cvectorization_ops_x86_i64*)indexBytes = (cvectorization_ops_x86_i64)b;
+    *(cvectorization_ops_x86_i64*)indexBytes = (cvectorization_ops_x86_i64)indices;
     for (int i = 0; i < 16; i++) {
       resultBytes[i] = tableBytes[indexBytes[i] & 15];
     }
@@ -13162,68 +14001,273 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ta
 #else
   cvectorization_ops_vector_i8 result;
   {
-    const uint8_t index = (uint8_t)b[0];
+    const uint8_t index = (uint8_t)indices[0];
     result[0] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[1];
+    const uint8_t index = (uint8_t)indices[1];
     result[1] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[2];
+    const uint8_t index = (uint8_t)indices[2];
     result[2] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[3];
+    const uint8_t index = (uint8_t)indices[3];
     result[3] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[4];
+    const uint8_t index = (uint8_t)indices[4];
     result[4] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[5];
+    const uint8_t index = (uint8_t)indices[5];
     result[5] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[6];
+    const uint8_t index = (uint8_t)indices[6];
     result[6] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[7];
+    const uint8_t index = (uint8_t)indices[7];
     result[7] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[8];
+    const uint8_t index = (uint8_t)indices[8];
     result[8] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[9];
+    const uint8_t index = (uint8_t)indices[9];
     result[9] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[10];
+    const uint8_t index = (uint8_t)indices[10];
     result[10] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[11];
+    const uint8_t index = (uint8_t)indices[11];
     result[11] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[12];
+    const uint8_t index = (uint8_t)indices[12];
     result[12] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[13];
+    const uint8_t index = (uint8_t)indices[13];
     result[13] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[14];
+    const uint8_t index = (uint8_t)indices[14];
     result[14] = index < 16 ? a[index] : 0;
   }
   {
-    const uint8_t index = (uint8_t)b[15];
+    const uint8_t index = (uint8_t)indices[15];
     result[15] = index < 16 ? a[index] : 0;
+  }
+  return (cvectorization_ops_raw_vector_i8)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_table_lookup_bytes_or_zero_i8(cvectorization_ops_raw_vector_i8 rawA, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtbl_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_u8)indices));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i8 signedIndices = (cvectorization_ops_x86_i8)indices;
+  const cvectorization_ops_x86_i8 zeroedZeroed = (cvectorization_ops_x86_i8){0} > signedIndices;
+  cvectorization_ops_x86_i64 zeroedLooked;
+  {
+    uint8_t resultBytes[16] __attribute__((aligned(16)));
+    uint8_t tableBytes[16] __attribute__((aligned(16)));
+    uint8_t indexBytes[16] __attribute__((aligned(16)));
+    *(cvectorization_ops_x86_i64*)tableBytes = (cvectorization_ops_x86_i64)a;
+    *(cvectorization_ops_x86_i64*)indexBytes = (cvectorization_ops_x86_i64)signedIndices;
+    for (int i = 0; i < 16; i++) {
+      resultBytes[i] = tableBytes[indexBytes[i] & 15];
+    }
+    zeroedLooked = *(cvectorization_ops_x86_i64*)resultBytes;
+  }
+  const cvectorization_ops_x86_i64 zeroed = ~(cvectorization_ops_x86_i64)zeroedZeroed & zeroedLooked;
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)zeroed);
+#else
+  cvectorization_ops_vector_i8 result;
+  {
+    const uint8_t index = (uint8_t)indices[0];
+    result[0] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[1];
+    result[1] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[2];
+    result[2] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[3];
+    result[3] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[4];
+    result[4] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[5];
+    result[5] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[6];
+    result[6] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[7];
+    result[7] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[8];
+    result[8] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[9];
+    result[9] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[10];
+    result[10] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[11];
+    result[11] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[12];
+    result[12] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[13];
+    result[13] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[14];
+    result[14] = index < 16 ? a[index] : 0;
+  }
+  {
+    const uint8_t index = (uint8_t)indices[15];
+    result[15] = index < 16 ? a[index] : 0;
+  }
+  return (cvectorization_ops_raw_vector_i8)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_table_lookup_lanes_i8(cvectorization_ops_raw_vector_i8 rawA, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtbl_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_u8)indices));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 == 6
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_permvarqi512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 == 5
+  const cvectorization_ops_x86_i16 shiftedBy3 = (cvectorization_ops_x86_i16)indices << 3;
+  const unsigned long long selectsUpperHalves = (unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)shiftedBy3);
+  const cvectorization_ops_x86_i16 shiftedBy2 = (cvectorization_ops_x86_i16)indices << 2;
+  const unsigned long long selectsUpperQuarters = (unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)shiftedBy2);
+  const cvectorization_ops_x86_i32 tableA = (cvectorization_ops_x86_i32)__builtin_ia32_shuf_i32x4((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)a, (int)0);
+  const cvectorization_ops_x86_i32 tableB = (cvectorization_ops_x86_i32)__builtin_ia32_shuf_i32x4((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)a, (int)0x55);
+  const cvectorization_ops_x86_i32 tableC = (cvectorization_ops_x86_i32)__builtin_ia32_shuf_i32x4((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)a, (int)0xAA);
+  const cvectorization_ops_x86_i32 tableD = (cvectorization_ops_x86_i32)__builtin_ia32_shuf_i32x4((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)a, (int)0xFF);
+  const cvectorization_ops_vector_i8 lookedA = (cvectorization_ops_vector_i8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)tableA, (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_i8 lookedC = (cvectorization_ops_vector_i8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)tableC, (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_i8 lookedAB = (cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)selectsUpperHalves, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)tableB, (cvectorization_ops_x86_i8)indices), (cvectorization_ops_x86_i8)lookedA);
+  const cvectorization_ops_vector_i8 lookedCD = (cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)selectsUpperHalves, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)__builtin_ia32_pshufb512((cvectorization_ops_x86_i8)tableD, (cvectorization_ops_x86_i8)indices), (cvectorization_ops_x86_i8)lookedC);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)selectsUpperQuarters, (cvectorization_ops_x86_i8)lookedCD, (cvectorization_ops_x86_i8)lookedAB));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)indices << 3;
+  const cvectorization_ops_vector_i8 lower = (cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i64)__builtin_ia32_insert128i256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_block_i64)__builtin_shufflevector((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, 0, 1), (int)1), (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_i8 upper = (cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i64)__builtin_ia32_permti256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, (int)0x31), (cvectorization_ops_x86_i8)indices);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)lower, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)selector));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  cvectorization_ops_x86_i64 looked;
+  {
+    uint8_t resultBytes[16] __attribute__((aligned(16)));
+    uint8_t tableBytes[16] __attribute__((aligned(16)));
+    uint8_t indexBytes[16] __attribute__((aligned(16)));
+    *(cvectorization_ops_x86_i64*)tableBytes = (cvectorization_ops_x86_i64)a;
+    *(cvectorization_ops_x86_i64*)indexBytes = (cvectorization_ops_x86_i64)indices;
+    for (int i = 0; i < 16; i++) {
+      resultBytes[i] = tableBytes[indexBytes[i] & 15];
+    }
+    looked = *(cvectorization_ops_x86_i64*)resultBytes;
+  }
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)looked);
+#else
+  int8_t source[16];
+  int8_t index[16];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_i8 result;
+  for (size_t i = 0; i < 16; ++i) {
+    result[i] = source[index[i]];
+  }
+  return (cvectorization_ops_raw_vector_i8)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_two_tables_lookup_lanes_i8(cvectorization_ops_raw_vector_i8 rawA, cvectorization_ops_raw_vector_i8 rawB, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
+  const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtbl2_s8(__builtin_sve_svcreate2_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b), (cvectorization_ops_sve_u8)indices));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 == 6
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_vpermi2varqi512((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)b));
+#elif CVECTORIZATION_OPS_X86 == 5
+  const cvectorization_ops_x86_i16 shifted = (cvectorization_ops_x86_i16)indices << 1;
+  const unsigned long long selectsUpper = (unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)shifted);
+  const cvectorization_ops_vector_i8 upper = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawB, rawIndices);
+  const cvectorization_ops_vector_i8 lower = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawA, rawIndices);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)selectsUpper, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)lower));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)indices << 2;
+  const cvectorization_ops_vector_i8 lower = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawA, rawIndices);
+  const cvectorization_ops_vector_i8 upper = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)lower, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)selector));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)indices << 3;
+  const cvectorization_ops_vector_i8 lower = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawA, rawIndices);
+  const cvectorization_ops_vector_i8 upper = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)lower, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)selector));
+#elif CVECTORIZATION_OPS_X86 == 2
+  const cvectorization_ops_x86_i8 selector = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)indices < (cvectorization_ops_x86_i8){16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16});
+  const cvectorization_ops_vector_i8 lower = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawA, rawIndices);
+  const cvectorization_ops_vector_i8 upper = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper)));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i8 selector = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i8)indices > (cvectorization_ops_x86_i8){15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15});
+  const cvectorization_ops_vector_i8 lower = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawA, rawIndices);
+  const cvectorization_ops_vector_i8 upper = (cvectorization_ops_vector_i8)cvectorization_ops_table_lookup_lanes_i8(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower)));
+#else
+  int8_t first[16];
+  int8_t second[16];
+  int8_t index[16];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_i8 result;
+  for (size_t i = 0; i < 16; ++i) {
+    result[i] = index[i] < (int8_t)16 ? first[index[i] & (int8_t)15] : second[index[i] & (int8_t)15];
   }
   return (cvectorization_ops_raw_vector_i8)(result);
 #endif
@@ -14067,6 +15111,74 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i8(cvectori
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lookup32_i8(const int8_t* from, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long half_vector __attribute__((vector_size(32)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 32), 32);
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (half_vector){0, 0, 0, 0}, 0, 1, 2, 3, 4, 5, 6, 7);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 16, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#else
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 16, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lookup64_i8(const int8_t* from, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 32, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#elif CVECTORIZATION_OPS_NEON
+  cvectorization_ops_vector_i8 table0;
+  __builtin_memcpy(&table0, from + 0, 16);
+  cvectorization_ops_vector_i8 table1;
+  __builtin_memcpy(&table1, from + 16, 16);
+  cvectorization_ops_vector_i8 table2;
+  __builtin_memcpy(&table2, from + 32, 16);
+  cvectorization_ops_vector_i8 table3;
+  __builtin_memcpy(&table3, from + 48, 16);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_neon_vqtbl4q_v((cvectorization_ops_neon_i8)table0, (cvectorization_ops_neon_i8)table1, (cvectorization_ops_neon_i8)table2, (cvectorization_ops_neon_i8)table3, (cvectorization_ops_neon_i8)indices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 32, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 32, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#else
+  cvectorization_ops_vector_i8 first;
+  cvectorization_ops_vector_i8 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 32, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)first, (cvectorization_ops_raw_vector_i8)second, rawIndices);
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_repeating_block_i8(int8_t v0, int8_t v1, int8_t v2, int8_t v3, int8_t v4, int8_t v5, int8_t v6, int8_t v7, int8_t v8, int8_t v9, int8_t v10, int8_t v11, int8_t v12, int8_t v13, int8_t v14, int8_t v15) {
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8){v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15});
@@ -14101,6 +15213,31 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_i16 cvectorization_ops_from_raw_mask_i16(cvectorization_ops_raw_mask_i16 v) {
   return (cvectorization_ops_mask_i16)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i16(void) {
+  return sizeof(cvectorization_ops_vector_i16) / sizeof(int16_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i16(void) {
+  return sizeof(cvectorization_ops_vector_i16) / sizeof(int16_t) >= 8;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_i16(cvectorization_ops_raw_vector_i16 rawIndices, size_t offset, size_t count) {
+  const cvectorization_ops_vector_i16 indices = (cvectorization_ops_vector_i16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint16_t first = (uint16_t)offset;
+  const uint16_t limit = (uint16_t)count;
+  const cvectorization_ops_vector_u16 shifted = (cvectorization_ops_vector_u16)indices - (cvectorization_ops_vector_u16){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT16_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u16){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint16_t first = (uint16_t)offset;
+  const uint16_t limit = (uint16_t)count;
+  const cvectorization_ops_vector_u16 shifted = (cvectorization_ops_vector_u16)indices - (cvectorization_ops_vector_u16){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT16_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u16){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#else
+  const uint16_t first = (uint16_t)offset;
+  const uint16_t limit = (uint16_t)count;
+  const cvectorization_ops_vector_u16 shifted = (cvectorization_ops_vector_u16)indices - (cvectorization_ops_vector_u16){first, first, first, first, first, first, first, first};
+  return count > UINT16_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u16){limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_i16(cvectorization_ops_vector_i16 v) {
@@ -15755,6 +16892,108 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_i16)(result);
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_table_lookup_lanes_i16(cvectorization_ops_raw_vector_i16 rawA, cvectorization_ops_raw_vector_i16 rawIndices) {
+  const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
+  const cvectorization_ops_vector_i16 indices = (cvectorization_ops_vector_i16)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtbl_s16((cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_u16)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_permvarhi512((cvectorization_ops_x86_i16)a, (cvectorization_ops_x86_i16)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_i16)(cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  cvectorization_ops_x86_i64 looked;
+  {
+    int16_t resultLanes[8] __attribute__((aligned(16)));
+    int16_t tableLanes[8] __attribute__((aligned(16)));
+    uint16_t indexLanes[8] __attribute__((aligned(16)));
+    const cvectorization_ops_x86_i64 tableVector = (cvectorization_ops_x86_i64)a;
+    const cvectorization_ops_x86_i64 indexVector = (cvectorization_ops_x86_i64)indices;
+    __builtin_memcpy(tableLanes, &tableVector, 16);
+    __builtin_memcpy(indexLanes, &indexVector, 16);
+    for (int i = 0; i < 8; i++) {
+      resultLanes[i] = tableLanes[indexLanes[i] & 7u];
+    }
+    __builtin_memcpy(&looked, resultLanes, 16);
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)looked);
+#else
+  uint16_t source[8];
+  int16_t index[8];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  uint64_t words[2] = {0};
+  for (size_t i = 0; i < 8; ++i) {
+    words[i / 4] |= (uint64_t)(source[index[i]]) << (16 * (i % 4));
+  }
+  cvectorization_ops_vector_i16 result;
+  __builtin_memcpy(&result, words, sizeof result);
+  return (cvectorization_ops_raw_vector_i16)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_two_tables_lookup_lanes_i16(cvectorization_ops_raw_vector_i16 rawA, cvectorization_ops_raw_vector_i16 rawB, cvectorization_ops_raw_vector_i16 rawIndices) {
+  const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
+  const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
+  const cvectorization_ops_vector_i16 indices = (cvectorization_ops_vector_i16)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtbl2_s16(__builtin_sve_svcreate2_s16((cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b), (cvectorization_ops_sve_u16)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_vpermi2varhi512((cvectorization_ops_x86_i16)a, (cvectorization_ops_x86_i16)indices, (cvectorization_ops_x86_i16)b));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14, 0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_i16)(cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)rawB, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 2, 2, 4, 4, 6, 6, 8, 8, 10, 10, 12, 12, 14, 14};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 1) + offsets;
+  return (cvectorization_ops_raw_vector_i16)(cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)rawB, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)((cvectorization_ops_x86_i16)indices > (cvectorization_ops_x86_i16){7, 7, 7, 7, 7, 7, 7, 7});
+  const cvectorization_ops_vector_i16 lower = (cvectorization_ops_vector_i16)cvectorization_ops_table_lookup_lanes_i16(rawA, rawIndices);
+  const cvectorization_ops_vector_i16 upper = (cvectorization_ops_vector_i16)cvectorization_ops_table_lookup_lanes_i16(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower)));
+#else
+  uint16_t first[8];
+  uint16_t second[8];
+  int16_t index[8];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  uint64_t words[2] = {0};
+  for (size_t i = 0; i < 8; ++i) {
+    words[i / 4] |= (uint64_t)(index[i] < (int16_t)8 ? first[index[i] & (int16_t)7] : second[index[i] & (int16_t)7]) << (16 * (i % 4));
+  }
+  cvectorization_ops_vector_i16 result;
+  __builtin_memcpy(&result, words, sizeof result);
+  return (cvectorization_ops_raw_vector_i16)(result);
+#endif
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_i16(const int16_t* from, void* rawV0, void* rawV1) {
   cvectorization_ops_block_i16* const v0 = (cvectorization_ops_block_i16*)rawV0;
   cvectorization_ops_block_i16* const v1 = (cvectorization_ops_block_i16*)rawV1;
@@ -16541,6 +17780,54 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i16(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_lookup8_i16(const int16_t* from, cvectorization_ops_raw_vector_i16 rawIndices) {
+  const cvectorization_ops_vector_i16 indices = (cvectorization_ops_vector_i16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_x86_block_i64 loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 16), 16);
+  const cvectorization_ops_vector_i16 table = (cvectorization_ops_vector_i16)__builtin_shufflevector(loaded, (cvectorization_ops_x86_block_i64){0, 0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_x86_block_i64 loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 16), 16);
+  const cvectorization_ops_vector_i16 table = (cvectorization_ops_vector_i16)__builtin_shufflevector(loaded, (cvectorization_ops_x86_block_i64){0, 0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i16 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 16), 16);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#else
+  cvectorization_ops_vector_i16 table;
+  __builtin_memcpy(&table, from, 16);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_lookup16_i16(const int16_t* from, cvectorization_ops_raw_vector_i16 rawIndices) {
+  const cvectorization_ops_vector_i16 indices = (cvectorization_ops_vector_i16)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long half_vector __attribute__((vector_size(32)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 32), 32);
+  const cvectorization_ops_vector_i16 table = (cvectorization_ops_vector_i16)__builtin_shufflevector(loaded, (half_vector){0, 0, 0, 0}, 0, 1, 2, 3, 4, 5, 6, 7);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i16 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i16 first;
+  cvectorization_ops_vector_i16 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)first, (cvectorization_ops_raw_vector_i16)second, rawIndices);
+#else
+  cvectorization_ops_vector_i16 first;
+  cvectorization_ops_vector_i16 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i16((cvectorization_ops_raw_vector_i16)first, (cvectorization_ops_raw_vector_i16)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_x86_promote_i8_to_i16(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_i8 a = (cvectorization_ops_block_i8)v;
@@ -16687,6 +17974,31 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_i32 cvectorization_ops_from_raw_mask_i32(cvectorization_ops_raw_mask_i32 v) {
   return (cvectorization_ops_mask_i32)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i32(void) {
+  return sizeof(cvectorization_ops_vector_i32) / sizeof(int32_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i32(void) {
+  return sizeof(cvectorization_ops_vector_i32) / sizeof(int32_t) >= 8;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_i32(cvectorization_ops_raw_vector_i32 rawIndices, size_t offset, size_t count) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint32_t first = (uint32_t)offset;
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_vector_u32 shifted = (cvectorization_ops_vector_u32)indices - (cvectorization_ops_vector_u32){first, first, first, first, first, first, first, first, first, first, first, first, first, first, first, first};
+  return count > UINT32_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint32_t first = (uint32_t)offset;
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_vector_u32 shifted = (cvectorization_ops_vector_u32)indices - (cvectorization_ops_vector_u32){first, first, first, first, first, first, first, first};
+  return count > UINT32_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#else
+  const uint32_t first = (uint32_t)offset;
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_vector_u32 shifted = (cvectorization_ops_vector_u32)indices - (cvectorization_ops_vector_u32){first, first, first, first};
+  return count > UINT32_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u32){limit, limit, limit, limit}) != 0;
+#endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_i32(cvectorization_ops_vector_i32 v) {
@@ -18028,6 +19340,99 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_i32)(result);
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_table_lookup_lanes_i32(cvectorization_ops_raw_vector_i32 rawA, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtbl_s32((cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_u32)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_permvarsi512((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_permvarsi256((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)indices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  cvectorization_ops_x86_i64 looked;
+  {
+    int32_t resultLanes[4] __attribute__((aligned(16)));
+    int32_t tableLanes[4] __attribute__((aligned(16)));
+    int32_t indexLanes[4] __attribute__((aligned(16)));
+    const cvectorization_ops_x86_i64 tableVector = (cvectorization_ops_x86_i64)a;
+    const cvectorization_ops_x86_i64 indexVector = (cvectorization_ops_x86_i64)indices;
+    __builtin_memcpy(tableLanes, &tableVector, 16);
+    __builtin_memcpy(indexLanes, &indexVector, 16);
+    for (int i = 0; i < 4; i++) {
+      resultLanes[i] = tableLanes[indexLanes[i] & 3];
+    }
+    __builtin_memcpy(&looked, resultLanes, 16);
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)looked);
+#else
+  int32_t source[4];
+  int32_t index[4];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_i32 result;
+  for (size_t i = 0; i < 4; ++i) {
+    result[i] = source[index[i]];
+  }
+  return (cvectorization_ops_raw_vector_i32)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_two_tables_lookup_lanes_i32(cvectorization_ops_raw_vector_i32 rawA, cvectorization_ops_raw_vector_i32 rawB, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
+  const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtbl2_s32(__builtin_sve_svcreate2_s32((cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b), (cvectorization_ops_sve_u32)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_vpermi2vard512((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_i32)b));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i32 selector = (cvectorization_ops_x86_i32)indices << 28;
+  const cvectorization_ops_vector_i32 lower = (cvectorization_ops_vector_i32)cvectorization_ops_table_lookup_lanes_i32(rawA, rawIndices);
+  const cvectorization_ops_vector_i32 upper = (cvectorization_ops_vector_i32)cvectorization_ops_table_lookup_lanes_i32(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_x86_f32)__builtin_ia32_blendvps256((cvectorization_ops_x86_f32)lower, (cvectorization_ops_x86_f32)upper, (cvectorization_ops_x86_f32)selector));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_i32)(cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)rawB, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i32 selector = (cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)indices > (cvectorization_ops_x86_i32){3, 3, 3, 3});
+  const cvectorization_ops_vector_i32 lower = (cvectorization_ops_vector_i32)cvectorization_ops_table_lookup_lanes_i32(rawA, rawIndices);
+  const cvectorization_ops_vector_i32 upper = (cvectorization_ops_vector_i32)cvectorization_ops_table_lookup_lanes_i32(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower)));
+#else
+  int32_t first[4];
+  int32_t second[4];
+  int32_t index[4];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_i32 result;
+  for (size_t i = 0; i < 4; ++i) {
+    result[i] = index[i] < (int32_t)4 ? first[index[i] & (int32_t)3] : second[index[i] & (int32_t)3];
+  }
+  return (cvectorization_ops_raw_vector_i32)(result);
+#endif
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_i32(const int32_t* from, void* rawV0, void* rawV1) {
   cvectorization_ops_block_i32* const v0 = (cvectorization_ops_block_i32*)rawV0;
   cvectorization_ops_block_i32* const v1 = (cvectorization_ops_block_i32*)rawV1;
@@ -18462,6 +19867,58 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i32(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_lookup8_i32(const int32_t* from, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long half_vector __attribute__((vector_size(32)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 32), 32);
+  const cvectorization_ops_vector_i32 table = (cvectorization_ops_vector_i32)__builtin_shufflevector(loaded, (half_vector){0, 0, 0, 0}, 0, 1, 2, 3, 4, 5, 6, 7);
+  return cvectorization_ops_table_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#else
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_lookup16_i32(const int32_t* from, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#else
+  cvectorization_ops_vector_i32 first;
+  cvectorization_ops_vector_i32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i32((cvectorization_ops_raw_vector_i32)first, (cvectorization_ops_raw_vector_i32)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_x86_promote_i8_to_i32(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_i8 a = (cvectorization_ops_block_i8)v;
@@ -18677,6 +20134,31 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i64 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_i64 cvectorization_ops_from_raw_mask_i64(cvectorization_ops_raw_mask_i64 v) {
   return (cvectorization_ops_mask_i64)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i64(void) {
+  return sizeof(cvectorization_ops_vector_i64) / sizeof(int64_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i64(void) {
+  return sizeof(cvectorization_ops_vector_i64) / sizeof(int64_t) >= 8;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_i64(cvectorization_ops_raw_vector_i64 rawIndices, size_t offset, size_t count) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint64_t first = (uint64_t)offset;
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_vector_u64 shifted = (cvectorization_ops_vector_u64)indices - (cvectorization_ops_vector_u64){first, first, first, first, first, first, first, first};
+  return __builtin_reduce_and(shifted < (cvectorization_ops_vector_u64){limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint64_t first = (uint64_t)offset;
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_vector_u64 shifted = (cvectorization_ops_vector_u64)indices - (cvectorization_ops_vector_u64){first, first, first, first};
+  return __builtin_reduce_and(shifted < (cvectorization_ops_vector_u64){limit, limit, limit, limit}) != 0;
+#else
+  const uint64_t first = (uint64_t)offset;
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_vector_u64 shifted = (cvectorization_ops_vector_u64)indices - (cvectorization_ops_vector_u64){first, first};
+  return __builtin_reduce_and(shifted < (cvectorization_ops_vector_u64){limit, limit}) != 0;
+#endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_i64(cvectorization_ops_vector_i64 v) {
@@ -20023,6 +21505,90 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_i64)(result);
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_table_lookup_lanes_i64(cvectorization_ops_raw_vector_i64 rawA, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svtbl_s64((cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_u64)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 3) + offsets;
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_permvardi512((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i64 duplicated = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_f32)indices, (cvectorization_ops_x86_f32)indices, 0, 0, 2, 2, 4, 4, 6, 6);
+  const cvectorization_ops_x86_i64 wordIndices = duplicated + duplicated + (cvectorization_ops_x86_i64){4294967296ll, 4294967296ll, 4294967296ll, 4294967296ll};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_permvarsi256((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)wordIndices));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_x86_i64 table = (cvectorization_ops_x86_i64)a;
+  const cvectorization_ops_x86_i64 same = ((cvectorization_ops_x86_i64)indices ^ (cvectorization_ops_x86_i64){0, 1}) - (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 swapped = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_i32)table, (cvectorization_ops_x86_i32)table, 2, 3, 0, 1);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_x86_i64)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)swapped, (cvectorization_ops_x86_i8)table, (cvectorization_ops_x86_i8)same));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_x86_i64 table = (cvectorization_ops_x86_i64)a;
+  const cvectorization_ops_x86_i64 same = ((cvectorization_ops_x86_i64)indices ^ (cvectorization_ops_x86_i64){0, 1}) - (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 swapped = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_i32)table, (cvectorization_ops_x86_i32)table, 2, 3, 0, 1);
+  return (cvectorization_ops_raw_vector_i64)((same & table) | (~same & swapped));
+#else
+  int64_t source[2];
+  int64_t index[2];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_i64 result;
+  for (size_t i = 0; i < 2; ++i) {
+    result[i] = source[index[i]];
+  }
+  return (cvectorization_ops_raw_vector_i64)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_two_tables_lookup_lanes_i64(cvectorization_ops_raw_vector_i64 rawA, cvectorization_ops_raw_vector_i64 rawB, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
+  const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svtbl2_s64(__builtin_sve_svcreate2_s64((cvectorization_ops_sve_i64)a, (cvectorization_ops_sve_i64)b), (cvectorization_ops_sve_u64)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 3) + offsets;
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_vpermi2varq512((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)indices, (cvectorization_ops_x86_i64)b));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i64 duplicated = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_f32)indices, (cvectorization_ops_x86_f32)indices, 0, 0, 2, 2, 4, 4, 6, 6);
+  const cvectorization_ops_x86_i64 wordIndices = duplicated + duplicated + (cvectorization_ops_x86_i64){4294967296ll, 4294967296ll, 4294967296ll, 4294967296ll};
+  return (cvectorization_ops_raw_vector_i64)(cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)rawA, (cvectorization_ops_raw_vector_u32)rawB, (cvectorization_ops_raw_vector_u32)wordIndices));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_x86_i64 moduloIndices = (cvectorization_ops_x86_i64)indices & (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 selector = (cvectorization_ops_x86_i64)indices << 62;
+  const cvectorization_ops_vector_i64 lower = (cvectorization_ops_vector_i64)cvectorization_ops_table_lookup_lanes_i64(rawA, (cvectorization_ops_raw_vector_i64)moduloIndices);
+  const cvectorization_ops_vector_i64 upper = (cvectorization_ops_vector_i64)cvectorization_ops_table_lookup_lanes_i64(rawB, (cvectorization_ops_raw_vector_i64)moduloIndices);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_x86_f64)__builtin_ia32_blendvpd((cvectorization_ops_x86_f64)lower, (cvectorization_ops_x86_f64)upper, (cvectorization_ops_x86_f64)selector));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_x86_i64 moduloIndices = (cvectorization_ops_x86_i64)indices & (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i32 duplicated = __builtin_shufflevector((cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_i32)indices, 0, 0, 2, 2);
+  const cvectorization_ops_x86_i64 selector = (cvectorization_ops_x86_i64)(duplicated > (cvectorization_ops_x86_i32){1, 1, 1, 1});
+  const cvectorization_ops_vector_i64 lower = (cvectorization_ops_vector_i64)cvectorization_ops_table_lookup_lanes_i64(rawA, (cvectorization_ops_raw_vector_i64)moduloIndices);
+  const cvectorization_ops_vector_i64 upper = (cvectorization_ops_vector_i64)cvectorization_ops_table_lookup_lanes_i64(rawB, (cvectorization_ops_raw_vector_i64)moduloIndices);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(((cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)upper) | (~(cvectorization_ops_x86_i64)selector & (cvectorization_ops_x86_i64)lower)));
+#else
+  int64_t first[2];
+  int64_t second[2];
+  int64_t index[2];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_i64 result;
+  for (size_t i = 0; i < 2; ++i) {
+    result[i] = index[i] < (int64_t)2 ? first[index[i] & (int64_t)1] : second[index[i] & (int64_t)1];
+  }
+  return (cvectorization_ops_raw_vector_i64)(result);
+#endif
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_i64(const int64_t* from, void* rawV0, void* rawV1) {
   cvectorization_ops_block_i64* const v0 = (cvectorization_ops_block_i64*)rawV0;
   cvectorization_ops_block_i64* const v1 = (cvectorization_ops_block_i64*)rawV1;
@@ -20409,6 +21975,60 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i64(cvector
   *to++ = d1;
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_lookup8_i64(const int64_t* from, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i64 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#else
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_lookup16_i64(const int64_t* from, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 64), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 64), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#else
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices);
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_x86_promote_i8_to_i64(cvectorization_ops_x86_block_i64 v) {
   const cvectorization_ops_block_i8 a = (cvectorization_ops_block_i8)v;
@@ -20696,6 +22316,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_f32 cvectorization_ops_from_raw_mask_f32(cvectorization_ops_raw_mask_f32 v) {
   return (cvectorization_ops_mask_f32)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_f32(void) {
+  return sizeof(cvectorization_ops_vector_f32) / sizeof(float) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_f32(void) {
+  return sizeof(cvectorization_ops_vector_f32) / sizeof(float) >= 8;
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_f32(cvectorization_ops_vector_f32 v) {
@@ -22001,6 +23627,99 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_f32)(result);
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_table_lookup_lanes_f32(cvectorization_ops_raw_vector_f32 rawA, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svtbl_f32((cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_u32)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_permvarsf512((cvectorization_ops_x86_f32)a, (cvectorization_ops_x86_i32)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_permvarsf256((cvectorization_ops_x86_f32)a, (cvectorization_ops_x86_i32)indices));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  cvectorization_ops_x86_i64 looked;
+  {
+    float resultLanes[4] __attribute__((aligned(16)));
+    float tableLanes[4] __attribute__((aligned(16)));
+    int32_t indexLanes[4] __attribute__((aligned(16)));
+    const cvectorization_ops_x86_i64 tableVector = (cvectorization_ops_x86_i64)a;
+    const cvectorization_ops_x86_i64 indexVector = (cvectorization_ops_x86_i64)indices;
+    __builtin_memcpy(tableLanes, &tableVector, 16);
+    __builtin_memcpy(indexLanes, &indexVector, 16);
+    for (int i = 0; i < 4; i++) {
+      resultLanes[i] = tableLanes[indexLanes[i] & 3];
+    }
+    __builtin_memcpy(&looked, resultLanes, 16);
+  }
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)looked);
+#else
+  float source[4];
+  int32_t index[4];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_f32 result;
+  for (size_t i = 0; i < 4; ++i) {
+    result[i] = source[index[i]];
+  }
+  return (cvectorization_ops_raw_vector_f32)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_two_tables_lookup_lanes_f32(cvectorization_ops_raw_vector_f32 rawA, cvectorization_ops_raw_vector_f32 rawB, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
+  const cvectorization_ops_vector_f32 b = (cvectorization_ops_vector_f32)rawB;
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svtbl2_f32(__builtin_sve_svcreate2_f32((cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b), (cvectorization_ops_sve_u32)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_vpermi2varps512((cvectorization_ops_x86_f32)a, (cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_f32)b));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i32 selector = (cvectorization_ops_x86_i32)indices << 28;
+  const cvectorization_ops_vector_f32 lower = (cvectorization_ops_vector_f32)cvectorization_ops_table_lookup_lanes_f32(rawA, rawIndices);
+  const cvectorization_ops_vector_f32 upper = (cvectorization_ops_vector_f32)cvectorization_ops_table_lookup_lanes_f32(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_x86_f32)__builtin_ia32_blendvps256((cvectorization_ops_x86_f32)lower, (cvectorization_ops_x86_f32)upper, (cvectorization_ops_x86_f32)selector));
+#elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
+  const cvectorization_ops_x86_i8 broadcast = {0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12};
+  const cvectorization_ops_x86_i8 offsets = {0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3};
+  const cvectorization_ops_x86_i8 laneIndices = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)indices, (cvectorization_ops_x86_i8)broadcast);
+  const cvectorization_ops_x86_i8 byteIndices = (cvectorization_ops_x86_i8)((cvectorization_ops_x86_i16)laneIndices << 2) + offsets;
+  return (cvectorization_ops_raw_vector_f32)(cvectorization_ops_two_tables_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)rawA, (cvectorization_ops_raw_vector_u8)rawB, (cvectorization_ops_raw_vector_u8)byteIndices));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_x86_i32 selector = (cvectorization_ops_x86_i32)((cvectorization_ops_x86_i32)indices > (cvectorization_ops_x86_i32){3, 3, 3, 3});
+  const cvectorization_ops_vector_f32 lower = (cvectorization_ops_vector_f32)cvectorization_ops_table_lookup_lanes_f32(rawA, rawIndices);
+  const cvectorization_ops_vector_f32 upper = (cvectorization_ops_vector_f32)cvectorization_ops_table_lookup_lanes_f32(rawB, rawIndices);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(((cvectorization_ops_vector_u32)selector & (cvectorization_ops_vector_u32)upper) | (~(cvectorization_ops_vector_u32)selector & (cvectorization_ops_vector_u32)lower)));
+#else
+  float first[4];
+  float second[4];
+  int32_t index[4];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_f32 result;
+  for (size_t i = 0; i < 4; ++i) {
+    result[i] = index[i] < (int32_t)4 ? first[index[i] & (int32_t)3] : second[index[i] & (int32_t)3];
+  }
+  return (cvectorization_ops_raw_vector_f32)(result);
+#endif
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_f32(const float* from, void* rawV0, void* rawV1) {
   cvectorization_ops_block_f32* const v0 = (cvectorization_ops_block_f32*)rawV0;
   cvectorization_ops_block_f32* const v1 = (cvectorization_ops_block_f32*)rawV1;
@@ -22442,6 +24161,58 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_f32(cvector
   }
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_lookup8_f32(const float* from, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long half_vector __attribute__((vector_size(32)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 32), 32);
+  const cvectorization_ops_vector_f32 table = (cvectorization_ops_vector_f32)__builtin_shufflevector(loaded, (half_vector){0, 0, 0, 0}, 0, 1, 2, 3, 4, 5, 6, 7);
+  return cvectorization_ops_table_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_f32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 32), 32);
+  return cvectorization_ops_table_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#else
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_lookup16_f32(const float* from, cvectorization_ops_raw_vector_i32 rawIndices) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_f32 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#else
+  cvectorization_ops_vector_f32 first;
+  cvectorization_ops_vector_f32 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f32((cvectorization_ops_raw_vector_f32)first, (cvectorization_ops_raw_vector_f32)second, rawIndices);
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_repeating_block_f32(float v0, float v1, float v2, float v3) {
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32){v0, v1, v2, v3, v0, v1, v2, v3, v0, v1, v2, v3, v0, v1, v2, v3});
@@ -22470,6 +24241,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f64 cvectorization_ops_to_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_mask_f64 cvectorization_ops_from_raw_mask_f64(cvectorization_ops_raw_mask_f64 v) {
   return (cvectorization_ops_mask_f64)v;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_f64(void) {
+  return sizeof(cvectorization_ops_vector_f64) / sizeof(double) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_f64(void) {
+  return sizeof(cvectorization_ops_vector_f64) / sizeof(double) >= 8;
 }
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_f64(cvectorization_ops_vector_f64 v) {
@@ -23585,6 +25362,90 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, (cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(fill), 1, 2));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_table_lookup_lanes_f64(cvectorization_ops_raw_vector_f64 rawA, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svtbl_f64((cvectorization_ops_sve_f64)a, (cvectorization_ops_sve_u64)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 3) + offsets;
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_permvardf512((cvectorization_ops_x86_f64)a, (cvectorization_ops_x86_i64)indices));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i64 duplicated = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_f32)indices, (cvectorization_ops_x86_f32)indices, 0, 0, 2, 2, 4, 4, 6, 6);
+  const cvectorization_ops_x86_i64 wordIndices = duplicated + duplicated + (cvectorization_ops_x86_i64){4294967296ll, 4294967296ll, 4294967296ll, 4294967296ll};
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_permvarsi256((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)wordIndices));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_x86_i64 table = (cvectorization_ops_x86_i64)a;
+  const cvectorization_ops_x86_i64 same = ((cvectorization_ops_x86_i64)indices ^ (cvectorization_ops_x86_i64){0, 1}) - (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 swapped = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_i32)table, (cvectorization_ops_x86_i32)table, 2, 3, 0, 1);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_x86_i64)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)swapped, (cvectorization_ops_x86_i8)table, (cvectorization_ops_x86_i8)same));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_x86_i64 table = (cvectorization_ops_x86_i64)a;
+  const cvectorization_ops_x86_i64 same = ((cvectorization_ops_x86_i64)indices ^ (cvectorization_ops_x86_i64){0, 1}) - (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 swapped = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_i32)table, (cvectorization_ops_x86_i32)table, 2, 3, 0, 1);
+  return (cvectorization_ops_raw_vector_f64)((same & table) | (~same & swapped));
+#else
+  double source[2];
+  int64_t index[2];
+  __builtin_memcpy(source, &a, sizeof a);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_f64 result;
+  for (size_t i = 0; i < 2; ++i) {
+    result[i] = source[index[i]];
+  }
+  return (cvectorization_ops_raw_vector_f64)(result);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_two_tables_lookup_lanes_f64(cvectorization_ops_raw_vector_f64 rawA, cvectorization_ops_raw_vector_f64 rawB, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
+  const cvectorization_ops_vector_f64 b = (cvectorization_ops_vector_f64)rawB;
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svtbl2_f64(__builtin_sve_svcreate2_f64((cvectorization_ops_sve_f64)a, (cvectorization_ops_sve_f64)b), (cvectorization_ops_sve_u64)indices));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_vector_u8 broadcast = {0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8};
+  const cvectorization_ops_vector_u8 offsets = {0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u8 laneIndices = (cvectorization_ops_vector_u8)__builtin_neon_vqtbl1q_v((cvectorization_ops_neon_i8)indices, (cvectorization_ops_neon_i8)broadcast, 48);
+  const cvectorization_ops_vector_u8 byteIndices = (laneIndices << 3) + offsets;
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_neon_vqtbl2q_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, (cvectorization_ops_neon_i8)byteIndices, 48));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_vpermi2varpd512((cvectorization_ops_x86_f64)a, (cvectorization_ops_x86_i64)indices, (cvectorization_ops_x86_f64)b));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i64 duplicated = (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_f32)indices, (cvectorization_ops_x86_f32)indices, 0, 0, 2, 2, 4, 4, 6, 6);
+  const cvectorization_ops_x86_i64 wordIndices = duplicated + duplicated + (cvectorization_ops_x86_i64){4294967296ll, 4294967296ll, 4294967296ll, 4294967296ll};
+  return (cvectorization_ops_raw_vector_f64)(cvectorization_ops_two_tables_lookup_lanes_u32((cvectorization_ops_raw_vector_u32)rawA, (cvectorization_ops_raw_vector_u32)rawB, (cvectorization_ops_raw_vector_u32)wordIndices));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_x86_i64 moduloIndices = (cvectorization_ops_x86_i64)indices & (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i64 selector = (cvectorization_ops_x86_i64)indices << 62;
+  const cvectorization_ops_vector_f64 lower = (cvectorization_ops_vector_f64)cvectorization_ops_table_lookup_lanes_f64(rawA, (cvectorization_ops_raw_vector_i64)moduloIndices);
+  const cvectorization_ops_vector_f64 upper = (cvectorization_ops_vector_f64)cvectorization_ops_table_lookup_lanes_f64(rawB, (cvectorization_ops_raw_vector_i64)moduloIndices);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_x86_f64)__builtin_ia32_blendvpd((cvectorization_ops_x86_f64)lower, (cvectorization_ops_x86_f64)upper, (cvectorization_ops_x86_f64)selector));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_x86_i64 moduloIndices = (cvectorization_ops_x86_i64)indices & (cvectorization_ops_x86_i64){1, 1};
+  const cvectorization_ops_x86_i32 duplicated = __builtin_shufflevector((cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_i32)indices, 0, 0, 2, 2);
+  const cvectorization_ops_x86_i64 selector = (cvectorization_ops_x86_i64)(duplicated > (cvectorization_ops_x86_i32){1, 1, 1, 1});
+  const cvectorization_ops_vector_f64 lower = (cvectorization_ops_vector_f64)cvectorization_ops_table_lookup_lanes_f64(rawA, (cvectorization_ops_raw_vector_i64)moduloIndices);
+  const cvectorization_ops_vector_f64 upper = (cvectorization_ops_vector_f64)cvectorization_ops_table_lookup_lanes_f64(rawB, (cvectorization_ops_raw_vector_i64)moduloIndices);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(((cvectorization_ops_vector_u64)selector & (cvectorization_ops_vector_u64)upper) | (~(cvectorization_ops_vector_u64)selector & (cvectorization_ops_vector_u64)lower)));
+#else
+  double first[2];
+  double second[2];
+  int64_t index[2];
+  __builtin_memcpy(first, &a, sizeof a);
+  __builtin_memcpy(second, &b, sizeof b);
+  __builtin_memcpy(index, &indices, sizeof indices);
+  cvectorization_ops_vector_f64 result;
+  for (size_t i = 0; i < 2; ++i) {
+    result[i] = index[i] < (int64_t)2 ? first[index[i] & (int64_t)1] : second[index[i] & (int64_t)1];
+  }
+  return (cvectorization_ops_raw_vector_f64)(result);
+#endif
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_f64(const double* from, void* rawV0, void* rawV1) {
   cvectorization_ops_block_f64* const v0 = (cvectorization_ops_block_f64*)rawV0;
   cvectorization_ops_block_f64* const v1 = (cvectorization_ops_block_f64*)rawV1;
@@ -23978,6 +25839,60 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_f64(cvector
   *to++ = b1;
   *to++ = c1;
   *to++ = d1;
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_lookup8_f64(const double* from, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_f64 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 64), 64);
+  return cvectorization_ops_table_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 4, 16), sizeof second);
+  return (cvectorization_ops_raw_vector_f64)(cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices));
+#else
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 4, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_lookup16_f64(const double* from, cvectorization_ops_raw_vector_i64 rawIndices) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 64), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 64), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 32), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 32), sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i64 first;
+  cvectorization_ops_vector_i64 second;
+  __builtin_memcpy(&first, __builtin_assume_aligned(from, 16), sizeof first);
+  __builtin_memcpy(&second, __builtin_assume_aligned(from + 8, 16), sizeof second);
+  return (cvectorization_ops_raw_vector_f64)(cvectorization_ops_two_tables_lookup_lanes_i64((cvectorization_ops_raw_vector_i64)first, (cvectorization_ops_raw_vector_i64)second, rawIndices));
+#else
+  cvectorization_ops_vector_f64 first;
+  cvectorization_ops_vector_f64 second;
+  __builtin_memcpy(&first, from, sizeof first);
+  __builtin_memcpy(&second, from + 8, sizeof second);
+  return cvectorization_ops_two_tables_lookup_lanes_f64((cvectorization_ops_raw_vector_f64)first, (cvectorization_ops_raw_vector_f64)second, rawIndices);
 #endif
 }
 #if CVECTORIZATION_OPS_X86 == 4

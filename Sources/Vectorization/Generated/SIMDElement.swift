@@ -8,6 +8,7 @@ public protocol SIMDElement {
     associatedtype Lane
     associatedtype Vector
     associatedtype Mask
+    associatedtype Indices
 
     /// How many lanes of `Lane` a `Vector` holds on the target this was compiled for.
     static var laneCount: Int { get }
@@ -95,6 +96,14 @@ public protocol SIMDElement {
     static func slide1Up(_ a: Vector, fillingWith fill: Lane) -> Vector
     static func slide1Down(_ a: Vector) -> Vector
     static func slide1Down(_ a: Vector, fillingWith fill: Lane) -> Vector
+    static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector
+    @unsafe static func tableLookupLanes(_ a: Vector, atUnchecked indices: Indices) -> Vector
+    static func twoTablesLookupLanes(_ a: Vector, _ b: Vector, at indices: Indices) -> Vector
+    @unsafe static func twoTablesLookupLanes(
+        _ a: Vector,
+        _ b: Vector,
+        atUnchecked indices: Indices
+    ) -> Vector
     static func loadInterleaved2(from: UnsafePointer<Lane>, _ v0: inout Vector, _ v1: inout Vector)
     @available(SwiftStdlib 5.1, *)
     static func loadInterleaved2(from span: Span<Lane>, _ v0: inout Vector, _ v1: inout Vector)
@@ -270,4 +279,14 @@ public protocol SIMDFloatElement: SIMDElement {
     static func smallestOrNaN(_ a: Vector) -> Lane
     static func largest(_ a: Vector) -> Lane
     static func largestOrNaN(_ a: Vector) -> Lane
+    static func lookup8(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func lookup8(at indices: Indices, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func lookup8(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
+    static func lookup16(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func lookup16(at indices: Indices, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func lookup16(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
 }

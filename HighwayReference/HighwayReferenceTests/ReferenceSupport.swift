@@ -1,3 +1,4 @@
+import CHighwayReference
 import Testing
 
 #if canImport(Darwin)
@@ -5,6 +6,10 @@ import Darwin
 #elseif canImport(Glibc)
 import Glibc
 #endif
+
+var assertionsAreEnabled: Bool {
+    _isDebugAssertConfiguration() || HighwayReference.hasDebugAssertions()
+}
 
 struct SplitMix64: RandomNumberGenerator {
     private var state: UInt64
@@ -230,28 +235,47 @@ enum Inputs {
 
     static func tableIndices<V: SIMD>(
         _ type: V.Type,
+        offset: Int = 0,
+        count: Int,
         seed: UInt64,
         inContract: Bool
     ) -> [V] where V.Scalar: ReferenceLane & FixedWidthInteger {
         var generator = SplitMix64(seed: seed)
-        let identity = V((0..<V.scalarCount).map { V.Scalar(truncatingIfNeeded: $0 & 15) })
+        func lane(_ index: Int) -> V.Scalar { V.Scalar(truncatingIfNeeded: offset + index) }
+        func inRange() -> V.Scalar { lane(Int(generator.next() % UInt64(count))) }
+        let identity = V((0..<V.scalarCount).map { lane($0 % count) })
+        guard !inContract else {
+            let random = (0..<randomCount).map { _ in
+                V((0..<V.scalarCount).map { _ in inRange() })
+            }
+            return [identity] + random
+        }
+        let beyond = [lane(count), lane(count + 1), lane(2 * count), lane(-1), V.Scalar.min, .max]
+        let splats = beyond.map { V(repeating: $0) }
         let random = (0..<randomCount).map { _ in
             V(
                 (0..<V.scalarCount).map { _ in
-                    let byte = generator.next() & 0xFF
-                    return V.Scalar(truncatingIfNeeded: inContract ? byte & 15 : byte)
+                    switch generator.next() % 4 {
+                    case 0: V.Scalar(truncatingIfNeeded: generator.next())
+                    case 1: lane(count + Int(generator.next() % UInt64(count)))
+                    case 2: lane(-1 - Int(generator.next() % UInt64(count)))
+                    default: inRange()
+                    }
                 }
             )
         }
-        return [identity] + random
+        return [identity] + splats + random
     }
 
     static func tableIndices<V: ReferenceVector>(
         _ type: V.Type,
+        offset: Int = 0,
+        count: Int,
         seed: UInt64,
         inContract: Bool
     ) -> [V] where V.Simd.Scalar: FixedWidthInteger {
-        tableIndices(V.Simd.self, seed: seed, inContract: inContract).map(V.init)
+        tableIndices(V.Simd.self, offset: offset, count: count, seed: seed, inContract: inContract)
+            .map(V.init)
     }
 
     static func shiftAmounts(bits: Int, inContract: Bool) -> [Int] {

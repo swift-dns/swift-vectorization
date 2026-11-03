@@ -2051,16 +2051,17 @@ struct SIMDInt8CodegenTests {
     @Test func tableLookupBytes() {
         let mismatches = Mismatches("portTableLookupBytesI8")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF665_66C2_DA74_45A3)
-        let bInputs = Inputs.tableIndices(
+        let indicesInputs = Inputs.tableIndices(
             H.Vector.self,
+            count: 16,
             seed: 0xF665_65C2_DA74_43F0,
             inContract: true
         )
-        for (a, b) in everyPair(aInputs, bInputs) {
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
-                portTableLookupBytesI8(a, b),
-                highwayTableLookupBytesI8(a, b),
-                "a: \(describe(a)), b: \(describe(b))"
+                portTableLookupBytesI8(a, atUnchecked: indices),
+                highwayTableLookupBytesI8(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
         mismatches.record()
@@ -2068,29 +2069,209 @@ struct SIMDInt8CodegenTests {
 
     @Test func tableLookupBytesConstantA() {
         let mismatches = Mismatches("portTableLookupBytesI8ConstantA")
-        let bInputs = Inputs.tableIndices(
+        let indicesInputs = Inputs.tableIndices(
             H.Vector.self,
+            count: 16,
             seed: 0x61AF_DBE6_FC48_F85F,
             inContract: true
         )
-        for b in bInputs {
+        for indices in indicesInputs {
             mismatches.check(
-                portTableLookupBytesI8ConstantA(b),
-                highwayTableLookupBytesI8ConstantA(b),
-                "b: \(describe(b))"
+                portTableLookupBytesI8ConstantA(atUnchecked: indices),
+                highwayTableLookupBytesI8ConstantA(atUnchecked: indices),
+                "indices: \(describe(indices))"
             )
         }
         mismatches.record()
     }
 
-    @Test func tableLookupBytesConstantB() {
-        let mismatches = Mismatches("portTableLookupBytesI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6A45_11E7_011F_D8C1)
+    @Test func tableLookupBytesConstantIndices() {
+        let mismatches = Mismatches("portTableLookupBytesI8ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCF20_3910_1D38_FB82)
         for a in aInputs {
             mismatches.check(
-                portTableLookupBytesI8ConstantB(a),
-                highwayTableLookupBytesI8ConstantB(a),
+                portTableLookupBytesI8ConstantIndices(a),
+                highwayTableLookupBytesI8ConstantIndices(a),
                 "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZero() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroI8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1D21_CC70_4930_F688)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            count: 144,
+            seed: 0x1D21_CD70_4930_F83B,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTableLookupBytesOrZeroI8(a, atUnchecked: indices),
+                highwayTableLookupBytesOrZeroI8(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantA() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroI8ConstantA")
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            count: 144,
+            seed: 0x0AF6_5680_2837_1A9E,
+            inContract: true
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                portTableLookupBytesOrZeroI8ConstantA(atUnchecked: indices),
+                highwayTableLookupBytesOrZeroI8ConstantA(atUnchecked: indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndices() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroI8ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAC74_A7C0_5C8B_3B27)
+        for a in aInputs {
+            mismatches.check(
+                portTableLookupBytesOrZeroI8ConstantIndices(a),
+                highwayTableLookupBytesOrZeroI8ConstantIndices(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupLanes() {
+        let mismatches = Mismatches("portTableLookupLanesI8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1663_3C49_5A23_E153)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: H.laneCount,
+            seed: 0x1663_3B49_5A23_DFA0,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTableLookupLanesI8(a, atUnchecked: indices),
+                highwayTableLookupLanesI8(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupLanesConstantA() {
+        let mismatches = Mismatches("portTableLookupLanesI8ConstantA")
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: H.laneCount,
+            seed: 0xE2A7_2A0E_7554_86CF,
+            inContract: true
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                portTableLookupLanesI8ConstantA(atUnchecked: indices),
+                highwayTableLookupLanesI8ConstantA(atUnchecked: indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupLanesConstantIndices() {
+        let mismatches = Mismatches("portTableLookupLanesI8ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x39A1_8EB2_F9C6_B912)
+        for a in aInputs {
+            mismatches.check(
+                portTableLookupLanesI8ConstantIndices(a),
+                highwayTableLookupLanesI8ConstantIndices(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanes() {
+        let mismatches = Mismatches("portTwoTablesLookupLanesI8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA7A0_76E8_890B_4A66)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA7A0_77E8_890B_4C19)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0xA7A0_74E8_890B_4700,
+            inContract: true
+        )
+        for (a, b, indices) in mixedTriples(
+            aInputs,
+            bInputs,
+            indicesInputs,
+            seed: 0x0E59_9040_BD07_35E2
+        ) {
+            mismatches.check(
+                portTwoTablesLookupLanesI8(a, b, atUnchecked: indices),
+                highwayTwoTablesLookupLanesI8(a, b, atUnchecked: indices),
+                "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanesConstantA() {
+        let mismatches = Mismatches("portTwoTablesLookupLanesI8ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE898_7532_4C5B_4F54)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0xE898_7832_4C5B_546D,
+            inContract: true
+        )
+        for (b, indices) in everyPair(bInputs, indicesInputs) {
+            mismatches.check(
+                portTwoTablesLookupLanesI8ConstantA(b, atUnchecked: indices),
+                highwayTwoTablesLookupLanesI8ConstantA(b, atUnchecked: indices),
+                "b: \(describe(b)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanesConstantB() {
+        let mismatches = Mismatches("portTwoTablesLookupLanesI8ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0331_5B32_5B98_54C6)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 2 * H.laneCount,
+            seed: 0x0331_5932_5B98_5160,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTwoTablesLookupLanesI8ConstantB(a, atUnchecked: indices),
+                highwayTwoTablesLookupLanesI8ConstantB(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func twoTablesLookupLanesConstantIndices() {
+        let mismatches = Mismatches("portTwoTablesLookupLanesI8ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5865_DD70_F955_A4B9)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5865_DC70_F955_A306)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portTwoTablesLookupLanesI8ConstantIndices(a, b),
+                highwayTwoTablesLookupLanesI8ConstantIndices(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
             )
         }
         mismatches.record()
@@ -2744,6 +2925,178 @@ struct SIMDInt8CodegenTests {
                 referenceLanes,
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup32, "Highway's lookup needs more lanes than this target has"))
+    func lookup32() {
+        let mismatches = Mismatches("portLookup32I8")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 32, seed: 0xA260_2EE7_D867_771D)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 32,
+            seed: 0xA260_2DE7_D867_756A,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 32) {
+                source in
+                (
+                    unsafe portLookup32I8(at: indices, from: source),
+                    unsafe highwayLookup32I8(at: indices, from: source)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup32, "Highway's lookup needs more lanes than this target has"))
+    func lookup32BeforeGuardPage() {
+        let mismatches = Mismatches("portLookup32I8 before a guard page")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 32, seed: 0x723F_96EC_286F_BD0A)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 32,
+            seed: 0x723F_97EC_286F_BEBD,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLookup32I8(at: indices, from: source),
+                    unsafe highwayLookup32I8(at: indices, from: source)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup32, "Highway's lookup needs more lanes than this target has"))
+    func lookup32ConstantIndices() {
+        let mismatches = Mismatches("portLookup32I8ConstantIndices")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 32, seed: 0xE422_E2F6_8991_EC80)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 32) {
+                source in
+                (
+                    unsafe portLookup32I8ConstantIndices(from: source),
+                    unsafe highwayLookup32I8ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup32, "Highway's lookup needs more lanes than this target has"))
+    func lookup32ConstantIndicesBeforeGuardPage() {
+        let mismatches = Mismatches("portLookup32I8ConstantIndices before a guard page")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 32, seed: 0xB533_29FC_CE23_6A39)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLookup32I8ConstantIndices(from: source),
+                    unsafe highwayLookup32I8ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64() {
+        let mismatches = Mismatches("portLookup64I8")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 64, seed: 0xE914_9CCF_7CB3_2A1A)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 64,
+            seed: 0xE914_9DCF_7CB3_2BCD,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 64) {
+                source in
+                (
+                    unsafe portLookup64I8(at: indices, from: source),
+                    unsafe highwayLookup64I8(at: indices, from: source)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64BeforeGuardPage() {
+        let mismatches = Mismatches("portLookup64I8 before a guard page")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 64, seed: 0xE6FE_6031_BA9B_85DB)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 64,
+            seed: 0xE6FE_5F31_BA9B_8428,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLookup64I8(at: indices, from: source),
+                    unsafe highwayLookup64I8(at: indices, from: source)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndices() {
+        let mismatches = Mismatches("portLookup64I8ConstantIndices")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 64, seed: 0x967B_33ED_C3E9_0085)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 64) {
+                source in
+                (
+                    unsafe portLookup64I8ConstantIndices(from: source),
+                    unsafe highwayLookup64I8ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
+    func lookup64ConstantIndicesBeforeGuardPage() {
+        let mismatches = Mismatches("portLookup64I8ConstantIndices before a guard page")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 64, seed: 0xC5F8_01D1_A6B7_A812)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLookup64I8ConstantIndices(from: source),
+                    unsafe highwayLookup64I8ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
         mismatches.record()
     }

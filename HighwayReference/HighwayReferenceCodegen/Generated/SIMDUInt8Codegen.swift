@@ -2603,45 +2603,239 @@ public func highwaySlide1DownFillingWithU8ConstantFill(_ a: SIMDUInt8.Vector) ->
 }
 
 @inline(never)
-public func portTableLookupBytesU8(_ a: SIMDUInt8.Vector, _ b: SIMDUInt8.Vector) -> SIMDUInt8.Vector
-{
-    SIMDUInt8.tableLookupBytes(a, b)
+public func portTableLookupBytesU8(
+    _ a: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupBytes(a, atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesU8(
     _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
+    atUnchecked indices: SIMDUInt8.Vector
 ) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.tableLookupBytesU8(a.raw, b.raw))
+    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.tableLookupBytesU8(a.raw, indices.raw))
 }
 
 @inline(never)
-public func portTableLookupBytesU8ConstantA(_ b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.tableLookupBytes(SIMDUInt8.repeating(26), b)
+public func portTableLookupBytesU8ConstantA(
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupBytes(SIMDUInt8.repeating(26), atUnchecked: indices)
 }
 
 @inline(never)
-public func highwayTableLookupBytesU8ConstantA(_ b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
+public func highwayTableLookupBytesU8ConstantA(
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
     SIMDUInt8.Vector(
         raw: HighwayReference.Nothrow.tableLookupBytesU8(
             SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
-            b.raw
+            indices.raw
         )
     )
 }
 
 @inline(never)
-public func portTableLookupBytesU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.tableLookupBytes(a, SIMDUInt8.repeating(3))
+public func portTableLookupBytesU8ConstantIndices(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupBytes(a, atUnchecked: SIMDUInt8.repeating(3))
 }
 
 @inline(never)
-public func highwayTableLookupBytesU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
+public func highwayTableLookupBytesU8ConstantIndices(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
     SIMDUInt8.Vector(
         raw: HighwayReference.Nothrow.tableLookupBytesU8(
             a.raw,
             SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroU8(
+    _ a: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupBytesOrZero(a, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroU8(
+    _ a: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.tableLookupBytesOrZeroU8(a.raw, indices.raw))
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroU8ConstantA(
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupBytesOrZero(SIMDUInt8.repeating(26), atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroU8ConstantA(
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.tableLookupBytesOrZeroU8(
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            indices.raw
+        )
+    )
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroU8ConstantIndices(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupBytesOrZero(a, atUnchecked: SIMDUInt8.repeating(3))
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroU8ConstantIndices(
+    _ a: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.tableLookupBytesOrZeroU8(
+            a.raw,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portTableLookupLanesU8(
+    _ a: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Indices
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupLanes(a, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupLanesU8(
+    _ a: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.tableLookupLanesU8(a.raw, indices.raw))
+}
+
+@inline(never)
+public func portTableLookupLanesU8ConstantA(
+    atUnchecked indices: SIMDUInt8.Indices
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupLanes(SIMDUInt8.repeating(26), atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupLanesU8ConstantA(
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.tableLookupLanesU8(
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            indices.raw
+        )
+    )
+}
+
+@inline(never)
+public func portTableLookupLanesU8ConstantIndices(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.tableLookupLanes(a, atUnchecked: SIMDUInt8.repeating(1))
+}
+
+@inline(never)
+public func highwayTableLookupLanesU8ConstantIndices(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.tableLookupLanesU8(
+            a.raw,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portTwoTablesLookupLanesU8(
+    _ a: SIMDUInt8.Vector,
+    _ b: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Indices
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.twoTablesLookupLanes(a, b, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTwoTablesLookupLanesU8(
+    _ a: SIMDUInt8.Vector,
+    _ b: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.twoTablesLookupLanesU8(a.raw, b.raw, indices.raw)
+    )
+}
+
+@inline(never)
+public func portTwoTablesLookupLanesU8ConstantA(
+    _ b: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Indices
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.twoTablesLookupLanes(SIMDUInt8.repeating(26), b, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTwoTablesLookupLanesU8ConstantA(
+    _ b: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.twoTablesLookupLanesU8(
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            b.raw,
+            indices.raw
+        )
+    )
+}
+
+@inline(never)
+public func portTwoTablesLookupLanesU8ConstantB(
+    _ a: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Indices
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.twoTablesLookupLanes(a, SIMDUInt8.repeating(26), atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTwoTablesLookupLanesU8ConstantB(
+    _ a: SIMDUInt8.Vector,
+    atUnchecked indices: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.twoTablesLookupLanesU8(
+            a.raw,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            indices.raw
+        )
+    )
+}
+
+@inline(never)
+public func portTwoTablesLookupLanesU8ConstantIndices(
+    _ a: SIMDUInt8.Vector,
+    _ b: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.twoTablesLookupLanes(a, b, atUnchecked: SIMDUInt8.repeating(1))
+}
+
+@inline(never)
+public func highwayTwoTablesLookupLanesU8ConstantIndices(
+    _ a: SIMDUInt8.Vector,
+    _ b: SIMDUInt8.Vector
+) -> SIMDUInt8.Vector {
+    SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.twoTablesLookupLanesU8(
+            a.raw,
+            b.raw,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(1)).raw
         )
     )
 }
@@ -2976,6 +3170,68 @@ public func highwayStoreInterleaved4U8ConstantD(
         c.raw,
         SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
         to
+    )
+}
+
+@inline(never)
+public func portLookup32U8(
+    at indices: SIMDUInt8.Indices,
+    from: UnsafePointer<SIMDUInt8.Lane>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup32(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup32U8(
+    at indices: SIMDUInt8.Vector,
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.lookup32U8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup32U8ConstantIndices(from: UnsafePointer<SIMDUInt8.Lane>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup32(at: SIMDUInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup32U8ConstantIndices(from: UnsafePointer<UInt8>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup32U8(
+            from,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portLookup64U8(
+    at indices: SIMDUInt8.Indices,
+    from: UnsafePointer<SIMDUInt8.Lane>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup64(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup64U8(
+    at indices: SIMDUInt8.Vector,
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.lookup64U8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup64U8ConstantIndices(from: UnsafePointer<SIMDUInt8.Lane>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup64(at: SIMDUInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup64U8ConstantIndices(from: UnsafePointer<UInt8>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup64U8(
+            from,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(1)).raw
+        )
     )
 }
 
@@ -3363,13 +3619,19 @@ public func portUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vector 
     return SIMDUInt8.bitwiseXor(
         SIMDUInt8.bitwiseAnd(
             SIMDUInt8.bitwiseAnd(
-                SIMDUInt8.tableLookupBytes(byte1High, SIMDUInt8.shiftedRight(prev1, by: 4)),
-                SIMDUInt8.tableLookupBytes(
+                unsafe SIMDUInt8.tableLookupBytes(
+                    byte1High,
+                    atUnchecked: SIMDUInt8.shiftedRight(prev1, by: 4)
+                ),
+                unsafe SIMDUInt8.tableLookupBytes(
                     byte1Low,
-                    SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
+                    atUnchecked: SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
                 )
             ),
-            SIMDUInt8.tableLookupBytes(byte2High, SIMDUInt8.shiftedRight(input, by: 4))
+            unsafe SIMDUInt8.tableLookupBytes(
+                byte2High,
+                atUnchecked: SIMDUInt8.shiftedRight(input, by: 4)
+            )
         ),
         SIMDUInt8.bitwiseOr(
             SIMDUInt8.saturatingSubtracting(prev2, SIMDUInt8.repeating(0x60)),
@@ -3854,13 +4116,19 @@ public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
     let prev3 = SIMDUInt8.slideUpLanes(headBytes, by: 3)
     let specialCases = SIMDUInt8.bitwiseAnd(
         SIMDUInt8.bitwiseAnd(
-            SIMDUInt8.tableLookupBytes(byte1High, SIMDUInt8.shiftedRight(prev1, by: 4)),
-            SIMDUInt8.tableLookupBytes(
+            unsafe SIMDUInt8.tableLookupBytes(
+                byte1High,
+                atUnchecked: SIMDUInt8.shiftedRight(prev1, by: 4)
+            ),
+            unsafe SIMDUInt8.tableLookupBytes(
                 byte1Low,
-                SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
+                atUnchecked: SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
             )
         ),
-        SIMDUInt8.tableLookupBytes(byte2High, SIMDUInt8.shiftedRight(input, by: 4))
+        unsafe SIMDUInt8.tableLookupBytes(
+            byte2High,
+            atUnchecked: SIMDUInt8.shiftedRight(input, by: 4)
+        )
     )
     let mustBe23Continuation = SIMDUInt8.bitwiseAnd(
         SIMDUInt8.bitwiseOr(
@@ -3895,13 +4163,19 @@ public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
             let prev3 = unsafe SIMDUInt8.load(fromUnchecked: remainingBytesSpan)
             let specialCases = SIMDUInt8.bitwiseAnd(
                 SIMDUInt8.bitwiseAnd(
-                    SIMDUInt8.tableLookupBytes(byte1High, SIMDUInt8.shiftedRight(prev1, by: 4)),
-                    SIMDUInt8.tableLookupBytes(
+                    unsafe SIMDUInt8.tableLookupBytes(
+                        byte1High,
+                        atUnchecked: SIMDUInt8.shiftedRight(prev1, by: 4)
+                    ),
+                    unsafe SIMDUInt8.tableLookupBytes(
                         byte1Low,
-                        SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
+                        atUnchecked: SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
                     )
                 ),
-                SIMDUInt8.tableLookupBytes(byte2High, SIMDUInt8.shiftedRight(input, by: 4))
+                unsafe SIMDUInt8.tableLookupBytes(
+                    byte2High,
+                    atUnchecked: SIMDUInt8.shiftedRight(input, by: 4)
+                )
             )
             let mustBe23Continuation = SIMDUInt8.bitwiseAnd(
                 SIMDUInt8.bitwiseOr(
@@ -3941,13 +4215,19 @@ public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
             let prev3 = SIMDUInt8.loadFirst(from: remainingBytesSpan)
             let specialCases = SIMDUInt8.bitwiseAnd(
                 SIMDUInt8.bitwiseAnd(
-                    SIMDUInt8.tableLookupBytes(byte1High, SIMDUInt8.shiftedRight(prev1, by: 4)),
-                    SIMDUInt8.tableLookupBytes(
+                    unsafe SIMDUInt8.tableLookupBytes(
+                        byte1High,
+                        atUnchecked: SIMDUInt8.shiftedRight(prev1, by: 4)
+                    ),
+                    unsafe SIMDUInt8.tableLookupBytes(
                         byte1Low,
-                        SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
+                        atUnchecked: SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
                     )
                 ),
-                SIMDUInt8.tableLookupBytes(byte2High, SIMDUInt8.shiftedRight(input, by: 4))
+                unsafe SIMDUInt8.tableLookupBytes(
+                    byte2High,
+                    atUnchecked: SIMDUInt8.shiftedRight(input, by: 4)
+                )
             )
             let mustBe23Continuation = SIMDUInt8.bitwiseAnd(
                 SIMDUInt8.bitwiseOr(
