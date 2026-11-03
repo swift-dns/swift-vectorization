@@ -2354,10 +2354,8 @@ func x86Avx2ByteLaneLookup(for element: Element) -> String {
     let upperTable = x86Avx2Concat(.upperUpper, hi: "a", lo: "a", for: element)
     return """
         const \(int16) selector = (\(int16))indices << 3;
-        const \(element.cVector) lowerTable = \(lowerTable);
-        const \(element.cVector) upperTable = \(upperTable);
-        const \(element.cVector) lower = \(x86TableLookup("lowerTable", "indices", for: element));
-        const \(element.cVector) upper = \(x86TableLookup("upperTable", "indices", for: element));
+        const \(element.cVector) lower = \(x86TableLookup(lowerTable, "indices", for: element));
+        const \(element.cVector) upper = \(x86TableLookup(upperTable, "indices", for: element));
         \(vectorResult(x86Selecting("selector", "upper", "lower", for: element), for: element))
         """
 }

@@ -1,0 +1,6 @@
+AVX2 Lookup16I16
+AVX2 Lookup16U16
+AVX2 Lookup32I8
+AVX2 Lookup32U8
+AVX2 Lookup64I8
+AVX2 Lookup64U8

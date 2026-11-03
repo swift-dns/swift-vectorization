@@ -3147,10 +3147,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ta
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)selectsUpperQuarters, (cvectorization_ops_x86_i8)lookedCD, (cvectorization_ops_x86_i8)lookedAB));
 #elif CVECTORIZATION_OPS_X86 == 4
   const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)indices << 3;
-  const cvectorization_ops_vector_u8 lowerTable = (cvectorization_ops_x86_i64)__builtin_ia32_insert128i256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_block_i64)__builtin_shufflevector((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, 0, 1), (int)1);
-  const cvectorization_ops_vector_u8 upperTable = (cvectorization_ops_x86_i64)__builtin_ia32_permti256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, (int)0x31);
-  const cvectorization_ops_vector_u8 lower = (cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)lowerTable, (cvectorization_ops_x86_i8)indices);
-  const cvectorization_ops_vector_u8 upper = (cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)upperTable, (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_u8 lower = (cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i64)__builtin_ia32_insert128i256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_block_i64)__builtin_shufflevector((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, 0, 1), (int)1), (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_u8 upper = (cvectorization_ops_vector_u8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i64)__builtin_ia32_permti256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, (int)0x31), (cvectorization_ops_x86_i8)indices);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)lower, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)selector));
 #elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
@@ -14193,10 +14191,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ta
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)selectsUpperQuarters, (cvectorization_ops_x86_i8)lookedCD, (cvectorization_ops_x86_i8)lookedAB));
 #elif CVECTORIZATION_OPS_X86 == 4
   const cvectorization_ops_x86_i16 selector = (cvectorization_ops_x86_i16)indices << 3;
-  const cvectorization_ops_vector_i8 lowerTable = (cvectorization_ops_x86_i64)__builtin_ia32_insert128i256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_block_i64)__builtin_shufflevector((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, 0, 1), (int)1);
-  const cvectorization_ops_vector_i8 upperTable = (cvectorization_ops_x86_i64)__builtin_ia32_permti256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, (int)0x31);
-  const cvectorization_ops_vector_i8 lower = (cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)lowerTable, (cvectorization_ops_x86_i8)indices);
-  const cvectorization_ops_vector_i8 upper = (cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)upperTable, (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_i8 lower = (cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i64)__builtin_ia32_insert128i256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_block_i64)__builtin_shufflevector((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, 0, 1), (int)1), (cvectorization_ops_x86_i8)indices);
+  const cvectorization_ops_vector_i8 upper = (cvectorization_ops_vector_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i64)__builtin_ia32_permti256((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)a, (int)0x31), (cvectorization_ops_x86_i8)indices);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)lower, (cvectorization_ops_x86_i8)upper, (cvectorization_ops_x86_i8)selector));
 #elif CVECTORIZATION_OPS_X86 >= 2 && CVECTORIZATION_OPS_X86 <= 3
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pshufb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)indices));
