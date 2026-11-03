@@ -12,14 +12,21 @@ repository_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly repository_root
 readonly package_root="${repository_root}/HighwayReference"
 readonly allowlist_path="${repository_root}/scripts/codegen-allowlist.txt"
+readonly reorder_allowlist_path="${repository_root}/scripts/codegen-reorder-allowlist.txt"
 readonly normalize_script="${repository_root}/scripts/normalize-disassembly.sh"
 readonly allowlist_entry_pattern='^([A-Z][A-Z0-9_]*)[[:space:]]+([A-Za-z0-9_]+)[[:space:]]+[^[:space:]]'
+readonly allowlist_entry_format='<TARGET> <Function> <reason>'
+readonly allowlist_entry_example='NEON FirstLanesU8 the reason it differs'
+readonly reorder_allowlist_entry_pattern='^([A-Z][A-Z0-9_]*)[[:space:]]+([A-Za-z0-9_]+)$'
+readonly reorder_allowlist_entry_format='<TARGET> <Function>'
+readonly reorder_allowlist_entry_example='NEON FirstLanesU8'
 readonly target_name="HighwayReferenceCodegen"
 readonly host_dependent_target="EMU128"
 
 architecture=""
 verbose="false"
 declare -a extra_build_arguments=()
+declare -A location_of_entry=()
 workspace=""
 
 cleanup() {
@@ -75,23 +82,25 @@ parse_arguments() {
 
 validate_allowlist() {
   local allowlist_file="${1:?validate_allowlist requires the allowlist file}"
+  local entry_pattern="${2:?validate_allowlist requires the pattern an entry must match}"
+  local entry_format="${3:?validate_allowlist requires the format of an entry}"
+  local entry_example="${4:?validate_allowlist requires an example of an entry}"
 
   if [[ ! -f "${allowlist_file}" ]]; then
     fatal "There is no '${allowlist_file}' to read the allowlisted functions from" \
-      "Every line of it is '<TARGET> <Function> <reason>'" \
+      "Every line of it is '${entry_format}'" \
       "It is empty when nothing is allowlisted"
   fi
 
-  local -A line_of_entry=()
   local line entry_key
   local line_number=0
   while IFS= read -r line || [[ -n "${line}" ]]; do
     line_number=$(( line_number + 1 ))
 
-    if [[ ! "${line}" =~ ${allowlist_entry_pattern} ]]; then
+    if [[ ! "${line}" =~ ${entry_pattern} ]]; then
       fatal "Line ${line_number} of '${allowlist_file}' is malformed: '${line}'" \
-        "It must be '<TARGET> <Function> <reason>'" \
-        "For example: 'NEON FirstLanesU8 the reason it differs'" \
+        "It must be '${entry_format}'" \
+        "For example: '${entry_example}'" \
         "Blank lines and comments are not allowed"
     fi
 
@@ -102,11 +111,11 @@ validate_allowlist() {
     fi
 
     entry_key="${BASH_REMATCH[1]} ${BASH_REMATCH[2]}"
-    if [[ -n "${line_of_entry["${entry_key}"]:-}" ]]; then
+    if [[ -n "${location_of_entry["${entry_key}"]:-}" ]]; then
       fatal "Line ${line_number} of '${allowlist_file}' repeats '${entry_key}'," \
-        "which line ${line_of_entry["${entry_key}"]} already allowlists"
+        "which ${location_of_entry["${entry_key}"]} already allowlists"
     fi
-    line_of_entry["${entry_key}"]="${line_number}"
+    location_of_entry["${entry_key}"]="line ${line_number} of '${allowlist_file}'"
   done < "${allowlist_file}"
   return 0
 }
@@ -206,13 +215,16 @@ compare_functions() {
   local names_file="${1:?compare_functions requires the file of symbols and demangled names}"
   local listing_file="${2:?compare_functions requires the disassembly listing}"
   local allowlist_file="${3:?compare_functions requires the allowlist file}"
-  local show_listings="${4:?compare_functions requires whether to print the listings}"
-  local host_architecture_key="${5:?compare_functions requires the key of the host architecture}"
+  local reorder_allowlist_file="${4:?compare_functions requires the reorder allowlist file}"
+  local show_listings="${5:?compare_functions requires whether to print the listings}"
+  local host_architecture_key="${6:?compare_functions requires the key of the host architecture}"
 
   if ! awk -F '\t' \
     -v names_file="${names_file}" \
     -v allowlist_file="${allowlist_file}" \
     -v allowlist_name="${allowlist_file#"${repository_root}/"}" \
+    -v reorder_allowlist_file="${reorder_allowlist_file}" \
+    -v reorder_allowlist_name="${reorder_allowlist_file#"${repository_root}/"}" \
     -v show_listings="${show_listings}" \
     -v host_dependent_target="${host_dependent_target}" \
     -v host_architecture_key="${host_architecture_key}" '
@@ -221,6 +233,13 @@ compare_functions() {
         return target "_" host_architecture_key
       }
       return target
+    }
+
+    function allowlist_name_of(entry) {
+      if (allowlist_for_reorders[entry]) {
+        return reorder_allowlist_name
+      }
+      return allowlist_name
     }
 
     function trimmed_length(function_name,    length_without_padding) {
@@ -251,6 +270,20 @@ compare_functions() {
       return 1
     }
 
+    function same_instructions_in_any_order(first, second, total,    position, surplus) {
+      for (position = 1; position <= total; position++) {
+        surplus[instruction[first, position]]++
+        surplus[instruction[second, position]]--
+      }
+      for (position = 1; position <= total; position++) {
+        if (surplus[instruction[first, position]] != 0 ||
+            surplus[instruction[second, position]] != 0) {
+          return 0
+        }
+      }
+      return 1
+    }
+
     function print_listing(label, function_name, total,    position) {
       printf "  %s\n", label
       for (position = 1; position <= total; position++) {
@@ -262,12 +295,13 @@ compare_functions() {
       printf "  %-12s %d\n", label, count
     }
 
-    FILENAME == allowlist_file {
+    FILENAME == allowlist_file || FILENAME == reorder_allowlist_file {
       split($0, entry_fields, " ")
       allowlist_total++
       allowlist_target[allowlist_total] = entry_fields[1]
       allowlist_function[allowlist_total] = entry_fields[2]
       allowlist_line[allowlist_total] = FNR
+      allowlist_for_reorders[allowlist_total] = (FILENAME == reorder_allowlist_file)
       next
     }
 
@@ -324,7 +358,12 @@ compare_functions() {
       branch_pattern = "^(b|b\\.[a-z]+|bc\\.[a-z]+|br|braa|braaz|brab|brabz|cbz|cbnz|tbz|tbnz|j[a-z]+)$"
 
       for (entry = 1; entry <= allowlist_total; entry++) {
-        if (allowlist_target[entry] == highway_target) {
+        if (allowlist_target[entry] != highway_target) {
+          continue
+        }
+        if (allowlist_for_reorders[entry]) {
+          reorder_allowlisted[allowlist_function[entry]] = 1
+        } else {
           allowlisted[allowlist_function[entry]] = 1
         }
       }
@@ -349,6 +388,8 @@ compare_functions() {
           verdict = "shorter"
         } else if (port_length > highway_length) {
           verdict = "longer"
+        } else if (same_instructions_in_any_order(port_name, highway_name, port_length)) {
+          verdict = "reordered"
         } else {
           verdict = "different"
         }
@@ -367,11 +408,16 @@ compare_functions() {
         }
         allowlist_mark = ""
         if (verdict != "same") {
-          if (key in allowlisted) {
+          if (key in reorder_allowlisted) {
+            allowlist_mark = " [reorder-allowlisted]"
+          } else if (key in allowlisted) {
             allowlist_mark = " [allowlisted]"
             allowlisted_count++
           } else {
             unlisted_count++
+            if (verdict == "reordered") {
+              unlisted_reordered_count++
+            }
           }
         }
 
@@ -408,19 +454,34 @@ compare_functions() {
           continue
         }
         listed_function = allowlist_function[entry]
+        listed_as = "allowlisted"
+        if (allowlist_for_reorders[entry]) {
+          listed_as = "reorder-allowlisted"
+        }
         if (!(listed_function in verdict_of)) {
-          printf "** ERROR: %s:%d: %s %s is allowlisted but has no port and highway pair\n",
-            allowlist_name, allowlist_line[entry], highway_target, listed_function > "/dev/stderr"
+          printf "** ERROR: %s:%d: %s %s is %s but has no port and highway pair\n",
+            allowlist_name_of(entry), allowlist_line[entry], highway_target, listed_function,
+            listed_as > "/dev/stderr"
           failed = 1
         } else if (verdict_of[listed_function] == "same") {
-          printf "** ERROR: %s:%d: %s %s is allowlisted but its pair is the same\n",
-            allowlist_name, allowlist_line[entry], highway_target, listed_function > "/dev/stderr"
+          printf "** ERROR: %s:%d: %s %s is %s but its pair is the same\n",
+            allowlist_name_of(entry), allowlist_line[entry], highway_target, listed_function,
+            listed_as > "/dev/stderr"
+          failed = 1
+        } else if (allowlist_for_reorders[entry] && verdict_of[listed_function] != "reordered") {
+          printf "** ERROR: %s:%d: %s %s is %s but its pair is %s, not reordered\n",
+            allowlist_name_of(entry), allowlist_line[entry], highway_target, listed_function,
+            listed_as, verdict_of[listed_function] > "/dev/stderr"
           failed = 1
         }
       }
       if (unlisted_count > 0) {
         printf "** ERROR: %d functions differ and are not in %s\n",
           unlisted_count, allowlist_name > "/dev/stderr"
+        if (unlisted_reordered_count > 0) {
+          printf "Of those, %d only reordered the instructions and can go in %s\n",
+            unlisted_reordered_count, reorder_allowlist_name > "/dev/stderr"
+        }
         failed = 1
       }
 
@@ -428,12 +489,13 @@ compare_functions() {
       print_count("same", verdict_count["same"])
       print_count("shorter", verdict_count["shorter"])
       print_count("longer", verdict_count["longer"])
+      print_count("reordered", verdict_count["reordered"])
       print_count("different", verdict_count["different"])
       print_count("flagged", flagged)
       print_count("allowlisted", allowlisted_count)
       exit failed
     }
-  ' "${allowlist_file}" "${names_file}" "${listing_file}"; then
+  ' "${allowlist_file}" "${reorder_allowlist_file}" "${names_file}" "${listing_file}"; then
     fatal "The comparison of the functions of '${target_name}' failed"
   fi
   return 0
@@ -452,7 +514,10 @@ main() {
     fatal "Cannot normalize the disassembly of '${target_name}' without an objdump"
   fi
 
-  validate_allowlist "${allowlist_path}"
+  validate_allowlist "${allowlist_path}" "${allowlist_entry_pattern}" \
+    "${allowlist_entry_format}" "${allowlist_entry_example}"
+  validate_allowlist "${reorder_allowlist_path}" "${reorder_allowlist_entry_pattern}" \
+    "${reorder_allowlist_entry_format}" "${reorder_allowlist_entry_example}"
 
   local host_architecture_key
   host_architecture_key="$(architecture_key "${architecture}")"
@@ -496,8 +561,8 @@ main() {
   demangle_symbols "${listing_file}" "${symbols_file}" "${demangled_file}" > "${names_file}"
 
   log "Comparing the functions..."
-  compare_functions "${names_file}" "${listing_file}" "${allowlist_path}" "${verbose}" \
-    "${host_architecture_key}"
+  compare_functions "${names_file}" "${listing_file}" "${allowlist_path}" \
+    "${reorder_allowlist_path}" "${verbose}" "${host_architecture_key}"
   return 0
 }
 

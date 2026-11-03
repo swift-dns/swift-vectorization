@@ -2354,8 +2354,10 @@ func x86Avx2ByteLaneLookup(for element: Element) -> String {
     let upperTable = x86Avx2Concat(.upperUpper, hi: "a", lo: "a", for: element)
     return """
         const \(int16) selector = (\(int16))indices << 3;
-        const \(element.cVector) lower = \(x86TableLookup(lowerTable, "indices", for: element));
-        const \(element.cVector) upper = \(x86TableLookup(upperTable, "indices", for: element));
+        const \(element.cVector) lowerTable = \(lowerTable);
+        const \(element.cVector) upperTable = \(upperTable);
+        const \(element.cVector) lower = \(x86TableLookup("lowerTable", "indices", for: element));
+        const \(element.cVector) upper = \(x86TableLookup("upperTable", "indices", for: element));
         \(vectorResult(x86Selecting("selector", "upper", "lower", for: element), for: element))
         """
 }
@@ -2383,8 +2385,8 @@ func x86Avx3ByteLaneLookup(for element: Element) -> String {
     }
     return """
         const \(int16) shiftedBy3 = (\(int16))indices << 3;
-        const \(int16) shiftedBy2 = (\(int16))indices << 2;
         const \(maskType) selectsUpperHalves = \(x86Avx3MaskBits("shiftedBy3", for: element));
+        const \(int16) shiftedBy2 = (\(int16))indices << 2;
         const \(maskType) selectsUpperQuarters = \(x86Avx3MaskBits("shiftedBy2", for: element));
         \(tables.joined(separator: "\n"))
         const \(element.cVector) lookedA = \(lookup("tableA"));
@@ -2481,10 +2483,10 @@ func x86TwoTablesLookupLanes(level: X86Level, for element: Element) -> String {
         let upper = "const \(vector) upper = (\(vector))\(lookup)(rawB, \(indices));"
         return upperFirst ? "\(upper)\n\(lower)" : "\(lower)\n\(upper)"
     }
-    func compared(with limit: Int) -> String {
+    func compared(_ comparison: String = ">", with limit: Int) -> String {
         let type = x86Vector("i\(element.bits)")
         let limits = splat("\(limit)", as: type, lanes: element.laneCount)
-        return "const \(type) selector = (\(type))((\(type))indices > \(limits));"
+        return "const \(type) selector = (\(type))((\(type))indices \(comparison) \(limits));"
     }
     func routed(through route: Element, indices: String) -> String {
         let function = cFunctionName("twoTablesLookupLanes", route)
@@ -2497,11 +2499,17 @@ func x86TwoTablesLookupLanes(level: X86Level, for element: Element) -> String {
         return "const \(type) selector = (\(type))indices << \(bits);"
     }
     switch (level, element.bits) {
-    case (.sse2, 8), (.ssse3, 8):
+    case (.sse2, 8):
         return """
             \(compared(with: 15))
             \(lookups())
             \(vectorResult(x86BitSelect("selector", "upper", "lower", for: element), for: element))
+            """
+    case (.ssse3, 8):
+        return """
+            \(compared("<", with: 16))
+            \(lookups())
+            \(vectorResult(x86BitSelect("selector", "lower", "upper", for: element), for: element))
             """
     case (.sse4, 8):
         return """
@@ -7120,20 +7128,28 @@ func canLookupMembers(for element: Element) -> String {
     return output
 }
 
-func lookupBody(lanes: Int, aligned: Bool, for element: Element) -> String {
+func x86Sse2LookupTables(for element: Element) -> Element {
+    element.bits == 64 ? laneIndexElement(of: element) : element
+}
+
+func lookupBody(lanes: Int, aligned: Bool, tables: Element? = nil, for element: Element) -> String {
     let vector = element.cVector
     let raw = element.cRawVector
     func pointer(_ expression: String, alignment: Int) -> String {
         aligned ? "__builtin_assume_aligned(\(expression), \(alignment))" : expression
     }
     guard element.laneCount >= lanes else {
-        let function = cFunctionName("twoTablesLookupLanes", element)
+        let tables = tables ?? element
+        let tableVector = tables.cVector
+        let tableRaw = tables.cRawVector
+        let function = cFunctionName("twoTablesLookupLanes", tables)
+        let call = "\(function)((\(tableRaw))first, (\(tableRaw))second, rawIndices)"
         return """
-            \(vector) first;
-            \(vector) second;
+            \(tableVector) first;
+            \(tableVector) second;
             __builtin_memcpy(&first, \(pointer("from", alignment: element.width)), sizeof first);
             __builtin_memcpy(&second, \(pointer("from + \(lanes / 2)", alignment: element.width)), sizeof second);
-            return \(function)((\(raw))first, (\(raw))second, rawIndices);
+            \(tableVector == vector ? "return \(call);" : vectorResult(call, for: element))
             """
     }
     let bytes = lanes * element.bits / 8
@@ -7194,7 +7210,14 @@ func lookupOp(_ size: LookupSize) -> Op {
             },
             avx3: aligned,
             avx2: aligned,
-            sse2: aligned
+            sse2: { element in
+                lookupBody(
+                    lanes: lanes,
+                    aligned: true,
+                    tables: x86Sse2LookupTables(for: element),
+                    for: element
+                )
+            }
         )
     ) { element in
         lookupBody(lanes: lanes, aligned: false, for: element)

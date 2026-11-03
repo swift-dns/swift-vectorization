@@ -112,7 +112,7 @@ print_codegen_comparisons() {
     fi
 
     printf -- '%s\n' '```'
-    grep -E '^[A-Za-z0-9_]+ +port=[0-9]+ +highway=[0-9]+ +(shorter|longer|different)' \
+    grep -E '^[A-Za-z0-9_]+ +port=[0-9]+ +highway=[0-9]+ +(shorter|longer|reordered|different)' \
       "${report_file}" || true
     sed -n '/^Summary of /,$p' "${report_file}"
     printf -- '%s\n' '```'
