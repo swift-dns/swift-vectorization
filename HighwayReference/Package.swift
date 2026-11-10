@@ -37,12 +37,20 @@ var settings: [SwiftSetting] {
         .enableExperimentalFeature(
             "AvailabilityMacro=SwiftStdlib 5.1:macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0"
         ),
+        .enableExperimentalFeature(
+            "AvailabilityMacro=SwiftStdlib 5.3:macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0"
+        ),
         .treatAllWarnings(as: .error),
     ]
 }
 // MARK: - END exact copy of the main package's Package.swift
 
 // MARK: - Add reference stuff now
+
+let elementNames = [
+    "SIMDBFloat16", "SIMDDouble", "SIMDFloat", "SIMDFloat16", "SIMDInt16", "SIMDInt32", "SIMDInt64",
+    "SIMDInt8", "SIMDUInt16", "SIMDUInt32", "SIMDUInt64", "SIMDUInt8",
+]
 
 package.targets += [
     .target(
@@ -56,10 +64,16 @@ package.targets += [
         path: "CHighwayReference",
         publicHeadersPath: "include"
     ),
+    .target(
+        name: "HighwayReferenceTestSupport",
+        dependencies: ["CHighwayReference", "Vectorization"],
+        path: "HighwayReferenceTests/HighwayReferenceTestSupport",
+        swiftSettings: settings + [.interoperabilityMode(.Cxx)]
+    ),
     .testTarget(
-        name: "HighwayReferenceTests",
-        dependencies: ["CHighwayReference", "HighwayReferenceCodegen", "Vectorization"],
-        path: "HighwayReferenceTests",
+        name: "HighwayTargetTests",
+        dependencies: ["CHighwayReference", "HighwayReferenceTestSupport", "Vectorization"],
+        path: "HighwayReferenceTests/Generated/HighwayTargetTests",
         swiftSettings: settings + [.interoperabilityMode(.Cxx)]
     ),
     .target(
@@ -69,5 +83,17 @@ package.targets += [
         swiftSettings: settings + [.interoperabilityMode(.Cxx)]
     ),
 ]
+
+package.targets += elementNames.map { name in
+    .testTarget(
+        name: "\(name)Tests",
+        dependencies: [
+            "CHighwayReference", "HighwayReferenceCodegen", "HighwayReferenceTestSupport",
+            "Vectorization",
+        ],
+        path: "HighwayReferenceTests/Generated/\(name)Tests",
+        swiftSettings: settings + [.interoperabilityMode(.Cxx)]
+    )
+}
 
 package.cxxLanguageStandard = .cxx17

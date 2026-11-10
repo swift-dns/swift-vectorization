@@ -13,6 +13,9 @@ public protocol SIMDElement {
     /// How many lanes of `Lane` a `Vector` holds on the target this was compiled for.
     static var laneCount: Int { get }
 
+    /// How many 16-byte blocks a `Vector` holds on the target this was compiled for.
+    static var blockCount: Int { get }
+
     static func zero() -> Vector
     static func repeating(_ value: Lane) -> Vector
     static func iota(_ value: Lane) -> Vector
@@ -60,20 +63,62 @@ public protocol SIMDElement {
     )
     static func adding(_ a: Vector, _ b: Vector) -> Vector
     static func subtracting(_ a: Vector, _ b: Vector) -> Vector
+    static func addingSubtracting(_ a: Vector, _ b: Vector) -> Vector
+    static func multiplying(_ a: Vector, _ b: Vector) -> Vector
+    static func dividing(_ a: Vector, _ b: Vector) -> Vector
     static func minimum(_ a: Vector, _ b: Vector) -> Vector
     static func maximum(_ a: Vector, _ b: Vector) -> Vector
+    static func clamped(_ a: Vector, between b: Vector, and c: Vector) -> Vector
+    static func absoluteDifference(_ a: Vector, _ b: Vector) -> Vector
+    static func multiplyAdding(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func negatedMultiplyAdding(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func multiplySubtracting(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func negatedMultiplySubtracting(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func multiplyAddingSubtracting(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func multiplySubtractingAdding(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func multiplyingComplex(_ a: Vector, _ b: Vector) -> Vector
+    static func multiplyingComplexConjugate(_ a: Vector, _ b: Vector) -> Vector
+    static func multiplyAddingComplex(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func multiplyAddingComplexConjugate(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func bitwiseAnd(_ a: Vector, _ b: Vector) -> Vector
+    static func bitwiseOr(_ a: Vector, _ b: Vector) -> Vector
+    static func bitwiseXor(_ a: Vector, _ b: Vector) -> Vector
+    static func bitwiseAndNot(_ a: Vector, _ b: Vector) -> Vector
+    static func bitwiseAndXor(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func bitwiseXor(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func bitwiseOr(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func bitwiseOrAnd(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func bitwiseXorAndNot(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func bitwiseSelecting(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
     static func equalTo(_ a: Vector, _ b: Vector) -> Mask
     static func notEqualTo(_ a: Vector, _ b: Vector) -> Mask
     static func lessThan(_ a: Vector, _ b: Vector) -> Mask
     static func greaterThan(_ a: Vector, _ b: Vector) -> Mask
     static func selecting(_ mask: Mask, _ a: Vector, _ b: Vector) -> Vector
+    static func pairwiseAdding(_ a: Vector, _ b: Vector) -> Vector
+    static func pairwiseSubtracting(_ a: Vector, _ b: Vector) -> Vector
+    static func minimumNumber(_ a: Vector, _ b: Vector) -> Vector
+    static func maximumNumber(_ a: Vector, _ b: Vector) -> Vector
+    static func minimumMagnitude(_ a: Vector, _ b: Vector) -> Vector
+    static func maximumMagnitude(_ a: Vector, _ b: Vector) -> Vector
     static func selectingOrZero(_ mask: Mask, _ a: Vector) -> Vector
     static func zeroingSelected(_ mask: Mask, _ a: Vector) -> Vector
+    static func bitwiseAnd(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func bitwiseOr(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func bitwiseXor(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func bitwiseAnd(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func bitwiseOr(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func bitwiseXor(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
     static func firstLanes(count: Int) -> Mask
     static func allTrue(_ mask: Mask) -> Bool
     static func allFalse(_ mask: Mask) -> Bool
+    static func allBitsSet(_ a: Vector) -> Bool
+    static func allBitsClear(_ a: Vector) -> Bool
     static func trueCount(_ mask: Mask) -> Int
     static func firstTrueIndex(_ mask: Mask) -> Int
+    static func sum(_ a: Vector) -> Lane
+    static func smallest(_ a: Vector) -> Lane
+    static func largest(_ a: Vector) -> Lane
     static func firstLane(_ a: Vector) -> Lane
     static func reversed(_ a: Vector) -> Vector
     static func slideUpLanes(_ a: Vector, by lanes: Int) -> Vector
@@ -246,39 +291,465 @@ public protocol SIMDElement {
         _ d: Vector,
         toUnchecked output: inout OutputSpan<Lane>
     )
+    static func signBit() -> Vector
+    static func unspecified() -> Vector
+    static func lessThanOrEqualTo(_ a: Vector, _ b: Vector) -> Mask
+    static func greaterThanOrEqualTo(_ a: Vector, _ b: Vector) -> Mask
+    static func mask(from a: Vector) -> Mask
+    static func repeatingMask(_ value: Bool) -> Mask
+    static func repeatingBlockMask(bits: UInt) -> Mask
+    static func loadMask(from: UnsafePointer<UInt8>) -> Mask
+    @available(SwiftStdlib 5.1, *)
+    static func loadMask(from span: Span<UInt8>) -> Mask
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func loadMask(fromUnchecked span: Span<UInt8>) -> Mask
+    static func vector(from mask: Mask) -> Vector
+    static func bits(of mask: Mask) -> UInt64
+    static func storeMask(_ mask: Mask, to: UnsafeMutablePointer<UInt8>) -> Int
+    @available(SwiftStdlib 5.1, *)
+    static func storeMask(_ mask: Mask, to span: inout MutableSpan<UInt8>) -> Int
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func storeMask(_ mask: Mask, toUnchecked span: inout MutableSpan<UInt8>) -> Int
+    @available(SwiftStdlib 5.1, *)
+    static func appendMask(_ mask: Mask, to output: inout OutputSpan<UInt8>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func appendMask(_ mask: Mask, toUnchecked output: inout OutputSpan<UInt8>)
+    static func slideUpLanes(_ mask: Mask, by lanes: Int) -> Mask
+    @unsafe static func slideUpLanes(_ mask: Mask, byUnchecked lanes: Int) -> Mask
+    static func slideDownLanes(_ mask: Mask, by lanes: Int) -> Mask
+    @unsafe static func slideDownLanes(_ mask: Mask, byUnchecked lanes: Int) -> Mask
+    static func slide1Up(_ mask: Mask) -> Mask
+    static func slide1Down(_ mask: Mask) -> Mask
+    static func lastTrueIndex(_ mask: Mask) -> Int
+    static func knownFirstTrueIndex(_ mask: Mask) -> Int
+    static func knownLastTrueIndex(_ mask: Mask) -> Int
+    static func selecting(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func bitwiseNot(_ mask: Mask) -> Mask
+    static func bitwiseAnd(_ a: Mask, _ b: Mask) -> Mask
+    static func bitwiseAndNot(_ a: Mask, _ b: Mask) -> Mask
+    static func bitwiseOr(_ a: Mask, _ b: Mask) -> Mask
+    static func bitwiseXor(_ a: Mask, _ b: Mask) -> Mask
+    static func neitherTrue(_ a: Mask, _ b: Mask) -> Mask
+    static func onlyFirstTrue(_ mask: Mask) -> Mask
+    static func beforeFirstTrue(_ mask: Mask) -> Mask
+    static func atOrBeforeFirstTrue(_ mask: Mask) -> Mask
+    static func atOrAfterFirstTrue(_ mask: Mask) -> Mask
+    static func lane(_ a: Vector, at index: Int) -> Lane
+    @unsafe static func lane(_ a: Vector, atUnchecked index: Int) -> Lane
+    static func replacingLane(_ a: Vector, at index: Int, with value: Lane) -> Vector
+    @unsafe static func replacingLane(
+        _ a: Vector,
+        atUnchecked index: Int,
+        with value: Lane
+    ) -> Vector
+    static func repeatingSum(_ a: Vector) -> Vector
+    static func repeatingSmallest(_ a: Vector) -> Vector
+    static func repeatingLargest(_ a: Vector) -> Vector
+    static func pairwiseAddingBlocks(_ a: Vector, _ b: Vector) -> Vector
+    static func pairwiseSubtractingBlocks(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingLower(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingUpper(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingEven(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingOdd(_ a: Vector, _ b: Vector) -> Vector
+    static func oddEven(_ a: Vector, _ b: Vector) -> Vector
+    static func duplicatingEven(_ a: Vector) -> Vector
+    static func duplicatingOdd(_ a: Vector) -> Vector
+    static func concatenatingLowerLower(_ a: Vector, _ b: Vector) -> Vector
+    static func concatenatingUpperUpper(_ a: Vector, _ b: Vector) -> Vector
+    static func concatenatingLowerUpper(_ a: Vector, _ b: Vector) -> Vector
+    static func concatenatingUpperLower(_ a: Vector, _ b: Vector) -> Vector
+    static func concatenatingOdd(_ a: Vector, _ b: Vector) -> Vector
+    static func concatenatingEven(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingWholeLower(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingWholeUpper(_ a: Vector, _ b: Vector) -> Vector
+    static func reversedBlocks(_ a: Vector) -> Vector
+    static func reversed2(_ a: Vector) -> Vector
+    static func oddEvenBlocks(_ a: Vector, _ b: Vector) -> Vector
+    static func swappingAdjacentBlocks(_ a: Vector) -> Vector
+    static func interleavingEvenBlocks(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingOddBlocks(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingLowerBlocks(_ a: Vector, _ b: Vector) -> Vector
+    static func interleavingUpperBlocks(_ a: Vector, _ b: Vector) -> Vector
+    static func create2(_ a: Vector, _ b: Vector) -> (Vector, Vector)
+    static func get2(_ tuple: (Vector, Vector), at index: Int) -> Vector
+    @unsafe static func get2(_ tuple: (Vector, Vector), atUnchecked index: Int) -> Vector
+    static func set2(_ tuple: (Vector, Vector), at index: Int, to a: Vector) -> (Vector, Vector)
+    @unsafe static func set2(
+        _ tuple: (Vector, Vector),
+        atUnchecked index: Int,
+        to a: Vector
+    ) -> (Vector, Vector)
+    static func create3(_ a: Vector, _ b: Vector, _ c: Vector) -> (Vector, Vector, Vector)
+    static func get3(_ tuple: (Vector, Vector, Vector), at index: Int) -> Vector
+    @unsafe static func get3(_ tuple: (Vector, Vector, Vector), atUnchecked index: Int) -> Vector
+    static func set3(
+        _ tuple: (Vector, Vector, Vector),
+        at index: Int,
+        to a: Vector
+    ) -> (Vector, Vector, Vector)
+    @unsafe static func set3(
+        _ tuple: (Vector, Vector, Vector),
+        atUnchecked index: Int,
+        to a: Vector
+    ) -> (Vector, Vector, Vector)
+    static func create4(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        _ d: Vector
+    ) -> (Vector, Vector, Vector, Vector)
+    static func get4(_ tuple: (Vector, Vector, Vector, Vector), at index: Int) -> Vector
+    @unsafe static func get4(
+        _ tuple: (Vector, Vector, Vector, Vector),
+        atUnchecked index: Int
+    ) -> Vector
+    static func set4(
+        _ tuple: (Vector, Vector, Vector, Vector),
+        at index: Int,
+        to a: Vector
+    ) -> (Vector, Vector, Vector, Vector)
+    @unsafe static func set4(
+        _ tuple: (Vector, Vector, Vector, Vector),
+        atUnchecked index: Int,
+        to a: Vector
+    ) -> (Vector, Vector, Vector, Vector)
+    static func indices(from vector: Indices) -> Indices
+    @unsafe static func indices(fromUnchecked vector: Indices) -> Indices
+    static func compressed(_ a: Vector, where mask: Mask) -> Vector
+    static func compressedNot(_ a: Vector, where mask: Mask) -> Vector
+    static func partitioned(_ a: Vector, where mask: Mask) -> Vector
+    static func expanded(_ a: Vector, where mask: Mask) -> Vector
+    static func minimum(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func maximum(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func maximum(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func adding(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func adding(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func subtracting(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func subtracting(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func multiplying(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func multiplying(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func dividing(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func dividing(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func multiplyAdding(_ a: Vector, _ b: Vector, _ c: Vector, where mask: Mask) -> Vector
+    static func multiplyAdding(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func multiplySubtracting(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        where mask: Mask
+    ) -> Vector
+    static func multiplySubtracting(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func negatedMultiplyAdding(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        where mask: Mask
+    ) -> Vector
+    static func negatedMultiplyAdding(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func negatedMultiplySubtracting(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        where mask: Mask
+    ) -> Vector
+    static func negatedMultiplySubtracting(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func multiplyingComplex(
+        _ a: Vector,
+        _ b: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func multiplyingComplexConjugate(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
+    static func multiplyAddingComplexConjugate(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        where mask: Mask
+    ) -> Vector
+    static func equalTo(_ a: Vector, _ b: Vector, where mask: Mask) -> Mask
+    static func notEqualTo(_ a: Vector, _ b: Vector, where mask: Mask) -> Mask
+    static func lessThan(_ a: Vector, _ b: Vector, where mask: Mask) -> Mask
+    static func greaterThan(_ a: Vector, _ b: Vector, where mask: Mask) -> Mask
+    static func lessThanOrEqualTo(_ a: Vector, _ b: Vector, where mask: Mask) -> Mask
+    static func greaterThanOrEqualTo(_ a: Vector, _ b: Vector, where mask: Mask) -> Mask
+    static func repeating(_ value: Lane, where mask: Mask) -> Vector
+    static func repeating(_ value: Lane, where mask: Mask, otherwise: Vector) -> Vector
+    static func sum(_ a: Vector, where mask: Mask) -> Lane
+    static func smallest(_ a: Vector, where mask: Mask) -> Lane
+    static func largest(_ a: Vector, where mask: Mask) -> Lane
+    static func shiftedLeftLanes(_ a: Vector, by lanes: Int) -> Vector
+    @unsafe static func shiftedLeftLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector
+    static func shiftedRightLanes(_ a: Vector, by lanes: Int) -> Vector
+    @unsafe static func shiftedRightLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector
+    static func combinedShiftedRightLanes(_ a: Vector, _ b: Vector, by lanes: Int) -> Vector
+    @unsafe static func combinedShiftedRightLanes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked lanes: Int
+    ) -> Vector
+    static func broadcastingInBlocks(_ a: Vector, lane: Int) -> Vector
+    @unsafe static func broadcastingInBlocks(_ a: Vector, laneUnchecked lane: Int) -> Vector
+    static func broadcasting(_ a: Vector, lane: Int) -> Vector
+    @unsafe static func broadcasting(_ a: Vector, laneUnchecked lane: Int) -> Vector
+    static func broadcasting(_ a: Vector, block: Int) -> Vector
+    @unsafe static func broadcasting(_ a: Vector, blockUnchecked block: Int) -> Vector
+    static func slideUpBlocks(_ a: Vector, by blocks: Int) -> Vector
+    @unsafe static func slideUpBlocks(_ a: Vector, byUnchecked blocks: Int) -> Vector
+    static func slideDownBlocks(_ a: Vector, by blocks: Int) -> Vector
+    @unsafe static func slideDownBlocks(_ a: Vector, byUnchecked blocks: Int) -> Vector
+    static func combinedSlideDownLanes(_ a: Vector, _ b: Vector, by lanes: Int) -> Vector
+    @unsafe static func combinedSlideDownLanes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked lanes: Int
+    ) -> Vector
+    static func shuffledPer4Lanes(_ a: Vector, _ i3: Int, _ i2: Int, _ i1: Int, _ i0: Int) -> Vector
+    @unsafe static func shuffledPer4Lanes(
+        _ a: Vector,
+        unchecked i3: Int,
+        _ i2: Int,
+        _ i1: Int,
+        _ i0: Int
+    ) -> Vector
+    static func loadRepeatingBlock(from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func loadRepeatingBlock(from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func loadRepeatingBlock(fromUnchecked span: Span<Lane>) -> Vector
+    static func load(from: UnsafePointer<Lane>, where mask: Mask) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func load(from span: Span<Lane>, where mask: Mask) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func load(fromUnchecked span: Span<Lane>, where mask: Mask) -> Vector
+    static func load(from: UnsafePointer<Lane>, where mask: Mask, otherwise: Vector) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func load(from span: Span<Lane>, where mask: Mask, otherwise: Vector) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func load(
+        fromUnchecked span: Span<Lane>,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func loadFirst(from: UnsafePointer<Lane>, count: Int, otherwise: Vector) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func loadFirst(from span: Span<Lane>, otherwise: Vector) -> Vector
+    static func loadingUpperHalf(_ a: Vector, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func loadingUpperHalf(_ a: Vector, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func loadingUpperHalf(_ a: Vector, fromUnchecked span: Span<Lane>) -> Vector
+    static func store(_ a: Vector, to: UnsafeMutablePointer<Lane>, where mask: Mask)
+    @available(SwiftStdlib 5.1, *)
+    static func store(_ a: Vector, to span: inout MutableSpan<Lane>, where mask: Mask)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func store(
+        _ a: Vector,
+        toUnchecked span: inout MutableSpan<Lane>,
+        where mask: Mask
+    )
+    static func storeRepeating(_ value: Lane, count: Int, to: UnsafeMutablePointer<Lane>)
+    @available(SwiftStdlib 5.1, *)
+    static func storeRepeating(_ value: Lane, to span: inout MutableSpan<Lane>)
+    static func copy(count: Int, from: UnsafePointer<Lane>, to: UnsafeMutablePointer<Lane>)
+    @available(SwiftStdlib 5.1, *)
+    static func copy(from: Span<Lane>, to: inout MutableSpan<Lane>)
+    static func storeCompressed(
+        _ a: Vector,
+        where mask: Mask,
+        to: UnsafeMutablePointer<Lane>
+    ) -> Int
+    @available(SwiftStdlib 5.1, *)
+    static func storeCompressed(
+        _ a: Vector,
+        where mask: Mask,
+        to span: inout MutableSpan<Lane>
+    ) -> Int
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func storeCompressed(
+        _ a: Vector,
+        where mask: Mask,
+        toUnchecked span: inout MutableSpan<Lane>
+    ) -> Int
+    static func storeCompressedBlended(
+        _ a: Vector,
+        where mask: Mask,
+        to: UnsafeMutablePointer<Lane>
+    ) -> Int
+    @available(SwiftStdlib 5.1, *)
+    static func storeCompressedBlended(
+        _ a: Vector,
+        where mask: Mask,
+        to span: inout MutableSpan<Lane>
+    ) -> Int
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func storeCompressedBlended(
+        _ a: Vector,
+        where mask: Mask,
+        toUnchecked span: inout MutableSpan<Lane>
+    ) -> Int
+    static func compressed(_ a: Vector, bits: UnsafePointer<UInt8>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func compressed(_ a: Vector, bits span: Span<UInt8>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func compressed(_ a: Vector, bitsUnchecked span: Span<UInt8>) -> Vector
+    static func storeCompressed(
+        _ a: Vector,
+        bits: UnsafePointer<UInt8>,
+        to: UnsafeMutablePointer<Lane>
+    ) -> Int
+    @available(SwiftStdlib 5.1, *)
+    static func storeCompressed(_ a: Vector, bits: Span<UInt8>, to: inout MutableSpan<Lane>) -> Int
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func storeCompressed(
+        _ a: Vector,
+        bitsUnchecked bits: Span<UInt8>,
+        toUnchecked to: inout MutableSpan<Lane>
+    ) -> Int
+    static func loadExpanded(from: UnsafePointer<Lane>, where mask: Mask) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func loadExpanded(from span: Span<Lane>, where mask: Mask) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> Vector
+    static func loadExpanded(
+        from: UnsafePointer<Lane>,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func loadExpanded(from span: Span<Lane>, where mask: Mask, otherwise: Vector) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func loadExpanded(
+        fromUnchecked span: Span<Lane>,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func storeStreaming(_ a: Vector, to: UnsafeMutablePointer<Lane>)
+    @available(SwiftStdlib 5.1, *)
+    static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>)
 }
 
 /// The ops that only the integer element types have.
 public protocol SIMDIntegerElement: SIMDElement {
-    static func bitwiseAnd(_ a: Vector, _ b: Vector) -> Vector
-    static func bitwiseOr(_ a: Vector, _ b: Vector) -> Vector
-    static func bitwiseXor(_ a: Vector, _ b: Vector) -> Vector
+    static func remainder(_ a: Vector, _ b: Vector) -> Vector
+    static func roundedAverage(_ a: Vector, _ b: Vector) -> Vector
     static func bitwiseNot(_ a: Vector) -> Vector
-    static func bitwiseAndNot(_ a: Vector, _ b: Vector) -> Vector
-    static func bitwiseAndXor(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
     static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector
     static func shiftedRight(_ a: Vector, by bits: Int) -> Vector
-    static func bitwiseAnd(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
-    static func bitwiseOr(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
-    static func bitwiseXor(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
-    static func bitwiseAnd(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
-    static func bitwiseOr(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
-    static func bitwiseXor(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func shiftedLeft(_ a: Vector, by b: Vector) -> Vector
+    static func shiftedRight(_ a: Vector, by b: Vector) -> Vector
+    static func roundingShiftedRight(_ a: Vector, by b: Vector) -> Vector
+    static func roundingShiftedRight(_ a: Vector, by bits: Int) -> Vector
+    static func rotatedLeft(_ a: Vector, by b: Vector) -> Vector
+    static func rotatedRight(_ a: Vector, by b: Vector) -> Vector
+    static func rotatedLeft(_ a: Vector, by bits: Int) -> Vector
+    static func rotatedRight(_ a: Vector, by bits: Int) -> Vector
+    static func multiplyingHigh(_ a: Vector, _ b: Vector) -> Vector
+    static func leadingZeroBitCount(_ a: Vector) -> Vector
+    static func trailingZeroBitCount(_ a: Vector) -> Vector
+    static func highestSetBitIndex(_ a: Vector) -> Vector
+    static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector
+    @unsafe static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector
+    static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector
+    @unsafe static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector
+    static func testingBit(_ a: Vector, _ b: Vector) -> Mask
+    static func bitReversed(_ a: Vector) -> Vector
+    static func remainder(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func shiftedLeft(_ a: Vector, by b: Vector, where mask: Mask) -> Vector
+    static func shiftedLeft(
+        _ a: Vector,
+        by b: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func shiftedRight(_ a: Vector, by b: Vector, where mask: Mask) -> Vector
+    static func shiftedRight(
+        _ a: Vector,
+        by b: Vector,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func leadingZeroBitCount(_ a: Vector, where mask: Mask) -> Vector
+    static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector
+    @unsafe static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
+    static func shiftedRightBytes(_ a: Vector, by bytes: Int) -> Vector
+    @unsafe static func shiftedRightBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
+    static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
+    @unsafe static func combinedShiftedRightBytes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked bytes: Int
+    ) -> Vector
+    static func shiftedLeft(_ a: Vector, by bits: Int, where mask: Mask) -> Vector
+    static func shiftedLeft(
+        _ a: Vector,
+        by bits: Int,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
+    static func shiftedRight(_ a: Vector, by bits: Int, where mask: Mask) -> Vector
+    static func shiftedRight(
+        _ a: Vector,
+        by bits: Int,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector
 }
 
 /// The ops that only the floating point element types have.
 public protocol SIMDFloatElement: SIMDElement {
-    static func multiplying(_ a: Vector, _ b: Vector) -> Vector
-    static func dividing(_ a: Vector, _ b: Vector) -> Vector
     static func negated(_ a: Vector) -> Vector
     static func magnitude(_ a: Vector) -> Vector
+    static func copyingSign(_ a: Vector, from b: Vector) -> Vector
+    static func copyingSignToMagnitude(_ a: Vector, from b: Vector) -> Vector
     static func squareRoot(_ a: Vector) -> Vector
-    static func multiplyAdding(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
-    static func sum(_ a: Vector) -> Lane
-    static func smallest(_ a: Vector) -> Lane
+    static func approximateReciprocalSquareRoot(_ a: Vector) -> Vector
+    static func approximateReciprocal(_ a: Vector) -> Vector
+    static func exponent(_ a: Vector) -> Vector
+    static func complexConjugate(_ a: Vector) -> Vector
+    static func multiplyingRounded(_ a: Vector, _ b: Vector) -> Vector
+    static func roundedToNearestOrEven(_ a: Vector) -> Vector
+    static func roundedTowardZero(_ a: Vector) -> Vector
+    static func roundedUp(_ a: Vector) -> Vector
+    static func roundedDown(_ a: Vector) -> Vector
+    static func multiplyingByFloorPowerOf2(_ a: Vector, _ b: Vector) -> Vector
+    static func isNaN(_ a: Vector) -> Mask
+    static func isEitherNaN(_ a: Vector, _ b: Vector) -> Mask
+    static func isInfinite(_ a: Vector) -> Mask
+    static func isFinite(_ a: Vector) -> Mask
     static func smallestOrNaN(_ a: Vector) -> Lane
-    static func largest(_ a: Vector) -> Lane
     static func largestOrNaN(_ a: Vector) -> Lane
+    static func zeroingNegative(_ a: Vector) -> Vector
+    static func selectingIfNegative(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
+    static func selectingIfNegativeOrZero(_ a: Vector, _ b: Vector) -> Vector
+    static func zeroingIfNegative(_ a: Vector, _ b: Vector) -> Vector
+    static func negatingIfNegative(_ a: Vector, _ b: Vector) -> Vector
+    static func isNegative(_ a: Vector) -> Mask
     static func lookup8(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
     @available(SwiftStdlib 5.1, *)
     static func lookup8(at indices: Indices, from span: Span<Lane>) -> Vector
@@ -289,4 +760,9 @@ public protocol SIMDFloatElement: SIMDElement {
     static func lookup16(at indices: Indices, from span: Span<Lane>) -> Vector
     @available(SwiftStdlib 5.1, *)
     @unsafe static func lookup16(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
+    static func squareRoot(_ a: Vector, where mask: Mask) -> Vector
+    static func squareRoot(_ a: Vector, where mask: Mask, otherwise: Vector) -> Vector
+    static func approximateReciprocal(_ a: Vector, where mask: Mask) -> Vector
+    static func approximateReciprocalSquareRoot(_ a: Vector, where mask: Mask) -> Vector
+    static func isNaN(_ a: Vector, where mask: Mask) -> Mask
 }
