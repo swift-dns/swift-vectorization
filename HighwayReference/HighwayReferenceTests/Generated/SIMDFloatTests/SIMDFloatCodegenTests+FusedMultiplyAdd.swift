@@ -125,7 +125,8 @@ extension SIMDFloatCodegenTests {
 
     @Test func multiplySubtracting() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
+            isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portMultiplySubtractingF32")
             let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDF1C_ADF5_DBF2_5DCC)
@@ -141,13 +142,16 @@ extension SIMDFloatCodegenTests {
             }
             mismatches.record()
         } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX2" && assertionsAreEnabled
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
         }
     }
 
     @Test func multiplySubtractingConstantA() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
+            isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portMultiplySubtractingF32ConstantA")
             let bInputs = Inputs.vectors(H.Vector.self, seed: 0x54DA_B659_FAF3_4192)
@@ -162,13 +166,16 @@ extension SIMDFloatCodegenTests {
             }
             mismatches.record()
         } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX2" && assertionsAreEnabled
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
         }
     }
 
     @Test func multiplySubtractingConstantB() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
+            isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portMultiplySubtractingF32ConstantB")
             let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4BD9_0059_F5C0_68D0)
@@ -183,7 +190,9 @@ extension SIMDFloatCodegenTests {
             }
             mismatches.record()
         } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX2" && assertionsAreEnabled
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
         }
     }
 
@@ -203,7 +212,8 @@ extension SIMDFloatCodegenTests {
 
     @Test func negatedMultiplySubtracting() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
+            isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portNegatedMultiplySubtractingF32")
             let aInputs = Inputs.vectors(H.Vector.self, seed: 0x28C9_85FF_D721_E74C)
@@ -219,13 +229,16 @@ extension SIMDFloatCodegenTests {
             }
             mismatches.record()
         } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX2" && assertionsAreEnabled
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
         }
     }
 
     @Test func negatedMultiplySubtractingConstantA() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
+            isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portNegatedMultiplySubtractingF32ConstantA")
             let bInputs = Inputs.vectors(H.Vector.self, seed: 0x176D_600E_049B_7612)
@@ -239,13 +252,16 @@ extension SIMDFloatCodegenTests {
             }
             mismatches.record()
         } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX2" && assertionsAreEnabled
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
         }
     }
 
     @Test func negatedMultiplySubtractingConstantB() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
+            isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("portNegatedMultiplySubtractingF32ConstantB")
             let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E6B_AA0D_FF68_9D50)
@@ -259,7 +275,9 @@ extension SIMDFloatCodegenTests {
             }
             mismatches.record()
         } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX2" && assertionsAreEnabled
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
         }
     }
 

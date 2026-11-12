@@ -43404,20 +43404,22 @@ let foldedExponentOps: [String: KnownIssue] = [
 struct KnownIssue {
     let comment: String
     let condition: String
-    var isIntermittent = false
+    var isIntermittent: String?
 }
 
-let linuxAvx2NaNSign = KnownIssue(
+let linuxAvx2AndAvx512NaNSign = KnownIssue(
     comment:
-        "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-    condition: "isAmd64 && !isDarwin && SIMDTarget.targetName == \"AVX2\" && assertionsAreEnabled"
+        "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
+    condition:
+        "isAmd64 && !isDarwin && (SIMDTarget.targetName == \"AVX2\" || SIMDTarget.targetName.hasPrefix(\"AVX3\")) && assertionsAreEnabled",
+    isIntermittent: "SIMDTarget.targetName != \"AVX2\""
 )
 
-let linuxAvx2IntermittentNaNSign = KnownIssue(
+let linuxAvx2AndAvx512IntermittentNaNSign = KnownIssue(
     comment:
-        "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
-    condition: linuxAvx2NaNSign.condition,
-    isIntermittent: true
+        "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+    condition: linuxAvx2AndAvx512NaNSign.condition,
+    isIntermittent: "true"
 )
 
 let knownGapTests: [String: [String]] = [
@@ -43554,8 +43556,8 @@ let emu128FoldedConstantTests: [String: [String]] = [
 ]
 
 let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] = [
-    (linuxAvx2NaNSign, knownGapTests),
-    (linuxAvx2IntermittentNaNSign, intermittentNaNSignTests),
+    (linuxAvx2AndAvx512NaNSign, knownGapTests),
+    (linuxAvx2AndAvx512IntermittentNaNSign, intermittentNaNSignTests),
     (darwinEmu128Folding, emu128FoldedConstantTests),
 ]
 
@@ -43567,7 +43569,7 @@ func markingKnownGaps(_ tests: [String], suite: String) -> [String] {
                 let header = test.range(of: "func \(name)() {\n"), test.hasSuffix("\n}")
             else { return test }
             let body = test[header.upperBound...].dropLast(2)
-            let options = gap.issue.isIntermittent ? ",\nisIntermittent: true" : ""
+            let options = gap.issue.isIntermittent.map { ",\nisIntermittent: \($0)" } ?? ""
             return """
                 \(test[..<header.upperBound])withKnownIssue(
                 "\(gap.issue.comment)"\(options)

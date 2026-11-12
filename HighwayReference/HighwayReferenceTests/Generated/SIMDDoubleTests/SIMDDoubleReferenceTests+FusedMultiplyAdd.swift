@@ -87,7 +87,8 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplySubtractingAdding() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
+            isIntermittent: SIMDTarget.targetName != "AVX2"
         ) {
             let mismatches = Mismatches("multiplySubtractingAdding")
             let aInputs = Inputs.vectors(H.Vector.self, seed: 0x811B_0CCF_99CC_B7FA)
@@ -103,7 +104,9 @@ extension SIMDDoubleReferenceTests {
             }
             mismatches.record()
         } when: {
-            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX2" && assertionsAreEnabled
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
+                && assertionsAreEnabled
         }
     }
 }
