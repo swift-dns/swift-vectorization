@@ -273,4 +273,278 @@ public func highwayMultiplyAddingComplexConjugateF16ConstantC(
         HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
     )
 }
+
+@inline(never)
+public func portMultiplyingComplexWhereOtherwiseF16(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayMultiplyingComplexWhereOtherwiseF16(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(otherwise, mask.raw, a, b)
+}
+
+@inline(never)
+public func portMultiplyingComplexWhereOtherwiseF16ConstantA(
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingComplex(
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        b,
+        where: mask,
+        otherwise: otherwise
+    )
+}
+
+@inline(never)
+public func highwayMultiplyingComplexWhereOtherwiseF16ConstantA(
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
+        otherwise,
+        mask.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        b
+    )
+}
+
+@inline(never)
+public func portMultiplyingComplexWhereOtherwiseF16ConstantB(
+    _ a: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingComplex(
+        a,
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        where: mask,
+        otherwise: otherwise
+    )
+}
+
+@inline(never)
+public func highwayMultiplyingComplexWhereOtherwiseF16ConstantB(
+    _ a: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
+        otherwise,
+        mask.raw,
+        a,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    )
+}
+
+@inline(never)
+public func portMultiplyingComplexWhereOtherwiseF16ConstantOtherwise(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingComplex(
+        a,
+        b,
+        where: mask,
+        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+    )
+}
+
+@inline(never)
+public func highwayMultiplyingComplexWhereOtherwiseF16ConstantOtherwise(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        mask.raw,
+        a,
+        b
+    )
+}
+
+@inline(never)
+public func portMultiplyingComplexConjugateWhereF16(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingComplexConjugate(a, b, where: mask)
+}
+
+@inline(never)
+public func highwayMultiplyingComplexConjugateWhereF16(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(mask.raw, a, b)
+}
+
+@inline(never)
+public func portMultiplyingComplexConjugateWhereF16ConstantA(
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingComplexConjugate(
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        b,
+        where: mask
+    )
+}
+
+@inline(never)
+public func highwayMultiplyingComplexConjugateWhereF16ConstantA(
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(
+        mask.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        b
+    )
+}
+
+@inline(never)
+public func portMultiplyingComplexConjugateWhereF16ConstantB(
+    _ a: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingComplexConjugate(
+        a,
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        where: mask
+    )
+}
+
+@inline(never)
+public func highwayMultiplyingComplexConjugateWhereF16ConstantB(
+    _ a: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(
+        mask.raw,
+        a,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    )
+}
+
+@inline(never)
+public func portMultiplyAddingComplexConjugateWhereF16(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    _ c: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyAddingComplexConjugate(a, b, c, where: mask)
+}
+
+@inline(never)
+public func highwayMultiplyAddingComplexConjugateWhereF16(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    _ c: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(mask.raw, a, b, c)
+}
+
+@inline(never)
+public func portMultiplyAddingComplexConjugateWhereF16ConstantA(
+    _ b: SIMDFloat16.Vector,
+    _ c: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyAddingComplexConjugate(
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        b,
+        c,
+        where: mask
+    )
+}
+
+@inline(never)
+public func highwayMultiplyAddingComplexConjugateWhereF16ConstantA(
+    _ b: SIMDFloat16.Vector,
+    _ c: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
+        mask.raw,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        b,
+        c
+    )
+}
+
+@inline(never)
+public func portMultiplyAddingComplexConjugateWhereF16ConstantB(
+    _ a: SIMDFloat16.Vector,
+    _ c: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyAddingComplexConjugate(
+        a,
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        c,
+        where: mask
+    )
+}
+
+@inline(never)
+public func highwayMultiplyAddingComplexConjugateWhereF16ConstantB(
+    _ a: SIMDFloat16.Vector,
+    _ c: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
+        mask.raw,
+        a,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        c
+    )
+}
+
+@inline(never)
+public func portMultiplyAddingComplexConjugateWhereF16ConstantC(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyAddingComplexConjugate(
+        a,
+        b,
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        where: mask
+    )
+}
+
+@inline(never)
+public func highwayMultiplyAddingComplexConjugateWhereF16ConstantC(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector,
+    where mask: SIMDFloat16.Mask
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
+        mask.raw,
+        a,
+        b,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    )
+}
 #endif

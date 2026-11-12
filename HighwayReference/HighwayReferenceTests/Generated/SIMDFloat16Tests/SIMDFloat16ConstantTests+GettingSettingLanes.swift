@@ -8,6 +8,98 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
+    private func checkFirstLaneConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("firstLane with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        mismatches.check(
+            H.firstLane(H.repeating(value)),
+            Float16(bitPattern: HighwayReference.firstLaneF16(H.repeating(value))),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLaneConstantSplatZero() {
+        checkFirstLaneConstantA(0.0)
+    }
+
+    @Test func firstLaneConstantSplatNegativeZero() {
+        checkFirstLaneConstantA(-0.0)
+    }
+
+    @Test func firstLaneConstantSplatOne() {
+        checkFirstLaneConstantA(1.0)
+    }
+
+    @Test func firstLaneConstantSplatMinusOne() {
+        checkFirstLaneConstantA(-1.0)
+    }
+
+    @Test func firstLaneConstantSplatTwo() {
+        checkFirstLaneConstantA(2.0)
+    }
+
+    @Test func firstLaneConstantSplatHalf() {
+        checkFirstLaneConstantA(0.5)
+    }
+
+    @Test func firstLaneConstantSplatFour() {
+        checkFirstLaneConstantA(4.0)
+    }
+
+    @Test func firstLaneConstantSplatQuarter() {
+        checkFirstLaneConstantA(0.25)
+    }
+
+    @Test func firstLaneConstantSplatOnePointFive() {
+        checkFirstLaneConstantA(1.5)
+    }
+
+    @Test func firstLaneConstantSplatMinusTwoPointFive() {
+        checkFirstLaneConstantA(-2.5)
+    }
+
+    @Test func firstLaneConstantSplatInfinity() {
+        checkFirstLaneConstantA(.infinity)
+    }
+
+    @Test func firstLaneConstantSplatMinusInfinity() {
+        checkFirstLaneConstantA(-.infinity)
+    }
+
+    @Test func firstLaneConstantSplatNaN() {
+        checkFirstLaneConstantA(.nan)
+    }
+
+    @Test func firstLaneConstantSplatMinusNaN() {
+        checkFirstLaneConstantA(-.nan)
+    }
+
+    @Test func firstLaneConstantSplatPayloadNaN() {
+        checkFirstLaneConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func firstLaneConstantSplatSignalingNaN() {
+        checkFirstLaneConstantA(.signalingNaN)
+    }
+
+    @Test func firstLaneConstantSplatMinusSignalingNaN() {
+        checkFirstLaneConstantA(-.signalingNaN)
+    }
+
+    @Test func firstLaneConstantSplatLeastNonzero() {
+        checkFirstLaneConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func firstLaneConstantSplatGreatest() {
+        checkFirstLaneConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkLaneConstantIndex(_ index: Int) {
         let mismatches = Mismatches("lane with index \(index)")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4C46_F957_B989_0422)
@@ -242,6 +334,102 @@ extension SIMDFloat16ConstantTests {
 
     @Test func laneConstantSplatGreatest() {
         checkLaneConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkReplacingLaneConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("replacingLane with a repeating \(hex(value))")
+        let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x623F_F5D9_6CFE_EB48)
+        mismatches.check(
+            H.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        for (index, value) in everyPair(indexInputs, valueInputs) {
+            mismatches.check(
+                H.replacingLane(H.repeating(value), at: index, with: value),
+                HighwayReference.replacingLaneF16(H.repeating(value), index, value.bitPattern),
+                "index: \(index), value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func replacingLaneConstantSplatZero() {
+        checkReplacingLaneConstantA(0.0)
+    }
+
+    @Test func replacingLaneConstantSplatNegativeZero() {
+        checkReplacingLaneConstantA(-0.0)
+    }
+
+    @Test func replacingLaneConstantSplatOne() {
+        checkReplacingLaneConstantA(1.0)
+    }
+
+    @Test func replacingLaneConstantSplatMinusOne() {
+        checkReplacingLaneConstantA(-1.0)
+    }
+
+    @Test func replacingLaneConstantSplatTwo() {
+        checkReplacingLaneConstantA(2.0)
+    }
+
+    @Test func replacingLaneConstantSplatHalf() {
+        checkReplacingLaneConstantA(0.5)
+    }
+
+    @Test func replacingLaneConstantSplatFour() {
+        checkReplacingLaneConstantA(4.0)
+    }
+
+    @Test func replacingLaneConstantSplatQuarter() {
+        checkReplacingLaneConstantA(0.25)
+    }
+
+    @Test func replacingLaneConstantSplatOnePointFive() {
+        checkReplacingLaneConstantA(1.5)
+    }
+
+    @Test func replacingLaneConstantSplatMinusTwoPointFive() {
+        checkReplacingLaneConstantA(-2.5)
+    }
+
+    @Test func replacingLaneConstantSplatInfinity() {
+        checkReplacingLaneConstantA(.infinity)
+    }
+
+    @Test func replacingLaneConstantSplatMinusInfinity() {
+        checkReplacingLaneConstantA(-.infinity)
+    }
+
+    @Test func replacingLaneConstantSplatNaN() {
+        checkReplacingLaneConstantA(.nan)
+    }
+
+    @Test func replacingLaneConstantSplatMinusNaN() {
+        checkReplacingLaneConstantA(-.nan)
+    }
+
+    @Test func replacingLaneConstantSplatPayloadNaN() {
+        checkReplacingLaneConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func replacingLaneConstantSplatSignalingNaN() {
+        checkReplacingLaneConstantA(.signalingNaN)
+    }
+
+    @Test func replacingLaneConstantSplatMinusSignalingNaN() {
+        checkReplacingLaneConstantA(-.signalingNaN)
+    }
+
+    @Test func replacingLaneConstantSplatLeastNonzero() {
+        checkReplacingLaneConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func replacingLaneConstantSplatGreatest() {
+        checkReplacingLaneConstantA(.greatestFiniteMagnitude)
     }
 }
 #endif

@@ -92,8 +92,14 @@ package func hasUnorderedNaNs<A: ReferenceVector, V: SIMD>(
     }
 }
 
-package func hasFoldedNaNs<A: ReferenceVector>(multiplier: BFloat16, _ other: A) -> Bool
-where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
+package func hasFoldedNaNs<A: ReferenceVector>(
+    multiplier: BFloat16,
+    _ other: A,
+    parity: Int? = nil
+) -> Bool where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
     Float(multiplier) == -1
-        && (0..<A.Simd.scalarCount).contains { Float(BFloat16(bitPattern: other.simd[$0])).isNaN }
+        && (0..<A.Simd.scalarCount).contains { lane in
+            (parity == nil || lane % 2 == parity)
+                && Float(BFloat16(bitPattern: other.simd[lane])).isNaN
+        }
 }

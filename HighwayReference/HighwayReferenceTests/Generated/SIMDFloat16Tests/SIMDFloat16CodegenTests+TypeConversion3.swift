@@ -8,6 +8,284 @@ import Testing
 import Vectorization
 
 extension SIMDFloat16CodegenTests {
+    @Test func vectorZeroExtendingResizingFromUInt8() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x2CA2_D9CA_7E90_F064)
+        for a in aInputs {
+            mismatches.check(
+                portVectorZeroExtendingResizingU8ToF16(zeroExtendingResizing: a),
+                highwayVectorZeroExtendingResizingU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorZeroExtendingResizingFromUInt8ConstantA() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingU8ToF16ConstantA")
+        mismatches.check(
+            portVectorZeroExtendingResizingU8ToF16ConstantA(),
+            highwayVectorZeroExtendingResizingU8ToF16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt8() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0xC4B5_A8CC_9BA6_6485)
+        for a in aInputs {
+            mismatches.check(
+                portHalfVectorZeroExtendingResizingU8ToF16(zeroExtendingResizing: a),
+                highwayHalfVectorZeroExtendingResizingU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt8ConstantA() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingU8ToF16ConstantA")
+        mismatches.check(
+            portHalfVectorZeroExtendingResizingU8ToF16ConstantA(),
+            highwayHalfVectorZeroExtendingResizingU8ToF16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func quarterVectorZeroExtendingResizingFromUInt8() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x156A_811E_F84E_CAB2)
+        for a in aInputs {
+            mismatches.check(
+                portQuarterVectorZeroExtendingResizingU8ToF16(zeroExtendingResizing: a),
+                highwayQuarterVectorZeroExtendingResizingU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func quarterVectorZeroExtendingResizingFromUInt8ConstantA() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingU8ToF16ConstantA")
+        mismatches.check(
+            portQuarterVectorZeroExtendingResizingU8ToF16ConstantA(),
+            highwayQuarterVectorZeroExtendingResizingU8ToF16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func vectorZeroExtendingResizingFromHalfUInt8() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingHalfU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0xF076_7408_09B6_2D5B)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorZeroExtendingResizingHalfU8ToF16(zeroExtendingResizing: a),
+                highwayVectorZeroExtendingResizingHalfU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromHalfUInt8() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingHalfU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0xA9A3_F478_55DB_59EA)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portHalfVectorZeroExtendingResizingHalfU8ToF16(zeroExtendingResizing: a),
+                highwayHalfVectorZeroExtendingResizingHalfU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func quarterVectorZeroExtendingResizingFromHalfUInt8() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingHalfU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0xFC24_B680_CB33_22DD)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portQuarterVectorZeroExtendingResizingHalfU8ToF16(zeroExtendingResizing: a),
+                highwayQuarterVectorZeroExtendingResizingHalfU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorZeroExtendingResizingFromQuarterUInt8() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingQuarterU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x6689_3457_42A3_B9D2)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorZeroExtendingResizingQuarterU8ToF16(zeroExtendingResizing: a),
+                highwayVectorZeroExtendingResizingQuarterU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromQuarterUInt8() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingQuarterU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x3A29_7777_5EDB_0F65)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portHalfVectorZeroExtendingResizingQuarterU8ToF16(zeroExtendingResizing: a),
+                highwayHalfVectorZeroExtendingResizingQuarterU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func quarterVectorZeroExtendingResizingFromQuarterUInt8() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingQuarterU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x98C0_86F9_EAFE_E1FC)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portQuarterVectorZeroExtendingResizingQuarterU8ToF16(zeroExtendingResizing: a),
+                highwayQuarterVectorZeroExtendingResizingQuarterU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorZeroExtendingResizingFromEighthUInt8() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingEighthU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.EighthVector.self, seed: 0x1FFF_8CFC_24E7_C007)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorZeroExtendingResizingEighthU8ToF16(zeroExtendingResizing: a),
+                highwayVectorZeroExtendingResizingEighthU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromEighthUInt8() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingEighthU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.EighthVector.self, seed: 0x26F4_7457_B298_B232)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portHalfVectorZeroExtendingResizingEighthU8ToF16(zeroExtendingResizing: a),
+                highwayHalfVectorZeroExtendingResizingEighthU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func quarterVectorZeroExtendingResizingFromEighthUInt8() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingEighthU8ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt8.EighthVector.self, seed: 0x9FCC_7E66_ACCA_AA19)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portQuarterVectorZeroExtendingResizingEighthU8ToF16(zeroExtendingResizing: a),
+                highwayQuarterVectorZeroExtendingResizingEighthU8ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorZeroExtendingResizingFromUInt16() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingU16ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xB037_EBC9_F9FB_23B5)
+        for a in aInputs {
+            mismatches.check(
+                portVectorZeroExtendingResizingU16ToF16(zeroExtendingResizing: a),
+                highwayVectorZeroExtendingResizingU16ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorZeroExtendingResizingFromUInt16ConstantA() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingU16ToF16ConstantA")
+        mismatches.check(
+            portVectorZeroExtendingResizingU16ToF16ConstantA(),
+            highwayVectorZeroExtendingResizingU16ToF16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt16() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingU16ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xA068_13F7_91F3_AE0E)
+        for a in aInputs {
+            mismatches.check(
+                portHalfVectorZeroExtendingResizingU16ToF16(zeroExtendingResizing: a),
+                highwayHalfVectorZeroExtendingResizingU16ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt16ConstantA() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingU16ToF16ConstantA")
+        mismatches.check(
+            portHalfVectorZeroExtendingResizingU16ToF16ConstantA(),
+            highwayHalfVectorZeroExtendingResizingU16ToF16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func quarterVectorZeroExtendingResizingFromUInt16() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingU16ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xF90F_7654_D75B_20AB)
+        for a in aInputs {
+            mismatches.check(
+                portQuarterVectorZeroExtendingResizingU16ToF16(zeroExtendingResizing: a),
+                highwayQuarterVectorZeroExtendingResizingU16ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func quarterVectorZeroExtendingResizingFromUInt16ConstantA() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingU16ToF16ConstantA")
+        mismatches.check(
+            portQuarterVectorZeroExtendingResizingU16ToF16ConstantA(),
+            highwayQuarterVectorZeroExtendingResizingU16ToF16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func vectorZeroExtendingResizingFromHalfUInt16() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingHalfU16ToF16")
+        let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0xBE1F_D7F5_1F96_5F9C)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorZeroExtendingResizingHalfU16ToF16(zeroExtendingResizing: a),
+                highwayVectorZeroExtendingResizingHalfU16ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func halfVectorZeroExtendingResizingFromHalfUInt16() {
         let mismatches = Mismatches("portHalfVectorZeroExtendingResizingHalfU16ToF16")
         let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0xC357_DFB3_453C_EEC3)
@@ -1201,103 +1479,72 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
-    @Test func vectorConvertingFromUInt16() {
-        let mismatches = Mismatches("portVectorConvertingU16ToF16")
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0x3720_21CC_FA43_6C5D)
+    @Test func vectorZeroExtendingResizingFromBFloat16() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingBF16ToF16")
+        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x240D_910E_95E0_C449)
         for a in aInputs {
             mismatches.check(
-                portVectorConvertingU16ToF16(converting: a),
-                highwayVectorConvertingU16ToF16(converting: a),
+                portVectorZeroExtendingResizingBF16ToF16(zeroExtendingResizing: a),
+                highwayVectorZeroExtendingResizingBF16ToF16(zeroExtendingResizing: a),
                 "a: \(describe(a))"
             )
         }
         mismatches.record()
     }
 
-    @Test func vectorConvertingFromUInt16ConstantA() {
-        let mismatches = Mismatches("portVectorConvertingU16ToF16ConstantA")
+    @Test func vectorZeroExtendingResizingFromBFloat16ConstantA() {
+        let mismatches = Mismatches("portVectorZeroExtendingResizingBF16ToF16ConstantA")
         mismatches.check(
-            portVectorConvertingU16ToF16ConstantA(),
-            highwayVectorConvertingU16ToF16ConstantA(),
+            portVectorZeroExtendingResizingBF16ToF16ConstantA(),
+            highwayVectorZeroExtendingResizingBF16ToF16ConstantA(),
             ""
         )
         mismatches.record()
     }
 
-    @Test func vectorConvertingFromInt16() {
-        let mismatches = Mismatches("portVectorConvertingI16ToF16")
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0xEA1B_BC63_DB7E_8316)
+    @Test func halfVectorZeroExtendingResizingFromBFloat16() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingBF16ToF16")
+        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x0C89_4FF9_AC7E_CD8A)
         for a in aInputs {
             mismatches.check(
-                portVectorConvertingI16ToF16(converting: a),
-                highwayVectorConvertingI16ToF16(converting: a),
+                portHalfVectorZeroExtendingResizingBF16ToF16(zeroExtendingResizing: a),
+                highwayHalfVectorZeroExtendingResizingBF16ToF16(zeroExtendingResizing: a),
                 "a: \(describe(a))"
             )
         }
         mismatches.record()
     }
 
-    @Test func vectorConvertingFromInt16ConstantA() {
-        let mismatches = Mismatches("portVectorConvertingI16ToF16ConstantA")
+    @Test func halfVectorZeroExtendingResizingFromBFloat16ConstantA() {
+        let mismatches = Mismatches("portHalfVectorZeroExtendingResizingBF16ToF16ConstantA")
         mismatches.check(
-            portVectorConvertingI16ToF16ConstantA(),
-            highwayVectorConvertingI16ToF16ConstantA(),
+            portHalfVectorZeroExtendingResizingBF16ToF16ConstantA(),
+            highwayHalfVectorZeroExtendingResizingBF16ToF16ConstantA(),
             ""
         )
         mismatches.record()
     }
 
-    @Test func vectorConvertingWhereFromUInt16() {
-        let mismatches = Mismatches("portVectorConvertingWhereU16ToF16")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE8A6_8731_B667_9420)
-        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xE8A6_8831_B667_95D3)
-        for (mask, a) in everyPair(maskInputs, aInputs) {
+    @Test func quarterVectorZeroExtendingResizingFromBFloat16() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingBF16ToF16")
+        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x79B0_CD8E_0496_FC4F)
+        for a in aInputs {
             mismatches.check(
-                portVectorConvertingWhereU16ToF16(converting: a, where: mask),
-                highwayVectorConvertingWhereU16ToF16(converting: a, where: mask),
-                "mask: \(describe(mask)), a: \(describe(a))"
+                portQuarterVectorZeroExtendingResizingBF16ToF16(zeroExtendingResizing: a),
+                highwayQuarterVectorZeroExtendingResizingBF16ToF16(zeroExtendingResizing: a),
+                "a: \(describe(a))"
             )
         }
         mismatches.record()
     }
 
-    @Test func vectorConvertingWhereFromUInt16ConstantA() {
-        let mismatches = Mismatches("portVectorConvertingWhereU16ToF16ConstantA")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0F7C_C807_B122_89C9)
-        for mask in maskInputs {
-            mismatches.check(
-                portVectorConvertingWhereU16ToF16ConstantA(where: mask),
-                highwayVectorConvertingWhereU16ToF16ConstantA(where: mask),
-                "mask: \(describe(mask))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func vectorConvertingWhereFromInt16() {
-        let mismatches = Mismatches("portVectorConvertingWhereI16ToF16")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1341_6ECC_C316_5B35)
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x1341_6DCC_C316_5982)
-        for (mask, a) in everyPair(maskInputs, aInputs) {
-            mismatches.check(
-                portVectorConvertingWhereI16ToF16(converting: a, where: mask),
-                highwayVectorConvertingWhereI16ToF16(converting: a, where: mask),
-                "mask: \(describe(mask)), a: \(describe(a))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func vectorConvertingWhereFromInt16ConstantA() {
-        let mismatches = Mismatches("portVectorConvertingWhereI16ToF16ConstantA")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9BC7_F2C1_E563_7526)
-        for mask in maskInputs {
-            mismatches.check(
-                portVectorConvertingWhereI16ToF16ConstantA(where: mask),
-                highwayVectorConvertingWhereI16ToF16ConstantA(where: mask),
-                "mask: \(describe(mask))"
-            )
-        }
+    @Test func quarterVectorZeroExtendingResizingFromBFloat16ConstantA() {
+        let mismatches = Mismatches("portQuarterVectorZeroExtendingResizingBF16ToF16ConstantA")
+        mismatches.check(
+            portQuarterVectorZeroExtendingResizingBF16ToF16ConstantA(),
+            highwayQuarterVectorZeroExtendingResizingBF16ToF16ConstantA(),
+            ""
+        )
         mismatches.record()
     }
 }

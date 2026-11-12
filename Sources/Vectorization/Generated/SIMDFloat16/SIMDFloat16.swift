@@ -5,7 +5,7 @@ public import CVectorizationOps
 
 /// Vectors of `Float16`, and the ops over them.
 @available(SwiftStdlib 5.3, *)
-public enum SIMDFloat16: SendableMetatype {
+public enum SIMDFloat16: SIMDElement, SIMDFloatElement, SendableMetatype {
     public typealias Lane = Float16
     public typealias Vector = cvectorization_ops_vector_f16
 

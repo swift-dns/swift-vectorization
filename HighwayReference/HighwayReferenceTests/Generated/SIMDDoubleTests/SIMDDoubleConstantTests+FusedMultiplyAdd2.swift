@@ -59,7 +59,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatZero() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(0.0)
             checkMultiplySubtractingAddingConstantB(0.0)
@@ -71,7 +72,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatNegativeZero() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(-0.0)
             checkMultiplySubtractingAddingConstantB(-0.0)
@@ -83,7 +85,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatOne() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(1.0)
             checkMultiplySubtractingAddingConstantB(1.0)
@@ -95,7 +98,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatMinusOne() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(-1.0)
             checkMultiplySubtractingAddingConstantB(-1.0)
@@ -107,7 +111,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatTwo() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(2.0)
             checkMultiplySubtractingAddingConstantB(2.0)
@@ -119,7 +124,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatHalf() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(0.5)
             checkMultiplySubtractingAddingConstantB(0.5)
@@ -131,7 +137,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatFour() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(4.0)
             checkMultiplySubtractingAddingConstantB(4.0)
@@ -143,7 +150,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatQuarter() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(0.25)
             checkMultiplySubtractingAddingConstantB(0.25)
@@ -155,7 +163,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatOnePointFive() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(1.5)
             checkMultiplySubtractingAddingConstantB(1.5)
@@ -167,7 +176,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatMinusTwoPointFive() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(-2.5)
             checkMultiplySubtractingAddingConstantB(-2.5)
@@ -179,7 +189,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatInfinity() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(.infinity)
             checkMultiplySubtractingAddingConstantB(.infinity)
@@ -191,7 +202,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatMinusInfinity() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(-.infinity)
             checkMultiplySubtractingAddingConstantB(-.infinity)
@@ -203,7 +215,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(.nan)
             checkMultiplySubtractingAddingConstantB(.nan)
@@ -215,7 +228,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatMinusNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(-.nan)
             checkMultiplySubtractingAddingConstantB(-.nan)
@@ -227,7 +241,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatPayloadNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(H.Lane(nan: 1, signaling: false))
             checkMultiplySubtractingAddingConstantB(H.Lane(nan: 1, signaling: false))
@@ -239,7 +254,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatSignalingNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(.signalingNaN)
             checkMultiplySubtractingAddingConstantB(.signalingNaN)
@@ -251,7 +267,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(-.signalingNaN)
             checkMultiplySubtractingAddingConstantB(-.signalingNaN)
@@ -263,7 +280,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatLeastNonzero() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(.leastNonzeroMagnitude)
             checkMultiplySubtractingAddingConstantB(.leastNonzeroMagnitude)
@@ -275,7 +293,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func multiplySubtractingAddingConstantSplatGreatest() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet"
+            "Under Linux in debug builds on AVX2 the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkMultiplySubtractingAddingConstantA(.greatestFiniteMagnitude)
             checkMultiplySubtractingAddingConstantB(.greatestFiniteMagnitude)

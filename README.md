@@ -37,7 +37,7 @@ targets: [
 ]
 ```
 
-Each element type has its own namespace of ops, such as `SIMDUInt8`, and `SIMDElement` lets a kernel be written once for all of them:
+Each element type has its own namespace of ops, such as `SIMDUInt8`, and `SIMDElement` lets a kernel be written once for all of them except `SIMDBFloat16`:
 
 ```swift
 import Vectorization
@@ -94,6 +94,12 @@ SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and hi
 
 When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or a
 minimum or maximum on SVE, which payload comes out is up to the compiler, in highway as in the port.
+
+On the targets without a carry-less multiply instruction, SSE2, SSSE3, NEON_WITHOUT_AES, SVE2_128
+without SVE2-AES, and EMU128, highway's `CLMulLower` and `CLMulUpper` return a wrong upper 64 bits
+when both operands have one of the bit groups `0x1111111111111111 << k` (k = 0...3) fully set, as
+`~0` does. So do the port's `carrylessMultiplyingLower` and `carrylessMultiplyingUpper` on those
+targets and in the portable C of WASM, PPC8, Z14 and so on.
 
 Lanes that highway leaves as uninitialized memory, such as the tail of an 8-bit `Compress` on x86,
 are not compared.

@@ -7,6 +7,484 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
+    private func checkVectorResizingFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+        let mismatches = Mismatches("vectorResizingFromBFloat16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDBFloat16.repeating(value),
+            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            "repeating"
+        )
+        let port = H.vector(resizing: SIMDBFloat16.repeating(value))
+        let reference = H.Vector(
+            raw: HighwayReference.vectorResizingBF16ToU64(SIMDBFloat16.repeating(value).raw)
+        )
+        let definedBytes = SIMDBFloat16.laneCount * MemoryLayout<SIMDBFloat16.Lane>.stride
+        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
+        mismatches.check(
+            Array(bytes(of: port).prefix(definedBytes)),
+            Array(bytes(of: reference).prefix(definedBytes)),
+            ""
+        )
+        mismatches.check(
+            Array(registerBytes(of: port).dropFirst(definedBytes).prefix(newBytes)),
+            Array(registerBytes(of: reference).dropFirst(definedBytes).prefix(newBytes)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatZero() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatNegativeZero() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatOne() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatMinusOne() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatTwo() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatHalf() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatFour() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatQuarter() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatOnePointFive() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatMinusTwoPointFive() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatInfinity() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatMinusInfinity() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatNaN() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatMinusNaN() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatPayloadNaN() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatSignalingNaN() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatMinusSignalingNaN() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatLeastNonzero() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+    }
+
+    @Test func vectorResizingFromBFloat16ConstantSplatGreatest() {
+        checkVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+    }
+
+    @inline(__always)
+    private func checkHalfVectorResizingFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+        let mismatches = Mismatches("halfVectorResizingFromBFloat16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDBFloat16.repeating(value),
+            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            "repeating"
+        )
+        let port = H.halfVector(resizing: SIMDBFloat16.repeating(value))
+        let reference = H.HalfVector(
+            raw: HighwayReference.halfVectorResizingBF16ToU64(SIMDBFloat16.repeating(value).raw)
+        )
+        let definedBytes = SIMDBFloat16.laneCount * MemoryLayout<SIMDBFloat16.Lane>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
+        mismatches.check(
+            Array(bytes(of: port).prefix(definedBytes)),
+            Array(bytes(of: reference).prefix(definedBytes)),
+            ""
+        )
+        mismatches.check(
+            Array(registerBytes(of: port).dropFirst(definedBytes).prefix(newBytes)),
+            Array(registerBytes(of: reference).dropFirst(definedBytes).prefix(newBytes)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatZero() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatNegativeZero() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatOne() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatMinusOne() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatTwo() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatHalf() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatFour() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatQuarter() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatOnePointFive() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatMinusTwoPointFive() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatInfinity() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatMinusInfinity() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatNaN() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatMinusNaN() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatPayloadNaN() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatSignalingNaN() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatMinusSignalingNaN() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatLeastNonzero() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+    }
+
+    @Test func halfVectorResizingFromBFloat16ConstantSplatGreatest() {
+        checkHalfVectorResizingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+    }
+
+    @inline(__always)
+    private func checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches(
+            "halfVectorZeroExtendingResizingFromUInt64 with a repeating \(hex(value))"
+        )
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.halfVector(zeroExtendingResizing: H.repeating(value)),
+            H.HalfVector(
+                raw: HighwayReference.halfVectorZeroExtendingResizingU64ToU64(
+                    H.repeating(value).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat0() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(0)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat1() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(1)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat15() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(15)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat16() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(16)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat26() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(26)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat127() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(127)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat128() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(128)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat255() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(255)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat256() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(256)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat257() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(257)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat65280() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(65280)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplat65281() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(65281)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromUInt64ConstantSplatMax() {
+        checkHalfVectorZeroExtendingResizingFromUInt64ConstantA(H.Lane.max)
+    }
+
+    @inline(__always)
+    private func checkVectorZeroExtendingResizingFromInt64ConstantA(_ value: SIMDInt64.Lane) {
+        let mismatches = Mismatches(
+            "vectorZeroExtendingResizingFromInt64 with a repeating \(hex(value))"
+        )
+        mismatches.check(
+            SIMDInt64.repeating(value),
+            SIMDInt64.Vector(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.vector(zeroExtendingResizing: SIMDInt64.repeating(value)),
+            H.Vector(
+                raw: HighwayReference.vectorZeroExtendingResizingI64ToU64(
+                    SIMDInt64.repeating(value).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat0() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(0)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat1() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(1)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat15() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(15)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat16() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(16)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat26() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(26)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat127() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(127)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat128() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(128)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat255() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(255)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat256() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(256)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat257() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(257)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat65280() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(65280)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplat65281() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(65281)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMinus1() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(-1)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMinus16() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(-16)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMinus17() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(-17)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMinus128() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(-128)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMinus129() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(-129)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMax() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(SIMDInt64.Lane.max)
+    }
+
+    @Test func vectorZeroExtendingResizingFromInt64ConstantSplatMin() {
+        checkVectorZeroExtendingResizingFromInt64ConstantA(SIMDInt64.Lane.min)
+    }
+
+    @inline(__always)
+    private func checkHalfVectorZeroExtendingResizingFromInt64ConstantA(_ value: SIMDInt64.Lane) {
+        let mismatches = Mismatches(
+            "halfVectorZeroExtendingResizingFromInt64 with a repeating \(hex(value))"
+        )
+        mismatches.check(
+            SIMDInt64.repeating(value),
+            SIMDInt64.Vector(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.halfVector(zeroExtendingResizing: SIMDInt64.repeating(value)),
+            H.HalfVector(
+                raw: HighwayReference.halfVectorZeroExtendingResizingI64ToU64(
+                    SIMDInt64.repeating(value).raw
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat0() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(0)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat1() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(1)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat15() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(15)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat16() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(16)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat26() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(26)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat127() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(127)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat128() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(128)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat255() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(255)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat256() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(256)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat257() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(257)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat65280() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(65280)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplat65281() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(65281)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplatMinus1() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(-1)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplatMinus16() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(-16)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplatMinus17() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(-17)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplatMinus128() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(-128)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplatMinus129() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(-129)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplatMax() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(SIMDInt64.Lane.max)
+    }
+
+    @Test func halfVectorZeroExtendingResizingFromInt64ConstantSplatMin() {
+        checkHalfVectorZeroExtendingResizingFromInt64ConstantA(SIMDInt64.Lane.min)
+    }
+
+    @inline(__always)
     private func checkVectorZeroExtendingResizingFromFloatConstantA(_ value: SIMDFloat.Lane) {
         let mismatches = Mismatches(
             "vectorZeroExtendingResizingFromFloat with a repeating \(hex(value))"
@@ -403,4 +881,285 @@ extension SIMDUInt64ConstantTests {
     @Test func halfVectorZeroExtendingResizingFromDoubleConstantSplatGreatest() {
         checkHalfVectorZeroExtendingResizingFromDoubleConstantA(.greatestFiniteMagnitude)
     }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @inline(__always)
+    private func checkVectorZeroExtendingResizingFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+        let mismatches = Mismatches(
+            "vectorZeroExtendingResizingFromFloat16 with a repeating \(hex(value))"
+        )
+        mismatches.check(
+            SIMDFloat16.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        mismatches.check(
+            H.vector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
+            H.Vector(
+                raw: HighwayReference.vectorZeroExtendingResizingF16ToU64(
+                    SIMDFloat16.repeating(value)
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatZero() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(0.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatNegativeZero() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(-0.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatOne() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(1.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatMinusOne() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(-1.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatTwo() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(2.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatHalf() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(0.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatFour() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(4.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatQuarter() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(0.25)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatOnePointFive() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(1.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatMinusTwoPointFive() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(-2.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatInfinity() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(.infinity)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatMinusInfinity() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(-.infinity)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatNaN() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(.nan)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatMinusNaN() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(-.nan)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatPayloadNaN() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(
+            SIMDFloat16.Lane(nan: 1, signaling: false)
+        )
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatSignalingNaN() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(.signalingNaN)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatMinusSignalingNaN() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(-.signalingNaN)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatLeastNonzero() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(.leastNonzeroMagnitude)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatGreatest() {
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(.greatestFiniteMagnitude)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @inline(__always)
+    private func checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(_ value: SIMDFloat16.Lane)
+    {
+        let mismatches = Mismatches(
+            "halfVectorZeroExtendingResizingFromFloat16 with a repeating \(hex(value))"
+        )
+        mismatches.check(
+            SIMDFloat16.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        mismatches.check(
+            H.halfVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
+            H.HalfVector(
+                raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU64(
+                    SIMDFloat16.repeating(value)
+                )
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatZero() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(0.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatNegativeZero() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(-0.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatOne() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(1.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatMinusOne() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(-1.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatTwo() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(2.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatHalf() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(0.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatFour() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(4.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatQuarter() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(0.25)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatOnePointFive() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(1.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatMinusTwoPointFive() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(-2.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatInfinity() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(.infinity)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatMinusInfinity() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(-.infinity)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatNaN() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(.nan)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatMinusNaN() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(-.nan)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatPayloadNaN() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(
+            SIMDFloat16.Lane(nan: 1, signaling: false)
+        )
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatSignalingNaN() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(.signalingNaN)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatMinusSignalingNaN() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(-.signalingNaN)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatLeastNonzero() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(.leastNonzeroMagnitude)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatGreatest() {
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(.greatestFiniteMagnitude)
+    }
+    #endif
 }

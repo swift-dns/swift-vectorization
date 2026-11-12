@@ -14665,7 +14665,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 dividingWhereOtherwiseF16(cvectoriz
 #if HWY_HAVE_FLOAT16
 hn::MaskedDivOr(fromPortF16(otherwise), maskFromPortF16(mask), fromPortF16(a), fromPortF16(b))
 #else
-hn::IfThenElse(maskFromPortF16(mask), hn::Combine(TagF16(), hn::DemoteTo(HalfTagF16(), hn::Div(hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a)), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(b)))), hn::DemoteTo(HalfTagF16(), hn::Div(hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a)), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(b))))), fromPortF16(otherwise))
+hn::IfThenElse(maskFromPortF16(mask), hn::Combine(TagF16(), hn::DemoteTo(HalfTagF16(), hn::Div(hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a)), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), hn::IfThenElse(maskFromPortF16(mask), fromPortF16(b), hn::Set(TagF16(), hwy::BitCastScalar<hwy::float16_t>(static_cast<uint16_t>(0x3C00))))))), hn::DemoteTo(HalfTagF16(), hn::Div(hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a)), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), hn::IfThenElse(maskFromPortF16(mask), fromPortF16(b), hn::Set(TagF16(), hwy::BitCastScalar<hwy::float16_t>(static_cast<uint16_t>(0x3C00)))))))), fromPortF16(otherwise))
 #endif
 ); }
 SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 minimumWhereOtherwiseF16(cvectorization_ops_raw_vector_f16 otherwise, cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) { return toPortF16(
@@ -14757,6 +14757,27 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 approximateReciprocalSquareRootWher
 hn::MaskedApproximateReciprocalSqrt(maskFromPortF16(mask), fromPortF16(a))
 #else
 hn::IfThenElseZero(maskFromPortF16(mask), hn::Combine(TagF16(), hn::DemoteTo(HalfTagF16(), hn::ApproximateReciprocalSqrt(hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a)))), hn::DemoteTo(HalfTagF16(), hn::ApproximateReciprocalSqrt(hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a))))))
+#endif
+); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 multiplyingComplexWhereOtherwiseF16(cvectorization_ops_raw_vector_f16 otherwise, cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) { return toPortF16(
+#if HWY_HAVE_FLOAT16
+hn::MaskedMulComplexOr(fromPortF16(otherwise), maskFromPortF16(mask), fromPortF16(a), fromPortF16(b))
+#else
+hn::IfThenElse(maskFromPortF16(mask), hn::Combine(TagF16(), hn::Combine(HalfTagF16(), hn::DemoteTo(QuarterTagF16(), hn::MulComplex(hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(b))))), hn::DemoteTo(QuarterTagF16(), hn::MulComplex(hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(b)))))), hn::Combine(HalfTagF16(), hn::DemoteTo(QuarterTagF16(), hn::MulComplex(hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(b))))), hn::DemoteTo(QuarterTagF16(), hn::MulComplex(hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(b))))))), fromPortF16(otherwise))
+#endif
+); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 multiplyingComplexConjugateWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) { return toPortF16(
+#if HWY_HAVE_FLOAT16
+hn::MaskedMulComplexConj(maskFromPortF16(mask), fromPortF16(a), fromPortF16(b))
+#else
+hn::IfThenElseZero(maskFromPortF16(mask), hn::Combine(TagF16(), hn::Combine(HalfTagF16(), hn::DemoteTo(QuarterTagF16(), hn::MulComplexConj(hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(b))))), hn::DemoteTo(QuarterTagF16(), hn::MulComplexConj(hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(b)))))), hn::Combine(HalfTagF16(), hn::DemoteTo(QuarterTagF16(), hn::MulComplexConj(hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(b))))), hn::DemoteTo(QuarterTagF16(), hn::MulComplexConj(hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(b))))))))
+#endif
+); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 multiplyAddingComplexConjugateWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c) { return toPortF16(
+#if HWY_HAVE_FLOAT16
+hn::MaskedMulComplexConjAdd(maskFromPortF16(mask), fromPortF16(a), fromPortF16(b), fromPortF16(c))
+#else
+hn::IfThenElseZero(maskFromPortF16(mask), hn::Combine(TagF16(), hn::Combine(HalfTagF16(), hn::DemoteTo(QuarterTagF16(), hn::MulComplexConjAdd(hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(b))), hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(c))))), hn::DemoteTo(QuarterTagF16(), hn::MulComplexConjAdd(hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(b))), hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(c)))))), hn::Combine(HalfTagF16(), hn::DemoteTo(QuarterTagF16(), hn::MulComplexConjAdd(hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(b))), hn::PromoteUpperTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(c))))), hn::DemoteTo(QuarterTagF16(), hn::MulComplexConjAdd(hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a))), hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(b))), hn::PromoteLowerTo(hn::Repartition<double, TagF16>(), hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(c))))))))
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 equalToWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) { return maskToPortF16(
@@ -21728,7 +21749,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorResizingF16ToI32(cvectorizati
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingF16ToI64(cvectorization_ops_raw_vector_f16 a) { return toPortI64(hn::ResizeBitCast(TagI64(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingF16ToF32(cvectorization_ops_raw_vector_f16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingF16ToF64(cvectorization_ops_raw_vector_f16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), fromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(hn::ResizeBitCast(TagBF16(), fromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(TagBF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ResizeBitCast(TagBF16(), fromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingF16ToU8(cvectorization_ops_raw_vector_f16 a) { return halfToPortU8(hn::ResizeBitCast(HalfTagU8(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingF16ToU16(cvectorization_ops_raw_vector_f16 a) { return halfToPortU16(hn::ResizeBitCast(HalfTagU16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorResizingF16ToU32(cvectorization_ops_raw_vector_f16 a) { return halfToPortU32(hn::ResizeBitCast(HalfTagU32(), fromPortF16(a))); }
@@ -21740,13 +21767,25 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingF16ToI64(cve
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingF16ToF32(cvectorization_ops_raw_vector_f16 a) { return halfToPortF32(hn::ResizeBitCast(HalfTagF32(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingF16ToF64(cvectorization_ops_raw_vector_f16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortF16(hn::ResizeBitCast(HalfTagF16(), fromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortBF16(hn::ResizeBitCast(HalfTagBF16(), fromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(HalfTagBF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ResizeBitCast(HalfTagBF16(), fromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingF16ToU8(cvectorization_ops_raw_vector_f16 a) { return quarterToPortU8(hn::ResizeBitCast(QuarterTagU8(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingF16ToU16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortU16(hn::ResizeBitCast(QuarterTagU16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingF16ToI8(cvectorization_ops_raw_vector_f16 a) { return quarterToPortI8(hn::ResizeBitCast(QuarterTagI8(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingF16ToI16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortF16(hn::ResizeBitCast(QuarterTagF16(), fromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortBF16(hn::ResizeBitCast(QuarterTagBF16(), fromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(QuarterTagBF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ResizeBitCast(QuarterTagBF16(), fromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingF16ToU8(cvectorization_ops_raw_vector_f16 a) { return eighthToPortU8(hn::ResizeBitCast(EighthTagU8(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingF16ToI8(cvectorization_ops_raw_vector_f16 a) { return eighthToPortI8(hn::ResizeBitCast(EighthTagI8(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 vectorResizingHalfF16ToU8(cvectorization_ops_raw_half_vector_f16 a) { return toPortU8(hn::ResizeBitCast(TagU8(), halfRegisterFromPortF16(a))); }
@@ -21760,7 +21799,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingHalfF16ToI64(cvectori
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingHalfF16ToF32(cvectorization_ops_raw_half_vector_f16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortF16(hn::ResizeBitCast(TagF16(), halfRegisterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(hn::ResizeBitCast(TagBF16(), halfRegisterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(TagBF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ResizeBitCast(TagBF16(), halfRegisterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingHalfF16ToU8(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortU8(hn::ResizeBitCast(HalfTagU8(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingHalfF16ToU16(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortU16(hn::ResizeBitCast(HalfTagU16(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorResizingHalfF16ToU32(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortU32(hn::ResizeBitCast(HalfTagU32(), halfRegisterFromPortF16(a))); }
@@ -21771,13 +21816,25 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorResizingHalfF16ToI32
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingHalfF16ToI64(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortI64(hn::ResizeBitCast(HalfTagI64(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingHalfF16ToF32(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortF32(hn::ResizeBitCast(HalfTagF32(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), halfRegisterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortBF16(hn::ResizeBitCast(HalfTagBF16(), halfRegisterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(HalfTagBF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ResizeBitCast(HalfTagBF16(), halfRegisterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingHalfF16ToU8(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortU8(hn::ResizeBitCast(QuarterTagU8(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingHalfF16ToU16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortU16(hn::ResizeBitCast(QuarterTagU16(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingHalfF16ToI8(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortI8(hn::ResizeBitCast(QuarterTagI8(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingHalfF16ToI16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortF16(hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortBF16(hn::ResizeBitCast(QuarterTagBF16(), halfRegisterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(QuarterTagBF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ResizeBitCast(QuarterTagBF16(), halfRegisterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingHalfF16ToU8(cvectorization_ops_raw_half_vector_f16 a) { return eighthToPortU8(hn::ResizeBitCast(EighthTagU8(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingHalfF16ToI8(cvectorization_ops_raw_half_vector_f16 a) { return eighthToPortI8(hn::ResizeBitCast(EighthTagI8(), halfRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 vectorResizingQuarterF16ToU8(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortU8(hn::ResizeBitCast(TagU8(), quarterRegisterFromPortF16(a))); }
@@ -21791,7 +21848,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingQuarterF16ToI64(cvect
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingQuarterF16ToF32(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingQuarterF16ToF64(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF16(hn::ResizeBitCast(TagF16(), quarterRegisterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(hn::ResizeBitCast(TagBF16(), quarterRegisterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(TagBF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ResizeBitCast(TagBF16(), quarterRegisterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingQuarterF16ToU8(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortU8(hn::ResizeBitCast(HalfTagU8(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingQuarterF16ToU16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortU16(hn::ResizeBitCast(HalfTagU16(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorResizingQuarterF16ToU32(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortU32(hn::ResizeBitCast(HalfTagU32(), quarterRegisterFromPortF16(a))); }
@@ -21803,12 +21866,24 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingQuarterF16To
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingQuarterF16ToF32(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortF32(hn::ResizeBitCast(HalfTagF32(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingQuarterF16ToF64(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortF16(hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortBF16(hn::ResizeBitCast(HalfTagBF16(), quarterRegisterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(HalfTagBF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ResizeBitCast(HalfTagBF16(), quarterRegisterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingQuarterF16ToU8(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortU8(hn::ResizeBitCast(QuarterTagU8(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingQuarterF16ToU16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortU16(hn::ResizeBitCast(QuarterTagU16(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingQuarterF16ToI8(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortI8(hn::ResizeBitCast(QuarterTagI8(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingQuarterF16ToI16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), quarterRegisterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortBF16(hn::ResizeBitCast(QuarterTagBF16(), quarterRegisterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(QuarterTagBF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ResizeBitCast(QuarterTagBF16(), quarterRegisterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingQuarterF16ToU8(cvectorization_ops_raw_quarter_vector_f16 a) { return eighthToPortU8(hn::ResizeBitCast(EighthTagU8(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingQuarterF16ToI8(cvectorization_ops_raw_quarter_vector_f16 a) { return eighthToPortI8(hn::ResizeBitCast(EighthTagI8(), quarterRegisterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 vectorResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) { return toPortU8(hn::ResizeBitCast(TagU8(), fromPortBF16(a))); }
@@ -21821,6 +21896,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorResizingBF16ToI32(cvectorizat
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingBF16ToI64(cvectorization_ops_raw_vector_bf16 a) { return toPortI64(hn::ResizeBitCast(TagI64(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), fromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return toPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(TagF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ResizeBitCast(TagF16(), fromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) { return halfToPortU8(hn::ResizeBitCast(HalfTagU8(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingBF16ToU16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortU16(hn::ResizeBitCast(HalfTagU16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorResizingBF16ToU32(cvectorization_ops_raw_vector_bf16 a) { return halfToPortU32(hn::ResizeBitCast(HalfTagU32(), fromPortBF16(a))); }
@@ -21831,11 +21913,25 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorResizingBF16ToI32(cv
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingBF16ToI64(cvectorization_ops_raw_vector_bf16 a) { return halfToPortI64(hn::ResizeBitCast(HalfTagI64(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF32(hn::ResizeBitCast(HalfTagF32(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), fromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(HalfTagF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ResizeBitCast(HalfTagF16(), fromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorResizingBF16ToBF16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortBF16(hn::ResizeBitCast(HalfTagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortU8(hn::ResizeBitCast(QuarterTagU8(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingBF16ToU16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortU16(hn::ResizeBitCast(QuarterTagU16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingBF16ToI8(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortI8(hn::ResizeBitCast(QuarterTagI8(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingBF16ToI16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), fromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(QuarterTagF16(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ResizeBitCast(QuarterTagF16(), fromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingBF16ToBF16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortBF16(hn::ResizeBitCast(QuarterTagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) { return eighthToPortU8(hn::ResizeBitCast(EighthTagU8(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingBF16ToI8(cvectorization_ops_raw_vector_bf16 a) { return eighthToPortI8(hn::ResizeBitCast(EighthTagI8(), fromPortBF16(a))); }
@@ -21849,6 +21945,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorResizingHalfBF16ToI32(cvector
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingHalfBF16ToI64(cvectorization_ops_raw_half_vector_bf16 a) { return toPortI64(hn::ResizeBitCast(TagI64(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), halfRegisterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(TagF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ResizeBitCast(TagF16(), halfRegisterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorResizingHalfBF16ToBF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortBF16(hn::ResizeBitCast(TagBF16(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortU8(hn::ResizeBitCast(HalfTagU8(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingHalfBF16ToU16(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortU16(hn::ResizeBitCast(HalfTagU16(), halfRegisterFromPortBF16(a))); }
@@ -21860,10 +21963,24 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorResizingHalfBF16ToI3
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingHalfBF16ToI64(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortI64(hn::ResizeBitCast(HalfTagI64(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF32(hn::ResizeBitCast(HalfTagF32(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), halfRegisterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(HalfTagF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ResizeBitCast(HalfTagF16(), halfRegisterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortU8(hn::ResizeBitCast(QuarterTagU8(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingHalfBF16ToU16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortU16(hn::ResizeBitCast(QuarterTagU16(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingHalfBF16ToI8(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortI8(hn::ResizeBitCast(QuarterTagI8(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingHalfBF16ToI16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), halfRegisterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ResizeBitCast(QuarterTagF16(), halfRegisterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingHalfBF16ToBF16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortBF16(hn::ResizeBitCast(QuarterTagBF16(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) { return eighthToPortU8(hn::ResizeBitCast(EighthTagU8(), halfRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingHalfBF16ToI8(cvectorization_ops_raw_half_vector_bf16 a) { return eighthToPortI8(hn::ResizeBitCast(EighthTagI8(), halfRegisterFromPortBF16(a))); }
@@ -21877,6 +21994,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorResizingQuarterBF16ToI32(cvec
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingQuarterBF16ToI64(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortI64(hn::ResizeBitCast(TagI64(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF32(hn::ResizeBitCast(TagF32(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF64(hn::ResizeBitCast(TagF64(), quarterRegisterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(TagF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ResizeBitCast(TagF16(), quarterRegisterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorResizingQuarterBF16ToBF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortBF16(hn::ResizeBitCast(TagBF16(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortU8(hn::ResizeBitCast(HalfTagU8(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingQuarterBF16ToU16(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortU16(hn::ResizeBitCast(HalfTagU16(), quarterRegisterFromPortBF16(a))); }
@@ -21888,11 +22012,25 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorResizingQuarterBF16T
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingQuarterBF16ToI64(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortI64(hn::ResizeBitCast(HalfTagI64(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF32(hn::ResizeBitCast(HalfTagF32(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF64(hn::ResizeBitCast(HalfTagF64(), quarterRegisterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ResizeBitCast(HalfTagF16(), quarterRegisterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorResizingQuarterBF16ToBF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortBF16(hn::ResizeBitCast(HalfTagBF16(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortU8(hn::ResizeBitCast(QuarterTagU8(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingQuarterBF16ToU16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortU16(hn::ResizeBitCast(QuarterTagU16(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingQuarterBF16ToI8(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortI8(hn::ResizeBitCast(QuarterTagI8(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingQuarterBF16ToI16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortI16(hn::ResizeBitCast(QuarterTagI16(), quarterRegisterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ResizeBitCast(QuarterTagF16(), quarterRegisterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ResizeBitCast(QuarterTagF16(), quarterRegisterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) { return eighthToPortU8(hn::ResizeBitCast(EighthTagU8(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingQuarterBF16ToI8(cvectorization_ops_raw_quarter_vector_bf16 a) { return eighthToPortI8(hn::ResizeBitCast(EighthTagI8(), quarterRegisterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 vectorZeroExtendingResizingU8ToU16(cvectorization_ops_raw_vector_u8 a) { return toPortU16(hn::ZeroExtendResizeBitCast(TagU16(), TagU8(), fromPortU8(a))); }
@@ -22711,7 +22849,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorZeroExtendingResizingF16ToI32
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingF16ToI64(cvectorization_ops_raw_vector_f16 a) { return toPortI64(hn::ZeroExtendResizeBitCast(TagI64(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingF16ToF32(cvectorization_ops_raw_vector_f16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingF16ToF64(cvectorization_ops_raw_vector_f16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), TagF16(), fromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(hn::ZeroExtendResizeBitCast(TagBF16(), TagF16(), fromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return toPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(TagBF16(), hn::RebindToUnsigned<TagF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(TagBF16(), TagF16(), fromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingF16ToU8(cvectorization_ops_raw_vector_f16 a) { return halfToPortU8(hn::ZeroExtendResizeBitCast(HalfTagU8(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingF16ToU16(cvectorization_ops_raw_vector_f16 a) { return halfToPortU16(hn::ZeroExtendResizeBitCast(HalfTagU16(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorZeroExtendingResizingF16ToU32(cvectorization_ops_raw_vector_f16 a) { return halfToPortU32(hn::ZeroExtendResizeBitCast(HalfTagU32(), TagF16(), fromPortF16(a))); }
@@ -22723,13 +22867,25 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingF16ToF32(cvectorization_ops_raw_vector_f16 a) { return halfToPortF32(hn::ZeroExtendResizeBitCast(HalfTagF32(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingF16ToF64(cvectorization_ops_raw_vector_f16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortF16(hn::ZeroExtendResizeBitCast(HalfTagF16(), TagF16(), fromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortBF16(hn::ZeroExtendResizeBitCast(HalfTagBF16(), TagF16(), fromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return halfToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<TagF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(HalfTagBF16(), TagF16(), fromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingF16ToU8(cvectorization_ops_raw_vector_f16 a) { return quarterToPortU8(hn::ZeroExtendResizeBitCast(QuarterTagU8(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingF16ToU16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortU16(hn::ZeroExtendResizeBitCast(QuarterTagU16(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingF16ToI8(cvectorization_ops_raw_vector_f16 a) { return quarterToPortI8(hn::ZeroExtendResizeBitCast(QuarterTagI8(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingF16ToI16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingF16ToF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortF16(hn::ZeroExtendResizeBitCast(QuarterTagF16(), TagF16(), fromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortBF16(hn::ZeroExtendResizeBitCast(QuarterTagBF16(), TagF16(), fromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingF16ToBF16(cvectorization_ops_raw_vector_f16 a) { return quarterToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<TagF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(QuarterTagBF16(), TagF16(), fromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingF16ToU8(cvectorization_ops_raw_vector_f16 a) { return eighthToPortU8(hn::ZeroExtendResizeBitCast(EighthTagU8(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingF16ToI8(cvectorization_ops_raw_vector_f16 a) { return eighthToPortI8(hn::ZeroExtendResizeBitCast(EighthTagI8(), TagF16(), fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 vectorZeroExtendingResizingHalfF16ToU8(cvectorization_ops_raw_half_vector_f16 a) { return toPortU8(hn::ZeroExtendResizeBitCast(TagU8(), HalfTagF16(), halfFromPortF16(a))); }
@@ -22743,7 +22899,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingHalfF16T
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingHalfF16ToF32(cvectorization_ops_raw_half_vector_f16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortF16(hn::ZeroExtendResizeBitCast(TagF16(), HalfTagF16(), halfFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(hn::ZeroExtendResizeBitCast(TagBF16(), HalfTagF16(), halfFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return toPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(TagBF16(), hn::RebindToUnsigned<HalfTagF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(TagBF16(), HalfTagF16(), halfFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingHalfF16ToU8(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortU8(hn::ZeroExtendResizeBitCast(HalfTagU8(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingHalfF16ToU16(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortU16(hn::ZeroExtendResizeBitCast(HalfTagU16(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorZeroExtendingResizingHalfF16ToU32(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortU32(hn::ZeroExtendResizeBitCast(HalfTagU32(), HalfTagF16(), halfFromPortF16(a))); }
@@ -22754,13 +22916,25 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizingHalfF16ToI64(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortI64(hn::ZeroExtendResizeBitCast(HalfTagI64(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingHalfF16ToF32(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortF32(hn::ZeroExtendResizeBitCast(HalfTagF32(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), HalfTagF16(), halfFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortBF16(hn::ZeroExtendResizeBitCast(HalfTagBF16(), HalfTagF16(), halfFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return halfToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<HalfTagF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(HalfTagBF16(), HalfTagF16(), halfFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingHalfF16ToU8(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortU8(hn::ZeroExtendResizeBitCast(QuarterTagU8(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingHalfF16ToU16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortU16(hn::ZeroExtendResizeBitCast(QuarterTagU16(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingHalfF16ToI8(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortI8(hn::ZeroExtendResizeBitCast(QuarterTagI8(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingHalfF16ToI16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingHalfF16ToF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortF16(hn::ZeroExtendResizeBitCast(QuarterTagF16(), HalfTagF16(), halfFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortBF16(hn::ZeroExtendResizeBitCast(QuarterTagBF16(), HalfTagF16(), halfFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingHalfF16ToBF16(cvectorization_ops_raw_half_vector_f16 a) { return quarterToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<HalfTagF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(QuarterTagBF16(), HalfTagF16(), halfFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingHalfF16ToU8(cvectorization_ops_raw_half_vector_f16 a) { return eighthToPortU8(hn::ZeroExtendResizeBitCast(EighthTagU8(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingHalfF16ToI8(cvectorization_ops_raw_half_vector_f16 a) { return eighthToPortI8(hn::ZeroExtendResizeBitCast(EighthTagI8(), HalfTagF16(), halfFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 vectorZeroExtendingResizingQuarterF16ToU8(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortU8(hn::ZeroExtendResizeBitCast(TagU8(), QuarterTagF16(), quarterFromPortF16(a))); }
@@ -22774,7 +22948,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingQuarterF
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingQuarterF16ToF32(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingQuarterF16ToF64(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortF16(hn::ZeroExtendResizeBitCast(TagF16(), QuarterTagF16(), quarterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(hn::ZeroExtendResizeBitCast(TagBF16(), QuarterTagF16(), quarterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return toPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(TagBF16(), hn::RebindToUnsigned<QuarterTagF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(TagBF16(), QuarterTagF16(), quarterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingQuarterF16ToU8(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortU8(hn::ZeroExtendResizeBitCast(HalfTagU8(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingQuarterF16ToU16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortU16(hn::ZeroExtendResizeBitCast(HalfTagU16(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorZeroExtendingResizingQuarterF16ToU32(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortU32(hn::ZeroExtendResizeBitCast(HalfTagU32(), QuarterTagF16(), quarterFromPortF16(a))); }
@@ -22786,12 +22966,24 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingQuarterF16ToF32(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortF32(hn::ZeroExtendResizeBitCast(HalfTagF32(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingQuarterF16ToF64(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingQuarterF16ToF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortF16(hn::ZeroExtendResizeBitCast(HalfTagF16(), QuarterTagF16(), quarterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortBF16(hn::ZeroExtendResizeBitCast(HalfTagBF16(), QuarterTagF16(), quarterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return halfToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(HalfTagBF16(), hn::RebindToUnsigned<QuarterTagF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(HalfTagBF16(), QuarterTagF16(), quarterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingQuarterF16ToU8(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortU8(hn::ZeroExtendResizeBitCast(QuarterTagU8(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingQuarterF16ToU16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortU16(hn::ZeroExtendResizeBitCast(QuarterTagU16(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingQuarterF16ToI8(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortI8(hn::ZeroExtendResizeBitCast(QuarterTagI8(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingQuarterF16ToI16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), QuarterTagF16(), quarterFromPortF16(a))); }
-HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortBF16(hn::ZeroExtendResizeBitCast(QuarterTagBF16(), QuarterTagF16(), quarterFromPortF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingQuarterF16ToBF16(cvectorization_ops_raw_quarter_vector_f16 a) { return quarterToPortBF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(QuarterTagBF16(), hn::RebindToUnsigned<QuarterTagF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(QuarterTagBF16(), QuarterTagF16(), quarterFromPortF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingQuarterF16ToU8(cvectorization_ops_raw_quarter_vector_f16 a) { return eighthToPortU8(hn::ZeroExtendResizeBitCast(EighthTagU8(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingQuarterF16ToI8(cvectorization_ops_raw_quarter_vector_f16 a) { return eighthToPortI8(hn::ZeroExtendResizeBitCast(EighthTagI8(), QuarterTagF16(), quarterFromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 vectorZeroExtendingResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) { return toPortU8(hn::ZeroExtendResizeBitCast(TagU8(), TagBF16(), fromPortBF16(a))); }
@@ -22804,6 +22996,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorZeroExtendingResizingBF16ToI3
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingBF16ToI64(cvectorization_ops_raw_vector_bf16 a) { return toPortI64(hn::ZeroExtendResizeBitCast(TagI64(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), TagBF16(), fromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return toPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(TagF16(), hn::RebindToUnsigned<TagBF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(TagF16(), TagBF16(), fromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) { return halfToPortU8(hn::ZeroExtendResizeBitCast(HalfTagU8(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingBF16ToU16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortU16(hn::ZeroExtendResizeBitCast(HalfTagU16(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorZeroExtendingResizingBF16ToU32(cvectorization_ops_raw_vector_bf16 a) { return halfToPortU32(hn::ZeroExtendResizeBitCast(HalfTagU32(), TagBF16(), fromPortBF16(a))); }
@@ -22814,11 +23013,25 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizingBF16ToI64(cvectorization_ops_raw_vector_bf16 a) { return halfToPortI64(hn::ZeroExtendResizeBitCast(HalfTagI64(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF32(hn::ZeroExtendResizeBitCast(HalfTagF32(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), TagBF16(), fromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<TagBF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(HalfTagF16(), TagBF16(), fromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingBF16ToBF16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortBF16(hn::ZeroExtendResizeBitCast(HalfTagBF16(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortU8(hn::ZeroExtendResizeBitCast(QuarterTagU8(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingBF16ToU16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortU16(hn::ZeroExtendResizeBitCast(QuarterTagU16(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingBF16ToI8(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortI8(hn::ZeroExtendResizeBitCast(QuarterTagI8(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingBF16ToI16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), TagBF16(), fromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<TagBF16>(), fromPortU16((cvectorization_ops_raw_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(QuarterTagF16(), TagBF16(), fromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingBF16ToBF16(cvectorization_ops_raw_vector_bf16 a) { return quarterToPortBF16(hn::ZeroExtendResizeBitCast(QuarterTagBF16(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) { return eighthToPortU8(hn::ZeroExtendResizeBitCast(EighthTagU8(), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingBF16ToI8(cvectorization_ops_raw_vector_bf16 a) { return eighthToPortI8(hn::ZeroExtendResizeBitCast(EighthTagI8(), TagBF16(), fromPortBF16(a))); }
@@ -22832,6 +23045,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorZeroExtendingResizingHalfBF16
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingHalfBF16ToI64(cvectorization_ops_raw_half_vector_bf16 a) { return toPortI64(hn::ZeroExtendResizeBitCast(TagI64(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), HalfTagBF16(), halfFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(TagF16(), hn::RebindToUnsigned<HalfTagBF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(TagF16(), HalfTagBF16(), halfFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingHalfBF16ToBF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortBF16(hn::ZeroExtendResizeBitCast(TagBF16(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortU8(hn::ZeroExtendResizeBitCast(HalfTagU8(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingHalfBF16ToU16(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortU16(hn::ZeroExtendResizeBitCast(HalfTagU16(), HalfTagBF16(), halfFromPortBF16(a))); }
@@ -22843,10 +23063,24 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizingHalfBF16ToI64(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortI64(hn::ZeroExtendResizeBitCast(HalfTagI64(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF32(hn::ZeroExtendResizeBitCast(HalfTagF32(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), HalfTagBF16(), halfFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return halfToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<HalfTagBF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(HalfTagF16(), HalfTagBF16(), halfFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortU8(hn::ZeroExtendResizeBitCast(QuarterTagU8(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingHalfBF16ToU16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortU16(hn::ZeroExtendResizeBitCast(QuarterTagU16(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingHalfBF16ToI8(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortI8(hn::ZeroExtendResizeBitCast(QuarterTagI8(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingHalfBF16ToI16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), HalfTagBF16(), halfFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<HalfTagBF16>(), halfFromPortU16((cvectorization_ops_raw_half_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(QuarterTagF16(), HalfTagBF16(), halfFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingHalfBF16ToBF16(cvectorization_ops_raw_half_vector_bf16 a) { return quarterToPortBF16(hn::ZeroExtendResizeBitCast(QuarterTagBF16(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) { return eighthToPortU8(hn::ZeroExtendResizeBitCast(EighthTagU8(), HalfTagBF16(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingHalfBF16ToI8(cvectorization_ops_raw_half_vector_bf16 a) { return eighthToPortI8(hn::ZeroExtendResizeBitCast(EighthTagI8(), HalfTagBF16(), halfFromPortBF16(a))); }
@@ -22860,6 +23094,13 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorZeroExtendingResizingQuarterB
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingQuarterBF16ToI64(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortI64(hn::ZeroExtendResizeBitCast(TagI64(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF32(hn::ZeroExtendResizeBitCast(TagF32(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF64(hn::ZeroExtendResizeBitCast(TagF64(), QuarterTagBF16(), quarterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(TagF16(), hn::RebindToUnsigned<QuarterTagBF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(TagF16(), QuarterTagBF16(), quarterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingQuarterBF16ToBF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return toPortBF16(hn::ZeroExtendResizeBitCast(TagBF16(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortU8(hn::ZeroExtendResizeBitCast(HalfTagU8(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingQuarterBF16ToU16(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortU16(hn::ZeroExtendResizeBitCast(HalfTagU16(), QuarterTagBF16(), quarterFromPortBF16(a))); }
@@ -22871,11 +23112,25 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizingQuarterBF16ToI64(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortI64(hn::ZeroExtendResizeBitCast(HalfTagI64(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF32(hn::ZeroExtendResizeBitCast(HalfTagF32(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF64(hn::ZeroExtendResizeBitCast(HalfTagF64(), QuarterTagBF16(), quarterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(HalfTagF16(), hn::RebindToUnsigned<QuarterTagBF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(HalfTagF16(), QuarterTagBF16(), quarterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingQuarterBF16ToBF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return halfToPortBF16(hn::ZeroExtendResizeBitCast(HalfTagBF16(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortU8(hn::ZeroExtendResizeBitCast(QuarterTagU8(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingQuarterBF16ToU16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortU16(hn::ZeroExtendResizeBitCast(QuarterTagU16(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingQuarterBF16ToI8(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortI8(hn::ZeroExtendResizeBitCast(QuarterTagI8(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingQuarterBF16ToI16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortI16(hn::ZeroExtendResizeBitCast(QuarterTagI16(), QuarterTagBF16(), quarterFromPortBF16(a))); }
+SWIFT_HIGHWAY_REFERENCE_OPERAND_ORDERED cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) { return quarterToPortF16(
+#if HWY_TARGET == HWY_SVE2_128
+hn::ZeroExtendResizeBitCast(QuarterTagF16(), hn::RebindToUnsigned<QuarterTagBF16>(), quarterFromPortU16((cvectorization_ops_raw_quarter_vector_u16)a))
+#else
+hn::ZeroExtendResizeBitCast(QuarterTagF16(), QuarterTagBF16(), quarterFromPortBF16(a))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) { return eighthToPortU8(hn::ZeroExtendResizeBitCast(EighthTagU8(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingQuarterBF16ToI8(cvectorization_ops_raw_quarter_vector_bf16 a) { return eighthToPortI8(hn::ZeroExtendResizeBitCast(EighthTagI8(), QuarterTagBF16(), quarterFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorWideningHalfF16ToF32(cvectorization_ops_raw_half_vector_f16 a) { return toPortF32(hn::PromoteTo(TagF32(), halfFromPortF16(a))); }
@@ -26303,6 +26558,9 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 negatedMultiplySubtractingWhereF16(
 HWY_INLINE cvectorization_ops_raw_vector_f16 negatedMultiplySubtractingWhereOtherwiseF16(cvectorization_ops_raw_vector_f16 otherwise, cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c) noexcept { return ::HighwayReference::negatedMultiplySubtractingWhereOtherwiseF16(otherwise, mask, a, b, c); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 approximateReciprocalWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::approximateReciprocalWhereF16(mask, a); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 approximateReciprocalSquareRootWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::approximateReciprocalSquareRootWhereF16(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 multiplyingComplexWhereOtherwiseF16(cvectorization_ops_raw_vector_f16 otherwise, cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::multiplyingComplexWhereOtherwiseF16(otherwise, mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 multiplyingComplexConjugateWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::multiplyingComplexConjugateWhereF16(mask, a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 multiplyAddingComplexConjugateWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c) noexcept { return ::HighwayReference::multiplyAddingComplexConjugateWhereF16(mask, a, b, c); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 equalToWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::equalToWhereF16(mask, a, b); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 notEqualToWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::notEqualToWhereF16(mask, a, b); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 lessThanWhereF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::lessThanWhereF16(mask, a, b); }
@@ -27944,6 +28202,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorResizingBF16ToI32(cvectorizat
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingBF16ToI64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 vectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingBF16ToU16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingBF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorResizingBF16ToU32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingBF16ToU32(a); }
@@ -27954,11 +28213,13 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorResizingBF16ToI32(cv
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingBF16ToI64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorResizingBF16ToBF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingBF16ToU16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingBF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingBF16ToI8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingBF16ToI8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingBF16ToI16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingBF16ToI16(a); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingBF16ToBF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorResizingBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingBF16ToI8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorResizingBF16ToI8(a); }
@@ -27972,6 +28233,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorResizingHalfBF16ToI32(cvector
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingHalfBF16ToI64(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingHalfBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingHalfBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingHalfBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 vectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingHalfBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorResizingHalfBF16ToBF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingHalfBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingHalfBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingHalfBF16ToU16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingHalfBF16ToU16(a); }
@@ -27983,10 +28245,12 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorResizingHalfBF16ToI3
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingHalfBF16ToI64(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingHalfBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingHalfBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingHalfBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingHalfBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingHalfBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingHalfBF16ToU16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingHalfBF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingHalfBF16ToI8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingHalfBF16ToI8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingHalfBF16ToI16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingHalfBF16ToI16(a); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingHalfBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorResizingHalfBF16ToBF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingHalfBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorResizingHalfBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingHalfBF16ToI8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorResizingHalfBF16ToI8(a); }
@@ -28000,6 +28264,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorResizingQuarterBF16ToI32(cvec
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorResizingQuarterBF16ToI64(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingQuarterBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingQuarterBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingQuarterBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 vectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingQuarterBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorResizingQuarterBF16ToBF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorResizingQuarterBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingQuarterBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorResizingQuarterBF16ToU16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingQuarterBF16ToU16(a); }
@@ -28011,11 +28276,13 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorResizingQuarterBF16T
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorResizingQuarterBF16ToI64(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingQuarterBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingQuarterBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingQuarterBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingQuarterBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorResizingQuarterBF16ToBF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorResizingQuarterBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingQuarterBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorResizingQuarterBF16ToU16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingQuarterBF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorResizingQuarterBF16ToI8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingQuarterBF16ToI8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorResizingQuarterBF16ToI16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingQuarterBF16ToI16(a); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorResizingQuarterBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorResizingQuarterBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorResizingQuarterBF16ToI8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorResizingQuarterBF16ToI8(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 vectorZeroExtendingResizingU8ToU16(cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingU8ToU16(a); }
@@ -28927,6 +29194,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorZeroExtendingResizingBF16ToI3
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingBF16ToI64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingBF16ToU16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingBF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u32 halfVectorZeroExtendingResizingBF16ToU32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingBF16ToU32(a); }
@@ -28937,11 +29205,13 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizingBF16ToI64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingBF16ToF32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingBF16ToF64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingBF16ToBF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingBF16ToU16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingBF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingBF16ToI8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingBF16ToI8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingBF16ToI16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingBF16ToI16(a); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingBF16ToF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingBF16ToBF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingBF16ToU8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorZeroExtendingResizingBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingBF16ToI8(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorZeroExtendingResizingBF16ToI8(a); }
@@ -28955,6 +29225,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorZeroExtendingResizingHalfBF16
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingHalfBF16ToI64(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingHalfBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingHalfBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingHalfBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingHalfBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingHalfBF16ToBF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingHalfBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingHalfBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingHalfBF16ToU16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingHalfBF16ToU16(a); }
@@ -28966,10 +29237,12 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizingHalfBF16ToI64(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingHalfBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingHalfBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingHalfBF16ToF64(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingHalfBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingHalfBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingHalfBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingHalfBF16ToU16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingHalfBF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingHalfBF16ToI8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingHalfBF16ToI8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingHalfBF16ToI16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingHalfBF16ToI16(a); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingHalfBF16ToF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingHalfBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_bf16 quarterVectorZeroExtendingResizingHalfBF16ToBF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingHalfBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingHalfBF16ToU8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorZeroExtendingResizingHalfBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingHalfBF16ToI8(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorZeroExtendingResizingHalfBF16ToI8(a); }
@@ -28983,6 +29256,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 vectorZeroExtendingResizingQuarterB
 HWY_INLINE cvectorization_ops_raw_vector_i64 vectorZeroExtendingResizingQuarterBF16ToI64(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingQuarterBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorZeroExtendingResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingQuarterBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 vectorZeroExtendingResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingQuarterBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 vectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingQuarterBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 vectorZeroExtendingResizingQuarterBF16ToBF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::vectorZeroExtendingResizingQuarterBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u8 halfVectorZeroExtendingResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingQuarterBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_u16 halfVectorZeroExtendingResizingQuarterBF16ToU16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingQuarterBF16ToU16(a); }
@@ -28994,11 +29268,13 @@ HWY_INLINE cvectorization_ops_raw_half_vector_i32 halfVectorZeroExtendingResizin
 HWY_INLINE cvectorization_ops_raw_half_vector_i64 halfVectorZeroExtendingResizingQuarterBF16ToI64(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingQuarterBF16ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f32 halfVectorZeroExtendingResizingQuarterBF16ToF32(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingQuarterBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 halfVectorZeroExtendingResizingQuarterBF16ToF64(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingQuarterBF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_half_vector_f16 halfVectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingQuarterBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 halfVectorZeroExtendingResizingQuarterBF16ToBF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::halfVectorZeroExtendingResizingQuarterBF16ToBF16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorZeroExtendingResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingQuarterBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_u16 quarterVectorZeroExtendingResizingQuarterBF16ToU16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingQuarterBF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i8 quarterVectorZeroExtendingResizingQuarterBF16ToI8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingQuarterBF16ToI8(a); }
 HWY_INLINE cvectorization_ops_raw_quarter_vector_i16 quarterVectorZeroExtendingResizingQuarterBF16ToI16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingQuarterBF16ToI16(a); }
+HWY_INLINE cvectorization_ops_raw_quarter_vector_f16 quarterVectorZeroExtendingResizingQuarterBF16ToF16(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::quarterVectorZeroExtendingResizingQuarterBF16ToF16(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_u8 eighthVectorZeroExtendingResizingQuarterBF16ToU8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorZeroExtendingResizingQuarterBF16ToU8(a); }
 HWY_INLINE cvectorization_ops_raw_eighth_vector_i8 eighthVectorZeroExtendingResizingQuarterBF16ToI8(cvectorization_ops_raw_quarter_vector_bf16 a) noexcept { return ::HighwayReference::eighthVectorZeroExtendingResizingQuarterBF16ToI8(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorWideningHalfF16ToF32(cvectorization_ops_raw_half_vector_f16 a) noexcept { return ::HighwayReference::vectorWideningHalfF16ToF32(a); }
