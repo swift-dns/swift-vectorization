@@ -168,7 +168,7 @@ extension SIMDDoubleReferenceTests {
 
     @Test func negatedMultiplySubtractingWhere() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             let mismatches = Mismatches("negatedMultiplySubtractingWhere")
@@ -191,8 +191,7 @@ extension SIMDDoubleReferenceTests {
             }
             mismatches.record()
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 

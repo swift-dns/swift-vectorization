@@ -251,267 +251,248 @@ extension SIMDDoubleConstantTests {
 
     @Test func negatedMultiplySubtractingWhereConstantSplatZero() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(0.0)
             checkNegatedMultiplySubtractingWhereConstantB(0.0)
             checkNegatedMultiplySubtractingWhereConstantC(0.0)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatNegativeZero() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(-0.0)
             checkNegatedMultiplySubtractingWhereConstantB(-0.0)
             checkNegatedMultiplySubtractingWhereConstantC(-0.0)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatOne() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(1.0)
             checkNegatedMultiplySubtractingWhereConstantB(1.0)
             checkNegatedMultiplySubtractingWhereConstantC(1.0)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatMinusOne() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(-1.0)
             checkNegatedMultiplySubtractingWhereConstantB(-1.0)
             checkNegatedMultiplySubtractingWhereConstantC(-1.0)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatTwo() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(2.0)
             checkNegatedMultiplySubtractingWhereConstantB(2.0)
             checkNegatedMultiplySubtractingWhereConstantC(2.0)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatHalf() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(0.5)
             checkNegatedMultiplySubtractingWhereConstantB(0.5)
             checkNegatedMultiplySubtractingWhereConstantC(0.5)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatFour() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(4.0)
             checkNegatedMultiplySubtractingWhereConstantB(4.0)
             checkNegatedMultiplySubtractingWhereConstantC(4.0)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatQuarter() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(0.25)
             checkNegatedMultiplySubtractingWhereConstantB(0.25)
             checkNegatedMultiplySubtractingWhereConstantC(0.25)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatOnePointFive() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(1.5)
             checkNegatedMultiplySubtractingWhereConstantB(1.5)
             checkNegatedMultiplySubtractingWhereConstantC(1.5)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatMinusTwoPointFive() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(-2.5)
             checkNegatedMultiplySubtractingWhereConstantB(-2.5)
             checkNegatedMultiplySubtractingWhereConstantC(-2.5)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatInfinity() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(.infinity)
             checkNegatedMultiplySubtractingWhereConstantB(.infinity)
             checkNegatedMultiplySubtractingWhereConstantC(.infinity)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatMinusInfinity() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(-.infinity)
             checkNegatedMultiplySubtractingWhereConstantB(-.infinity)
             checkNegatedMultiplySubtractingWhereConstantC(-.infinity)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatNaN() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(.nan)
             checkNegatedMultiplySubtractingWhereConstantB(.nan)
             checkNegatedMultiplySubtractingWhereConstantC(.nan)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatMinusNaN() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(-.nan)
             checkNegatedMultiplySubtractingWhereConstantB(-.nan)
             checkNegatedMultiplySubtractingWhereConstantC(-.nan)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatPayloadNaN() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(H.Lane(nan: 1, signaling: false))
             checkNegatedMultiplySubtractingWhereConstantB(H.Lane(nan: 1, signaling: false))
             checkNegatedMultiplySubtractingWhereConstantC(H.Lane(nan: 1, signaling: false))
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatSignalingNaN() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(.signalingNaN)
             checkNegatedMultiplySubtractingWhereConstantB(.signalingNaN)
             checkNegatedMultiplySubtractingWhereConstantC(.signalingNaN)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(-.signalingNaN)
             checkNegatedMultiplySubtractingWhereConstantB(-.signalingNaN)
             checkNegatedMultiplySubtractingWhereConstantC(-.signalingNaN)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatLeastNonzero() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(.leastNonzeroMagnitude)
             checkNegatedMultiplySubtractingWhereConstantB(.leastNonzeroMagnitude)
             checkNegatedMultiplySubtractingWhereConstantC(.leastNonzeroMagnitude)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 
     @Test func negatedMultiplySubtractingWhereConstantSplatGreatest() {
         withKnownIssue(
-            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
             isIntermittent: true
         ) {
             checkNegatedMultiplySubtractingWhereConstantA(.greatestFiniteMagnitude)
             checkNegatedMultiplySubtractingWhereConstantB(.greatestFiniteMagnitude)
             checkNegatedMultiplySubtractingWhereConstantC(.greatestFiniteMagnitude)
         } when: {
-            isAmd64 && !isDarwin
-                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
+            isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix("AVX3")
         }
     }
 

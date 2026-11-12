@@ -2894,6 +2894,7 @@ func x86UnsuffixedBits(_ width: Int) -> String {
 }
 
 let x86CurrentRounding = 4
+let x86FloorRounding = 9
 
 func x86LaneLetter(bits: Int) -> String {
     guard let letter = [8: "b", 16: "w", 32: "d", 64: "q"][bits] else {
@@ -11997,7 +11998,16 @@ enum FloorExponent {
     case sve
 }
 
-func multiplyingByFloorPowerOf2(_ conversion: FloorExponent, for element: Element) -> String {
+enum ExponentIsolation {
+    case operand
+    case raised
+}
+
+func multiplyingByFloorPowerOf2(
+    _ conversion: FloorExponent,
+    isolating: ExponentIsolation? = nil,
+    for element: Element
+) -> String {
     let lanes = element.laneCount
     let exponents = signedElement(of: element).at(width: element.width)
     let (integer, mask) = (exponents.cVector, element.cMask)
@@ -12068,16 +12078,28 @@ func multiplyingByFloorPowerOf2(_ conversion: FloorExponent, for element: Elemen
             let magic = element.bits == 32 ? "12582912.0f" : "6755399441055744.0"
             let magnitudes = splat(magic, as: element.cVector, lanes: lanes)
             let (lowest, highest) = (floating(3 - 3 * bias), floating(3 * bias))
+            func isolation(_ stage: ExponentIsolation, _ name: String, _ source: String) -> String {
+                guard isolating == stage else { return "" }
+                return """
+                    \(element.cVector) \(name) = \(source);
+                    __asm__("" : "+x"(\(name)));
+
+                    """
+            }
+            let operand = isolating == .operand ? "isolated" : "b"
+            let raised = isolating == .raised ? "floored" : "raised"
             exponent = """
-                const \(element.cVector) raised = \(bitSelect("(\(mask))(b > \(lowest))", "b", lowest, of: element));
-                const \(element.cVector) limited = \(bitSelect("(\(mask))(raised < \(highest))", "raised", highest, of: element));
+                \(isolation(.operand, "isolated", "b"))const \(element.cVector) \(raised) = \(bitSelect("(\(mask))(\(operand) > \(lowest))", operand, lowest, of: element));
+                \(isolation(.raised, "raised", "floored"))const \(element.cVector) limited = \(bitSelect("(\(mask))(raised < \(highest))", "raised", highest, of: element));
                 const \(element.cVector) magic = \(magnitudes);
                 const \(element.cVector) shifted = limited + magic;
                 const \(integer) rounded = (\(integer))shifted - (\(integer))magic;
                 const \(integer) exponent = rounded + (\(integer))(shifted - magic > limited);
                 """
         default:
-            let floor = "__builtin_elementwise_floor(b)"
+            let floor =
+                conversion == .vector
+                ? x86Floored(of: "b", for: element) : "__builtin_elementwise_floor(b)"
             let raised = "__builtin_elementwise_max(\(floor), \(floating(3 - 3 * bias)))"
             let bounded = "__builtin_elementwise_min(\(raised), \(floating(3 * bias)))"
             let direct =
@@ -12304,7 +12326,11 @@ func portableApproximateReciprocal(for element: Element) -> String {
         """
 }
 
-func portableApproximateReciprocalSquareRoot(fused: Bool = false, for element: Element) -> String {
+func portableApproximateReciprocalSquareRoot(
+    fused: Bool = false,
+    outlining: Bool = false,
+    for element: Element
+) -> String {
     guard element.bits == 64 else {
         return """
             \(element.cVector) result;
@@ -12322,16 +12348,43 @@ func portableApproximateReciprocalSquareRoot(fused: Bool = false, for element: E
     let magic = splat("0x5FE6EB50C7B537A9", as: unsigned, lanes: element.laneCount)
     let halves = splat("0.5", as: vector, lanes: element.laneCount)
     let threeHalves = splat("1.5", as: vector, lanes: element.laneCount)
-    let correction =
-        fused
-        ? "__builtin_elementwise_fma(-(half * guess), guess, \(threeHalves))"
-        : "\(threeHalves) - half * guess * guess"
+    let fusedCorrection =
+        outlining
+        ? "\(x86NegatedMultiplyAddingName(for: element))(half * guess, guess, \(threeHalves))"
+        : "__builtin_elementwise_fma(-(half * guess), guess, \(threeHalves))"
+    let correction = fused ? fusedCorrection : "\(threeHalves) - half * guess * guess"
     let statements = """
         const \(vector) half = a * \(halves);
         const \(vector) guess = (\(vector))(\(magic) - ((\(unsigned))a >> 1));
         \(vectorResult("guess * (\(correction))", for: element))
         """
     return fused ? statements : withoutContraction(statements)
+}
+
+func x86Floored(of operand: String, for element: Element) -> String {
+    let name = "roundp\(element.bits == 32 ? "s" : "d")\(x86UnsuffixedBits(element.width))"
+    let operands = [
+        (value: operand, type: x86Vector(element.cSuffix)),
+        (value: "\(x86FloorRounding)", type: "int"),
+    ]
+    return x86Builtin(name, operands, returning: element.cVector)
+}
+
+func x86NegatedMultiplyAddingName(for element: Element) -> String {
+    "cvectorization_ops_x86_negated_multiply_adding_\(element.cSuffix)"
+}
+
+func x86NegatedMultiplyAddingHelper(for element: Element) -> String? {
+    guard element.bits == 64 else { return nil }
+    let function = cFunction(
+        returns: element.cRawVector,
+        name: x86NegatedMultiplyAddingName(for: element),
+        parameters: ["a", "b", "c"].map { "\(element.cRawVector) \($0)" },
+        body:
+            "return (\(element.cRawVector))__builtin_elementwise_fma(-(\(element.cVector))a, (\(element.cVector))b, (\(element.cVector))c);",
+        specifiers: "CVECTORIZATION_OPS_FUNCTION"
+    )
+    return "#if !defined(HWY_DISABLE_BMI2_FMA)\n\(function)#endif"
 }
 
 func neonApproximate(_ name: String, for element: Element) -> String {
@@ -13765,12 +13818,16 @@ let basicOps: [Op] = [
                     #if defined(HWY_DISABLE_BMI2_FMA)
                     \(portableApproximateReciprocalSquareRoot(for: element))
                     #else
+                    if (__builtin_constant_p(__builtin_reduce_or(\(unsignedBits("a", of: element))))) {
+                      \(portableApproximateReciprocalSquareRoot(fused: true, outlining: true, for: element))
+                    }
                     \(portableApproximateReciprocalSquareRoot(fused: true, for: element))
                     #endif
                     """
             },
             sse2: { element in x86Approximate("rsqrt", for: element) }
-        )
+        ),
+        helpers: TargetBodies(avx2: { element in x86NegatedMultiplyAddingHelper(for: element) })
     ) { element in
         portableApproximateReciprocalSquareRoot(for: element)
     },
@@ -14077,9 +14134,17 @@ let basicOps: [Op] = [
             avx3: { element in x86MultiplyingByFloorPowerOf2(for: element) },
             avx2: { element in multiplyingByFloorPowerOf2(.vector, for: element) },
             sse4: { element in
-                multiplyingByFloorPowerOf2(element.bits == 64 ? .magic : .vector, for: element)
+                element.bits == 64
+                    ? multiplyingByFloorPowerOf2(.magic, isolating: .raised, for: element)
+                    : multiplyingByFloorPowerOf2(.vector, for: element)
             },
-            sse2: { element in multiplyingByFloorPowerOf2(.magic, for: element) }
+            sse2: { element in
+                multiplyingByFloorPowerOf2(
+                    .magic,
+                    isolating: element.bits == 32 ? .operand : nil,
+                    for: element
+                )
+            }
         )
     ) { element in
         multiplyingByFloorPowerOf2(.emulated, for: element)
@@ -43494,11 +43559,10 @@ let intermittentNaNSignTests: [String: [String]] = [
     "SIMDFloatConstant": multiplySubtractingAddingConstantSplatTests,
 ]
 
-let linuxAvx3DlAndSprMaskedZeroSign = KnownIssue(
+let linuxAvx512MaskedZeroSign = KnownIssue(
     comment:
-        "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
-    condition:
-        "isAmd64 && !isDarwin && (SIMDTarget.targetName == \"AVX3_DL\" || SIMDTarget.targetName == \"AVX3_SPR\")",
+        "Under Linux on the AVX-512 targets in Intel SDE Highway's zero-masked negated multiply-subtract sometimes gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+    condition: "isAmd64 && !isDarwin && SIMDTarget.targetName.hasPrefix(\"AVX3\")",
     isIntermittent: "true"
 )
 
@@ -43597,7 +43661,7 @@ let emu128FoldedConstantTests: [String: [String]] = [
 let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] = [
     (linuxAvx2AndAvx512NaNSign, knownGapTests),
     (linuxAvx2AndAvx512IntermittentNaNSign, intermittentNaNSignTests),
-    (linuxAvx3DlAndSprMaskedZeroSign, maskedZeroSignTests),
+    (linuxAvx512MaskedZeroSign, maskedZeroSignTests),
     (darwinEmu128Folding, emu128FoldedConstantTests),
 ]
 

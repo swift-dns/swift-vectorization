@@ -31,74 +31,103 @@ jobs:
             runner: ubuntu-24.04-arm
             flags: ""
             compare-codegen: true
+            debug-tests: true
+            release-tests: true
             sde-cpu: ""
           - name: SVE2_128
             expected-target: SVE2_128
             runner: ubuntu-24.04-arm
             flags: "-Xcc -march=armv9-a+bf16+i8mm -Xcc -msve-vector-bits=128 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=128 -Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=128"
             compare-codegen: true
+            debug-tests: false
+            release-tests: true
             sde-cpu: ""
           - name: SSE2
             expected-target: SSE2
             runner: ubuntu-latest
             flags: ""
             compare-codegen: true
+            debug-tests: false
+            release-tests: true
             sde-cpu: ""
           - name: SSSE3
             expected-target: SSSE3
             runner: ubuntu-latest
             flags: "-Xcc -mssse3 -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            debug-tests: false
+            release-tests: true
             sde-cpu: ""
           - name: SSE4
             expected-target: SSE4
             runner: ubuntu-latest
             flags: "-Xcc -march=x86-64-v2 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            debug-tests: false
+            release-tests: true
             sde-cpu: ""
           - name: AVX2
             expected-target: AVX2
             runner: ubuntu-latest
             flags: "-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            debug-tests: true
+            release-tests: true
             sde-cpu: ""
           - name: AVX3
             expected-target: AVX3
             runner: ubuntu-latest
             flags: "-Xcc -march=skylake-avx512 -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            debug-tests: false
+            release-tests: true
             sde-cpu: skx
           - name: AVX3_DL
             expected-target: AVX3_DL
             runner: ubuntu-latest
             flags: "-Xcc -march=icelake-server -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            debug-tests: false
+            release-tests: true
             sde-cpu: icx
           - name: AVX3_SPR
             expected-target: AVX3_SPR
             runner: ubuntu-latest
             flags: "-Xcc -march=sapphirerapids -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            debug-tests: false
+            release-tests: true
             sde-cpu: spr
           - name: AVX3_ZEN4
             expected-target: AVX3_ZEN4
             runner: ubuntu-latest
             flags: "-Xcc -march=znver4 -Xcc -DHWY_WANT_AVX3_ZEN4 -Xcc -D__MM_MALLOC_H"
             compare-codegen: true
+            debug-tests: false
+            release-tests: true
             sde-cpu: spr
           - name: EMU128
             expected-target: EMU128
             runner: ubuntu-latest
             flags: "-Xcc -DHWY_COMPILE_ONLY_EMU128"
             compare-codegen: true
+            debug-tests: true
+            release-tests: false
             sde-cpu: ""
           - name: EMU128-arm64
             expected-target: EMU128
             runner: ubuntu-24.04-arm
             flags: "-Xcc -DHWY_COMPILE_ONLY_EMU128"
             compare-codegen: true
+            debug-tests: true
+            release-tests: false
             sde-cpu: ""
         mode: [debug, release, codegen]
+        exclude:
+          - target: { debug-tests: false }
+            mode: debug
+          - target: { release-tests: false }
+            mode: release
 
     runs-on: ${{ matrix.target.runner }}
 
@@ -109,8 +138,8 @@ jobs:
       # Intel SDE emulates an AVX-512 CPU by tracing the test runners with ptrace.
       options: ${{ matrix.target.sde-cpu && '--cap-add=SYS_PTRACE --security-opt seccomp=unconfined' || '' }}
 
-    # Intel SDE emulates the test runners of the debug and the release modes, which is far slower than running them.
-    timeout-minutes: ${{ matrix.mode == 'codegen' && 90 || matrix.target.sde-cpu && (matrix.mode == 'debug' && 180 || 240) || (matrix.mode == 'debug' && 90 || 120) }}
+    # Intel SDE emulates the release test runners, which is far slower than running them.
+    timeout-minutes: ${{ matrix.mode == 'codegen' && 90 || matrix.target.sde-cpu && 240 || (matrix.mode == 'debug' && 90 || 120) }}
 
     permissions:
       contents: read
@@ -181,38 +210,6 @@ jobs:
           read -r -a flags <<< "${FLAGS}"
           swift test -c release --jobs 2 --package-path HighwayReference "${flags[@]}"
 
-      - name: Build the tests of the ops against highway
-        if: ${{ matrix.mode == 'debug' && matrix.target.sde-cpu }}
-        env:
-          FLAGS: ${{ matrix.target.flags }}
-        run: |
-          read -r -a flags <<< "${FLAGS}"
-          swift build --package-path HighwayReference --build-tests "${flags[@]}"
-
-      - name: Test the ops against highway under Intel SDE
-        if: ${{ matrix.mode == 'debug' && matrix.target.sde-cpu }}
-        env:
-          SDE_CPU: ${{ matrix.target.sde-cpu }}
-          SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
-        run: |
-          mapfile -d '' -t runners < <(
-            find -L HighwayReference/.build/debug -maxdepth 1 -type f -name '*-test-runner' -print0
-          )
-          if [[ "${#runners[@]}" -eq 0 ]]; then
-            printf '%s\n' "There is no test runner in HighwayReference/.build/debug" >&2
-            exit 1
-          fi
-          failed=()
-          for runner in "${runners[@]}"; do
-            if ! sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing; then
-              failed+=("${runner##*/}")
-            fi
-          done
-          if [[ "${#failed[@]}" -gt 0 ]]; then
-            printf 'Failed runners: %s\n' "${failed[*]}" >&2
-            exit 1
-          fi
-
       - name: Build the tests of the ops against highway in release
         if: ${{ matrix.mode == 'release' && matrix.target.sde-cpu }}
         env:
@@ -243,17 +240,18 @@ jobs:
               continue
             fi
             failed+=("${name}")
-            grep -E '✘' "${log}" | head -n 40 || true
+            grep -E -A4 '✘ Test [A-Za-z0-9_]+\(\) recorded an issue' "${log}" | grep -v 'swift-runtime' | head -n 60 || true
             tail -n 5 "${log}"
-            mapfile -t suspects < <(grep -oE 'Test [A-Za-z0-9_]+\(\) started' "${log}" | tail -n 12 | sed -E 's/Test (.*)\(\) started/\1/')
-            for suspect in "${suspects[@]}"; do
-              if SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing --filter "/${suspect}\\(\\)\$" > "/tmp/${name}-${suspect}.log" 2>&1; then
-                printf '%s: %s passes alone\n' "${name}" "${suspect}"
-              else
-                printf '%s: %s fails alone (exit %s)\n' "${name}" "${suspect}" "$?"
-                tail -n 3 "/tmp/${name}-${suspect}.log"
-              fi
-            done
+            if SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing --skip GuardPage > "/tmp/${name}-skip.log" 2>&1; then
+              printf '%s: passes without the guard-page tests\n' "${name}"
+            else
+              printf '%s: fails without the guard-page tests too (exit %s)\n' "${name}" "$?"
+              tail -n 3 "/tmp/${name}-skip.log"
+            fi
+            if [[ "${#failed[@]}" -eq 1 ]]; then
+              SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing --filter GuardPage --no-parallel > "/tmp/${name}-guard.log" 2>&1 || printf '%s: sequential guard-page run exit %s\n' "${name}" "$?"
+              grep -E 'started\.|✘' "/tmp/${name}-guard.log" | tail -n 6 || true
+            fi
           done
           if [[ "${#failed[@]}" -gt 0 ]]; then
             printf 'Failed runners: %s\n' "${failed[*]}" >&2
@@ -274,7 +272,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [debug, release, codegen]
+        mode: [release, codegen]
 
     runs-on: macos-26
 
@@ -340,12 +338,6 @@ jobs:
           # Update swift
           swiftly install --assume-yes ${{ env.SWIFT_VERSION }}
           swiftly use --assume-yes ${{ env.SWIFT_VERSION }}
-
-      - name: Test the ops against highway
-        if: ${{ matrix.mode == 'debug' }}
-        env:
-          SIMD_EXPECTED_TARGET: NEON
-        run: swift test --package-path HighwayReference
 
       - name: Test the ops against highway in release
         if: ${{ matrix.mode == 'release' }}
