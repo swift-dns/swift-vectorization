@@ -23486,19 +23486,10 @@ func slideBlocksCases(
 }
 
 func portableSlideBlocks(_ direction: SlideDirection, for element: Element) -> String {
-    let (condition, source) =
-        switch direction {
-        case .up:
-            ("i >= blocks * \(element.blockLaneCount)", "i - blocks * \(element.blockLaneCount)")
-        case .down:
-            (
-                "i + blocks * \(element.blockLaneCount) < \(element.laneCount)",
-                "i + blocks * \(element.blockLaneCount)"
-            )
-        }
+    let lanes = cFunctionName(direction == .up ? "slideUpLanes" : "slideDownLanes", element)
     return """
         \(constantSwitch(on: "blocks", slideBlocksCases(direction, for: element)))
-        \(laneLoop("i", "result[i] = \(condition) ? a[\(source)] : (\(element.cType))0;", for: element))
+        return \(lanes)(rawA, (size_t)blocks * \(element.blockLaneCount));
         """
 }
 

@@ -13276,12 +13276,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sl
       case 3: return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector((cvectorization_ops_vector_u8){0}, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79));
     }
   }
-  cvectorization_ops_vector_u8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    result[i] = i >= blocks * 16 ? a[i - blocks * 16] : (uint8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u8)(result);
+  return cvectorization_ops_slide_up_lanes_u8(rawA, (size_t)blocks * 16);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -13289,24 +13284,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sl
       case 1: return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector((cvectorization_ops_vector_u8){0}, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47));
     }
   }
-  cvectorization_ops_vector_u8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    result[i] = i >= blocks * 16 ? a[i - blocks * 16] : (uint8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u8)(result);
+  return cvectorization_ops_slide_up_lanes_u8(rawA, (size_t)blocks * 16);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_u8)(a);
     }
   }
-  cvectorization_ops_vector_u8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i >= blocks * 16 ? a[i - blocks * 16] : (uint8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u8)(result);
+  return cvectorization_ops_slide_up_lanes_u8(rawA, (size_t)blocks * 16);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_slide_down_blocks_u8(cvectorization_ops_raw_vector_u8 rawA, int blocks) {
@@ -13320,12 +13305,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sl
       case 3: return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(a, (cvectorization_ops_vector_u8){0}, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111));
     }
   }
-  cvectorization_ops_vector_u8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    result[i] = i + blocks * 16 < 64 ? a[i + blocks * 16] : (uint8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u8)(result);
+  return cvectorization_ops_slide_down_lanes_u8(rawA, (size_t)blocks * 16);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -13333,24 +13313,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sl
       case 1: return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(a, (cvectorization_ops_vector_u8){0}, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47));
     }
   }
-  cvectorization_ops_vector_u8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    result[i] = i + blocks * 16 < 32 ? a[i + blocks * 16] : (uint8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u8)(result);
+  return cvectorization_ops_slide_down_lanes_u8(rawA, (size_t)blocks * 16);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_u8)(a);
     }
   }
-  cvectorization_ops_vector_u8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i + blocks * 16 < 16 ? a[i + blocks * 16] : (uint8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u8)(result);
+  return cvectorization_ops_slide_down_lanes_u8(rawA, (size_t)blocks * 16);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_combined_slide_down_lanes_u8(cvectorization_ops_raw_vector_u8 rawA, cvectorization_ops_raw_vector_u8 rawB, int lanes) {
@@ -24198,12 +24168,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector((cvectorization_ops_vector_u16){0}, a, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39));
     }
   }
-  cvectorization_ops_vector_u16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    result[i] = i >= blocks * 8 ? a[i - blocks * 8] : (uint16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u16)(result);
+  return cvectorization_ops_slide_up_lanes_u16(rawA, (size_t)blocks * 8);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -24211,24 +24176,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector((cvectorization_ops_vector_u16){0}, a, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23));
     }
   }
-  cvectorization_ops_vector_u16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i >= blocks * 8 ? a[i - blocks * 8] : (uint16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u16)(result);
+  return cvectorization_ops_slide_up_lanes_u16(rawA, (size_t)blocks * 8);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_u16)(a);
     }
   }
-  cvectorization_ops_vector_u16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i >= blocks * 8 ? a[i - blocks * 8] : (uint16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u16)(result);
+  return cvectorization_ops_slide_up_lanes_u16(rawA, (size_t)blocks * 8);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_slide_down_blocks_u16(cvectorization_ops_raw_vector_u16 rawA, int blocks) {
@@ -24242,12 +24197,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(a, (cvectorization_ops_vector_u16){0}, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55));
     }
   }
-  cvectorization_ops_vector_u16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    result[i] = i + blocks * 8 < 32 ? a[i + blocks * 8] : (uint16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u16)(result);
+  return cvectorization_ops_slide_down_lanes_u16(rawA, (size_t)blocks * 8);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -24255,24 +24205,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(a, (cvectorization_ops_vector_u16){0}, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23));
     }
   }
-  cvectorization_ops_vector_u16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i + blocks * 8 < 16 ? a[i + blocks * 8] : (uint16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u16)(result);
+  return cvectorization_ops_slide_down_lanes_u16(rawA, (size_t)blocks * 8);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_u16)(a);
     }
   }
-  cvectorization_ops_vector_u16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i + blocks * 8 < 8 ? a[i + blocks * 8] : (uint16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u16)(result);
+  return cvectorization_ops_slide_down_lanes_u16(rawA, (size_t)blocks * 8);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_combined_slide_down_lanes_u16(cvectorization_ops_raw_vector_u16 rawA, cvectorization_ops_raw_vector_u16 rawB, int lanes) {
@@ -33262,12 +33202,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector((cvectorization_ops_vector_u32){0}, a, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19));
     }
   }
-  cvectorization_ops_vector_u32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (uint32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u32)(result);
+  return cvectorization_ops_slide_up_lanes_u32(rawA, (size_t)blocks * 4);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -33275,24 +33210,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector((cvectorization_ops_vector_u32){0}, a, 4, 5, 6, 7, 8, 9, 10, 11));
     }
   }
-  cvectorization_ops_vector_u32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (uint32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u32)(result);
+  return cvectorization_ops_slide_up_lanes_u32(rawA, (size_t)blocks * 4);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_u32)(a);
     }
   }
-  cvectorization_ops_vector_u32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (uint32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u32)(result);
+  return cvectorization_ops_slide_up_lanes_u32(rawA, (size_t)blocks * 4);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_slide_down_blocks_u32(cvectorization_ops_raw_vector_u32 rawA, int blocks) {
@@ -33306,12 +33231,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(a, (cvectorization_ops_vector_u32){0}, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27));
     }
   }
-  cvectorization_ops_vector_u32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i + blocks * 4 < 16 ? a[i + blocks * 4] : (uint32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u32)(result);
+  return cvectorization_ops_slide_down_lanes_u32(rawA, (size_t)blocks * 4);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -33319,24 +33239,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(a, (cvectorization_ops_vector_u32){0}, 4, 5, 6, 7, 8, 9, 10, 11));
     }
   }
-  cvectorization_ops_vector_u32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i + blocks * 4 < 8 ? a[i + blocks * 4] : (uint32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u32)(result);
+  return cvectorization_ops_slide_down_lanes_u32(rawA, (size_t)blocks * 4);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_u32)(a);
     }
   }
-  cvectorization_ops_vector_u32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i + blocks * 4 < 4 ? a[i + blocks * 4] : (uint32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u32)(result);
+  return cvectorization_ops_slide_down_lanes_u32(rawA, (size_t)blocks * 4);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_combined_slide_down_lanes_u32(cvectorization_ops_raw_vector_u32 rawA, cvectorization_ops_raw_vector_u32 rawB, int lanes) {
@@ -43377,12 +43287,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector((cvectorization_ops_vector_u64){0}, a, 2, 3, 4, 5, 6, 7, 8, 9));
     }
   }
-  cvectorization_ops_vector_u64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (uint64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  return cvectorization_ops_slide_up_lanes_u64(rawA, (size_t)blocks * 2);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -43390,24 +43295,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector((cvectorization_ops_vector_u64){0}, a, 2, 3, 4, 5));
     }
   }
-  cvectorization_ops_vector_u64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (uint64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  return cvectorization_ops_slide_up_lanes_u64(rawA, (size_t)blocks * 2);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_u64)(a);
     }
   }
-  cvectorization_ops_vector_u64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 2; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (uint64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  return cvectorization_ops_slide_up_lanes_u64(rawA, (size_t)blocks * 2);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_slide_down_blocks_u64(cvectorization_ops_raw_vector_u64 rawA, int blocks) {
@@ -43421,12 +43316,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(a, (cvectorization_ops_vector_u64){0}, 6, 7, 8, 9, 10, 11, 12, 13));
     }
   }
-  cvectorization_ops_vector_u64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i + blocks * 2 < 8 ? a[i + blocks * 2] : (uint64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  return cvectorization_ops_slide_down_lanes_u64(rawA, (size_t)blocks * 2);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -43434,24 +43324,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(a, (cvectorization_ops_vector_u64){0}, 2, 3, 4, 5));
     }
   }
-  cvectorization_ops_vector_u64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i + blocks * 2 < 4 ? a[i + blocks * 2] : (uint64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  return cvectorization_ops_slide_down_lanes_u64(rawA, (size_t)blocks * 2);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_u64)(a);
     }
   }
-  cvectorization_ops_vector_u64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 2; ++i) {
-    result[i] = i + blocks * 2 < 2 ? a[i + blocks * 2] : (uint64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  return cvectorization_ops_slide_down_lanes_u64(rawA, (size_t)blocks * 2);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_combined_slide_down_lanes_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB, int lanes) {
@@ -56219,12 +56099,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sl
       case 3: return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector((cvectorization_ops_vector_i8){0}, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79));
     }
   }
-  cvectorization_ops_vector_i8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    result[i] = i >= blocks * 16 ? a[i - blocks * 16] : (int8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i8)(result);
+  return cvectorization_ops_slide_up_lanes_i8(rawA, (size_t)blocks * 16);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -56232,24 +56107,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sl
       case 1: return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector((cvectorization_ops_vector_i8){0}, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47));
     }
   }
-  cvectorization_ops_vector_i8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    result[i] = i >= blocks * 16 ? a[i - blocks * 16] : (int8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i8)(result);
+  return cvectorization_ops_slide_up_lanes_i8(rawA, (size_t)blocks * 16);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_i8)(a);
     }
   }
-  cvectorization_ops_vector_i8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i >= blocks * 16 ? a[i - blocks * 16] : (int8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i8)(result);
+  return cvectorization_ops_slide_up_lanes_i8(rawA, (size_t)blocks * 16);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_slide_down_blocks_i8(cvectorization_ops_raw_vector_i8 rawA, int blocks) {
@@ -56263,12 +56128,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sl
       case 3: return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(a, (cvectorization_ops_vector_i8){0}, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111));
     }
   }
-  cvectorization_ops_vector_i8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    result[i] = i + blocks * 16 < 64 ? a[i + blocks * 16] : (int8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i8)(result);
+  return cvectorization_ops_slide_down_lanes_i8(rawA, (size_t)blocks * 16);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -56276,24 +56136,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sl
       case 1: return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(a, (cvectorization_ops_vector_i8){0}, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47));
     }
   }
-  cvectorization_ops_vector_i8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    result[i] = i + blocks * 16 < 32 ? a[i + blocks * 16] : (int8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i8)(result);
+  return cvectorization_ops_slide_down_lanes_i8(rawA, (size_t)blocks * 16);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_i8)(a);
     }
   }
-  cvectorization_ops_vector_i8 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i + blocks * 16 < 16 ? a[i + blocks * 16] : (int8_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i8)(result);
+  return cvectorization_ops_slide_down_lanes_i8(rawA, (size_t)blocks * 16);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_combined_slide_down_lanes_i8(cvectorization_ops_raw_vector_i8 rawA, cvectorization_ops_raw_vector_i8 rawB, int lanes) {
@@ -67300,12 +67150,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector((cvectorization_ops_vector_i16){0}, a, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39));
     }
   }
-  cvectorization_ops_vector_i16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    result[i] = i >= blocks * 8 ? a[i - blocks * 8] : (int16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i16)(result);
+  return cvectorization_ops_slide_up_lanes_i16(rawA, (size_t)blocks * 8);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -67313,24 +67158,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector((cvectorization_ops_vector_i16){0}, a, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23));
     }
   }
-  cvectorization_ops_vector_i16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i >= blocks * 8 ? a[i - blocks * 8] : (int16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i16)(result);
+  return cvectorization_ops_slide_up_lanes_i16(rawA, (size_t)blocks * 8);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_i16)(a);
     }
   }
-  cvectorization_ops_vector_i16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i >= blocks * 8 ? a[i - blocks * 8] : (int16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i16)(result);
+  return cvectorization_ops_slide_up_lanes_i16(rawA, (size_t)blocks * 8);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_slide_down_blocks_i16(cvectorization_ops_raw_vector_i16 rawA, int blocks) {
@@ -67344,12 +67179,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(a, (cvectorization_ops_vector_i16){0}, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55));
     }
   }
-  cvectorization_ops_vector_i16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    result[i] = i + blocks * 8 < 32 ? a[i + blocks * 8] : (int16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i16)(result);
+  return cvectorization_ops_slide_down_lanes_i16(rawA, (size_t)blocks * 8);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -67357,24 +67187,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(a, (cvectorization_ops_vector_i16){0}, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23));
     }
   }
-  cvectorization_ops_vector_i16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i + blocks * 8 < 16 ? a[i + blocks * 8] : (int16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i16)(result);
+  return cvectorization_ops_slide_down_lanes_i16(rawA, (size_t)blocks * 8);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_i16)(a);
     }
   }
-  cvectorization_ops_vector_i16 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i + blocks * 8 < 8 ? a[i + blocks * 8] : (int16_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i16)(result);
+  return cvectorization_ops_slide_down_lanes_i16(rawA, (size_t)blocks * 8);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_combined_slide_down_lanes_i16(cvectorization_ops_raw_vector_i16 rawA, cvectorization_ops_raw_vector_i16 rawB, int lanes) {
@@ -76588,12 +76408,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector((cvectorization_ops_vector_i32){0}, a, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19));
     }
   }
-  cvectorization_ops_vector_i32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (int32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i32)(result);
+  return cvectorization_ops_slide_up_lanes_i32(rawA, (size_t)blocks * 4);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -76601,24 +76416,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector((cvectorization_ops_vector_i32){0}, a, 4, 5, 6, 7, 8, 9, 10, 11));
     }
   }
-  cvectorization_ops_vector_i32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (int32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i32)(result);
+  return cvectorization_ops_slide_up_lanes_i32(rawA, (size_t)blocks * 4);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_i32)(a);
     }
   }
-  cvectorization_ops_vector_i32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (int32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i32)(result);
+  return cvectorization_ops_slide_up_lanes_i32(rawA, (size_t)blocks * 4);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_slide_down_blocks_i32(cvectorization_ops_raw_vector_i32 rawA, int blocks) {
@@ -76632,12 +76437,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(a, (cvectorization_ops_vector_i32){0}, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27));
     }
   }
-  cvectorization_ops_vector_i32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i + blocks * 4 < 16 ? a[i + blocks * 4] : (int32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i32)(result);
+  return cvectorization_ops_slide_down_lanes_i32(rawA, (size_t)blocks * 4);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -76645,24 +76445,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(a, (cvectorization_ops_vector_i32){0}, 4, 5, 6, 7, 8, 9, 10, 11));
     }
   }
-  cvectorization_ops_vector_i32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i + blocks * 4 < 8 ? a[i + blocks * 4] : (int32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i32)(result);
+  return cvectorization_ops_slide_down_lanes_i32(rawA, (size_t)blocks * 4);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_i32)(a);
     }
   }
-  cvectorization_ops_vector_i32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i + blocks * 4 < 4 ? a[i + blocks * 4] : (int32_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i32)(result);
+  return cvectorization_ops_slide_down_lanes_i32(rawA, (size_t)blocks * 4);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_combined_slide_down_lanes_i32(cvectorization_ops_raw_vector_i32 rawA, cvectorization_ops_raw_vector_i32 rawB, int lanes) {
@@ -86255,12 +86045,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector((cvectorization_ops_vector_i64){0}, a, 2, 3, 4, 5, 6, 7, 8, 9));
     }
   }
-  cvectorization_ops_vector_i64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (int64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  return cvectorization_ops_slide_up_lanes_i64(rawA, (size_t)blocks * 2);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -86268,24 +86053,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector((cvectorization_ops_vector_i64){0}, a, 2, 3, 4, 5));
     }
   }
-  cvectorization_ops_vector_i64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (int64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  return cvectorization_ops_slide_up_lanes_i64(rawA, (size_t)blocks * 2);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_i64)(a);
     }
   }
-  cvectorization_ops_vector_i64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 2; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (int64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  return cvectorization_ops_slide_up_lanes_i64(rawA, (size_t)blocks * 2);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_slide_down_blocks_i64(cvectorization_ops_raw_vector_i64 rawA, int blocks) {
@@ -86299,12 +86074,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(a, (cvectorization_ops_vector_i64){0}, 6, 7, 8, 9, 10, 11, 12, 13));
     }
   }
-  cvectorization_ops_vector_i64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i + blocks * 2 < 8 ? a[i + blocks * 2] : (int64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  return cvectorization_ops_slide_down_lanes_i64(rawA, (size_t)blocks * 2);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -86312,24 +86082,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(a, (cvectorization_ops_vector_i64){0}, 2, 3, 4, 5));
     }
   }
-  cvectorization_ops_vector_i64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i + blocks * 2 < 4 ? a[i + blocks * 2] : (int64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  return cvectorization_ops_slide_down_lanes_i64(rawA, (size_t)blocks * 2);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_i64)(a);
     }
   }
-  cvectorization_ops_vector_i64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 2; ++i) {
-    result[i] = i + blocks * 2 < 2 ? a[i + blocks * 2] : (int64_t)0;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  return cvectorization_ops_slide_down_lanes_i64(rawA, (size_t)blocks * 2);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_combined_slide_down_lanes_i64(cvectorization_ops_raw_vector_i64 rawA, cvectorization_ops_raw_vector_i64 rawB, int lanes) {
@@ -95187,12 +94947,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector((cvectorization_ops_vector_f32){0}, a, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19));
     }
   }
-  cvectorization_ops_vector_f32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (float)0;
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return cvectorization_ops_slide_up_lanes_f32(rawA, (size_t)blocks * 4);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -95200,24 +94955,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector((cvectorization_ops_vector_f32){0}, a, 4, 5, 6, 7, 8, 9, 10, 11));
     }
   }
-  cvectorization_ops_vector_f32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (float)0;
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return cvectorization_ops_slide_up_lanes_f32(rawA, (size_t)blocks * 4);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_f32)(a);
     }
   }
-  cvectorization_ops_vector_f32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i >= blocks * 4 ? a[i - blocks * 4] : (float)0;
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return cvectorization_ops_slide_up_lanes_f32(rawA, (size_t)blocks * 4);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_slide_down_blocks_f32(cvectorization_ops_raw_vector_f32 rawA, int blocks) {
@@ -95231,12 +94976,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, (cvectorization_ops_vector_f32){0}, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27));
     }
   }
-  cvectorization_ops_vector_f32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    result[i] = i + blocks * 4 < 16 ? a[i + blocks * 4] : (float)0;
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return cvectorization_ops_slide_down_lanes_f32(rawA, (size_t)blocks * 4);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -95244,24 +94984,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, (cvectorization_ops_vector_f32){0}, 4, 5, 6, 7, 8, 9, 10, 11));
     }
   }
-  cvectorization_ops_vector_f32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i + blocks * 4 < 8 ? a[i + blocks * 4] : (float)0;
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return cvectorization_ops_slide_down_lanes_f32(rawA, (size_t)blocks * 4);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_f32)(a);
     }
   }
-  cvectorization_ops_vector_f32 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i + blocks * 4 < 4 ? a[i + blocks * 4] : (float)0;
-  }
-  return (cvectorization_ops_raw_vector_f32)(result);
+  return cvectorization_ops_slide_down_lanes_f32(rawA, (size_t)blocks * 4);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_combined_slide_down_lanes_f32(cvectorization_ops_raw_vector_f32 rawA, cvectorization_ops_raw_vector_f32 rawB, int lanes) {
@@ -103723,12 +103453,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector((cvectorization_ops_vector_f64){0}, a, 2, 3, 4, 5, 6, 7, 8, 9));
     }
   }
-  cvectorization_ops_vector_f64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (double)0;
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return cvectorization_ops_slide_up_lanes_f64(rawA, (size_t)blocks * 2);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -103736,24 +103461,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector((cvectorization_ops_vector_f64){0}, a, 2, 3, 4, 5));
     }
   }
-  cvectorization_ops_vector_f64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (double)0;
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return cvectorization_ops_slide_up_lanes_f64(rawA, (size_t)blocks * 2);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_f64)(a);
     }
   }
-  cvectorization_ops_vector_f64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 2; ++i) {
-    result[i] = i >= blocks * 2 ? a[i - blocks * 2] : (double)0;
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return cvectorization_ops_slide_up_lanes_f64(rawA, (size_t)blocks * 2);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_slide_down_blocks_f64(cvectorization_ops_raw_vector_f64 rawA, int blocks) {
@@ -103767,12 +103482,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
       case 3: return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, (cvectorization_ops_vector_f64){0}, 6, 7, 8, 9, 10, 11, 12, 13));
     }
   }
-  cvectorization_ops_vector_f64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    result[i] = i + blocks * 2 < 8 ? a[i + blocks * 2] : (double)0;
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return cvectorization_ops_slide_down_lanes_f64(rawA, (size_t)blocks * 2);
 #elif CVECTORIZATION_OPS_X86 == 4
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
@@ -103780,24 +103490,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
       case 1: return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, (cvectorization_ops_vector_f64){0}, 2, 3, 4, 5));
     }
   }
-  cvectorization_ops_vector_f64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 4; ++i) {
-    result[i] = i + blocks * 2 < 4 ? a[i + blocks * 2] : (double)0;
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return cvectorization_ops_slide_down_lanes_f64(rawA, (size_t)blocks * 2);
 #else
   if (__builtin_constant_p(blocks)) {
     switch (blocks) {
       case 0: return (cvectorization_ops_raw_vector_f64)(a);
     }
   }
-  cvectorization_ops_vector_f64 result;
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 2; ++i) {
-    result[i] = i + blocks * 2 < 2 ? a[i + blocks * 2] : (double)0;
-  }
-  return (cvectorization_ops_raw_vector_f64)(result);
+  return cvectorization_ops_slide_down_lanes_f64(rawA, (size_t)blocks * 2);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_combined_slide_down_lanes_f64(cvectorization_ops_raw_vector_f64 rawA, cvectorization_ops_raw_vector_f64 rawB, int lanes) {
