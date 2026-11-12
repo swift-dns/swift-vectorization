@@ -179,7 +179,7 @@ jobs:
           SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
         run: |
           read -r -a flags <<< "${FLAGS}"
-          swift test -c release --package-path HighwayReference "${flags[@]}"
+          swift test -c release --jobs 2 --package-path HighwayReference "${flags[@]}"
 
       - name: Build the tests of the ops against highway
         if: ${{ matrix.mode == 'debug' && matrix.target.sde-cpu }}
@@ -202,9 +202,16 @@ jobs:
             printf '%s\n' "There is no test runner in HighwayReference/.build/debug" >&2
             exit 1
           fi
+          failed=()
           for runner in "${runners[@]}"; do
-            sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing
+            if ! sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing; then
+              failed+=("${runner##*/}")
+            fi
           done
+          if [[ "${#failed[@]}" -gt 0 ]]; then
+            printf 'Failed runners: %s\n' "${failed[*]}" >&2
+            exit 1
+          fi
 
       - name: Build the tests of the ops against highway in release
         if: ${{ matrix.mode == 'release' && matrix.target.sde-cpu }}
@@ -212,7 +219,7 @@ jobs:
           FLAGS: ${{ matrix.target.flags }}
         run: |
           read -r -a flags <<< "${FLAGS}"
-          swift build -c release --package-path HighwayReference --build-tests "${flags[@]}"
+          swift build -c release --jobs 2 --package-path HighwayReference --build-tests "${flags[@]}"
 
       - name: Test the ops against highway in release under Intel SDE
         if: ${{ matrix.mode == 'release' && matrix.target.sde-cpu }}
@@ -227,9 +234,31 @@ jobs:
             printf '%s\n' "There is no test runner in HighwayReference/.build/release" >&2
             exit 1
           fi
+          failed=()
           for runner in "${runners[@]}"; do
-            sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing
+            name="${runner##*/}"
+            log="/tmp/${name}.log"
+            if SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing > "${log}" 2>&1; then
+              tail -n 1 "${log}"
+              continue
+            fi
+            failed+=("${name}")
+            grep -E '✘' "${log}" | head -n 40 || true
+            tail -n 5 "${log}"
+            mapfile -t suspects < <(grep -oE 'Test [A-Za-z0-9_]+\(\) started' "${log}" | tail -n 12 | sed -E 's/Test (.*)\(\) started/\1/')
+            for suspect in "${suspects[@]}"; do
+              if SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing --filter "/${suspect}\\(\\)\$" > "/tmp/${name}-${suspect}.log" 2>&1; then
+                printf '%s: %s passes alone\n' "${name}" "${suspect}"
+              else
+                printf '%s: %s fails alone (exit %s)\n' "${name}" "${suspect}" "$?"
+                tail -n 3 "/tmp/${name}-${suspect}.log"
+              fi
+            done
           done
+          if [[ "${#failed[@]}" -gt 0 ]]; then
+            printf 'Failed runners: %s\n' "${failed[*]}" >&2
+            exit 1
+          fi
 
       - name: Compare the codegen of the ops with highway's
         if: ${{ matrix.mode == 'codegen' && matrix.target.compare-codegen }}

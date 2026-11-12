@@ -43494,6 +43494,45 @@ let intermittentNaNSignTests: [String: [String]] = [
     "SIMDFloatConstant": multiplySubtractingAddingConstantSplatTests,
 ]
 
+let linuxAvx3DlAndSprMaskedZeroSign = KnownIssue(
+    comment:
+        "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+    condition:
+        "isAmd64 && !isDarwin && (SIMDTarget.targetName == \"AVX3_DL\" || SIMDTarget.targetName == \"AVX3_SPR\")",
+    isIntermittent: "true"
+)
+
+let negatedMultiplySubtractingWhereConstantSplatTests = [
+    "negatedMultiplySubtractingWhereConstantSplatFour",
+    "negatedMultiplySubtractingWhereConstantSplatGreatest",
+    "negatedMultiplySubtractingWhereConstantSplatHalf",
+    "negatedMultiplySubtractingWhereConstantSplatInfinity",
+    "negatedMultiplySubtractingWhereConstantSplatLeastNonzero",
+    "negatedMultiplySubtractingWhereConstantSplatMinusInfinity",
+    "negatedMultiplySubtractingWhereConstantSplatMinusNaN",
+    "negatedMultiplySubtractingWhereConstantSplatMinusOne",
+    "negatedMultiplySubtractingWhereConstantSplatMinusSignalingNaN",
+    "negatedMultiplySubtractingWhereConstantSplatMinusTwoPointFive",
+    "negatedMultiplySubtractingWhereConstantSplatNaN",
+    "negatedMultiplySubtractingWhereConstantSplatNegativeZero",
+    "negatedMultiplySubtractingWhereConstantSplatOne",
+    "negatedMultiplySubtractingWhereConstantSplatOnePointFive",
+    "negatedMultiplySubtractingWhereConstantSplatPayloadNaN",
+    "negatedMultiplySubtractingWhereConstantSplatQuarter",
+    "negatedMultiplySubtractingWhereConstantSplatSignalingNaN",
+    "negatedMultiplySubtractingWhereConstantSplatTwo",
+    "negatedMultiplySubtractingWhereConstantSplatZero",
+]
+
+let maskedZeroSignTests: [String: [String]] = [
+    "SIMDDoubleCodegen": ["negatedMultiplySubtractingWhereConstantC"],
+    "SIMDDoubleConstant": negatedMultiplySubtractingWhereConstantSplatTests,
+    "SIMDDoubleReference": ["negatedMultiplySubtractingWhere"],
+    "SIMDFloatCodegen": ["negatedMultiplySubtractingWhereConstantC"],
+    "SIMDFloatConstant": negatedMultiplySubtractingWhereConstantSplatTests,
+    "SIMDFloatReference": ["negatedMultiplySubtractingWhere"],
+]
+
 let darwinEmu128Folding = KnownIssue(
     comment:
         "Highway's emulated Set is opaque to the optimizer on Darwin, so Highway computes a constant operand at run time where the port folds it, which differs in the sign and payload of a NaN and in the sign of a zero that a minimum, a maximum or a clamp picks",
@@ -43558,6 +43597,7 @@ let emu128FoldedConstantTests: [String: [String]] = [
 let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] = [
     (linuxAvx2AndAvx512NaNSign, knownGapTests),
     (linuxAvx2AndAvx512IntermittentNaNSign, intermittentNaNSignTests),
+    (linuxAvx3DlAndSprMaskedZeroSign, maskedZeroSignTests),
     (darwinEmu128Folding, emu128FoldedConstantTests),
 ]
 

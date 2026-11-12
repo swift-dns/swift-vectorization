@@ -167,25 +167,33 @@ extension SIMDFloatReferenceTests {
     }
 
     @Test func negatedMultiplySubtractingWhere() {
-        let mismatches = Mismatches("negatedMultiplySubtractingWhere")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8C2F_6C0A_EFB5_1C0D)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8C2F_6B0A_EFB5_1A5A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8C2F_6A0A_EFB5_18A7)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8C2F_690A_EFB5_16F4)
-        for (mask, a, b, c) in mixedQuadruples(
-            maskInputs,
-            aInputs,
-            bInputs,
-            cInputs,
-            seed: 0x2723_ED71_3C81_DF5F
-        ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
-            mismatches.check(
-                H.negatedMultiplySubtracting(a, b, c, where: mask),
-                HighwayReference.negatedMultiplySubtractingWhereF32(mask.raw, a, b, c),
-                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
-            )
+        withKnownIssue(
+            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            let mismatches = Mismatches("negatedMultiplySubtractingWhere")
+            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8C2F_6C0A_EFB5_1C0D)
+            let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8C2F_6B0A_EFB5_1A5A)
+            let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8C2F_6A0A_EFB5_18A7)
+            let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8C2F_690A_EFB5_16F4)
+            for (mask, a, b, c) in mixedQuadruples(
+                maskInputs,
+                aInputs,
+                bInputs,
+                cInputs,
+                seed: 0x2723_ED71_3C81_DF5F
+            ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
+                mismatches.check(
+                    H.negatedMultiplySubtracting(a, b, c, where: mask),
+                    HighwayReference.negatedMultiplySubtractingWhereF32(mask.raw, a, b, c),
+                    "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
         }
-        mismatches.record()
     }
 
     @Test func approximateReciprocalWhere() {

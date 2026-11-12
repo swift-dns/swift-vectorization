@@ -589,19 +589,31 @@ extension SIMDDoubleCodegenTests {
     }
 
     @Test func negatedMultiplySubtractingWhereConstantC() {
-        let mismatches = Mismatches("portNegatedMultiplySubtractingWhereF64ConstantC")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6130_3AFF_C037_5905)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6130_39FF_C037_5752)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6130_38FF_C037_559F)
-        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x37FF_C67D_DF3F_A4F7)
-        where !hasNaNs(in: a, b) {
-            mismatches.check(
-                portNegatedMultiplySubtractingWhereF64ConstantC(a, b, where: mask),
-                highwayNegatedMultiplySubtractingWhereF64ConstantC(a, b, where: mask),
-                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
-            )
+        withKnownIssue(
+            "Under Linux on AVX3_DL and AVX3_SPR in Intel SDE Highway's zero-masked negated multiply-subtract gives -0.0 in the masked-off lanes where the port gives the +0.0 that the instruction set specifies, which is not confirmed on hardware",
+            isIntermittent: true
+        ) {
+            let mismatches = Mismatches("portNegatedMultiplySubtractingWhereF64ConstantC")
+            let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6130_3AFF_C037_5905)
+            let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6130_39FF_C037_5752)
+            let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6130_38FF_C037_559F)
+            for (mask, a, b) in mixedTriples(
+                maskInputs,
+                aInputs,
+                bInputs,
+                seed: 0x37FF_C67D_DF3F_A4F7
+            ) where !hasNaNs(in: a, b) {
+                mismatches.check(
+                    portNegatedMultiplySubtractingWhereF64ConstantC(a, b, where: mask),
+                    highwayNegatedMultiplySubtractingWhereF64ConstantC(a, b, where: mask),
+                    "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            isAmd64 && !isDarwin
+                && (SIMDTarget.targetName == "AVX3_DL" || SIMDTarget.targetName == "AVX3_SPR")
         }
-        mismatches.record()
     }
 
     @Test func approximateReciprocalWhere() {
