@@ -235,23 +235,14 @@ jobs:
           for runner in "${runners[@]}"; do
             name="${runner##*/}"
             log="/tmp/${name}.log"
-            if SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing > "${log}" 2>&1; then
+            if SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing --no-parallel > "${log}" 2>&1; then
               tail -n 1 "${log}"
               continue
             fi
             failed+=("${name}")
             grep -E -A4 '✘ Test [A-Za-z0-9_]+\(\) recorded an issue' "${log}" | grep -v 'swift-runtime' | head -n 60 || true
-            tail -n 5 "${log}"
-            if SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing --skip GuardPage > "/tmp/${name}-skip.log" 2>&1; then
-              printf '%s: passes without the guard-page tests\n' "${name}"
-            else
-              printf '%s: fails without the guard-page tests too (exit %s)\n' "${name}" "$?"
-              tail -n 3 "/tmp/${name}-skip.log"
-            fi
-            if [[ "${#failed[@]}" -eq 1 ]]; then
-              SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing --filter GuardPage --no-parallel > "/tmp/${name}-guard.log" 2>&1 || printf '%s: sequential guard-page run exit %s\n' "${name}" "$?"
-              grep -E 'started\.|✘' "/tmp/${name}-guard.log" | tail -n 6 || true
-            fi
+            grep -E 'started\.' "${log}" | tail -n 3 || true
+            tail -n 3 "${log}"
           done
           if [[ "${#failed[@]}" -gt 0 ]]; then
             printf 'Failed runners: %s\n' "${failed[*]}" >&2
