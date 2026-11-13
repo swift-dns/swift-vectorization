@@ -27,13 +27,16 @@ package var isDarwin: Bool {
     #endif
 }
 
+@usableFromInline
 package struct SplitMix64: RandomNumberGenerator {
     private var state: UInt64
 
+    @usableFromInline
     package init(seed: UInt64) {
         state = seed
     }
 
+    @usableFromInline
     package mutating func next() -> UInt64 {
         state &+= 0x9E37_79B9_7F4A_7C15
         var mixed = state
@@ -43,6 +46,7 @@ package struct SplitMix64: RandomNumberGenerator {
     }
 }
 
+@usableFromInline
 package protocol ReferenceLane: Hashable, Codable {
     associatedtype Bits: FixedWidthInteger & UnsignedInteger
 
@@ -53,8 +57,10 @@ package protocol ReferenceLane: Hashable, Codable {
 }
 
 extension ReferenceLane where Self: FixedWidthInteger {
+    @usableFromInline
     package var bits: Bits { Bits(truncatingIfNeeded: self) }
 
+    @usableFromInline
     package static var edges: [Self] {
         let candidates: [Self] = [
             0, 1, 2, 3, .max / 2, .max / 2 + 1, .max - 1, .max, .min, .min + 1,
@@ -66,6 +72,7 @@ extension ReferenceLane where Self: FixedWidthInteger {
         }
     }
 
+    @usableFromInline
     package static var conversionEdges: [Self] {
         var unique: [Self] = []
         for width in [8, 16, 24, 32, 53] where width < bitWidth {
@@ -87,12 +94,14 @@ extension ReferenceLane where Self: FixedWidthInteger {
         return unique
     }
 
+    @usableFromInline
     package static func random(using generator: inout SplitMix64) -> Self {
         Self(truncatingIfNeeded: generator.next())
     }
 }
 
 extension ReferenceLane where Self: BinaryFloatingPoint, Self.Exponent == Int {
+    @usableFromInline
     package static var conversionEdges: [Self] {
         func power(_ exponent: Int) -> Self {
             Self(sign: .plus, exponent: exponent, significand: 1)
@@ -112,18 +121,20 @@ extension ReferenceLane where Self: BinaryFloatingPoint, Self.Exponent == Int {
     }
 }
 
-extension UInt8: ReferenceLane { package typealias Bits = UInt8 }
-extension UInt16: ReferenceLane { package typealias Bits = UInt16 }
-extension UInt32: ReferenceLane { package typealias Bits = UInt32 }
-extension UInt64: ReferenceLane { package typealias Bits = UInt64 }
-extension Int8: ReferenceLane { package typealias Bits = UInt8 }
-extension Int16: ReferenceLane { package typealias Bits = UInt16 }
-extension Int32: ReferenceLane { package typealias Bits = UInt32 }
-extension Int64: ReferenceLane { package typealias Bits = UInt64 }
+extension UInt8: ReferenceLane { @usableFromInline package typealias Bits = UInt8 }
+extension UInt16: ReferenceLane { @usableFromInline package typealias Bits = UInt16 }
+extension UInt32: ReferenceLane { @usableFromInline package typealias Bits = UInt32 }
+extension UInt64: ReferenceLane { @usableFromInline package typealias Bits = UInt64 }
+extension Int8: ReferenceLane { @usableFromInline package typealias Bits = UInt8 }
+extension Int16: ReferenceLane { @usableFromInline package typealias Bits = UInt16 }
+extension Int32: ReferenceLane { @usableFromInline package typealias Bits = UInt32 }
+extension Int64: ReferenceLane { @usableFromInline package typealias Bits = UInt64 }
 
 extension Float: ReferenceLane {
+    @usableFromInline
     package var bits: UInt32 { bitPattern }
 
+    @usableFromInline
     package static var edges: [Float] {
         let limits: [Float] = [0x1p31, 0x1p32, 0x1p63, 0x1p64]
         return [
@@ -137,6 +148,7 @@ extension Float: ReferenceLane {
             }
     }
 
+    @usableFromInline
     package static func random(using generator: inout SplitMix64) -> Float {
         let raw = generator.next()
         guard raw & 3 != 0 else { return Float(bitPattern: UInt32(truncatingIfNeeded: raw >> 32)) }
@@ -145,8 +157,10 @@ extension Float: ReferenceLane {
 }
 
 extension Double: ReferenceLane {
+    @usableFromInline
     package var bits: UInt64 { bitPattern }
 
+    @usableFromInline
     package static var edges: [Double] {
         [
             0, -0.0, 1, -1, 0.5, -0.5, 1.5, 2.5, -2.5, .ulpOfOne, .infinity, -.infinity,
@@ -156,6 +170,7 @@ extension Double: ReferenceLane {
         ]
     }
 
+    @usableFromInline
     package static func random(using generator: inout SplitMix64) -> Double {
         let raw = generator.next()
         guard raw & 3 != 0 else { return Double(bitPattern: generator.next()) }
@@ -662,10 +677,12 @@ package enum Inputs {
     }
 }
 
+@inlinable
 package func everyPair<A, B>(_ first: [A], _ second: [B]) -> [(A, B)] {
     first.flatMap { a in second.map { b in (a, b) } }
 }
 
+@inlinable
 package func mixedTriples<A, B, C>(
     _ first: [A],
     _ second: [B],
@@ -678,6 +695,7 @@ package func mixedTriples<A, B, C>(
     }
 }
 
+@inlinable
 package func mixedQuadruples<A, B, C, D>(
     _ first: [A],
     _ second: [B],
@@ -694,6 +712,7 @@ package func mixedQuadruples<A, B, C, D>(
     }
 }
 
+@inlinable
 package func mixedQuintuples<A, B, C, D, E>(
     _ first: [A],
     _ second: [B],
@@ -797,13 +816,18 @@ package func withGuardedLanes<Lane: ReferenceLane, Result>(
     return (result, unsafe Array(UnsafeBufferPointer(start: pointer, count: lanes.count)))
 }
 
+@inlinable
 package func hasUnorderedNaNs<V: SIMD>(_ operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
-        Set(operands.map { $0[lane] }.filter(\.isNaN).map(\.bits)).count > 1
+        operands.contains { first in
+            first[lane].isNaN
+                && operands.contains { $0[lane].isNaN && $0[lane].bits != first[lane].bits }
+        }
     }
 }
 
+@inlinable
 package func hasUnorderedNaNs<V: SIMD>(multiplying a: V, _ b: V, adding c: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
@@ -817,21 +841,25 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     }
 }
 
+@inlinable
 package func hasNaNs<V: SIMD>(in operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
 }
 
+@inlinable
 package func hasUnorderedNaNs<V: SIMD>(negating a: V, _ b: V, adding c: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     hasNaNs(in: a, b) || hasUnorderedNaNs(multiplying: a, b, adding: c)
 }
 
+@inlinable
 package func negatedLanes<V: SIMD>(of vector: V) -> V
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     V((0..<V.scalarCount).map { -vector[$0] })
 }
 
+@inlinable
 package func hasUnorderedNaNs<V: SIMD>(alternatingNegation a: V, _ b: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
@@ -840,6 +868,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     }
 }
 
+@inlinable
 package func hasUnorderedNaNs<V: SIMD>(adjacentLanesOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     operands.contains { operand in
@@ -850,21 +879,28 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     }
 }
 
+@inlinable
 package func hasUnorderedNaNs<V: SIMD>(complexLanesOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     let large = V.Scalar.greatestFiniteMagnitude.squareRoot() / 4
     return stride(from: 0, to: V.scalarCount, by: 2).contains { lane in
-        let lanes = operands.flatMap { [$0[lane], $0[lane + 1]] }
-        let payloads = Set(lanes.filter(\.isNaN).map(\.bits))
-        let mayGenerateNaN = lanes.contains { !$0.isFinite || $0.magnitude >= large }
-        return payloads.count > 1 || (!payloads.isEmpty && mayGenerateNaN)
+        func anyLane(_ predicate: (V.Scalar) -> Bool) -> Bool {
+            operands.contains { predicate($0[lane]) || predicate($0[lane + 1]) }
+        }
+        let hasPayloads = anyLane { $0.isNaN }
+        let payloadsDiffer = anyLane { first in
+            first.isNaN && anyLane { $0.isNaN && $0.bits != first.bits }
+        }
+        let mayGenerateNaN = anyLane { !$0.isFinite || $0.magnitude >= large }
+        return payloadsDiffer || (hasPayloads && mayGenerateNaN)
     }
 }
 
+@inlinable
 package func hasUnorderedNaNs<V: SIMD>(lanesOf vector: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     let lanes = (0..<V.scalarCount).map { vector[$0] }
-    let payloads = Set(lanes.filter(\.isNaN).map(\.bits))
+    let payloads = Set(lanes.filter { $0.isNaN }.map { $0.bits })
     let hasOppositeInfinities = lanes.contains(.infinity) && lanes.contains(-.infinity)
     return payloads.count > 1 || (!payloads.isEmpty && hasOppositeInfinities)
 }
@@ -1015,7 +1051,7 @@ package final class Mismatches {
         _ reference: [Lane],
         _ inputs: @autoclosure () -> String
     ) {
-        let same = port.map(\.bits) == reference.map(\.bits)
+        let same = port.elementsEqual(reference) { $0.bits == $1.bits }
         note(same, "port \(describe(port)), Highway \(describe(reference))", inputs)
     }
 

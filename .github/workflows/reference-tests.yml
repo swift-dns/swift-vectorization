@@ -7,10 +7,14 @@ on:
   push: { branches: [main] }
   schedule:
     - cron: "0 6 * * 6"
+  workflow_dispatch:
 
 defaults:
   run:
     shell: bash --noprofile --norc -Eeuo pipefail {0}
+
+env:
+  TEST_ONLY_NEW_OPS: &test_only_new_ops ${{ github.event_name == 'pull_request' && !github.event.pull_request.draft && !contains(github.event.pull_request.labels.*.name, 'full-reference-tests') }}
 
 jobs:
   reference-tests:
@@ -26,10 +30,10 @@ jobs:
         # `-msve-vector-bits`, so the two `-Xllvm` options tell it the vector length, without which
         # it pads SVE ops with `ptrue` and `sel` the C compiler would not.
         target:
-          - name: NEON_WITHOUT_AES
+          - name: &neon_without_aes_name NEON_WITHOUT_AES
             expected-target: NEON_WITHOUT_AES
-            runner: ubuntu-24.04-arm
-            flags: ""
+            runner: &neon_without_aes_runner ubuntu-24.04-arm
+            flags: &neon_without_aes_flags ""
             compare-codegen: true
             debug-tests: true
             release-tests: true
@@ -42,7 +46,8 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
-          - name: SSE2
+          - &sse2
+            name: SSE2
             expected-target: SSE2
             runner: ubuntu-latest
             flags: ""
@@ -50,7 +55,8 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
-          - name: SSSE3
+          - &ssse3
+            name: SSSE3
             expected-target: SSSE3
             runner: ubuntu-latest
             flags: "-Xcc -mssse3 -Xcc -D__MM_MALLOC_H"
@@ -58,6 +64,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
+            base: *sse2
           - name: SSE4
             expected-target: SSE4
             runner: ubuntu-latest
@@ -66,6 +73,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
+            base: *ssse3
           - name: AVX2
             expected-target: AVX2
             runner: ubuntu-latest
@@ -74,7 +82,8 @@ jobs:
             debug-tests: true
             release-tests: true
             sde-cpu: ""
-          - name: AVX3
+          - &avx3
+            name: AVX3
             expected-target: AVX3
             runner: ubuntu-latest
             flags: "-Xcc -march=skylake-avx512 -Xcc -D__MM_MALLOC_H"
@@ -82,7 +91,8 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: skx
-          - name: AVX3_DL
+          - &avx3_dl
+            name: AVX3_DL
             expected-target: AVX3_DL
             runner: ubuntu-latest
             flags: "-Xcc -march=icelake-server -Xcc -D__MM_MALLOC_H"
@@ -90,6 +100,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: icx
+            base: *avx3
           - name: AVX3_SPR
             expected-target: AVX3_SPR
             runner: ubuntu-latest
@@ -98,6 +109,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: spr
+            base: *avx3_dl
           - name: AVX3_ZEN4
             expected-target: AVX3_ZEN4
             runner: ubuntu-latest
@@ -106,6 +118,7 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: spr
+            base: *avx3_dl
           - name: EMU128
             expected-target: EMU128
             runner: ubuntu-latest
@@ -192,6 +205,39 @@ jobs:
           path: ${{ env.SDE_CACHE_DIR }}
           key: "${{ github.event.repository.name }}-sde-${{ env.SDE_VERSION }}-${{ runner.os }}"
 
+      - name: Fingerprint the codegen of the ops on the base target
+        if: ${{ matrix.mode == 'release' && matrix.target.base && env.TEST_ONLY_NEW_OPS == 'true' }}
+        env:
+          TARGET: ${{ matrix.target.base.name }}
+          FLAGS: ${{ matrix.target.base.flags }}
+        run: |
+          read -r -a flags <<< "${FLAGS}"
+          scripts/compare-codegen.sh --fingerprints "${RUNNER_TEMP}/${TARGET}.tsv" \
+            -- --scratch-path "${RUNNER_TEMP}/fingerprints-build" "${flags[@]}"
+
+      - name: Fingerprint the codegen of the ops on this target
+        if: ${{ matrix.mode == 'release' && matrix.target.base && env.TEST_ONLY_NEW_OPS == 'true' }}
+        env:
+          TARGET: ${{ matrix.target.name }}
+          FLAGS: ${{ matrix.target.flags }}
+        run: |
+          read -r -a flags <<< "${FLAGS}"
+          scripts/compare-codegen.sh --fingerprints "${RUNNER_TEMP}/${TARGET}.tsv" \
+            -- --scratch-path "${RUNNER_TEMP}/fingerprints-build" "${flags[@]}"
+
+      - name: List the ops new on this target
+        if: ${{ matrix.mode == 'release' && matrix.target.base && env.TEST_ONLY_NEW_OPS == 'true' }}
+        env:
+          TARGET: ${{ matrix.target.name }}
+          BASE: ${{ matrix.target.base.name }}
+        run: |
+          scripts/list-new-ops.sh "${RUNNER_TEMP}/${TARGET}.tsv" "${RUNNER_TEMP}/${BASE}.tsv" \
+            >"${RUNNER_TEMP}/new-ops.txt"
+
+      - name: Generate the tests of the new ops only
+        if: ${{ matrix.mode == 'release' && matrix.target.base && env.TEST_ONLY_NEW_OPS == 'true' }}
+        run: swift utils/GenerateVectorizationOps.swift --only-tests-of "${RUNNER_TEMP}/new-ops.txt"
+
       - name: Test the ops against highway
         if: ${{ matrix.mode == 'debug' && !matrix.target.sde-cpu }}
         env:
@@ -231,6 +277,9 @@ jobs:
             printf '%s\n' "There is no test runner in HighwayReference/.build/release" >&2
             exit 1
           fi
+          printf 'Runner CPU:%s\n' "$(grep -m 1 'model name' /proc/cpuinfo | cut -d ':' -f 2)"
+          printf 'Runner AVX-512 features: %s\n' \
+            "$(grep -m 1 '^flags' /proc/cpuinfo | tr ' ' '\n' | grep '^avx512' | sort | tr '\n' ' ' || true)"
           for runner in "${runners[@]}"; do
             sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing
           done
@@ -243,6 +292,45 @@ jobs:
           read -r -a flags <<< "${FLAGS}"
           scripts/compare-codegen.sh -- "${flags[@]}"
 
+  macos-base-fingerprints:
+    name: reference-tests (NEON_WITHOUT_AES, fingerprints)
+
+    runs-on: *neon_without_aes_runner
+
+    if: *test_only_new_ops
+
+    container: swift:6.4-resolute
+
+    timeout-minutes: 30
+
+    permissions:
+      contents: read
+
+    env:
+      TARGET: *neon_without_aes_name
+      FLAGS: *neon_without_aes_flags
+
+    steps:
+      - name: Check out ${{ github.event.repository.name }}
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Fingerprint the codegen of the ops on this target
+        id: fingerprint
+        run: |
+          read -r -a flags <<< "${FLAGS}"
+          scripts/compare-codegen.sh --fingerprints "${RUNNER_TEMP}/${TARGET}.tsv" -- "${flags[@]}"
+          printf '%s\n' "path=${RUNNER_TEMP}/${TARGET}.tsv" >>"${GITHUB_OUTPUT}"
+
+      - name: Upload the codegen fingerprints of this target
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.TARGET }}-fingerprints
+          path: ${{ steps.fingerprint.outputs.path }}
+          if-no-files-found: error
+          retention-days: 1
+
   macos-reference-tests:
     name: reference-tests (NEON, macOS, ${{ matrix.mode }})
 
@@ -253,7 +341,8 @@ jobs:
 
     runs-on: macos-26
 
-    if: ${{ !github.event.pull_request.draft }}
+    needs: macos-base-fingerprints
+    if: ${{ !cancelled() && !github.event.pull_request.draft }}
 
     timeout-minutes: ${{ matrix.mode == 'release' && 150 || 90 }}
 
@@ -315,6 +404,29 @@ jobs:
           # Update swift
           swiftly install --assume-yes ${{ env.SWIFT_VERSION }}
           swiftly use --assume-yes ${{ env.SWIFT_VERSION }}
+
+      - name: Download the codegen fingerprints of the base target
+        if: ${{ matrix.mode == 'release' && env.TEST_ONLY_NEW_OPS == 'true' }}
+        uses: actions/download-artifact@v8
+        with:
+          name: NEON_WITHOUT_AES-fingerprints
+          path: ${{ runner.temp }}
+
+      - name: Fingerprint the codegen of the ops on this target
+        if: ${{ matrix.mode == 'release' && env.TEST_ONLY_NEW_OPS == 'true' }}
+        run: |
+          scripts/compare-codegen.sh --fingerprints "${RUNNER_TEMP}/NEON.tsv" \
+            -- --scratch-path "${RUNNER_TEMP}/fingerprints-build"
+
+      - name: List the ops new on this target
+        if: ${{ matrix.mode == 'release' && env.TEST_ONLY_NEW_OPS == 'true' }}
+        run: |
+          scripts/list-new-ops.sh "${RUNNER_TEMP}/NEON.tsv" "${RUNNER_TEMP}/NEON_WITHOUT_AES.tsv" \
+            >"${RUNNER_TEMP}/new-ops.txt"
+
+      - name: Generate the tests of the new ops only
+        if: ${{ matrix.mode == 'release' && env.TEST_ONLY_NEW_OPS == 'true' }}
+        run: swift utils/GenerateVectorizationOps.swift --only-tests-of "${RUNNER_TEMP}/new-ops.txt"
 
       - name: Test the ops against highway in release
         if: ${{ matrix.mode == 'release' }}

@@ -24489,13 +24489,13 @@ func cacheControlCodegenFunctions() -> String {
         let label = op.pointerLabel.map { $0 == "_" ? "" : "\($0): " } ?? ""
         return [
             codegenFunction(
-                "port\(uppercasedFirst(op.swiftName))",
+                codegenFunctionName("port", op.swiftName),
                 parameters: [parameter].filter { !$0.isEmpty },
                 returnClause: "",
                 call: "\(keyword)SIMDTarget.\(op.swiftName)(\(label)\(arguments))"
             ),
             codegenFunction(
-                "highway\(uppercasedFirst(op.swiftName))",
+                codegenFunctionName("highway", op.swiftName),
                 parameters: [parameter].filter { !$0.isEmpty },
                 returnClause: "",
                 call: "\(keyword)\(reference)"
@@ -41447,8 +41447,60 @@ func uncheckedOutputSpanTest(of op: Op, forms: SpanForms, for element: Element) 
     )
 }
 
-func generateReferenceTestMembers(_ element: Element) -> [SectionMember] {
-    var members = ops.filter { $0.applies.matches(element) }.map {
+func codegenKeysOfOps(for element: Element) -> [[String]] {
+    var keys = ops.filter { $0.applies.matches(element) }.map { codegenKeys(of: $0, for: element) }
+    keys += wideningOps.flatMap { op in
+        wideningSources(of: element).map { codegenKeys(of: op, from: $0, to: element) }
+    }
+    keys += rebindingOps.flatMap { op in
+        rebindingSources(of: element).map { codegenKeys(of: op, from: $0, to: element) }
+    }
+    keys.append(repeatingBlockCodegenKeys(for: element))
+    keys += codegenKernels.filter { $0.applies.matches(element) }.map {
+        codegenKeys(of: $0, for: element)
+    }
+    return keys
+}
+
+func isTested(_ opKeys: [String], by keys: Set<String>?) -> Bool {
+    guard let keys else { return true }
+    return !keys.isDisjoint(with: opKeys)
+}
+
+func testedOps(for element: Element, by keys: Set<String>?) -> [Op] {
+    ops.filter {
+        $0.applies.matches(element) && isTested(codegenKeys(of: $0, for: element), by: keys)
+    }
+}
+
+func testedWideningSources(
+    of op: WideningOp,
+    for element: Element,
+    by keys: Set<String>?
+) -> [Element] {
+    wideningSources(of: element).filter {
+        isTested(codegenKeys(of: op, from: $0, to: element), by: keys)
+    }
+}
+
+func testedRebindingSources(
+    of op: RebindingOp,
+    for element: Element,
+    by keys: Set<String>?
+) -> [Element] {
+    rebindingSources(of: element).filter {
+        isTested(codegenKeys(of: op, from: $0, to: element), by: keys)
+    }
+}
+
+func testedKernels(for element: Element, by keys: Set<String>?) -> [CodegenKernel] {
+    codegenKernels.filter {
+        $0.applies.matches(element) && isTested(codegenKeys(of: $0, for: element), by: keys)
+    }
+}
+
+func generateReferenceTestMembers(_ element: Element, by keys: Set<String>?) -> [SectionMember] {
+    var members = testedOps(for: element, by: keys).map {
         SectionMember(
             section: $0.section,
             inside: markingKnownGaps(
@@ -41463,7 +41515,7 @@ func generateReferenceTestMembers(_ element: Element) -> [SectionMember] {
         )
     }
     members += wideningOps.map { op in
-        let tests = wideningSources(of: element).flatMap { narrow in
+        let tests = testedWideningSources(of: op, for: element, by: keys).flatMap { narrow in
             [
                 wideningReferenceTest(op, from: narrow, to: element),
                 wideningReferenceTest(op, from: narrow, to: element, guarded: true),
@@ -41472,7 +41524,7 @@ func generateReferenceTestMembers(_ element: Element) -> [SectionMember] {
         return SectionMember(section: op.section, inside: tests)
     }
     members += rebindingOps.map { op in
-        let tests = rebindingSources(of: element).flatMap { source in
+        let tests = testedRebindingSources(of: op, for: element, by: keys).flatMap { source in
             [false, true].map { nonCanonical in
                 guarded(
                     rebindingReferenceTest(
@@ -41489,9 +41541,14 @@ func generateReferenceTestMembers(_ element: Element) -> [SectionMember] {
         }
         return SectionMember(section: op.section, inside: tests)
     }
-    members.append(
-        SectionMember(section: .initialization, inside: [repeatingBlockReferenceTest(for: element)])
-    )
+    if isTested(repeatingBlockCodegenKeys(for: element), by: keys) {
+        members.append(
+            SectionMember(
+                section: .initialization,
+                inside: [repeatingBlockReferenceTest(for: element)]
+            )
+        )
+    }
     members += reorderMulPairingMembers(of: element)
     return members
 }
@@ -41580,12 +41637,16 @@ func codegenConstantSuffix(_ constantParameter: String?) -> String {
     constantParameter.map { "Constant\(uppercasedFirst($0))" } ?? ""
 }
 
+func codegenKey(_ referenceName: String, constantParameter: String? = nil) -> String {
+    "\(uppercasedFirst(referenceName))\(codegenConstantSuffix(constantParameter))"
+}
+
 func codegenFunctionName(
     _ side: String,
     _ referenceName: String,
     constantParameter: String? = nil
 ) -> String {
-    "\(side)\(uppercasedFirst(referenceName))\(codegenConstantSuffix(constantParameter))"
+    "\(side)\(codegenKey(referenceName, constantParameter: constantParameter))"
 }
 
 func codegenFunction(
@@ -41918,6 +41979,23 @@ func codegenFunctions(
     return functions.joined(separator: "\n\n")
 }
 
+func codegenKeys(
+    _ referenceName: String,
+    parameters: [CodegenParameter],
+    for element: Element
+) -> [String] {
+    codegenVariants(of: parameters, for: element).map {
+        codegenKey(
+            referenceName,
+            constantParameter: codegenConstantName(
+                of: parameters,
+                constant: $0.constant,
+                alternative: $0.alternative
+            )
+        )
+    }
+}
+
 func codegenParameters(of op: Op, for element: Element) -> [CodegenParameter] {
     var parameters: [CodegenParameter] = []
 
@@ -41962,6 +42040,14 @@ func codegenFunctions(of op: Op, for element: Element) -> String {
     )
 }
 
+func codegenKeys(of op: Op, for element: Element) -> [String] {
+    codegenKeys(
+        referenceFunctionName(of: op, for: element),
+        parameters: codegenParameters(of: op, for: element),
+        for: element
+    )
+}
+
 func codegenParameters(of op: WideningOp, from narrow: Element) -> [CodegenParameter] {
     let pointerType = importedType(of: .constLanePointer, for: narrow)
     var parameters = [
@@ -41995,6 +42081,14 @@ func codegenFunctions(_ op: WideningOp, from narrow: Element, to wide: Element) 
     )
 }
 
+func codegenKeys(of op: WideningOp, from narrow: Element, to wide: Element) -> [String] {
+    codegenKeys(
+        wideningFunctionName(op, from: narrow, to: wide),
+        parameters: codegenParameters(of: op, from: narrow),
+        for: wide
+    )
+}
+
 func codegenParameters(of op: RebindingOp, from source: Element) -> [CodegenParameter] {
     let type = importedType(of: .mask, for: source)
     return [
@@ -42017,6 +42111,14 @@ func codegenFunctions(_ op: RebindingOp, from source: Element, to target: Elemen
     )
 }
 
+func codegenKeys(of op: RebindingOp, from source: Element, to target: Element) -> [String] {
+    codegenKeys(
+        rebindingFunctionName(op, from: source, to: target),
+        parameters: codegenParameters(of: op, from: source),
+        for: target
+    )
+}
+
 func repeatingBlockCodegenFunctions(for element: Element) -> String {
     let lanes = repeatingBlockLanes(of: element)
     return codegenFunctions(
@@ -42031,6 +42133,10 @@ func repeatingBlockCodegenFunctions(for element: Element) -> String {
             lanes.map(element.swiftScalarArgument)
         )
     )
+}
+
+func repeatingBlockCodegenKeys(for element: Element) -> [String] {
+    [codegenKey(referenceFunctionName(repeatingBlockName, element))]
 }
 
 func referenceNamespace(of element: Element) -> String {
@@ -42666,6 +42772,10 @@ func codegenKernelFunctions(_ kernel: CodegenKernel, for element: Element) -> St
     return functions.joined(separator: "\n\n")
 }
 
+func codegenKeys(of kernel: CodegenKernel, for element: Element) -> [String] {
+    [codegenKey(referenceFunctionName(kernel.name, element))]
+}
+
 func codegenCalls(
     of parameters: [CodegenParameter],
     for element: Element,
@@ -43175,22 +43285,20 @@ func codegenTests(of op: Op, for element: Element) -> [String] {
     return tests
 }
 
-func codegenWideningTests(_ op: WideningOp, for element: Element) -> [String] {
+func codegenWideningTests(_ op: WideningOp, from narrow: Element, to wide: Element) -> [String] {
     var tests: [String] = []
-    for narrow in wideningSources(of: element) {
-        let parameters = codegenParameters(of: op, from: narrow)
-        for variant in codegenVariants(of: parameters, for: element) {
-            for guarded in [false, true] {
-                tests.append(
-                    codegenWideningTest(
-                        op,
-                        from: narrow,
-                        to: element,
-                        constant: variant.constant,
-                        guarded: guarded
-                    )
+    let parameters = codegenParameters(of: op, from: narrow)
+    for variant in codegenVariants(of: parameters, for: wide) {
+        for guarded in [false, true] {
+            tests.append(
+                codegenWideningTest(
+                    op,
+                    from: narrow,
+                    to: wide,
+                    constant: variant.constant,
+                    guarded: guarded
                 )
-            }
+            )
         }
     }
     return tests
@@ -43204,8 +43312,8 @@ func codegenKernelTests(_ kernel: CodegenKernel, for element: Element) -> [Strin
     return tests
 }
 
-func generateCodegenTestMembers(_ element: Element) -> [SectionMember] {
-    var members = ops.filter { $0.applies.matches(element) }.map {
+func generateCodegenTestMembers(_ element: Element, by keys: Set<String>?) -> [SectionMember] {
+    var members = testedOps(for: element, by: keys).map {
         SectionMember(
             section: $0.section,
             inside: markingKnownGaps(
@@ -43214,11 +43322,14 @@ func generateCodegenTestMembers(_ element: Element) -> [SectionMember] {
             )
         )
     }
-    members += wideningOps.map {
-        SectionMember(section: $0.section, inside: codegenWideningTests($0, for: element))
+    members += wideningOps.map { op in
+        let tests = testedWideningSources(of: op, for: element, by: keys).flatMap {
+            codegenWideningTests(op, from: $0, to: element)
+        }
+        return SectionMember(section: op.section, inside: tests)
     }
     members += rebindingOps.map { op in
-        let tests = rebindingSources(of: element).map {
+        let tests = testedRebindingSources(of: op, for: element, by: keys).map {
             guarded(
                 codegenRebindingTest(op, from: $0, to: element),
                 rebinding: $0,
@@ -43228,10 +43339,15 @@ func generateCodegenTestMembers(_ element: Element) -> [SectionMember] {
         }
         return SectionMember(section: op.section, inside: tests)
     }
-    members.append(
-        SectionMember(section: .initialization, inside: [codegenRepeatingBlockTest(for: element)])
-    )
-    members += codegenKernels.filter { $0.applies.matches(element) }.map {
+    if isTested(repeatingBlockCodegenKeys(for: element), by: keys) {
+        members.append(
+            SectionMember(
+                section: .initialization,
+                inside: [codegenRepeatingBlockTest(for: element)]
+            )
+        )
+    }
+    members += testedKernels(for: element, by: keys).map {
         SectionMember(section: .kernels, inside: codegenKernelTests($0, for: element))
     }
     return members
@@ -44157,8 +44273,8 @@ func wideningConstantTests(
     return members
 }
 
-func generateConstantTestMembers(_ element: Element) -> [SectionMember] {
-    var members = ops.filter { $0.applies.matches(element) }.map {
+func generateConstantTestMembers(_ element: Element, by keys: Set<String>?) -> [SectionMember] {
+    var members = testedOps(for: element, by: keys).map {
         SectionMember(
             section: $0.section,
             inside: markingKnownGaps(
@@ -44168,7 +44284,7 @@ func generateConstantTestMembers(_ element: Element) -> [SectionMember] {
         )
     }
     members += wideningOps.map { op in
-        let tests = wideningSources(of: element).flatMap {
+        let tests = testedWideningSources(of: op, for: element, by: keys).flatMap {
             wideningConstantTests(op, from: $0, to: element)
         }
         return SectionMember(section: op.section, inside: tests)
@@ -44442,6 +44558,44 @@ func writeSections(
     }
 }
 
+struct TestSelection {
+    let keptTests: Int
+    let tests: Int
+    let keptOps: Int
+    let ops: Int
+    let unattributableTests: Int
+
+    var summary: String {
+        "kept \(keptTests)/\(tests) tests (\(unattributableTests) unattributable) and "
+            + "\(keptOps)/\(ops) ops"
+    }
+}
+
+func testCount(of element: Element, by keys: Set<String>?) -> Int {
+    let members =
+        generateReferenceTestMembers(element, by: keys)
+        + generateCodegenTestMembers(element, by: keys)
+        + generateConstantTestMembers(element, by: keys)
+    let suites = [
+        generateReferenceTests(element), generateCodegenTests(element),
+        generateConstantTests(element),
+    ]
+    return (suites + members.flatMap(\.inside)).reduce(0) {
+        $0 + $1.components(separatedBy: "@Test").count - 1
+    }
+}
+
+func testSelection(of element: Element, by keys: Set<String>) -> TestSelection {
+    let keysOfOps = codegenKeysOfOps(for: element)
+    return TestSelection(
+        keptTests: testCount(of: element, by: keys),
+        tests: testCount(of: element, by: nil),
+        keptOps: keysOfOps.filter { isTested($0, by: keys) }.count,
+        ops: keysOfOps.count,
+        unattributableTests: testCount(of: element, by: [])
+    )
+}
+
 let repositoryRoot = FileManager.default.currentDirectoryPath
 let headerPath = "\(repositoryRoot)/Sources/CVectorizationOps/include/CVectorizationOps.h"
 let referenceHeaderPath =
@@ -44479,6 +44633,34 @@ guard unlistedElements.isEmpty else {
     let message = "add \(unlistedElements) to elementNames in HighwayReference/Package.swift"
     FileHandle.standardError.write(Data("** ERROR: \(message)\n".utf8))
     exit(1)
+}
+
+let arguments = Array(CommandLine.arguments.dropFirst())
+guard arguments.isEmpty || (arguments.count == 2 && arguments[0] == "--only-tests-of") else {
+    let message = "the only option is --only-tests-of <file of codegen keys, one per line>"
+    FileHandle.standardError.write(Data("** ERROR: \(message)\n".utf8))
+    exit(1)
+}
+let testedKeys = arguments.last.map { path in
+    guard let contents = try? String(contentsOfFile: path, encoding: .utf8) else {
+        FileHandle.standardError.write(Data("** ERROR: failed to read \(path)\n".utf8))
+        exit(1)
+    }
+    return Set(contents.split(whereSeparator: \.isNewline).map(String.init))
+}
+if let testedKeys {
+    let knownKeys = Set(
+        elements.flatMap { codegenKeysOfOps(for: $0).joined() }
+            + cacheControlOps.map { codegenKey($0.swiftName) }
+    )
+    let unknownKeys = testedKeys.subtracting(knownKeys).sorted()
+    guard unknownKeys.isEmpty else {
+        let message =
+            "\(unknownKeys.count) keys in \(arguments[1]) are not codegen keys, such as "
+            + "\(unknownKeys.prefix(5))"
+        FileHandle.standardError.write(Data("** ERROR: \(message)\n".utf8))
+        exit(1)
+    }
 }
 
 try? FileManager.default.removeItem(atPath: generatedSwiftRoot)
@@ -44530,7 +44712,7 @@ for element in elements {
         to: "\(testsDirectory)/\(referenceTestsName).swift"
     )
     try writeSections(
-        generateReferenceTestMembers(element),
+        generateReferenceTestMembers(element, by: testedKeys),
         named: referenceTestsName,
         in: testsDirectory,
         imports: referenceTestImports,
@@ -44544,7 +44726,7 @@ for element in elements {
         to: "\(testsDirectory)/\(codegenTestsName).swift"
     )
     try writeSections(
-        generateCodegenTestMembers(element),
+        generateCodegenTestMembers(element, by: testedKeys),
         named: codegenTestsName,
         in: testsDirectory,
         imports: codegenTestImports,
@@ -44558,7 +44740,7 @@ for element in elements {
         to: "\(testsDirectory)/\(constantTestsName).swift"
     )
     try writeSections(
-        generateConstantTestMembers(element),
+        generateConstantTestMembers(element, by: testedKeys),
         named: constantTestsName,
         in: testsDirectory,
         imports: constantTestImports,
@@ -44586,6 +44768,19 @@ try format(generatedSwiftRoot)
 try format(generatedReferenceTestsRoot)
 try format(generatedReferenceSupportRoot)
 try format(generatedCodegenRoot)
+if let testedKeys {
+    let selections = elements.map { testSelection(of: $0, by: testedKeys) }
+    let total = TestSelection(
+        keptTests: selections.reduce(0) { $0 + $1.keptTests },
+        tests: selections.reduce(0) { $0 + $1.tests },
+        keptOps: selections.reduce(0) { $0 + $1.keptOps },
+        ops: selections.reduce(0) { $0 + $1.ops },
+        unattributableTests: selections.reduce(0) { $0 + $1.unattributableTests }
+    )
+    for (name, selection) in zip(elements.map(\.namespace) + ["Total"], selections + [total]) {
+        FileHandle.standardError.write(Data("** \(name): \(selection.summary)\n".utf8))
+    }
+}
 FileHandle.standardError.write(
     Data("** ✅ Generated \(elements.count) element types.\n".utf8)
 )
