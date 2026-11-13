@@ -231,6 +231,9 @@ jobs:
             printf '%s\n' "There is no test runner in HighwayReference/.build/release" >&2
             exit 1
           fi
+          printf 'Runner CPU:%s\n' "$(grep -m 1 'model name' /proc/cpuinfo | cut -d ':' -f 2)"
+          printf 'Runner AVX-512 features: %s\n' \
+            "$(grep -m 1 '^flags' /proc/cpuinfo | tr ' ' '\n' | grep '^avx512' | sort | tr '\n' ' ' || true)"
           for runner in "${runners[@]}"; do
             sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing
           done
