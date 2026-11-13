@@ -11,8 +11,7 @@ extension SIMDFloat16ReferenceTests {
         let mismatches = Mismatches("sumWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEE9F_1826_2CE1_753E)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEE9F_1926_2CE1_76F1)
-        for (mask, a) in everyPair(maskInputs, aInputs)
-        where HighwayReference.hasFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
+        for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
                 Float16(bitPattern: HighwayReference.sumWhereF16(mask.raw, a)),

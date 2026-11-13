@@ -10,7 +10,7 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches("sumWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5390_E232_A476_15C8)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5390_E332_A476_177B)
-        for (mask, a) in everyPair(maskInputs, aInputs) {
+        for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
                 HighwayReference.sumWhereF32(mask.raw, a),

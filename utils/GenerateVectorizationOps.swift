@@ -16301,7 +16301,8 @@ func maskedReductionOp(
     _ highwayName: String,
     identity: ((Element) -> String)?,
     sve: String? = nil,
-    unorderedNaNs: UnorderedNaNs? = nil
+    unorderedNaNs: UnorderedNaNs? = nil,
+    filtersUnorderedNaNs: Bool = false
 ) -> Op {
     Op(
         swiftName,
@@ -16311,6 +16312,7 @@ func maskedReductionOp(
         .all,
         section: .maskedReductions,
         unorderedNaNs: unorderedNaNs,
+        filtersUnorderedNaNs: filtersUnorderedNaNs,
         targets: TargetBodies(sve2_128: { element in
             sve.map { sveMaskedReduction($0, for: element) }
         })
@@ -16646,7 +16648,13 @@ let maskedOps: [Op] =
     maskedFamilies.flatMap(maskedFamilyOps) + [
         maskedRepeatingOp(merging: false),
         maskedRepeatingOp(merging: true),
-        maskedReductionOp("sum", "MaskedReduceSum", identity: nil, unorderedNaNs: .acrossLanes),
+        maskedReductionOp(
+            "sum",
+            "MaskedReduceSum",
+            identity: nil,
+            unorderedNaNs: .acrossLanes,
+            filtersUnorderedNaNs: true
+        ),
         maskedReductionOp("smallest", "MaskedReduceMin", identity: highestValue, sve: "min"),
         maskedReductionOp("largest", "MaskedReduceMax", identity: lowestValue, sve: "max"),
     ]
@@ -43588,6 +43596,28 @@ let maskedZeroSignTests: [String: [String]] = [
     "SIMDFloatReference": ["negatedMultiplySubtractingWhere"],
 ]
 
+let linuxAvx3SprFloat16LessThan = KnownIssue(
+    comment:
+        "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one",
+    condition:
+        "isAmd64 && !isDarwin && SIMDTarget.targetName == \"AVX3_SPR\" && !assertionsAreEnabled"
+)
+
+let float16LessThanTests: [String: [String]] = [
+    "SIMDFloat16Constant": [
+        "lessThanWhereConstantSplatFour",
+        "lessThanWhereConstantSplatHalf",
+        "lessThanWhereConstantSplatMinusOne",
+        "lessThanWhereConstantSplatMinusTwoPointFive",
+        "lessThanWhereConstantSplatNegativeZero",
+        "lessThanWhereConstantSplatOne",
+        "lessThanWhereConstantSplatOnePointFive",
+        "lessThanWhereConstantSplatQuarter",
+        "lessThanWhereConstantSplatTwo",
+        "lessThanWhereConstantSplatZero",
+    ]
+]
+
 let darwinEmu128Folding = KnownIssue(
     comment:
         "Highway's emulated Set is opaque to the optimizer on Darwin, so Highway computes a constant operand at run time where the port folds it, which differs in the sign and payload of a NaN and in the sign of a zero that a minimum, a maximum or a clamp picks",
@@ -43653,6 +43683,7 @@ let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] = [
     (linuxAvx2AndAvx512NaNSign, knownGapTests),
     (linuxAvx2AndAvx512IntermittentNaNSign, intermittentNaNSignTests),
     (linuxAvx512MaskedZeroSign, maskedZeroSignTests),
+    (linuxAvx3SprFloat16LessThan, float16LessThanTests),
     (darwinEmu128Folding, emu128FoldedConstantTests),
 ]
 

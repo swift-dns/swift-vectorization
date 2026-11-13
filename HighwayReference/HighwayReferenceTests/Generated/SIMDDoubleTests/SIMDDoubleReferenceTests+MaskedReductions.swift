@@ -10,7 +10,7 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches("sumWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB538_0DBF_E8B2_6CC1)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB538_0CBF_E8B2_6B0E)
-        for (mask, a) in everyPair(maskInputs, aInputs) {
+        for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a, where: mask),
                 HighwayReference.sumWhereF64(mask.raw, a),

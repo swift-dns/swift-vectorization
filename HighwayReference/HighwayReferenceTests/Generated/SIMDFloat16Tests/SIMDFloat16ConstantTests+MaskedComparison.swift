@@ -318,53 +318,113 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func lessThanWhereConstantSplatZero() {
-        checkLessThanWhereConstantA(0.0)
-        checkLessThanWhereConstantB(0.0)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(0.0)
+            checkLessThanWhereConstantB(0.0)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatNegativeZero() {
-        checkLessThanWhereConstantA(-0.0)
-        checkLessThanWhereConstantB(-0.0)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(-0.0)
+            checkLessThanWhereConstantB(-0.0)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatOne() {
-        checkLessThanWhereConstantA(1.0)
-        checkLessThanWhereConstantB(1.0)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(1.0)
+            checkLessThanWhereConstantB(1.0)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatMinusOne() {
-        checkLessThanWhereConstantA(-1.0)
-        checkLessThanWhereConstantB(-1.0)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(-1.0)
+            checkLessThanWhereConstantB(-1.0)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatTwo() {
-        checkLessThanWhereConstantA(2.0)
-        checkLessThanWhereConstantB(2.0)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(2.0)
+            checkLessThanWhereConstantB(2.0)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatHalf() {
-        checkLessThanWhereConstantA(0.5)
-        checkLessThanWhereConstantB(0.5)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(0.5)
+            checkLessThanWhereConstantB(0.5)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatFour() {
-        checkLessThanWhereConstantA(4.0)
-        checkLessThanWhereConstantB(4.0)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(4.0)
+            checkLessThanWhereConstantB(4.0)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatQuarter() {
-        checkLessThanWhereConstantA(0.25)
-        checkLessThanWhereConstantB(0.25)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(0.25)
+            checkLessThanWhereConstantB(0.25)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatOnePointFive() {
-        checkLessThanWhereConstantA(1.5)
-        checkLessThanWhereConstantB(1.5)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(1.5)
+            checkLessThanWhereConstantB(1.5)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatMinusTwoPointFive() {
-        checkLessThanWhereConstantA(-2.5)
-        checkLessThanWhereConstantB(-2.5)
+        withKnownIssue(
+            "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one"
+        ) {
+            checkLessThanWhereConstantA(-2.5)
+            checkLessThanWhereConstantB(-2.5)
+        } when: {
+            isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
+        }
     }
 
     @Test func lessThanWhereConstantSplatInfinity() {
