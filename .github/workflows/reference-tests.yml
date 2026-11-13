@@ -231,23 +231,9 @@ jobs:
             printf '%s\n' "There is no test runner in HighwayReference/.build/release" >&2
             exit 1
           fi
-          failed=()
           for runner in "${runners[@]}"; do
-            name="${runner##*/}"
-            log="/tmp/${name}.log"
-            if SWIFT_BACKTRACE=enable=no sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing --no-parallel > "${log}" 2>&1; then
-              tail -n 1 "${log}"
-              continue
-            fi
-            failed+=("${name}")
-            grep -E -A4 '✘ Test [A-Za-z0-9_]+\(\) recorded an issue' "${log}" | grep -v 'swift-runtime' | head -n 60 || true
-            grep -E 'started\.' "${log}" | tail -n 3 || true
-            tail -n 3 "${log}"
+            sde64 "-${SDE_CPU}" -- "${runner}" --testing-library swift-testing
           done
-          if [[ "${#failed[@]}" -gt 0 ]]; then
-            printf 'Failed runners: %s\n' "${failed[*]}" >&2
-            exit 1
-          fi
 
       - name: Compare the codegen of the ops with highway's
         if: ${{ matrix.mode == 'codegen' && matrix.target.compare-codegen }}

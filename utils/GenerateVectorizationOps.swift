@@ -43596,26 +43596,40 @@ let maskedZeroSignTests: [String: [String]] = [
     "SIMDFloatReference": ["negatedMultiplySubtractingWhere"],
 ]
 
-let linuxAvx3SprFloat16LessThan = KnownIssue(
+let linuxAvx3SprFloat16OrderedComparison = KnownIssue(
     comment:
-        "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked less-than with a constant first operand gives the result of the reversed comparison, where the port gives the correct one",
+        "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked ordered comparisons with a constant operand sometimes give the result of the reversed comparison, depending on how the compiler inlines them, where the port gives the correct one",
     condition:
-        "isAmd64 && !isDarwin && SIMDTarget.targetName == \"AVX3_SPR\" && !assertionsAreEnabled"
+        "isAmd64 && !isDarwin && SIMDTarget.targetName == \"AVX3_SPR\" && !assertionsAreEnabled",
+    isIntermittent: "true"
 )
 
-let float16LessThanTests: [String: [String]] = [
+let float16ComparisonSplats = [
+    "Four",
+    "Greatest",
+    "Half",
+    "Infinity",
+    "LeastNonzero",
+    "MinusInfinity",
+    "MinusNaN",
+    "MinusOne",
+    "MinusSignalingNaN",
+    "MinusTwoPointFive",
+    "NaN",
+    "NegativeZero",
+    "One",
+    "OnePointFive",
+    "PayloadNaN",
+    "Quarter",
+    "SignalingNaN",
+    "Two",
+    "Zero",
+]
+
+let float16OrderedComparisonTests: [String: [String]] = [
     "SIMDFloat16Constant": [
-        "lessThanWhereConstantSplatFour",
-        "lessThanWhereConstantSplatHalf",
-        "lessThanWhereConstantSplatMinusOne",
-        "lessThanWhereConstantSplatMinusTwoPointFive",
-        "lessThanWhereConstantSplatNegativeZero",
-        "lessThanWhereConstantSplatOne",
-        "lessThanWhereConstantSplatOnePointFive",
-        "lessThanWhereConstantSplatQuarter",
-        "lessThanWhereConstantSplatTwo",
-        "lessThanWhereConstantSplatZero",
-    ]
+        "lessThanWhere", "greaterThanWhere", "lessThanOrEqualToWhere", "greaterThanOrEqualToWhere",
+    ].flatMap { comparison in float16ComparisonSplats.map { "\(comparison)ConstantSplat\($0)" } }
 ]
 
 let darwinEmu128Folding = KnownIssue(
@@ -43683,7 +43697,7 @@ let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] = [
     (linuxAvx2AndAvx512NaNSign, knownGapTests),
     (linuxAvx2AndAvx512IntermittentNaNSign, intermittentNaNSignTests),
     (linuxAvx512MaskedZeroSign, maskedZeroSignTests),
-    (linuxAvx3SprFloat16LessThan, float16LessThanTests),
+    (linuxAvx3SprFloat16OrderedComparison, float16OrderedComparisonTests),
     (darwinEmu128Folding, emu128FoldedConstantTests),
 ]
 
