@@ -37,7 +37,7 @@ targets: [
 ]
 ```
 
-Each element type has its own namespace of ops, such as `SIMDUInt8`, and `SIMDElement` lets a kernel be written once for all of them:
+Each element type has its own namespace of ops, such as `SIMDUInt8`, and `SIMDElement` lets a kernel be written once for all of them except `SIMDBFloat16`:
 
 ```swift
 import Vectorization
@@ -95,7 +95,16 @@ SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and hi
 When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or a
 minimum or maximum on SVE, which payload comes out is up to the compiler, in highway as in the port.
 
-Two differences are deliberate:
+On the targets without a carry-less multiply instruction, SSE2, SSSE3, NEON_WITHOUT_AES, SVE2_128
+without SVE2-AES, and EMU128, highway's `CLMulLower` and `CLMulUpper` return a wrong upper 64 bits
+when both operands have one of the bit groups `0x1111111111111111 << k` (k = 0...3) fully set, as
+`~0` does. So do the port's `carrylessMultiplyingLower` and `carrylessMultiplyingUpper` on those
+targets and in the portable C of WASM, PPC8, Z14 and so on.
+
+Lanes that highway leaves as uninitialized memory, such as the tail of an 8-bit `Compress` on x86,
+are not compared.
+
+These differences are deliberate:
 
 - `firstLanes(count:)` on NEON selects every lane for any count of at least `laneCount`, as
   highway's x86 and EMU128 ops do. Highway's NEON op wraps counts above the lane type's signed
@@ -106,8 +115,14 @@ Two differences are deliberate:
   `byUnchecked:`, `atUnchecked:` and `fromUnchecked:` forms, and the lookups' pointer forms, only
   assert it. Above `laneCount`, highway's NEON slides read their index tables out of bounds, and
   its EMU128 `TableLookupLanes` reads outside the vector.
+- `SIMDFloat16` has arithmetic on every target. Where highway has none for `float16_t` (x86, NEON
+  without FP16, and EMU128), the port computes in `Float` and rounds once to `Float16`. Fused ops go
+  through `Double`, so every result is correctly rounded.
+- `SIMDFloat16` is not available on Intel macOS, where Swift has no `Float16`.
 
 ## What is not wrapped
+
+Every op in highway's quick reference is wrapped except `Print`.
 
 swift-vectorization wraps Highway's SIMD ops only. The libraries Highway builds on top of them, such as
 `vqsort`, `thread_pool`, `image`, `matvec`, `bit_pack`, `btree`, `unroller`, the `iguana` and
