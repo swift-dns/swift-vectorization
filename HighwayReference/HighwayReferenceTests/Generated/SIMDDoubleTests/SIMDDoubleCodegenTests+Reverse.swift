@@ -55,4 +55,38 @@ extension SIMDDoubleCodegenTests {
         mismatches.check(portReversed2F64ConstantA(), highwayReversed2F64ConstantA(), "")
         mismatches.record()
     }
+
+    @Test(.disabled(if: !H.canReverse4, "Highway's reversal needs more lanes than this target has"))
+    func reversed4() {
+        let mismatches = Mismatches("portReversed4F64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4729_0E04_8F58_2EAD)
+        for a in aInputs {
+            mismatches.check(portReversed4F64(a), highwayReversed4F64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canReverse4, "Highway's reversal needs more lanes than this target has"))
+    func reversed4ConstantA() {
+        let mismatches = Mismatches("portReversed4F64ConstantA")
+        mismatches.check(portReversed4F64ConstantA(), highwayReversed4F64ConstantA(), "")
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8() {
+        let mismatches = Mismatches("portReversed8F64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE02C_1A04_5548_5891)
+        for a in aInputs {
+            mismatches.check(portReversed8F64(a), highwayReversed8F64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantA() {
+        let mismatches = Mismatches("portReversed8F64ConstantA")
+        mismatches.check(portReversed8F64ConstantA(), highwayReversed8F64ConstantA(), "")
+        mismatches.record()
+    }
 }

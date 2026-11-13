@@ -36,4 +36,24 @@ extension SIMDDoubleReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test(.disabled(if: !H.canReverse4, "Highway's reversal needs more lanes than this target has"))
+    func reversed4() {
+        let mismatches = Mismatches("reversed4")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4729_0E04_8F58_2EAD)
+        for a in aInputs {
+            mismatches.check(H.reversed4(a), HighwayReference.reversed4F64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8() {
+        let mismatches = Mismatches("reversed8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE02C_1A04_5548_5891)
+        for a in aInputs {
+            mismatches.check(H.reversed8(a), HighwayReference.reversed8F64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
 }

@@ -46,5 +46,14 @@ extension SIMDFloat16ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func reversed8() {
+        let mismatches = Mismatches("reversed8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD349_6C4E_E555_6040)
+        for a in aInputs {
+            mismatches.check(H.reversed8(a), HighwayReference.reversed8F16(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
 }
 #endif

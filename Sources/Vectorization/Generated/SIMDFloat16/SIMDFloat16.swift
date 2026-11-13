@@ -145,6 +145,12 @@ public enum SIMDFloat16: SIMDElement, SIMDFloatElement, SendableMetatype {
     @export(implementation) @inline(always)
     public static var canLookup16: Bool { cvectorization_ops_can_lookup16_f16() }
 
+    @export(implementation) @inline(always)
+    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_f16() }
+
+    @export(implementation) @inline(always)
+    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_f16() }
+
 }
 
 @available(*, unavailable)

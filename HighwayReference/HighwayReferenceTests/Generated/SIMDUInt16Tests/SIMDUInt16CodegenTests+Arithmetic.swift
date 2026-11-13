@@ -632,4 +632,31 @@ extension SIMDUInt16CodegenTests {
         }
         mismatches.record()
     }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func biasedExponentFromFloat16() {
+        let mismatches = Mismatches("portBiasedExponentF16ToU16")
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xA4ED_EE2B_C81B_A33F)
+        for a in aInputs {
+            mismatches.check(
+                portBiasedExponentF16ToU16(a),
+                highwayBiasedExponentF16ToU16(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func biasedExponentFromFloat16ConstantA() {
+        let mismatches = Mismatches("portBiasedExponentF16ToU16ConstantA")
+        mismatches.check(
+            portBiasedExponentF16ToU16ConstantA(),
+            highwayBiasedExponentF16ToU16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+    #endif
 }

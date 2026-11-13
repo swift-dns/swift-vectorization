@@ -763,3 +763,33 @@ public func highwaySumsOfShuffledQuadAbsoluteDifferencesU8ToU16ConstantI3(
         )
     )
 }
+
+#if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portBiasedExponentF16ToU16(_ a: SIMDFloat16.Vector) -> SIMDUInt16.Vector {
+    SIMDUInt16.biasedExponent(a)
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwayBiasedExponentF16ToU16(_ a: SIMDFloat16.Vector) -> SIMDUInt16.Vector {
+    SIMDUInt16.Vector(raw: HighwayReference.Nothrow.biasedExponentF16ToU16(a))
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portBiasedExponentF16ToU16ConstantA() -> SIMDUInt16.Vector {
+    SIMDUInt16.biasedExponent(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwayBiasedExponentF16ToU16ConstantA() -> SIMDUInt16.Vector {
+    SIMDUInt16.Vector(
+        raw: HighwayReference.Nothrow.biasedExponentF16ToU16(
+            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        )
+    )
+}
+#endif

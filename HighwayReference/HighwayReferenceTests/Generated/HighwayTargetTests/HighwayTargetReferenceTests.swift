@@ -23,6 +23,434 @@ struct HighwayTargetReferenceTests {
         mismatches.record()
     }
 
+    @Test func memoryOpsMightFault() {
+        let mismatches = Mismatches("memoryOpsMightFault")
+        mismatches.check(SIMDTarget.memoryOpsMightFault, HighwayReference.memoryOpsMightFault(), "")
+        mismatches.record()
+    }
+
+    @Test func hasNativeFusedMultiplyAdd() {
+        let mismatches = Mismatches("hasNativeFusedMultiplyAdd")
+        mismatches.check(
+            SIMDTarget.hasNativeFusedMultiplyAdd,
+            HighwayReference.hasNativeFusedMultiplyAdd(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func hasNativeMasking() {
+        let mismatches = Mismatches("hasNativeMasking")
+        mismatches.check(SIMDTarget.hasNativeMasking, HighwayReference.hasNativeMasking(), "")
+        mismatches.record()
+    }
+
+    @Test func hasNativeBFloat16DotProduct() {
+        let mismatches = Mismatches("hasNativeBFloat16DotProduct")
+        mismatches.check(
+            SIMDTarget.hasNativeBFloat16DotProduct,
+            HighwayReference.hasNativeBFloat16DotProduct(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func hasNativeWholeInterleave() {
+        let mismatches = Mismatches("hasNativeWholeInterleave")
+        mismatches.check(
+            SIMDTarget.hasNativeWholeInterleave,
+            HighwayReference.hasNativeWholeInterleave(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func hasNativeStoreFirst() {
+        let mismatches = Mismatches("hasNativeStoreFirst")
+        mismatches.check(SIMDTarget.hasNativeStoreFirst, HighwayReference.hasNativeStoreFirst(), "")
+        mismatches.record()
+    }
+
+    @Test func hasNative64BitMultiply() {
+        let mismatches = Mismatches("hasNative64BitMultiply")
+        mismatches.check(
+            SIMDTarget.hasNative64BitMultiply,
+            HighwayReference.hasNative64BitMultiply(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func hasNativeFloat16Arithmetic() {
+        let mismatches = Mismatches("hasNativeFloat16Arithmetic")
+        mismatches.check(
+            SIMDTarget.hasNativeFloat16Arithmetic,
+            HighwayReference.hasNativeFloat16Arithmetic(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func registerCount() {
+        let mismatches = Mismatches("registerCount")
+        mismatches.check(SIMDTarget.registerCount, HighwayReference.registerCount(), "")
+        mismatches.record()
+    }
+
+    @Test func target() {
+        let mismatches = Mismatches("target")
+        mismatches.check(SIMDTarget.target.rawValue, HighwayReference.staticTarget(), "")
+        mismatches.record()
+    }
+
+    @Test func supportedTargets() {
+        let mismatches = Mismatches("supportedTargets")
+        mismatches.check(
+            SIMDTarget.supportedTargets.rawValue,
+            HighwayReference.supportedTargets(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sse2Target() {
+        let mismatches = Mismatches("sse2Target")
+        mismatches.check(SIMDTargetSet.sse2.rawValue, HighwayReference.sse2Target(), "")
+        mismatches.check(
+            SIMDTargetSet.sse2.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.sse2Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func ssse3Target() {
+        let mismatches = Mismatches("ssse3Target")
+        mismatches.check(SIMDTargetSet.ssse3.rawValue, HighwayReference.ssse3Target(), "")
+        mismatches.check(
+            SIMDTargetSet.ssse3.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.ssse3Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sse4Target() {
+        let mismatches = Mismatches("sse4Target")
+        mismatches.check(SIMDTargetSet.sse4.rawValue, HighwayReference.sse4Target(), "")
+        mismatches.check(
+            SIMDTargetSet.sse4.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.sse4Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func avx2Target() {
+        let mismatches = Mismatches("avx2Target")
+        mismatches.check(SIMDTargetSet.avx2.rawValue, HighwayReference.avx2Target(), "")
+        mismatches.check(
+            SIMDTargetSet.avx2.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.avx2Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func avx3Target() {
+        let mismatches = Mismatches("avx3Target")
+        mismatches.check(SIMDTargetSet.avx3.rawValue, HighwayReference.avx3Target(), "")
+        mismatches.check(
+            SIMDTargetSet.avx3.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.avx3Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func avx3DLTarget() {
+        let mismatches = Mismatches("avx3DLTarget")
+        mismatches.check(SIMDTargetSet.avx3DL.rawValue, HighwayReference.avx3DLTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.avx3DL.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.avx3DLTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func avx3ZEN4Target() {
+        let mismatches = Mismatches("avx3ZEN4Target")
+        mismatches.check(SIMDTargetSet.avx3ZEN4.rawValue, HighwayReference.avx3ZEN4Target(), "")
+        mismatches.check(
+            SIMDTargetSet.avx3ZEN4.names.joined(separator: " "),
+            unsafe String(
+                cString: HighwayReference.targetNameOf(HighwayReference.avx3ZEN4Target())
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func avx3SPRTarget() {
+        let mismatches = Mismatches("avx3SPRTarget")
+        mismatches.check(SIMDTargetSet.avx3SPR.rawValue, HighwayReference.avx3SPRTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.avx3SPR.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.avx3SPRTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func avx10Version2Target() {
+        let mismatches = Mismatches("avx10Version2Target")
+        mismatches.check(
+            SIMDTargetSet.avx10Version2.rawValue,
+            HighwayReference.avx10Version2Target(),
+            ""
+        )
+        mismatches.check(
+            SIMDTargetSet.avx10Version2.names.joined(separator: " "),
+            unsafe String(
+                cString: HighwayReference.targetNameOf(HighwayReference.avx10Version2Target())
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func neonWithoutAESTarget() {
+        let mismatches = Mismatches("neonWithoutAESTarget")
+        mismatches.check(
+            SIMDTargetSet.neonWithoutAES.rawValue,
+            HighwayReference.neonWithoutAESTarget(),
+            ""
+        )
+        mismatches.check(
+            SIMDTargetSet.neonWithoutAES.names.joined(separator: " "),
+            unsafe String(
+                cString: HighwayReference.targetNameOf(HighwayReference.neonWithoutAESTarget())
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func neonTarget() {
+        let mismatches = Mismatches("neonTarget")
+        mismatches.check(SIMDTargetSet.neon.rawValue, HighwayReference.neonTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.neon.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.neonTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func neonBF16Target() {
+        let mismatches = Mismatches("neonBF16Target")
+        mismatches.check(SIMDTargetSet.neonBF16.rawValue, HighwayReference.neonBF16Target(), "")
+        mismatches.check(
+            SIMDTargetSet.neonBF16.names.joined(separator: " "),
+            unsafe String(
+                cString: HighwayReference.targetNameOf(HighwayReference.neonBF16Target())
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sveTarget() {
+        let mismatches = Mismatches("sveTarget")
+        mismatches.check(SIMDTargetSet.sve.rawValue, HighwayReference.sveTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.sve.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.sveTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sve2Target() {
+        let mismatches = Mismatches("sve2Target")
+        mismatches.check(SIMDTargetSet.sve2.rawValue, HighwayReference.sve2Target(), "")
+        mismatches.check(
+            SIMDTargetSet.sve2.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.sve2Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sveFixed256Target() {
+        let mismatches = Mismatches("sveFixed256Target")
+        mismatches.check(
+            SIMDTargetSet.sveFixed256.rawValue,
+            HighwayReference.sveFixed256Target(),
+            ""
+        )
+        mismatches.check(
+            SIMDTargetSet.sveFixed256.names.joined(separator: " "),
+            unsafe String(
+                cString: HighwayReference.targetNameOf(HighwayReference.sveFixed256Target())
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sve2Fixed128Target() {
+        let mismatches = Mismatches("sve2Fixed128Target")
+        mismatches.check(
+            SIMDTargetSet.sve2Fixed128.rawValue,
+            HighwayReference.sve2Fixed128Target(),
+            ""
+        )
+        mismatches.check(
+            SIMDTargetSet.sve2Fixed128.names.joined(separator: " "),
+            unsafe String(
+                cString: HighwayReference.targetNameOf(HighwayReference.sve2Fixed128Target())
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func rvvTarget() {
+        let mismatches = Mismatches("rvvTarget")
+        mismatches.check(SIMDTargetSet.rvv.rawValue, HighwayReference.rvvTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.rvv.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.rvvTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func lsxTarget() {
+        let mismatches = Mismatches("lsxTarget")
+        mismatches.check(SIMDTargetSet.lsx.rawValue, HighwayReference.lsxTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.lsx.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.lsxTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func lasxTarget() {
+        let mismatches = Mismatches("lasxTarget")
+        mismatches.check(SIMDTargetSet.lasx.rawValue, HighwayReference.lasxTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.lasx.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.lasxTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func ppc8Target() {
+        let mismatches = Mismatches("ppc8Target")
+        mismatches.check(SIMDTargetSet.ppc8.rawValue, HighwayReference.ppc8Target(), "")
+        mismatches.check(
+            SIMDTargetSet.ppc8.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.ppc8Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func ppc9Target() {
+        let mismatches = Mismatches("ppc9Target")
+        mismatches.check(SIMDTargetSet.ppc9.rawValue, HighwayReference.ppc9Target(), "")
+        mismatches.check(
+            SIMDTargetSet.ppc9.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.ppc9Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func ppc10Target() {
+        let mismatches = Mismatches("ppc10Target")
+        mismatches.check(SIMDTargetSet.ppc10.rawValue, HighwayReference.ppc10Target(), "")
+        mismatches.check(
+            SIMDTargetSet.ppc10.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.ppc10Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func z14Target() {
+        let mismatches = Mismatches("z14Target")
+        mismatches.check(SIMDTargetSet.z14.rawValue, HighwayReference.z14Target(), "")
+        mismatches.check(
+            SIMDTargetSet.z14.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.z14Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func z15Target() {
+        let mismatches = Mismatches("z15Target")
+        mismatches.check(SIMDTargetSet.z15.rawValue, HighwayReference.z15Target(), "")
+        mismatches.check(
+            SIMDTargetSet.z15.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.z15Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func wasmTarget() {
+        let mismatches = Mismatches("wasmTarget")
+        mismatches.check(SIMDTargetSet.wasm.rawValue, HighwayReference.wasmTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.wasm.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.wasmTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func wasmEMU256Target() {
+        let mismatches = Mismatches("wasmEMU256Target")
+        mismatches.check(SIMDTargetSet.wasmEMU256.rawValue, HighwayReference.wasmEMU256Target(), "")
+        mismatches.check(
+            SIMDTargetSet.wasmEMU256.names.joined(separator: " "),
+            unsafe String(
+                cString: HighwayReference.targetNameOf(HighwayReference.wasmEMU256Target())
+            ),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func emu128Target() {
+        let mismatches = Mismatches("emu128Target")
+        mismatches.check(SIMDTargetSet.emu128.rawValue, HighwayReference.emu128Target(), "")
+        mismatches.check(
+            SIMDTargetSet.emu128.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.emu128Target())),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func scalarTarget() {
+        let mismatches = Mismatches("scalarTarget")
+        mismatches.check(SIMDTargetSet.scalar.rawValue, HighwayReference.scalarTarget(), "")
+        mismatches.check(
+            SIMDTargetSet.scalar.names.joined(separator: " "),
+            unsafe String(cString: HighwayReference.targetNameOf(HighwayReference.scalarTarget())),
+            ""
+        )
+        mismatches.record()
+    }
+
     @Test func flushStreams() {
         SIMDTarget.flushStreams()
         HighwayReference.flushStreams()

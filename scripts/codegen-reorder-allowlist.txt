@@ -6,6 +6,7 @@ NEON StoreCompressedI8ConstantA
 NEON StoreCompressedU8ConstantA
 NEON_WITHOUT_AES SquareRootWhereF32
 NEON_WITHOUT_AES SquareRootWhereF64
+NEON_WITHOUT_AES MultiplyingByPowerOf2I16ToF16ConstantB
 SSE2 DividingI16
 SSE2 DividingU8
 SSE2 MultiplyingHighU64

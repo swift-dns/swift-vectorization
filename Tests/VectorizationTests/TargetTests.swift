@@ -61,6 +61,36 @@ struct TargetTests {
         #expect(!SIMDTarget.targetName.isEmpty)
     }
 
+    @Test("Compiles for exactly one target, the one it names")
+    func compilesForOneTarget() {
+        #expect(SIMDTarget.target.rawValue.nonzeroBitCount == 1)
+        #expect(SIMDTarget.target.names == [SIMDTarget.targetName])
+    }
+
+    @Test("Names a set's targets best first")
+    func namesTargetsBestFirst() {
+        let targets: SIMDTargetSet = [.emu128, .sse4, .avx2]
+        #expect(targets.names == ["AVX2", "SSE4", "EMU128"])
+    }
+
+    @Test("Supports EMU128 and SCALAR on every CPU")
+    func supportsEmulatedTargets() {
+        let supported = SIMDTarget.supportedTargets
+        #expect(supported.contains(.emu128))
+        #expect(supported.contains(.scalar))
+    }
+
+    @Test(
+        "Runs on a CPU that supports the target it was compiled for",
+        .disabled(
+            if: SIMDTarget.target == .avx3ZEN4,
+            "Highway reports AVX3_ZEN4 only on AMD CPUs, and CI runs that row under Intel's SDE"
+        )
+    )
+    func supportsTarget() {
+        #expect(SIMDTarget.isSupported)
+    }
+
     @Test("Every element type fills the vector width of the target")
     func laneCountsFillTheVector() throws {
         let bytes = try #require(

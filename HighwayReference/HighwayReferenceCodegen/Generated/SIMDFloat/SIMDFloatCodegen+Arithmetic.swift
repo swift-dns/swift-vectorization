@@ -423,3 +423,31 @@ public func portPairwiseSubtractingF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFl
 public func highwayPairwiseSubtractingF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
     HighwayReference.Nothrow.pairwiseSubtractingF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
 }
+
+#if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portSumsOf2F16ToF32(_ a: SIMDFloat16.Vector) -> SIMDFloat.Vector {
+    SIMDFloat.sumsOf2(a)
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwaySumsOf2F16ToF32(_ a: SIMDFloat16.Vector) -> SIMDFloat.Vector {
+    HighwayReference.Nothrow.sumsOf2F16ToF32(a)
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portSumsOf2F16ToF32ConstantA() -> SIMDFloat.Vector {
+    SIMDFloat.sumsOf2(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwaySumsOf2F16ToF32ConstantA() -> SIMDFloat.Vector {
+    HighwayReference.Nothrow.sumsOf2F16ToF32(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    )
+}
+#endif

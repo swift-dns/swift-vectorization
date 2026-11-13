@@ -11,7 +11,7 @@ extension SIMDFloat16ReferenceTests {
         let mismatches = Mismatches("sum")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4E5F_60E3_CFBA_9EDD)
         for a in aInputs
-        where HighwayReference.hasFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
+        where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.sum(a),
                 Float16(bitPattern: HighwayReference.sumF16(a)),
@@ -77,7 +77,7 @@ extension SIMDFloat16ReferenceTests {
         let mismatches = Mismatches("repeatingSum")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5E11_7B6C_93C6_E434)
         for a in aInputs
-        where HighwayReference.hasFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
+        where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
             mismatches.check(
                 H.repeatingSum(a),
                 HighwayReference.repeatingSumF16(a),

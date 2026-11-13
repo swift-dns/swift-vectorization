@@ -5,6 +5,55 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
+public func portMultiplyingByPowerOf2I16ToF16(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDInt16.Vector
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingByPowerOf2(a, b)
+}
+
+@inline(never)
+public func highwayMultiplyingByPowerOf2I16ToF16(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDInt16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingByPowerOf2I16ToF16(a, b.raw)
+}
+
+@inline(never)
+public func portMultiplyingByPowerOf2I16ToF16ConstantA(_ b: SIMDInt16.Vector) -> SIMDFloat16.Vector
+{
+    SIMDFloat16.multiplyingByPowerOf2(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+}
+
+@inline(never)
+public func highwayMultiplyingByPowerOf2I16ToF16ConstantA(
+    _ b: SIMDInt16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingByPowerOf2I16ToF16(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        b.raw
+    )
+}
+
+@inline(never)
+public func portMultiplyingByPowerOf2I16ToF16ConstantB(
+    _ a: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    SIMDFloat16.multiplyingByPowerOf2(a, SIMDInt16.repeating(26))
+}
+
+@inline(never)
+public func highwayMultiplyingByPowerOf2I16ToF16ConstantB(
+    _ a: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.multiplyingByPowerOf2I16ToF16(
+        a,
+        SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+    )
+}
+
+@inline(never)
 public func portMultiplyingF16(
     _ a: SIMDFloat16.Vector,
     _ b: SIMDFloat16.Vector

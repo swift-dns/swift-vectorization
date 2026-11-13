@@ -83,4 +83,18 @@ extension SIMDInt32ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8() {
+        let mismatches = Mismatches("reversed8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3772_0C1C_47C7_56BB)
+        for a in aInputs {
+            mismatches.check(
+                H.reversed8(a),
+                H.Vector(raw: HighwayReference.reversed8I32(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

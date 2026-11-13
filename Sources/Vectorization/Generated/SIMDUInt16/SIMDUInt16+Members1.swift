@@ -241,6 +241,15 @@ extension SIMDUInt16 {
         )
     }
 
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func biasedExponent(_ a: SIMDFloat16.Vector) -> Vector {
+        Vector(raw: cvectorization_ops_biased_exponent_f16_to_u16(a))
+    }
+
+    #endif
+
     @export(implementation) @inline(always)
     public static func minimum(_ a: Vector, _ b: Vector) -> Vector {
         Vector(raw: cvectorization_ops_minimum_u16(a.raw, b.raw))

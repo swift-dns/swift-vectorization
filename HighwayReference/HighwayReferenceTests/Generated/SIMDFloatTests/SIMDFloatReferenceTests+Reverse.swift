@@ -45,4 +45,14 @@ extension SIMDFloatReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8() {
+        let mismatches = Mismatches("reversed8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71CC_722A_4929_ADC2)
+        for a in aInputs {
+            mismatches.check(H.reversed8(a), HighwayReference.reversed8F32(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
 }

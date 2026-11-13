@@ -20,4 +20,16 @@ struct SIMDBFloat16ReferenceTests {
         mismatches.check(H.blockCount, HighwayReference.blockCountBF16(), "")
         mismatches.record()
     }
+
+    @Test func canReverse4() {
+        let mismatches = Mismatches("canReverse4")
+        mismatches.check(H.canReverse4, HighwayReference.canReverse4BF16(), "")
+        mismatches.record()
+    }
+
+    @Test func canReverse8() {
+        let mismatches = Mismatches("canReverse8")
+        mismatches.check(H.canReverse8, HighwayReference.canReverse8BF16(), "")
+        mismatches.record()
+    }
 }

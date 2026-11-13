@@ -373,4 +373,96 @@ extension SIMDBFloat16ConstantTests {
     @Test func reversed4ConstantSplatGreatest() {
         checkReversed4ConstantA(H.Lane(bitPattern: 0x7F7F))
     }
+
+    @inline(__always)
+    private func checkReversed8ConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("reversed8 with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversed8(H.repeating(value)),
+            H.Vector(raw: HighwayReference.reversed8BF16(H.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversed8ConstantSplatZero() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x0000))
+    }
+
+    @Test func reversed8ConstantSplatNegativeZero() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x8000))
+    }
+
+    @Test func reversed8ConstantSplatOne() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x3F80))
+    }
+
+    @Test func reversed8ConstantSplatMinusOne() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0xBF80))
+    }
+
+    @Test func reversed8ConstantSplatTwo() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x4000))
+    }
+
+    @Test func reversed8ConstantSplatHalf() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x3F00))
+    }
+
+    @Test func reversed8ConstantSplatFour() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x4080))
+    }
+
+    @Test func reversed8ConstantSplatQuarter() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x3E80))
+    }
+
+    @Test func reversed8ConstantSplatOnePointFive() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x3FC0))
+    }
+
+    @Test func reversed8ConstantSplatMinusTwoPointFive() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0xC020))
+    }
+
+    @Test func reversed8ConstantSplatInfinity() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x7F80))
+    }
+
+    @Test func reversed8ConstantSplatMinusInfinity() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0xFF80))
+    }
+
+    @Test func reversed8ConstantSplatNaN() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x7FC0))
+    }
+
+    @Test func reversed8ConstantSplatMinusNaN() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0xFFC0))
+    }
+
+    @Test func reversed8ConstantSplatPayloadNaN() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x7FC1))
+    }
+
+    @Test func reversed8ConstantSplatSignalingNaN() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x7F81))
+    }
+
+    @Test func reversed8ConstantSplatMinusSignalingNaN() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0xFF81))
+    }
+
+    @Test func reversed8ConstantSplatLeastNonzero() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x0001))
+    }
+
+    @Test func reversed8ConstantSplatGreatest() {
+        checkReversed8ConstantA(H.Lane(bitPattern: 0x7F7F))
+    }
 }

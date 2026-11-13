@@ -202,6 +202,12 @@ public enum SIMDInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
     @export(implementation) @inline(always)
     public static var canLookup64: Bool { cvectorization_ops_can_lookup64_i8() }
 
+    @export(implementation) @inline(always)
+    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_i8() }
+
+    @export(implementation) @inline(always)
+    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_i8() }
+
 }
 
 @available(*, unavailable)

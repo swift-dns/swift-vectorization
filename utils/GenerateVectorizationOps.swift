@@ -786,6 +786,7 @@ struct Op {
     let immediates: [ImmediateArgument]
     let template: ImmediateTemplate?
     let indexContract: IndexContract?
+    let laneCapability: LaneCapability?
     let divides: Bool
     let requiresTrueLane: Bool
     let unorderedNaNs: UnorderedNaNs?
@@ -824,6 +825,7 @@ struct Op {
         immediates: [ImmediateArgument] = [],
         template: ImmediateTemplate? = nil,
         indexContract: IndexContract? = nil,
+        laneCapability: LaneCapability? = nil,
         divides: Bool = false,
         requiresTrueLane: Bool = false,
         unorderedNaNs: UnorderedNaNs? = nil,
@@ -864,6 +866,7 @@ struct Op {
         self.immediates = immediates
         self.template = template
         self.indexContract = indexContract
+        self.laneCapability = laneCapability
         self.divides = divides
         self.requiresTrueLane = requiresTrueLane
         self.unorderedNaNs = unorderedNaNs
@@ -11621,6 +11624,8 @@ func integerNegatedMultiplySubtracting(for element: Element) -> String {
     return vectorResult(negatedLanes("(\(sum))", for: element), for: element)
 }
 
+let x86DisablesFmaCondition = "defined(HWY_DISABLE_BMI2_FMA)"
+
 func fusedMultiplicationTargets(_ form: FusedMultiplication) -> TargetBodies<Element> {
     TargetBodies(
         neon: { element in
@@ -11636,7 +11641,7 @@ func fusedMultiplicationTargets(_ form: FusedMultiplication) -> TargetBodies<Ele
         avx2: { element in
             guard element.category == .float else { return nil }
             return """
-                #if defined(HWY_DISABLE_BMI2_FMA)
+                #if \(x86DisablesFmaCondition)
                 \(withoutContraction(vectorResult(form.unfused, for: element)))
                 #else
                 \(vectorResult(form.fused, for: element))
@@ -11732,7 +11737,7 @@ func x86MultiplyAlternating(
     }
     let fused = x86Builtin(name, ["a", "b", third], as: floating, returning: element.cVector)
     return """
-        #if defined(HWY_DISABLE_BMI2_FMA)
+        #if \(x86DisablesFmaCondition)
         \(withoutContraction(separate))
         #else
         \(vectorResult(fused, for: element))
@@ -12384,7 +12389,7 @@ func x86NegatedMultiplyAddingHelper(for element: Element) -> String? {
             "return (\(element.cRawVector))__builtin_elementwise_fma(-(\(element.cVector))a, (\(element.cVector))b, (\(element.cVector))c);",
         specifiers: "CVECTORIZATION_OPS_FUNCTION"
     )
-    return "#if !defined(HWY_DISABLE_BMI2_FMA)\n\(function)#endif"
+    return "#if !\(x86DisablesFmaCondition)\n\(function)#endif"
 }
 
 func neonApproximate(_ name: String, for element: Element) -> String {
@@ -12813,7 +12818,7 @@ func complexMultiplyingTargets(conjugating: Bool, adding: Bool) -> TargetBodies<
                 for: element
             )
             return """
-                #if defined(HWY_DISABLE_BMI2_FMA)
+                #if \(x86DisablesFmaCondition)
                 \(unfused)
                 #else
                 \(fused(element) ?? "")
@@ -13146,26 +13151,85 @@ let lookupSizes = [
     LookupSize(lanes: 64, applies: .integer(bits: [8])),
 ]
 
-func canLookupName(_ lanes: Int) -> String {
-    "canLookup\(lanes)"
+enum LaneCapability {
+    case lookup(LookupSize)
+    case reversal(lanes: Int)
+
+    var name: String {
+        switch self {
+        case .lookup(let size): return "canLookup\(size.lanes)"
+        case .reversal(let lanes): return "canReverse\(lanes)"
+        }
+    }
+
+    var opName: String {
+        switch self {
+        case .lookup(let size): return "lookup\(size.lanes)"
+        case .reversal(let lanes): return "reversed\(lanes)"
+        }
+    }
+
+    var operation: String {
+        switch self {
+        case .lookup: return "lookup"
+        case .reversal: return "reversal"
+        }
+    }
+
+    var applies: Applies {
+        switch self {
+        case .lookup(let size): return size.applies
+        case .reversal: return Applies.all.including(halfPrecisionElements)
+        }
+    }
+
+    var check: Check {
+        (name, "Vector has too few lanes for this \(operation)")
+    }
+
+    var disabling: Disabling {
+        ("!H.\(name)", "Highway's \(operation) needs more lanes than this target has")
+    }
+
+    func isChecked(for element: Element) -> Bool {
+        switch self {
+        case .lookup: return true
+        case .reversal(let lanes): return element.at(width: 16).laneCount < lanes
+        }
+    }
+
+    func body(for element: Element) -> String {
+        let lanes = "sizeof(\(element.cVector)) / sizeof(\(element.cType))"
+        switch self {
+        case .lookup(let size):
+            let enough = "return \(lanes) >= \(size.lanes / 2);"
+            guard size.lanes == 64 else { return enough }
+            return """
+                #if \(neonCondition) == \(ArmLevel.neon.rawValue)
+                return true;
+                #else
+                \(enough)
+                #endif
+                """
+        case .reversal(let count):
+            return "return \(lanes) >= \(count);"
+        }
+    }
+
+    func reference(for element: Element) -> String {
+        switch self {
+        case .lookup(let size): return "hn::CanLookup\(size.lanes)(\(element.tag)())"
+        case .reversal(let lanes): return "hn::Lanes(\(element.tag)()) >= \(lanes)"
+        }
+    }
 }
 
-func canLookupBody(_ lanes: Int, for element: Element) -> String {
-    let enough = "return sizeof(\(element.cVector)) / sizeof(\(element.cType)) >= \(lanes / 2);"
-    guard lanes == 64 else { return enough }
-    return """
-        #if \(neonCondition) == \(ArmLevel.neon.rawValue)
-        return true;
-        #else
-        \(enough)
-        #endif
-        """
-}
+let laneCapabilities =
+    lookupSizes.map(LaneCapability.lookup) + [4, 8].map { LaneCapability.reversal(lanes: $0) }
 
-func lookupChecks(of op: Op, for element: Element) -> [Check] {
-    guard takesLookupIndices(op), case .table(let lanes)? = op.span else { return [] }
-    return indexChecks(of: op, for: element)
-        + [(canLookupName(lanes), "Vector has too few lanes for this lookup")]
+func laneCapabilityChecks(of op: Op, for element: Element) -> [Check] {
+    guard let capability = op.laneCapability, capability.isChecked(for: element) else { return [] }
+    return indexChecks(of: op, for: element) + [capability.check]
 }
 
 func takesPointerIndices(_ op: Op) -> Bool {
@@ -13236,23 +13300,35 @@ func loadedIndexChecks(of op: Op, for element: Element) -> [Check] {
 }
 
 func spanOpChecks(of op: Op, for element: Element) -> [Check] {
-    lookupChecks(of: op, for: element) + gatherChecks(of: op, for: element)
+    laneCapabilityChecks(of: op, for: element) + gatherChecks(of: op, for: element)
         + loadedIndexChecks(of: op, for: element)
 }
 
-func lookupAssertions(of op: Op, for element: Element) -> String {
-    lookupChecks(of: op, for: element)
-        .map { "        assert(\($0.condition), \"\($0.message)\")\n" }.joined()
+func laneCapabilityStatements(of op: Op, for element: Element) -> String {
+    let function = isUnsafe(op) ? "assert" : "precondition"
+    return laneCapabilityChecks(of: op, for: element)
+        .map { "        \(function)(\($0.condition), \"\($0.message)\")\n" }.joined()
 }
 
-func canLookupMembers(for element: Element) -> String {
+func laneCapabilityMembers(for element: Element) -> String {
     var output = ""
-    for size in lookupSizes where size.applies.matches(element) {
-        let name = canLookupName(size.lanes)
+    for capability in laneCapabilities where capability.applies.matches(element) {
+        let name = capability.name
         output += "    @export(implementation) @inline(always)\n"
         output += "    public static var \(name): Bool { \(cFunctionName(name, element))() }\n\n"
     }
     return output
+}
+
+func laneCapabilityRequirements(indent: String) -> String {
+    laneCapabilities.filter { classicElements.allSatisfy($0.applies.matches) }.map {
+        """
+        \(indent)/// Whether a `Vector` holds enough lanes for `\($0.opName)` on the target this was compiled for.
+        \(indent)static var \($0.name): Bool { get }
+
+
+        """
+    }.joined()
 }
 
 func x86Sse2LookupTables(for element: Element) -> Element {
@@ -13331,6 +13407,7 @@ func lookupOp(_ size: LookupSize) -> Op {
         section: .userSpecifiedPermutationAcrossBlocks,
         span: .table(lanes: lanes),
         indexContract: .table(lanes: lanes),
+        laneCapability: .lookup(size),
         targets: TargetBodies(
             neon: { element in lanes == 64 ? neonLookup64(for: element) : nil },
             sve2_128: { element in
@@ -13815,7 +13892,7 @@ let basicOps: [Op] = [
             avx2: { element in
                 guard element.bits == 64 else { return x86Approximate("rsqrt", for: element) }
                 return """
-                    #if defined(HWY_DISABLE_BMI2_FMA)
+                    #if \(x86DisablesFmaCondition)
                     \(portableApproximateReciprocalSquareRoot(for: element))
                     #else
                     if (__builtin_constant_p(__builtin_reduce_or(\(unsignedBits("a", of: element))))) {
@@ -13877,7 +13954,7 @@ let basicOps: [Op] = [
             avx2: { element in
                 guard element.category == .float else { return nil }
                 return """
-                    #if defined(HWY_DISABLE_BMI2_FMA)
+                    #if \(x86DisablesFmaCondition)
                     \(unfusedMultiplyAdding(for: element))
                     #else
                     \(vectorResult("__builtin_elementwise_fma(a, b, c)", for: element))
@@ -19421,6 +19498,7 @@ struct FixedPermutation {
     var helpers = TargetBodies<Element>()
     var sse2Only: ((Element) -> String?)?
     var lowerFirst = false
+    var laneCapability: LaneCapability?
     let indices: (Element) -> [Int]
 }
 
@@ -20034,7 +20112,10 @@ func fixedPermutationOp(_ permutation: FixedPermutation) -> Op {
     let isBinary = permutation.parameters.filter { $0 == .vector }.count > 1
     let operands = isBinary ? (permutation.lowerFirst ? ("b", "a") : ("a", "b")) : ("a", "a")
     let portable = { (element: Element) in
-        shuffled(operands.0, operands.1, permutation.indices(element), for: element)
+        if case .reversal(let lanes)? = permutation.laneCapability, element.laneCount < lanes {
+            return "__builtin_trap();"
+        }
+        return shuffled(operands.0, operands.1, permutation.indices(element), for: element)
     }
     var targets = permutation.targets
     if let sse2 = permutation.sse2Only {
@@ -20048,6 +20129,7 @@ func fixedPermutationOp(_ permutation: FixedPermutation) -> Op {
         .vector,
         permutation.applies,
         section: permutation.section,
+        laneCapability: permutation.laneCapability,
         targets: targets,
         helpers: permutation.helpers,
         portable: portable
@@ -20692,7 +20774,7 @@ let fixedPermutations: [FixedPermutation] = [
         swiftName: "reversed4",
         highwayName: "Reverse4",
         parameters: [.tag, .vector],
-        applies: .all(bits: [8, 16, 32]),
+        applies: .all,
         section: .reverse,
         targets: TargetBodies(
             sve2_128: { element in element.bits == 32 ? sveReversed(for: element) : nil },
@@ -20700,6 +20782,7 @@ let fixedPermutations: [FixedPermutation] = [
         ),
         helpers: TargetBodies(avx3: { element in x86Avx3ReverseHelpers(4, for: element) }),
         sse2Only: { element in x86ReversedGroups(4, for: element) },
+        laneCapability: .reversal(lanes: 4),
         indices: { element in
             reversedGroups(4, for: element)
         }
@@ -20708,11 +20791,12 @@ let fixedPermutations: [FixedPermutation] = [
         swiftName: "reversed8",
         highwayName: "Reverse8",
         parameters: [.tag, .vector],
-        applies: .all(bits: [8, 16]),
+        applies: .all,
         section: .reverse,
         targets: TargetBodies(avx3: { element in x86Avx3ReversedGroups(8, for: element) }),
         helpers: TargetBodies(avx3: { element in x86Avx3ReverseHelpers(8, for: element) }),
         sse2Only: { element in x86ReversedGroups(8, for: element) },
+        laneCapability: .reversal(lanes: 8),
         indices: { element in
             reversedGroups(8, for: element)
         }
@@ -28823,7 +28907,9 @@ func mulBitsPowerOf2Accepts(_ source: Element, _ result: Element) -> Bool {
 func mulBitsPowerOf2(_ clamp: MulBitsExponentClamp, to result: Element) -> String {
     let exponents = signedElement(of: result).at(width: result.width)
     let integer = exponents.cVector
-    let bias = result.bits == 32 ? 127 : 1023
+    let bias = maxExponentField(of: result) >> 1
+    let isHalf = result.category == .float16
+    let arithmetic = isHalf ? "native_vector" : result.cVector
     func integers(_ value: Int) -> String {
         splat("\(value)", as: integer, lanes: result.laneCount)
     }
@@ -28886,7 +28972,7 @@ func mulBitsPowerOf2(_ clamp: MulBitsExponentClamp, to result: Element) -> Strin
             """
     }
     func factor(_ exponent: String) -> String {
-        "(\(result.cVector))((\(exponent) + \(integers(bias))) << \(mantissaBits(of: result)))"
+        "(\(arithmetic))((\(exponent) + \(integers(bias))) << \(mantissaBits(of: result)))"
     }
     func clampedExponent(_ operand: String, _ lowest: Int, _ highest: Int, narrowly: Bool) -> String
     {
@@ -28903,18 +28989,23 @@ func mulBitsPowerOf2(_ clamp: MulBitsExponentClamp, to result: Element) -> Strin
         ? bitwiseClamped(3 - 3 * bias, 3 * bias)
         : "const \(integer) exponent = \(clampedExponent("b", 3 - 3 * bias, 3 * bias, narrowly: false));"
     let factors = [
-        "const \(result.cVector) factor1 = \(factor("exponent1"));",
-        "const \(result.cVector) factor2 = \(factor("exponent2"));",
-        "const \(result.cVector) factor3 = \(factor("exponent3"));",
+        "const \(arithmetic) factor1 = \(factor("exponent1"));",
+        "const \(arithmetic) factor2 = \(factor("exponent2"));",
+        "const \(arithmetic) factor3 = \(factor("exponent3"));",
     ]
+    let natives =
+        isHalf
+        ? "\(halfPrecisionNativeVector(for: result))\nconst native_vector nativeA = (native_vector)a;\n"
+        : ""
+    let product = "((\(isHalf ? "nativeA" : "a") * factor1) * factor2) * factor3"
     return """
-        \(widest)
+        \(natives)\(widest)
         const \(integer) exponent3 = \(clampedExponent("exponent", 1 - bias, bias, narrowly: true));
         const \(integer) remaining = exponent - exponent3;
         const \(integer) exponent2 = \(clampedExponent("remaining", 1 - bias, bias, narrowly: true));
         const \(integer) exponent1 = remaining - exponent2;
         \(factors.joined(separator: "\n"))
-        \(vectorResult("((a * factor1) * factor2) * factor3", for: result))
+        \(vectorResult(isHalf ? "(\(result.cVector))(\(product))" : product, for: result))
         """
 }
 
@@ -33347,6 +33438,7 @@ let bitwiseHalfPrecisionOps: [String: [Element]] = [
     "reversedBlocks": halfPrecisionElements,
     "reversed2": halfPrecisionElements,
     "reversed4": halfPrecisionElements,
+    "reversed8": halfPrecisionElements,
     "oddEvenBlocks": halfPrecisionElements,
     "swappingAdjacentBlocks": halfPrecisionElements,
     "interleavingEvenBlocks": halfPrecisionElements,
@@ -34417,8 +34509,181 @@ let float16IntegerOps: [Op] =
     + float16ToIntegerOps(.saturating, "MaskedConvertTo", label: "converting", masked: true)
     + float16FromIntegerOps(masked: false) + float16FromIntegerOps(masked: true)
 
+func float16SumsOf2(from source: Element, to result: Element) -> String {
+    let promoted = [Float16Promotion.even, .odd].map { promotion in
+        float16ComposedCall(
+            float16PromotionOpList,
+            promotion.highwayName,
+            from: source,
+            to: result,
+            [rawName("a")]
+        )
+    }
+    return "return \(cFunctionName("adding", result))(\(promoted.joined(separator: ", ")));"
+}
+
+let float16SumsOf2Ops = sourcedOps(
+    accepting: Float16Promotion.even.accepts,
+    includingHalfPrecision: true
+) { source, results in
+    Op(
+        "sumsOf2",
+        "SumsOf2",
+        [.sourceVector],
+        .vector,
+        results,
+        section: .arithmetic,
+        unorderedNaNs: .adjacentLanes,
+        filtersUnorderedNaNs: true,
+        vectorLabels: ["_"],
+        source: source,
+        portable: sourced(source) { source, result in float16SumsOf2(from: source, to: result) }
+    )
+}
+
+func float16BiasedExponentAccepts(_ source: Element, _ result: Element) -> Bool {
+    source.category == .float16 && result.category == .unsignedInteger
+        && source.bits == result.bits
+}
+
+func float16BiasedExponent(native: Bool, from source: Element, to result: Element) -> String {
+    let magnitude =
+        native
+        ? "__builtin_elementwise_abs((native_vector)a)"
+        : halfPrecisionMasked("&", with: 0x7fff, for: source)
+    let shifted = "(\(result.cVector))(\(magnitude)) >> \(mantissaBits(of: source))"
+    guard native else { return vectorResult(shifted, for: result) }
+    return "\(halfPrecisionNativeVector(for: source))\n\(vectorResult(shifted, for: result))"
+}
+
+func float16BiasedExponentReference(from source: Element, _ arguments: [String]) -> String {
+    let unsigned = "hn::RebindToUnsigned<\(source.tag)>()"
+    let magnitude =
+        "hn::And(hn::BitCast(\(unsigned), \(arguments[0])), hn::Set(\(unsigned), 0x7FFF))"
+    let emulated = "hn::ShiftRight<\(mantissaBits(of: source))>(\(magnitude))"
+    let direct = "hn::GetBiasedExponent(\(arguments[0]))"
+    return "\n#if HWY_HAVE_FLOAT16\n\(direct)\n#else\n\(emulated)\n#endif\n"
+}
+
+let float16BiasedExponentOps = sourcedOps(
+    accepting: float16BiasedExponentAccepts,
+    includingHalfPrecision: true
+) { source, results in
+    Op(
+        "biasedExponent",
+        "GetBiasedExponent",
+        [.sourceVector],
+        .vector,
+        results,
+        section: .arithmetic,
+        source: source,
+        targets: TargetBodies(
+            neon: sourced(source) { source, result in
+                """
+                #if \(neonHasFloat16Condition)
+                \(float16BiasedExponent(native: true, from: source, to: result))
+                #else
+                \(float16BiasedExponent(native: false, from: source, to: result))
+                #endif
+                """
+            }
+        ),
+        referenceCall: { _, arguments in float16BiasedExponentReference(from: source, arguments) },
+        portable: sourced(source) { source, result in
+            float16BiasedExponent(native: false, from: source, to: result)
+        }
+    )
+}
+
+func float16PowerOf2Accepts(_ source: Element, _ result: Element) -> Bool {
+    source.category == .signedInteger && result.category == .float16 && source.bits == result.bits
+}
+
+func float16PowerOf2Emulated(from source: Element, to result: Element) -> String {
+    let single = float16Single(for: result)
+    let integer = signedElement(of: single).at(width: result.width)
+    func scaled(_ half: PromoteLowerUpperHalf) -> String {
+        let promotion = "Promote\(uppercasedFirst(half.rawValue))To"
+        let operand = float16ComposedCall(
+            float16PromotionOpList,
+            promotion,
+            from: result,
+            to: single,
+            [rawName("a")]
+        )
+        let exponents = float16ComposedCall(
+            conversionOps,
+            promotion,
+            from: source,
+            to: integer,
+            [rawName("b")]
+        )
+        return float16ComposedCall(
+            mulBitsPowerOf2Ops,
+            "MulByPow2",
+            from: integer,
+            to: single,
+            [operand, exponents]
+        )
+    }
+    return "return (\(result.cRawVector))\(float16Combined(for: result, halfResult: scaled));"
+}
+
+func float16PowerOf2Reference(to result: Element, _ arguments: [String]) -> String {
+    let single = "hn::Repartition<float, \(result.tag)>()"
+    let wide = "hn::RebindToSigned<hn::Repartition<float, \(result.tag)>>()"
+    func scaled(_ promotion: String) -> String {
+        let operands = [
+            "hn::\(promotion)(\(single), \(arguments[0]))",
+            "hn::\(promotion)(\(wide), \(arguments[1]))",
+        ]
+        let product = "hn::MulByPow2(\(operands.joined(separator: ", ")))"
+        return "hn::DemoteTo(\(result.tag(of: .half))(), \(product))"
+    }
+    let emulated =
+        "hn::Combine(\(result.tag)(), \(scaled("PromoteUpperTo")), \(scaled("PromoteLowerTo")))"
+    let direct = "hn::MulByPow2(\(arguments.joined(separator: ", ")))"
+    return "\n#if HWY_HAVE_FLOAT16\n\(direct)\n#else\n\(emulated)\n#endif\n"
+}
+
+let float16PowerOf2Ops = sourcedOps(
+    accepting: float16PowerOf2Accepts,
+    includingHalfPrecision: true
+) { source, results in
+    Op(
+        "multiplyingByPowerOf2",
+        "MulByPow2",
+        [.vector, .sourceVector],
+        .vector,
+        results,
+        section: .multiply,
+        source: source,
+        targets: TargetBodies(
+            neon: sourced(source) { source, result in
+                """
+                #if \(neonHasFloat16Condition)
+                \(mulBitsPowerOf2(.selecting, to: result))
+                #else
+                \(float16PowerOf2Emulated(from: source, to: result))
+                #endif
+                """
+            },
+            sve2_128: sourced(source) { source, result in
+                mulBitsPowerOf2Sve(from: source, to: result)
+            }
+        ),
+        referenceCall: { result, arguments in float16PowerOf2Reference(to: result, arguments) },
+        portable: sourced(source) { source, result in
+            float16PowerOf2Emulated(from: source, to: result)
+        }
+    )
+}
+
+let float16WidenArithmeticOps: [Op] =
+    float16SumsOf2Ops + float16BiasedExponentOps + float16PowerOf2Ops
+
 let convertFloat16Ops: [Op] =
-    float16PromotionOpList + float16DemotionOpList + float16IntegerOps
+    float16PromotionOpList + float16DemotionOpList + float16IntegerOps + float16WidenArithmeticOps
 
 func bfloat16PromotesToFloat(_ source: Element, _ result: Element) -> Bool {
     source.category == .bfloat16 && result.category == .float && result.bits == 32
@@ -36563,6 +36828,7 @@ func wideningFunctionName(_ op: WideningOp, from narrow: Element, to wide: Eleme
 
 func snakeCased(_ name: String) -> String {
     name.replacingOccurrences(of: "NaN", with: "Nan")
+        .replacingOccurrences(of: "BFloat", with: "Bfloat")
         .map { $0.isUppercase ? "_\($0.lowercased())" : String($0) }.joined()
 }
 
@@ -37778,11 +38044,19 @@ func generateReferenceHeader() -> String {
         /// The name of the target the ops below were compiled for.
         HWY_INLINE const char* targetName() { return hwy::TargetName(HWY_TARGET); }
 
+        HWY_INLINE const char* targetNameOf(int64_t target) { return hwy::TargetName(target); }
+
+        HWY_INLINE int64_t staticTarget() { return HWY_STATIC_TARGET; }
+
+        HWY_INLINE int64_t supportedTargets() { return hwy::SupportedTargets(); }
+
+        \(targetSetReferenceFunctions())
+
         /// Whether highway's debug assertions are on, which abort on indices that its lookups
         /// do not accept.
         HWY_INLINE bool hasDebugAssertions() { return HWY_IS_DEBUG_BUILD; }
 
-        HWY_INLINE bool hasFloat16Arithmetic() { return HWY_HAVE_FLOAT16; }
+        \(targetCapabilityReferenceFunctions())
 
         /// Whether the lanes that Highway's Compress ops return after the selected ones are the
         /// same on every run. They are not where an op goes through a local array that it only
@@ -37848,10 +38122,9 @@ func generateReferenceHeader() -> String {
         let tailIsDeterministic = referenceFunctionName("compressTailIsDeterministic", element)
         output += "HWY_INLINE bool \(tailIsDeterministic)()"
         output += " { return compressTailIsDeterministic<\(element.hwyType)>(); }\n"
-        for size in lookupSizes where size.applies.matches(element) {
-            let name = canLookupName(size.lanes)
-            output += "HWY_INLINE bool \(referenceFunctionName(name, element))()"
-            output += " { return hn::CanLookup\(size.lanes)(\(element.tag)()); }\n"
+        for capability in laneCapabilities where capability.applies.matches(element) {
+            output += "HWY_INLINE bool \(referenceFunctionName(capability.name, element))()"
+            output += " { return \(capability.reference(for: element)); }\n"
         }
         output += portConversions(of: element)
         output += narrowReferenceDeclarations(of: element)
@@ -38367,11 +38640,12 @@ func cFunction(
     specifiers: String = "CVECTORIZATION_OPS_INLINE"
 ) -> String {
     let signature = parameters.isEmpty ? "void" : parameters.joined(separator: ", ")
+    let declaration = [specifiers, returns, "\(name)(\(signature))"].filter { !$0.isEmpty }
     let lines = body.split(separator: "\n", omittingEmptySubsequences: false).map {
         $0.hasPrefix("#") ? String($0) : "  \($0)"
     }
     return """
-        \(specifiers) \(returns) \(name)(\(signature)) {
+        \(declaration.joined(separator: " ")) {
         \(lines.joined(separator: "\n"))
         }
 
@@ -38479,6 +38753,14 @@ let sveRemedy = "use SVE2 with -msve-vector-bits=128 or \(disablingFlag("HWY_ALL
 
 let staticTargetRules: [StaticTargetRule] = [
     StaticTargetRule(names: armNeonTargets, condition: "HWY_ARCH_ARM_A64", support: .arm(.neon)),
+    StaticTargetRule(
+        names: ["SVE2_128"],
+        condition: "(!defined(__ARM_FEATURE_SVE_BF16) || !defined(__ARM_FEATURE_SVE_MATMUL_INT8))",
+        support: .unsupported(
+            "highway's SVE2_128 target needs BF16 and I8MM: add +bf16+i8mm to -march, "
+                + "as in -march=armv9-a+bf16+i8mm"
+        )
+    ),
     StaticTargetRule(names: ["SVE2_128"], support: .arm(.sve2_128)),
     StaticTargetRule(names: ["AVX3"], support: .x86(.avx3)),
     StaticTargetRule(names: ["AVX3_DL", "AVX3_ZEN4", "AVX3_SPR"], support: .x86(.avx3dl)),
@@ -38610,6 +38892,1033 @@ func setMaskFunction() -> String {
         parameters: ["bool value"],
         body: "return -(int32_t)value;"
     )
+}
+
+struct TargetCapability {
+    let swiftName: String
+    let highwayName: String
+    let summary: String
+    var returns = ReturnType.boolean
+    let values: [(condition: String, value: String)]
+    var otherwise = "false"
+
+    var cName: String { "cvectorization_ops_\(snakeCased(swiftName))" }
+    var cType: String { returns == .count ? "size_t" : "bool" }
+    var swiftValue: String { returns == .count ? "Int(\(cName)())" : "\(cName)()" }
+}
+
+let x86Avx3Condition = x86Condition(from: .avx3, through: .avx3dl)
+let neonOnlyCondition = "\(neonCondition) == \(ArmLevel.neon.rawValue)"
+
+let targetCapabilities = [
+    TargetCapability(
+        swiftName: "memoryOpsMightFault",
+        highwayName: "HWY_MEM_OPS_MIGHT_FAULT",
+        summary: "Whether `load(from:where:)` can fault on unmapped memory in lanes the mask "
+            + "leaves out.",
+        values: [
+            ("HWY_IS_ASAN || HWY_IS_MSAN", "true"),
+            ("\(sve2_128Condition) || (\(x86Avx3Condition))", "false"),
+        ],
+        otherwise: "true"
+    ),
+    TargetCapability(
+        swiftName: "hasNativeFusedMultiplyAdd",
+        highwayName: "HWY_NATIVE_FMA",
+        summary: "Whether `multiplyAdding` and related ops fuse on floating-point lanes, "
+            + "rounding once.",
+        values: [
+            (
+                "\(neonCondition) || (\(x86Avx3Condition)) || "
+                    + "(\(x86Condition(from: .avx2, through: .avx2)) && !\(x86DisablesFmaCondition))",
+                "true"
+            )
+        ]
+    ),
+    TargetCapability(
+        swiftName: "hasNativeMasking",
+        highwayName: "HWY_NATIVE_MASK",
+        summary: "Whether ops that take a mask, such as `adding(_:_:where:)`, use native masked "
+            + "instructions.",
+        values: [("\(sve2_128Condition) || (\(x86Avx3Condition))", "true")]
+    ),
+    TargetCapability(
+        swiftName: "hasNativeBFloat16DotProduct",
+        highwayName: "HWY_NATIVE_DOT_BF16",
+        summary: "Whether `multiplyAccumulatingInAnyOrder` on `SIMDBFloat16` lanes has a native "
+            + "instruction.",
+        values: [
+            (
+                "(\(sve2_128Condition) && (\(bfloat16SveFeatureCondition))) || "
+                    + "(\(neonOnlyCondition) && (\(bfloat16NeonNativeCondition))) || "
+                    + "(\(x86Condition(from: .avx3dl, through: .avx3dl)) && (\(bfloat16Avx3Condition)))",
+                "true"
+            )
+        ]
+    ),
+    TargetCapability(
+        swiftName: "hasNativeWholeInterleave",
+        highwayName: "HWY_NATIVE_INTERLEAVE_WHOLE",
+        summary: "Whether interleaving whole vectors is at least as fast as interleaving within "
+            + "each block.",
+        values: [("CVECTORIZATION_OPS_VECTOR_BYTES <= 16", "true")]
+    ),
+    TargetCapability(
+        swiftName: "hasNativeStoreFirst",
+        highwayName: "HWY_NATIVE_STORE_N",
+        summary: "Whether `storeFirst` is efficient, typically masked, rather than branches on "
+            + "the count.",
+        values: [("\(sve2_128Condition) || (\(x86Avx3Condition)) || (\(emu128Condition))", "true")]
+    ),
+    TargetCapability(
+        swiftName: "hasNative64BitMultiply",
+        highwayName: "HWY_NATIVE_MUL64",
+        summary: "Whether `multiplying` and `multiplyingHigh` of 64-bit integer lanes are native "
+            + "instructions.",
+        values: [("\(sve2_128Condition) || (\(emu128Condition))", "true")]
+    ),
+    TargetCapability(
+        swiftName: "hasNativeFloat16Arithmetic",
+        highwayName: "HWY_HAVE_FLOAT16",
+        summary: "Whether `SIMDFloat16` arithmetic runs on native instructions rather than "
+            + "through `Float`.",
+        values: [
+            (
+                "\(sve2_128Condition) || (\(neonOnlyCondition) && (\(neonHasFloat16Condition)))",
+                "true"
+            )
+        ]
+    ),
+    TargetCapability(
+        swiftName: "registerCount",
+        highwayName: "HWY_REGISTERS",
+        summary: "How many vector registers the architecture has: 32, or 16 on x86 below AVX-512.",
+        returns: .count,
+        values: [("!HWY_ARCH_X86 || (\(x86Avx3Condition))", "32")],
+        otherwise: "16"
+    ),
+]
+
+func targetCapabilityFunctions() -> String {
+    targetCapabilities.map { capability in
+        let chain = capability.values.enumerated().flatMap { index, branch in
+            ["#\(index == 0 ? "if" : "elif") \(branch.condition)", "return \(branch.value);"]
+        }
+        let otherwise = ["#else", "return \(capability.otherwise);", "#endif"]
+        return cFunction(
+            returns: capability.cType,
+            name: capability.cName,
+            parameters: [],
+            body: (chain + otherwise).joined(separator: "\n")
+        )
+    }.joined()
+}
+
+func targetCapabilityMembers() -> String {
+    targetCapabilities.map { capability in
+        """
+        /// \(capability.summary)
+        @export(implementation) @inline(always)
+        public static var \(capability.swiftName): \(swiftReturnType(capability.returns)) { \(capability.swiftValue) }
+        """
+    }.joined(separator: "\n\n")
+}
+
+func generateTargetCapabilities() -> String {
+    """
+    \(generationNotice)
+
+    \(elementImports)
+
+    extension SIMDTarget {
+    \(targetCapabilityMembers())
+    }
+
+    """
+}
+
+func targetCapabilityReferenceFunctions() -> String {
+    targetCapabilities.map {
+        "HWY_INLINE \($0.cType) \($0.swiftName)() { return \($0.highwayName); }"
+    }.joined(separator: "\n")
+}
+
+struct TargetSetMember {
+    let swiftName: String
+    let highwayName: String
+    let bit: Int
+    let summary: String
+
+    var macro: String { "HWY_\(highwayName)" }
+    var referenceName: String { "\(swiftName)Target" }
+}
+
+let targetSetMembers = [
+    TargetSetMember(
+        swiftName: "sse2",
+        highwayName: "SSE2",
+        bit: 14,
+        summary: "Highway's `SSE2` target: x86 with SSE2."
+    ),
+    TargetSetMember(
+        swiftName: "ssse3",
+        highwayName: "SSSE3",
+        bit: 12,
+        summary: "Highway's `SSSE3` target: SSE2 plus SSE3 and SSSE3."
+    ),
+    TargetSetMember(
+        swiftName: "sse4",
+        highwayName: "SSE4",
+        bit: 11,
+        summary: "Highway's `SSE4` target: SSSE3 plus SSE4.1, SSE4.2, AES and PCLMUL."
+    ),
+    TargetSetMember(
+        swiftName: "avx2",
+        highwayName: "AVX2",
+        bit: 9,
+        summary: "Highway's `AVX2` target: SSE4 plus AVX, AVX2, BMI, BMI2, FMA, F16C and LZCNT."
+    ),
+    TargetSetMember(
+        swiftName: "avx3",
+        highwayName: "AVX3",
+        bit: 8,
+        summary: "Highway's `AVX3` target: AVX2 plus AVX-512 F, VL, DQ, BW and CD."
+    ),
+    TargetSetMember(
+        swiftName: "avx3DL",
+        highwayName: "AVX3_DL",
+        bit: 7,
+        summary: "Highway's `AVX3_DL` target: AVX3 plus the AVX-512 extensions of Ice Lake, "
+            + "such as VNNI."
+    ),
+    TargetSetMember(
+        swiftName: "avx3ZEN4",
+        highwayName: "AVX3_ZEN4",
+        bit: 6,
+        summary: "Highway's `AVX3_ZEN4` target: AVX3_DL plus AVX-512 BF16, on AMD CPUs only."
+    ),
+    TargetSetMember(
+        swiftName: "avx3SPR",
+        highwayName: "AVX3_SPR",
+        bit: 4,
+        summary: "Highway's `AVX3_SPR` target: AVX3_DL plus AVX-512 BF16 and FP16, as in "
+            + "Sapphire Rapids."
+    ),
+    TargetSetMember(
+        swiftName: "avx10Version2",
+        highwayName: "AVX10_2",
+        bit: 3,
+        summary: "Highway's `AVX10_2` target: AVX10.2 with 512-bit vectors."
+    ),
+    TargetSetMember(
+        swiftName: "neonWithoutAES",
+        highwayName: "NEON_WITHOUT_AES",
+        bit: 29,
+        summary: "Highway's `NEON_WITHOUT_AES` target: NEON without the AES instructions."
+    ),
+    TargetSetMember(
+        swiftName: "neon",
+        highwayName: "NEON",
+        bit: 28,
+        summary: "Highway's `NEON` target: NEON with the AES instructions."
+    ),
+    TargetSetMember(
+        swiftName: "neonBF16",
+        highwayName: "NEON_BF16",
+        bit: 26,
+        summary: "Highway's `NEON_BF16` target: NEON plus FP16 arithmetic, dot products and BF16."
+    ),
+    TargetSetMember(
+        swiftName: "sve",
+        highwayName: "SVE",
+        bit: 24,
+        summary: "Highway's `SVE` target: SVE with the vector length the CPU has."
+    ),
+    TargetSetMember(
+        swiftName: "sve2",
+        highwayName: "SVE2",
+        bit: 23,
+        summary: "Highway's `SVE2` target: SVE2 with the vector length the CPU has."
+    ),
+    TargetSetMember(
+        swiftName: "sveFixed256",
+        highwayName: "SVE_256",
+        bit: 19,
+        summary: "Highway's `SVE_256` target: SVE with 256-bit vectors, as in Neoverse V1."
+    ),
+    TargetSetMember(
+        swiftName: "sve2Fixed128",
+        highwayName: "SVE2_128",
+        bit: 18,
+        summary: "Highway's `SVE2_128` target: SVE2 with 128-bit vectors, BF16 and I8MM, as in "
+            + "Neoverse V2."
+    ),
+    TargetSetMember(
+        swiftName: "rvv",
+        highwayName: "RVV",
+        bit: 37,
+        summary: "Highway's `RVV` target: RISC-V vectors."
+    ),
+    TargetSetMember(
+        swiftName: "lsx",
+        highwayName: "LSX",
+        bit: 41,
+        summary: "Highway's `LSX` target: LoongArch's 128-bit vectors."
+    ),
+    TargetSetMember(
+        swiftName: "lasx",
+        highwayName: "LASX",
+        bit: 40,
+        summary: "Highway's `LASX` target: LoongArch's 256-bit vectors."
+    ),
+    TargetSetMember(
+        swiftName: "ppc8",
+        highwayName: "PPC8",
+        bit: 49,
+        summary: "Highway's `PPC8` target: the vectors of POWER8, ISA 2.07."
+    ),
+    TargetSetMember(
+        swiftName: "ppc9",
+        highwayName: "PPC9",
+        bit: 48,
+        summary: "Highway's `PPC9` target: the vectors of POWER9, ISA 3.0."
+    ),
+    TargetSetMember(
+        swiftName: "ppc10",
+        highwayName: "PPC10",
+        bit: 47,
+        summary: "Highway's `PPC10` target: the vectors of POWER10, ISA 3.1."
+    ),
+    TargetSetMember(
+        swiftName: "z14",
+        highwayName: "Z14",
+        bit: 51,
+        summary: "Highway's `Z14` target: the vectors of IBM z14."
+    ),
+    TargetSetMember(
+        swiftName: "z15",
+        highwayName: "Z15",
+        bit: 50,
+        summary: "Highway's `Z15` target: the vectors of IBM z15."
+    ),
+    TargetSetMember(
+        swiftName: "wasm",
+        highwayName: "WASM",
+        bit: 59,
+        summary: "Highway's `WASM` target: WebAssembly's 128-bit SIMD."
+    ),
+    TargetSetMember(
+        swiftName: "wasmEMU256",
+        highwayName: "WASM_EMU256",
+        bit: 58,
+        summary: "Highway's `WASM_EMU256` target: 256-bit vectors made of pairs of WebAssembly "
+            + "ones."
+    ),
+    TargetSetMember(
+        swiftName: "emu128",
+        highwayName: "EMU128",
+        bit: 61,
+        summary: "Highway's `EMU128` target: portable code that emulates 128-bit vectors."
+    ),
+    TargetSetMember(
+        swiftName: "scalar",
+        highwayName: "SCALAR",
+        bit: 62,
+        summary: "Highway's `SCALAR` target: portable code with vectors of one lane."
+    ),
+]
+
+func generateTargetSet() -> String {
+    let members = targetSetMembers.map { member in
+        """
+        /// \(member.summary)
+        @export(implementation) @inline(always)
+        public static var \(member.swiftName): SIMDTargetSet { SIMDTargetSet(rawValue: 1 << \(member.bit)) }
+        """
+    }
+    let names = targetSetMembers.map { "case .\($0.swiftName): \"\($0.highwayName)\"" }
+    return """
+        \(generationNotice)
+
+        /// A set of highway's targets, with highway's bit for each of them.
+        public struct SIMDTargetSet: OptionSet, Sendable, Hashable {
+        public let rawValue: Int64
+
+        @export(implementation) @inline(always)
+        public init(rawValue: Int64) {
+        self.rawValue = rawValue
+        }
+
+        \(members.joined(separator: "\n\n"))
+
+        /// Highway's name of each target in the set, best first, as `SIMDTarget.targetName` names one.
+        public var names: [String] {
+        var names: [String] = []
+        var remaining = rawValue
+        while remaining != 0 {
+        names.append(Self.name(of: remaining & ~(remaining &- 1)))
+        remaining &= remaining &- 1
+        }
+        return names
+        }
+
+        private static func name(of target: Int64) -> String {
+        switch SIMDTargetSet(rawValue: target) {
+        \(names.joined(separator: "\n"))
+        default: "Unknown"
+        }
+        }
+        }
+
+        """
+}
+
+let targetFunctionName = "cvectorization_ops_target"
+let supportedTargetsFunctionName = "cvectorization_ops_supported_targets"
+
+func targetFunction() -> String {
+    cFunction(
+        returns: "int64_t",
+        name: targetFunctionName,
+        parameters: [],
+        body: "return HWY_STATIC_TARGET;"
+    )
+}
+
+func supportedTargetsDeclaration() -> String {
+    "int64_t \(supportedTargetsFunctionName)(void);\n"
+}
+
+func generateSupportedTargets() -> String {
+    """
+    \(generationNotice)
+
+    \(elementImports)
+
+    extension SIMDTarget {
+    /// The target the ops were compiled for, highway's `HWY_STATIC_TARGET`.
+    @export(implementation) @inline(always)
+    public static var target: SIMDTargetSet { SIMDTargetSet(rawValue: \(targetFunctionName)()) }
+
+    /// The targets the CPU supports, as highway's `SupportedTargets()` detects them.
+    ///
+    /// Each call detects them anew, which on x86 runs the slow CPUID instruction. Where highway has
+    /// no detection, as on architectures other than x86 and arm, they are the targets the compiler
+    /// flags enable.
+    @export(implementation) @inline(always)
+    public static var supportedTargets: SIMDTargetSet {
+    SIMDTargetSet(rawValue: \(supportedTargetsFunctionName)())
+    }
+
+    /// Whether the CPU supports the target the ops were compiled for.
+    @export(implementation) @inline(always)
+    public static var isSupported: Bool { supportedTargets.contains(target) }
+    }
+
+    """
+}
+
+func targetSetReferenceFunctions() -> String {
+    targetSetMembers.map {
+        "HWY_INLINE int64_t \($0.referenceName)() { return \($0.macro); }"
+    }.joined(separator: "\n")
+}
+
+func targetSetReferenceTests() -> [String] {
+    targetSetMembers.map { member in
+        let bit = referenceCall(member.referenceName, [])
+        let name = "unsafe String(cString: \(referenceCall("targetNameOf", [bit])))"
+        return """
+            @Test func \(member.referenceName)() {
+            let mismatches = Mismatches("\(member.referenceName)")
+            mismatches.check(SIMDTargetSet.\(member.swiftName).rawValue, \(bit), "")
+            mismatches.check(SIMDTargetSet.\(member.swiftName).names.joined(separator: " "), \(name), "")
+            mismatches.record()
+            }
+            """
+    }
+}
+
+func targetSetAssertions() -> String {
+    targetSetMembers.map {
+        "_Static_assert(\($0.macro) == (1LL << \($0.bit)), "
+            + "\"SIMDTargetSet.\($0.swiftName) is not highway's \($0.macro)\");"
+    }.joined(separator: "\n")
+}
+
+struct X86CpuidLeaf {
+    let leaf: String
+    let subleaf: Int
+    let flags: [(register: Int, bit: Int, feature: String)]
+    var needsLevel7 = false
+}
+
+let x86CpuFeatures = [
+    "SSE", "SSE2", "SSE3", "SSSE3", "SSE41", "SSE42", "CLMUL", "AES", "AVX", "AVX2", "F16C", "FMA",
+    "LZCNT", "BMI", "BMI2", "AVX512F", "AVX512VL", "AVX512CD", "AVX512DQ", "AVX512BW", "AVX512FP16",
+    "AVX512BF16", "AVX512IFMA", "AMX_TILE", "AMX_BF16", "AMX_INT8", "VNNI", "VPCLMULQDQ", "VBMI",
+    "VBMI2", "VAES", "POPCNTDQ", "BITALG", "GFNI", "AVX10", "APX",
+]
+
+let x86CpuidLeaves = [
+    X86CpuidLeaf(
+        leaf: "1",
+        subleaf: 0,
+        flags: [
+            (3, 25, "SSE"), (3, 26, "SSE2"), (2, 0, "SSE3"), (2, 1, "CLMUL"), (2, 9, "SSSE3"),
+            (2, 12, "FMA"), (2, 19, "SSE41"), (2, 20, "SSE42"), (2, 25, "AES"), (2, 28, "AVX"),
+            (2, 29, "F16C"),
+        ]
+    ),
+    X86CpuidLeaf(leaf: "0x80000001U", subleaf: 0, flags: [(2, 5, "LZCNT")]),
+    X86CpuidLeaf(
+        leaf: "7",
+        subleaf: 0,
+        flags: [
+            (1, 3, "BMI"), (1, 5, "AVX2"), (1, 8, "BMI2"), (1, 16, "AVX512F"), (1, 17, "AVX512DQ"),
+            (1, 28, "AVX512CD"), (1, 30, "AVX512BW"), (1, 31, "AVX512VL"), (1, 21, "AVX512IFMA"),
+            (2, 1, "VBMI"), (2, 6, "VBMI2"), (2, 8, "GFNI"), (2, 9, "VAES"), (2, 10, "VPCLMULQDQ"),
+            (2, 11, "VNNI"), (2, 12, "BITALG"), (2, 14, "POPCNTDQ"), (3, 22, "AMX_BF16"),
+            (3, 23, "AVX512FP16"), (3, 24, "AMX_TILE"), (3, 25, "AMX_INT8"),
+        ],
+        needsLevel7: true
+    ),
+    X86CpuidLeaf(
+        leaf: "7",
+        subleaf: 1,
+        flags: [(0, 5, "AVX512BF16"), (3, 19, "AVX10"), (3, 21, "APX")],
+        needsLevel7: true
+    ),
+]
+
+struct X86FeatureGroup {
+    let name: String
+    let features: [String]
+    var groups: [String] = []
+    var conditional: (condition: String, features: [String])?
+}
+
+let x86FeatureGroups = [
+    X86FeatureGroup(name: "SSE2", features: ["SSE", "SSE2"]),
+    X86FeatureGroup(name: "SSSE3", features: ["SSE3", "SSSE3"], groups: ["SSE2"]),
+    X86FeatureGroup(
+        name: "SSE4",
+        features: ["SSE41", "SSE42", "CLMUL", "AES"],
+        groups: ["SSSE3"],
+        conditional: (x86HasAesCondition, ["CLMUL", "AES"])
+    ),
+    X86FeatureGroup(
+        name: "BMI2_FMA",
+        features: ["BMI", "BMI2", "FMA"],
+        conditional: ("!\(x86DisablesFmaCondition)", ["BMI", "BMI2", "FMA"])
+    ),
+    X86FeatureGroup(
+        name: "F16C",
+        features: ["F16C"],
+        conditional: ("!defined(HWY_DISABLE_F16C)", ["F16C"])
+    ),
+    X86FeatureGroup(
+        name: "AVX2",
+        features: ["AVX", "AVX2", "LZCNT"],
+        groups: ["BMI2_FMA", "F16C", "SSE4"]
+    ),
+    X86FeatureGroup(
+        name: "AVX3",
+        features: ["AVX512F", "AVX512VL", "AVX512DQ", "AVX512BW", "AVX512CD"],
+        groups: ["AVX2"]
+    ),
+    X86FeatureGroup(
+        name: "AVX3_DL",
+        features: [
+            "VNNI", "VPCLMULQDQ", "VBMI", "VBMI2", "VAES", "POPCNTDQ", "BITALG", "GFNI",
+            "AVX512IFMA",
+        ],
+        groups: ["AVX3"]
+    ),
+    X86FeatureGroup(name: "AVX3_ZEN4", features: ["AVX512BF16"], groups: ["AVX3_DL"]),
+    X86FeatureGroup(name: "AVX3_SPR", features: ["AVX512FP16"], groups: ["AVX3_ZEN4"]),
+    X86FeatureGroup(
+        name: "AVX10",
+        features: ["AVX10", "APX", "VPCLMULQDQ", "VAES", "GFNI"],
+        groups: ["AVX2"]
+    ),
+]
+
+let x86GroupTargets = ["AVX3_SPR", "AVX3_DL", "AVX3", "AVX2", "SSE4", "SSSE3"]
+
+let x86Xcr0Bits = [("XMM", 1), ("YMM", 2), ("OPMASK", 5), ("ZMM_HI", 6), ("REGS32", 7)]
+
+let x86CpuidName = "cvectorization_ops_x86_cpuid"
+let x86IsBitSetName = "cvectorization_ops_x86_is_bit_set"
+let x86IsAmdName = "cvectorization_ops_x86_is_amd"
+let x86ReadXcr0Name = "cvectorization_ops_x86_read_xcr0"
+let x86FlagsFromCpuidName = "cvectorization_ops_x86_flags_from_cpuid"
+let x86DetectTargetsName = "cvectorization_ops_x86_detect_targets_impl"
+let armGetAuxValName = "cvectorization_ops_getauxval"
+let armDetectAdditionalSveTargetsName = "cvectorization_ops_arm_detect_additional_sve_targets"
+let armDetectTargetsName = "cvectorization_ops_arm_detect_targets_impl"
+let hasCpuFeatureName = "cvectorization_ops_has_cpu_feature"
+let parseU32Name = "cvectorization_ops_parse_u32"
+let isMacOs12_2OrLaterName = "cvectorization_ops_is_mac_os_12_2_or_later"
+
+func x86FeatureMacro(_ feature: String) -> String {
+    "CVECTORIZATION_OPS_X86_\(feature)"
+}
+
+func x86GroupMacro(_ group: String) -> String {
+    "CVECTORIZATION_OPS_X86_GROUP_\(group)"
+}
+
+func x86Xcr0Macro(_ bit: String) -> String {
+    "CVECTORIZATION_OPS_X86_XCR0_\(bit)"
+}
+
+func x86HasXcr0Name(_ registers: String) -> String {
+    "cvectorization_ops_x86_has_\(registers)"
+}
+
+func x86Xcr0Function(named name: String, mask: String, requiring bits: [String]) -> String {
+    let required = bits.map(x86Xcr0Macro).joined(separator: " | ")
+    return cFunction(
+        returns: "bool",
+        name: x86HasXcr0Name(name),
+        parameters: ["uint32_t xcr0"],
+        body: """
+            const uint32_t \(mask) = \(required);
+            return (xcr0 & \(mask)) == \(mask);
+            """,
+        specifiers: "static"
+    )
+}
+
+func x86FeatureDefinitions() -> String {
+    let features = x86CpuFeatures.enumerated().map { index, feature in
+        "#define \(x86FeatureMacro(feature)) (1ull << \(index))"
+    }
+    let groups = x86FeatureGroups.map { group in
+        func definition(dropping dropped: [String]) -> String {
+            let terms =
+                group.features.filter { !dropped.contains($0) }.map(x86FeatureMacro)
+                + group.groups.map(x86GroupMacro)
+            let value = terms.isEmpty ? "0" : "(\(terms.joined(separator: " | ")))"
+            return "#define \(x86GroupMacro(group.name)) \(value)"
+        }
+        guard let conditional = group.conditional else { return definition(dropping: []) }
+        return [
+            "#if \(conditional.condition)", definition(dropping: []), "#else",
+            definition(dropping: conditional.features), "#endif",
+        ].joined(separator: "\n")
+    }
+    return (features + groups).joined(separator: "\n")
+}
+
+func x86FlagsFromCpuidFunction() -> String {
+    func reads(_ leaf: X86CpuidLeaf) -> [String] {
+        ["\(x86CpuidName)(\(leaf.leaf), \(leaf.subleaf), abcd);"]
+            + leaf.flags.map { register, bit, feature in
+                "flags |= \(x86IsBitSetName)(abcd[\(register)], \(bit)) ? \(x86FeatureMacro(feature)) : 0;"
+            }
+    }
+    let standard = x86CpuidLeaves.filter { !$0.needsLevel7 }.flatMap(reads)
+    let extended = x86CpuidLeaves.filter(\.needsLevel7).flatMap(reads).map { "  \($0)" }
+    let body =
+        [
+            "uint64_t flags = 0;", "uint32_t abcd[4];", "\(x86CpuidName)(0, 0, abcd);",
+            "const uint32_t max_level = abcd[0];",
+        ] + standard + ["if (max_level >= 7) {"] + extended + ["}", "return flags;"]
+    return cFunction(
+        returns: "uint64_t",
+        name: x86FlagsFromCpuidName,
+        parameters: [],
+        body: body.joined(separator: "\n"),
+        specifiers: "static"
+    )
+}
+
+func x86DetectTargetsFunction() -> String {
+    func groupCheck(_ group: String) -> String {
+        "if ((flags & \(x86GroupMacro(group))) == \(x86GroupMacro(group))) {"
+    }
+    let groupTargets = x86GroupTargets.map { target in
+        "\(groupCheck(target))\n  bits |= HWY_\(target);\n}"
+    }
+    return cFunction(
+        returns: "int64_t",
+        name: x86DetectTargetsName,
+        parameters: [],
+        body: """
+            int64_t bits = 0;
+            if (HWY_ARCH_X86_64) {
+              bits |= HWY_SSE2;
+            }
+            const uint64_t flags = \(x86FlagsFromCpuidName)();
+            \(groupTargets.joined(separator: "\n"))
+            if (HWY_ARCH_X86_32) {
+              \(groupCheck("SSE2"))
+                bits |= HWY_SSE2;
+              }
+            }
+            uint32_t abcd[4];
+            \(groupCheck("AVX10"))
+              \(x86CpuidName)(0x24, 0, abcd);
+              const uint32_t avx10_ver = abcd[1] & 0xFFu;
+              const bool has_avx10_with_512bit_vectors = (avx10_ver >= 1) && \(x86IsBitSetName)(abcd[1], 18);
+              if (has_avx10_with_512bit_vectors) {
+                bits |= (HWY_AVX3_SPR | HWY_AVX3_DL | HWY_AVX3);
+                if (avx10_ver >= 2) {
+                  bits |= HWY_AVX10_2;
+                }
+              }
+            }
+            \(x86CpuidName)(1, 0, abcd);
+            const bool has_xsave = \(x86IsBitSetName)(abcd[2], 26);
+            const bool has_osxsave = \(x86IsBitSetName)(abcd[2], 27);
+            const int64_t min_avx2 = HWY_AVX2 | (HWY_AVX2 - 1);
+            if (has_xsave && has_osxsave) {
+            #if HWY_OS_APPLE
+              const bool have_avx3_xsave_support = \(isMacOs12_2OrLaterName)() && \(hasCpuFeatureName)("hw.optional.avx512f");
+            #endif
+              const uint32_t xcr0 = \(x86ReadXcr0Name)();
+              const int64_t min_avx3 = HWY_AVX3 | (HWY_AVX3 - 1);
+              if (!\(x86HasXcr0Name("ymm"))(xcr0)) {
+                bits &= ~min_avx2;
+              }
+            #if !HWY_OS_APPLE
+              const bool have_avx3_xsave_support = \(x86HasXcr0Name("zmm"))(xcr0);
+            #endif
+              if (!have_avx3_xsave_support) {
+                bits &= ~min_avx3;
+              }
+            } else {
+              bits &= ~min_avx2;
+            }
+            if ((bits & HWY_AVX3_DL) && (flags & \(x86GroupMacro("AVX3_ZEN4"))) == \(x86GroupMacro("AVX3_ZEN4")) && \(x86IsAmdName)()) {
+              bits |= HWY_AVX3_ZEN4;
+            }
+            return bits;
+            """,
+        specifiers: "static"
+    )
+}
+
+func x86TargetDetection() -> String {
+    let cpuid = cFunction(
+        returns: "void",
+        name: x86CpuidName,
+        parameters: ["const uint32_t level", "const uint32_t count", "uint32_t* restrict abcd"],
+        body: """
+            #if HWY_COMPILER_MSVC || HWY_COMPILER_CLANGCL
+            int regs[4];
+            __cpuidex(regs, (int)level, (int)count);
+            for (int i = 0; i < 4; ++i) {
+              abcd[i] = (uint32_t)regs[i];
+            }
+            #else
+            uint32_t a;
+            uint32_t b;
+            uint32_t c;
+            uint32_t d;
+            __cpuid_count(level, count, a, b, c, d);
+            abcd[0] = a;
+            abcd[1] = b;
+            abcd[2] = c;
+            abcd[3] = d;
+            #endif
+            """,
+        specifiers: "static"
+    )
+    let isBitSet = cFunction(
+        returns: "bool",
+        name: x86IsBitSetName,
+        parameters: ["const uint32_t reg", "const int index"],
+        body: "return (reg & (1U << index)) != 0;",
+        specifiers: "static"
+    )
+    let isAmd = cFunction(
+        returns: "bool",
+        name: x86IsAmdName,
+        parameters: [],
+        body: """
+            uint32_t abcd[4];
+            \(x86CpuidName)(0, 0, abcd);
+            const uint32_t max_level = abcd[0];
+            return max_level >= 1 && abcd[1] == 0x68747541 && abcd[2] == 0x444d4163 && abcd[3] == 0x69746e65;
+            """,
+        specifiers: "static"
+    )
+    let parseU32 = cFunction(
+        returns: "bool",
+        name: parseU32Name,
+        parameters: ["const char** ptr", "uint32_t* parsed_val"],
+        body: """
+            uint64_t parsed_u64 = 0;
+            const char* start_ptr = *ptr;
+            for (char ch; (ch = (**ptr)) != '\\0'; ++*ptr) {
+              unsigned digit = (unsigned)(unsigned char)ch - (unsigned)(unsigned char)'0';
+              if (digit > 9u) {
+                break;
+              }
+              parsed_u64 = (parsed_u64 * 10u) + digit;
+              if (parsed_u64 > 0xFFFFFFFFu) {
+                return false;
+              }
+            }
+            *parsed_val = (uint32_t)parsed_u64;
+            return (*ptr != start_ptr);
+            """,
+        specifiers: "static"
+    )
+    let isMacOs12_2OrLater = cFunction(
+        returns: "bool",
+        name: isMacOs12_2OrLaterName,
+        parameters: [],
+        body: """
+            struct utsname uname_buf = {0};
+            if (uname(&uname_buf) != 0) {
+              return false;
+            }
+            const char* ptr = uname_buf.release;
+            if (!ptr) {
+              return false;
+            }
+            uint32_t major;
+            uint32_t minor;
+            if (!\(parseU32Name)(&ptr, &major)) {
+              return false;
+            }
+            if (*ptr != '.') {
+              return false;
+            }
+            ++ptr;
+            if (!\(parseU32Name)(&ptr, &minor)) {
+              return false;
+            }
+            return (major > 21 || (major == 21 && minor >= 3));
+            """,
+        specifiers: "static"
+    )
+    let xcr0Bits = x86Xcr0Bits.map { name, bit in "#define \(x86Xcr0Macro(name)) (1u << \(bit))" }
+    let readXcr0 = cFunction(
+        returns: "uint32_t",
+        name: x86ReadXcr0Name,
+        parameters: [],
+        body: """
+            #if HWY_COMPILER_MSVC
+            return (uint32_t)_xgetbv(0);
+            #else
+            uint32_t xcr0, xcr0_high;
+            const uint32_t index = 0;
+            __asm__ volatile(".byte 0x0F, 0x01, 0xD0" : "=a"(xcr0), "=d"(xcr0_high) : "c"(index));
+            return xcr0;
+            #endif
+            """,
+        specifiers: "static"
+    )
+    return """
+        #if HWY_ARCH_X86 && HWY_HAVE_RUNTIME_DISPATCH
+        \(cpuid)\(isBitSet)\(isAmd)#if HWY_OS_APPLE
+        \(parseU32)\(isMacOs12_2OrLater)#endif
+        \(xcr0Bits.joined(separator: "\n"))
+        \(readXcr0)\(x86Xcr0Function(named: "ymm", mask: "xmm_ymm", requiring: ["XMM", "YMM"]))#if !HWY_OS_APPLE
+        \(x86Xcr0Function(named: "zmm", mask: "zmm", requiring: ["OPMASK", "ZMM_HI", "REGS32"]))#endif
+        \(x86FeatureDefinitions())
+        \(x86FlagsFromCpuidFunction())\(x86DetectTargetsFunction())#endif
+        """
+}
+
+let armHwcap2Fallbacks = [("SVE2", 1), ("SVEAES", 2), ("SVEI8MM", 9), ("SVEBF16", 12)]
+
+let armSveDetectionCondition =
+    "(HWY_COMPILER_GCC || HWY_COMPILER_CLANG) && ((HWY_TARGETS & HWY_ALL_SVE) != 0)"
+
+func armTargetDetection() -> String {
+    let getAuxVal = cFunction(
+        returns: "unsigned long",
+        name: armGetAuxValName,
+        parameters: ["unsigned long type"],
+        body: """
+            #if HWY_OS_FREEBSD || HWY_OS_OPENBSD
+            unsigned long hwcap = 0;
+            switch (type) {
+            case AT_HWCAP:
+            case AT_HWCAP2:
+              if (elf_aux_info((int)type, &hwcap, sizeof(hwcap)) != 0) hwcap = 0;
+              return hwcap;
+            default:
+              return 0;
+            }
+            #else
+            return getauxval(type);
+            #endif
+            """,
+        specifiers: "static"
+    )
+    let additionalSveTargets = cFunction(
+        returns: "int64_t",
+        name: armDetectAdditionalSveTargetsName,
+        parameters: ["int64_t detected_targets"],
+        body: """
+            uint64_t sve_vec_len;
+            __asm__("cntb %0" : "=r"(sve_vec_len)::);
+            return ((sve_vec_len == 32) ? HWY_SVE_256 : (((detected_targets & HWY_SVE2) != 0 && sve_vec_len == 16) ? HWY_SVE2_128 : 0));
+            """,
+        specifiers: "static __attribute__((target(\"+sve\")))"
+    )
+    let hwcap2Fallbacks = armHwcap2Fallbacks.map { name, bit in
+        "#ifndef HWCAP2_\(name)\n#define HWCAP2_\(name) (1 << \(bit))\n#endif"
+    }
+    let detectTargets = cFunction(
+        returns: "int64_t",
+        name: armDetectTargetsName,
+        parameters: [],
+        body: """
+            int64_t bits = 0;
+            #if defined(AT_HWCAP) && !HWY_OS_APPLE
+            const unsigned long hw = \(armGetAuxValName)(AT_HWCAP);
+            #else
+            const unsigned long hw = 0UL;
+            #endif
+            (void)hw;
+            #if HWY_ARCH_ARM_A64
+            bits |= HWY_NEON_WITHOUT_AES;
+            #if HWY_OS_APPLE
+            if (\(hasCpuFeatureName)("hw.optional.arm.FEAT_AES")) {
+              bits |= HWY_NEON;
+              if ((\(hasCpuFeatureName)("hw.optional.AdvSIMD_HPFPCvt") || \(hasCpuFeatureName)("hw.optional.arm.AdvSIMD_HPFPCvt")) && \(hasCpuFeatureName)("hw.optional.arm.FEAT_DotProd") && \(hasCpuFeatureName)("hw.optional.arm.FEAT_BF16") && \(hasCpuFeatureName)("hw.optional.arm.FEAT_I8MM")) {
+                bits |= HWY_NEON_BF16;
+              }
+            }
+            #else
+            #if defined(HWCAP_AES)
+            if (hw & HWCAP_AES) {
+              bits |= HWY_NEON;
+            #if defined(AT_HWCAP2) && defined(HWCAP_ASIMDHP) && defined(HWCAP_ASIMDDP) && defined(HWCAP2_BF16)
+              const unsigned long hw2 = \(armGetAuxValName)(AT_HWCAP2);
+              const unsigned long group_f16_dot = HWCAP_ASIMDHP | HWCAP_ASIMDDP;
+              const unsigned long group_bf16 = HWCAP2_BF16;
+              if ((hw & group_f16_dot) == group_f16_dot && (hw2 & group_bf16) == group_bf16) {
+                bits |= HWY_NEON_BF16;
+              }
+            #endif
+            }
+            #endif
+            #if defined(HWCAP_SVE)
+            if (hw & HWCAP_SVE) {
+              bits |= HWY_SVE;
+            }
+            #endif
+            \(hwcap2Fallbacks.joined(separator: "\n"))
+            const unsigned long group_sve2 = HWCAP2_SVE2 | HWCAP2_SVEAES;
+            #if defined(AT_HWCAP2)
+            const unsigned long hw2 = \(armGetAuxValName)(AT_HWCAP2);
+            #else
+            const unsigned long hw2 = 0UL;
+            #endif
+            if ((hw2 & group_sve2) == group_sve2) {
+              bits |= HWY_SVE2;
+            }
+            #if \(armSveDetectionCondition)
+            if ((bits & HWY_ALL_SVE) != 0) {
+              bits |= \(armDetectAdditionalSveTargetsName)(bits);
+              const unsigned long group_sve2_128 = HWCAP2_SVEI8MM | HWCAP2_SVEBF16;
+              if ((hw2 & group_sve2_128) != group_sve2_128) {
+                bits &= ~HWY_SVE2_128;
+              }
+            }
+            #endif
+            #endif
+            #else
+            #if defined(HWCAP_NEON) && defined(HWCAP_VFPv4)
+            if ((hw & HWCAP_NEON) && (hw & HWCAP_VFPv4)) {
+              bits |= HWY_NEON_WITHOUT_AES;
+            }
+            #endif
+            #endif
+            return bits;
+            """,
+        specifiers: "static"
+    )
+    return """
+        #if HWY_ARCH_ARM && HWY_HAVE_RUNTIME_DISPATCH
+        #if !HWY_OS_APPLE
+        \(getAuxVal)#endif
+        #if HWY_ARCH_ARM_A64 && !HWY_OS_APPLE && \(armSveDetectionCondition)
+        \(additionalSveTargets)#endif
+        \(detectTargets)#endif
+        """
+}
+
+func generateSupportedTargetsSource() -> String {
+    let hasCpuFeature = cFunction(
+        returns: "bool",
+        name: hasCpuFeatureName,
+        parameters: ["const char* feature_name"],
+        body: """
+            int result = 0;
+            size_t len = sizeof(int);
+            return (sysctlbyname(feature_name, &result, &len, NULL, 0) == 0 && result != 0);
+            """,
+        specifiers: "static"
+    )
+    let supportedTargets = cFunction(
+        returns: "int64_t",
+        name: supportedTargetsFunctionName,
+        parameters: [],
+        body: """
+            int64_t bits = HWY_SCALAR | HWY_EMU128;
+            #if HWY_ARCH_X86 && HWY_HAVE_RUNTIME_DISPATCH
+            bits |= \(x86DetectTargetsName)();
+            #elif HWY_ARCH_ARM && HWY_HAVE_RUNTIME_DISPATCH
+            bits |= \(armDetectTargetsName)();
+            #else
+            bits |= HWY_ENABLED_BASELINE;
+            #endif
+            return bits;
+            """,
+        specifiers: ""
+    )
+    return """
+        \(generationNotice)
+
+        #include "include/CVectorizationOps.h"
+
+        #if HWY_ARCH_X86 && HWY_HAVE_RUNTIME_DISPATCH
+        #if HWY_COMPILER_MSVC || HWY_COMPILER_CLANGCL
+        #include <intrin.h>
+        #else
+        #include <cpuid.h>
+        #endif
+        #endif
+
+        #if HWY_ARCH_ARM && HWY_OS_LINUX
+        #if HWY_HAVE_ASM_HWCAP
+        #include <asm/hwcap.h>
+        #endif
+        #if HWY_HAVE_AUXV
+        #include <sys/auxv.h>
+        #endif
+        #elif HWY_ARCH_ARM && (HWY_OS_FREEBSD || HWY_OS_OPENBSD)
+        #if HWY_HAVE_ELF_AUX_INFO
+        #include <sys/auxv.h>
+        #endif
+        #endif
+
+        #if HWY_OS_APPLE
+        #include <sys/sysctl.h>
+        #include <sys/utsname.h>
+        #endif
+
+        \(targetSetAssertions())
+
+        #if HWY_OS_APPLE && HWY_HAVE_RUNTIME_DISPATCH && (HWY_ARCH_X86 || HWY_ARCH_ARM_A64)
+        \(hasCpuFeature)#endif
+
+        \(x86TargetDetection())
+
+        \(armTargetDetection())
+
+        \(supportedTargets)
+        """
 }
 
 func tupleTypedefs(of element: Element) -> String {
@@ -38866,6 +40175,9 @@ func generateHeader() -> String {
         \(emulatedFunction())
         /// The name of the target the ops below were compiled for.
         \(targetNameFunction())
+        \(targetFunction())
+        \(supportedTargetsDeclaration())
+        \(targetCapabilityFunctions())
         \(setMaskFunction())
         \(cacheControlFunctions())
         """
@@ -38903,12 +40215,12 @@ func generateHeader() -> String {
         )
         output += cRawConversions(of: element)
         output += cNarrowRawConversions(of: element)
-        for size in lookupSizes where size.applies.matches(element) {
+        for capability in laneCapabilities where capability.applies.matches(element) {
             output += cFunction(
                 returns: "bool",
-                name: cFunctionName(canLookupName(size.lanes), element),
+                name: cFunctionName(capability.name, element),
                 parameters: [],
-                body: canLookupBody(size.lanes, for: element)
+                body: capability.body(for: element)
             )
         }
         if element.category != .float {
@@ -39852,7 +41164,7 @@ func generateProtocols() -> String {
             /// How many 16-byte blocks a `Vector` holds on the target this was compiled for.
             static var blockCount: Int { get }
 
-        \(protocolRequirements(universalOps, indent: "    "))}
+        \(laneCapabilityRequirements(indent: "    "))\(protocolRequirements(universalOps, indent: "    "))}
 
         /// The ops that only the integer element types have.
         public protocol SIMDIntegerElement: SIMDElement {
@@ -40008,9 +41320,9 @@ func opMembers(of op: Op, for element: Element) -> String {
     output += "    @export(implementation) @inline(always)\n"
     output +=
         "    public static func \(op.swiftName)(\(signature.parameters))\(returnClause) {\n"
-    let assertions = lookupAssertions(of: op, for: element)
-    output += assertions
-    output += "        \(assertions.isEmpty ? "" : "return ")\(body)\n"
+    let checks = laneCapabilityStatements(of: op, for: element)
+    output += checks
+    output += "        \(checks.isEmpty ? "" : "return ")\(body)\n"
     output += "    }\n\n"
     if let forms = spanForms(of: op, for: element) {
         output += spanMembers(forms)
@@ -40181,7 +41493,7 @@ func generateElement(_ element: Element) -> String {
 
 
         """
-    output += canLookupMembers(for: element)
+    output += laneCapabilityMembers(for: element)
     output += "}\n\n\(unavailableSendableConformance(of: element.namespace))\n"
 
     return output
@@ -40642,10 +41954,9 @@ func outOfContractDisabling(of op: Op) -> [Disabling] {
             ? [] : [emulationDisabling("EMU128 reads outside the vector for these indices")])
 }
 
-func lookupDisabling(of op: Op) -> [Disabling] {
-    guard case .table(let lanes)? = op.span else { return [] }
-    let reason = "Highway's lookup needs more lanes than this target has"
-    return [("!H.\(canLookupName(lanes))", reason)]
+func laneCapabilityDisabling(of op: Op, for element: Element) -> [Disabling] {
+    guard let capability = op.laneCapability, capability.isChecked(for: element) else { return [] }
+    return [capability.disabling]
 }
 
 func testAttribute(disabling: [Disabling]) -> String {
@@ -41085,7 +42396,8 @@ func referenceTest(
         for: element,
         inputs: inputs,
         declarations: declarations,
-        disabling: lookupDisabling(of: op) + (inContract ? [] : outOfContractDisabling(of: op)),
+        disabling: laneCapabilityDisabling(of: op, for: element)
+            + (inContract ? [] : outOfContractDisabling(of: op)),
         loopCondition: referenceLoopCondition(of: op, for: element, inputs: inputs),
         statements: statements
     )
@@ -41213,8 +42525,8 @@ func repeatingBlockReferenceTest(for element: Element) -> String {
     )
 }
 
-func canLookupReferenceTest(_ size: LookupSize, for element: Element) -> String {
-    let name = canLookupName(size.lanes)
+func laneCapabilityReferenceTest(_ capability: LaneCapability, for element: Element) -> String {
+    let name = capability.name
     let call = referenceCall(referenceFunctionName(name, element), [])
     return referenceTestFunction(
         name,
@@ -41505,8 +42817,8 @@ let referenceTestImports = """
 
 func generateReferenceTests(_ element: Element) -> String {
     var tests = [laneCountReferenceTest(for: element), blockCountReferenceTest(for: element)]
-    for size in lookupSizes where size.applies.matches(element) {
-        tests.append(canLookupReferenceTest(size, for: element))
+    for capability in laneCapabilities where capability.applies.matches(element) {
+        tests.append(laneCapabilityReferenceTest(capability, for: element))
     }
 
     return """
@@ -41535,14 +42847,25 @@ func generateReferenceConformances(of conformingElements: [Element], importing: 
     """
 }
 
-let targetReferenceChecks: [(test: String, port: String, reference: String)] = [
-    (
-        "targetName",
-        "SIMDTarget.targetName",
-        "unsafe String(cString: \(referenceCall("targetName", [])))"
-    ),
-    ("isEmulated", "SIMDTarget.isEmulated", referenceCall("isEmulated", [])),
-]
+let targetReferenceChecks: [(test: String, port: String, reference: String)] =
+    [
+        (
+            "targetName",
+            "SIMDTarget.targetName",
+            "unsafe String(cString: \(referenceCall("targetName", [])))"
+        ),
+        ("isEmulated", "SIMDTarget.isEmulated", referenceCall("isEmulated", [])),
+    ]
+    + targetCapabilities.map {
+        ($0.swiftName, "SIMDTarget.\($0.swiftName)", referenceCall($0.swiftName, []))
+    } + [
+        ("target", "SIMDTarget.target.rawValue", referenceCall("staticTarget", [])),
+        (
+            "supportedTargets",
+            "SIMDTarget.supportedTargets.rawValue",
+            referenceCall("supportedTargets", [])
+        ),
+    ]
 
 func generateReferenceTargetTests() -> String {
     let tests =
@@ -41554,7 +42877,7 @@ func generateReferenceTargetTests() -> String {
             mismatches.record()
             }
             """
-        } + cacheControlRunTests()
+        } + targetSetReferenceTests() + cacheControlRunTests()
 
     return """
         \(generationNotice)
@@ -42750,7 +44073,7 @@ func referenceLoopCondition(
     let condition = unorderedNaNsCondition(of: op, for: element, inputs: inputs)
     guard !op.filtersUnorderedNaNs else { return condition }
     guard element.category == .float16 else { return nil }
-    return condition.map { "HighwayReference.hasFloat16Arithmetic() || \($0)" }
+    return condition.map { "HighwayReference.hasNativeFloat16Arithmetic() || \($0)" }
 }
 
 func unorderedNaNsCondition(
@@ -42904,7 +44227,7 @@ func codegenTest(
         for: element,
         inputs: inputs,
         declarations: declarations,
-        disabling: lookupDisabling(of: op),
+        disabling: laneCapabilityDisabling(of: op, for: element),
         loopCondition: codegenUnorderedNaNsCondition(
             of: op,
             for: element,
@@ -43885,7 +45208,8 @@ func constantHelper(
     let knownIssue =
         alternating
         ? adjacentLaneArithmeticOps[op.identifier]
-        : op.parameters[index] == .sourceVector ? foldedExponentOps[op.identifier] : nil
+        : op.parameters[index] == .sourceVector && element.category == .float
+            ? foldedExponentOps[op.identifier] : nil
     return referenceTestFunction(
         name,
         label: "\(op.testIdentifier) with \(binding.swiftName) \(describedValue)\(suffix)",
@@ -44082,8 +45406,9 @@ func constantTests(of op: Op, for element: Element) -> [String] {
             members.append(
                 constantTest(
                     "\(op.testIdentifier)Constant\(infix)Splat\(value.name)",
-                    disabling: isOutOfContractSplat(value, of: op, for: element)
-                        ? outOfContractDisabling(of: op) : [],
+                    disabling: laneCapabilityDisabling(of: op, for: element)
+                        + (isOutOfContractSplat(value, of: op, for: element)
+                            ? outOfContractDisabling(of: op) : []),
                     calls: helpers.map { "\($0)(\(literal))" }
                 )
             )
@@ -44444,6 +45769,7 @@ func writeSections(
 
 let repositoryRoot = FileManager.default.currentDirectoryPath
 let headerPath = "\(repositoryRoot)/Sources/CVectorizationOps/include/CVectorizationOps.h"
+let supportedTargetsSourcePath = "\(repositoryRoot)/Sources/CVectorizationOps/SupportedTargets.c"
 let referenceHeaderPath =
     "\(repositoryRoot)/HighwayReference/CHighwayReference/include/CHighwayReference.h"
 let generatedSwiftRoot = "\(repositoryRoot)/Sources/Vectorization/Generated"
@@ -44507,6 +45833,16 @@ try write(
 try write(generateCodegenTarget(), to: "\(generatedCodegenRoot)/HighwayTargetCodegen.swift")
 try write(generateProtocols(), to: "\(generatedSwiftRoot)/SIMDElement.swift")
 try write(generateCacheControl(), to: "\(generatedSwiftRoot)/SIMDTarget+CacheControl.swift")
+try write(
+    generateTargetCapabilities(),
+    to: "\(generatedSwiftRoot)/SIMDTarget+Capabilities.swift"
+)
+try write(
+    generateSupportedTargets(),
+    to: "\(generatedSwiftRoot)/SIMDTarget+SupportedTargets.swift"
+)
+try write(generateTargetSet(), to: "\(generatedSwiftRoot)/SIMDTargetSet.swift")
+try write(generateSupportedTargetsSource(), to: supportedTargetsSourcePath)
 for element in elements {
     let swiftDirectory = "\(generatedSwiftRoot)/\(element.namespace)"
     try write(

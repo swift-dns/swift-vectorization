@@ -82,3 +82,23 @@ public func portReversed4F32ConstantA() -> SIMDFloat.Vector {
 public func highwayReversed4F32ConstantA() -> SIMDFloat.Vector {
     HighwayReference.Nothrow.reversed4F32(HighwayReference.Nothrow.repeatingF32(1.5))
 }
+
+@inline(never)
+public func portReversed8F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+    SIMDFloat.reversed8(a)
+}
+
+@inline(never)
+public func highwayReversed8F32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+    HighwayReference.Nothrow.reversed8F32(a)
+}
+
+@inline(never)
+public func portReversed8F32ConstantA() -> SIMDFloat.Vector {
+    SIMDFloat.reversed8(SIMDFloat.repeating(1.5))
+}
+
+@inline(never)
+public func highwayReversed8F32ConstantA() -> SIMDFloat.Vector {
+    HighwayReference.Nothrow.reversed8F32(HighwayReference.Nothrow.repeatingF32(1.5))
+}

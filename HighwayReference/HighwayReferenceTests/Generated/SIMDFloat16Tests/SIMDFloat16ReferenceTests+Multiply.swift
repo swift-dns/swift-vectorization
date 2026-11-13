@@ -7,12 +7,26 @@ import Testing
 import Vectorization
 
 extension SIMDFloat16ReferenceTests {
+    @Test func multiplyingByPowerOf2FromInt16() {
+        let mismatches = Mismatches("multiplyingByPowerOf2FromInt16")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F0D_A96A_E627_051B)
+        let bInputs = Inputs.exponents(SIMDInt16.Vector.self, seed: 0x2F0D_A86A_E627_0368)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.multiplyingByPowerOf2(a, b),
+                HighwayReference.multiplyingByPowerOf2I16ToF16(a, b.raw),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplying() {
         let mismatches = Mismatches("multiplying")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE9DD_C041_B1D9_B7F6)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE9DD_C141_B1D9_B9A9)
         for (a, b) in everyPair(aInputs, bInputs)
-        where HighwayReference.hasFloat16Arithmetic() || !hasUnorderedNaNs(a, b) {
+        where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplying(a, b),
                 HighwayReference.multiplyingF16(a, b),

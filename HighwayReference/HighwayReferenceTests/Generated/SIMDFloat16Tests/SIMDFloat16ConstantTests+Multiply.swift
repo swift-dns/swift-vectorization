@@ -8,6 +8,188 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
+    private func checkMultiplyingByPowerOf2FromInt16ConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("multiplyingByPowerOf2FromInt16 with a repeating \(hex(value))")
+        let bInputs = Inputs.exponents(SIMDInt16.Vector.self, seed: 0x25D4_5A67_FFD2_1065)
+        mismatches.check(
+            H.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.multiplyingByPowerOf2(H.repeating(value), b),
+                HighwayReference.multiplyingByPowerOf2I16ToF16(H.repeating(value), b.raw),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkMultiplyingByPowerOf2FromInt16ConstantB(_ value: SIMDInt16.Lane) {
+        let mismatches = Mismatches("multiplyingByPowerOf2FromInt16 with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0C15_5467_F14E_7853)
+        mismatches.check(
+            SIMDInt16.repeating(value),
+            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.multiplyingByPowerOf2(a, SIMDInt16.repeating(value)),
+                HighwayReference.multiplyingByPowerOf2I16ToF16(a, SIMDInt16.repeating(value).raw),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatZero() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(0.0)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatNegativeZero() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(-0.0)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatOne() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(1.0)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatMinusOne() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(-1.0)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatTwo() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(2.0)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatHalf() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(0.5)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatFour() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(4.0)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatQuarter() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(0.25)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatOnePointFive() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(1.5)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatMinusTwoPointFive() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(-2.5)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatInfinity() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(.infinity)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatMinusInfinity() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(-.infinity)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatNaN() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(.nan)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatMinusNaN() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(-.nan)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatPayloadNaN() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatSignalingNaN() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(.signalingNaN)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatMinusSignalingNaN() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(-.signalingNaN)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatLeastNonzero() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSplatGreatest() {
+        checkMultiplyingByPowerOf2FromInt16ConstantA(.greatestFiniteMagnitude)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat0() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(0)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat1() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(1)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat15() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(15)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat16() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(16)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat26() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(26)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat127() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(127)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat128() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(128)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat255() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(255)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat256() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(256)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16Splat257() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(257)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMinus1() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(-1)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMinus16() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(-16)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMinus17() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(-17)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMinus128() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(-128)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMinus129() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(-129)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMax() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(SIMDInt16.Lane.max)
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantSIMDInt16SplatMin() {
+        checkMultiplyingByPowerOf2FromInt16ConstantB(SIMDInt16.Lane.min)
+    }
+
+    @inline(__always)
     private func checkMultiplyingConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("multiplying with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x02D3_8082_A41F_330E)

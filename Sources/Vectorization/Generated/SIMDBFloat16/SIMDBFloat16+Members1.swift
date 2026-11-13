@@ -1416,6 +1416,11 @@ extension SIMDBFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func reversed8(_ a: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_reversed8_bf16(a.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func slide1Up(_ a: Vector) -> Vector {
         Vector(raw: cvectorization_ops_slide1_up_bf16(a.raw))
     }
@@ -1747,11 +1752,6 @@ extension SIMDBFloat16 {
         span.withUnsafeMutableBufferPointer {
             unsafe cvectorization_ops_store_streaming_bf16(a.raw, $0.baseAddress.unsafelyUnwrapped)
         }
-    }
-
-    @export(implementation) @inline(always)
-    public static func compressed(_ a: Vector, where mask: Mask) -> Vector {
-        Vector(raw: cvectorization_ops_compressed_bf16(a.raw, mask.raw))
     }
 
 }

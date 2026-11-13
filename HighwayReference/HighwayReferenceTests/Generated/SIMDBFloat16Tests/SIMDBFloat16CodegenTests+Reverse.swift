@@ -74,4 +74,19 @@ extension SIMDBFloat16CodegenTests {
         mismatches.check(portReversed4BF16ConstantA(), highwayReversed4BF16ConstantA(), "")
         mismatches.record()
     }
+
+    @Test func reversed8() {
+        let mismatches = Mismatches("portReversed8BF16")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x20A0_20AC_B4F5_D360)
+        for a in aInputs {
+            mismatches.check(portReversed8BF16(a), highwayReversed8BF16(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func reversed8ConstantA() {
+        let mismatches = Mismatches("portReversed8BF16ConstantA")
+        mismatches.check(portReversed8BF16ConstantA(), highwayReversed8BF16ConstantA(), "")
+        mismatches.record()
+    }
 }
