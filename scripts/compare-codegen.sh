@@ -22,6 +22,7 @@ readonly reorder_allowlist_entry_format='<TARGET> <Function>'
 readonly reorder_allowlist_entry_example='NEON FirstLanesU8'
 readonly target_name="HighwayReferenceCodegen"
 readonly host_dependent_target="EMU128"
+readonly listing_limit_on_failure=50
 
 architecture=""
 verbose="false"
@@ -240,7 +241,8 @@ compare_functions() {
     -v reorder_allowlist_name="${reorder_allowlist_file#"${repository_root}/"}" \
     -v show_listings="${show_listings}" \
     -v host_dependent_target="${host_dependent_target}" \
-    -v host_architecture_key="${host_architecture_key}" '
+    -v host_architecture_key="${host_architecture_key}" \
+    -v listing_limit="${listing_limit_on_failure}" '
     function keyed_target(target) {
       if (target == host_dependent_target) {
         return target "_" host_architecture_key
@@ -428,6 +430,7 @@ compare_functions() {
             allowlisted_count++
           } else {
             unlisted_count++
+            failing_function[++failing_total] = key
             if (verdict == "reordered") {
               unlisted_reordered_count++
             }
@@ -486,6 +489,7 @@ compare_functions() {
             allowlist_name_of(entry), allowlist_line[entry], highway_target, listed_function,
             listed_as, verdict_of[listed_function] > "/dev/stderr"
           failed = 1
+          failing_function[++failing_total] = listed_function
         }
       }
       if (unlisted_count > 0) {
@@ -496,6 +500,21 @@ compare_functions() {
             unlisted_reordered_count, reorder_allowlist_name > "/dev/stderr"
         }
         failed = 1
+      }
+
+      if (show_listings != "true" && failing_total > 0) {
+        printf "\nListings of the %d functions that differ from what the allowlists say\n",
+          failing_total
+        for (rank = 1; rank <= failing_total && rank <= listing_limit; rank++) {
+          key = failing_function[rank]
+          printf "%s (%s)\n", key, verdict_of[key]
+          print_listing("port", "port" key, trimmed_length("port" key))
+          print_listing("highway", "highway" key, trimmed_length("highway" key))
+        }
+        if (failing_total > listing_limit) {
+          printf "The other %d listings are left out; --verbose prints them all\n",
+            failing_total - listing_limit
+        }
       }
 
       printf "\nSummary of %d functions on %s\n", port_total, highway_target
