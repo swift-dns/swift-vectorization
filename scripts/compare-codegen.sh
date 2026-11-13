@@ -25,6 +25,7 @@ readonly host_dependent_target="EMU128"
 
 architecture=""
 verbose="false"
+fingerprints_path=""
 declare -a extra_build_arguments=()
 declare -A location_of_entry=()
 workspace=""
@@ -37,8 +38,11 @@ cleanup() {
 }
 
 usage() {
-  printf -- 'Usage: %s [--arch <arch>] [--verbose] [-- <extra swift build arguments>]\n' \
+  printf -- 'Usage: %s [--arch <arch>] [--verbose | --fingerprints <file>]\n' \
     "$(basename -- "${BASH_SOURCE[0]}")"
+  printf -- '       [-- <extra swift build arguments>]\n'
+  printf -- '  --fingerprints <file> write the fingerprint of every port and highway function to the\n'
+  printf -- '                        file instead of comparing them, for list-new-ops.sh to read\n'
   return 0
 }
 
@@ -64,6 +68,10 @@ parse_arguments() {
       --verbose)
         verbose="true"
         ;;
+      --fingerprints)
+        fingerprints_path="${1:?--fingerprints requires the file to write the fingerprints to}"
+        shift
+        ;;
       -h | --help)
         usage
         exit 0
@@ -77,6 +85,10 @@ parse_arguments() {
         ;;
     esac
   done
+
+  if [[ "${verbose}" == "true" && -n "${fingerprints_path}" ]]; then
+    fatal "--verbose prints the listings of the comparison, which --fingerprints skips" "$(usage)"
+  fi
   return 0
 }
 
@@ -167,8 +179,9 @@ binary_path() {
 
 normalize_object_files() {
   local -n object_files_ref="${1:?normalize_object_files requires the object file array}"
+  shift
 
-  if ! "${normalize_script}" -- "${object_files_ref[@]}"; then
+  if ! "${normalize_script}" "$@" -- "${object_files_ref[@]}"; then
     fatal "Failed to normalize the disassembly of the object files of '${target_name}'"
   fi
   return 0
@@ -501,6 +514,499 @@ compare_functions() {
   return 0
 }
 
+validate_fingerprints_path() {
+  local fingerprints_file="${1:?validate_fingerprints_path requires the file of the fingerprints}"
+
+  local fingerprints_directory
+  fingerprints_directory="$(dirname -- "${fingerprints_file}")"
+  if [[ ! -d "${fingerprints_directory}" ]]; then
+    fatal "There is no directory '${fingerprints_directory}' to write the fingerprints to"
+  fi
+  if [[ -d "${fingerprints_file}" ]]; then
+    fatal "'${fingerprints_file}' is a directory, not a file to write the fingerprints to"
+  fi
+  return 0
+}
+
+find_hash_command() {
+  local -n found_command_ref="${1:?find_hash_command requires the name of the hash command array}"
+
+  if command -v sha256sum > /dev/null 2>&1; then
+    found_command_ref+=( sha256sum )
+  elif command -v shasum > /dev/null 2>&1; then
+    found_command_ref+=( shasum -a 256 )
+  else
+    fatal "Writing fingerprints requires 'sha256sum' or 'shasum', and neither is installed"
+  fi
+  return 0
+}
+
+serialize_closures() {
+  local names_file="${1:?serialize_closures requires the file of symbols and demangled names}"
+  local listing_file="${2:?serialize_closures requires the disassembly listing}"
+  local closure_directory="${3:?serialize_closures requires the directory to write the closures to}"
+  local host_architecture_key="${4:?serialize_closures requires the key of the host architecture}"
+
+  if ! awk -F '\t' \
+    -v names_file="${names_file}" \
+    -v closure_directory="${closure_directory}" \
+    -v host_dependent_target="${host_dependent_target}" \
+    -v host_architecture_key="${host_architecture_key}" '
+    BEGIN {
+      detail_limit = 100
+    }
+
+    function quoted(value) {
+      return "\047" value "\047"
+    }
+
+    function fatal(message) {
+      printf "** ERROR: %s\n", message > "/dev/stderr"
+      failed = 1
+      exit 1
+    }
+
+    function keyed_target(target) {
+      if (target == host_dependent_target) {
+        return target "_" host_architecture_key
+      }
+      return target
+    }
+
+    function mnemonic_of(text,    mnemonic) {
+      mnemonic = text
+      sub(/[[:space:]].*$/, "", mnemonic)
+      return mnemonic
+    }
+
+    function is_terminator(mnemonic) {
+      return mnemonic ~ /^(ret|retq|retl|retaa|retab|b|br|braa|braaz|brab|brabz|brk|udf)$/ ||
+             mnemonic ~ /^(jmp|jmpq|jmpl|ud2|int3)$/
+    }
+
+    function register_label(object, label, block,    name) {
+      if (((object, label) in raw_block) && raw_block[object, label] != block) {
+        raw_ambiguous[object, label] = 1
+      }
+      raw_block[object, label] = block
+      name = label
+      if (object_is_macho[object]) {
+        sub(/^_/, "", name)
+      }
+      if ((name in named_block) && named_block[name] != block) {
+        named_ambiguous[name] = 1
+      }
+      named_block[name] = block
+    }
+
+    function fail_block(block, reason, detail) {
+      if (length(detail) > detail_limit) {
+        detail = substr(detail, 1, detail_limit) "..."
+      }
+      block_problem[block] = reason
+      block_problem_detail[block] = detail
+      return ""
+    }
+
+    function edge_marker(block, target) {
+      edge_total[block]++
+      edge_target[block, edge_total[block]] = target
+      return "\001" edge_total[block] "\001"
+    }
+
+    function branch_template(block, target_text,    object, name, offset) {
+      if (target_text ~ /^\+0x[0-9a-fA-F]+$/) {
+        return "<" target_text ">"
+      }
+      object = block_object[block]
+      name = target_text
+      offset = ""
+      if (match(target_text, /\+0x[0-9a-fA-F]+$/)) {
+        name = substr(target_text, 1, RSTART - 1)
+        offset = substr(target_text, RSTART)
+      }
+      if (!((object, name) in raw_block) || ((object, name) in raw_ambiguous)) {
+        return fail_block(block, "refer to code their object does not name once", target_text)
+      }
+      return "<" edge_marker(block, raw_block[object, name]) offset ">"
+    }
+
+    function annotation_template(block, annotation,    kind, content, name) {
+      kind = substr(annotation, 2, index(annotation, ":") - 2)
+      content = substr(annotation, index(annotation, ":") + 1)
+      sub(/}$/, "", content)
+      if (kind == "const") {
+        return annotation
+      }
+      if (kind == "data") {
+        return fail_block(block, "refer to data the listing does not resolve", annotation)
+      }
+      if (kind != "sym" && kind != "got") {
+        return fail_block(block, "carry an annotation of an unknown kind", annotation)
+      }
+      name = content
+      sub(/[+-]0x[0-9a-fA-F]+$/, "", name)
+      if (name in named_ambiguous) {
+        return fail_block(block, "refer to a symbol that several functions define", annotation)
+      }
+      if (name in named_block) {
+        return "{" kind ":" content edge_marker(block, named_block[name]) "}"
+      }
+      if (kind == "got") {
+        return fail_block(block, "load an address the listing does not resolve", annotation)
+      }
+      return annotation
+    }
+
+    function instruction_template(block, text,    template, literal_text, remaining, token) {
+      if (text == "<unknown>") {
+        return fail_block(block, "hold bytes objdump cannot decode", text)
+      }
+      if (text ~ /\(%rip\)/ && text !~ /\{[a-z]+:/) {
+        return fail_block(block, "address memory relative to the instruction without a relocation",
+                          text)
+      }
+      template = ""
+      literal_text = ""
+      remaining = text
+      while (match(remaining, /<[^>]*>|\{[a-z]+:[^}]*\}/)) {
+        literal_text = literal_text " " substr(remaining, 1, RSTART - 1)
+        template = template substr(remaining, 1, RSTART - 1)
+        token = substr(remaining, RSTART, RLENGTH)
+        remaining = substr(remaining, RSTART + RLENGTH)
+        if (token ~ /^</) {
+          template = template branch_template(block, substr(token, 2, length(token) - 2))
+        } else {
+          template = template annotation_template(block, token)
+        }
+        if (block_problem[block] != "") {
+          return ""
+        }
+      }
+      literal_text = literal_text " " remaining
+      if (literal_text ~ /[ ,]-?0x[0-9a-fA-F]+([ ,]|$)/) {
+        return fail_block(block, "name an address without a symbol", text)
+      }
+      return template remaining
+    }
+
+    function analyze(block,    total, position) {
+      if (block in analyzed) {
+        return
+      }
+      analyzed[block] = 1
+      block_problem[block] = ""
+      edge_total[block] = 0
+      total = instruction_count[block]
+      while (total > 0 && mnemonic_of(instruction[block, total]) ~ /^nop/) {
+        total--
+      }
+      trimmed_total[block] = total
+      if (total == 0) {
+        fail_block(block, "hold nothing but padding", "")
+        return
+      }
+      if (!is_terminator(mnemonic_of(instruction[block, total]))) {
+        fail_block(block, "may run past their last instruction", instruction[block, total])
+        return
+      }
+      for (position = 1; position <= total; position++) {
+        template[block, position] = instruction_template(block, instruction[block, position])
+        if (block_problem[block] != "") {
+          return
+        }
+      }
+    }
+
+    function serialize_closure(root, path,    queue, index_of, tail, head, block, edge, target,
+                               position, pieces, piece_total, piece, line) {
+      tail = 1
+      queue[1] = root
+      index_of[root] = 1
+      for (head = 1; head <= tail; head++) {
+        block = queue[head]
+        analyze(block)
+        if (block_problem[block] != "") {
+          return block
+        }
+        for (edge = 1; edge <= edge_total[block]; edge++) {
+          target = edge_target[block, edge]
+          if (!(target in index_of)) {
+            tail++
+            queue[tail] = target
+            index_of[target] = tail
+          }
+        }
+      }
+      for (head = 1; head <= tail; head++) {
+        block = queue[head]
+        print "block " head > path
+        for (position = 1; position <= trimmed_total[block]; position++) {
+          piece_total = split(template[block, position], pieces, "\001")
+          line = ""
+          for (piece = 1; piece <= piece_total; piece++) {
+            if (piece % 2 == 1) {
+              line = line pieces[piece]
+            } else {
+              line = line "@" index_of[edge_target[block, pieces[piece]]]
+            }
+          }
+          print line > path
+        }
+      }
+      close(path)
+      return 0
+    }
+
+    function closure_state(function_name,    failing_block, reason) {
+      function_total++
+      failing_block = serialize_closure(block_of_function[function_name],
+                                        closure_directory "/" function_name)
+      if (failing_block == 0) {
+        return "hashed"
+      }
+      reason = block_problem[failing_block]
+      if (!(reason in reason_total)) {
+        reason_kinds++
+        reason_order[reason_kinds] = reason
+        reason_example[reason] = function_name " (" block_problem_detail[failing_block] ")"
+      }
+      reason_total[reason]++
+      unresolved_total++
+      return "unresolved"
+    }
+
+    FILENAME == names_file {
+      base_name = $2
+      sub(/\(.*$/, "", base_name)
+      if (base_name ~ /^(port|highway)[A-Z]/) {
+        if (base_name !~ /^(port|highway)[A-Z][A-Za-z0-9_]*$/) {
+          fatal("Cannot name a file after the function " quoted(base_name))
+        }
+        function_of_symbol[$1] = base_name
+      }
+      if (highway_target == "" && base_name == "targetOfHighway" &&
+          match($1, /N_[A-Z0-9_]+O[0-9]/)) {
+        highway_target = substr($1, RSTART + 2, RLENGTH - 2)
+        sub(/O[0-9]+$/, "", highway_target)
+      }
+      next
+    }
+
+    /:\tfile format / {
+      object_total++
+      object_is_macho[object_total] = ($0 ~ /:\tfile format mach-o /)
+      current_block = 0
+      next
+    }
+
+    /^<.*>:$/ {
+      if (object_total == 0) {
+        fatal("Found the label " quoted($0) " before the file format of any object")
+      }
+      if (current_block == 0 || instruction_count[current_block] > 0) {
+        block_total++
+        current_block = block_total
+        block_object[current_block] = object_total
+        instruction_count[current_block] = 0
+      }
+      label = substr($0, 2, length($0) - 3)
+      register_label(object_total, label, current_block)
+      if (label in function_of_symbol) {
+        function_name = function_of_symbol[label]
+        if (function_name in block_of_function) {
+          fatal(function_name " is defined more than once")
+        }
+        block_of_function[function_name] = current_block
+        if (function_name ~ /^port/) {
+          port_total++
+          port_order[port_total] = function_name
+        }
+      }
+      next
+    }
+
+    /^\t/ {
+      if (current_block == 0) {
+        fatal("Found the instruction " quoted($0) " before any label of its object")
+      }
+      instruction_count[current_block]++
+      instruction[current_block, instruction_count[current_block]] = substr($0, 2)
+      next
+    }
+
+    {
+      fatal("Cannot read the line " quoted($0) " of the disassembly listing")
+    }
+
+    END {
+      if (failed) {
+        exit 1
+      }
+      if (port_total == 0) {
+        fatal("Found no port functions to fingerprint")
+      }
+      if (highway_target == "") {
+        fatal("Found no targetOfHighway to read the target from")
+      }
+      for (function_name in block_of_function) {
+        if (function_name ~ /^highway/ && !(("port" substr(function_name, 8)) in block_of_function)) {
+          fatal(function_name " has no port counterpart")
+        }
+      }
+
+      printf "target\t%s\n", keyed_target(highway_target)
+      for (rank = 1; rank <= port_total; rank++) {
+        port_name = port_order[rank]
+        key = substr(port_name, 5)
+        if (!(("highway" key) in block_of_function)) {
+          fatal(port_name " has no highway counterpart")
+        }
+        port_state = closure_state(port_name)
+        highway_state = closure_state("highway" key)
+        printf "%s\t%s\t%s\n", key, port_state, highway_state
+      }
+
+      if (unresolved_total > 0) {
+        printf "** %d of %d functions cannot be fingerprinted, so their keys count as new:\n",
+          unresolved_total, function_total > "/dev/stderr"
+        for (kind = 1; kind <= reason_kinds; kind++) {
+          reason = reason_order[kind]
+          printf "**   %d %s, like %s\n", reason_total[reason], reason,
+            reason_example[reason] > "/dev/stderr"
+        }
+      }
+    }
+  ' "${names_file}" "${listing_file}"; then
+    fatal "Failed to serialize what the functions of '${target_name}' run"
+  fi
+  return 0
+}
+
+hash_closures() {
+  local closure_directory="${1:?hash_closures requires the directory of the closures}"
+  local -n hash_command_ref="${2:?hash_closures requires the name of the hash command array}"
+
+  if ! (cd -- "${closure_directory}" && find . -type f -exec "${hash_command_ref[@]}" {} +); then
+    fatal "Failed to hash the closures in '${closure_directory}'"
+  fi
+  return 0
+}
+
+merge_fingerprints() {
+  local manifest_file="${1:?merge_fingerprints requires the manifest of the closures}"
+  local hashes_file="${2:?merge_fingerprints requires the hashes of the closures}"
+  local merged_file="${3:?merge_fingerprints requires the file to merge them into}"
+
+  if ! awk -F '\t' -v hashes_file="${hashes_file}" '
+    function quoted(value) {
+      return "\047" value "\047"
+    }
+
+    function fatal(message) {
+      printf "** ERROR: %s\n", message > "/dev/stderr"
+      failed = 1
+      exit 1
+    }
+
+    function fingerprint(function_name, state) {
+      if (state == "unresolved") {
+        return state
+      }
+      if (state != "hashed") {
+        fatal("The closure of " function_name " is " quoted(state) ", neither hashed nor unresolved")
+      }
+      if (!(function_name in hash_of)) {
+        fatal("Found no hash of the closure of " function_name)
+      }
+      hashed_total++
+      return hash_of[function_name]
+    }
+
+    FILENAME == hashes_file {
+      if (!match($0, /^[0-9a-f]+ [ *]\.\//)) {
+        fatal("Cannot read the hash " quoted($0))
+      }
+      digest = substr($0, 1, index($0, " ") - 1)
+      closure_name = substr($0, RLENGTH + 1)
+      if (length(digest) != 64) {
+        fatal("The hash " quoted($0) " is not a SHA-256 digest")
+      }
+      if (closure_name in hash_of) {
+        fatal("Found two hashes of the closure of " closure_name)
+      }
+      hash_of[closure_name] = digest
+      hash_total++
+      next
+    }
+
+    FNR == 1 {
+      if (NF != 2 || $1 != "target") {
+        fatal("The manifest starts with " quoted($0) " instead of the target")
+      }
+      target = $2
+      print
+      next
+    }
+
+    {
+      if (NF != 3) {
+        fatal("Cannot read the line " quoted($0) " of the manifest")
+      }
+      printf "%s\t%s\t%s\n", $1, fingerprint("port" $1, $2), fingerprint("highway" $1, $3)
+      key_total++
+    }
+
+    END {
+      if (failed) {
+        exit 1
+      }
+      if (hashed_total != hash_total) {
+        fatal(hash_total " closures were hashed, but the manifest names " hashed_total)
+      }
+      printf "** Fingerprinted %d keys on %s\n", key_total, target > "/dev/stderr"
+    }
+  ' "${hashes_file}" "${manifest_file}" > "${merged_file}"; then
+    fatal "Failed to merge the hashes into the fingerprints"
+  fi
+
+  if ! head -n 1 -- "${merged_file}"; then
+    fatal "Failed to read the target out of '${merged_file}'"
+  fi
+  if ! tail -n +2 -- "${merged_file}" | LC_ALL=C sort; then
+    fatal "Failed to sort the fingerprints of '${merged_file}'"
+  fi
+  return 0
+}
+
+write_fingerprints() {
+  local names_file="${1:?write_fingerprints requires the file of symbols and demangled names}"
+  local listing_file="${2:?write_fingerprints requires the disassembly listing}"
+  local host_architecture_key="${3:?write_fingerprints requires the key of the host architecture}"
+  local hash_command_name="${4:?write_fingerprints requires the name of the hash command array}"
+  local work_directory="${5:?write_fingerprints requires a directory to work in}"
+  local fingerprints_file="${6:?write_fingerprints requires the file to write the fingerprints to}"
+
+  local -r closure_directory="${work_directory}/closures"
+  local -r manifest_file="${work_directory}/manifest.tsv"
+  local -r hashes_file="${work_directory}/hashes.txt"
+  local -r merged_file="${work_directory}/merged.tsv"
+  local -r written_file="${work_directory}/fingerprints.tsv"
+
+  if ! mkdir -- "${closure_directory}"; then
+    fatal "Failed to create the directory '${closure_directory}'"
+  fi
+  serialize_closures "${names_file}" "${listing_file}" "${closure_directory}" \
+    "${host_architecture_key}" > "${manifest_file}"
+  hash_closures "${closure_directory}" "${hash_command_name}" > "${hashes_file}"
+  merge_fingerprints "${manifest_file}" "${hashes_file}" "${merged_file}" > "${written_file}"
+
+  if ! mv -f -- "${written_file}" "${fingerprints_file}"; then
+    fatal "Failed to move the fingerprints to '${fingerprints_file}'"
+  fi
+  return 0
+}
+
 main() {
   require_command swift
 
@@ -514,10 +1020,18 @@ main() {
     fatal "Cannot normalize the disassembly of '${target_name}' without an objdump"
   fi
 
-  validate_allowlist "${allowlist_path}" "${allowlist_entry_pattern}" \
-    "${allowlist_entry_format}" "${allowlist_entry_example}"
-  validate_allowlist "${reorder_allowlist_path}" "${reorder_allowlist_entry_pattern}" \
-    "${reorder_allowlist_entry_format}" "${reorder_allowlist_entry_example}"
+  local -a normalize_options=()
+  local -a hash_command=()
+  if [[ -n "${fingerprints_path}" ]]; then
+    validate_fingerprints_path "${fingerprints_path}"
+    find_hash_command hash_command
+    normalize_options=( --file-formats --complete-constants --generic-syntax )
+  else
+    validate_allowlist "${allowlist_path}" "${allowlist_entry_pattern}" \
+      "${allowlist_entry_format}" "${allowlist_entry_example}"
+    validate_allowlist "${reorder_allowlist_path}" "${reorder_allowlist_entry_pattern}" \
+      "${reorder_allowlist_entry_format}" "${reorder_allowlist_entry_example}"
+  fi
 
   local host_architecture_key
   host_architecture_key="$(architecture_key "${architecture}")"
@@ -557,8 +1071,16 @@ main() {
   local -r names_file="${workspace}/names.tsv"
 
   log "Disassembling ${#object_files[@]} object files..."
-  normalize_object_files object_files > "${listing_file}"
+  normalize_object_files object_files "${normalize_options[@]}" > "${listing_file}"
   demangle_symbols "${listing_file}" "${symbols_file}" "${demangled_file}" > "${names_file}"
+
+  if [[ -n "${fingerprints_path}" ]]; then
+    log "Fingerprinting the functions with ${hash_command[0]}..."
+    write_fingerprints "${names_file}" "${listing_file}" "${host_architecture_key}" hash_command \
+      "${workspace}" "${fingerprints_path}"
+    log "Wrote the fingerprints to '${fingerprints_path}'"
+    return 0
+  fi
 
   log "Comparing the functions..."
   compare_functions "${names_file}" "${listing_file}" "${allowlist_path}" \

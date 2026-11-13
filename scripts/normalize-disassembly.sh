@@ -9,6 +9,9 @@ error() { printf -- "** ERROR: %s\n" "$*" >&2; }
 fatal() { error "$@"; exit 1; }
 
 check_only="false"
+print_file_formats="false"
+complete_constants="false"
+generic_syntax="false"
 declare -a object_files=()
 workspace=""
 
@@ -20,8 +23,15 @@ cleanup() {
 }
 
 usage() {
-  printf -- 'Usage: %s [--check] <object file>...\n' "$(basename -- "${BASH_SOURCE[0]}")"
-  printf -- '  --check only verify that an objdump is available, taking no object files\n'
+  printf -- 'Usage: %s [--check] [--file-formats] [--complete-constants] [--generic-syntax]\n' \
+    "$(basename -- "${BASH_SOURCE[0]}")"
+  printf -- '       <object file>...\n'
+  printf -- '  --check              only verify that an objdump is available, taking no object files\n'
+  printf -- '  --file-formats       print the file format line of every object before its listing\n'
+  printf -- '  --complete-constants resolve all the bytes the code can read from every constant,\n'
+  printf -- '                       and leave the constants that hold relocations unresolved\n'
+  printf -- '  --generic-syntax     print arm64 instructions in the syntax objdump uses for ELF,\n'
+  printf -- '                       not in the Apple syntax it uses for Mach-O\n'
   return 0
 }
 
@@ -33,6 +43,15 @@ parse_arguments() {
     case "${option}" in
       --check)
         check_only="true"
+        ;;
+      --file-formats)
+        print_file_formats="true"
+        ;;
+      --complete-constants)
+        complete_constants="true"
+        ;;
+      --generic-syntax)
+        generic_syntax="true"
         ;;
       -h | --help)
         usage
@@ -53,6 +72,15 @@ parse_arguments() {
 
   if [[ "${check_only}" == "true" && "${#object_files[@]}" -gt 0 ]]; then
     fatal "--check takes no object files" "$(usage)"
+  fi
+  if [[ "${check_only}" == "true" && "${print_file_formats}" == "true" ]]; then
+    fatal "--check takes no --file-formats" "$(usage)"
+  fi
+  if [[ "${check_only}" == "true" && "${complete_constants}" == "true" ]]; then
+    fatal "--check takes no --complete-constants" "$(usage)"
+  fi
+  if [[ "${check_only}" == "true" && "${generic_syntax}" == "true" ]]; then
+    fatal "--check takes no --generic-syntax" "$(usage)"
   fi
   if [[ "${check_only}" != "true" && "${#object_files[@]}" -eq 0 ]]; then
     fatal "Found no object files to normalize" "$(usage)"
@@ -110,10 +138,14 @@ normalize_disassembly() {
   local objdump_path="${1:?normalize_disassembly requires the path of objdump}"
   local object_file="${2:?normalize_disassembly requires the object file}"
   local dump_directory="${3:?normalize_disassembly requires the directory to write the dumps to}"
+  local print_file_formats="${4:?normalize_disassembly requires whether to print the file formats}"
+  local complete_constants="${5:?normalize_disassembly requires whether to complete the constants}"
+  local generic_syntax="${6:?normalize_disassembly requires whether to print the generic syntax}"
 
   local -r sections_file="${dump_directory}/object-sections.txt"
   local -r symbols_file="${dump_directory}/object-symbols.txt"
   local -r contents_file="${dump_directory}/object-contents.txt"
+  local -r relocations_file="${dump_directory}/object-relocations.txt"
   local -r disassembly_file="${dump_directory}/object-disassembly.txt"
 
   local -a disassemble_arguments=(
@@ -123,6 +155,9 @@ normalize_disassembly() {
     --show-all-symbols
     --reloc
   )
+  if [[ "${generic_syntax}" == "true" ]]; then
+    disassemble_arguments+=( -mllvm -aarch64-neon-syntax=generic )
+  fi
   run_objdump "${objdump_path}" "${object_file}" "${sections_file}" "section headers" \
     --section-headers
   run_objdump "${objdump_path}" "${object_file}" "${symbols_file}" "symbol table" --syms
@@ -131,11 +166,26 @@ normalize_disassembly() {
   run_objdump "${objdump_path}" "${object_file}" "${disassembly_file}" "disassembly" \
     "${disassemble_arguments[@]}"
 
+  local -a dump_files=( "${sections_file}" "${symbols_file}" "${contents_file}" )
+  if [[ "${complete_constants}" == "true" ]]; then
+    local -a relocation_arguments=( --reloc )
+    if grep -q -- $'\tfile format mach-o ' "${sections_file}"; then
+      relocation_arguments=( --macho --reloc )
+    fi
+    run_objdump "${objdump_path}" "${object_file}" "${relocations_file}" "relocations" \
+      "${relocation_arguments[@]}"
+    dump_files+=( "${relocations_file}" )
+  fi
+  dump_files+=( "${disassembly_file}" )
+
   if ! awk \
     -v object_file="${object_file}" \
     -v sections_file="${sections_file}" \
     -v symbols_file="${symbols_file}" \
-    -v contents_file="${contents_file}" '
+    -v contents_file="${contents_file}" \
+    -v relocations_file="${relocations_file}" \
+    -v print_file_formats="${print_file_formats}" \
+    -v complete_constants="${complete_constants}" '
     BEGIN {
       dump_groups = 4
       dump_group_digits = 8
@@ -182,6 +232,9 @@ normalize_disassembly() {
       }
       if (section ~ /literal4|cst4/) {
         return 4
+      }
+      if (complete_constants == "true" && match(section, /\.cst[0-9]+$/)) {
+        return substr(section, RSTART + 4) + 0
       }
       return 0
     }
@@ -301,9 +354,21 @@ normalize_disassembly() {
       return "{got:" symbol_text(symbol) "}"
     }
 
+    function holds_relocation(section, address, size,    position) {
+      for (position = address - 7; position < address + size; position++) {
+        if ((section, position) in relocated_byte) {
+          return 1
+        }
+      }
+      return 0
+    }
+
     function constant_annotation(section, address, size,    offset, bytes, missing) {
       if (!is_macho && section_count[section] > 1) {
         unresolvable("several sections are named " quoted(section))
+      }
+      if (complete_constants == "true" && holds_relocation(section, address, size)) {
+        return "{data:" section "}"
       }
       bytes = ""
       for (offset = 0; offset < size; offset++) {
@@ -329,6 +394,48 @@ normalize_disassembly() {
         }
       }
       unresolvable("the address 0x" comment_digits " is outside of the section " quoted(section))
+    }
+
+    function containing_section(section, address,    position) {
+      for (position = 1; position <= section_total; position++) {
+        if (section_name[position] == section &&
+            section_vma[position] <= address &&
+            address < section_vma[position] + section_size[position]) {
+          return position
+        }
+      }
+      unresolvable("the address " sprintf("0x%x", address) " is outside of the section " quoted(section))
+    }
+
+    function section_contents_annotation(position, offset,    annotation) {
+      if (!(position in section_contents)) {
+        section_contents[position] = constant_annotation(section_name[position],
+                                                         section_vma[position],
+                                                         section_size[position])
+      }
+      annotation = section_contents[position]
+      sub(/}$/, "@" offset "}", annotation)
+      return annotation
+    }
+
+    function relocated_section_annotation(section, addend, addend_sign, comment_digits,
+                                          address, position) {
+      if (is_macho && architecture == "x86") {
+        address = target_address_in_section(section, comment_digits)
+        position = containing_section(section, address)
+        return section_contents_annotation(position, sprintf("0x%x", address - section_vma[position]))
+      }
+      if (!is_macho) {
+        return section_contents_annotation(section_position[section],
+                                           addend_sign sprintf("0x%x", addend))
+      }
+      unresolvable("the offset within the section " quoted(section) " is unknown for this format")
+    }
+
+    function symbol_contents_annotation(symbol, addend, addend_sign,    position, offset) {
+      position = containing_section(symbol_section[symbol], symbol_value[symbol])
+      offset = sprintf("0x%x", symbol_value[symbol] - section_vma[position])
+      return section_contents_annotation(position, offset addend_sign sprintf("0x%x", addend))
     }
 
     function code_target_annotation(section, addend, addend_sign, relocation_type,
@@ -361,6 +468,9 @@ normalize_disassembly() {
       }
       size = constant_size(section)
       if (size == 0) {
+        if (complete_constants == "true" && is_constant_data(section)) {
+          return relocated_section_annotation(section, addend, addend_sign, comment_digits)
+        }
         return "{data:" section "}"
       }
       if (is_macho && architecture == "x86") {
@@ -419,6 +529,9 @@ normalize_disassembly() {
       }
       size = constant_size(section)
       if (size == 0) {
+        if (complete_constants == "true" && is_constant_data(section)) {
+          return symbol_contents_annotation(symbol, addend, addend_sign)
+        }
         if (is_local_label(symbol)) {
           return "{data:" section "}"
         }
@@ -550,6 +663,7 @@ normalize_disassembly() {
         block_section = $0
         sub(/^Contents of section /, "", block_section)
         sub(/:$/, "", block_section)
+        block_qualified_section = block_section
         block_section = without_segment(block_section)
         block_is_constant = (constant_size(block_section) > 0 || is_constant_data(block_section))
       } else if (block_is_constant && $0 ~ /^ [0-9a-fA-F]+ /) {
@@ -562,6 +676,9 @@ normalize_disassembly() {
           fatal("Cannot read the bytes of " quoted($0) " in " object_file)
         }
         line_address = hex_value(line_address)
+        if (!(block_qualified_section in qualified_section_vma)) {
+          qualified_section_vma[block_qualified_section] = line_address
+        }
         for (byte_position = 1; byte_position * 2 <= length(hex_area); byte_position++) {
           byte_digits = substr(hex_area, byte_position * 2 - 1, 2)
           constant_byte[block_section, line_address + byte_position - 1] = tolower(byte_digits)
@@ -570,10 +687,27 @@ normalize_disassembly() {
       next
     }
 
+    FILENAME == relocations_file {
+      if ($0 ~ /^RELOCATION RECORDS FOR \[.*\]:$/) {
+        relocated_section = substr($0, 25, length($0) - 26)
+      } else if ($0 ~ /^Relocation information \(.*\) [0-9]+ entries$/) {
+        relocated_section = $0
+        sub(/^Relocation information \(/, "", relocated_section)
+        sub(/\) [0-9]+ entries$/, "", relocated_section)
+      } else if ((relocated_section in qualified_section_vma) && $1 ~ /^[0-9a-fA-F]+$/) {
+        relocated_address = qualified_section_vma[relocated_section] + hex_value($1)
+        relocated_byte[without_segment(relocated_section), relocated_address] = 1
+      }
+      next
+    }
+
     /:\tfile format / {
       object_format = $0
       sub(/^.*:\tfile format /, "", object_format)
       set_object_format(object_format)
+      if (print_file_formats == "true") {
+        print $0
+      }
       next
     }
 
@@ -666,7 +800,7 @@ normalize_disassembly() {
       }
       flush_instruction()
     }
-  ' "${sections_file}" "${symbols_file}" "${contents_file}" "${disassembly_file}"; then
+  ' "${dump_files[@]}"; then
     fatal "Failed to normalize the disassembly of '${object_file}'"
   fi
   return 0
@@ -676,10 +810,14 @@ disassemble() {
   local objdump_path="${1:?disassemble requires the path of objdump}"
   local -n object_files_ref="${2:?disassemble requires the name of the object file array}"
   local dump_directory="${3:?disassemble requires the directory to write the dumps to}"
+  local print_file_formats="${4:?disassemble requires whether to print the file formats}"
+  local complete_constants="${5:?disassemble requires whether to complete the constants}"
+  local generic_syntax="${6:?disassemble requires whether to print the generic syntax}"
 
   local object_file
   for object_file in "${object_files_ref[@]}"; do
-    normalize_disassembly "${objdump_path}" "${object_file}" "${dump_directory}"
+    normalize_disassembly "${objdump_path}" "${object_file}" "${dump_directory}" \
+      "${print_file_formats}" "${complete_constants}" "${generic_syntax}"
   done
   return 0
 }
@@ -698,7 +836,8 @@ main() {
   workspace="$(mktemp -d)" || fatal "Failed to create a temporary directory for the dumps"
   trap cleanup EXIT
 
-  disassemble "${objdump_path}" object_files "${workspace}"
+  disassemble "${objdump_path}" object_files "${workspace}" "${print_file_formats}" \
+    "${complete_constants}" "${generic_syntax}"
   return 0
 }
 
