@@ -19446,6 +19446,100 @@ let maskOps: [Op] = [
     },
 ]
 
+struct MaskComposition {
+    let outer: Op
+    let inner: Op
+
+    var name: String { "\(outer.identifier)Of\(uppercasedFirst(inner.identifier))" }
+}
+
+let firstTrueSettingOps = [
+    "onlyFirstTrue", "beforeFirstTrue", "atOrBeforeFirstTrue", "atOrAfterFirstTrue",
+]
+let firstTrueSettingSources = ["bitwiseNotMask", "neitherTrue"]
+
+func firstTrueCompositions(for element: Element) -> [MaskComposition] {
+    let applying = ops.filter { $0.applies.matches(element) }
+    return firstTrueSettingOps.flatMap { outerName in
+        firstTrueSettingSources.compactMap { innerName in
+            guard let outer = applying.first(where: { $0.identifier == outerName }),
+                let inner = applying.first(where: { $0.identifier == innerName })
+            else { return nil }
+            return MaskComposition(outer: outer, inner: inner)
+        }
+    }
+}
+
+func maskCompositionReferenceFunction(
+    _ composition: MaskComposition,
+    for element: Element
+) -> String {
+    let parameterBindings = bindings(of: composition.inner, for: element)
+    let declarations = parameterBindings.map(\.declaration).filter { !$0.isEmpty }
+    let arguments = parameterBindings.map(\.argument).filter { !$0.isEmpty }
+    let inner = "hn::\(composition.inner.highwayName)(\(arguments.joined(separator: ", ")))"
+    let body = referenceBody(
+        calling: "hn::\(composition.outer.highwayName)(\(inner))",
+        returning: composition.outer.returns,
+        for: element
+    )
+    let name = referenceFunctionName(composition.name, element)
+    return "HWY_INLINE \(cReturnType(composition.outer.returns, element)) "
+        + "\(name)(\(declarations.joined(separator: ", "))) { \(body) }\n"
+}
+
+func maskCompositionTest(_ composition: MaskComposition, for element: Element) -> String {
+    let test = composition.name
+    let innerBindings = bindings(of: composition.inner, for: element)
+    let operands = zip(innerBindings, composition.inner.parameters).filter { !$0.1.isTag }
+    let inputs = operands.enumerated().map { index, operand in
+        let seed = "seed: \(referenceTestSeed(element, test, String(index)))"
+        return ReferenceInput(
+            parameter: operand.1,
+            name: operand.0.swiftName,
+            values: "Inputs.masksAndComplements(H.Mask.self, \(seed))"
+        )
+    }
+    let calls = referenceCalls(
+        of: composition.inner,
+        for: element,
+        pointer: "",
+        referenceName: referenceFunctionName(composition.name, element)
+    )
+    let outerBindings = bindings(of: composition.outer, for: element)
+    let outerOperands = zip(outerBindings, composition.outer.parameters).filter { !$0.1.isTag }
+    let port = portCall(
+        composition.outer.swiftName,
+        outerOperands.map { swiftCallArgument($0.0, passing: calls.port) }
+    )
+    return referenceTestFunction(
+        test,
+        label: "\(composition.outer.testIdentifier) of \(composition.inner.testIdentifier)",
+        for: element,
+        inputs: inputs,
+        statements:
+            "mismatches.check(\(port), \(calls.reference), \(referenceDescription(of: inputs)))"
+    )
+}
+
+func firstTrueCompositionMembers(of element: Element, by keys: Set<String>?) -> [SectionMember] {
+    firstTrueCompositions(for: element).filter { composition in
+        isTested(
+            codegenKeys(of: composition.outer, for: element)
+                + codegenKeys(of: composition.inner, for: element),
+            by: keys
+        )
+    }.map { composition in
+        SectionMember(
+            section: composition.outer.section,
+            inside: markingKnownGaps(
+                [maskCompositionTest(composition, for: element)],
+                suite: "\(element.namespace)Reference"
+            )
+        )
+    }
+}
+
 func shuffled(
     _ first: String,
     _ second: String,
@@ -38181,6 +38275,10 @@ func generateReferenceHeader() -> String {
             }
         }
 
+        for composition in firstTrueCompositions(for: element) {
+            output += maskCompositionReferenceFunction(composition, for: element)
+        }
+
         let blockLanes = repeatingBlockLanes(of: element)
         let blockArguments = blockLanes.map(element.hwyScalar).joined(separator: ", ")
         let blockBody = referenceBody(
@@ -42862,6 +42960,7 @@ func generateReferenceTestMembers(_ element: Element, by keys: Set<String>?) -> 
         )
     }
     members += reorderMulPairingMembers(of: element)
+    members += firstTrueCompositionMembers(of: element, by: keys)
     return members
 }
 
@@ -45132,13 +45231,54 @@ let emu128FoldedConstantTests: [String: [String]] = [
     ]
 ]
 
-let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] = [
-    (linuxAvx2AndAvx512NaNSign, knownGapTests),
-    (linuxAvx2AndAvx512IntermittentNaNSign, intermittentNaNSignTests),
-    (linuxAvx512MaskedZeroSign, maskedZeroSignTests),
-    (linuxAvx3SprFloat16OrderedComparison, float16OrderedComparisonTests),
-    (darwinEmu128Folding, emu128FoldedConstantTests),
-]
+func sveFirstTrueSettingIssue(_ result: String) -> KnownIssue {
+    KnownIssue(
+        comment:
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its \(result), while the port builds a canonical predicate in each op and returns the documented result",
+        condition: "SIMDTarget.targetName.hasPrefix(\"SVE\")"
+    )
+}
+
+func firstTrueCompositionTests(of identifier: String) -> [String: [String]] {
+    Dictionary(
+        uniqueKeysWithValues: elements.filter { $0.bits > 8 }.map { element in
+            let compositions = firstTrueCompositions(for: element).filter {
+                $0.outer.identifier == identifier
+            }
+            return ("\(element.namespace)Reference", compositions.map(\.name))
+        }
+    )
+}
+
+let sveFirstTrueSettingGaps = [
+    (
+        "onlyFirstTrue",
+        "SetOnlyFirst breaks after the first true byte, so it returns no true lane where the first true lane is not lane 0"
+    ),
+    (
+        "beforeFirstTrue",
+        "SetBeforeFirst breaks before the first true byte, so it returns only lane 0 where the first true lane is above lane 1 or no lane is true"
+    ),
+    (
+        "atOrBeforeFirstTrue",
+        "SetAtOrBeforeFirst breaks after the first true byte, so it returns only lane 0 where the first true lane is not lane 0 or no lane is true"
+    ),
+    (
+        "atOrAfterFirstTrue",
+        "SetAtOrAfterFirst negates SetBeforeFirst, which breaks before the first true byte, so it returns every lane but lane 0 where the first true lane is above lane 1 or no lane is true"
+    ),
+].map { identifier, result in
+    (issue: sveFirstTrueSettingIssue(result), tests: firstTrueCompositionTests(of: identifier))
+}
+
+let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] =
+    [
+        (linuxAvx2AndAvx512NaNSign, knownGapTests),
+        (linuxAvx2AndAvx512IntermittentNaNSign, intermittentNaNSignTests),
+        (linuxAvx512MaskedZeroSign, maskedZeroSignTests),
+        (linuxAvx3SprFloat16OrderedComparison, float16OrderedComparisonTests),
+        (darwinEmu128Folding, emu128FoldedConstantTests),
+    ] + sveFirstTrueSettingGaps
 
 func markingKnownGaps(_ tests: [String], suite: String) -> [String] {
     knownGaps.reduce(tests) { tests, gap in

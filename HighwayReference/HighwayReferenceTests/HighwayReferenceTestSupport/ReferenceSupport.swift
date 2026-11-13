@@ -371,6 +371,10 @@ package enum Inputs {
         masks(SIMDMask<M.Storage>.self, seed: seed).map(M.init)
     }
 
+    package static func masksAndComplements<M: ReferenceMask>(_ type: M.Type, seed: UInt64) -> [M] {
+        masks(SIMDMask<M.Storage>.self, seed: seed).flatMap { [M($0), M(.!$0)] }
+    }
+
     package static func masks<M: ReferenceNarrowMask>(_ type: M.Type, seed: UInt64) -> [M] {
         var generator = SplitMix64(seed: seed)
         let lanes = M.laneCount

@@ -140,4 +140,112 @@ extension SIMDInt8ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func onlyFirstTrueOfBitwiseNotMask() {
+        let mismatches = Mismatches("onlyFirstTrue of bitwiseNotMask")
+        let maskInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x2115_39AA_43BF_3479)
+        for mask in maskInputs {
+            mismatches.check(
+                H.onlyFirstTrue(H.bitwiseNot(mask)),
+                H.Mask(raw: HighwayReference.onlyFirstTrueOfBitwiseNotMaskI8(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func onlyFirstTrueOfNeitherTrue() {
+        let mismatches = Mismatches("onlyFirstTrue of neitherTrue")
+        let aInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x2652_ED60_236A_C806)
+        let bInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x2652_EE60_236A_C9B9)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.onlyFirstTrue(H.neitherTrue(a, b)),
+                H.Mask(raw: HighwayReference.onlyFirstTrueOfNeitherTrueI8(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func beforeFirstTrueOfBitwiseNotMask() {
+        let mismatches = Mismatches("beforeFirstTrue of bitwiseNotMask")
+        let maskInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x4BE3_8BFC_057A_0056)
+        for mask in maskInputs {
+            mismatches.check(
+                H.beforeFirstTrue(H.bitwiseNot(mask)),
+                H.Mask(raw: HighwayReference.beforeFirstTrueOfBitwiseNotMaskI8(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func beforeFirstTrueOfNeitherTrue() {
+        let mismatches = Mismatches("beforeFirstTrue of neitherTrue")
+        let aInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x535C_98EC_C6D6_82B3)
+        let bInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x535C_97EC_C6D6_8100)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.beforeFirstTrue(H.neitherTrue(a, b)),
+                H.Mask(raw: HighwayReference.beforeFirstTrueOfNeitherTrueI8(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func atOrBeforeFirstTrueOfBitwiseNotMask() {
+        let mismatches = Mismatches("atOrBeforeFirstTrue of bitwiseNotMask")
+        let maskInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xD32F_7591_138A_2716)
+        for mask in maskInputs {
+            mismatches.check(
+                H.atOrBeforeFirstTrue(H.bitwiseNot(mask)),
+                H.Mask(raw: HighwayReference.atOrBeforeFirstTrueOfBitwiseNotMaskI8(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func atOrBeforeFirstTrueOfNeitherTrue() {
+        let mismatches = Mismatches("atOrBeforeFirstTrue of neitherTrue")
+        let aInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xEC15_1CD4_99E9_EC73)
+        let bInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xEC15_1BD4_99E9_EAC0)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.atOrBeforeFirstTrue(H.neitherTrue(a, b)),
+                H.Mask(raw: HighwayReference.atOrBeforeFirstTrueOfNeitherTrueI8(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func atOrAfterFirstTrueOfBitwiseNotMask() {
+        let mismatches = Mismatches("atOrAfterFirstTrue of bitwiseNotMask")
+        let maskInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xDD08_E21D_4BDB_52F7)
+        for mask in maskInputs {
+            mismatches.check(
+                H.atOrAfterFirstTrue(H.bitwiseNot(mask)),
+                H.Mask(raw: HighwayReference.atOrAfterFirstTrueOfBitwiseNotMaskI8(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func atOrAfterFirstTrueOfNeitherTrue() {
+        let mismatches = Mismatches("atOrAfterFirstTrue of neitherTrue")
+        let aInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x38C6_CF47_3B01_AB08)
+        let bInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x38C6_D047_3B01_ACBB)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.atOrAfterFirstTrue(H.neitherTrue(a, b)),
+                H.Mask(raw: HighwayReference.atOrAfterFirstTrueOfNeitherTrueI8(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
 }
