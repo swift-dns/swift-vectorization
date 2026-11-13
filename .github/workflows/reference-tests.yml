@@ -30,11 +30,10 @@ jobs:
         # `-msve-vector-bits`, so the two `-Xllvm` options tell it the vector length, without which
         # it pads SVE ops with `ptrue` and `sel` the C compiler would not.
         target:
-          - &neon_without_aes
-            name: NEON_WITHOUT_AES
+          - name: &neon_without_aes_name NEON_WITHOUT_AES
             expected-target: NEON_WITHOUT_AES
-            runner: ubuntu-24.04-arm
-            flags: ""
+            runner: &neon_without_aes_runner ubuntu-24.04-arm
+            flags: &neon_without_aes_flags ""
             compare-codegen: true
             debug-tests: true
             release-tests: true
@@ -296,11 +295,7 @@ jobs:
   macos-base-fingerprints:
     name: reference-tests (NEON_WITHOUT_AES, fingerprints)
 
-    strategy:
-      matrix:
-        target: [*neon_without_aes]
-
-    runs-on: ${{ matrix.target.runner }}
+    runs-on: *neon_without_aes_runner
 
     if: *test_only_new_ops
 
@@ -311,6 +306,10 @@ jobs:
     permissions:
       contents: read
 
+    env:
+      TARGET: *neon_without_aes_name
+      FLAGS: *neon_without_aes_flags
+
     steps:
       - name: Check out ${{ github.event.repository.name }}
         uses: actions/checkout@v7
@@ -319,9 +318,6 @@ jobs:
 
       - name: Fingerprint the codegen of the ops on this target
         id: fingerprint
-        env:
-          TARGET: ${{ matrix.target.name }}
-          FLAGS: ${{ matrix.target.flags }}
         run: |
           read -r -a flags <<< "${FLAGS}"
           scripts/compare-codegen.sh --fingerprints "${RUNNER_TEMP}/${TARGET}.tsv" -- "${flags[@]}"
@@ -330,7 +326,7 @@ jobs:
       - name: Upload the codegen fingerprints of this target
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.target.name }}-fingerprints
+          name: ${{ env.TARGET }}-fingerprints
           path: ${{ steps.fingerprint.outputs.path }}
           if-no-files-found: error
           retention-days: 1
