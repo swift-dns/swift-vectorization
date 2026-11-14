@@ -593,6 +593,7 @@ struct TargetBodies<Input> {
     var sve2_128Splat: ((Input) -> String?)?
     var sve: ((Input) -> String?)?
     var sve2: ((Input) -> String?)?
+    var sveSplat: ((Input) -> String?)?
     var avx3dl: ((Input) -> String?)?
     var avx3: ((Input) -> String?)?
     var avx2: ((Input) -> String?)?
@@ -603,7 +604,7 @@ struct TargetBodies<Input> {
 
     var isEmpty: Bool {
         neon == nil && sve2_128 == nil && sve2_128Splat == nil && sve == nil && sve2 == nil
-            && avx3dl == nil && avx3 == nil && avx2 == nil && sse4 == nil
+            && sveSplat == nil && avx3dl == nil && avx3 == nil && avx2 == nil && sse4 == nil
             && ssse3 == nil && sse2 == nil && emu128 == nil
     }
 
@@ -38695,12 +38696,15 @@ let sve2OnlyBuiltins = [
     "qxtunb_", "qxtunt_", "rhadd_", "rshl_", "rshr_", "tbl2_",
 ]
 
-func sveBody<Input>(_ targets: TargetBodies<Input>, for input: Input) -> String? {
-    guard let body = targets.sve?(input) else { return nil }
+func sve1Checked(_ body: String) -> String {
     if let builtin = sve2OnlyBuiltins.first(where: { body.contains("__builtin_sve_sv\($0)") }) {
         fatalError("An sve body calls SVE2's sv\(builtin.prefix { $0 != "_" }): use sve2")
     }
     return body
+}
+
+func sveBody<Input>(_ targets: TargetBodies<Input>, for input: Input) -> String? {
+    targets.sve?(input).map(sve1Checked)
 }
 
 func sveBranches<Input: WidthScaled>(
@@ -38710,8 +38714,15 @@ func sveBranches<Input: WidthScaled>(
 ) -> [TargetBranch] {
     supportedSveWidths.flatMap { width -> [TargetBranch] in
         let scaled = input.at(width: width)
-        let sve = sveBody(targets, for: scaled) ?? portable?(scaled)
-        let sve2 = supportedSveLevels.contains(.sve2(bytes: width)) ? targets.sve2?(scaled) : nil
+        let splat = targets.sveSplat?(scaled).map(sve1Checked)
+        func splatting(_ body: String?) -> String? {
+            guard let splat else { return body }
+            return [splat, body].compactMap { $0 }.joined(separator: "\n")
+        }
+        let sve = splatting(sveBody(targets, for: scaled) ?? portable?(scaled))
+        let sve2 =
+            supportedSveLevels.contains(.sve2(bytes: width))
+            ? targets.sve2?(scaled).flatMap(splatting) : nil
         let specific = sve2.flatMap { $0 == sve ? nil : $0 }.map {
             (condition: sveWidthCondition(width, level: .sve2(bytes: width)), body: $0)
         }
