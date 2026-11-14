@@ -12561,6 +12561,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_re
   const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
   const cvectorization_ops_vector_u8 target = (cvectorization_ops_vector_u8){(uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index};
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+  const cvectorization_ops_vector_u8 target = (cvectorization_ops_vector_u8){(uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index};
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value), (cvectorization_ops_x86_i8)(positions == target)));
 #elif CVECTORIZATION_OPS_X86 == 2
   if (__builtin_constant_p(index)) {
     const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -12569,9 +12573,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_re
     const cvectorization_ops_vector_u8 others = (cvectorization_ops_vector_u8)~selected;
     return (cvectorization_ops_raw_vector_u8)((selected & (cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value)) | (others & a));
   }
-  union { cvectorization_ops_vector_u8 vector; uint8_t lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u8)(storage.vector);
+  const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+  const cvectorization_ops_vector_u8 target = (cvectorization_ops_vector_u8){(uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index};
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #elif CVECTORIZATION_OPS_X86 == 1
   if (__builtin_constant_p(index)) {
     const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -12580,9 +12584,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_re
     const cvectorization_ops_vector_u8 others = (cvectorization_ops_vector_u8)(positions != target);
     return (cvectorization_ops_raw_vector_u8)((selected & (cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value)) | (others & a));
   }
-  union { cvectorization_ops_vector_u8 vector; uint8_t lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u8)(storage.vector);
+  const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+  const cvectorization_ops_vector_u8 target = (cvectorization_ops_vector_u8){(uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index};
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #else
   union { cvectorization_ops_vector_u8 vector; uint8_t lanes[16]; } storage = {a};
   storage.lanes[index] = value;
@@ -19971,10 +19975,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_u8(cvectorization_
   int8_t selected[16] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int8_t* destination = (int8_t*)to;
   for (size_t i = 0; i < 16; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -27383,6 +27386,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_r
   const cvectorization_ops_vector_u16 positions = (cvectorization_ops_vector_u16){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
   const cvectorization_ops_vector_u16 target = (cvectorization_ops_vector_u16){(uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index};
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u16 positions = (cvectorization_ops_vector_u16){0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u16 target = (cvectorization_ops_vector_u16){(uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index};
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_u16 positions = (cvectorization_ops_vector_u16){0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u16 target = (cvectorization_ops_vector_u16){(uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index};
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #else
   union { cvectorization_ops_vector_u16 vector; uint16_t lanes[8]; } storage = {a};
   storage.lanes[index] = value;
@@ -33528,10 +33539,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_u16(cvectorization
   int16_t selected[8] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int16_t* destination = (int16_t*)to;
   for (size_t i = 0; i < 8; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -39781,6 +39791,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_r
   const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3, 4, 5, 6, 7};
   const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3};
+  const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3};
+  const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #else
   union { cvectorization_ops_vector_u32 vector; uint32_t lanes[4]; } storage = {a};
   storage.lanes[index] = value;
@@ -45384,10 +45402,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_u32(cvectorization
   int32_t selected[4] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int32_t* destination = (int32_t*)to;
   for (size_t i = 0; i < 4; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -53404,6 +53421,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_r
   const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1, 2, 3};
   const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index, (uint64_t)index, (uint64_t)index};
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1};
+  const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1};
+  const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #else
   union { cvectorization_ops_vector_u64 vector; uint64_t lanes[2]; } storage = {a};
   storage.lanes[index] = value;
@@ -58491,10 +58516,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_u64(cvectorization
   int64_t selected[2] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int64_t* destination = (int64_t*)to;
   for (size_t i = 0; i < 2; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -69069,6 +69093,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_re
   const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
   const cvectorization_ops_vector_u8 target = (cvectorization_ops_vector_u8){(uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index};
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+  const cvectorization_ops_vector_u8 target = (cvectorization_ops_vector_u8){(uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index};
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value), (cvectorization_ops_x86_i8)(positions == target)));
 #elif CVECTORIZATION_OPS_X86 == 2
   if (__builtin_constant_p(index)) {
     const cvectorization_ops_vector_i8 positions = (cvectorization_ops_vector_i8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -69077,9 +69105,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_re
     const cvectorization_ops_vector_i8 others = (cvectorization_ops_vector_i8)~selected;
     return (cvectorization_ops_raw_vector_i8)((selected & (cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value)) | (others & a));
   }
-  union { cvectorization_ops_vector_i8 vector; int8_t lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i8)(storage.vector);
+  const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+  const cvectorization_ops_vector_u8 target = (cvectorization_ops_vector_u8){(uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index};
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #elif CVECTORIZATION_OPS_X86 == 1
   if (__builtin_constant_p(index)) {
     const cvectorization_ops_vector_i8 positions = (cvectorization_ops_vector_i8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -69088,9 +69116,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_re
     const cvectorization_ops_vector_i8 others = (cvectorization_ops_vector_i8)(positions != target);
     return (cvectorization_ops_raw_vector_i8)((selected & (cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value)) | (others & a));
   }
-  union { cvectorization_ops_vector_i8 vector; int8_t lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i8)(storage.vector);
+  const cvectorization_ops_vector_u8 positions = (cvectorization_ops_vector_u8){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+  const cvectorization_ops_vector_u8 target = (cvectorization_ops_vector_u8){(uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index, (uint8_t)index};
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #else
   union { cvectorization_ops_vector_i8 vector; int8_t lanes[16]; } storage = {a};
   storage.lanes[index] = value;
@@ -76489,10 +76517,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_i8(cvectorization_
   int8_t selected[16] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int8_t* destination = (int8_t*)to;
   for (size_t i = 0; i < 16; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -84058,6 +84085,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_r
   const cvectorization_ops_vector_u16 positions = (cvectorization_ops_vector_u16){0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
   const cvectorization_ops_vector_u16 target = (cvectorization_ops_vector_u16){(uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index};
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u16 positions = (cvectorization_ops_vector_u16){0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u16 target = (cvectorization_ops_vector_u16){(uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index};
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_u16 positions = (cvectorization_ops_vector_u16){0, 1, 2, 3, 4, 5, 6, 7};
+  const cvectorization_ops_vector_u16 target = (cvectorization_ops_vector_u16){(uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index};
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #else
   union { cvectorization_ops_vector_i16 vector; int16_t lanes[8]; } storage = {a};
   storage.lanes[index] = value;
@@ -90223,10 +90258,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_i16(cvectorization
   int16_t selected[8] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int16_t* destination = (int16_t*)to;
   for (size_t i = 0; i < 8; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -96765,6 +96799,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_r
   const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3, 4, 5, 6, 7};
   const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3};
+  const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3};
+  const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #else
   union { cvectorization_ops_vector_i32 vector; int32_t lanes[4]; } storage = {a};
   storage.lanes[index] = value;
@@ -102383,10 +102425,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_i32(cvectorization
   int32_t selected[4] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int32_t* destination = (int32_t*)to;
   for (size_t i = 0; i < 4; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -109827,6 +109868,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_r
   const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1, 2, 3};
   const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index, (uint64_t)index, (uint64_t)index};
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_pblendvb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1};
+  const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_pblendvb128((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value), (cvectorization_ops_x86_i8)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1};
+  const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
 #else
   union { cvectorization_ops_vector_i64 vector; int64_t lanes[2]; } storage = {a};
   storage.lanes[index] = value;
@@ -114916,10 +114965,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_i64(cvectorization
   int64_t selected[2] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int64_t* destination = (int64_t*)to;
   for (size_t i = 0; i < 2; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -122918,6 +122966,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_r
   const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3, 4, 5, 6, 7};
   const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_blendvps256((cvectorization_ops_x86_f32)a, (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value), (cvectorization_ops_x86_f32)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3};
+  const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_blendvps((cvectorization_ops_x86_f32)a, (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value), (cvectorization_ops_x86_f32)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_u32 positions = (cvectorization_ops_vector_u32){0, 1, 2, 3};
+  const cvectorization_ops_vector_u32 target = (cvectorization_ops_vector_u32){(uint32_t)index, (uint32_t)index, (uint32_t)index, (uint32_t)index};
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(((cvectorization_ops_vector_u32)(positions == target) & (cvectorization_ops_vector_u32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value)) | (~(cvectorization_ops_vector_u32)(positions == target) & (cvectorization_ops_vector_u32)a)));
 #else
   union { cvectorization_ops_vector_f32 vector; float lanes[4]; } storage = {a};
   storage.lanes[index] = value;
@@ -127896,10 +127952,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_f32(cvectorization
   int32_t selected[4] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int32_t* destination = (int32_t*)to;
   for (size_t i = 0; i < 4; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else
@@ -135112,6 +135167,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_r
   const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1, 2, 3};
   const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index, (uint64_t)index, (uint64_t)index};
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_blendvpd256((cvectorization_ops_x86_f64)a, (cvectorization_ops_x86_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value), (cvectorization_ops_x86_f64)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1};
+  const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_blendvpd((cvectorization_ops_x86_f64)a, (cvectorization_ops_x86_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value), (cvectorization_ops_x86_f64)(positions == target)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1};
+  const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(((cvectorization_ops_vector_u64)(positions == target) & (cvectorization_ops_vector_u64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value)) | (~(cvectorization_ops_vector_u64)(positions == target) & (cvectorization_ops_vector_u64)a)));
 #else
   union { cvectorization_ops_vector_f64 vector; double lanes[2]; } storage = {a};
   storage.lanes[index] = value;
@@ -139493,10 +139556,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_f64(cvectorization
   int64_t selected[2] __attribute__((aligned(16)));
   __builtin_memcpy(lanes, &a, sizeof a);
   __builtin_memcpy(selected, &mask, sizeof mask);
-  int64_t* destination = (int64_t*)to;
   for (size_t i = 0; i < 2; ++i) {
     if (selected[i]) {
-      destination[i] = lanes[i];
+      __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
     }
   }
 #else

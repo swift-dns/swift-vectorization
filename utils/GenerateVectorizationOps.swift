@@ -20779,7 +20779,7 @@ func x86ReplacingLaneBytes(level: X86Level, for element: Element) -> String? {
           const \(element.cVector) others = (\(element.cVector))\(others);
           \(vectorResult("(selected & \(repeatingVector("value", of: element))) | (others & a)", for: element))
         }
-        \(portableReplacingLane(for: element))
+        \(x86ReplacingLane(level: level, for: element))
         """
 }
 
@@ -20910,17 +20910,15 @@ func x86Avx2InterleavedWhole(upper: Bool, for element: Element) -> String? {
     )
 }
 
-func x86Avx2ReplacingLane(for element: Element) -> String? {
-    guard element.width == 32 else { return nil }
+func x86ReplacingLane(level: X86Level, for element: Element) -> String {
     let unsigned = unsignedElement(of: element)
     let positions = iota(as: unsigned.cVector, lanes: element.laneCount)
     let target = splat("(\(unsigned.cType))index", as: unsigned.cVector, lanes: element.laneCount)
-    let selected = x86Selecting(
-        "(positions == target)",
-        repeatingVector("value", of: element),
-        "a",
-        for: element
-    )
+    let value = repeatingVector("value", of: element)
+    let selected =
+        level >= .sse4
+        ? x86Selecting("(positions == target)", value, "a", for: element)
+        : x86BitSelect("(positions == target)", value, "a", for: element)
     return """
         const \(unsigned.cVector) positions = \(positions);
         const \(unsigned.cVector) target = \(target);
@@ -23451,10 +23449,13 @@ let swizzleOps: [Op] =
             section: .gettingSettingLanes,
             targets: TargetBodies(
                 avx3: { x86Avx3ReplacingLane(for: $0) },
-                avx2: { x86Avx2ReplacingLane(for: $0) },
-                sse4: { element in element.bits == 8 ? portableReplacingLane(for: element) : nil },
+                avx2: { x86ReplacingLane(level: .avx2, for: $0) },
+                sse4: { x86ReplacingLane(level: .sse4, for: $0) },
                 ssse3: { x86ReplacingLaneBytes(level: .ssse3, for: $0) },
-                sse2: { x86ReplacingLaneBytes(level: .sse2, for: $0) }
+                sse2: { element in
+                    x86ReplacingLaneBytes(level: .sse2, for: element)
+                        ?? x86ReplacingLane(level: .sse2, for: element)
+                }
             )
         ) { element in
             portableReplacingLane(for: element)
@@ -26180,10 +26181,9 @@ func scalarMaskedStore(for element: Element) -> String {
         \(signed.cType) selected[\(element.laneCount)] __attribute__((aligned(\(element.width))));
         __builtin_memcpy(lanes, &a, sizeof a);
         __builtin_memcpy(selected, &mask, sizeof mask);
-        \(signed.cType)* destination = (\(signed.cType)*)to;
         for (size_t i = 0; i < \(element.laneCount); ++i) {
           if (selected[i]) {
-            destination[i] = lanes[i];
+            __builtin_memcpy(to + i, lanes + i, sizeof lanes[i]);
           }
         }
         """
