@@ -157,4 +157,158 @@ extension SIMDUInt8CodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func sumAboveSpan() {
+        let mismatches = Mismatches("portSumAboveSpanU8")
+        let valuesInputs = Inputs.byteBuffers(
+            count: 3 * H.laneCount + 1,
+            seed: 0x4A38_6039_D410_763D
+        )
+        let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
+        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x4A38_5F39_D410_748A)
+        for (values, valuesCount, t) in mixedTriples(
+            valuesInputs,
+            valuesCountInputs,
+            tInputs,
+            seed: 0x9390_AAFE_35A4_2B4E
+        ) {
+            let valuesPrefix = ContiguousArray(values.prefix(valuesCount))
+            mismatches.check(
+                portSumAboveSpanU8(above: t, in: valuesPrefix.span),
+                highwaySumAboveSpanU8(above: t, in: valuesPrefix.span),
+                "values: \(describe(values)), valuesCount: \(valuesCount), t: \(hex(t))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func countEqualAboveSpan() {
+        let mismatches = Mismatches("portCountEqualAboveSpanU8")
+        let valuesInputs = Inputs.byteBuffers(
+            count: 3 * H.laneCount + 1,
+            seed: 0xA64A_B693_4263_21F1
+        )
+        let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
+        let othersInputs = Inputs.byteBuffers(
+            count: 3 * H.laneCount + 1,
+            seed: 0xA64A_B493_4263_1E8B
+        )
+        let othersCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
+        let tInputs = Inputs.lanes(H.Lane.self, seed: 0xA64A_B593_4263_203E)
+        for (values, valuesCount, others, othersCount, t) in mixedQuintuples(
+            valuesInputs,
+            valuesCountInputs,
+            othersInputs,
+            othersCountInputs,
+            tInputs,
+            seed: 0x90AC_313A_6D30_275A
+        ) {
+            let valuesPrefix = ContiguousArray(values.prefix(valuesCount))
+            let othersPrefix = ContiguousArray(others.prefix(othersCount))
+            mismatches.check(
+                portCountEqualAboveSpanU8(
+                    above: t,
+                    in: valuesPrefix.span,
+                    matching: othersPrefix.span
+                ),
+                highwayCountEqualAboveSpanU8(
+                    above: t,
+                    in: valuesPrefix.span,
+                    matching: othersPrefix.span
+                ),
+                "values: \(describe(values)), valuesCount: \(valuesCount), others: \(describe(others)), othersCount: \(othersCount), t: \(hex(t))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func clampAboveSpan() {
+        let mismatches = Mismatches("portClampAboveSpanU8")
+        let valuesInputs = Inputs.byteBuffers(
+            count: 3 * H.laneCount + 1,
+            seed: 0xA5E7_A84D_85F2_6EC1
+        )
+        let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
+        let outputInputs = Inputs.byteBuffers(
+            count: 3 * H.laneCount + 1,
+            seed: 0xA5E7_A64D_85F2_6B5B
+        )
+        let outputCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
+        let tInputs = Inputs.lanes(H.Lane.self, seed: 0xA5E7_A74D_85F2_6D0E)
+        for (values, valuesCount, output, outputCount, t) in mixedQuintuples(
+            valuesInputs,
+            valuesCountInputs,
+            outputInputs,
+            outputCountInputs,
+            tInputs,
+            seed: 0xFEE3_9887_B828_27EA
+        ) {
+            let valuesPrefix = ContiguousArray(values.prefix(valuesCount))
+            let (portResult, portLanes) = withMutableSpan(of: Array(output.prefix(outputCount))) {
+                outputSpan in
+                portClampAboveSpanU8(atMost: t, in: valuesPrefix.span, into: &outputSpan)
+            }
+            let (referenceResult, referenceLanes) = withMutableSpan(
+                of: Array(output.prefix(outputCount))
+            ) { outputSpan in
+                highwayClampAboveSpanU8(atMost: t, in: valuesPrefix.span, into: &outputSpan)
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "values: \(describe(values)), valuesCount: \(valuesCount), output: \(describe(output)), outputCount: \(outputCount), t: \(hex(t))"
+            )
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "values: \(describe(values)), valuesCount: \(valuesCount), output: \(describe(output)), outputCount: \(outputCount), t: \(hex(t))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func selectBelowSpan() {
+        let mismatches = Mismatches("portSelectBelowSpanU8")
+        let valuesInputs = Inputs.byteBuffers(
+            count: 3 * H.laneCount + 1,
+            seed: 0x0EAA_E3FE_6FA2_0DEA
+        )
+        let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
+        let outputInputs = Inputs.byteBuffers(
+            count: 3 * H.laneCount + 1,
+            seed: 0x0EAA_E1FE_6FA2_0A84
+        )
+        let outputCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
+        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x0EAA_E4FE_6FA2_0F9D)
+        for (values, valuesCount, output, outputCount, t) in mixedQuintuples(
+            valuesInputs,
+            valuesCountInputs,
+            outputInputs,
+            outputCountInputs,
+            tInputs,
+            seed: 0x1511_7AAC_5CA4_42EF
+        ) {
+            let valuesPrefix = ContiguousArray(values.prefix(valuesCount))
+            let (portResult, portLanes) = withMutableSpan(of: Array(output.prefix(outputCount))) {
+                outputSpan in
+                portSelectBelowSpanU8(below: t, in: valuesPrefix.span, into: &outputSpan)
+            }
+            let (referenceResult, referenceLanes) = withMutableSpan(
+                of: Array(output.prefix(outputCount))
+            ) { outputSpan in
+                highwaySelectBelowSpanU8(below: t, in: valuesPrefix.span, into: &outputSpan)
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "values: \(describe(values)), valuesCount: \(valuesCount), output: \(describe(output)), outputCount: \(outputCount), t: \(hex(t))"
+            )
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "values: \(describe(values)), valuesCount: \(valuesCount), output: \(describe(output)), outputCount: \(outputCount), t: \(hex(t))"
+            )
+        }
+        mismatches.record()
+    }
 }

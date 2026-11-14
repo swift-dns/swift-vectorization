@@ -2424,6 +2424,29 @@ HWY_INLINE cvectorization_ops_raw_mask_u8 atOrBeforeFirstTrueOfBitwiseNotMaskU8(
 HWY_INLINE cvectorization_ops_raw_mask_u8 atOrBeforeFirstTrueOfNeitherTrueU8(cvectorization_ops_raw_mask_u8 a, cvectorization_ops_raw_mask_u8 b) { return maskToPortU8(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortU8(a), maskFromPortU8(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_u8 atOrAfterFirstTrueOfBitwiseNotMaskU8(cvectorization_ops_raw_mask_u8 mask) { return maskToPortU8(hn::SetAtOrAfterFirst(hn::Not(maskFromPortU8(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_u8 atOrAfterFirstTrueOfNeitherTrueU8(cvectorization_ops_raw_mask_u8 a, cvectorization_ops_raw_mask_u8 b) { return maskToPortU8(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortU8(a), maskFromPortU8(b)))); }
+HWY_INLINE uint8_t sumAboveSpanU8(uint8_t t, const uint8_t* values) {
+  const TagU8 d;
+  const VectorU8 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanU8(uint8_t t, const uint8_t* values, const uint8_t* others) {
+  const TagU8 d;
+  const VectorU8 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanU8(uint8_t t, const uint8_t* values, uint8_t* output) {
+  const TagU8 d;
+  const VectorU8 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanU8(uint8_t t, const uint8_t* values, uint8_t* output) {
+  const TagU8 d;
+  const VectorU8 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_u8 repeatingBlockU8(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5, uint8_t v6, uint8_t v7, uint8_t v8, uint8_t v9, uint8_t v10, uint8_t v11, uint8_t v12, uint8_t v13, uint8_t v14, uint8_t v15) { return toPortU8(hn::Dup128VecFromValues(TagU8(), v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_u16 zeroU16() { return toPortU16(hn::Zero(TagU16())); }
@@ -3631,6 +3654,29 @@ HWY_INLINE cvectorization_ops_raw_mask_u16 atOrBeforeFirstTrueOfBitwiseNotMaskU1
 HWY_INLINE cvectorization_ops_raw_mask_u16 atOrBeforeFirstTrueOfNeitherTrueU16(cvectorization_ops_raw_mask_u16 a, cvectorization_ops_raw_mask_u16 b) { return maskToPortU16(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortU16(a), maskFromPortU16(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_u16 atOrAfterFirstTrueOfBitwiseNotMaskU16(cvectorization_ops_raw_mask_u16 mask) { return maskToPortU16(hn::SetAtOrAfterFirst(hn::Not(maskFromPortU16(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_u16 atOrAfterFirstTrueOfNeitherTrueU16(cvectorization_ops_raw_mask_u16 a, cvectorization_ops_raw_mask_u16 b) { return maskToPortU16(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortU16(a), maskFromPortU16(b)))); }
+HWY_INLINE uint16_t sumAboveSpanU16(uint16_t t, const uint16_t* values) {
+  const TagU16 d;
+  const VectorU16 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanU16(uint16_t t, const uint16_t* values, const uint16_t* others) {
+  const TagU16 d;
+  const VectorU16 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanU16(uint16_t t, const uint16_t* values, uint16_t* output) {
+  const TagU16 d;
+  const VectorU16 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanU16(uint16_t t, const uint16_t* values, uint16_t* output) {
+  const TagU16 d;
+  const VectorU16 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_u16 repeatingBlockU16(uint16_t v0, uint16_t v1, uint16_t v2, uint16_t v3, uint16_t v4, uint16_t v5, uint16_t v6, uint16_t v7) { return toPortU16(hn::Dup128VecFromValues(TagU16(), v0, v1, v2, v3, v4, v5, v6, v7)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_u32 zeroU32() { return toPortU32(hn::Zero(TagU32())); }
@@ -4896,6 +4942,29 @@ HWY_INLINE cvectorization_ops_raw_mask_u32 atOrBeforeFirstTrueOfBitwiseNotMaskU3
 HWY_INLINE cvectorization_ops_raw_mask_u32 atOrBeforeFirstTrueOfNeitherTrueU32(cvectorization_ops_raw_mask_u32 a, cvectorization_ops_raw_mask_u32 b) { return maskToPortU32(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortU32(a), maskFromPortU32(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 atOrAfterFirstTrueOfBitwiseNotMaskU32(cvectorization_ops_raw_mask_u32 mask) { return maskToPortU32(hn::SetAtOrAfterFirst(hn::Not(maskFromPortU32(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 atOrAfterFirstTrueOfNeitherTrueU32(cvectorization_ops_raw_mask_u32 a, cvectorization_ops_raw_mask_u32 b) { return maskToPortU32(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortU32(a), maskFromPortU32(b)))); }
+HWY_INLINE uint32_t sumAboveSpanU32(uint32_t t, const uint32_t* values) {
+  const TagU32 d;
+  const VectorU32 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanU32(uint32_t t, const uint32_t* values, const uint32_t* others) {
+  const TagU32 d;
+  const VectorU32 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanU32(uint32_t t, const uint32_t* values, uint32_t* output) {
+  const TagU32 d;
+  const VectorU32 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanU32(uint32_t t, const uint32_t* values, uint32_t* output) {
+  const TagU32 d;
+  const VectorU32 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_u32 repeatingBlockU32(uint32_t v0, uint32_t v1, uint32_t v2, uint32_t v3) { return toPortU32(hn::Dup128VecFromValues(TagU32(), v0, v1, v2, v3)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_u64 zeroU64() { return toPortU64(hn::Zero(TagU64())); }
@@ -6418,6 +6487,29 @@ HWY_INLINE cvectorization_ops_raw_mask_u64 atOrBeforeFirstTrueOfBitwiseNotMaskU6
 HWY_INLINE cvectorization_ops_raw_mask_u64 atOrBeforeFirstTrueOfNeitherTrueU64(cvectorization_ops_raw_mask_u64 a, cvectorization_ops_raw_mask_u64 b) { return maskToPortU64(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortU64(a), maskFromPortU64(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_u64 atOrAfterFirstTrueOfBitwiseNotMaskU64(cvectorization_ops_raw_mask_u64 mask) { return maskToPortU64(hn::SetAtOrAfterFirst(hn::Not(maskFromPortU64(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_u64 atOrAfterFirstTrueOfNeitherTrueU64(cvectorization_ops_raw_mask_u64 a, cvectorization_ops_raw_mask_u64 b) { return maskToPortU64(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortU64(a), maskFromPortU64(b)))); }
+HWY_INLINE uint64_t sumAboveSpanU64(uint64_t t, const uint64_t* values) {
+  const TagU64 d;
+  const VectorU64 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanU64(uint64_t t, const uint64_t* values, const uint64_t* others) {
+  const TagU64 d;
+  const VectorU64 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanU64(uint64_t t, const uint64_t* values, uint64_t* output) {
+  const TagU64 d;
+  const VectorU64 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanU64(uint64_t t, const uint64_t* values, uint64_t* output) {
+  const TagU64 d;
+  const VectorU64 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_u64 repeatingBlockU64(uint64_t v0, uint64_t v1) { return toPortU64(hn::Dup128VecFromValues(TagU64(), v0, v1)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_i8 zeroI8() { return toPortI8(hn::Zero(TagI8())); }
@@ -7758,6 +7850,29 @@ HWY_INLINE cvectorization_ops_raw_mask_i8 atOrBeforeFirstTrueOfBitwiseNotMaskI8(
 HWY_INLINE cvectorization_ops_raw_mask_i8 atOrBeforeFirstTrueOfNeitherTrueI8(cvectorization_ops_raw_mask_i8 a, cvectorization_ops_raw_mask_i8 b) { return maskToPortI8(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortI8(a), maskFromPortI8(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_i8 atOrAfterFirstTrueOfBitwiseNotMaskI8(cvectorization_ops_raw_mask_i8 mask) { return maskToPortI8(hn::SetAtOrAfterFirst(hn::Not(maskFromPortI8(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_i8 atOrAfterFirstTrueOfNeitherTrueI8(cvectorization_ops_raw_mask_i8 a, cvectorization_ops_raw_mask_i8 b) { return maskToPortI8(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortI8(a), maskFromPortI8(b)))); }
+HWY_INLINE int8_t sumAboveSpanI8(int8_t t, const int8_t* values) {
+  const TagI8 d;
+  const VectorI8 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanI8(int8_t t, const int8_t* values, const int8_t* others) {
+  const TagI8 d;
+  const VectorI8 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanI8(int8_t t, const int8_t* values, int8_t* output) {
+  const TagI8 d;
+  const VectorI8 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanI8(int8_t t, const int8_t* values, int8_t* output) {
+  const TagI8 d;
+  const VectorI8 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_i8 repeatingBlockI8(int8_t v0, int8_t v1, int8_t v2, int8_t v3, int8_t v4, int8_t v5, int8_t v6, int8_t v7, int8_t v8, int8_t v9, int8_t v10, int8_t v11, int8_t v12, int8_t v13, int8_t v14, int8_t v15) { return toPortI8(hn::Dup128VecFromValues(TagI8(), v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_i16 zeroI16() { return toPortI16(hn::Zero(TagI16())); }
@@ -8983,6 +9098,29 @@ HWY_INLINE cvectorization_ops_raw_mask_i16 atOrBeforeFirstTrueOfBitwiseNotMaskI1
 HWY_INLINE cvectorization_ops_raw_mask_i16 atOrBeforeFirstTrueOfNeitherTrueI16(cvectorization_ops_raw_mask_i16 a, cvectorization_ops_raw_mask_i16 b) { return maskToPortI16(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortI16(a), maskFromPortI16(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_i16 atOrAfterFirstTrueOfBitwiseNotMaskI16(cvectorization_ops_raw_mask_i16 mask) { return maskToPortI16(hn::SetAtOrAfterFirst(hn::Not(maskFromPortI16(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_i16 atOrAfterFirstTrueOfNeitherTrueI16(cvectorization_ops_raw_mask_i16 a, cvectorization_ops_raw_mask_i16 b) { return maskToPortI16(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortI16(a), maskFromPortI16(b)))); }
+HWY_INLINE int16_t sumAboveSpanI16(int16_t t, const int16_t* values) {
+  const TagI16 d;
+  const VectorI16 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanI16(int16_t t, const int16_t* values, const int16_t* others) {
+  const TagI16 d;
+  const VectorI16 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanI16(int16_t t, const int16_t* values, int16_t* output) {
+  const TagI16 d;
+  const VectorI16 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanI16(int16_t t, const int16_t* values, int16_t* output) {
+  const TagI16 d;
+  const VectorI16 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_i16 repeatingBlockI16(int16_t v0, int16_t v1, int16_t v2, int16_t v3, int16_t v4, int16_t v5, int16_t v6, int16_t v7) { return toPortI16(hn::Dup128VecFromValues(TagI16(), v0, v1, v2, v3, v4, v5, v6, v7)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_i32 zeroI32() { return toPortI32(hn::Zero(TagI32())); }
@@ -10265,6 +10403,29 @@ HWY_INLINE cvectorization_ops_raw_mask_i32 atOrBeforeFirstTrueOfBitwiseNotMaskI3
 HWY_INLINE cvectorization_ops_raw_mask_i32 atOrBeforeFirstTrueOfNeitherTrueI32(cvectorization_ops_raw_mask_i32 a, cvectorization_ops_raw_mask_i32 b) { return maskToPortI32(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortI32(a), maskFromPortI32(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 atOrAfterFirstTrueOfBitwiseNotMaskI32(cvectorization_ops_raw_mask_i32 mask) { return maskToPortI32(hn::SetAtOrAfterFirst(hn::Not(maskFromPortI32(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 atOrAfterFirstTrueOfNeitherTrueI32(cvectorization_ops_raw_mask_i32 a, cvectorization_ops_raw_mask_i32 b) { return maskToPortI32(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortI32(a), maskFromPortI32(b)))); }
+HWY_INLINE int32_t sumAboveSpanI32(int32_t t, const int32_t* values) {
+  const TagI32 d;
+  const VectorI32 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanI32(int32_t t, const int32_t* values, const int32_t* others) {
+  const TagI32 d;
+  const VectorI32 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanI32(int32_t t, const int32_t* values, int32_t* output) {
+  const TagI32 d;
+  const VectorI32 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanI32(int32_t t, const int32_t* values, int32_t* output) {
+  const TagI32 d;
+  const VectorI32 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_i32 repeatingBlockI32(int32_t v0, int32_t v1, int32_t v2, int32_t v3) { return toPortI32(hn::Dup128VecFromValues(TagI32(), v0, v1, v2, v3)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_i64 zeroI64() { return toPortI64(hn::Zero(TagI64())); }
@@ -11790,6 +11951,29 @@ HWY_INLINE cvectorization_ops_raw_mask_i64 atOrBeforeFirstTrueOfBitwiseNotMaskI6
 HWY_INLINE cvectorization_ops_raw_mask_i64 atOrBeforeFirstTrueOfNeitherTrueI64(cvectorization_ops_raw_mask_i64 a, cvectorization_ops_raw_mask_i64 b) { return maskToPortI64(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortI64(a), maskFromPortI64(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 atOrAfterFirstTrueOfBitwiseNotMaskI64(cvectorization_ops_raw_mask_i64 mask) { return maskToPortI64(hn::SetAtOrAfterFirst(hn::Not(maskFromPortI64(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 atOrAfterFirstTrueOfNeitherTrueI64(cvectorization_ops_raw_mask_i64 a, cvectorization_ops_raw_mask_i64 b) { return maskToPortI64(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortI64(a), maskFromPortI64(b)))); }
+HWY_INLINE int64_t sumAboveSpanI64(int64_t t, const int64_t* values) {
+  const TagI64 d;
+  const VectorI64 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanI64(int64_t t, const int64_t* values, const int64_t* others) {
+  const TagI64 d;
+  const VectorI64 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanI64(int64_t t, const int64_t* values, int64_t* output) {
+  const TagI64 d;
+  const VectorI64 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanI64(int64_t t, const int64_t* values, int64_t* output) {
+  const TagI64 d;
+  const VectorI64 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_i64 repeatingBlockI64(int64_t v0, int64_t v1) { return toPortI64(hn::Dup128VecFromValues(TagI64(), v0, v1)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_f32 zeroF32() { return toPortF32(hn::Zero(TagF32())); }
@@ -12655,6 +12839,29 @@ HWY_INLINE cvectorization_ops_raw_mask_f32 atOrBeforeFirstTrueOfBitwiseNotMaskF3
 HWY_INLINE cvectorization_ops_raw_mask_f32 atOrBeforeFirstTrueOfNeitherTrueF32(cvectorization_ops_raw_mask_f32 a, cvectorization_ops_raw_mask_f32 b) { return maskToPortF32(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortF32(a), maskFromPortF32(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 atOrAfterFirstTrueOfBitwiseNotMaskF32(cvectorization_ops_raw_mask_f32 mask) { return maskToPortF32(hn::SetAtOrAfterFirst(hn::Not(maskFromPortF32(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 atOrAfterFirstTrueOfNeitherTrueF32(cvectorization_ops_raw_mask_f32 a, cvectorization_ops_raw_mask_f32 b) { return maskToPortF32(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortF32(a), maskFromPortF32(b)))); }
+HWY_INLINE float sumAboveSpanF32(float t, const float* values) {
+  const TagF32 d;
+  const VectorF32 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanF32(float t, const float* values, const float* others) {
+  const TagF32 d;
+  const VectorF32 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanF32(float t, const float* values, float* output) {
+  const TagF32 d;
+  const VectorF32 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanF32(float t, const float* values, float* output) {
+  const TagF32 d;
+  const VectorF32 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingBlockF32(float v0, float v1, float v2, float v3) { return toPortF32(hn::Dup128VecFromValues(TagF32(), v0, v1, v2, v3)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_f64 zeroF64() { return toPortF64(hn::Zero(TagF64())); }
@@ -13473,6 +13680,29 @@ HWY_INLINE cvectorization_ops_raw_mask_f64 atOrBeforeFirstTrueOfBitwiseNotMaskF6
 HWY_INLINE cvectorization_ops_raw_mask_f64 atOrBeforeFirstTrueOfNeitherTrueF64(cvectorization_ops_raw_mask_f64 a, cvectorization_ops_raw_mask_f64 b) { return maskToPortF64(hn::SetAtOrBeforeFirst(hn::ExclusiveNeither(maskFromPortF64(a), maskFromPortF64(b)))); }
 HWY_INLINE cvectorization_ops_raw_mask_f64 atOrAfterFirstTrueOfBitwiseNotMaskF64(cvectorization_ops_raw_mask_f64 mask) { return maskToPortF64(hn::SetAtOrAfterFirst(hn::Not(maskFromPortF64(mask)))); }
 HWY_INLINE cvectorization_ops_raw_mask_f64 atOrAfterFirstTrueOfNeitherTrueF64(cvectorization_ops_raw_mask_f64 a, cvectorization_ops_raw_mask_f64 b) { return maskToPortF64(hn::SetAtOrAfterFirst(hn::ExclusiveNeither(maskFromPortF64(a), maskFromPortF64(b)))); }
+HWY_INLINE double sumAboveSpanF64(double t, const double* values) {
+  const TagF64 d;
+  const VectorF64 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::MaskedReduceSum(d, isAbove, loaded);
+}
+HWY_INLINE size_t countEqualAboveSpanF64(double t, const double* values, const double* others) {
+  const TagF64 d;
+  const VectorF64 loaded = hn::LoadU(d, values);
+  const auto isAbove = hn::Gt(loaded, hn::Set(d, t));
+  return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+}
+HWY_INLINE void clampAboveSpanF64(double t, const double* values, double* output) {
+  const TagF64 d;
+  const VectorF64 limit = hn::Set(d, t);
+  hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+}
+HWY_INLINE void selectBelowSpanF64(double t, const double* values, double* output) {
+  const TagF64 d;
+  const VectorF64 loaded = hn::LoadU(d, values);
+  const auto isBelow = hn::Lt(loaded, hn::Set(d, t));
+  hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+}
 HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingBlockF64(double v0, double v1) { return toPortF64(hn::Dup128VecFromValues(TagF64(), v0, v1)); }
 
 HWY_INLINE cvectorization_ops_raw_vector_f16 zeroF16() { return toPortF16(hn::Zero(TagF16())); }
@@ -23770,6 +24000,10 @@ HWY_INLINE cvectorization_ops_raw_half_mask_u8 upperHalfOfMaskU8(cvectorization_
 HWY_INLINE cvectorization_ops_raw_mask_u8 combiningMasksU8(cvectorization_ops_raw_half_mask_u8 a, cvectorization_ops_raw_half_mask_u8 b) noexcept { return ::HighwayReference::combiningMasksU8(a, b); }
 HWY_INLINE cvectorization_ops_raw_block_u8 extractingBlockU8(cvectorization_ops_raw_vector_u8 a, int index) noexcept { return ::HighwayReference::extractingBlockU8(a, index); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 replacingBlockU8(cvectorization_ops_raw_vector_u8 a, int index, cvectorization_ops_raw_block_u8 b) noexcept { return ::HighwayReference::replacingBlockU8(a, index, b); }
+HWY_INLINE uint8_t sumAboveSpanU8(uint8_t t, const uint8_t* values) noexcept { return ::HighwayReference::sumAboveSpanU8(t, values); }
+HWY_INLINE size_t countEqualAboveSpanU8(uint8_t t, const uint8_t* values, const uint8_t* others) noexcept { return ::HighwayReference::countEqualAboveSpanU8(t, values, others); }
+HWY_INLINE void clampAboveSpanU8(uint8_t t, const uint8_t* values, uint8_t* output) noexcept { ::HighwayReference::clampAboveSpanU8(t, values, output); }
+HWY_INLINE void selectBelowSpanU8(uint8_t t, const uint8_t* values, uint8_t* output) noexcept { ::HighwayReference::selectBelowSpanU8(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 repeatingBlockU8(uint8_t v0, uint8_t v1, uint8_t v2, uint8_t v3, uint8_t v4, uint8_t v5, uint8_t v6, uint8_t v7, uint8_t v8, uint8_t v9, uint8_t v10, uint8_t v11, uint8_t v12, uint8_t v13, uint8_t v14, uint8_t v15) noexcept { return ::HighwayReference::repeatingBlockU8(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 zeroU16() noexcept { return ::HighwayReference::zeroU16(); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 repeatingU16(uint16_t value) noexcept { return ::HighwayReference::repeatingU16(value); }
@@ -24061,6 +24295,10 @@ HWY_INLINE cvectorization_ops_raw_block_u16 extractingBlockU16(cvectorization_op
 HWY_INLINE cvectorization_ops_raw_vector_u16 replacingBlockU16(cvectorization_ops_raw_vector_u16 a, int index, cvectorization_ops_raw_block_u16 b) noexcept { return ::HighwayReference::replacingBlockU16(a, index, b); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 loadWideningU8ToU16(const uint8_t* from) noexcept { return ::HighwayReference::loadWideningU8ToU16(from); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 loadFirstWideningU8ToU16(const uint8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU8ToU16(from, count); }
+HWY_INLINE uint16_t sumAboveSpanU16(uint16_t t, const uint16_t* values) noexcept { return ::HighwayReference::sumAboveSpanU16(t, values); }
+HWY_INLINE size_t countEqualAboveSpanU16(uint16_t t, const uint16_t* values, const uint16_t* others) noexcept { return ::HighwayReference::countEqualAboveSpanU16(t, values, others); }
+HWY_INLINE void clampAboveSpanU16(uint16_t t, const uint16_t* values, uint16_t* output) noexcept { ::HighwayReference::clampAboveSpanU16(t, values, output); }
+HWY_INLINE void selectBelowSpanU16(uint16_t t, const uint16_t* values, uint16_t* output) noexcept { ::HighwayReference::selectBelowSpanU16(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 repeatingBlockU16(uint16_t v0, uint16_t v1, uint16_t v2, uint16_t v3, uint16_t v4, uint16_t v5, uint16_t v6, uint16_t v7) noexcept { return ::HighwayReference::repeatingBlockU16(v0, v1, v2, v3, v4, v5, v6, v7); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 zeroU32() noexcept { return ::HighwayReference::zeroU32(); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 repeatingU32(uint32_t value) noexcept { return ::HighwayReference::repeatingU32(value); }
@@ -24362,6 +24600,10 @@ HWY_INLINE cvectorization_ops_raw_vector_u32 loadWideningU8ToU32(const uint8_t* 
 HWY_INLINE cvectorization_ops_raw_vector_u32 loadWideningU16ToU32(const uint16_t* from) noexcept { return ::HighwayReference::loadWideningU16ToU32(from); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstWideningU8ToU32(const uint8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU8ToU32(from, count); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstWideningU16ToU32(const uint16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU16ToU32(from, count); }
+HWY_INLINE uint32_t sumAboveSpanU32(uint32_t t, const uint32_t* values) noexcept { return ::HighwayReference::sumAboveSpanU32(t, values); }
+HWY_INLINE size_t countEqualAboveSpanU32(uint32_t t, const uint32_t* values, const uint32_t* others) noexcept { return ::HighwayReference::countEqualAboveSpanU32(t, values, others); }
+HWY_INLINE void clampAboveSpanU32(uint32_t t, const uint32_t* values, uint32_t* output) noexcept { ::HighwayReference::clampAboveSpanU32(t, values, output); }
+HWY_INLINE void selectBelowSpanU32(uint32_t t, const uint32_t* values, uint32_t* output) noexcept { ::HighwayReference::selectBelowSpanU32(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 repeatingBlockU32(uint32_t v0, uint32_t v1, uint32_t v2, uint32_t v3) noexcept { return ::HighwayReference::repeatingBlockU32(v0, v1, v2, v3); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 zeroU64() noexcept { return ::HighwayReference::zeroU64(); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 repeatingU64(uint64_t value) noexcept { return ::HighwayReference::repeatingU64(value); }
@@ -24680,6 +24922,10 @@ HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU8ToU64(const uint
 HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU16ToU64(const uint16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU16ToU64(from, count); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningU32ToU64(const uint32_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningU32ToU64(from, count); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstWideningF32ToU64(const float* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningF32ToU64(from, count); }
+HWY_INLINE uint64_t sumAboveSpanU64(uint64_t t, const uint64_t* values) noexcept { return ::HighwayReference::sumAboveSpanU64(t, values); }
+HWY_INLINE size_t countEqualAboveSpanU64(uint64_t t, const uint64_t* values, const uint64_t* others) noexcept { return ::HighwayReference::countEqualAboveSpanU64(t, values, others); }
+HWY_INLINE void clampAboveSpanU64(uint64_t t, const uint64_t* values, uint64_t* output) noexcept { ::HighwayReference::clampAboveSpanU64(t, values, output); }
+HWY_INLINE void selectBelowSpanU64(uint64_t t, const uint64_t* values, uint64_t* output) noexcept { ::HighwayReference::selectBelowSpanU64(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 repeatingBlockU64(uint64_t v0, uint64_t v1) noexcept { return ::HighwayReference::repeatingBlockU64(v0, v1); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 zeroI8() noexcept { return ::HighwayReference::zeroI8(); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 repeatingI8(int8_t value) noexcept { return ::HighwayReference::repeatingI8(value); }
@@ -24984,6 +25230,10 @@ HWY_INLINE cvectorization_ops_raw_block_i8 extractingBlockI8(cvectorization_ops_
 HWY_INLINE cvectorization_ops_raw_vector_i8 replacingBlockI8(cvectorization_ops_raw_vector_i8 a, int index, cvectorization_ops_raw_block_i8 b) noexcept { return ::HighwayReference::replacingBlockI8(a, index, b); }
 HWY_INLINE cvectorization_ops_raw_mask_i8 maskRebindingU8ToI8(cvectorization_ops_raw_mask_u8 mask) noexcept { return ::HighwayReference::maskRebindingU8ToI8(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_u8 maskRebindingI8ToU8(cvectorization_ops_raw_mask_i8 mask) noexcept { return ::HighwayReference::maskRebindingI8ToU8(mask); }
+HWY_INLINE int8_t sumAboveSpanI8(int8_t t, const int8_t* values) noexcept { return ::HighwayReference::sumAboveSpanI8(t, values); }
+HWY_INLINE size_t countEqualAboveSpanI8(int8_t t, const int8_t* values, const int8_t* others) noexcept { return ::HighwayReference::countEqualAboveSpanI8(t, values, others); }
+HWY_INLINE void clampAboveSpanI8(int8_t t, const int8_t* values, int8_t* output) noexcept { ::HighwayReference::clampAboveSpanI8(t, values, output); }
+HWY_INLINE void selectBelowSpanI8(int8_t t, const int8_t* values, int8_t* output) noexcept { ::HighwayReference::selectBelowSpanI8(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 repeatingBlockI8(int8_t v0, int8_t v1, int8_t v2, int8_t v3, int8_t v4, int8_t v5, int8_t v6, int8_t v7, int8_t v8, int8_t v9, int8_t v10, int8_t v11, int8_t v12, int8_t v13, int8_t v14, int8_t v15) noexcept { return ::HighwayReference::repeatingBlockI8(v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 zeroI16() noexcept { return ::HighwayReference::zeroI16(); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 repeatingI16(int16_t value) noexcept { return ::HighwayReference::repeatingI16(value); }
@@ -25293,6 +25543,10 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 loadFirstWideningU8ToI16(const uint
 HWY_INLINE cvectorization_ops_raw_vector_i16 loadFirstWideningI8ToI16(const int8_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningI8ToI16(from, count); }
 HWY_INLINE cvectorization_ops_raw_mask_i16 maskRebindingU16ToI16(cvectorization_ops_raw_mask_u16 mask) noexcept { return ::HighwayReference::maskRebindingU16ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_u16 maskRebindingI16ToU16(cvectorization_ops_raw_mask_i16 mask) noexcept { return ::HighwayReference::maskRebindingI16ToU16(mask); }
+HWY_INLINE int16_t sumAboveSpanI16(int16_t t, const int16_t* values) noexcept { return ::HighwayReference::sumAboveSpanI16(t, values); }
+HWY_INLINE size_t countEqualAboveSpanI16(int16_t t, const int16_t* values, const int16_t* others) noexcept { return ::HighwayReference::countEqualAboveSpanI16(t, values, others); }
+HWY_INLINE void clampAboveSpanI16(int16_t t, const int16_t* values, int16_t* output) noexcept { ::HighwayReference::clampAboveSpanI16(t, values, output); }
+HWY_INLINE void selectBelowSpanI16(int16_t t, const int16_t* values, int16_t* output) noexcept { ::HighwayReference::selectBelowSpanI16(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 repeatingBlockI16(int16_t v0, int16_t v1, int16_t v2, int16_t v3, int16_t v4, int16_t v5, int16_t v6, int16_t v7) noexcept { return ::HighwayReference::repeatingBlockI16(v0, v1, v2, v3, v4, v5, v6, v7); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 zeroI32() noexcept { return ::HighwayReference::zeroI32(); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 repeatingI32(int32_t value) noexcept { return ::HighwayReference::repeatingI32(value); }
@@ -25611,6 +25865,10 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstWideningI8ToI32(const int8
 HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstWideningI16ToI32(const int16_t* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningI16ToI32(from, count); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskRebindingU32ToI32(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::maskRebindingU32ToI32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskRebindingI32ToU32(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::maskRebindingI32ToU32(mask); }
+HWY_INLINE int32_t sumAboveSpanI32(int32_t t, const int32_t* values) noexcept { return ::HighwayReference::sumAboveSpanI32(t, values); }
+HWY_INLINE size_t countEqualAboveSpanI32(int32_t t, const int32_t* values, const int32_t* others) noexcept { return ::HighwayReference::countEqualAboveSpanI32(t, values, others); }
+HWY_INLINE void clampAboveSpanI32(int32_t t, const int32_t* values, int32_t* output) noexcept { ::HighwayReference::clampAboveSpanI32(t, values, output); }
+HWY_INLINE void selectBelowSpanI32(int32_t t, const int32_t* values, int32_t* output) noexcept { ::HighwayReference::selectBelowSpanI32(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 repeatingBlockI32(int32_t v0, int32_t v1, int32_t v2, int32_t v3) noexcept { return ::HighwayReference::repeatingBlockI32(v0, v1, v2, v3); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 zeroI64() noexcept { return ::HighwayReference::zeroI64(); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 repeatingI64(int64_t value) noexcept { return ::HighwayReference::repeatingI64(value); }
@@ -25932,6 +26190,10 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstWideningI32ToI64(const int
 HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstWideningF32ToI64(const float* from, size_t count) noexcept { return ::HighwayReference::loadFirstWideningF32ToI64(from, count); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 maskRebindingU64ToI64(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::maskRebindingU64ToI64(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_u64 maskRebindingI64ToU64(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::maskRebindingI64ToU64(mask); }
+HWY_INLINE int64_t sumAboveSpanI64(int64_t t, const int64_t* values) noexcept { return ::HighwayReference::sumAboveSpanI64(t, values); }
+HWY_INLINE size_t countEqualAboveSpanI64(int64_t t, const int64_t* values, const int64_t* others) noexcept { return ::HighwayReference::countEqualAboveSpanI64(t, values, others); }
+HWY_INLINE void clampAboveSpanI64(int64_t t, const int64_t* values, int64_t* output) noexcept { ::HighwayReference::clampAboveSpanI64(t, values, output); }
+HWY_INLINE void selectBelowSpanI64(int64_t t, const int64_t* values, int64_t* output) noexcept { ::HighwayReference::selectBelowSpanI64(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 repeatingBlockI64(int64_t v0, int64_t v1) noexcept { return ::HighwayReference::repeatingBlockI64(v0, v1); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 zeroF32() noexcept { return ::HighwayReference::zeroF32(); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingF32(float value) noexcept { return ::HighwayReference::repeatingF32(value); }
@@ -26218,6 +26480,10 @@ HWY_INLINE cvectorization_ops_raw_mask_f32 maskRebindingU32ToF32(cvectorization_
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskRebindingF32ToU32(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::maskRebindingF32ToU32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskRebindingI32ToF32(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::maskRebindingI32ToF32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskRebindingF32ToI32(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::maskRebindingF32ToI32(mask); }
+HWY_INLINE float sumAboveSpanF32(float t, const float* values) noexcept { return ::HighwayReference::sumAboveSpanF32(t, values); }
+HWY_INLINE size_t countEqualAboveSpanF32(float t, const float* values, const float* others) noexcept { return ::HighwayReference::countEqualAboveSpanF32(t, values, others); }
+HWY_INLINE void clampAboveSpanF32(float t, const float* values, float* output) noexcept { ::HighwayReference::clampAboveSpanF32(t, values, output); }
+HWY_INLINE void selectBelowSpanF32(float t, const float* values, float* output) noexcept { ::HighwayReference::selectBelowSpanF32(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingBlockF32(float v0, float v1, float v2, float v3) noexcept { return ::HighwayReference::repeatingBlockF32(v0, v1, v2, v3); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 zeroF64() noexcept { return ::HighwayReference::zeroF64(); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingF64(double value) noexcept { return ::HighwayReference::repeatingF64(value); }
@@ -26505,6 +26771,10 @@ HWY_INLINE cvectorization_ops_raw_mask_f64 maskRebindingU64ToF64(cvectorization_
 HWY_INLINE cvectorization_ops_raw_mask_u64 maskRebindingF64ToU64(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::maskRebindingF64ToU64(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f64 maskRebindingI64ToF64(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::maskRebindingI64ToF64(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 maskRebindingF64ToI64(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::maskRebindingF64ToI64(mask); }
+HWY_INLINE double sumAboveSpanF64(double t, const double* values) noexcept { return ::HighwayReference::sumAboveSpanF64(t, values); }
+HWY_INLINE size_t countEqualAboveSpanF64(double t, const double* values, const double* others) noexcept { return ::HighwayReference::countEqualAboveSpanF64(t, values, others); }
+HWY_INLINE void clampAboveSpanF64(double t, const double* values, double* output) noexcept { ::HighwayReference::clampAboveSpanF64(t, values, output); }
+HWY_INLINE void selectBelowSpanF64(double t, const double* values, double* output) noexcept { ::HighwayReference::selectBelowSpanF64(t, values, output); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingBlockF64(double v0, double v1) noexcept { return ::HighwayReference::repeatingBlockF64(v0, v1); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 zeroF16() noexcept { return ::HighwayReference::zeroF16(); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 repeatingF16(uint16_t value) noexcept { return ::HighwayReference::repeatingF16(value); }

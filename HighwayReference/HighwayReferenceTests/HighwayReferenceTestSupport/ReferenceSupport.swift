@@ -797,6 +797,20 @@ package func withOutputSpan<Lane: ReferenceLane, Result>(
     return (result, unsafe Array(buffer))
 }
 
+package func withMutableSpan<Lane: ReferenceLane, Result>(
+    of lanes: [Lane],
+    _ body: (inout MutableSpan<Lane>) -> Result
+) -> (result: Result, lanes: [Lane]) {
+    let sentinel = Inputs.sentinel(Lane.self, count: 4)
+    let buffer = UnsafeMutableBufferPointer<Lane>.allocate(capacity: lanes.count + sentinel.count)
+    defer { unsafe buffer.deallocate() }
+    _ = unsafe buffer.initialize(from: lanes + sentinel)
+    let region = unsafe UnsafeMutableBufferPointer(rebasing: buffer[0..<lanes.count])
+    var span = unsafe region.mutableSpan
+    let result = body(&span)
+    return (result, unsafe Array(buffer))
+}
+
 package func withGuardedLanes<Lane: ReferenceLane, Result>(
     _ lanes: [Lane],
     _ body: (UnsafeMutablePointer<Lane>) -> Result

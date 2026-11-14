@@ -38343,6 +38343,17 @@ func generateReferenceHeader() -> String {
             output += maskCompositionReferenceFunction(composition, for: element)
         }
 
+        for kernel in codegenKernels where kernel.applies.matches(element) {
+            guard let step = kernel.nativeHighwayStep else { continue }
+            let (functions, wrappers) = nativeKernelReferenceFunctions(
+                kernel,
+                step: step,
+                for: element
+            )
+            output += functions
+            nothrow += wrappers
+        }
+
         let blockLanes = repeatingBlockLanes(of: element)
         let blockArguments = blockLanes.map(element.hwyScalar).joined(separator: ", ")
         let blockBody = referenceBody(
@@ -43733,6 +43744,7 @@ struct KernelParameter {
         case count
         case span
         case byteSpan
+        case mutableSpan
         case outputSpan
     }
 
@@ -43748,6 +43760,7 @@ struct KernelParameter {
         case .count: return "Int"
         case .span: return "Span<\(side.lane)>"
         case .byteSpan: return "Span<UInt8>"
+        case .mutableSpan: return "inout MutableSpan<\(side.lane)>"
         case .outputSpan: return "inout OutputSpan<\(side.lane)>"
         }
     }
@@ -43769,6 +43782,12 @@ struct CodegenKernel {
     let parameters: [KernelParameter]
     let body: (CodegenSide) -> String
     var usesSpans = false
+    var nativeHighwayStep: NativeHighwayStep?
+}
+
+struct NativeHighwayStep {
+    let returns: ReturnType
+    let body: (Element) -> String
 }
 
 func codegenBlockLoop(on side: CodegenSide, block: [String], remainder: [String]) -> String {
@@ -43812,6 +43831,13 @@ func codegenSpanAdvance(_ span: String, by count: String, range: String) -> Stri
     """
     let \(range) = unsafe Range<Int>(uncheckedBounds: (\(count), \(span).count))
     \(span) = unsafe \(span).extracting(unchecked: \(range))
+    """
+}
+
+func codegenMutableSpanAdvance(_ span: String, by count: String, range: String) -> String {
+    """
+    let \(range) = unsafe Range<Int>(uncheckedBounds: (\(count), \(span).count))
+    \(span) = unsafe \(span)._consumingExtracting(unchecked: \(range))
     """
 }
 
@@ -44256,7 +44282,234 @@ let codegenKernels: [CodegenKernel] = [
         },
         usesSpans: true
     ),
+    CodegenKernel(
+        name: "SumAboveSpan",
+        applies: .all,
+        returns: .lane,
+        parameters: [
+            KernelParameter(label: "above", name: "t", kind: .lane),
+            KernelParameter(label: "in", name: "values", kind: .span),
+        ],
+        body: { side in
+            let adding = side.element.category == .float ? "+=" : "&+="
+            let isAbove = side.call("greaterThan", ["loaded", "threshold"])
+            let step =
+                side.kind == .port
+                ? [
+                    "let loaded = \(side.namespace).load(from: remainingValuesSpan)",
+                    "total \(adding) \(side.call("sumWhere", ["loaded", isAbove]))",
+                ]
+                : [
+                    "total \(adding) \(nativeStepCall("SumAboveSpan", on: side, reading: ["values"]))"
+                ]
+            return codegenSpansLoop(
+                on: side,
+                reading: ["values"],
+                declarations: codegenSplat("threshold", on: side) + ["var total: \(side.lane) = 0"],
+                step: step,
+                result: "total"
+            )
+        },
+        usesSpans: true,
+        nativeHighwayStep: NativeHighwayStep(returns: .lane) { element in
+            """
+            const \(element.tag) d;
+            const \(element.vector) loaded = hn::LoadU(d, values);
+            const auto isAbove = hn::Gt(loaded, hn::Set(d, \(element.hwyScalar("t"))));
+            return hn::MaskedReduceSum(d, isAbove, loaded);
+            """
+        }
+    ),
+    CodegenKernel(
+        name: "CountEqualAboveSpan",
+        applies: .all,
+        returns: .count,
+        parameters: [
+            KernelParameter(label: "above", name: "t", kind: .lane),
+            KernelParameter(label: "in", name: "values", kind: .span),
+            KernelParameter(label: "matching", name: "others", kind: .span),
+        ],
+        body: { side in
+            let isAbove = side.call("greaterThan", ["loaded", "threshold"])
+            let isEqual = side.call("equalToWhere", ["loaded", "other", isAbove])
+            let step =
+                side.kind == .port
+                ? [
+                    "let loaded = \(side.namespace).load(from: remainingValuesSpan)",
+                    "let other = \(side.namespace).load(from: remainingOthersSpan)",
+                    "count &+= \(side.call("trueCount", [isEqual]))",
+                ]
+                : [
+                    "count &+= \(nativeStepCall("CountEqualAboveSpan", on: side, reading: ["values", "others"]))"
+                ]
+            return codegenSpansLoop(
+                on: side,
+                reading: ["values", "others"],
+                declarations: codegenSplat("threshold", on: side) + ["var count = 0"],
+                step: step,
+                result: "count"
+            )
+        },
+        usesSpans: true,
+        nativeHighwayStep: NativeHighwayStep(returns: .count) { element in
+            """
+            const \(element.tag) d;
+            const \(element.vector) loaded = hn::LoadU(d, values);
+            const auto isAbove = hn::Gt(loaded, hn::Set(d, \(element.hwyScalar("t"))));
+            return hn::CountTrue(d, hn::MaskedEq(isAbove, loaded, hn::LoadU(d, others)));
+            """
+        }
+    ),
+    CodegenKernel(
+        name: "ClampAboveSpan",
+        applies: .all,
+        returns: .count,
+        parameters: [
+            KernelParameter(label: "atMost", name: "t", kind: .lane),
+            KernelParameter(label: "in", name: "values", kind: .span),
+            KernelParameter(label: "into", name: "output", kind: .mutableSpan),
+        ],
+        body: { side in
+            let isAbove = side.call("greaterThan", ["loaded", "limit"])
+            let step =
+                side.kind == .port
+                ? [
+                    "let loaded = \(side.namespace).load(from: remainingValuesSpan)",
+                    "\(side.namespace).store(limit, to: &remainingOutputSpan, where: \(isAbove))",
+                ]
+                : [
+                    nativeStepCall(
+                        "ClampAboveSpan",
+                        on: side,
+                        reading: ["values"],
+                        writing: ["output"]
+                    )
+                ]
+            return codegenSpansLoop(
+                on: side,
+                reading: ["values"],
+                writing: ["output"],
+                declarations: codegenSplat("limit", on: side),
+                step: step,
+                result: "remainingValuesSpan.count"
+            )
+        },
+        usesSpans: true,
+        nativeHighwayStep: NativeHighwayStep(returns: .void) { element in
+            """
+            const \(element.tag) d;
+            const \(element.vector) limit = hn::Set(d, \(element.hwyScalar("t")));
+            hn::BlendedStore(limit, hn::Gt(hn::LoadU(d, values), limit), d, output);
+            """
+        }
+    ),
+    CodegenKernel(
+        name: "SelectBelowSpan",
+        applies: .all,
+        returns: .count,
+        parameters: [
+            KernelParameter(label: "below", name: "t", kind: .lane),
+            KernelParameter(label: "in", name: "values", kind: .span),
+            KernelParameter(label: "into", name: "output", kind: .mutableSpan),
+        ],
+        body: { side in
+            let isBelow = side.call("lessThan", ["loaded", "threshold"])
+            let selected = side.call("selectingOrZero", [isBelow, "loaded"])
+            let step =
+                side.kind == .port
+                ? [
+                    "let loaded = \(side.namespace).load(from: remainingValuesSpan)",
+                    "\(side.namespace).store(\(selected), to: &remainingOutputSpan)",
+                ]
+                : [
+                    nativeStepCall(
+                        "SelectBelowSpan",
+                        on: side,
+                        reading: ["values"],
+                        writing: ["output"]
+                    )
+                ]
+            return codegenSpansLoop(
+                on: side,
+                reading: ["values"],
+                writing: ["output"],
+                declarations: codegenSplat("threshold", on: side),
+                step: step,
+                result: "remainingValuesSpan.count"
+            )
+        },
+        usesSpans: true,
+        nativeHighwayStep: NativeHighwayStep(returns: .void) { element in
+            """
+            const \(element.tag) d;
+            const \(element.vector) loaded = hn::LoadU(d, values);
+            const auto isBelow = hn::Lt(loaded, hn::Set(d, \(element.hwyScalar("t"))));
+            hn::StoreU(hn::IfThenElseZero(isBelow, loaded), d, output);
+            """
+        }
+    ),
 ]
+
+func codegenSplat(_ name: String, on side: CodegenSide) -> [String] {
+    side.kind == .port ? ["let \(name) = \(side.repeating("t"))"] : []
+}
+
+func codegenSpansLoop(
+    on side: CodegenSide,
+    reading spans: [String],
+    writing mutableSpans: [String] = [],
+    declarations: [String],
+    step: [String],
+    result: String
+) -> String {
+    let remaining = { (name: String) in "remaining\(uppercasedFirst(name))" }
+    let starts =
+        spans.map { "var \(remaining($0))Span = \($0)" }
+        + mutableSpans.map { "var \(remaining($0))Span = \($0)._mutatingExtracting(...)" }
+    let condition = (spans + mutableSpans).map { "\(remaining($0))Span.count >= laneCount" }
+    let advances =
+        spans.map {
+            codegenSpanAdvance(
+                "\(remaining($0))Span",
+                by: "laneCount",
+                range: "\(remaining($0))Range"
+            )
+        }
+        + mutableSpans.map {
+            codegenMutableSpanAdvance(
+                "\(remaining($0))Span",
+                by: "laneCount",
+                range: "\(remaining($0))Range"
+            )
+        }
+    return """
+        let laneCount = \(side.laneCount)
+        \((declarations + starts).joined(separator: "\n"))
+        while \(condition.joined(separator: " && ")) {
+        \((step + advances).joined(separator: "\n"))
+        }
+        return \(result)
+        """
+}
+
+func nativeStepCall(
+    _ kernelName: String,
+    on side: CodegenSide,
+    reading spans: [String],
+    writing mutableSpans: [String] = []
+) -> String {
+    let remaining = { (name: String) in "remaining\(uppercasedFirst(name))" }
+    let scopes =
+        mutableSpans.map { "\(remaining($0))Span.withUnsafeMutableBufferPointer { \($0)Buffer in" }
+        + spans.map { "\(remaining($0))Span.withUnsafeBufferPointer { \($0)Buffer in" }
+    let pointers = (spans + mutableSpans).map { "\($0)Buffer.baseAddress.unsafelyUnwrapped" }
+    let call = referenceCall(
+        referenceFunctionName(lowercasedFirstWord(kernelName), side.element),
+        [side.element.swiftScalarArgument("t")] + pointers,
+        in: referenceNothrowNamespace
+    )
+    return scopes.reversed().reduce("unsafe \(call)") { inner, scope in "\(scope)\n\(inner)\n}" }
+}
 
 func codegenKernelFunctions(_ kernel: CodegenKernel, for element: Element) -> String {
     let referenceName = referenceFunctionName(kernel.name, element)
@@ -44271,6 +44524,30 @@ func codegenKernelFunctions(_ kernel: CodegenKernel, for element: Element) -> St
         return kernel.usesSpans ? "\(spanAvailability)\n\(function)" : function
     }
     return functions.joined(separator: "\n\n")
+}
+
+func nativeKernelReferenceFunctions(
+    _ kernel: CodegenKernel,
+    step: NativeHighwayStep,
+    for element: Element
+) -> ReferenceFunctions {
+    let name = referenceFunctionName(lowercasedFirstWord(kernel.name), element)
+    let returns = cReturnType(step.returns, element)
+    let lanes = kernel.parameters.filter { $0.kind == .lane }.map {
+        "\(element.cScalar) \($0.name)"
+    }
+    let spans = kernel.parameters.filter { $0.kind == .span }.map {
+        "const \(element.cPointee)* \($0.name)"
+    }
+    let mutableSpans = kernel.parameters.filter { $0.kind == .mutableSpan }.map {
+        "\(element.cPointee)* \($0.name)"
+    }
+    let declarations = (lanes + spans + mutableSpans).joined(separator: ", ")
+    let statements = step.body(element).split(separator: "\n").map { "  \($0)" }
+    return (
+        "HWY_INLINE \(returns) \(name)(\(declarations)) {\n\(statements.joined(separator: "\n"))\n}\n",
+        referenceNothrowWrapper(returning: returns, named: name, declarations: declarations)
+    )
 }
 
 func codegenKeys(of kernel: CodegenKernel, for element: Element) -> [String] {
@@ -44667,8 +44944,10 @@ func codegenKernelInputs(
         case .lane:
             let values = "Inputs.lanes(H.Lane.self, \(seed))"
             inputs.append(ReferenceInput(parameter: .lane, name: parameter.name, values: values))
-        case .pointer, .span, .byteSpan:
-            let isBytes = element.bits == 8 || parameter.kind == .byteSpan
+        case .pointer, .span, .byteSpan, .mutableSpan:
+            let isBytes =
+                element.bits == 8 && element.category == .unsignedInteger
+                || parameter.kind == .byteSpan
             let values =
                 isBytes
                 ? "Inputs.byteBuffers(count: \(codegenKernelLength), \(seed))"
@@ -44713,6 +44992,7 @@ func codegenKernelTest(
         case .pointer:
             return parameter.argument(passing: pointerExpression("source", aligned: guarded))
         case .span, .byteSpan: return parameter.argument(passing: "\(parameter.name)Prefix.span")
+        case .mutableSpan: return parameter.argument(passing: "&\(parameter.name)Span")
         case .outputSpan: return parameter.argument(passing: "&output")
         }
     }
@@ -44735,6 +45015,17 @@ func codegenKernelTest(
                 description: description
             )
         )
+    } else if let mutable = kernel.parameters.first(where: { $0.kind == .mutableSpan }) {
+        let lanes = "Array(\(mutable.name).prefix(\(mutable.name)Count))"
+        statements += [("port", calls[0]), ("reference", calls[1])].map { side, call in
+            """
+            let (\(side)Result, \(side)Lanes) = withMutableSpan(of: \(lanes)) { \(mutable.name)Span in
+            \(call)
+            }
+            """
+        }
+        statements.append("mismatches.check(portResult, referenceResult, \(description))")
+        statements.append("mismatches.check(portLanes, referenceLanes, \(description))")
     } else if kernel.parameters.contains(where: { $0.kind == .outputSpan }) {
         let capacity = "\(spans[0].name)Prefix.count"
         statements += [("port", calls[0]), ("reference", calls[1])].map { side, call in
