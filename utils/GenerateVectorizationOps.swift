@@ -17123,6 +17123,44 @@ func sveUndefined(for element: Element) -> String {
     vectorResult(sveResult("\(sveUndefinedName(for: element))()", for: element), for: element)
 }
 
+let sveUnspecifiedSizes = [2, 4, 8, 16, 32]
+
+func sveUnspecifiedName(bytes: Int) -> String {
+    "cvectorization_ops_sve_unspecified_\(bytes)"
+}
+
+func sveUnspecified(like operand: String, bytes: Int) -> String {
+    "(__typeof__(\(operand)))\(sveUnspecifiedName(bytes: bytes))()"
+}
+
+func unspecifiedLaneIndices(lanes: Int, to register: Int) -> [Int] {
+    (0..<register).map { $0 < lanes ? $0 : lanes + ($0 - lanes) % lanes }
+}
+
+func sveUnspecifiedHelpers() -> String {
+    let bytes = unsignedElement(bits: 8)
+    let functions = sveUnspecifiedSizes.map { size in
+        let type = "cvectorization_ops_sve_bytes_\(size)"
+        let function = cFunction(
+            returns: type,
+            name: sveUnspecifiedName(bytes: size),
+            parameters: [],
+            body: """
+                const cvectorization_ops_register_vector undefined = (cvectorization_ops_register_vector)(\(sveVector(bytes.cSuffix)))\(sveUndefinedName(for: bytes))();
+                return __builtin_shufflevector(undefined, undefined, \(laneIndices(0..<size)));
+                """
+        )
+        return """
+            #if CVECTORIZATION_OPS_VECTOR_BYTES > \(size)
+            typedef uint8_t \(type) __attribute__((vector_size(\(size))));
+            \(function)#endif
+
+            """
+    }
+    let declaration = sveUndefinedDeclaration(for: bytes)
+    return "#if \(sveCondition)\n\(declaration)\n\(functions.joined())#endif"
+}
+
 func x86NegativeLanesType(for element: Element) -> String {
     element.category == .float ? element.cUnsignedVector : x86Vector("i64")
 }
@@ -33054,7 +33092,7 @@ func narrowedResult(
         guard zeroing != nil else { return lane % operandLanes }
         return lane < 2 * operandLanes ? lane : operandLanes + lane % operandLanes
     }
-    return
+    let general =
         arm && !isMask && element.hasOpaqueVector && operandLanes == element.laneCount(of: shape)
         ? "return \(element.cToRawVector(of: shape))(\(operand));"
         : narrowResult(
@@ -33063,6 +33101,16 @@ func narrowedResult(
             for: element,
             isMask: isMask
         )
+    guard register > operandLanes else { return general }
+    let unspecified = sveUnspecified(like: operand, bytes: operandLanes * element.bits / 8)
+    let grown = unspecifiedLaneIndices(lanes: operandLanes, to: register)
+    let specific = narrowResult(
+        "__builtin_shufflevector(\(operand), \(unspecified), \(laneIndices(grown)))",
+        shape,
+        for: element,
+        isMask: isMask
+    )
+    return "#if \(sveCondition)\n\(specific)\n#else\n\(general)\n#endif"
 }
 
 func narrowedConversion(
@@ -34027,6 +34075,12 @@ func grownLanes(
     return (statements, doubledLanes("doubled", lanes: 2 * lanes))
 }
 
+func sveGrownRegister(from: Int, to: Int) -> String {
+    let indices = laneIndices(unspecifiedLaneIndices(lanes: from, to: to))
+    let unspecified = sveUnspecified(like: "a", bytes: from)
+    return "return __builtin_shufflevector(a, \(unspecified), \(indices));"
+}
+
 func grownRegister(from: Int, to: Int) -> String {
     let grown = grownLanes("a", lane: (type: "uint8_t", bits: 8), from: from, to: to)
     return (grown.statements + ["return \(grown.value);"]).joined(separator: "\n")
@@ -34165,11 +34219,21 @@ func resizeHelperTargets(
             #endif
             """
     }
+    func sveGrowth(arm: Bool) -> (Element) -> String? {
+        { element in
+            let from = registerBytes(of: source, for: element, arm: arm)
+            let to = registerBytes(of: result, for: element, arm: arm)
+            return zeroExtending || from >= to ? nil : sveGrownRegister(from: from, to: to)
+        }
+    }
     let targets = TargetBodies<Element>(
         neon: { body($0, zeroing: true, arm: true) },
         sve2_128: { element in
-            zeroExtending ? sveZeroExtendedRegister(from: source, to: result, for: element) : nil
+            zeroExtending
+                ? sveZeroExtendedRegister(from: source, to: result, for: element)
+                : sveGrowth(arm: true)(element)
         },
+        sve: sveGrowth(arm: false),
         avx3: leavingRegister,
         avx2: leavingRegister,
         sse4: leavingRegister,
@@ -34178,8 +34242,11 @@ func resizeHelperTargets(
     return (targets, { body($0, zeroing: false, arm: false) })
 }
 
+func resizeTypedefs() -> String {
+    resizeShapes.map { "\(registerTypedef(of: $0))\n" }.joined()
+}
+
 func resizeHelpers() -> String {
-    let typedefs = resizeShapes.map(registerTypedef(of:))
     let functions = [false, true].flatMap { zeroExtending in
         resizeShapes.flatMap { source in
             resizeShapes.filter { $0 != source }.map { result in
@@ -34201,7 +34268,7 @@ func resizeHelpers() -> String {
             }
         }
     }
-    return (typedefs.map { "\($0)\n" } + functions).joined()
+    return functions.joined()
 }
 
 func resizeOp(
@@ -41442,6 +41509,18 @@ func narrowRawBody(_ shape: Shape, raw: String, arm: Bool, for element: Element)
     return zeroExtendedNarrowBytes("&v", into: raw, bytes: bytes, register: register)
 }
 
+func sveNarrowRawBody(_ shape: Shape, raw: String, arm: Bool, for element: Element) -> String? {
+    let bytes = element.bytes(of: shape)
+    let register = partialRegisterBytes(of: shape, for: element, arm: arm)
+    guard bytes < register else { return nil }
+    let indices = unspecifiedLaneIndices(
+        lanes: element.laneCount(of: shape),
+        to: register / (element.bits / 8)
+    )
+    let unspecified = sveUnspecified(like: "v", bytes: bytes)
+    return "return (\(raw))__builtin_shufflevector(v, \(unspecified), \(laneIndices(indices)));"
+}
+
 func cNarrowRawConversion(
     _ shape: Shape,
     simd: String,
@@ -41461,12 +41540,20 @@ func cNarrowRawConversion(
                 : narrowRawBody(shape, raw: raw, arm: arm, for: element)
         }
     }
+    let sveBody = { (arm: Bool) in
+        { (element: Element) in sveNarrowRawBody(shape, raw: raw, arm: arm, for: element) }
+    }
     return cFunction(
         returns: raw,
         name: toRaw,
         parameters: ["\(simd) v"],
         body: cBody(
-            TargetBodies(neon: leaving(true), emu128: leaving(false)),
+            TargetBodies(
+                neon: leaving(true),
+                sve2_128: sveBody(true),
+                sve: sveBody(false),
+                emu128: leaving(false)
+            ),
             for: element,
             portable: body(false)
         )
@@ -41727,6 +41814,9 @@ func generateHeader() -> String {
         \(x86Helpers())
 
         \(neonHelpers())
+
+        \(resizeTypedefs())
+        \(sveUnspecifiedHelpers())
 
         \(resizeHelpers())
 
