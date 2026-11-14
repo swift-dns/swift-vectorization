@@ -25144,7 +25144,7 @@ func x86BlendedGatheredFirst(otherwise: Bool, for element: Element) -> String? {
         return "(wide_lane_vector)\(compoundLiteral(unsigned, values))"
     }
     let lane = splat("lane", as: element.cVector, lanes: element.laneCount)
-    return """
+    let blended = """
         typedef long long wide_lane_vector __attribute__((vector_size(16)));
         const wide_lane_vector masks[\(element.laneCount)] = {\(masks.joined(separator: ", "))};
         wide_lane_vector v = \(otherwise ? "(wide_lane_vector)otherwise" : "{0, 0}");
@@ -25155,6 +25155,13 @@ func x86BlendedGatheredFirst(otherwise: Bool, for element: Element) -> String? {
           }
         }
         \(vectorResult("(\(element.cVector))v", for: element))
+        """
+    guard otherwise else { return blended }
+    return """
+        if (__builtin_constant_p(count) && count >= \(element.laneCount)) {
+        \(indented(gatheredFirst(otherwise: true, for: element)))
+        }
+        \(blended)
         """
 }
 

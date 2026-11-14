@@ -45985,6 +45985,15 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_g
 #elif CVECTORIZATION_OPS_X86 == 4
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_gatherd_d256((cvectorization_ops_x86_i32)otherwise, (const int*)from, (cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32)cvectorization_ops_first_lanes_u32(count), (int)4));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  if (__builtin_constant_p(count) && count >= 4) {
+    cvectorization_ops_vector_u32 v = otherwise;
+    for (size_t i = 0; i < 4; ++i) {
+      if (i < count) {
+        v[i] = from[indices[i]];
+      }
+    }
+    return (cvectorization_ops_raw_vector_u32)(v);
+  }
   typedef long long wide_lane_vector __attribute__((vector_size(16)));
   const wide_lane_vector masks[4] = {(wide_lane_vector)(cvectorization_ops_vector_u32){~0u, 0, 0, 0}, (wide_lane_vector)(cvectorization_ops_vector_u32){0, ~0u, 0, 0}, (wide_lane_vector)(cvectorization_ops_vector_u32){0, 0, ~0u, 0}, (wide_lane_vector)(cvectorization_ops_vector_u32){0, 0, 0, ~0u}};
   wide_lane_vector v = (wide_lane_vector)otherwise;
@@ -103361,6 +103370,15 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_g
 #elif CVECTORIZATION_OPS_X86 == 4
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_gatherd_d256((cvectorization_ops_x86_i32)otherwise, (const int*)from, (cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32)cvectorization_ops_first_lanes_i32(count), (int)4));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  if (__builtin_constant_p(count) && count >= 4) {
+    cvectorization_ops_vector_i32 v = otherwise;
+    for (size_t i = 0; i < 4; ++i) {
+      if (i < count) {
+        v[i] = from[indices[i]];
+      }
+    }
+    return (cvectorization_ops_raw_vector_i32)(v);
+  }
   typedef long long wide_lane_vector __attribute__((vector_size(16)));
   const wide_lane_vector masks[4] = {(wide_lane_vector)(cvectorization_ops_vector_u32){~0u, 0, 0, 0}, (wide_lane_vector)(cvectorization_ops_vector_u32){0, ~0u, 0, 0}, (wide_lane_vector)(cvectorization_ops_vector_u32){0, 0, ~0u, 0}, (wide_lane_vector)(cvectorization_ops_vector_u32){0, 0, 0, ~0u}};
   wide_lane_vector v = (wide_lane_vector)otherwise;
