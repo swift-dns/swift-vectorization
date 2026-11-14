@@ -248,7 +248,7 @@ extension SIMDUInt8CodegenTests {
         let mismatches = Mismatches("portLoadFirstU8ConstantCountTwiceLaneCount")
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0xE1F0_6239_D0CC_A04E
         )
         for from in fromInputs {
@@ -269,7 +269,7 @@ extension SIMDUInt8CodegenTests {
         )
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0x2558_10D1_36CD_277F
         )
         for from in fromInputs {
@@ -825,7 +825,7 @@ extension SIMDUInt8CodegenTests {
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x660D_F15D_5859_BD86)
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0x660D_F25D_5859_BF39
         )
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
@@ -857,7 +857,7 @@ extension SIMDUInt8CodegenTests {
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x0E41_AF94_3633_0C77)
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0x0E41_AE94_3633_0AC4
         )
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {

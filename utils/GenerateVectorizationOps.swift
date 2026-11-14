@@ -43314,10 +43314,19 @@ func alignmentLanes(of op: Op) -> String {
     return "H.laneCount"
 }
 
-func pointerLanes(of op: Op, guarded: Bool = false) -> String {
+func alternativeLanes(_ alternative: CodegenAlternative?) -> String {
+    alternative?.fitsOneVector == false ? "2 * H.laneCount" : "H.laneCount"
+}
+
+func pointerLanes(
+    of op: Op,
+    guarded: Bool = false,
+    alternative: CodegenAlternative? = nil
+) -> String {
     switch op.span {
     case .vectors(let count, _)?: return count == 1 ? "H.laneCount" : "\(count) * H.laneCount"
-    case .first?: return op.clampsSpanCount && !guarded ? "2 * H.laneCount" : "H.laneCount"
+    case .first?:
+        return op.clampsSpanCount && !guarded ? "2 * H.laneCount" : alternativeLanes(alternative)
     case .table(let lanes)?: return String(lanes)
     case .maskBytes?: return "(H.laneCount + 7) / 8"
     case .block?: return "16 / MemoryLayout<H.Lane>.size"
@@ -43396,7 +43405,8 @@ func referenceInputs(
     test: String,
     inContract: Bool,
     guarded: Bool = false,
-    nonCanonical: Bool = false
+    nonCanonical: Bool = false,
+    alternative: CodegenAlternative? = nil
 ) -> [ReferenceInput] {
     var inputs: [ReferenceInput] = []
     for (binding, parameter) in zip(bindings(of: op, for: element), op.parameters) {
@@ -43499,7 +43509,10 @@ func referenceInputs(
             values = "Inputs.indexBuffers(\(pointee).self, lanes: \(lanes), \(seed))"
         case .constLanePointer, .constBytePointer, .constBitsPointer:
             let isBytes = parameter.isBytePointer
-            let lanes = isBytes ? "(H.laneCount + 7) / 8" : pointerLanes(of: op, guarded: guarded)
+            let lanes =
+                isBytes
+                ? "(H.laneCount + 7) / 8"
+                : pointerLanes(of: op, guarded: guarded, alternative: alternative)
             let pointee = isBytes ? "UInt8" : pointeeType(of: op, for: element)
             values = "Inputs.buffers(\(pointee).self, count: \(lanes), \(seed))"
         case .pointerIndices, .pointerOffsets:
@@ -43930,6 +43943,7 @@ func referenceStatements(
     inputs: [ReferenceInput],
     guarded: Bool,
     count: String = "count",
+    alternative: CodegenAlternative? = nil,
     calls: (port: String, reference: String)
 ) -> (declarations: [String], statements: String) {
     let description = referenceDescription(of: inputs)
@@ -43939,7 +43953,7 @@ func referenceStatements(
     let statements: String
 
     if hasCopiedLanes(op), let source = inputs.first(where: { $0.parameter.isConstPointer })?.name {
-        let lanes = pointerLanes(of: op, guarded: guarded)
+        let lanes = pointerLanes(of: op, guarded: guarded, alternative: alternative)
         declarations.append(
             "let sentinel = Inputs.sentinel(\(pointeeType(of: op, for: element)).self, count: \(guarded ? lanes : "\(lanes) + 4"))"
         )
@@ -43982,7 +43996,11 @@ func referenceStatements(
                 inputs: inputs
             )
     } else if isStore {
-        let lanes = pointerLanes(of: op, guarded: guarded)
+        let lanes = pointerLanes(
+            of: op,
+            guarded: guarded,
+            alternative: op.clampsSpanCount ? alternative : nil
+        )
         let sentinelCount = guarded ? lanes : "\(lanes) + 4"
         declarations.append(
             "let sentinel = Inputs.sentinel(\(pointeeType(of: op, for: element)).self, count: \(sentinelCount))"
@@ -46366,7 +46384,8 @@ func codegenTest(
         for: element,
         test: test,
         inContract: true,
-        guarded: guarded
+        guarded: guarded,
+        alternative: alternative
     )
     .filter { !constantNames.contains($0.name) }
     let calls = codegenCalls(
@@ -46391,6 +46410,7 @@ func codegenTest(
             constant: constant,
             alternative: alternative
         ),
+        alternative: alternative,
         calls: calls
     )
 
@@ -46435,7 +46455,8 @@ func codegenWideningTest(
         ReferenceInput(
             parameter: .constLanePointer,
             name: "from",
-            values: "Inputs.buffers(\(narrow.swiftType).self, count: H.laneCount, \(seed))"
+            values:
+                "Inputs.buffers(\(narrow.swiftType).self, count: \(alternativeLanes(alternative)), \(seed))"
         )
     ]
     if op.takesCount && constant == nil {
@@ -46681,7 +46702,7 @@ func codegenTests(of op: Op, for element: Element) -> [String] {
                 alternative: variant.alternative
             )
         )
-        if op.span != nil && (variant.alternative?.fitsOneVector ?? true || !op.clampsSpanCount) {
+        if op.span != nil {
             tests.append(
                 codegenTest(
                     of: op,

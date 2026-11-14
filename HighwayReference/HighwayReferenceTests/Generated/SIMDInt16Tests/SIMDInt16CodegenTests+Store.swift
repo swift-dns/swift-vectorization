@@ -638,6 +638,28 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeRepeatingConstantCountTwiceLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portStoreRepeatingI16ConstantCountTwiceLaneCount before a guard page"
+        )
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x72ED_C4BA_2CDD_F1F7)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
+        for value in valueInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(2 * SIMDInt16.laneCount))
+            ) { destination in
+                unsafe portStoreRepeatingI16ConstantCountTwiceLaneCount(value, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(2 * SIMDInt16.laneCount))
+            ) { destination in
+                unsafe highwayStoreRepeatingI16ConstantCountTwiceLaneCount(value, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
     @Test func copy() {
         let mismatches = Mismatches("portCopyI16")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
@@ -890,6 +912,34 @@ extension SIMDInt16CodegenTests {
                         to: destination.baseAddress!
                     )
                 }
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func copyConstantCountTwiceLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches("portCopyI16ConstantCountTwiceLaneCount before a guard page")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0xAB74_FFF8_D1E1_A6D8
+        )
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
+        for from in fromInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(2 * SIMDInt16.laneCount))
+            ) { destination in
+                unsafe withGuardedLanes(Array(from.prefix(2 * SIMDInt16.laneCount))) { source in
+                    unsafe portCopyI16ConstantCountTwiceLaneCount(from: source, to: destination)
+                }.result
+            }
+            let (_, referenceLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(2 * SIMDInt16.laneCount))
+            ) { destination in
+                unsafe withGuardedLanes(Array(from.prefix(2 * SIMDInt16.laneCount))) { source in
+                    unsafe highwayCopyI16ConstantCountTwiceLaneCount(from: source, to: destination)
+                }.result
             }
             mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
         }

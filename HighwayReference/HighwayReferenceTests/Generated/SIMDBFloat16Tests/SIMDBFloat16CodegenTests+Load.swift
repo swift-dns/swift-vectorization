@@ -254,7 +254,7 @@ extension SIMDBFloat16CodegenTests {
         let mismatches = Mismatches("portLoadFirstBF16ConstantCountTwiceLaneCount")
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0xC9AE_D313_A362_AA8C
         )
         for from in fromInputs {
@@ -277,7 +277,7 @@ extension SIMDBFloat16CodegenTests {
         )
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0xA86D_8DA3_CF83_FEC5
         )
         for from in fromInputs {
@@ -842,7 +842,7 @@ extension SIMDBFloat16CodegenTests {
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x12B8_DE76_B3A9_C0D0)
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0x12B8_DF76_B3A9_C283
         )
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
@@ -874,7 +874,7 @@ extension SIMDBFloat16CodegenTests {
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5EDB_86FB_796A_91E9)
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0x5EDB_85FB_796A_9036
         )
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {

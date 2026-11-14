@@ -254,7 +254,7 @@ extension SIMDInt64CodegenTests {
         let mismatches = Mismatches("portLoadFirstI64ConstantCountTwiceLaneCount")
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0xBFC3_46A6_2905_FB90
         )
         for from in fromInputs {
@@ -275,7 +275,7 @@ extension SIMDInt64CodegenTests {
         )
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0x2D0D_C5B5_7D60_09A9
         )
         for from in fromInputs {
@@ -835,7 +835,7 @@ extension SIMDInt64CodegenTests {
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA3BB_9A61_56D8_41A4)
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0xA3BB_9B61_56D8_4357
         )
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
@@ -867,7 +867,7 @@ extension SIMDInt64CodegenTests {
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB469_6A6F_A224_757D)
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0xB469_696F_A224_73CA
         )
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {

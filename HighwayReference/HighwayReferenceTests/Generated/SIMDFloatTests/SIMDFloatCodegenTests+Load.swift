@@ -254,7 +254,7 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches("portLoadFirstF32ConstantCountTwiceLaneCount")
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0xD716_B150_E3F7_9412
         )
         for from in fromInputs {
@@ -275,7 +275,7 @@ extension SIMDFloatCodegenTests {
         )
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0x429E_164D_3E38_97B3
         )
         for from in fromInputs {
@@ -835,7 +835,7 @@ extension SIMDFloatCodegenTests {
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xCBEE_8562_9361_D1CA)
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0xCBEE_8662_9361_D37D
         )
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
@@ -867,7 +867,7 @@ extension SIMDFloatCodegenTests {
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x7639_85B5_8CE2_93AB)
         let fromInputs = Inputs.buffers(
             H.Lane.self,
-            count: H.laneCount,
+            count: 2 * H.laneCount,
             seed: 0x7639_84B5_8CE2_91F8
         )
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
