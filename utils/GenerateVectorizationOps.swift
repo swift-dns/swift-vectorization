@@ -323,6 +323,12 @@ struct Applies {
             bits: bits
         )
     }
+    static func allAndHalfPrecision(bits: Set<Int>) -> Applies {
+        Applies(
+            categories: [.unsignedInteger, .signedInteger, .float, .float16, .bfloat16],
+            bits: bits
+        )
+    }
     static func results(_ elements: [Element]) -> Applies {
         Applies(categories: [], bits: nil, suffixes: Set(elements.map(\.suffix)))
     }
@@ -13227,11 +13233,20 @@ func x86Sse2MultiplyingFixedPoint15(for element: Element) -> String {
 struct LookupSize {
     let lanes: Int
     let applies: Applies
+    var capabilityApplies: Applies?
 }
 
 let lookupSizes = [
-    LookupSize(lanes: 8, applies: .allAndFloat16(bits: [16, 32, 64])),
-    LookupSize(lanes: 16, applies: .allAndFloat16(bits: [16, 32, 64])),
+    LookupSize(
+        lanes: 8,
+        applies: .allAndFloat16(bits: [8, 16, 32, 64]),
+        capabilityApplies: .allAndHalfPrecision(bits: [8, 16, 32, 64])
+    ),
+    LookupSize(
+        lanes: 16,
+        applies: .allAndFloat16(bits: [8, 16, 32, 64]),
+        capabilityApplies: .allAndHalfPrecision(bits: [8, 16, 32, 64])
+    ),
     LookupSize(lanes: 32, applies: .integer(bits: [8])),
     LookupSize(lanes: 64, applies: .integer(bits: [8])),
 ]
@@ -13263,7 +13278,7 @@ enum LaneCapability {
 
     var applies: Applies {
         switch self {
-        case .lookup(let size): return size.applies
+        case .lookup(let size): return size.capabilityApplies ?? size.applies
         case .reversal: return Applies.all.including(halfPrecisionElements)
         }
     }
@@ -13488,6 +13503,17 @@ func lookupBody(
 
 func zeroExtendedLoad(from pointer: String, bytes: Int, x86: Bool, for element: Element) -> String {
     let words = bytes / 8
+    guard words > 1 else {
+        let indices = (0..<element.width / 8).map { $0 < 2 ? $0 : 2 + $0 % 2 }
+        let extended = "__builtin_shufflevector(loaded, (lane_block){0}, \(laneIndices(indices)))"
+        return """
+            typedef long long lane_block __attribute__((vector_size(16)));
+            long long word;
+            __builtin_memcpy(&word, \(pointer), 8);
+            const lane_block loaded = {word, 0};
+            const \(element.cVector) table = (\(element.cVector))\(extended);
+            """
+    }
     let isBlock = x86 && bytes == 16
     let part = isBlock ? x86Block("i64") : "half_vector"
     let size = "vector_size(\(bytes))"

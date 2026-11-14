@@ -164,6 +164,68 @@ public func highwayIndicesU8ConstantVector() -> SIMDUInt8.Vector {
 }
 
 @inline(never)
+public func portLookup8U8(
+    at indices: SIMDUInt8.Indices,
+    from: UnsafePointer<SIMDUInt8.Lane>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup8(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup8U8(
+    at indices: SIMDUInt8.Vector,
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.lookup8U8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup8U8ConstantIndices(from: UnsafePointer<SIMDUInt8.Lane>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup8(at: SIMDUInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup8U8ConstantIndices(from: UnsafePointer<UInt8>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup8U8(
+            from,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portLookup16U8(
+    at indices: SIMDUInt8.Indices,
+    from: UnsafePointer<SIMDUInt8.Lane>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup16(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup16U8(
+    at indices: SIMDUInt8.Vector,
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.lookup16U8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup16U8ConstantIndices(from: UnsafePointer<SIMDUInt8.Lane>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.lookup16(at: SIMDUInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup16U8ConstantIndices(from: UnsafePointer<UInt8>) -> SIMDUInt8.Vector {
+    unsafe SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup16U8(
+            from,
+            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(1)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portLookup32U8(
     at indices: SIMDUInt8.Indices,
     from: UnsafePointer<SIMDUInt8.Lane>

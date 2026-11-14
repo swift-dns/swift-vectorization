@@ -2097,4 +2097,40 @@ extension SIMDInt8 {
         }
     }
 
+    @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return unsafe tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_bytes_i8(a.raw, indices.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return unsafe tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_bytes_or_zero_i8(a.raw, indices.raw))
+    }
+
 }

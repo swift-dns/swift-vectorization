@@ -16,6 +16,12 @@ public protocol SIMDElement {
     /// How many 16-byte blocks a `Vector` holds on the target this was compiled for.
     static var blockCount: Int { get }
 
+    /// Whether a `Vector` holds enough lanes for `lookup8` on the target this was compiled for.
+    static var canLookup8: Bool { get }
+
+    /// Whether a `Vector` holds enough lanes for `lookup16` on the target this was compiled for.
+    static var canLookup16: Bool { get }
+
     /// Whether a `Vector` holds enough lanes for `reversed4` on the target this was compiled for.
     static var canReverse4: Bool { get }
 
@@ -427,6 +433,16 @@ public protocol SIMDElement {
     static func compressedNot(_ a: Vector, where mask: Mask) -> Vector
     static func partitioned(_ a: Vector, where mask: Mask) -> Vector
     static func expanded(_ a: Vector, where mask: Mask) -> Vector
+    static func lookup8(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func lookup8(at indices: Indices, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func lookup8(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
+    static func lookup16(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func lookup16(at indices: Indices, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func lookup16(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
     static func minimum(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
     static func maximum(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
     static func maximum(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
@@ -760,16 +776,6 @@ public protocol SIMDFloatElement: SIMDElement {
     static func zeroingIfNegative(_ a: Vector, _ b: Vector) -> Vector
     static func negatingIfNegative(_ a: Vector, _ b: Vector) -> Vector
     static func isNegative(_ a: Vector) -> Mask
-    static func lookup8(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
-    @available(SwiftStdlib 5.1, *)
-    static func lookup8(at indices: Indices, from span: Span<Lane>) -> Vector
-    @available(SwiftStdlib 5.1, *)
-    @unsafe static func lookup8(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
-    static func lookup16(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
-    @available(SwiftStdlib 5.1, *)
-    static func lookup16(at indices: Indices, from span: Span<Lane>) -> Vector
-    @available(SwiftStdlib 5.1, *)
-    @unsafe static func lookup16(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
     static func squareRoot(_ a: Vector, where mask: Mask) -> Vector
     static func squareRoot(_ a: Vector, where mask: Mask, otherwise: Vector) -> Vector
     static func approximateReciprocal(_ a: Vector, where mask: Mask) -> Vector

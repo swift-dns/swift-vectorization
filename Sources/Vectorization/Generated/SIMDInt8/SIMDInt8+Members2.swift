@@ -4,42 +4,6 @@ public import CVectorizationOps
 
 extension SIMDInt8 {
     @export(implementation) @inline(always)
-    public static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector {
-        precondition(
-            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
-            "Byte index is negative or more than 15"
-        )
-        return unsafe tableLookupBytes(a, atUnchecked: indices)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector {
-        assert(
-            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
-            "Byte index is negative or more than 15"
-        )
-        return Vector(raw: cvectorization_ops_table_lookup_bytes_i8(a.raw, indices.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector {
-        precondition(
-            cvectorization_ops_indices_within_i8(indices.raw, 128, 144),
-            "Byte index is 16 through 127"
-        )
-        return unsafe tableLookupBytesOrZero(a, atUnchecked: indices)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector {
-        assert(
-            cvectorization_ops_indices_within_i8(indices.raw, 128, 144),
-            "Byte index is 16 through 127"
-        )
-        return Vector(raw: cvectorization_ops_table_lookup_bytes_or_zero_i8(a.raw, indices.raw))
-    }
-
-    @export(implementation) @inline(always)
     public static func pairwiseAddingBlocks(_ a: Vector, _ b: Vector) -> Vector {
         Vector(raw: cvectorization_ops_pairwise_adding_blocks_i8(a.raw, b.raw))
     }
@@ -273,6 +237,112 @@ extension SIMDInt8 {
             "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return Indices(raw: cvectorization_ops_indices_i8(vector.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func lookup8(at indices: Indices, from: UnsafePointer<Lane>) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 8),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        assert(canLookup8, "Vector has too few lanes for this lookup")
+        return Vector(raw: unsafe cvectorization_ops_lookup8_i8(from, indices.raw))
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func lookup8(at indices: Indices, from span: Span<Lane>) -> Vector {
+        precondition(span.count >= 8, "Span has fewer elements than the table has lanes")
+        precondition(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(8 * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the table size"
+        )
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 8),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        precondition(canLookup8, "Vector has too few lanes for this lookup")
+        return unsafe lookup8(at: indices, fromUnchecked: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func lookup8(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector {
+        assert(span.count >= 8, "Span has fewer elements than the table has lanes")
+        assert(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(8 * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the table size"
+        )
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 8),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        assert(canLookup8, "Vector has too few lanes for this lookup")
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_lookup8_i8(
+                    $0.baseAddress.unsafelyUnwrapped,
+                    indices.raw
+                )
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func lookup16(at indices: Indices, from: UnsafePointer<Lane>) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        assert(canLookup16, "Vector has too few lanes for this lookup")
+        return Vector(raw: unsafe cvectorization_ops_lookup16_i8(from, indices.raw))
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func lookup16(at indices: Indices, from span: Span<Lane>) -> Vector {
+        precondition(span.count >= 16, "Span has fewer elements than the table has lanes")
+        precondition(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(16 * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the table size"
+        )
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        precondition(canLookup16, "Vector has too few lanes for this lookup")
+        return unsafe lookup16(at: indices, fromUnchecked: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func lookup16(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector {
+        assert(span.count >= 16, "Span has fewer elements than the table has lanes")
+        assert(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(16 * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the table size"
+        )
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Lane index is negative or at least as many as the table has lanes"
+        )
+        assert(canLookup16, "Vector has too few lanes for this lookup")
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_lookup16_i8(
+                    $0.baseAddress.unsafelyUnwrapped,
+                    indices.raw
+                )
+            )
+        }
     }
 
     @export(implementation) @inline(always)
@@ -2058,36 +2128,6 @@ extension SIMDInt8 {
     @export(implementation) @inline(always)
     public static func eighthVector(resizing a: SIMDUInt64.HalfVector) -> EighthVector {
         EighthVector(raw: cvectorization_ops_eighth_vector_resizing_half_vector_u64_to_i8(a.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func halfVector(resizing a: SIMDInt8.Vector) -> HalfVector {
-        HalfVector(raw: cvectorization_ops_half_vector_resizing_i8_to_i8(a.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func quarterVector(resizing a: SIMDInt8.Vector) -> QuarterVector {
-        QuarterVector(raw: cvectorization_ops_quarter_vector_resizing_i8_to_i8(a.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func eighthVector(resizing a: SIMDInt8.Vector) -> EighthVector {
-        EighthVector(raw: cvectorization_ops_eighth_vector_resizing_i8_to_i8(a.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func vector(resizing a: SIMDInt8.HalfVector) -> Vector {
-        Vector(raw: cvectorization_ops_vector_resizing_half_vector_i8_to_i8(a.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func quarterVector(resizing a: SIMDInt8.HalfVector) -> QuarterVector {
-        QuarterVector(raw: cvectorization_ops_quarter_vector_resizing_half_vector_i8_to_i8(a.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func eighthVector(resizing a: SIMDInt8.HalfVector) -> EighthVector {
-        EighthVector(raw: cvectorization_ops_eighth_vector_resizing_half_vector_i8_to_i8(a.raw))
     }
 
 }

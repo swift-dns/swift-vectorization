@@ -168,6 +168,8 @@ typedef cvectorization_ops_raw_vector_u8 OutVectorU8 __attribute__((aligned(16))
 HWY_INLINE size_t laneCountU8() { return hn::Lanes(TagU8()); }
 HWY_INLINE size_t blockCountU8() { return hn::Blocks(TagU8()); }
 HWY_INLINE bool compressTailIsDeterministicU8() { return compressTailIsDeterministic<uint8_t>(); }
+HWY_INLINE bool canLookup8U8() { return hn::CanLookup8(TagU8()); }
+HWY_INLINE bool canLookup16U8() { return hn::CanLookup16(TagU8()); }
 HWY_INLINE bool canLookup32U8() { return hn::CanLookup32(TagU8()); }
 HWY_INLINE bool canLookup64U8() { return hn::CanLookup64(TagU8()); }
 HWY_INLINE bool canReverse4U8() { return hn::Lanes(TagU8()) >= 4; }
@@ -404,6 +406,8 @@ typedef cvectorization_ops_raw_vector_i8 OutVectorI8 __attribute__((aligned(16))
 HWY_INLINE size_t laneCountI8() { return hn::Lanes(TagI8()); }
 HWY_INLINE size_t blockCountI8() { return hn::Blocks(TagI8()); }
 HWY_INLINE bool compressTailIsDeterministicI8() { return compressTailIsDeterministic<int8_t>(); }
+HWY_INLINE bool canLookup8I8() { return hn::CanLookup8(TagI8()); }
+HWY_INLINE bool canLookup16I8() { return hn::CanLookup16(TagI8()); }
 HWY_INLINE bool canLookup32I8() { return hn::CanLookup32(TagI8()); }
 HWY_INLINE bool canLookup64I8() { return hn::CanLookup64(TagI8()); }
 HWY_INLINE bool canReverse4I8() { return hn::Lanes(TagI8()) >= 4; }
@@ -802,6 +806,8 @@ typedef cvectorization_ops_raw_vector_bf16 OutVectorBF16 __attribute__((aligned(
 HWY_INLINE size_t laneCountBF16() { return hn::Lanes(TagBF16()); }
 HWY_INLINE size_t blockCountBF16() { return hn::Blocks(TagBF16()); }
 HWY_INLINE bool compressTailIsDeterministicBF16() { return compressTailIsDeterministic<hwy::bfloat16_t>(); }
+HWY_INLINE bool canLookup8BF16() { return hn::CanLookup8(TagBF16()); }
+HWY_INLINE bool canLookup16BF16() { return hn::CanLookup16(TagBF16()); }
 HWY_INLINE bool canReverse4BF16() { return hn::Lanes(TagBF16()) >= 4; }
 HWY_INLINE bool canReverse8BF16() { return hn::Lanes(TagBF16()) >= 8; }
 #if HWY_TARGET == HWY_SVE2_128
@@ -1490,6 +1496,8 @@ HWY_INLINE cvectorization_ops_raw_vector_u8 compressedU8(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_u8 compressedNotU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask) { return toPortU8(hn::CompressNot(fromPortU8(a), maskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 partitionedU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask) { return toPortU8(hn::Partition(TagU8(), fromPortU8(a), maskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 expandedU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask) { return toPortU8(hn::Expand(fromPortU8(a), maskFromPortU8(mask))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 lookup8U8(const uint8_t* from, cvectorization_ops_raw_vector_u8 indices) { return toPortU8(hn::Lookup8(TagU8(), from, fromPortU8(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 lookup16U8(const uint8_t* from, cvectorization_ops_raw_vector_u8 indices) { return toPortU8(hn::Lookup16(TagU8(), from, fromPortU8(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 lookup32U8(const uint8_t* from, cvectorization_ops_raw_vector_u8 indices) { return toPortU8(hn::Lookup32(TagU8(), from, fromPortU8(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 lookup64U8(const uint8_t* from, cvectorization_ops_raw_vector_u8 indices) { return toPortU8(hn::Lookup64(TagU8(), from, fromPortU8(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 minimumWhereOtherwiseU8(cvectorization_ops_raw_vector_u8 otherwise, cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU8(hn::MaskedMinOr(fromPortU8(otherwise), maskFromPortU8(mask), fromPortU8(a), fromPortU8(b))); }
@@ -6914,6 +6922,8 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 compressedI8(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_i8 compressedNotI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask) { return toPortI8(hn::CompressNot(fromPortI8(a), maskFromPortI8(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 partitionedI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask) { return toPortI8(hn::Partition(TagI8(), fromPortI8(a), maskFromPortI8(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 expandedI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask) { return toPortI8(hn::Expand(fromPortI8(a), maskFromPortI8(mask))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 lookup8I8(const int8_t* from, cvectorization_ops_raw_vector_i8 indices) { return toPortI8(hn::Lookup8(TagI8(), from, fromPortI8(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 lookup16I8(const int8_t* from, cvectorization_ops_raw_vector_i8 indices) { return toPortI8(hn::Lookup16(TagI8(), from, fromPortI8(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 lookup32I8(const int8_t* from, cvectorization_ops_raw_vector_i8 indices) { return toPortI8(hn::Lookup32(TagI8(), from, fromPortI8(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 lookup64I8(const int8_t* from, cvectorization_ops_raw_vector_i8 indices) { return toPortI8(hn::Lookup64(TagI8(), from, fromPortI8(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 minimumWhereOtherwiseI8(cvectorization_ops_raw_vector_i8 otherwise, cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) { return toPortI8(hn::MaskedMinOr(fromPortI8(otherwise), maskFromPortI8(mask), fromPortI8(a), fromPortI8(b))); }
@@ -23986,6 +23996,8 @@ HWY_INLINE cvectorization_ops_raw_vector_u8 compressedU8(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_u8 compressedNotU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask) noexcept { return ::HighwayReference::compressedNotU8(a, mask); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 partitionedU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask) noexcept { return ::HighwayReference::partitionedU8(a, mask); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 expandedU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask) noexcept { return ::HighwayReference::expandedU8(a, mask); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 lookup8U8(const uint8_t* from, cvectorization_ops_raw_vector_u8 indices) noexcept { return ::HighwayReference::lookup8U8(from, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_u8 lookup16U8(const uint8_t* from, cvectorization_ops_raw_vector_u8 indices) noexcept { return ::HighwayReference::lookup16U8(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 lookup32U8(const uint8_t* from, cvectorization_ops_raw_vector_u8 indices) noexcept { return ::HighwayReference::lookup32U8(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 lookup64U8(const uint8_t* from, cvectorization_ops_raw_vector_u8 indices) noexcept { return ::HighwayReference::lookup64U8(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 minimumWhereOtherwiseU8(cvectorization_ops_raw_vector_u8 otherwise, cvectorization_ops_raw_mask_u8 mask, cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::minimumWhereOtherwiseU8(otherwise, mask, a, b); }
@@ -25214,6 +25226,8 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 compressedI8(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_i8 compressedNotI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask) noexcept { return ::HighwayReference::compressedNotI8(a, mask); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 partitionedI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask) noexcept { return ::HighwayReference::partitionedI8(a, mask); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 expandedI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask) noexcept { return ::HighwayReference::expandedI8(a, mask); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 lookup8I8(const int8_t* from, cvectorization_ops_raw_vector_i8 indices) noexcept { return ::HighwayReference::lookup8I8(from, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_i8 lookup16I8(const int8_t* from, cvectorization_ops_raw_vector_i8 indices) noexcept { return ::HighwayReference::lookup16I8(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 lookup32I8(const int8_t* from, cvectorization_ops_raw_vector_i8 indices) noexcept { return ::HighwayReference::lookup32I8(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 lookup64I8(const int8_t* from, cvectorization_ops_raw_vector_i8 indices) noexcept { return ::HighwayReference::lookup64I8(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 minimumWhereOtherwiseI8(cvectorization_ops_raw_vector_i8 otherwise, cvectorization_ops_raw_mask_i8 mask, cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_vector_i8 b) noexcept { return ::HighwayReference::minimumWhereOtherwiseI8(otherwise, mask, a, b); }

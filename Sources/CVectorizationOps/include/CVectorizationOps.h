@@ -1323,6 +1323,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_block_u8 cvectorization_ops_from_ra
   __builtin_memcpy(&result, &v, sizeof result);
   return result;
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u8(void) {
+  return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u8(void) {
+  return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 8;
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup32_u8(void) {
   return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 16;
 }
@@ -14219,6 +14225,86 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ex
   cvectorization_ops_vector_u8 expanded;
   __builtin_memcpy(&expanded, result, sizeof expanded);
   return (cvectorization_ops_raw_vector_u8)(expanded);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lookup8_u8(const uint8_t* from, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, from, 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, from, 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, __builtin_assume_aligned(from, 8), 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, __builtin_assume_aligned(from, 8), 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, __builtin_assume_aligned(from, 8), 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#else
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, from, 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lookup16_u8(const uint8_t* from, cvectorization_ops_raw_vector_u8 rawIndices) {
+  const cvectorization_ops_vector_u8 indices = (cvectorization_ops_vector_u8)rawIndices;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  typedef long long half_vector __attribute__((vector_size(16)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, from, 16);
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (half_vector){0, 0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef long long half_vector __attribute__((vector_size(16)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, from, 16);
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (half_vector){0, 0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_x86_block_i64 loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 16), 16);
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (cvectorization_ops_x86_block_i64){0, 0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_x86_block_i64 loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 16), 16);
+  const cvectorization_ops_vector_u8 table = (cvectorization_ops_vector_u8)__builtin_shufflevector(loaded, (cvectorization_ops_x86_block_i64){0, 0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_u8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 16), 16);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
+#else
+  cvectorization_ops_vector_u8 table;
+  __builtin_memcpy(&table, from, 16);
+  return cvectorization_ops_table_lookup_lanes_u8((cvectorization_ops_raw_vector_u8)table, rawIndices);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lookup32_u8(const uint8_t* from, cvectorization_ops_raw_vector_u8 rawIndices) {
@@ -59952,6 +60038,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_block_i8 cvectorization_ops_from_ra
   __builtin_memcpy(&result, &v, sizeof result);
   return result;
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i8(void) {
+  return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i8(void) {
+  return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 8;
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup32_i8(void) {
   return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 16;
 }
@@ -70248,6 +70340,86 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ex
   cvectorization_ops_vector_i8 expanded;
   __builtin_memcpy(&expanded, result, sizeof expanded);
   return (cvectorization_ops_raw_vector_i8)(expanded);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lookup8_i8(const int8_t* from, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, from, 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, from, 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, __builtin_assume_aligned(from, 8), 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, __builtin_assume_aligned(from, 8), 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, __builtin_assume_aligned(from, 8), 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#else
+  typedef long long lane_block __attribute__((vector_size(16)));
+  long long word;
+  __builtin_memcpy(&word, from, 8);
+  const lane_block loaded = {word, 0};
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (lane_block){0}, 0, 1);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lookup16_i8(const int8_t* from, cvectorization_ops_raw_vector_i8 rawIndices) {
+  const cvectorization_ops_vector_i8 indices = (cvectorization_ops_vector_i8)rawIndices;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  typedef long long half_vector __attribute__((vector_size(16)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, from, 16);
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (half_vector){0, 0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef long long half_vector __attribute__((vector_size(16)));
+  half_vector loaded;
+  __builtin_memcpy(&loaded, from, 16);
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (half_vector){0, 0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  cvectorization_ops_x86_block_i64 loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 16), 16);
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (cvectorization_ops_x86_block_i64){0, 0}, 0, 1, 2, 3, 2, 3, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 == 4
+  cvectorization_ops_x86_block_i64 loaded;
+  __builtin_memcpy(&loaded, __builtin_assume_aligned(from, 16), 16);
+  const cvectorization_ops_vector_i8 table = (cvectorization_ops_vector_i8)__builtin_shufflevector(loaded, (cvectorization_ops_x86_block_i64){0, 0}, 0, 1, 2, 3);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  cvectorization_ops_vector_i8 table;
+  __builtin_memcpy(&table, __builtin_assume_aligned(from, 16), 16);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
+#else
+  cvectorization_ops_vector_i8 table;
+  __builtin_memcpy(&table, from, 16);
+  return cvectorization_ops_table_lookup_lanes_i8((cvectorization_ops_raw_vector_i8)table, rawIndices);
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lookup32_i8(const int8_t* from, cvectorization_ops_raw_vector_i8 rawIndices) {
@@ -140942,6 +141114,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_block_bf16 cvectorization_ops_from_
   cvectorization_ops_block_bf16 result;
   __builtin_memcpy(&result, &v, sizeof result);
   return result;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_bf16(void) {
+  return sizeof(cvectorization_ops_vector_bf16) / sizeof(uint16_t) >= 4;
+}
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_bf16(void) {
+  return sizeof(cvectorization_ops_vector_bf16) / sizeof(uint16_t) >= 8;
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_bf16(void) {
   return sizeof(cvectorization_ops_vector_bf16) / sizeof(uint16_t) >= 4;

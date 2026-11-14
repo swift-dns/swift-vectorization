@@ -2088,4 +2088,38 @@ extension SIMDUInt8 {
         Vector(raw: cvectorization_ops_pairwise_subtracting_blocks_u8(a.raw, b.raw))
     }
 
+    @export(implementation) @inline(always)
+    public static func broadcastingInBlocks(_ a: Vector, lane: Int) -> Vector {
+        precondition(lane >= 0 && lane <= 15, "Lane is negative or not in a block")
+        return unsafe broadcastingInBlocks(a, laneUnchecked: lane)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func broadcastingInBlocks(_ a: Vector, laneUnchecked lane: Int) -> Vector {
+        assert(lane >= 0 && lane <= 15, "Lane is negative or not in a block")
+        return Vector(
+            raw: cvectorization_ops_broadcasting_in_blocks_u8(
+                a.raw,
+                Int32(truncatingIfNeeded: lane)
+            )
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector {
+        precondition(
+            bytes >= 0 && bytes <= 16,
+            "Byte count is negative or more than a block has bytes"
+        )
+        return unsafe shiftedLeftBytes(a, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector {
+        assert(bytes >= 0 && bytes <= 16, "Byte count is negative or more than a block has bytes")
+        return Vector(
+            raw: cvectorization_ops_shifted_left_bytes_u8(a.raw, Int32(truncatingIfNeeded: bytes))
+        )
+    }
+
 }

@@ -158,6 +158,178 @@ extension SIMDUInt8CodegenTests {
         mismatches.record()
     }
 
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8() {
+        let mismatches = Mismatches("portLookup8U8")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x64FB_D38E_F54B_16D6)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 8,
+            seed: 0x64FB_D48E_F54B_1889,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 8) {
+                source in
+                (
+                    unsafe portLookup8U8(at: indices, from: source),
+                    unsafe highwayLookup8U8(at: indices, from: source)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8BeforeGuardPage() {
+        let mismatches = Mismatches("portLookup8U8 before a guard page")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0xF09E_D90D_A3C1_E5A7)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 8,
+            seed: 0xF09E_D80D_A3C1_E3F4,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLookup8U8(at: indices, from: source),
+                    unsafe highwayLookup8U8(at: indices, from: source)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8ConstantIndices() {
+        let mismatches = Mismatches("portLookup8U8ConstantIndices")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x0579_CD99_E495_F949)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 8) {
+                source in
+                (
+                    unsafe portLookup8U8ConstantIndices(from: source),
+                    unsafe highwayLookup8U8ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
+    func lookup8ConstantIndicesBeforeGuardPage() {
+        let mismatches = Mismatches("portLookup8U8ConstantIndices before a guard page")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x5679_185C_B445_43E6)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLookup8U8ConstantIndices(from: source),
+                    unsafe highwayLookup8U8ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16() {
+        let mismatches = Mismatches("portLookup16U8")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0xC86A_EF26_06A6_BF1F)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 16,
+            seed: 0xC86A_EE26_06A6_BD6C,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 16) {
+                source in
+                (
+                    unsafe portLookup16U8(at: indices, from: source),
+                    unsafe highwayLookup16U8(at: indices, from: source)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16BeforeGuardPage() {
+        let mismatches = Mismatches("portLookup16U8 before a guard page")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0x21EB_27B5_1DD1_A524)
+        let indicesInputs = Inputs.tableIndices(
+            H.Indices.self,
+            count: 16,
+            seed: 0x21EB_28B5_1DD1_A6D7,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLookup16U8(at: indices, from: source),
+                    unsafe highwayLookup16U8(at: indices, from: source)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16ConstantIndices() {
+        let mismatches = Mismatches("portLookup16U8ConstantIndices")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0x586D_F05E_A693_6FF6)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 16) {
+                source in
+                (
+                    unsafe portLookup16U8ConstantIndices(from: source),
+                    unsafe highwayLookup16U8ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
+    func lookup16ConstantIndicesBeforeGuardPage() {
+        let mismatches = Mismatches("portLookup16U8ConstantIndices before a guard page")
+        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0x96B5_6656_E65F_F587)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLookup16U8ConstantIndices(from: source),
+                    unsafe highwayLookup16U8ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test(.disabled(if: !H.canLookup32, "Highway's lookup needs more lanes than this target has"))
     func lookup32() {
         let mismatches = Mismatches("portLookup32U8")
