@@ -309,6 +309,24 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_x86_i64 cvectorization_ops_x86_nega
   return (cvectorization_ops_x86_i64)__builtin_shufflevector((cvectorization_ops_x86_i32)a >> 31, (cvectorization_ops_x86_i32)a >> 31, 1, 1, 3, 3);
 }
 #endif
+#if CVECTORIZATION_OPS_X86 == 4
+CVECTORIZATION_OPS_INLINE unsigned cvectorization_ops_x86_word_mask_bits(cvectorization_ops_x86_i16 mask) {
+#if defined(HWY_DISABLE_BMI2_FMA) || defined(HWY_DISABLE_PEXT_ON_AVX2)
+  const cvectorization_ops_x86_i64 packed = (cvectorization_ops_x86_i64)__builtin_ia32_packsswb256((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0});
+  const cvectorization_ops_x86_i64 compressed = (cvectorization_ops_x86_i64)__builtin_ia32_permdi256((cvectorization_ops_x86_i64)packed, (int)0xD8);
+  return (unsigned)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_block_i8)__builtin_shufflevector(compressed, compressed, 0, 1));
+#else
+  return __builtin_ia32_pext_si((unsigned)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu);
+#endif
+}
+CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_x86_trailing_zeros(unsigned bits) {
+#if defined(HWY_DISABLE_BMI2_FMA)
+  return (size_t)__builtin_ctz(bits | 0x80000000u);
+#else
+  return (size_t)__builtin_ia32_tzcnt_u32(bits);
+#endif
+}
+#endif
 
 #if CVECTORIZATION_OPS_NEON
 CVECTORIZATION_OPS_INLINE const uint8_t* cvectorization_ops_neon_slide_table(void) {
@@ -11785,7 +11803,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_u8(cv
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u64((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)mask) | 0x80000000u);
 #else
@@ -23815,8 +23833,8 @@ CVECTORIZATION_OPS_INLINE intptr_t cvectorization_ops_first_true_index_u16(cvect
   const unsigned bits = (unsigned)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask);
   return bits ? (intptr_t)(__builtin_ia32_tzcnt_u32(bits)) : -1;
 #elif CVECTORIZATION_OPS_X86 == 4
-  const unsigned bits = (unsigned)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu);
-  return bits ? (intptr_t)(__builtin_ia32_tzcnt_u32(bits)) : -1;
+  const unsigned bits = (unsigned)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask);
+  return bits ? (intptr_t)(cvectorization_ops_x86_trailing_zeros(bits)) : -1;
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   const unsigned bits = (unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
   return bits ? (intptr_t)__builtin_ctz(bits | 0x80000000u) : -1;
@@ -26346,7 +26364,7 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_u16(cvectoriz
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (uint64_t)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask);
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (uint64_t)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu);
+  return (uint64_t)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask);
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (uint64_t)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
@@ -26603,7 +26621,7 @@ CVECTORIZATION_OPS_INLINE intptr_t cvectorization_ops_last_true_index_u16(cvecto
   const unsigned bits = (unsigned)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask);
   return bits ? (intptr_t)((size_t)31 - (size_t)__builtin_clz(bits)) : -1;
 #elif CVECTORIZATION_OPS_X86 == 4
-  const unsigned bits = (unsigned)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu);
+  const unsigned bits = (unsigned)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask);
   return bits ? (intptr_t)((size_t)31 - (size_t)__builtin_clz(bits)) : -1;
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   const unsigned bits = (unsigned)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
@@ -26799,7 +26817,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_u16(c
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0})) | 0x80000000u);
 #else
@@ -26994,7 +27012,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_last_true_index_u16(cv
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)(size_t)31 - (size_t)__builtin_clz((unsigned)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)(size_t)31 - (size_t)__builtin_clz((unsigned)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu));
+  return (size_t)(size_t)31 - (size_t)__builtin_clz((unsigned)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)(size_t)31 - (size_t)__builtin_clz((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0})));
 #else
@@ -28374,8 +28392,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_c
   __builtin_memcpy(buffer + __builtin_popcountll(maskLow1), &compressed1, sizeof compressed1);
   return (cvectorization_ops_raw_vector_u16)(*(const cvectorization_ops_vector_u16*)buffer);
 #elif CVECTORIZATION_OPS_X86 == 4
-  const uint32_t sparse = (uint32_t)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask);
-  const uint32_t selectedBits = __builtin_ia32_pext_si(sparse, 0xAAAAAAAAu);
+  const uint32_t selectedBits = cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask);
   const uint32_t lowBits = selectedBits & 0xFF;
   const uint32_t highBits = selectedBits >> 8;
   uint64_t lowCompressedRow;
@@ -28547,8 +28564,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_c
   __builtin_memcpy(buffer + __builtin_popcountll(maskLow1), &compressed1, sizeof compressed1);
   return (cvectorization_ops_raw_vector_u16)(*(const cvectorization_ops_vector_u16*)buffer);
 #elif CVECTORIZATION_OPS_X86 == 4
-  const uint32_t sparse = (uint32_t)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask);
-  const uint32_t selectedBits = __builtin_ia32_pext_si(sparse, 0xAAAAAAAAu) ^ 0xFFFFu;
+  const uint32_t selectedBits = cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask) ^ 0xFFFFu;
   const uint32_t lowBits = selectedBits & 0xFF;
   const uint32_t highBits = selectedBits >> 8;
   uint64_t lowCompressedRow;
@@ -39295,7 +39311,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_u32(c
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned)(int)__builtin_ia32_movmskps256((cvectorization_ops_x86_f32)mask));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)(unsigned)(int)__builtin_ia32_movmskps256((cvectorization_ops_x86_f32)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_movmskps((cvectorization_ops_x86_f32)mask) | 0x80000000u);
 #else
@@ -53016,7 +53032,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_u64(c
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned)(int)__builtin_ia32_movmskpd256((cvectorization_ops_x86_f64)mask));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)(unsigned)(int)__builtin_ia32_movmskpd256((cvectorization_ops_x86_f64)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_movmskpd((cvectorization_ops_x86_f64)mask) | 0x80000000u);
 #else
@@ -68295,7 +68311,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_i8(cv
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u64((unsigned long long)(unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)mask) | 0x80000000u);
 #else
@@ -80435,8 +80451,8 @@ CVECTORIZATION_OPS_INLINE intptr_t cvectorization_ops_first_true_index_i16(cvect
   const unsigned bits = (unsigned)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask);
   return bits ? (intptr_t)(__builtin_ia32_tzcnt_u32(bits)) : -1;
 #elif CVECTORIZATION_OPS_X86 == 4
-  const unsigned bits = (unsigned)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu);
-  return bits ? (intptr_t)(__builtin_ia32_tzcnt_u32(bits)) : -1;
+  const unsigned bits = (unsigned)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask);
+  return bits ? (intptr_t)(cvectorization_ops_x86_trailing_zeros(bits)) : -1;
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   const unsigned bits = (unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
   return bits ? (intptr_t)__builtin_ctz(bits | 0x80000000u) : -1;
@@ -83023,7 +83039,7 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_bits_of_mask_i16(cvectoriz
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (uint64_t)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask);
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (uint64_t)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu);
+  return (uint64_t)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask);
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (uint64_t)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
 #else
@@ -83280,7 +83296,7 @@ CVECTORIZATION_OPS_INLINE intptr_t cvectorization_ops_last_true_index_i16(cvecto
   const unsigned bits = (unsigned)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask);
   return bits ? (intptr_t)((size_t)31 - (size_t)__builtin_clz(bits)) : -1;
 #elif CVECTORIZATION_OPS_X86 == 4
-  const unsigned bits = (unsigned)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu);
+  const unsigned bits = (unsigned)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask);
   return bits ? (intptr_t)((size_t)31 - (size_t)__builtin_clz(bits)) : -1;
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   const unsigned bits = (unsigned)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0}));
@@ -83476,7 +83492,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_i16(c
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0})) | 0x80000000u);
 #else
@@ -83671,7 +83687,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_last_true_index_i16(cv
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)(size_t)31 - (size_t)__builtin_clz((unsigned)(unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)(size_t)31 - (size_t)__builtin_clz((unsigned)__builtin_ia32_pext_si((unsigned)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask), 0xAAAAAAAAu));
+  return (size_t)(size_t)31 - (size_t)__builtin_clz((unsigned)cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)(size_t)31 - (size_t)__builtin_clz((unsigned)(unsigned)(int)__builtin_ia32_pmovmskb128((cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)mask, (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16){0})));
 #else
@@ -85046,8 +85062,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_c
   __builtin_memcpy(buffer + __builtin_popcountll(maskLow1), &compressed1, sizeof compressed1);
   return (cvectorization_ops_raw_vector_i16)(*(const cvectorization_ops_vector_i16*)buffer);
 #elif CVECTORIZATION_OPS_X86 == 4
-  const uint32_t sparse = (uint32_t)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask);
-  const uint32_t selectedBits = __builtin_ia32_pext_si(sparse, 0xAAAAAAAAu);
+  const uint32_t selectedBits = cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask);
   const uint32_t lowBits = selectedBits & 0xFF;
   const uint32_t highBits = selectedBits >> 8;
   uint64_t lowCompressedRow;
@@ -85219,8 +85234,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_c
   __builtin_memcpy(buffer + __builtin_popcountll(maskLow1), &compressed1, sizeof compressed1);
   return (cvectorization_ops_raw_vector_i16)(*(const cvectorization_ops_vector_i16*)buffer);
 #elif CVECTORIZATION_OPS_X86 == 4
-  const uint32_t sparse = (uint32_t)(int)__builtin_ia32_pmovmskb256((cvectorization_ops_x86_i8)mask);
-  const uint32_t selectedBits = __builtin_ia32_pext_si(sparse, 0xAAAAAAAAu) ^ 0xFFFFu;
+  const uint32_t selectedBits = cvectorization_ops_x86_word_mask_bits((cvectorization_ops_x86_i16)mask) ^ 0xFFFFu;
   const uint32_t lowBits = selectedBits & 0xFF;
   const uint32_t highBits = selectedBits >> 8;
   uint64_t lowCompressedRow;
@@ -96281,7 +96295,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_i32(c
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned)(int)__builtin_ia32_movmskps256((cvectorization_ops_x86_f32)mask));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)(unsigned)(int)__builtin_ia32_movmskps256((cvectorization_ops_x86_f32)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_movmskps((cvectorization_ops_x86_f32)mask) | 0x80000000u);
 #else
@@ -109441,7 +109455,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_i64(c
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned)(int)__builtin_ia32_movmskpd256((cvectorization_ops_x86_f64)mask));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)(unsigned)(int)__builtin_ia32_movmskpd256((cvectorization_ops_x86_f64)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_movmskpd((cvectorization_ops_x86_f64)mask) | 0x80000000u);
 #else
@@ -118095,7 +118109,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_n
 #if defined(HWY_DISABLE_BMI2_FMA)
   {
 #pragma clang fp contract(off)
-    return (cvectorization_ops_raw_vector_f32)(-a * b - c);
+    return (cvectorization_ops_raw_vector_f32)(-(a * b) - c);
   }
 #else
   return (cvectorization_ops_raw_vector_f32)(__builtin_elementwise_fma(-a, b, -c));
@@ -122401,7 +122415,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_f32(c
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned)(int)__builtin_ia32_movmskps256((cvectorization_ops_x86_f32)mask));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)(unsigned)(int)__builtin_ia32_movmskps256((cvectorization_ops_x86_f32)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_movmskps((cvectorization_ops_x86_f32)mask) | 0x80000000u);
 #else
@@ -130529,7 +130543,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_n
 #if defined(HWY_DISABLE_BMI2_FMA)
   {
 #pragma clang fp contract(off)
-    return (cvectorization_ops_raw_vector_f64)(-a * b - c);
+    return (cvectorization_ops_raw_vector_f64)(-(a * b) - c);
   }
 #else
   return (cvectorization_ops_raw_vector_f64)(__builtin_elementwise_fma(-a, b, -c));
@@ -134684,7 +134698,7 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_known_first_true_index_f64(c
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask));
 #elif CVECTORIZATION_OPS_X86 == 4
-  return (size_t)__builtin_ia32_tzcnt_u32((unsigned)(unsigned)(int)__builtin_ia32_movmskpd256((cvectorization_ops_x86_f64)mask));
+  return (size_t)cvectorization_ops_x86_trailing_zeros((unsigned)(unsigned)(int)__builtin_ia32_movmskpd256((cvectorization_ops_x86_f64)mask));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (size_t)__builtin_ctz((unsigned)(unsigned)(int)__builtin_ia32_movmskpd((cvectorization_ops_x86_f64)mask) | 0x80000000u);
 #else
@@ -179697,10 +179711,26 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_v
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps512_mask((narrow_bits)__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}, (unsigned short)-1, (int)4);
   return (cvectorization_ops_raw_vector_f32)(single);
 #elif CVECTORIZATION_OPS_X86 == 4
+#if defined(HWY_DISABLE_F16C)
+  typedef uint32_t words __attribute__((vector_size(32)));
+  typedef int32_t signed_words __attribute__((vector_size(32)));
+  typedef float single_vector __attribute__((vector_size(32)));
+  typedef uint16_t narrow_bits __attribute__((vector_size(16)));
+  const words bits = __builtin_convertvector((narrow_bits)__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7), words);
+  const words magnitude = bits & 0x7FFF;
+  const words special = (words)(magnitude > 0x7BFF);
+  const words zero = (words)(magnitude < 0x400);
+  const words subnormal = (words)(__builtin_convertvector((signed_words)(bits & 0x3FF), single_vector) * 0x1p-24f);
+  const words normal = ((magnitude << 13) + 0x38000000) | (special & 0x7F800000);
+  const words combined = (zero & subnormal) | (~zero & normal);
+  const single_vector single = (single_vector)(((bits & 0x8000) << 16) | combined);
+  return (cvectorization_ops_raw_vector_f32)(single);
+#else
   typedef short narrow_bits __attribute__((vector_size(16)));
   typedef float single_vector __attribute__((vector_size(32)));
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps256((narrow_bits)__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7));
   return (cvectorization_ops_raw_vector_f32)(single);
+#endif
 #else
   typedef uint32_t words __attribute__((vector_size(16)));
   typedef int32_t signed_words __attribute__((vector_size(16)));
@@ -179757,10 +179787,26 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps256((narrow_bits)a);
   return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(single, cvectorization_ops_vector_f64));
 #elif CVECTORIZATION_OPS_X86 == 4
+#if defined(HWY_DISABLE_F16C)
+  typedef uint32_t words __attribute__((vector_size(16)));
+  typedef int32_t signed_words __attribute__((vector_size(16)));
+  typedef float single_vector __attribute__((vector_size(16)));
+  typedef uint16_t narrow_bits __attribute__((vector_size(8)));
+  const words bits = __builtin_convertvector((narrow_bits)__builtin_shufflevector(a, a, 0, 1, 2, 3), words);
+  const words magnitude = bits & 0x7FFF;
+  const words special = (words)(magnitude > 0x7BFF);
+  const words zero = (words)(magnitude < 0x400);
+  const words subnormal = (words)(__builtin_convertvector((signed_words)(bits & 0x3FF), single_vector) * 0x1p-24f);
+  const words normal = ((magnitude << 13) + 0x38000000) | (special & 0x7F800000);
+  const words combined = (zero & subnormal) | (~zero & normal);
+  const single_vector single = (single_vector)(((bits & 0x8000) << 16) | combined);
+  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(single, cvectorization_ops_vector_f64));
+#else
   typedef short narrow_bits __attribute__((vector_size(16)));
   typedef float single_vector __attribute__((vector_size(16)));
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps((narrow_bits)a);
   return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(single, cvectorization_ops_vector_f64));
+#endif
 #else
   typedef uint32_t words __attribute__((vector_size(8)));
   typedef int32_t signed_words __attribute__((vector_size(8)));
@@ -179817,10 +179863,26 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_v
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps512_mask((narrow_bits)__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}, (unsigned short)-1, (int)4);
   return (cvectorization_ops_raw_vector_f32)(single);
 #elif CVECTORIZATION_OPS_X86 == 4
+#if defined(HWY_DISABLE_F16C)
+  typedef uint32_t words __attribute__((vector_size(32)));
+  typedef int32_t signed_words __attribute__((vector_size(32)));
+  typedef float single_vector __attribute__((vector_size(32)));
+  typedef uint16_t narrow_bits __attribute__((vector_size(16)));
+  const words bits = __builtin_convertvector((narrow_bits)__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7), words);
+  const words magnitude = bits & 0x7FFF;
+  const words special = (words)(magnitude > 0x7BFF);
+  const words zero = (words)(magnitude < 0x400);
+  const words subnormal = (words)(__builtin_convertvector((signed_words)(bits & 0x3FF), single_vector) * 0x1p-24f);
+  const words normal = ((magnitude << 13) + 0x38000000) | (special & 0x7F800000);
+  const words combined = (zero & subnormal) | (~zero & normal);
+  const single_vector single = (single_vector)(((bits & 0x8000) << 16) | combined);
+  return (cvectorization_ops_raw_vector_f32)(single);
+#else
   typedef short narrow_bits __attribute__((vector_size(16)));
   typedef float single_vector __attribute__((vector_size(32)));
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps256((narrow_bits)__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7));
   return (cvectorization_ops_raw_vector_f32)(single);
+#endif
 #else
   typedef uint32_t words __attribute__((vector_size(16)));
   typedef int32_t signed_words __attribute__((vector_size(16)));
@@ -179877,10 +179939,26 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_v
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps512_mask((narrow_bits)__builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}, (unsigned short)-1, (int)4);
   return (cvectorization_ops_raw_vector_f32)(single);
 #elif CVECTORIZATION_OPS_X86 == 4
+#if defined(HWY_DISABLE_F16C)
+  typedef uint32_t words __attribute__((vector_size(32)));
+  typedef int32_t signed_words __attribute__((vector_size(32)));
+  typedef float single_vector __attribute__((vector_size(32)));
+  typedef uint16_t narrow_bits __attribute__((vector_size(16)));
+  const words bits = __builtin_convertvector((narrow_bits)__builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15), words);
+  const words magnitude = bits & 0x7FFF;
+  const words special = (words)(magnitude > 0x7BFF);
+  const words zero = (words)(magnitude < 0x400);
+  const words subnormal = (words)(__builtin_convertvector((signed_words)(bits & 0x3FF), single_vector) * 0x1p-24f);
+  const words normal = ((magnitude << 13) + 0x38000000) | (special & 0x7F800000);
+  const words combined = (zero & subnormal) | (~zero & normal);
+  const single_vector single = (single_vector)(((bits & 0x8000) << 16) | combined);
+  return (cvectorization_ops_raw_vector_f32)(single);
+#else
   typedef short narrow_bits __attribute__((vector_size(16)));
   typedef float single_vector __attribute__((vector_size(32)));
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps256((narrow_bits)__builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15));
   return (cvectorization_ops_raw_vector_f32)(single);
+#endif
 #else
   typedef uint32_t words __attribute__((vector_size(16)));
   typedef int32_t signed_words __attribute__((vector_size(16)));
@@ -179935,12 +180013,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_v
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps512_mask((narrow_bits)__builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}, (unsigned short)-1, (int)4);
   return (cvectorization_ops_raw_vector_f32)(single);
 #elif CVECTORIZATION_OPS_X86 == 4
+#if defined(HWY_DISABLE_F16C)
+  typedef uint32_t words __attribute__((vector_size(32)));
+  typedef int32_t signed_words __attribute__((vector_size(32)));
+  typedef float single_vector __attribute__((vector_size(32)));
+  const words bits = (words)a & 0xFFFF;
+  const words magnitude = bits & 0x7FFF;
+  const words special = (words)(magnitude > 0x7BFF);
+  const words zero = (words)(magnitude < 0x400);
+  const words subnormal = (words)(__builtin_convertvector((signed_words)(bits & 0x3FF), single_vector) * 0x1p-24f);
+  const words normal = ((magnitude << 13) + 0x38000000) | (special & 0x7F800000);
+  const words combined = (zero & subnormal) | (~zero & normal);
+  const single_vector single = (single_vector)(((bits & 0x8000) << 16) | combined);
+  return (cvectorization_ops_raw_vector_f32)(single);
+#else
   typedef short narrow_bits __attribute__((vector_size(16)));
   typedef float single_vector __attribute__((vector_size(32)));
   const cvectorization_ops_x86_i8 shuffled = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){0, 1, 4, 5, 8, 9, 12, 13, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 4, 5, 8, 9, 12, 13, -1, -1, -1, -1, -1, -1, -1, -1});
   const cvectorization_ops_x86_i64 gathered = (cvectorization_ops_x86_i64)__builtin_ia32_permdi256((cvectorization_ops_x86_i64)shuffled, (int)232);
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps256((narrow_bits)__builtin_shufflevector(gathered, gathered, 0, 1));
   return (cvectorization_ops_raw_vector_f32)(single);
+#endif
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef uint32_t words __attribute__((vector_size(16)));
   typedef int32_t signed_words __attribute__((vector_size(16)));
@@ -180008,12 +180101,27 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_v
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps512_mask((narrow_bits)__builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}, (unsigned short)-1, (int)4);
   return (cvectorization_ops_raw_vector_f32)(single);
 #elif CVECTORIZATION_OPS_X86 == 4
+#if defined(HWY_DISABLE_F16C)
+  typedef uint32_t words __attribute__((vector_size(32)));
+  typedef int32_t signed_words __attribute__((vector_size(32)));
+  typedef float single_vector __attribute__((vector_size(32)));
+  const words bits = (words)a >> 16;
+  const words magnitude = bits & 0x7FFF;
+  const words special = (words)(magnitude > 0x7BFF);
+  const words zero = (words)(magnitude < 0x400);
+  const words subnormal = (words)(__builtin_convertvector((signed_words)(bits & 0x3FF), single_vector) * 0x1p-24f);
+  const words normal = ((magnitude << 13) + 0x38000000) | (special & 0x7F800000);
+  const words combined = (zero & subnormal) | (~zero & normal);
+  const single_vector single = (single_vector)(((bits & 0x8000) << 16) | combined);
+  return (cvectorization_ops_raw_vector_f32)(single);
+#else
   typedef short narrow_bits __attribute__((vector_size(16)));
   typedef float single_vector __attribute__((vector_size(32)));
   const cvectorization_ops_x86_i8 shuffled = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)a, (cvectorization_ops_x86_i8)(cvectorization_ops_x86_i8){2, 3, 6, 7, 10, 11, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, 2, 3, 6, 7, 10, 11, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1});
   const cvectorization_ops_x86_i64 gathered = (cvectorization_ops_x86_i64)__builtin_ia32_permdi256((cvectorization_ops_x86_i64)shuffled, (int)232);
   const single_vector single = (single_vector)__builtin_ia32_vcvtph2ps256((narrow_bits)__builtin_shufflevector(gathered, gathered, 0, 1));
   return (cvectorization_ops_raw_vector_f32)(single);
+#endif
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef uint32_t words __attribute__((vector_size(16)));
   typedef int32_t signed_words __attribute__((vector_size(16)));
@@ -180084,10 +180192,31 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_vector_f16 cvectorization_
   const single_vector single = (single_vector)a;
   return (cvectorization_ops_raw_half_vector_f16)((narrow_bits)__builtin_ia32_vcvtps2ph512_mask((single_vector)single, (int)8, (narrow_bits)(narrow_bits){0}, (unsigned short)-1));
 #elif CVECTORIZATION_OPS_X86 == 4
+#if defined(HWY_DISABLE_F16C)
+  typedef uint32_t words __attribute__((vector_size(32)));
+  typedef int32_t signed_words __attribute__((vector_size(32)));
+  typedef float single_vector __attribute__((vector_size(32)));
+  typedef uint8_t bytes __attribute__((vector_size(32)));
+  typedef long long double_words __attribute__((vector_size(32)));
+  const single_vector single = (single_vector)a;
+  const words increment = (words)__builtin_elementwise_max(__builtin_elementwise_add_sat((bytes)((words)single >> 23), (bytes)(words){13, 13, 13, 13, 13, 13, 13, 13}), (bytes)(words){126, 126, 126, 126, 126, 126, 126, 126});
+  const single_vector rounded_single = single + (single_vector)(increment << 23);
+  const words rounded_bits = (words)rounded_single;
+  const words exponent = (words)__builtin_elementwise_min(__builtin_elementwise_add_sat((bytes)increment, (bytes)(rounded_bits >> 10)), (bytes)(words){157, 157, 157, 157, 157, 157, 157, 157});
+  const words infinite = (words)(exponent == 157);
+  const words mantissa = (~infinite & rounded_bits) | (words)(rounded_single != rounded_single);
+  const double_words fields = (double_words)((exponent << 10) - 0x1F800) | ((double_words)mantissa & (double_words)(words){0x3FF, 0x3FF, 0x3FF, 0x3FF, 0x3FF, 0x3FF, 0x3FF, 0x3FF});
+  const double_words bits = fields | ((double_words)((signed_words)rounded_bits >> 16) & (double_words)(words){0xFFFF8000u, 0xFFFF8000u, 0xFFFF8000u, 0xFFFF8000u, 0xFFFF8000u, 0xFFFF8000u, 0xFFFF8000u, 0xFFFF8000u});
+  const cvectorization_ops_x86_i64 packed = (cvectorization_ops_x86_i64)__builtin_ia32_packssdw256((cvectorization_ops_x86_i32)bits, (cvectorization_ops_x86_i32)bits);
+  const cvectorization_ops_x86_i64 gathered = (cvectorization_ops_x86_i64)__builtin_ia32_permdi256((cvectorization_ops_x86_i64)packed, (int)0x88);
+  const cvectorization_ops_block_f16 block = (cvectorization_ops_block_f16)__builtin_shufflevector(gathered, gathered, 0, 1);
+  return (cvectorization_ops_raw_half_vector_f16)(block);
+#else
   typedef short narrow_bits __attribute__((vector_size(16)));
   typedef float single_vector __attribute__((vector_size(32)));
   const single_vector single = (single_vector)a;
   return (cvectorization_ops_raw_half_vector_f16)((narrow_bits)__builtin_ia32_vcvtps2ph256((single_vector)single, (int)8));
+#endif
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   typedef uint32_t words __attribute__((vector_size(16)));
   typedef int32_t signed_words __attribute__((vector_size(16)));
@@ -180173,6 +180302,26 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_vector_f16 cvectorizati
   return (cvectorization_ops_raw_quarter_vector_f16)((narrow_bits)__builtin_ia32_vcvtps2ph256((single_vector)single, (int)8));
 #endif
 #elif CVECTORIZATION_OPS_X86 == 4
+#if defined(HWY_DISABLE_F16C)
+  typedef uint32_t words __attribute__((vector_size(16)));
+  typedef int32_t signed_words __attribute__((vector_size(16)));
+  typedef float single_vector __attribute__((vector_size(16)));
+  typedef uint8_t bytes __attribute__((vector_size(16)));
+  typedef long long double_words __attribute__((vector_size(16)));
+  const cvectorization_ops_vector_u64 quads = (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 rounded = (quads & 0xFFFFFFFFE0000000u) | ((quads + 0x1FFFFFFF) & 0x20000000);
+  const single_vector single = (single_vector)__builtin_ia32_cvtpd2ps256((cvectorization_ops_x86_f64)(cvectorization_ops_vector_f64)rounded);
+  const words increment = (words)__builtin_elementwise_max(__builtin_elementwise_add_sat((bytes)((words)single >> 23), (bytes)(words){13, 13, 13, 13}), (bytes)(words){126, 126, 126, 126});
+  const single_vector rounded_single = single + (single_vector)(increment << 23);
+  const words rounded_bits = (words)rounded_single;
+  const words exponent = (words)__builtin_elementwise_min(__builtin_elementwise_add_sat((bytes)increment, (bytes)(rounded_bits >> 10)), (bytes)(words){157, 157, 157, 157});
+  const words infinite = (words)(exponent == 157);
+  const words mantissa = (~infinite & rounded_bits) | (words)(rounded_single != rounded_single);
+  const double_words fields = (double_words)((exponent << 10) - 0x1F800) | ((double_words)mantissa & (double_words)(words){0x3FF, 0x3FF, 0x3FF, 0x3FF});
+  const double_words bits = fields | ((double_words)((signed_words)rounded_bits >> 16) & (double_words)(words){0xFFFF8000u, 0xFFFF8000u, 0xFFFF8000u, 0xFFFF8000u});
+  const cvectorization_ops_block_f16 block = (cvectorization_ops_block_f16)__builtin_ia32_packssdw128((signed_words)bits, (signed_words)bits);
+  return (cvectorization_ops_raw_quarter_vector_f16)(__builtin_shufflevector(block, block, 0, 1, 2, 3, -1, -1, -1, -1));
+#else
   typedef short narrow_bits __attribute__((vector_size(16)));
   typedef float single_vector __attribute__((vector_size(16)));
   const cvectorization_ops_vector_u64 quads = (cvectorization_ops_vector_u64)a;
@@ -180180,6 +180329,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_vector_f16 cvectorizati
   const cvectorization_ops_vector_f64 odd = (cvectorization_ops_vector_f64)rounded;
   const single_vector single = (single_vector)__builtin_ia32_cvtpd2ps256((cvectorization_ops_x86_f64)odd);
   return (cvectorization_ops_raw_quarter_vector_f16)((narrow_bits)__builtin_ia32_vcvtps2ph((single_vector)single, (int)8));
+#endif
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   typedef uint32_t words __attribute__((vector_size(16)));
   typedef int32_t signed_words __attribute__((vector_size(16)));

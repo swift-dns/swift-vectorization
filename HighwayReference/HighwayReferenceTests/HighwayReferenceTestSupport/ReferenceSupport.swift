@@ -923,15 +923,16 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasNaNs<V: SIMD>(in operands: V...) -> Bool
+package func hasNaNs<V: SIMD>(negating operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
-    operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
+    HighwayReference.hasNativeFusedMultiplyAdd()
+        && operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
 }
 
 @inlinable
 package func hasUnorderedNaNs<V: SIMD>(negating a: V, _ b: V, adding c: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
-    hasNaNs(in: a, b) || hasUnorderedNaNs(multiplying: a, b, adding: c)
+    hasNaNs(negating: a, b) || hasUnorderedNaNs(multiplying: a, b, adding: c)
 }
 
 @inlinable

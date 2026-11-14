@@ -908,7 +908,7 @@ extension SIMDFloatCodegenTests {
             bInputs,
             cInputs,
             seed: 0x4A46_2CA2_6732_44F3
-        ) where !hasNaNs(in: b) {
+        ) where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF32ConstantA(
                     b,
@@ -940,7 +940,7 @@ extension SIMDFloatCodegenTests {
             aInputs,
             cInputs,
             seed: 0xFB5E_B69B_C775_60B8
-        ) where !hasNaNs(in: a) {
+        ) where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF32ConstantB(
                     a,
@@ -972,7 +972,7 @@ extension SIMDFloatCodegenTests {
             aInputs,
             bInputs,
             seed: 0x73A2_924A_D1B6_6E89
-        ) where !hasNaNs(in: a, b) {
+        ) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF32ConstantC(
                     a,
@@ -1080,7 +1080,7 @@ extension SIMDFloatCodegenTests {
                 bInputs,
                 cInputs,
                 seed: 0xCBAB_AE58_8854_2114
-            ) where !hasNaNs(in: b) {
+            ) where !hasNaNs(negating: b) {
                 mismatches.check(
                     portNegatedMultiplySubtractingWhereOtherwiseF32ConstantA(
                         b,
@@ -1121,7 +1121,7 @@ extension SIMDFloatCodegenTests {
                 aInputs,
                 cInputs,
                 seed: 0xA8E5_A8E1_FA64_6DFF
-            ) where !hasNaNs(in: a) {
+            ) where !hasNaNs(negating: a) {
                 mismatches.check(
                     portNegatedMultiplySubtractingWhereOtherwiseF32ConstantB(
                         a,
@@ -1158,7 +1158,7 @@ extension SIMDFloatCodegenTests {
             aInputs,
             bInputs,
             seed: 0xBA73_57B0_AA38_61A6
-        ) where !hasNaNs(in: a, b) {
+        ) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplySubtractingWhereOtherwiseF32ConstantC(
                     a,

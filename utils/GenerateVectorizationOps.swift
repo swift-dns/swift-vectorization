@@ -1699,6 +1699,10 @@ func x86AsFloatName(bits: Int) -> String {
     "cvectorization_ops_x86_as_f\(bits)"
 }
 
+let x86WordMaskBitsName = "cvectorization_ops_x86_word_mask_bits"
+let x86TrailingZerosName = "cvectorization_ops_x86_trailing_zeros"
+let x86DisablesPextCondition = "defined(HWY_DISABLE_PEXT_ON_AVX2)"
+
 let neonVectors: [RawVector] = [
     RawVector(name: neonVector("i8x8"), type: "int8_t", attribute: "neon_vector_type(8)"),
     RawVector(name: neonVector("i8"), type: "int8_t", attribute: "neon_vector_type(16)"),
@@ -11620,6 +11624,7 @@ func magnitudeExtremum(
 
 struct FusedMultiplication {
     let unfused: String
+    var avx2Unfused: String?
     let fused: String
     let neon: String
     let sve: String
@@ -11647,6 +11652,7 @@ let multiplySubtractingForm = FusedMultiplication(
 
 let negatedMultiplySubtractingForm = FusedMultiplication(
     unfused: "-a * b - c",
+    avx2Unfused: "-(a * b) - c",
     fused: "__builtin_elementwise_fma(-a, b, -c)",
     neon: "-__builtin_elementwise_fma(a, b, c)",
     sve: "nmad",
@@ -11715,7 +11721,7 @@ func fusedMultiplicationTargets(_ form: FusedMultiplication) -> TargetBodies<Ele
             guard element.category == .float else { return nil }
             return """
                 #if \(x86DisablesFmaCondition)
-                \(withoutContraction(vectorResult(form.unfused, for: element)))
+                \(withoutContraction(vectorResult(form.avx2Unfused ?? form.unfused, for: element)))
                 #else
                 \(vectorResult(form.fused, for: element))
                 #endif
@@ -19147,9 +19153,58 @@ func neonBitsOfMask(for element: Element) -> String {
 
 func x86MaskBitsValue(for element: Element) -> String {
     guard element.width < 64 else { return x86Avx3MaskBits("mask", for: element) }
-    let bits = "(unsigned)\(x86MaskBits(for: element))"
-    guard element.width == 32 && element.bits == 16 else { return bits }
-    return "__builtin_ia32_pext_si(\(bits), 0xAAAAAAAAu)"
+    guard element.width == 32 && element.bits == 16 else {
+        return "(unsigned)\(x86MaskBits(for: element))"
+    }
+    return "\(x86WordMaskBitsName)((\(x86Vector("i16")))mask)"
+}
+
+func x86Avx2BitScanHelpers() -> [String] {
+    let i64 = x86Vector("i64")
+    let packed = x86Builtin(
+        "packsswb256",
+        ["mask", compoundLiteral(x86Vector("i16"), ["0"])],
+        as: "i16",
+        returning: i64
+    )
+    let compressed = x86Builtin(
+        "permdi256",
+        [(value: "packed", type: i64), (value: "0xD8", type: "int")],
+        returning: i64
+    )
+    let lower = x86Builtin(
+        "pmovmskb128",
+        [(value: "__builtin_shufflevector(compressed, compressed, 0, 1)", type: x86Block("i8"))],
+        returning: "unsigned"
+    )
+    let interleaved = x86Builtin("pmovmskb256", ["mask"], as: "i8", returning: "unsigned")
+    let wordMaskBits = cFunction(
+        returns: "unsigned",
+        name: x86WordMaskBitsName,
+        parameters: ["\(x86Vector("i16")) mask"],
+        body: """
+            #if \(x86DisablesFmaCondition) || \(x86DisablesPextCondition)
+            const \(i64) packed = \(packed);
+            const \(i64) compressed = \(compressed);
+            return \(lower);
+            #else
+            return __builtin_ia32_pext_si(\(interleaved), 0xAAAAAAAAu);
+            #endif
+            """
+    )
+    let trailingZeros = cFunction(
+        returns: "size_t",
+        name: x86TrailingZerosName,
+        parameters: ["unsigned bits"],
+        body: """
+            #if \(x86DisablesFmaCondition)
+            return (size_t)__builtin_ctz(bits | 0x80000000u);
+            #else
+            return (size_t)__builtin_ia32_tzcnt_u32(bits);
+            #endif
+            """
+    )
+    return [wordMaskBits, trailingZeros]
 }
 
 func x86BitsOfMask(for element: Element) -> String {
@@ -19229,7 +19284,9 @@ func x86TrueLaneIndex(_ search: TrueLane, of bits: String, for element: Element)
     let isWide = element.width == 64 && element.bits == 8
     let width = isWide ? 64 : 32
     switch search {
-    case .first where element.width >= 32:
+    case .first where element.width == 32:
+        return "\(x86TrailingZerosName)(\(bits))"
+    case .first where element.width == 64:
         return "__builtin_ia32_tzcnt_u\(width)(\(bits))"
     case .first:
         return "__builtin_ctz(\(bits) | 0x80000000u)"
@@ -22468,8 +22525,7 @@ func x86Avx2CompressedWordsLookup(for element: Element) -> (statements: String, 
 func x86Avx2CompressedWords(not: Bool, for element: Element) -> String {
     let lookup = x86Avx2CompressedWordsLookup(for: element)
     return """
-        const uint32_t sparse = (uint32_t)\(x86MaskBits(for: element));
-        const uint32_t selectedBits = __builtin_ia32_pext_si(sparse, 0xAAAAAAAAu)\(not ? " ^ 0xFFFFu" : "");
+        const uint32_t selectedBits = \(x86MaskBitsValue(for: element))\(not ? " ^ 0xFFFFu" : "");
         \(lookup.statements)
         \(vectorResult(lookup.value, for: element))
         """
@@ -34737,6 +34793,11 @@ enum Float16Promotion {
 }
 
 let float16SprCondition = staticTargetCondition(of: ["AVX3_SPR"])
+let x86DisablesF16cCondition = "defined(HWY_DISABLE_F16C)"
+
+func x86F16cConditioned(software: String, hardware: String) -> String {
+    "#if \(x86DisablesF16cCondition)\n\(software)\n#else\n\(hardware)\n#endif"
+}
 
 func float16Singles(_ lanes: Int) -> String {
     vectorTypedef("single_vector", lane: "float", bits: 32, lanes: lanes)
@@ -34879,7 +34940,12 @@ func float16PromotionOps(_ promotion: Float16Promotion) -> [Op] {
                     float16PromotedNeon(promotion, from: source, to: result)
                 },
                 avx3: hardware,
-                avx2: hardware,
+                avx2: sourced(source) { _, result in
+                    x86F16cConditioned(
+                        software: float16PromotedSoftware(promotion, to: result),
+                        hardware: float16PromotedHardware(promotion, to: result)
+                    )
+                },
                 sse2: software,
                 emu128: sourced(source) { _, result in
                     promotion.parity.map { _ in
@@ -35047,11 +35113,64 @@ func float16DemotedSoftware(
     return statements.joined(separator: "\n")
 }
 
+func x86Avx2Float16DemotedEmulated(
+    _ demotion: Float16Demotion,
+    from source: Element,
+    to result: Element
+) -> String {
+    let lanes = max(4, source.laneCount)
+    func words(_ value: String) -> String {
+        splat(value, as: "words", lanes: lanes)
+    }
+    var statements =
+        float16SoftwareTypedefs(lanes: lanes) + [
+            vectorTypedef("bytes", lane: "uint8_t", bits: 8, lanes: 4 * lanes),
+            vectorTypedef("double_words", lane: "long long", bits: 64, lanes: lanes / 2),
+        ]
+    if demotion == .double {
+        let narrowed = x86Builtin(
+            "cvtpd2ps256",
+            [(value: "(\(source.cVector))rounded", type: x86Vector("f64"))],
+            returning: "single_vector"
+        )
+        statements += float16RoundedToOdd(from: source)
+        statements.append("const single_vector single = \(narrowed);")
+    } else {
+        statements.append("const single_vector single = (single_vector)a;")
+    }
+    statements += [
+        "const words increment = (words)__builtin_elementwise_max(__builtin_elementwise_add_sat((bytes)((words)single >> 23), (bytes)\(words("13"))), (bytes)\(words("126")));",
+        "const single_vector rounded_single = single + (single_vector)(increment << 23);",
+        "const words rounded_bits = (words)rounded_single;",
+        "const words exponent = (words)__builtin_elementwise_min(__builtin_elementwise_add_sat((bytes)increment, (bytes)(rounded_bits >> 10)), (bytes)\(words("157")));",
+        "const words infinite = (words)(exponent == 157);",
+        "const words mantissa = (~infinite & rounded_bits) | (words)(rounded_single != rounded_single);",
+        "const double_words fields = (double_words)((exponent << 10) - 0x1F800) | ((double_words)mantissa & (double_words)\(words("0x3FF")));",
+        "const double_words bits = fields | ((double_words)((signed_words)rounded_bits >> 16) & (double_words)\(words("0xFFFF8000u")));",
+    ]
+    guard lanes == 8 else {
+        let packed = "__builtin_ia32_packssdw128((signed_words)bits, (signed_words)bits)"
+        statements.append(narrowedBlock(packed, demotion.shape, for: result))
+        return statements.joined(separator: "\n")
+    }
+    let quads = x86Vector("i64")
+    let packed = x86Builtin("packssdw256", ["bits", "bits"], as: "i32", returning: quads)
+    let gathered = x86Builtin(
+        "permdi256",
+        [(value: "packed", type: quads), (value: "0x88", type: "int")],
+        returning: quads
+    )
+    let lower = "__builtin_shufflevector(gathered, gathered, 0, 1)"
+    statements += [
+        "const \(quads) packed = \(packed);",
+        "const \(quads) gathered = \(gathered);",
+        narrowedBlock(lower, demotion.shape, for: result),
+    ]
+    return statements.joined(separator: "\n")
+}
+
 func float16DemoteOps(_ demotion: Float16Demotion) -> [Op] {
     sourcedOps(accepting: demotion.accepts, includingHalfPrecision: true) { source, results in
-        let hardware = sourced(source) { source, result in
-            float16DemotedHardware(demotion, from: source, to: result)
-        }
         let avx3 = sourced(source) { source, result in
             demotion == .double
                 ? "#if \(float16SprCondition)\n\(float16DemotedSpr(from: source, to: result))\n#else\n\(float16DemotedHardware(demotion, from: source, to: result))\n#endif"
@@ -35071,7 +35190,12 @@ func float16DemoteOps(_ demotion: Float16Demotion) -> [Op] {
                     float16DemotedNeon(demotion, to: result)
                 },
                 avx3: avx3,
-                avx2: hardware,
+                avx2: sourced(source) { source, result in
+                    x86F16cConditioned(
+                        software: x86Avx2Float16DemotedEmulated(demotion, from: source, to: result),
+                        hardware: float16DemotedHardware(demotion, from: source, to: result)
+                    )
+                },
                 sse2: sourced(source) { source, result in
                     float16DemotedSoftware(demotion, x86: true, from: source, to: result)
                 }
@@ -39593,6 +39717,8 @@ func x86Helpers() -> String {
         \(helpers.joined())#endif
         #if \(negativesCondition)
         \(negatives)#endif
+        #if \(x86Condition(from: .avx2, through: .avx2))
+        \(x86Avx2BitScanHelpers().joined())#endif
         """
 }
 
@@ -40559,7 +40685,7 @@ let x86FeatureGroups = [
     X86FeatureGroup(
         name: "F16C",
         features: ["F16C"],
-        conditional: ("!defined(HWY_DISABLE_F16C)", ["F16C"])
+        conditional: ("!\(x86DisablesF16cCondition)", ["F16C"])
     ),
     X86FeatureGroup(
         name: "AVX2",
@@ -45717,7 +45843,7 @@ func unorderedNaNsCondition(
     case (.negatedMultiplicand, 3):
         return "!hasUnorderedNaNs(negating: \(vectors[0]), \(vectors[1]), adding: \(vectors[2]))"
     case (.negatedMultiplicand, 2):
-        return "!hasNaNs(in: \(vectors.filter { $0 != "c" }.joined(separator: ", ")))"
+        return "!hasNaNs(negating: \(vectors.filter { $0 != "c" }.joined(separator: ", ")))"
     case (.acrossLanes, 1):
         return "!hasUnorderedNaNs(lanesOf: \(vectors[0]))"
     case (.complexLanes, _):

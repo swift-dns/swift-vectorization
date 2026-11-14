@@ -74,7 +74,8 @@ jobs:
             release-tests: true
             sde-cpu: ""
             base: *ssse3
-          - name: AVX2
+          - &avx2
+            name: AVX2
             expected-target: AVX2
             runner: ubuntu-latest
             flags: "-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
@@ -82,6 +83,15 @@ jobs:
             debug-tests: true
             release-tests: true
             sde-cpu: ""
+          - name: AVX2_WITHOUT_BMI2_FMA_F16C
+            expected-target: AVX2
+            runner: ubuntu-latest
+            flags: "-Xcc -march=x86-64-v3 -Xcc -mno-bmi -Xcc -mno-bmi2 -Xcc -mno-fma -Xcc -mno-f16c -Xcc -maes -Xcc -mpclmul -Xcc -DHWY_DISABLE_BMI2_FMA -Xcc -DHWY_DISABLE_F16C -Xcc -DHWY_DISABLE_PEXT_ON_AVX2 -Xcc -D__MM_MALLOC_H"
+            compare-codegen: false
+            debug-tests: false
+            release-tests: true
+            sde-cpu: ""
+            base: *avx2
           - &avx3
             name: AVX3
             expected-target: AVX3
@@ -141,6 +151,8 @@ jobs:
             mode: debug
           - target: { release-tests: false }
             mode: release
+          - target: { compare-codegen: false }
+            mode: codegen
 
     runs-on: ${{ matrix.target.runner }}
 
