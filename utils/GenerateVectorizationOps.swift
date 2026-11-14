@@ -31781,12 +31781,37 @@ let reorderMulOps: [Op] =
 
 let widenArithmeticOps: [Op] = sumsOps + mulBitsOps + widenMulOps + reorderMulOps
 
-func narrowLoadedVector(_ shape: Shape, for element: Element) -> String {
-    """
-    \(element.cRawVector(of: shape)) v;
-    __builtin_memcpy(&v, from, \(element.bytes(of: shape)));
-    return v;
-    """
+func zeroExtendedNarrowBytes(
+    _ source: String,
+    into raw: String,
+    bytes: Int,
+    register: Int
+) -> String {
+    let unit = unsignedElement(bits: 8 * bytes)
+    return """
+        \(vectorTypedef("unit_vector", of: unit, lanes: register / bytes))
+        \(unit.cType) bits;
+        __builtin_memcpy(&bits, \(source), \(bytes));
+        return (\(raw))(unit_vector){bits};
+        """
+}
+
+func narrowLoadedVector(_ shape: Shape, arm: Bool, for element: Element) -> String {
+    let bytes = element.bytes(of: shape)
+    let register = partialRegisterBytes(of: shape, for: element, arm: arm)
+    guard bytes < register else {
+        return """
+            \(element.cRawVector(of: shape)) v;
+            __builtin_memcpy(&v, from, \(bytes));
+            return v;
+            """
+    }
+    return zeroExtendedNarrowBytes(
+        "from",
+        into: element.cRawVector(of: shape),
+        bytes: bytes,
+        register: register
+    )
 }
 
 func narrowStoredVector(_ shape: Shape, for element: Element) -> String {
@@ -31820,9 +31845,10 @@ let narrowMemoryOps: [Op] = Shape.allCases.filter { $0 != .full }.flatMap { shap
             .narrowVector(shape),
             shape.applies,
             section: .load,
-            span: shape.spanExtent
+            span: shape.spanExtent,
+            targets: TargetBodies(neon: { narrowLoadedVector(shape, arm: true, for: $0) })
         ) { element in
-            narrowLoadedVector(shape, for: element)
+            narrowLoadedVector(shape, arm: false, for: element)
         },
         Op(
             "store",
@@ -31863,15 +31889,16 @@ func narrowResult(
         : "return (\(element.cRawVector(of: shape)))(\(expression));"
 }
 
-func halfPadding(arm: Bool, for element: Element) -> [Int] {
+func halfPadding(upper: Bool, arm: Bool, for element: Element) -> [Int] {
+    let half = element.laneCount(of: .half)
     let lanes = partialRegisterLanes(of: .half, for: element, arm: arm)
-    return Array(repeating: -1, count: lanes - element.laneCount(of: .half))
+    return (half..<lanes).map { upper ? half + $0 % half : $0 }
 }
 
 func halfIndices(upper: Bool, arm: Bool, for element: Element) -> String {
     let half = element.laneCount(of: .half)
     let lanes = upper ? Array(half..<2 * half) : Array(0..<half)
-    return laneIndices(lanes + halfPadding(arm: arm, for: element))
+    return laneIndices(lanes + halfPadding(upper: upper, arm: arm, for: element))
 }
 
 func halfOfVector(upper: Bool, arm: Bool, for element: Element) -> String {
@@ -32212,12 +32239,6 @@ func demoteSingleRoute(from source: Element, to result: Element) -> [Element] {
     return route
 }
 
-func demoteSingleRegisterLanes(_ shape: Shape, to result: Element, arm: Bool) -> [Int] {
-    let own = result.laneCount(of: shape)
-    let padding = partialRegisterLanes(of: shape, for: result, arm: arm) - own
-    return Array(0..<own) + Array(repeating: -1, count: padding)
-}
-
 func demoteSinglePortable(
     _ operand: String,
     _ shape: Shape,
@@ -32226,11 +32247,19 @@ func demoteSinglePortable(
     isMask: Bool = false
 ) -> String {
     let lanes = result.laneCount(of: shape)
-    let indices = laneIndices(demoteSingleRegisterLanes(shape, to: result, arm: false))
+    let padded = narrowedResult(
+        "narrowed",
+        lanes: lanes,
+        shape,
+        arm: false,
+        zeroable: "narrow_lanes",
+        isMask: isMask,
+        for: result
+    )
     return """
         \(vectorTypedef("narrow_lanes", lane: result.cType, bits: result.bits, lanes: lanes))
         const narrow_lanes narrowed = \(demoteSaturated(operand, from: source, to: result));
-        \(narrowResult("__builtin_shufflevector(narrowed, narrowed, \(indices))", shape, for: result, isMask: isMask))
+        \(padded)
         """
 }
 
@@ -32250,9 +32279,9 @@ func demoteSingleNeon(
             let lanes = 8 / (step.0.bits / 8)
             let name = "lanes\(index)"
             statements.append(vectorTypedef(name, of: step.0, lanes: lanes))
-            let indices = laneIndices(0..<lanes, 0..<lanes)
+            let zero = compoundLiteral(name, ["0"])
             input =
-                "__builtin_shufflevector((\(name))\(previous), (\(name))\(previous), \(indices))"
+                "__builtin_shufflevector((\(name))\(previous), \(zero), \(laneIndices(0..<2 * lanes)))"
         }
         let narrowed = demoteNeonNarrowed(input, from: step.0, to: step.1)
         statements.append("const \(halves) narrowed\(index) = \(narrowed);")
@@ -32269,9 +32298,7 @@ func demoteSingleNeon(
         value = "(result_lanes)__builtin_elementwise_min((narrow_lanes)\(previous), \(highest))"
     }
     statements.append("const result_lanes narrowed = \(value);")
-    let indices = laneIndices(demoteSingleRegisterLanes(shape, to: result, arm: true))
-    let shuffled = "__builtin_shufflevector(narrowed, narrowed, \(indices))"
-    return (statements + [narrowResult(shuffled, shape, for: result)]).joined(separator: "\n")
+    return (statements + [narrowResult("narrowed", shape, for: result)]).joined(separator: "\n")
 }
 
 func demoteSingleNeonFused(
@@ -32380,9 +32407,8 @@ func demoteSingleSve(
         element = target
     }
     let converted = sveResult(previous, for: result)
-    let indices = laneIndices(demoteSingleRegisterLanes(shape, to: result, arm: true))
-    let shuffled = "__builtin_shufflevector(\(converted), \(converted), \(indices))"
-    return (statements + [narrowResult(shuffled, shape, for: result)]).joined(separator: "\n")
+    let padded = narrowedResult(converted, lanes: result.laneCount, shape, arm: true, for: result)
+    return (statements + [padded]).joined(separator: "\n")
 }
 
 func demoteSingleSveBody(
@@ -33007,37 +33033,58 @@ func floatDemotionSourceInputs(
     return "Inputs.floatDemotions(\(operand.namespace).Vector.self, \(seed))"
 }
 
-func narrowedLanes(
-    _ operand: String,
-    _ shape: Shape,
-    arm: Bool,
-    for element: Element
-) -> String {
-    let lanes = element.laneCount(of: shape)
-    let padding = partialRegisterLanes(of: shape, for: element, arm: arm) - lanes
-    let indices = laneIndices(Array(0..<lanes) + Array(repeating: -1, count: padding))
-    return narrowResult(
-        "__builtin_shufflevector(\(operand), \(operand), \(indices))",
-        shape,
-        for: element
-    )
-}
-
 func narrowedResult(
     _ operand: String,
+    lanes operandLanes: Int,
     _ shape: Shape,
     arm: Bool,
+    zeroable zeroType: String? = nil,
+    isMask: Bool = false,
     for element: Element
 ) -> String {
-    guard partialRegisterLanes(of: shape, for: element, arm: arm) > element.laneCount(of: shape)
-    else { return narrowResult(operand, shape, for: element) }
-    return narrowedLanes(operand, shape, arm: arm, for: element)
+    let register = partialRegisterLanes(of: shape, for: element, arm: arm)
+    guard operandLanes != register else {
+        return narrowResult(operand, shape, for: element, isMask: isMask)
+    }
+    let zeroing = zeroType.flatMap { type in
+        element.width == 64 || register == 2 * operandLanes ? type : nil
+    }
+    let second = zeroing.map { compoundLiteral($0, ["0"]) } ?? operand
+    let indices = (0..<register).map { lane in
+        guard zeroing != nil else { return lane % operandLanes }
+        return lane < 2 * operandLanes ? lane : operandLanes + lane % operandLanes
+    }
+    return
+        arm && !isMask && element.hasOpaqueVector && operandLanes == element.laneCount(of: shape)
+        ? "return \(element.cToRawVector(of: shape))(\(operand));"
+        : narrowResult(
+            "__builtin_shufflevector(\(operand), \(second), \(laneIndices(indices)))",
+            shape,
+            for: element,
+            isMask: isMask
+        )
+}
+
+func narrowedConversion(
+    _ operand: String,
+    _ shape: Shape,
+    arm: Bool,
+    for result: Element
+) -> String {
+    narrowedResult(
+        operand,
+        lanes: result.laneCount(of: shape),
+        shape,
+        arm: arm,
+        zeroable: result.cVector(of: shape),
+        for: result
+    )
 }
 
 func narrowedBlock(_ expression: String, _ shape: Shape, for result: Element) -> String {
     """
     const \(result.cBlock) block = (\(result.cBlock))\(expression);
-    \(narrowedResult("block", shape, arm: false, for: result))
+    \(narrowedResult("block", lanes: result.blockLaneCount, shape, arm: false, for: result))
     """
 }
 
@@ -33067,7 +33114,7 @@ func demoteFloatPortable(
     guard convertsFloatToInteger(from: source, to: result) else {
         return """
             const \(narrow) converted = __builtin_convertvector(a, \(narrow));
-            \(narrowedResult("converted", .half, arm: false, for: result))
+            \(narrowedConversion("converted", .half, arm: false, for: result))
             """
     }
     let lane: String
@@ -33088,7 +33135,7 @@ func demoteFloatPortable(
           const \(source.cType) value = a[i];
         \(indented(lane))
         }
-        \(narrowedResult("converted", .half, arm: false, for: result))
+        \(narrowedConversion("converted", .half, arm: false, for: result))
         """
 }
 
@@ -33101,7 +33148,7 @@ func demoteFloatNeon(
     guard convertsFloatToInteger(from: source, to: result) else {
         return """
             const \(narrow) converted = __builtin_convertvector(a, \(narrow));
-            \(narrowedResult("converted", .half, arm: true, for: result))
+            \(narrowedConversion("converted", .half, arm: true, for: result))
             """
     }
     let wide = resizedElement(of: result, bits: 64)
@@ -33173,12 +33220,9 @@ func demoteFloatX86Statements(
         return nonNegative + [narrowResult(converted, .half, for: result)]
     }
     let operand = saturating ? "clamped" : "a"
-    let evens = Array(stride(from: 0, to: 2 * lanes, by: 2))
-    let padding = Array(
-        repeating: -1,
-        count: partialRegisterLanes(of: .half, for: result, arm: false) - lanes
-    )
-    let upper = "__builtin_shufflevector(words, words, \(laneIndices(evens + padding)))"
+    let register = partialRegisterLanes(of: .half, for: result, arm: false)
+    let evens = (0..<register).map { $0 % lanes * 2 }
+    let upper = "__builtin_shufflevector(words, words, \(laneIndices(evens)))"
     let raw = result.cRawVector(of: .half)
     return nonNegative + (saturating ? [clamped("nonNegative", to: "4294967295.0")] : []) + [
         "const float_vector limit = \(splat("2147483648.0", as: "float_vector", lanes: lanes));",
@@ -33317,7 +33361,7 @@ func demoteTruncated(_ shape: Shape, arm: Bool, for result: Element) -> String {
     let narrow = result.cVector(of: shape)
     return """
         const \(narrow) converted = __builtin_convertvector(a, \(narrow));
-        \(narrowedResult("converted", shape, arm: arm, for: result))
+        \(narrowedConversion("converted", shape, arm: arm, for: result))
         """
 }
 
@@ -33426,25 +33470,39 @@ func demoteTruncatedSse2(from source: Element, to result: Element, shape: Shape)
             const \(words) words = \(x86Packing("packssdw", "masked", "masked", from: "i32", to: "i16", width: 16));
             \(narrowedBlock(packed, shape, for: result))
             """
+    case (64, 32):
+        return demoteTruncatedShuffled(from: source, to: result, shape: shape)
     default:
         return nil
     }
 }
 
 func demoteTruncatedNeon(from source: Element, to result: Element, shape: Shape) -> String {
-    let lanes = 16 / (result.bits / 8)
-    let evens = Array(stride(from: 0, to: lanes, by: 2))
-    let steps = (source.bits / result.bits).trailingZeroBitCount
-    let narrowings = (1...steps).map { step in
-        let previous = "narrowed\(step - 1)"
-        return
-            "const even_vector narrowed\(step) = __builtin_shufflevector(\(previous), \(previous), \(laneIndices(evens + evens)));"
-    }
+    let wide = unsignedElement(bits: 2 * result.bits)
+    let lanes = 8 / (result.bits / 8)
+    let kept = result.laneCount(of: shape)
+    let stride = source.bits / result.bits / 2
+    let gathered = laneIndices((0..<kept).map { $0 * stride })
+    let returned =
+        stride == 1
+        ? narrowResult("narrowed", shape, for: result)
+        : "return \(result.cToRawVector(of: shape))(__builtin_shufflevector(narrowed, narrowed, \(gathered)));"
     return """
-        \(vectorTypedef("even_vector", lane: result.cType, bits: result.bits, lanes: lanes))
-        const even_vector narrowed0 = (even_vector)a;
-        \(narrowings.joined(separator: "\n"))
-        \(narrowedLanes("narrowed\(steps)", shape, arm: true, for: result))
+        \(vectorTypedef("wide_lanes", of: wide, lanes: 16 / (wide.bits / 8)))
+        \(vectorTypedef("narrow_lanes", of: result, lanes: lanes))
+        const narrow_lanes narrowed = __builtin_convertvector((wide_lanes)a, narrow_lanes);
+        \(returned)
+        """
+}
+
+func demoteTruncatedShuffled(from source: Element, to result: Element, shape: Shape) -> String {
+    let lanes = result.blockLaneCount
+    let kept = result.laneCount(of: shape)
+    let indices = laneIndices((0..<lanes).map { $0 % kept * (source.bits / result.bits) })
+    let shuffled = "__builtin_shufflevector((result_lanes)a, (result_lanes)a, \(indices))"
+    return """
+        \(vectorTypedef("result_lanes", of: result, lanes: lanes))
+        \(narrowResult(shuffled, shape, for: result))
         """
 }
 
@@ -33465,7 +33523,9 @@ func demoteSveUnzipped(
     statements.append(
         "const \(result.cVector) narrowed = \(sveResult("unzipped\(stages.count)", for: result));"
     )
-    statements.append(narrowedLanes("narrowed", shape, arm: true, for: result))
+    statements.append(
+        narrowedResult("narrowed", lanes: result.laneCount, shape, arm: true, for: result)
+    )
     return statements.joined(separator: "\n")
 }
 
@@ -33480,7 +33540,7 @@ func demoteSveConverting(from source: Element, to result: Element) -> String {
     return """
         const \(sveType(of: result)) converted = \(converted);
         const \(result.cVector) narrowed = \(sveResult(unzipped, for: result));
-        \(narrowedLanes("narrowed", .half, arm: true, for: result))
+        \(narrowedResult("narrowed", lanes: result.laneCount, .half, arm: true, for: result))
         """
 }
 
@@ -33516,7 +33576,7 @@ let demoteFloatTruncatingOps = [Shape.half, .quarter, .eighth].flatMap { shape i
                     )
                 },
                 avx2: x86(demoteTruncatedAvx2),
-                ssse3: { result in demoteTruncated(shape, arm: false, for: result) },
+                ssse3: x86(demoteTruncatedShuffled),
                 sse2: x86(demoteTruncatedSse2)
             ),
             portable: { result in demoteTruncated(shape, arm: false, for: result) }
@@ -33531,7 +33591,7 @@ func demoteU8FromU32(saturating: Bool, arm: Bool, for result: Element) -> String
     let operand = saturating ? "__builtin_elementwise_min(a, \(highest))" : "a"
     return """
         const \(narrow) converted = __builtin_convertvector(\(operand), \(narrow));
-        \(narrowedResult("converted", .quarter, arm: arm, for: result))
+        \(narrowedConversion("converted", .quarter, arm: arm, for: result))
         """
 }
 
@@ -33669,17 +33729,24 @@ func demotedMask(from source: Element, to result: Element, shape: Shape) -> Stri
     let register = partialRegisterLanes(of: shape, for: result, arm: false)
     let narrowed = "__builtin_convertvector(mask, \(result.cMask(of: shape)))"
     guard lanes < register else { return narrowMaskResult(narrowed, shape, for: result) }
-    let padding = Array(repeating: -1, count: register - lanes)
-    let indices = laneIndices(Array(0..<lanes) + padding)
+    let padded = narrowedResult(
+        "narrowed",
+        lanes: lanes,
+        shape,
+        arm: false,
+        zeroable: result.cMask(of: shape),
+        isMask: true,
+        for: result
+    )
     return """
         const \(result.cMask(of: shape)) narrowed = \(narrowed);
-        \(narrowMaskResult("__builtin_shufflevector(narrowed, narrowed, \(indices))", shape, for: result))
+        \(padded)
         """
 }
 
 func neonDemotedMask(from source: Element, to result: Element, shape: Shape) -> String {
     let signed = signedElement(of: source)
-    let padding = laneIndices(Array(0..<8) + Array(repeating: -1, count: 8))
+    let halves = neonVector("i8x8")
     var statements: [String] = []
     var operand = "mask"
     var bits = source.bits
@@ -33690,8 +33757,9 @@ func neonDemotedMask(from source: Element, to result: Element, shape: Shape) -> 
         )
         let name = "narrowed\(statements.count + 1)"
         let narrowed = demoteNeonNarrowed(operand, from: step.from, to: step.to)
-        statements.append("const \(neonVector("i8x8")) \(name) = \(narrowed);")
-        operand = "__builtin_shufflevector(\(name), \(name), \(padding))"
+        statements.append("const \(halves) \(name) = \(narrowed);")
+        operand =
+            "__builtin_shufflevector(\(name), \(compoundLiteral(halves, ["0"])), \(laneIndices(0..<16)))"
         bits /= 2
     }
     let last = "narrowed\(statements.count)"
@@ -33932,10 +34000,36 @@ func resizedRegister(
     let from = registerBytes(of: source, for: element, arm: arm)
     let to = registerBytes(of: result, for: element, arm: arm)
     guard from != to else { return "return a;" }
-    let padding = (0..<max(to - from, 0)).map { zeroing ? from + $0 % from : -1 }
+    guard zeroing || to < from else { return grownRegister(from: from, to: to) }
+    let padding = (0..<max(to - from, 0)).map { from + $0 % from }
     let indices = laneIndices(Array(0..<min(from, to)) + padding)
     let second = zeroing ? compoundLiteral(registerType(of: source), ["0"]) : "a"
     return "return __builtin_shufflevector(a, \(second), \(indices));"
+}
+
+func doubledLanes(_ operand: String, lanes: Int) -> String {
+    let unspecified = "__builtin_nondeterministic_value(\(operand))"
+    return "__builtin_shufflevector(\(operand), \(unspecified), \(laneIndices(0..<2 * lanes)))"
+}
+
+func grownLanes(
+    _ operand: String,
+    lane: (type: String, bits: Int),
+    from: Int,
+    to: Int
+) -> (statements: [String], value: String) {
+    let lanes = 8 * from / lane.bits
+    guard 2 * from < to else { return ([], doubledLanes(operand, lanes: lanes)) }
+    let statements = [
+        vectorTypedef("doubled_lanes", lane: lane.type, bits: lane.bits, lanes: 2 * lanes),
+        "const doubled_lanes doubled = \(doubledLanes(operand, lanes: lanes));",
+    ]
+    return (statements, doubledLanes("doubled", lanes: 2 * lanes))
+}
+
+func grownRegister(from: Int, to: Int) -> String {
+    let grown = grownLanes("a", lane: (type: "uint8_t", bits: 8), from: from, to: to)
+    return (grown.statements + ["return \(grown.value);"]).joined(separator: "\n")
 }
 
 func zeroExtendedRegister(
@@ -33957,6 +34051,9 @@ func zeroExtendedRegister(
     let insertsLanes = (arm || wideLanes) && (doubles || to > 8)
     let lane = insertsLanes ? min(8, 1 << kept.trailingZeroBitCount) : 1
     let zeroed = arm ? (doubles ? grown : to) : (zeroingRegister ? to : grown)
+    if !arm && !zeroingRegister && !passingTail && grown <= 8 {
+        return zeroExtendedQuadwords(kept: kept, register: from, to: result)
+    }
     let zeros = (0..<(zeroed - kept) / lane).map { from / lane + $0 % (from / lane) }
     if passingTail && zeros.count > 1 && grown <= 8 {
         return """
@@ -33966,7 +34063,7 @@ func zeroExtendedRegister(
             return (\(registerType(of: result)))widened;
             """
     }
-    let remaining = (zeroed / lane..<to / lane).map { passingTail && $0 < from / lane ? $0 : -1 }
+    let remaining = (zeroed / lane..<to / lane).map { $0 % (from / lane) }
     let indices = laneIndices(Array(0..<kept / lane) + zeros + remaining)
     let shuffle = { (type: String) in
         "return (\(registerType(of: result)))"
@@ -33976,6 +34073,17 @@ func zeroExtendedRegister(
     return """
         typedef uint\(lane * 8)_t lanes __attribute__((vector_size(\(from))));
         \(shuffle("lanes"))
+        """
+}
+
+func zeroExtendedQuadwords(kept: Int, register: Int, to result: Shape) -> String {
+    let units = register / kept
+    let perQuadword = 8 / kept
+    let indices = (0..<units).map { $0 % perQuadword == 0 ? $0 / perQuadword : units }
+    let lanes = unsignedElement(bits: 8 * kept)
+    return """
+        \(vectorTypedef("lanes", of: lanes, lanes: units))
+        return (\(registerType(of: result)))__builtin_shufflevector((lanes)a, (lanes){0}, \(laneIndices(indices)));
         """
 }
 
@@ -34053,20 +34161,14 @@ func resizeHelperTargets(
             #if defined(__aarch64__)
             \(growth(zeroingRegister: false, passingTail: true))
             #else
-            \(growth(zeroingRegister: zeroExtending, passingTail: false))
+            \(growth(zeroingRegister: true, passingTail: false))
             #endif
             """
     }
     let targets = TargetBodies<Element>(
         neon: { body($0, zeroing: true, arm: true) },
         sve2_128: { element in
-            if zeroExtending {
-                return sveZeroExtendedRegister(from: source, to: result, for: element)
-            }
-            let grows =
-                registerBytes(of: result, for: element, arm: true)
-                > registerBytes(of: source, for: element, arm: true)
-            return grows ? body(element, zeroing: false, arm: true) : nil
+            zeroExtending ? sveZeroExtendedRegister(from: source, to: result, for: element) : nil
         },
         avx3: leavingRegister,
         avx2: leavingRegister,
@@ -34128,22 +34230,29 @@ func resizeOp(
             ? vectorResult(expression, for: result)
             : narrowResult(expression, resultShape, for: result)
     }
-    func narrowedRegister(arm: Bool) -> (Element) -> String? {
-        { result in
-            guard resultShape == .quarter || resultShape == .eighth else { return nil }
-            let register = sourceShape == resultShape ? "a" : expression
-            let lanes = partialRegisterLanes(of: resultShape, for: result, arm: arm)
-            let unspecified = lanes - result.laneCount(of: resultShape)
-            let indices = laneIndices(
-                Array(0..<lanes - unspecified) + Array(repeating: -1, count: unspecified)
-            )
-            let operand = "(\(result.cRawVector(of: resultShape)))\(register)"
-            return narrowResult(
-                "__builtin_shufflevector(\(operand), \(operand), \(indices))",
-                resultShape,
-                for: result
-            )
+    let grown = sourced(source) { source, result -> String? in
+        let from = registerBytes(of: sourceShape, for: source, arm: false)
+        let to = registerBytes(of: resultShape, for: result, arm: false)
+        guard !zeroExtending, from < to else { return nil }
+        let lane = (type: "long long", bits: 64)
+        let grown = grownLanes("grown", lane: lane, from: from, to: to)
+        let lanes = 8 * from / lane.bits
+        let statements = [
+            vectorTypedef("grown_lanes", lane: lane.type, bits: lane.bits, lanes: lanes),
+            "const grown_lanes grown = (grown_lanes)a;",
+        ]
+        return (statements + grown.statements + [resultOf(grown.value, for: result)])
+            .joined(separator: "\n")
+    }
+    let narrowedRegister = { (result: Element) -> String? in
+        guard resultShape == .quarter || resultShape == .eighth, result.hasOpaqueVector else {
+            return nil
         }
+        let register = sourceShape == resultShape ? "a" : expression
+        let operand = "(\(result.cRawVector(of: resultShape)))\(register)"
+        let kept = laneIndices(0..<result.laneCount(of: resultShape))
+        let narrowed = "__builtin_shufflevector(\(operand), \(operand), \(kept))"
+        return "return \(result.cToRawVector(of: resultShape))(\(narrowed));"
     }
     return Op(
         resultShape.conversion("vector"),
@@ -34156,7 +34265,7 @@ func resizeOp(
         vectorLabels: [zeroExtending ? "zeroExtendingResizing" : "resizing"],
         source: source,
         targets: TargetBodies(
-            neon: narrowedRegister(arm: true),
+            neon: narrowedRegister,
             sve2_128: sourced(source) { source, result in
                 guard sourceShape == .full, isInteger64(source) else { return nil }
                 let splat = sveSplatOperand("a", for: source)
@@ -34167,7 +34276,8 @@ func resizeOp(
                 let register = "(\(registerType(of: .full)))\(sveResult(splat, for: source))"
                 return resultOf("\(resized)(\(register))", for: result)
             },
-            emu128: narrowedRegister(arm: false)
+            avx3: grown,
+            avx2: grown
         ),
         outOfLineOnSVE: source.isHalfPrecision
             ? .results(results.filter { differentHalfPrecisions(source, $0) }) : nil,
@@ -35027,9 +35137,10 @@ func float16RoundedToOdd(from source: Element) -> [String] {
 
 func float16DemotedNeon(_ demotion: Float16Demotion, to result: Element) -> String {
     let narrow = result.cVector(of: demotion.shape)
+    let lanes = result.laneCount(of: demotion.shape)
     return """
         const \(narrow) converted = __builtin_convertvector(a, \(narrow));
-        \(narrowedResult("converted", demotion.shape, arm: true, for: result))
+        \(narrowedResult("converted", lanes: lanes, demotion.shape, arm: true, for: result))
         """
 }
 
@@ -35153,7 +35264,14 @@ func float16DemotedSoftware(
         statements += [
             vectorTypedef("narrow_bits", lane: "int16_t", bits: 16, lanes: lanes),
             "const narrow_bits narrowed = __builtin_convertvector((signed_words)bits, narrow_bits);",
-            narrowedResult("narrowed", demotion.shape, arm: false, for: result),
+            narrowedResult(
+                "narrowed",
+                lanes: lanes,
+                demotion.shape,
+                arm: false,
+                zeroable: "narrow_bits",
+                for: result
+            ),
         ]
     }
     return statements.joined(separator: "\n")
@@ -36008,7 +36126,7 @@ func bfloat16DemoteHalf(
     return """
         \(bfloat16DemoteRounded("a", from: source, using: rounding))
         const \(narrow) converted = __builtin_convertvector(aRounded >> 16, \(narrow));
-        \(narrowedResult("converted", .half, arm: arm, for: result))
+        \(narrowedConversion("converted", .half, arm: arm, for: result))
         """
 }
 
@@ -36220,7 +36338,7 @@ func bfloat16DemoteSveHalf(from source: Element, to result: Element) -> String {
     let native = """
         const \(sveType(of: result)) converted = \(bfloat16DemoteSveConverted("a", from: source, to: result));
         const \(result.cVector) narrowed = \(sveResult(unzipped, for: result));
-        \(narrowedLanes("narrowed", .half, arm: true, for: result))
+        \(narrowedResult("narrowed", lanes: result.laneCount, .half, arm: true, for: result))
         """
     return widenMulChoice(
         [(bfloat16SveConvertCondition, native)],
@@ -41285,17 +41403,45 @@ func narrowTypedefs(of element: Element) -> String {
     }.joined(separator: "\n")
 }
 
+func copiedNarrowRaw(_ raw: String) -> String {
+    "\(raw) result;\n__builtin_memcpy(&result, &v, sizeof v);\nreturn result;"
+}
+
+func narrowRawBody(_ shape: Shape, raw: String, arm: Bool, for element: Element) -> String {
+    let bytes = element.bytes(of: shape)
+    let register = partialRegisterBytes(of: shape, for: element, arm: arm)
+    guard bytes < register else { return copiedNarrowRaw(raw) }
+    return zeroExtendedNarrowBytes("&v", into: raw, bytes: bytes, register: register)
+}
+
 func cNarrowRawConversion(
+    _ shape: Shape,
     simd: String,
     raw: String,
     toRaw: String,
-    fromRaw: String
+    fromRaw: String,
+    isMask: Bool = false,
+    for element: Element
 ) -> String {
-    cFunction(
+    let body = { (arm: Bool) in
+        { (element: Element) in narrowRawBody(shape, raw: raw, arm: arm, for: element) }
+    }
+    let leaving = { (arm: Bool) in
+        { (element: Element) in
+            isMask || element.hasOpaqueVector
+                ? copiedNarrowRaw(raw)
+                : narrowRawBody(shape, raw: raw, arm: arm, for: element)
+        }
+    }
+    return cFunction(
         returns: raw,
         name: toRaw,
         parameters: ["\(simd) v"],
-        body: "\(raw) result;\n__builtin_memcpy(&result, &v, sizeof v);\nreturn result;"
+        body: cBody(
+            TargetBodies(neon: leaving(true), emu128: leaving(false)),
+            for: element,
+            portable: body(false)
+        )
     )
         + cFunction(
             returns: simd,
@@ -41308,17 +41454,22 @@ func cNarrowRawConversion(
 func cNarrowRawConversions(of element: Element) -> String {
     narrowShapes(of: element).map { shape in
         cNarrowRawConversion(
+            shape,
             simd: element.cVector(of: shape),
             raw: element.cRawVector(of: shape),
             toRaw: element.cToRawVector(of: shape),
-            fromRaw: element.cFromRawVector(of: shape)
+            fromRaw: element.cFromRawVector(of: shape),
+            for: element
         )
             + (shape.hasMask
                 ? cNarrowRawConversion(
+                    shape,
                     simd: element.cMask(of: shape),
                     raw: element.cRawMask(of: shape),
                     toRaw: element.cToRawMask(of: shape),
-                    fromRaw: element.cFromRawMask(of: shape)
+                    fromRaw: element.cFromRawMask(of: shape),
+                    isMask: true,
+                    for: element
                 ) : "")
     }.joined()
 }
