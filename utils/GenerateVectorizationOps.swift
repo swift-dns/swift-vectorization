@@ -19107,7 +19107,7 @@ func portableRepeatingBlockMask(for element: Element) -> String {
     const unsigned maskBits = (unsigned)bits;
     \(element.cMask) result;
     for (size_t i = 0; i < \(element.laneCount); ++i) {
-      result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+      result[i] = ((maskBits >> (i % \(element.blockLaneCount))) & 1u) != 0 ? -1 : 0;
     }
     \(maskResult("result", for: element))
     """

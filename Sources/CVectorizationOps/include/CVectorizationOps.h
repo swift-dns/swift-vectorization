@@ -11081,14 +11081,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_repe
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u8 result;
   for (size_t i = 0; i < 32; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 16)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u8)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u8 result;
   for (size_t i = 0; i < 64; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 16)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u8)(result);
 #elif CVECTORIZATION_OPS_NEON
@@ -11128,7 +11128,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_repe
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u8 result;
   for (size_t i = 0; i < 16; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 16)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u8)(result);
 #endif
@@ -26570,14 +26570,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u16 result;
   for (size_t i = 0; i < 16; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 8)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u16)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u16 result;
   for (size_t i = 0; i < 32; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 8)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u16)(result);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -26603,7 +26603,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u16 result;
   for (size_t i = 0; i < 8; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 8)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u16)(result);
 #endif
@@ -39283,14 +39283,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u32 result;
   for (size_t i = 0; i < 8; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u32)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u32 result;
   for (size_t i = 0; i < 16; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u32)(result);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -39316,7 +39316,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u32 result;
   for (size_t i = 0; i < 4; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u32)(result);
 #endif
@@ -53135,14 +53135,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u64 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u64 result;
   for (size_t i = 0; i < 4; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u64)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u64 result;
   for (size_t i = 0; i < 8; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u64)(result);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -53168,7 +53168,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u64 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_u64 result;
   for (size_t i = 0; i < 2; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_u64)(result);
 #endif
@@ -67966,14 +67966,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_repe
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i8 result;
   for (size_t i = 0; i < 32; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 16)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i8)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i8 result;
   for (size_t i = 0; i < 64; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 16)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i8)(result);
 #elif CVECTORIZATION_OPS_NEON
@@ -68013,7 +68013,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_repe
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i8 result;
   for (size_t i = 0; i < 16; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 16)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i8)(result);
 #endif
@@ -83622,14 +83622,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i16 result;
   for (size_t i = 0; i < 16; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 8)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i16)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i16 result;
   for (size_t i = 0; i < 32; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 8)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i16)(result);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -83655,7 +83655,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i16 result;
   for (size_t i = 0; i < 8; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 8)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i16)(result);
 #endif
@@ -96644,14 +96644,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i32 result;
   for (size_t i = 0; i < 8; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i32)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i32 result;
   for (size_t i = 0; i < 16; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i32)(result);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -96677,7 +96677,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i32 result;
   for (size_t i = 0; i < 4; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i32)(result);
 #endif
@@ -109935,14 +109935,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i64 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i64 result;
   for (size_t i = 0; i < 4; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i64)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i64 result;
   for (size_t i = 0; i < 8; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i64)(result);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -109968,7 +109968,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i64 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_i64 result;
   for (size_t i = 0; i < 2; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_i64)(result);
 #endif
@@ -122851,14 +122851,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_f32 result;
   for (size_t i = 0; i < 8; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_f32)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_f32 result;
   for (size_t i = 0; i < 16; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_f32)(result);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -122884,7 +122884,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_f32 result;
   for (size_t i = 0; i < 4; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 4)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_f32)(result);
 #endif
@@ -135268,14 +135268,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f64 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_f64 result;
   for (size_t i = 0; i < 4; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_f64)(result);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_f64 result;
   for (size_t i = 0; i < 8; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_f64)(result);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -135301,7 +135301,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f64 cvectorization_ops_rep
   const unsigned maskBits = (unsigned)bits;
   cvectorization_ops_mask_f64 result;
   for (size_t i = 0; i < 2; ++i) {
-    result[i] = ((maskBits >> i) & 1u) != 0 ? -1 : 0;
+    result[i] = ((maskBits >> (i % 2)) & 1u) != 0 ? -1 : 0;
   }
   return (cvectorization_ops_raw_mask_f64)(result);
 #endif
