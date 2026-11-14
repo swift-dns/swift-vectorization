@@ -2808,7 +2808,9 @@ func sveActiveLanes(_ count: String, for element: Element) -> String {
 }
 
 func sveClampedLanes(for element: Element) -> String {
-    "__builtin_sve_svwhilelt_b\(element.bits)_u64(0, (uint64_t)count)"
+    let lanes = element.laneCount
+    let clamped = "__builtin_constant_p(count) && count > \(lanes) ? \(lanes) : (uint64_t)count"
+    return "__builtin_sve_svwhilelt_b\(element.bits)_u64(0, \(clamped))"
 }
 
 func sveFirstLanes(for element: Element) -> String {
