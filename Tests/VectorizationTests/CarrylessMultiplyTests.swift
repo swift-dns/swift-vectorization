@@ -28,7 +28,7 @@ struct CarrylessMultiplyTests {
     }
 
     static let targetsWithEmulatedCarrylessMultiply = [
-        "SSE2", "SSSE3", "NEON_WITHOUT_AES", "SVE2_128", "EMU128",
+        "SSE2", "SSSE3", "NEON_WITHOUT_AES", "SVE2_128", "SVE_256", "SVE", "SVE2", "EMU128",
         "WASM", "PPC8", "PPC9", "PPC10", "Z14", "Z15", "LSX",
     ]
 
