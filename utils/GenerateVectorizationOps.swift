@@ -591,6 +591,8 @@ struct TargetBodies<Input> {
     var neon: ((Input) -> String?)?
     var sve2_128: ((Input) -> String?)?
     var sve2_128Splat: ((Input) -> String?)?
+    var sve: ((Input) -> String?)?
+    var sve2: ((Input) -> String?)?
     var avx3dl: ((Input) -> String?)?
     var avx3: ((Input) -> String?)?
     var avx2: ((Input) -> String?)?
@@ -600,8 +602,8 @@ struct TargetBodies<Input> {
     var emu128: ((Input) -> String?)?
 
     var isEmpty: Bool {
-        neon == nil && sve2_128 == nil && sve2_128Splat == nil && avx3dl == nil && avx3 == nil
-            && avx2 == nil && sse4 == nil
+        neon == nil && sve2_128 == nil && sve2_128Splat == nil && sve == nil && sve2 == nil
+            && avx3dl == nil && avx3 == nil && avx2 == nil && sse4 == nil
             && ssse3 == nil && sse2 == nil && emu128 == nil
     }
 
@@ -1671,13 +1673,11 @@ let neonVectors: [RawVector] = [
     RawVector(name: neonVector("f64"), type: "double", attribute: "neon_vector_type(2)"),
 ]
 
-let sveVectorBits = 128
-
 let sveVectors: [RawVector] = elements.map { element in
     RawVector(
         name: sveVector(element.cSuffix),
         type: sveType(of: element),
-        attribute: "arm_sve_vector_bits(\(sveVectorBits))"
+        attribute: "arm_sve_vector_bits(__ARM_FEATURE_SVE_BITS)"
     )
 }
 
@@ -1961,6 +1961,14 @@ func neonFirstTrueIndex(for element: Element) -> String {
 }
 
 let sveAllPattern = 31
+
+func svePattern(lanes: Int) -> Int {
+    guard lanes > 8 else { return lanes }
+    guard lanes.nonzeroBitCount == 1, lanes <= 256 else {
+        fatalError("There is no SVE pattern of \(lanes) lanes")
+    }
+    return 9 + (lanes / 16).trailingZeroBitCount
+}
 
 func sveType(of element: Element) -> String {
     switch element.category {
@@ -2356,7 +2364,7 @@ func sveAllLanesEqual(
         [sveAllLanes(of: element), sveOperand(operand, for: element, splat: splat), scalar],
         for: element
     )
-    let pattern = min(element.laneCount, 9)
+    let pattern = svePattern(lanes: element.laneCount)
     let vector = "__builtin_sve_svptrue_pat_b\(element.bits)(\(pattern))"
     let count = "__builtin_sve_svcntp_b\(element.bits)(\(vector), equal)"
     return """
@@ -2818,9 +2826,34 @@ func sveStoreFirst(for element: Element) -> String {
     return "\(stored);"
 }
 
-enum ArmLevel: Int {
-    case neon = 1
+enum ArmLevel: Equatable {
+    case neon
     case sve2_128
+    case sve(bytes: Int)
+    case sve2(bytes: Int)
+
+    var width: Int {
+        switch self {
+        case .neon, .sve2_128: return 16
+        case .sve(let bytes), .sve2(let bytes): return bytes
+        }
+    }
+
+    var neonLevel: Int {
+        switch self {
+        case .neon: return 1
+        case .sve2_128: return 2
+        case .sve, .sve2: return 0
+        }
+    }
+
+    var sveLevel: Int {
+        switch self {
+        case .neon: return 0
+        case .sve: return 1
+        case .sve2_128, .sve2: return 2
+        }
+    }
 }
 
 enum X86Level: Int, CaseIterable, Comparable {
@@ -13194,7 +13227,7 @@ enum LaneCapability {
             let enough = "return \(lanes) >= \(size.lanes / 2);"
             guard size.lanes == 64 else { return enough }
             return """
-                #if \(neonCondition) == \(ArmLevel.neon.rawValue)
+                #if \(neonCondition) == \(ArmLevel.neon.neonLevel)
                 return true;
                 #else
                 \(enough)
@@ -13351,7 +13384,13 @@ func x86Sse2LookupTables(for element: Element) -> Element {
     element.bits == 64 ? laneIndexElement(of: element) : element
 }
 
-func lookupBody(lanes: Int, aligned: Bool, tables: Element? = nil, for element: Element) -> String {
+func lookupBody(
+    lanes: Int,
+    aligned: Bool,
+    tables: Element? = nil,
+    x86: Bool = false,
+    for element: Element
+) -> String {
     let vector = element.cVector
     let raw = element.cRawVector
     func pointer(_ expression: String, alignment: Int) -> String {
@@ -13376,7 +13415,7 @@ func lookupBody(lanes: Int, aligned: Bool, tables: Element? = nil, for element: 
     let table = pointer("from", alignment: bytes)
     let load =
         bytes < element.width
-        ? zeroExtendedLoad(from: table, bytes: bytes, for: element)
+        ? zeroExtendedLoad(from: table, bytes: bytes, x86: x86, for: element)
         : "\(vector) table;\n__builtin_memcpy(&table, \(table), \(bytes));"
     return """
         \(load)
@@ -13384,11 +13423,12 @@ func lookupBody(lanes: Int, aligned: Bool, tables: Element? = nil, for element: 
         """
 }
 
-func zeroExtendedLoad(from pointer: String, bytes: Int, for element: Element) -> String {
+func zeroExtendedLoad(from pointer: String, bytes: Int, x86: Bool, for element: Element) -> String {
     let words = bytes / 8
-    let part = bytes == 16 ? x86Block("i64") : "half_vector"
+    let isBlock = x86 && bytes == 16
+    let part = isBlock ? x86Block("i64") : "half_vector"
     let size = "vector_size(\(bytes))"
-    let typedef = bytes == 16 ? "" : "typedef long long half_vector __attribute__((\(size)));\n"
+    let typedef = isBlock ? "" : "typedef long long half_vector __attribute__((\(size)));\n"
     let zeros = compoundLiteral(part, Array(repeating: "0", count: words))
     let indices = (0..<element.width / 8).map { $0 < words ? $0 : words + ($0 - words) % words }
     let extended = "__builtin_shufflevector(loaded, \(zeros), \(laneIndices(indices)))"
@@ -13412,7 +13452,7 @@ func neonLookup64(for element: Element) -> String {
 func lookupOp(_ size: LookupSize) -> Op {
     let lanes = size.lanes
     func aligned(_ element: Element) -> String {
-        lookupBody(lanes: lanes, aligned: true, for: element)
+        lookupBody(lanes: lanes, aligned: true, x86: true, for: element)
     }
     return Op(
         "lookup\(lanes)",
@@ -13436,12 +13476,55 @@ func lookupOp(_ size: LookupSize) -> Op {
                     lanes: lanes,
                     aligned: true,
                     tables: x86Sse2LookupTables(for: element),
+                    x86: true,
                     for: element
                 )
             }
         )
     ) { element in
         lookupBody(lanes: lanes, aligned: false, for: element)
+    }
+}
+
+let bfloat16EmulatedOnSveCondition = "HWY_TARGET_IS_SVE && !HWY_SVE_HAVE_BF16_FEATURE"
+
+func bfloat16ViaIntegers(
+    _ highwayName: String,
+    signed: Bool = false,
+    returning returns: ReturnType = .vector,
+    when condition: String
+) -> (Element, [String]) -> String {
+    { element, arguments in
+        let direct = "hn::\(highwayName)(\(arguments.joined(separator: ", ")))"
+        guard element.category == .bfloat16 else { return direct }
+        let integer = signed ? signedElement(of: element) : unsignedElement(of: element)
+        let tag = "hn::RebindTo\(signed ? "Signed" : "Unsigned")<\(element.tag)>()"
+        let operands = arguments.map { argument in
+            if argument == "\(element.tag)()" { return tag }
+            if argument.hasPrefix("reinterpret_cast<") {
+                return argument.replacingOccurrences(of: element.hwyType, with: integer.hwyType)
+            }
+            return "hn::BitCast(\(tag), \(argument))"
+        }
+        let call = "hn::\(highwayName)(\(operands.joined(separator: ", ")))"
+        let result: String
+        switch returns {
+        case .vector: result = "hn::BitCast(\(element.tag)(), \(call))"
+        case .mask: result = "hn::RebindMask(\(element.tag)(), \(call))"
+        default: result = call
+        }
+        return "\n#if \(condition)\n\(result)\n#else\n\(direct)\n#endif\n"
+    }
+}
+
+func tupleTag(of element: Element) -> String {
+    element.category == .bfloat16 ? "Tuple\(element.tag)" : element.tag
+}
+
+func tupleCreationReference(_ count: Int) -> (Element, [String]) -> String {
+    { element, arguments in
+        let operands = ["\(tupleTag(of: element))()"] + arguments.dropFirst()
+        return "hn::Create\(count)(\(operands.joined(separator: ", ")))"
     }
 }
 
@@ -17289,7 +17372,12 @@ let signAndComparisonOps: [Op] = [
         .vector,
         .signedOrFloat,
         section: .logical,
-        targets: negativeSelectTargets(nil, "a")
+        targets: negativeSelectTargets(nil, "a"),
+        referenceCall: bfloat16ViaIntegers(
+            "ZeroIfNegative",
+            signed: true,
+            when: bfloat16EmulatedOnSveCondition
+        )
     ) { element in
         portableSignSelect("~negative & \(unsignedBits("a", of: element))", for: element)
     },
@@ -17300,7 +17388,12 @@ let signAndComparisonOps: [Op] = [
         .vector,
         .signedOrFloat,
         section: .logical,
-        targets: negativeSelectTargets("b", "c")
+        targets: negativeSelectTargets("b", "c"),
+        referenceCall: bfloat16ViaIntegers(
+            "IfNegativeThenElse",
+            signed: true,
+            when: bfloat16EmulatedOnSveCondition
+        )
     ) { element in
         portableSignSelect(bitSelect("negative", "b", "c", of: element), for: element)
     },
@@ -17311,7 +17404,12 @@ let signAndComparisonOps: [Op] = [
         .vector,
         .signedOrFloat,
         section: .logical,
-        targets: negativeSelectTargets("b", nil, sveSplat: sveSelectingNegativeOrZeroSplat)
+        targets: negativeSelectTargets("b", nil, sveSplat: sveSelectingNegativeOrZeroSplat),
+        referenceCall: bfloat16ViaIntegers(
+            "IfNegativeThenElseZero",
+            signed: true,
+            when: bfloat16EmulatedOnSveCondition
+        )
     ) { element in
         portableSignSelect("negative & \(unsignedBits("b", of: element))", for: element)
     },
@@ -17322,7 +17420,12 @@ let signAndComparisonOps: [Op] = [
         .vector,
         .signedOrFloat,
         section: .logical,
-        targets: negativeSelectTargets(nil, "b")
+        targets: negativeSelectTargets(nil, "b"),
+        referenceCall: bfloat16ViaIntegers(
+            "IfNegativeThenZeroElse",
+            signed: true,
+            when: bfloat16EmulatedOnSveCondition
+        )
     ) { element in
         portableSignSelect("~negative & \(unsignedBits("b", of: element))", for: element)
     },
@@ -17373,7 +17476,13 @@ let signAndComparisonOps: [Op] = [
         [.vector],
         .mask,
         .signedOrFloat,
-        section: .comparisons
+        section: .comparisons,
+        referenceCall: bfloat16ViaIntegers(
+            "IsNegative",
+            signed: true,
+            returning: .mask,
+            when: bfloat16EmulatedOnSveCondition
+        )
     ) { element in
         maskResult("(\(element.cMask))\(negativeLanes(for: element))", for: element)
     },
@@ -17565,7 +17674,7 @@ let x86HasAesCondition = "!defined(HWY_DISABLE_PCLMUL_AES)"
 
 extension TargetBodies {
     static func everywhere(_ body: @escaping (Input) -> String?) -> TargetBodies {
-        TargetBodies(neon: body, avx3: body, avx2: body, sse2: body, emu128: body)
+        TargetBodies(neon: body, sve: body, avx3: body, avx2: body, sse2: body, emu128: body)
     }
 }
 
@@ -18409,6 +18518,7 @@ let aesKeyGenerationAssistHelpers: TargetBodies<Element> = {
     }
     return TargetBodies(
         neon: emulated,
+        sve: emulated,
         avx3dl: emulated,
         avx3: assisted,
         avx2: assisted,
@@ -19027,7 +19137,7 @@ func sveMaskVector(_ predicate: String, for element: Element) -> String {
 }
 
 func sveVectorLanes(for element: Element) -> String {
-    "__builtin_sve_svptrue_pat_b\(element.bits)(\(min(element.laneCount, 9)))"
+    "__builtin_sve_svptrue_pat_b\(element.bits)(\(svePattern(lanes: element.laneCount)))"
 }
 
 func sveFirstTrueSet(_ kind: FirstTrueSet, for element: Element) -> String? {
@@ -19179,10 +19289,10 @@ let maskOps: [Op] = [
             avx3: { element in x86BitsOfMask(for: element) },
             avx2: { element in x86BitsOfMask(for: element) },
             sse2: { element in x86BitsOfMask(for: element) }
-        )
-    ) { element in
-        portableBitsOfMask(for: element)
-    },
+        ),
+        referenceCall: { _, arguments in "bitsFromMask(\(arguments.joined(separator: ", ")))" },
+        portable: { element in portableBitsOfMask(for: element) }
+    ),
     Op(
         "storeMask",
         "StoreMaskBits",
@@ -19608,6 +19718,7 @@ struct FixedPermutation {
     var sse2Only: ((Element) -> String?)?
     var lowerFirst = false
     var laneCapability: LaneCapability?
+    var referenceCall: ((Element, [String]) -> String)?
     let indices: (Element) -> [Int]
 }
 
@@ -19812,7 +19923,8 @@ func sveSplatExtended(for element: Element) -> String? {
 }
 
 func sveSplatSelectedLower(for element: Element) -> String {
-    let lower = "__builtin_sve_svptrue_pat_b\(element.bits)(\(element.laneCount / 2))"
+    let pattern = svePattern(lanes: element.laneCount / 2)
+    let lower = "__builtin_sve_svptrue_pat_b\(element.bits)(\(pattern))"
     let selected = sveBuiltin(
         "sel",
         [lower, sveBuiltin("dup_n", ["b[0]"], for: element), sveOperand("a", for: element)],
@@ -20241,6 +20353,7 @@ func fixedPermutationOp(_ permutation: FixedPermutation) -> Op {
         laneCapability: permutation.laneCapability,
         targets: targets,
         helpers: permutation.helpers,
+        referenceCall: permutation.referenceCall,
         portable: portable
     )
 }
@@ -20515,8 +20628,8 @@ func concatenatedBlocks(_ blocks: [String], lanes: Int) -> String {
     return concatenatedBlocks(pairs, lanes: 2 * lanes)
 }
 
-func tupleMember(_ count: Int, for element: Element) -> String {
-    guard element.width > 16 else { return tupleSwitch(count) { "tuple.v\($0)" } }
+func tupleMember(_ count: Int, x86: Bool, for element: Element) -> String {
+    guard x86, element.width > 16 else { return tupleSwitch(count) { "tuple.v\($0)" } }
     let blockLanes = element.category == .float ? element.blockLaneCount : 2
     let names = (0..<element.width / 16).map { "block\($0)" }
     let first = laneIndices(0..<blockLanes)
@@ -20538,8 +20651,8 @@ func tupleMember(_ count: Int, for element: Element) -> String {
         """
 }
 
-func tupleReplacement(_ count: Int, for element: Element) -> String {
-    guard element.width == 32, count == 2 else {
+func tupleReplacement(_ count: Int, x86: Bool, for element: Element) -> String {
+    guard x86, element.width == 32, count == 2 else {
         return tupleSwitch(count) { replaced in
             let members = (0..<count).map { $0 == replaced ? rawName("a") : "tuple.v\($0)" }
             return "(\(element.cTuple(count))){\(members.joined(separator: ", "))}"
@@ -20863,7 +20976,8 @@ let fixedPermutations: [FixedPermutation] = [
         highwayName: "ReverseBlocks",
         parameters: [.tag, .vector],
         applies: .all,
-        section: .reverse
+        section: .reverse,
+        referenceCall: bfloat16ViaIntegers("ReverseBlocks", when: "HWY_TARGET == HWY_SVE_256")
     ) { element in
         let blocks = element.width / 16
         return blockIndices((0..<blocks).reversed().map { ($0, false) }, for: element)
@@ -20924,7 +21038,11 @@ let fixedPermutations: [FixedPermutation] = [
         highwayName: "SwapAdjacentBlocks",
         parameters: [.vector],
         applies: .all,
-        section: .otherFixedPatternAcrossBlocks
+        section: .otherFixedPatternAcrossBlocks,
+        referenceCall: bfloat16ViaIntegers(
+            "SwapAdjacentBlocks",
+            when: "HWY_TARGET == HWY_SVE_256"
+        )
     ) { element in
         let blocks = element.width / 16
         return blockIndices((0..<blocks).map { (blocks > 1 ? $0 ^ 1 : $0, false) }, for: element)
@@ -22854,7 +22972,8 @@ func tupleOps(count: Int) -> [Op] {
             section: .tuples,
             targets: TargetBodies(sve2_128: { element in
                 tupleCreation(count, for: element) { sveSplatMember($0, for: element) }
-            })
+            }),
+            referenceCall: tupleCreationReference(count)
         ) { element in
             tupleCreation(count, for: element)
         },
@@ -22864,9 +22983,13 @@ func tupleOps(count: Int) -> [Op] {
             [.tuple(count), .tupleIndex],
             .vector,
             .all,
-            section: .tuples
+            section: .tuples,
+            targets: TargetBodies(
+                avx3: { element in tupleMember(count, x86: true, for: element) },
+                avx2: { element in tupleMember(count, x86: true, for: element) }
+            )
         ) { element in
-            tupleMember(count, for: element)
+            tupleMember(count, x86: false, for: element)
         },
         Op(
             "set\(count)",
@@ -22875,9 +22998,13 @@ func tupleOps(count: Int) -> [Op] {
             .tuple(count),
             .all,
             section: .tuples,
-            vectorLabels: ["to"]
+            vectorLabels: ["to"],
+            targets: TargetBodies(
+                avx3: { element in tupleReplacement(count, x86: true, for: element) },
+                avx2: { element in tupleReplacement(count, x86: true, for: element) }
+            )
         ) { element in
-            tupleReplacement(count, for: element)
+            tupleReplacement(count, x86: false, for: element)
         },
     ]
 }
@@ -25880,7 +26007,12 @@ let memoryOps: [Op] =
                 avx2: { element in x86Streamed(for: element) },
                 sse2: { element in x86Streamed(for: element) }
             ),
-            appendsToOutputSpan: false
+            appendsToOutputSpan: false,
+            referenceCall: bfloat16ViaIntegers(
+                "Stream",
+                returning: .void,
+                when: bfloat16EmulatedOnSveCondition
+            )
         ) { _ in
             storedVector(to: "to")
         },
@@ -30260,21 +30392,27 @@ func widenMulQuadPortable(to result: Element) -> WidenMulKernel {
         let products = widenMulProducts("a", "b", stride: 4, to: result)
         return ("", widenMulSum(products + ["c"], for: result))
     }
-    let (middle, vector) = (resizedElement(of: result, bits: 32).cVector, result.cVector)
+    let (middle, vector) = (resizedElement(of: result, bits: 32), result.cVector)
+    let (evens, odds) = (
+        Array(stride(from: 0, to: middle.laneCount, by: 2)),
+        Array(stride(from: 1, to: middle.laneCount, by: 2))
+    )
     func products(part: Int) -> String {
-        let lanes = ["a", "b"].map { convertedPart($0, part: part, lanes: 4, to: middle) }
+        let lanes = ["a", "b"].map {
+            convertedPart($0, part: part, lanes: middle.laneCount, to: middle.cVector)
+        }
         return "\(lanes[0]) * \(lanes[1])"
     }
     func pairs(_ operand: String) -> String {
-        let sums = [[0, 2], [1, 3]].map { convertedLanes(operand, at: $0, to: vector) }
+        let sums = [evens, odds].map { convertedLanes(operand, at: $0, to: vector) }
         return "\(sums[0]) + \(sums[1])"
     }
     let statements = """
-        const \(middle) lows = \(products(part: 0));
-        const \(middle) highs = \(products(part: 1));
+        const \(middle.cVector) lows = \(products(part: 0));
+        const \(middle.cVector) highs = \(products(part: 1));
         const \(vector) lowSums = \(pairs("lows"));
         const \(vector) highSums = \(pairs("highs"));
-        const \(vector) sums = __builtin_shufflevector(lowSums, highSums, 0, 2) + __builtin_shufflevector(lowSums, highSums, 1, 3);
+        const \(vector) sums = __builtin_shufflevector(lowSums, highSums, \(laneIndices(evens))) + __builtin_shufflevector(lowSums, highSums, \(laneIndices(odds)));
         """
     return (statements, widenMulSum(["c", "sums"], for: result))
 }
@@ -31031,7 +31169,7 @@ let narrowMemoryOps: [Op] = Shape.allCases.filter { $0 != .full }.flatMap { shap
 
 func partialRegisterBytes(of shape: Shape, for element: Element, arm: Bool) -> Int {
     if shape == .block { return 16 }
-    return arm ? 8 : max(16, element.bytes(of: shape))
+    return arm && element.width == 16 ? 8 : max(16, element.bytes(of: shape))
 }
 
 func partialRegisterLanes(of shape: Shape, for element: Element, arm: Bool) -> Int {
@@ -33819,7 +33957,7 @@ let halfPrecisionBodies: [String: (Element) -> String] = [
             "\(cFunctionName("storeFirst", unsigned))((\(unsigned.cRawVector))rawA, (\(unsigned.cType)*)to, count);"
         guard element.category == .float16, element.width == 16 else { return delegated }
         return """
-            #if \(neonCondition) == \(ArmLevel.neon.rawValue) && (\(neonHasFloat16Condition))
+            #if \(neonCondition) == \(ArmLevel.neon.neonLevel) && (\(neonHasFloat16Condition))
             \(neonStoreFirst(for: element))
             #else
             \(delegated)
@@ -33834,7 +33972,7 @@ let halfPrecisionBodies: [String: (Element) -> String] = [
             "return \(allTrue)((\(element.cRawMask))(\(element.cMask))(\(operand) == \(zero)));"
         }
         return """
-            #if CVECTORIZATION_OPS_X86 || (\(neonCondition) == \(ArmLevel.neon.rawValue) && !(\(neonHasFloat16Condition))) || (!\(neonCondition) && HWY_STATIC_TARGET != HWY_EMU128)
+            #if CVECTORIZATION_OPS_X86 || (\(neonCondition) == \(ArmLevel.neon.neonLevel) && !(\(neonHasFloat16Condition))) || (!\(neonCondition) && !\(sveCondition) && HWY_STATIC_TARGET != HWY_EMU128)
             return \(cFunctionName("allBitsClear", unsigned))((\(unsigned.cRawVector))rawA);
             #elif \(neonHasFloat16Condition)
             \(halfPrecisionNativeVector(for: element))
@@ -35959,9 +36097,14 @@ func float16Masked(_ op: Op, base: String, for element: Element) -> String {
     return "return \(float16Call("selectingOrZero", ["rawMask", result], for: element));"
 }
 
-func float16Fallback(_ op: Op, for element: Element, truncatingMasks: Bool = false) -> String {
+func float16Fallback(
+    _ op: Op,
+    for element: Element,
+    truncatingMasks: Bool = false,
+    x86: Bool = false
+) -> String {
     float16PortableBodies[op.identifier]?(element)
-        ?? float16Emulated(op, for: element, truncatingMasks: truncatingMasks)
+        ?? float16Emulated(op, for: element, truncatingMasks: truncatingMasks, x86: x86)
 }
 
 let float16X86RoundingImmediates: [String: Int] = [
@@ -35971,9 +36114,15 @@ let float16X86RoundingImmediates: [String: Int] = [
     "roundedDown": 9,
 ]
 
-func float16Emulated(_ op: Op, for element: Element, truncatingMasks: Bool) -> String {
+func float16Emulated(_ op: Op, for element: Element, truncatingMasks: Bool, x86: Bool) -> String {
     guard let immediate = float16X86RoundingImmediates[op.identifier] else {
-        return float16Lanewise(op, for: element, x86Rounding: nil, truncatingMasks: truncatingMasks)
+        return float16Lanewise(
+            op,
+            for: element,
+            x86Rounding: nil,
+            truncatingMasks: truncatingMasks,
+            x86: x86
+        )
     }
     return """
         #if CVECTORIZATION_OPS_X86 >= 3
@@ -35988,7 +36137,8 @@ func float16Lanewise(
     _ op: Op,
     for element: Element,
     x86Rounding: Int?,
-    truncatingMasks: Bool
+    truncatingMasks: Bool,
+    x86: Bool = false
 ) -> String {
     if let reduced = float16Reduced(op, for: element) { return reduced }
     if let base = float16BaseIdentifier(ofMasked: op.identifier) {
@@ -36015,7 +36165,7 @@ func float16Lanewise(
         return "(\(single.cRawVector))\(rounded)"
     }
     if op.returns == .mask {
-        if element.width == X86Level.avx3.width {
+        if x86 && element.width == X86Level.avx3.width {
             let bits = [PromoteLowerUpperHalf.lower, .upper].map {
                 x86Builtin(
                     "cvtd2mask512",
@@ -36823,10 +36973,12 @@ func float16ArithmeticVariant(of op: Op) -> Op {
     let native = float16NativeBodies[op.identifier]
     let halves: ((Element) -> String)? =
         float16HalvesIdentifiers.contains(op.identifier)
-        ? { float16Lanewise(op, for: $0, x86Rounding: nil, truncatingMasks: false) } : nil
+        ? { float16Lanewise(op, for: $0, x86Rounding: nil, truncatingMasks: false, x86: true) }
+        : nil
     let truncatedMasks: ((Element) -> String)? =
         op.returns == .mask && float16PortableBodies[op.identifier] == nil
-        ? { float16Lanewise(op, for: $0, x86Rounding: nil, truncatingMasks: true) } : nil
+        ? { float16Lanewise(op, for: $0, x86Rounding: nil, truncatingMasks: true, x86: true) }
+        : nil
     let nativeMasks: ((Element) -> String)? =
         op.returns == .mask
         ? native.map { native in
@@ -36835,7 +36987,7 @@ func float16ArithmeticVariant(of op: Op) -> Op {
                 #if \(float16SprCondition)
                 \(native(element))
                 #else
-                \(float16Lanewise(op, for: element, x86Rounding: nil, truncatingMasks: false))
+                \(float16Lanewise(op, for: element, x86Rounding: nil, truncatingMasks: false, x86: true))
                 #endif
                 """
             }
@@ -36866,7 +37018,7 @@ func float16ArithmeticVariant(of op: Op) -> Op {
             },
             sve2_128: float16SveBodies[op.identifier] ?? float16SveMaskedArithmetic(of: op),
             sve2_128Splat: float16SveSplatBodies[op.identifier],
-            avx3: halves ?? nativeMasks,
+            avx3: halves ?? nativeMasks ?? { float16Fallback(op, for: $0, x86: true) },
             avx2: halves ?? truncatedMasks ?? float16Avx2Bodies[op.identifier],
             ssse3: float16SsseBodies[op.identifier],
             sse2: float16SseBodies[op.identifier] ?? halves
@@ -37248,7 +37400,7 @@ func bindings(
                     declaration: "\(element.cTuple(count)) tuple",
                     cDeclaration: "\(element.cTuple(count)) tuple",
                     argument:
-                        "hn::Create\(count)(\(element.tag)(), \(members.joined(separator: ", ")))",
+                        "hn::Create\(count)(\(tupleTag(of: element))(), \(members.joined(separator: ", ")))",
                     swiftLabel: "_",
                     swiftName: "tuple",
                     swiftType: tupleType("\(scope)Vector", count: count),
@@ -38045,7 +38197,7 @@ func narrowReferenceDeclarations(of element: Element) -> String {
         return """
             using \(element.tag(of: shape)) = \(narrowReferenceTag(of: element, shape: shape));
             using \(element.vector(of: shape)) = hn::VFromD<\(element.tag(of: shape))>;
-            \(mask)#if HWY_TARGET_IS_SVE
+            \(mask)#if HWY_TARGET == HWY_SVE2_128
             \(bridgedNarrowPortConversions(of: element, shape: shape))#else
             \(memoryNarrowPortConversions(of: element, shape: shape))#endif
 
@@ -38055,7 +38207,7 @@ func narrowReferenceDeclarations(of element: Element) -> String {
 
 func portConversions(of element: Element) -> String {
     """
-    #if HWY_TARGET_IS_SVE
+    #if HWY_TARGET == HWY_SVE2_128
     \(bridgedPortConversions(of: element))#else
     \(memoryPortConversions(of: element))#endif
 
@@ -38161,7 +38313,7 @@ func generateReferenceHeader() -> String {
 
         #include "hwy/cache_control.h"
         #include "hwy/highway.h"
-        #if HWY_TARGET_IS_SVE
+        #if HWY_TARGET == HWY_SVE2_128
         #include <arm_neon_sve_bridge.h>
         #endif
 
@@ -38187,10 +38339,25 @@ func generateReferenceHeader() -> String {
           return *new (&port) Highway;
         }
 
-        /// The count a span form hands to an op that takes one. Highway's SVE2_128 ops truncate a
-        /// count to 32 bits, so they get at most `lanes`, while the other targets take any.
+        /// The count a span form hands to an op that takes one. Highway's SVE ops truncate a count
+        /// to 32 bits, so they get at most `lanes`, while the other targets take any.
         HWY_INLINE size_t spanCount(size_t count, size_t lanes) {
-          return HWY_TARGET == HWY_SVE2_128 && count > lanes ? lanes : count;
+          return HWY_TARGET_IS_SVE && count > lanes ? lanes : count;
+        }
+
+        /// Highway's BitsFromMask, which its scalable targets do not have, so there the bits come
+        /// from StoreMaskBits, which gives the same ones.
+        template <class D>
+        HWY_INLINE uint64_t bitsFromMask(D d, hn::MFromD<D> mask) {
+        #if HWY_HAVE_SCALABLE
+          uint8_t bits[HWY_MAX_BYTES / 8] = {};
+          hn::StoreMaskBits(d, mask, bits);
+          uint64_t result = 0;
+          hwy::CopyBytes<sizeof(result)>(bits, &result);
+          return result;
+        #else
+          return hn::BitsFromMask(d, mask);
+        #endif
         }
 
         /// Whether the static target only emulates vectors, in which case a caller is better off
@@ -38264,6 +38431,13 @@ func generateReferenceHeader() -> String {
     var nothrow = ""
     for element in elements {
         output += "using \(element.tag) = hn::ScalableTag<\(element.hwyType)>;\n"
+        if element.category == .bfloat16 {
+            output += "#if \(bfloat16EmulatedOnSveCondition)\n"
+            output += "using \(tupleTag(of: element)) = hn::RebindToUnsigned<\(element.tag)>;\n"
+            output += "#else\n"
+            output += "using \(tupleTag(of: element)) = \(element.tag);\n"
+            output += "#endif\n"
+        }
         output += "using \(element.vector) = hn::VFromD<\(element.tag)>;\n"
         output += "using \(element.mask) = hn::MFromD<\(element.tag)>;\n"
         output += "typedef \(element.cRawVector) \(element.outVector) "
@@ -38464,8 +38638,14 @@ func repeatingBlockBody(of element: Element) -> String {
 typealias TargetBranch = (condition: String, body: String)
 
 let neonCondition = "CVECTORIZATION_OPS_NEON"
-let sve2_128Condition = "\(neonCondition) == \(ArmLevel.sve2_128.rawValue)"
-let emu128Condition = "!\(neonCondition) && !CVECTORIZATION_OPS_X86"
+let sve2_128Condition = "\(neonCondition) == \(ArmLevel.sve2_128.neonLevel)"
+let sveCondition = "CVECTORIZATION_OPS_SVE"
+let emu128Condition = "!\(neonCondition) && !\(sveCondition) && !CVECTORIZATION_OPS_X86"
+
+func sveWidthCondition(_ bytes: Int, level: ArmLevel? = nil) -> String {
+    let sve = level.map { "\(sveCondition) == \($0.sveLevel)" } ?? sveCondition
+    return "\(sve) && CVECTORIZATION_OPS_VECTOR_BYTES == \(bytes)"
+}
 
 func x86Condition(from first: X86Level, through last: X86Level) -> String {
     guard first != last else { return "CVECTORIZATION_OPS_X86 == \(first.rawValue)" }
@@ -38509,6 +38689,37 @@ func x86Branches<Input: WidthScaled>(
     }
 }
 
+let sve2OnlyBuiltins = [
+    "adalp_", "addp_", "bcax_", "bsl_", "cadd_s", "cadd_u", "eor3_", "logb_", "mlalb_", "mlalt_",
+    "movlb_", "movlt_", "mullb_", "mullt_", "qabs_", "qneg_", "qrdmulh_", "qxtnb_", "qxtnt_",
+    "qxtunb_", "qxtunt_", "rhadd_", "rshl_", "rshr_", "tbl2_",
+]
+
+func sveBody<Input>(_ targets: TargetBodies<Input>, for input: Input) -> String? {
+    guard let body = targets.sve?(input) else { return nil }
+    if let builtin = sve2OnlyBuiltins.first(where: { body.contains("__builtin_sve_sv\($0)") }) {
+        fatalError("An sve body calls SVE2's sv\(builtin.prefix { $0 != "_" }): use sve2")
+    }
+    return body
+}
+
+func sveBranches<Input: WidthScaled>(
+    _ targets: TargetBodies<Input>,
+    for input: Input,
+    portable: ((Input) -> String)?
+) -> [TargetBranch] {
+    supportedSveWidths.flatMap { width -> [TargetBranch] in
+        let scaled = input.at(width: width)
+        let sve = sveBody(targets, for: scaled) ?? portable?(scaled)
+        let sve2 = supportedSveLevels.contains(.sve2(bytes: width)) ? targets.sve2?(scaled) : nil
+        let specific = sve2.flatMap { $0 == sve ? nil : $0 }.map {
+            (condition: sveWidthCondition(width, level: .sve2(bytes: width)), body: $0)
+        }
+        let general = sve.map { (condition: sveWidthCondition(width), body: $0) }
+        return [specific, general].compactMap { $0 }
+    }
+}
+
 func cBody<Input: WidthScaled>(
     _ targets: TargetBodies<Input>,
     for input: Input,
@@ -38525,8 +38736,10 @@ func cBody<Input: WidthScaled>(
     let neon = neonBody.map { (condition: neonCondition, body: $0) }
     let emu128 = targets.emu128?(input).map { (condition: emu128Condition, body: $0) }
     let specific = (neon.map { [$0] } ?? []) + x86Branches(targets, for: input, portable: portable)
+    let wide = sveBranches(targets, for: input, portable: portable).filter { $0.body != fallback }
     let branches =
-        (sve2.map { [$0] } ?? []) + mergingIdenticalBodies(specific.filter { $0.body != fallback })
+        (sve2.map { [$0] } ?? []) + wide
+        + mergingIdenticalBodies(specific.filter { $0.body != fallback })
         + (emu128.map { [$0] } ?? [])
     guard !branches.isEmpty else { return fallback ?? "" }
     let chain = branches.enumerated().flatMap { index, branch in
@@ -38587,6 +38800,8 @@ func cBody(of op: Op, for element: Element) -> String {
     let deferred = TargetBodies(
         neon: deferring(paths.neon),
         sve2_128: deferring(paths.sve2_128),
+        sve: deferring(paths.sve),
+        sve2: deferring(paths.sve2),
         avx3dl: deferring(paths.avx3dl),
         avx3: deferring(paths.avx3),
         avx2: deferring(paths.avx2),
@@ -38806,7 +39021,7 @@ func indicesWithinWhereFunction(gathering: Bool, for element: Element) -> String
 func rawVectorDeclarations() -> String {
     let groups = [
         (neonCondition, neonVectors),
-        (sve2_128Condition, sveVectors),
+        (sveCondition, sveVectors),
         ("CVECTORIZATION_OPS_X86", x86Vectors),
     ]
     return groups.map { condition, vectors in
@@ -38920,9 +39135,16 @@ enum StaticTargetSupport {
 
     var selection: [String] {
         switch self {
-        case .arm(let level): return bodySelection(neon: level.rawValue, x86: 0, bytes: 16)
-        case .x86(let level): return bodySelection(neon: 0, x86: level.rawValue, bytes: level.width)
-        case .portable: return bodySelection(neon: 0, x86: 0, bytes: 16)
+        case .arm(let level):
+            return bodySelection(
+                neon: level.neonLevel,
+                sve: level.sveLevel,
+                x86: 0,
+                bytes: level.width
+            )
+        case .x86(let level):
+            return bodySelection(neon: 0, sve: 0, x86: level.rawValue, bytes: level.width)
+        case .portable: return bodySelection(neon: 0, sve: 0, x86: 0, bytes: 16)
         case .unsupported(let message): return ["#error \"\(message)\""]
         }
     }
@@ -38935,7 +39157,9 @@ struct StaticTargetRule {
 }
 
 let armNeonTargets = ["NEON_BF16", "NEON", "NEON_WITHOUT_AES"]
-let sveRemedy = "use SVE2 with -msve-vector-bits=128 or \(disablingFlag("HWY_ALL_SVE"))"
+let sveRemedy =
+    "use -msve-vector-bits=256 or 512, -msve-vector-bits=128 with SVE2, or "
+    + disablingFlag("HWY_ALL_SVE")
 
 let staticTargetRules: [StaticTargetRule] = [
     StaticTargetRule(names: armNeonTargets, condition: "HWY_ARCH_ARM_A64", support: .arm(.neon)),
@@ -38948,6 +39172,17 @@ let staticTargetRules: [StaticTargetRule] = [
         )
     ),
     StaticTargetRule(names: ["SVE2_128"], support: .arm(.sve2_128)),
+    StaticTargetRule(names: ["SVE_256"], support: .arm(.sve(bytes: 32))),
+    StaticTargetRule(
+        names: ["SVE"],
+        condition: "__ARM_FEATURE_SVE_BITS == 512",
+        support: .arm(.sve(bytes: 64))
+    ),
+    StaticTargetRule(
+        names: ["SVE2"],
+        condition: "__ARM_FEATURE_SVE_BITS == 512",
+        support: .arm(.sve2(bytes: 64))
+    ),
     StaticTargetRule(names: ["AVX3"], support: .x86(.avx3)),
     StaticTargetRule(names: ["AVX3_DL", "AVX3_ZEN4", "AVX3_SPR"], support: .x86(.avx3dl)),
     StaticTargetRule(names: ["AVX2"], support: .x86(.avx2)),
@@ -38969,10 +39204,18 @@ let staticTargetRules: [StaticTargetRule] = [
         support: .unsupported("highway sizes SVE vectors at run time: \(sveRemedy)")
     ),
     StaticTargetRule(
-        names: ["SVE", "SVE2", "SVE_256"],
-        condition: "defined(__ARM_FEATURE_SVE_BITS)",
+        names: ["SVE", "SVE2"],
+        condition: "__ARM_FEATURE_SVE_BITS > 512",
         support: .unsupported(
-            "the port does not support highway's fixed-size SVE targets yet: \(sveRemedy)"
+            "Swift has no SIMD type of 128 or 256 lanes, which SVE vectors of 1024 or 2048 bits "
+                + "need: \(sveRemedy)"
+        )
+    ),
+    StaticTargetRule(
+        names: ["SVE", "SVE2"],
+        support: .unsupported(
+            "the port does not support highway's SVE and SVE2 targets at this vector length: "
+                + sveRemedy
         )
     ),
     StaticTargetRule(
@@ -39008,15 +39251,27 @@ let supportedX86Levels: [X86Level] = staticTargetRules.compactMap { rule in
 }
 .sorted()
 
+let supportedSveLevels: [ArmLevel] = staticTargetRules.compactMap { rule in
+    guard case .arm(let level) = rule.support, level.neonLevel == 0 else { return nil }
+    return level
+}
+
+let supportedSveWidths = supportedSveLevels.map(\.width).reduce(into: [Int]()) { widths, width in
+    if !widths.contains(width) {
+        widths.append(width)
+    }
+}
+
 let emulatedTargets = ["SCALAR", "EMU128"]
 
 func disablingFlag(_ targets: String) -> String {
     "-DHWY_DISABLED_TARGETS=\(targets)"
 }
 
-func bodySelection(neon: Int, x86: Int, bytes: Int) -> [String] {
+func bodySelection(neon: Int, sve: Int, x86: Int, bytes: Int) -> [String] {
     [
         "#define CVECTORIZATION_OPS_NEON \(neon)",
+        "#define CVECTORIZATION_OPS_SVE \(sve)",
         "#define CVECTORIZATION_OPS_X86 \(x86)",
         "#define CVECTORIZATION_OPS_VECTOR_BYTES \(bytes)",
     ]
@@ -39094,7 +39349,7 @@ struct TargetCapability {
 }
 
 let x86Avx3Condition = x86Condition(from: .avx3, through: .avx3dl)
-let neonOnlyCondition = "\(neonCondition) == \(ArmLevel.neon.rawValue)"
+let neonOnlyCondition = "\(neonCondition) == \(ArmLevel.neon.neonLevel)"
 
 let targetCapabilities = [
     TargetCapability(
@@ -39104,7 +39359,7 @@ let targetCapabilities = [
             + "leaves out.",
         values: [
             ("HWY_IS_ASAN || HWY_IS_MSAN", "true"),
-            ("\(sve2_128Condition) || (\(x86Avx3Condition))", "false"),
+            ("\(sveCondition) || (\(x86Avx3Condition))", "false"),
         ],
         otherwise: "true"
     ),
@@ -39115,7 +39370,7 @@ let targetCapabilities = [
             + "rounding once.",
         values: [
             (
-                "\(neonCondition) || (\(x86Avx3Condition)) || "
+                "\(neonCondition) || \(sveCondition) || (\(x86Avx3Condition)) || "
                     + "(\(x86Condition(from: .avx2, through: .avx2)) && !\(x86DisablesFmaCondition))",
                 "true"
             )
@@ -39126,7 +39381,7 @@ let targetCapabilities = [
         highwayName: "HWY_NATIVE_MASK",
         summary: "Whether ops that take a mask, such as `adding(_:_:where:)`, use native masked "
             + "instructions.",
-        values: [("\(sve2_128Condition) || (\(x86Avx3Condition))", "true")]
+        values: [("\(sveCondition) || (\(x86Avx3Condition))", "true")]
     ),
     TargetCapability(
         swiftName: "hasNativeBFloat16DotProduct",
@@ -39135,7 +39390,8 @@ let targetCapabilities = [
             + "instruction.",
         values: [
             (
-                "(\(sve2_128Condition) && (\(bfloat16SveFeatureCondition))) || "
+                "(\(sveCondition) && (\(sve2_128Condition) || defined(__ARM_FEATURE_SVE_BF16)) "
+                    + "&& (\(bfloat16SveFeatureCondition))) || "
                     + "(\(neonOnlyCondition) && (\(bfloat16NeonNativeCondition))) || "
                     + "(\(x86Condition(from: .avx3dl, through: .avx3dl)) && (\(bfloat16Avx3Condition)))",
                 "true"
@@ -39147,21 +39403,21 @@ let targetCapabilities = [
         highwayName: "HWY_NATIVE_INTERLEAVE_WHOLE",
         summary: "Whether interleaving whole vectors is at least as fast as interleaving within "
             + "each block.",
-        values: [("CVECTORIZATION_OPS_VECTOR_BYTES <= 16", "true")]
+        values: [("CVECTORIZATION_OPS_VECTOR_BYTES <= 16 || \(sveCondition)", "true")]
     ),
     TargetCapability(
         swiftName: "hasNativeStoreFirst",
         highwayName: "HWY_NATIVE_STORE_N",
         summary: "Whether `storeFirst` is efficient, typically masked, rather than branches on "
             + "the count.",
-        values: [("\(sve2_128Condition) || (\(x86Avx3Condition)) || (\(emu128Condition))", "true")]
+        values: [("\(sveCondition) || (\(x86Avx3Condition)) || (\(emu128Condition))", "true")]
     ),
     TargetCapability(
         swiftName: "hasNative64BitMultiply",
         highwayName: "HWY_NATIVE_MUL64",
         summary: "Whether `multiplying` and `multiplyingHigh` of 64-bit integer lanes are native "
             + "instructions.",
-        values: [("\(sve2_128Condition) || (\(emu128Condition))", "true")]
+        values: [("\(sveCondition) || (\(emu128Condition))", "true")]
     ),
     TargetCapability(
         swiftName: "hasNativeFloat16Arithmetic",
@@ -39170,7 +39426,7 @@ let targetCapabilities = [
             + "through `Float`.",
         values: [
             (
-                "\(sve2_128Condition) || (\(neonOnlyCondition) && (\(neonHasFloat16Condition)))",
+                "\(sveCondition) || (\(neonOnlyCondition) && (\(neonHasFloat16Condition)))",
                 "true"
             )
         ]
@@ -39461,6 +39717,7 @@ func generateTargetSet() -> String {
 
 let targetFunctionName = "cvectorization_ops_target"
 let supportedTargetsFunctionName = "cvectorization_ops_supported_targets"
+let vectorLengthMatchesFunctionName = "cvectorization_ops_vector_length_matches"
 
 func targetFunction() -> String {
     cFunction(
@@ -39472,7 +39729,7 @@ func targetFunction() -> String {
 }
 
 func supportedTargetsDeclaration() -> String {
-    "int64_t \(supportedTargetsFunctionName)(void);\n"
+    "int64_t \(supportedTargetsFunctionName)(void);\nbool \(vectorLengthMatchesFunctionName)(void);\n"
 }
 
 func generateSupportedTargets() -> String {
@@ -39497,8 +39754,15 @@ func generateSupportedTargets() -> String {
     }
 
     /// Whether the CPU supports the target the ops were compiled for.
+    ///
+    /// Highway sizes the vectors of its `SVE` and `SVE2` targets at run time, while the ops are
+    /// compiled for the length that `-msve-vector-bits` gives. A build for either target is
+    /// therefore only supported where the CPU's vectors have that length: on any other, the ops
+    /// read and write the wrong number of lanes.
     @export(implementation) @inline(always)
-    public static var isSupported: Bool { supportedTargets.contains(target) }
+    public static var isSupported: Bool {
+    supportedTargets.contains(target) && \(vectorLengthMatchesFunctionName)()
+    }
     }
 
     """
@@ -40046,6 +40310,21 @@ func generateSupportedTargetsSource() -> String {
             """,
         specifiers: "static"
     )
+    let vectorLengthMatches = cFunction(
+        returns: "bool",
+        name: vectorLengthMatchesFunctionName,
+        parameters: [],
+        body: """
+            #if \(staticTargetCondition(of: ["SVE", "SVE2"]))
+            uint64_t sve_vec_len;
+            __asm__("cntb %0" : "=r"(sve_vec_len)::);
+            return sve_vec_len == CVECTORIZATION_OPS_VECTOR_BYTES;
+            #else
+            return true;
+            #endif
+            """,
+        specifiers: ""
+    )
     let supportedTargets = cFunction(
         returns: "int64_t",
         name: supportedTargetsFunctionName,
@@ -40104,6 +40383,7 @@ func generateSupportedTargetsSource() -> String {
         \(armTargetDetection())
 
         \(supportedTargets)
+        \(vectorLengthMatches)
         """
 }
 
@@ -40336,7 +40616,7 @@ func generateHeader() -> String {
 
         \(staticTargetSelection())
 
-        #if CVECTORIZATION_OPS_VECTOR_BYTES == \(X86Level.avx3.width)
+        #if CVECTORIZATION_OPS_X86 && CVECTORIZATION_OPS_VECTOR_BYTES == \(X86Level.avx3.width)
         #define CVECTORIZATION_OPS_VECTOR_WIDTH __attribute__((min_vector_width(\(X86Level.avx3.width * 8))))
         #else
         #define CVECTORIZATION_OPS_VECTOR_WIDTH

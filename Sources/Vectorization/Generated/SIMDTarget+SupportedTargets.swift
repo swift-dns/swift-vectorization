@@ -18,6 +18,13 @@ extension SIMDTarget {
     }
 
     /// Whether the CPU supports the target the ops were compiled for.
+    ///
+    /// Highway sizes the vectors of its `SVE` and `SVE2` targets at run time, while the ops are
+    /// compiled for the length that `-msve-vector-bits` gives. A build for either target is
+    /// therefore only supported where the CPU's vectors have that length: on any other, the ops
+    /// read and write the wrong number of lanes.
     @export(implementation) @inline(always)
-    public static var isSupported: Bool { supportedTargets.contains(target) }
+    public static var isSupported: Bool {
+        supportedTargets.contains(target) && cvectorization_ops_vector_length_matches()
+    }
 }
