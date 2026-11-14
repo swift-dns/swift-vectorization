@@ -138646,6 +138646,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_f64(cvectoriza
   __builtin_memcpy(to, &a, sizeof a);
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_rearranged_to_odd_plus_even_f64(cvectorization_ops_raw_vector_f64 rawA, cvectorization_ops_raw_vector_f64 rawB) {
+  const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
+  const cvectorization_ops_vector_f64 b = (cvectorization_ops_vector_f64)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+#if HWY_COMPILER_CLANG >= 1700 || HWY_COMPILER_GCC_ACTUAL >= 1400
+  return (cvectorization_ops_raw_vector_f64)(a);
+#else
+  return (cvectorization_ops_raw_vector_f64)(a + b);
+#endif
+#elif CVECTORIZATION_OPS_X86 == 6
+#if (HWY_STATIC_TARGET & (HWY_AVX3_SPR | HWY_AVX3_ZEN4)) && (defined(HWY_AVX3_ENABLE_AVX512BF16) ? HWY_AVX3_ENABLE_AVX512BF16 : !defined(HWY_AVX3_DISABLE_AVX512BF16) && !HWY_COMPILER_CLANGCL)
+  return (cvectorization_ops_raw_vector_f64)(a);
+#else
+  return (cvectorization_ops_raw_vector_f64)(a + b);
+#endif
+#else
+  return (cvectorization_ops_raw_vector_f64)(a + b);
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_vector_f64 cvectorization_ops_load_half_f64(const double* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
   cvectorization_ops_raw_half_vector_f64 v;

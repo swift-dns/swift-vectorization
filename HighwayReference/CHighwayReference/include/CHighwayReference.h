@@ -13647,6 +13647,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 loadExpandedWhereF64(cvectorization
 HWY_INLINE cvectorization_ops_raw_vector_f64 loadExpandedWhereOtherwiseF64(cvectorization_ops_raw_vector_f64 otherwise, cvectorization_ops_raw_mask_f64 mask, const double* from) { return toPortF64(hn::MaskedLoadExpandOr(fromPortF64(otherwise), maskFromPortF64(mask), TagF64(), from)); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 loadIndicesF64(const int64_t* from) { return toPortI64(hn::BitCast(TagI64(), hn::TableLookupLanes(hn::BitCast(TagF64(), hn::Iota(TagI64(), 0)), hn::SetTableIndices(TagF64(), from)))); }
 HWY_INLINE void storeStreamingF64(cvectorization_ops_raw_vector_f64 a, double* to) { hn::Stream(fromPortF64(a), TagF64(), to); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 rearrangedToOddPlusEvenF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::RearrangeToOddPlusEven(fromPortF64(a), fromPortF64(b))); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 loadHalfF64(const double* from) { return halfToPortF64(hn::LoadU(HalfTagF64(), from)); }
 HWY_INLINE void storeHalfF64(cvectorization_ops_raw_half_vector_f64 a, double* to) { hn::StoreU(halfFromPortF64(a), HalfTagF64(), to); }
 HWY_INLINE cvectorization_ops_raw_block_f64 loadBlockF64(const double* from) { return blockToPortF64(hn::LoadU(BlockTagF64(), from)); }
@@ -26832,6 +26833,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 loadExpandedWhereF64(cvectorization
 HWY_INLINE cvectorization_ops_raw_vector_f64 loadExpandedWhereOtherwiseF64(cvectorization_ops_raw_vector_f64 otherwise, cvectorization_ops_raw_mask_f64 mask, const double* from) noexcept { return ::HighwayReference::loadExpandedWhereOtherwiseF64(otherwise, mask, from); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 loadIndicesF64(const int64_t* from) noexcept { return ::HighwayReference::loadIndicesF64(from); }
 HWY_INLINE void storeStreamingF64(cvectorization_ops_raw_vector_f64 a, double* to) noexcept { ::HighwayReference::storeStreamingF64(a, to); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 rearrangedToOddPlusEvenF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::rearrangedToOddPlusEvenF64(a, b); }
 HWY_INLINE cvectorization_ops_raw_half_vector_f64 loadHalfF64(const double* from) noexcept { return ::HighwayReference::loadHalfF64(from); }
 HWY_INLINE void storeHalfF64(cvectorization_ops_raw_half_vector_f64 a, double* to) noexcept { ::HighwayReference::storeHalfF64(a, to); }
 HWY_INLINE cvectorization_ops_raw_block_f64 loadBlockF64(const double* from) noexcept { return ::HighwayReference::loadBlockF64(from); }

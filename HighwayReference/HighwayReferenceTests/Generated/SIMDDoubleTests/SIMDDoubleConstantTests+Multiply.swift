@@ -571,4 +571,129 @@ extension SIMDDoubleConstantTests {
     @Test func multiplyingByPowerOf2FromInt64ConstantSIMDInt64SplatMin() {
         checkMultiplyingByPowerOf2FromInt64ConstantB(SIMDInt64.Lane.min)
     }
+
+    @inline(__always)
+    private func checkRearrangedToOddPlusEvenConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("rearrangedToOddPlusEven with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8E7C_AF3B_D544_AC0C)
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+            mismatches.check(
+                H.rearrangedToOddPlusEven(H.repeating(value), b),
+                HighwayReference.rearrangedToOddPlusEvenF64(H.repeating(value), b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkRearrangedToOddPlusEvenConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("rearrangedToOddPlusEven with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA7CF_353B_E36C_4BBE)
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+            mismatches.check(
+                H.rearrangedToOddPlusEven(a, H.repeating(value)),
+                HighwayReference.rearrangedToOddPlusEvenF64(a, H.repeating(value)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatZero() {
+        checkRearrangedToOddPlusEvenConstantA(0.0)
+        checkRearrangedToOddPlusEvenConstantB(0.0)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatNegativeZero() {
+        checkRearrangedToOddPlusEvenConstantA(-0.0)
+        checkRearrangedToOddPlusEvenConstantB(-0.0)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatOne() {
+        checkRearrangedToOddPlusEvenConstantA(1.0)
+        checkRearrangedToOddPlusEvenConstantB(1.0)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatMinusOne() {
+        checkRearrangedToOddPlusEvenConstantA(-1.0)
+        checkRearrangedToOddPlusEvenConstantB(-1.0)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatTwo() {
+        checkRearrangedToOddPlusEvenConstantA(2.0)
+        checkRearrangedToOddPlusEvenConstantB(2.0)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatHalf() {
+        checkRearrangedToOddPlusEvenConstantA(0.5)
+        checkRearrangedToOddPlusEvenConstantB(0.5)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatFour() {
+        checkRearrangedToOddPlusEvenConstantA(4.0)
+        checkRearrangedToOddPlusEvenConstantB(4.0)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatQuarter() {
+        checkRearrangedToOddPlusEvenConstantA(0.25)
+        checkRearrangedToOddPlusEvenConstantB(0.25)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatOnePointFive() {
+        checkRearrangedToOddPlusEvenConstantA(1.5)
+        checkRearrangedToOddPlusEvenConstantB(1.5)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatMinusTwoPointFive() {
+        checkRearrangedToOddPlusEvenConstantA(-2.5)
+        checkRearrangedToOddPlusEvenConstantB(-2.5)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatInfinity() {
+        checkRearrangedToOddPlusEvenConstantA(.infinity)
+        checkRearrangedToOddPlusEvenConstantB(.infinity)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatMinusInfinity() {
+        checkRearrangedToOddPlusEvenConstantA(-.infinity)
+        checkRearrangedToOddPlusEvenConstantB(-.infinity)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatNaN() {
+        checkRearrangedToOddPlusEvenConstantA(.nan)
+        checkRearrangedToOddPlusEvenConstantB(.nan)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatMinusNaN() {
+        checkRearrangedToOddPlusEvenConstantA(-.nan)
+        checkRearrangedToOddPlusEvenConstantB(-.nan)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatPayloadNaN() {
+        checkRearrangedToOddPlusEvenConstantA(H.Lane(nan: 1, signaling: false))
+        checkRearrangedToOddPlusEvenConstantB(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatSignalingNaN() {
+        checkRearrangedToOddPlusEvenConstantA(.signalingNaN)
+        checkRearrangedToOddPlusEvenConstantB(.signalingNaN)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatMinusSignalingNaN() {
+        checkRearrangedToOddPlusEvenConstantA(-.signalingNaN)
+        checkRearrangedToOddPlusEvenConstantB(-.signalingNaN)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatLeastNonzero() {
+        checkRearrangedToOddPlusEvenConstantA(.leastNonzeroMagnitude)
+        checkRearrangedToOddPlusEvenConstantB(.leastNonzeroMagnitude)
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantSplatGreatest() {
+        checkRearrangedToOddPlusEvenConstantA(.greatestFiniteMagnitude)
+        checkRearrangedToOddPlusEvenConstantB(.greatestFiniteMagnitude)
+    }
 }

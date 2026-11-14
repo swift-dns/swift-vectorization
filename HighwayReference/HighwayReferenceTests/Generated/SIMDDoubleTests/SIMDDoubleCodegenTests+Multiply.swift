@@ -166,4 +166,44 @@ extension SIMDDoubleCodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func rearrangedToOddPlusEven() {
+        let mismatches = Mismatches("portRearrangedToOddPlusEvenF64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5795_13E3_0890_DDB6)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5795_14E3_0890_DF69)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+            mismatches.check(
+                portRearrangedToOddPlusEvenF64(a, b),
+                highwayRearrangedToOddPlusEvenF64(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantA() {
+        let mismatches = Mismatches("portRearrangedToOddPlusEvenF64ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3772_D1AA_C2C7_8CE4)
+        for b in bInputs {
+            mismatches.check(
+                portRearrangedToOddPlusEvenF64ConstantA(b),
+                highwayRearrangedToOddPlusEvenF64ConstantA(b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func rearrangedToOddPlusEvenConstantB() {
+        let mismatches = Mismatches("portRearrangedToOddPlusEvenF64ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5132_37AA_D14B_C816)
+        for a in aInputs {
+            mismatches.check(
+                portRearrangedToOddPlusEvenF64ConstantB(a),
+                highwayRearrangedToOddPlusEvenF64ConstantB(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

@@ -167,3 +167,47 @@ public func highwayMultiplyingByPowerOf2I64ToF64ConstantB(
         SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
     )
 }
+
+@inline(never)
+public func portRearrangedToOddPlusEvenF64(
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    SIMDDouble.rearrangedToOddPlusEven(a, b)
+}
+
+@inline(never)
+public func highwayRearrangedToOddPlusEvenF64(
+    _ a: SIMDDouble.Vector,
+    _ b: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.rearrangedToOddPlusEvenF64(a, b)
+}
+
+@inline(never)
+public func portRearrangedToOddPlusEvenF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    SIMDDouble.rearrangedToOddPlusEven(SIMDDouble.repeating(1.5), b)
+}
+
+@inline(never)
+public func highwayRearrangedToOddPlusEvenF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector
+{
+    HighwayReference.Nothrow.rearrangedToOddPlusEvenF64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        b
+    )
+}
+
+@inline(never)
+public func portRearrangedToOddPlusEvenF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    SIMDDouble.rearrangedToOddPlusEven(a, SIMDDouble.repeating(1.5))
+}
+
+@inline(never)
+public func highwayRearrangedToOddPlusEvenF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector
+{
+    HighwayReference.Nothrow.rearrangedToOddPlusEvenF64(
+        a,
+        HighwayReference.Nothrow.repeatingF64(1.5)
+    )
+}

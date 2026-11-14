@@ -229,6 +229,11 @@ extension SIMDDouble {
     }
 
     @export(implementation) @inline(always)
+    public static func rearrangedToOddPlusEven(_ a: Vector, _ b: Vector) -> Vector {
+        cvectorization_ops_rearranged_to_odd_plus_even_f64(a, b)
+    }
+
+    @export(implementation) @inline(always)
     public static func multiplyAdding(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector {
         cvectorization_ops_multiply_adding_f64(a, b, c)
     }
