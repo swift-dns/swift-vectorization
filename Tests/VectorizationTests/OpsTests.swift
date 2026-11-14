@@ -286,6 +286,14 @@ struct OpsTests {
         }
     }
 
+    @Test("Complex products of integer lanes wrap around as the scalar ones do")
+    func integerComplexProductsWrap() {
+        verifyWrappingComplexProducts(SIMDInt8.self)
+        verifyWrappingComplexProducts(SIMDInt16.self)
+        verifyWrappingComplexProducts(SIMDInt32.self)
+        verifyWrappingComplexProducts(SIMDInt64.self)
+    }
+
     @Test("Reductions match the scalar result")
     func reductions() {
         typealias H = SIMDInt32
@@ -353,6 +361,28 @@ struct OpsTests {
 
         #expect(F.smallestOrNaN(F.repeating(.infinity)) == .infinity)
         #expect(F.largestOrNaN(F.repeating(-.infinity)) == -.infinity)
+    }
+
+    @Test("A zero-masked maximum of a NaN is NaN on SVE2_128 and the other operand on NEON")
+    func maskedMaximumOfNaN() {
+        let isSVE = SIMDTarget.targetName == "SVE2_128"
+        let isNEON = SIMDTarget.targetName.hasPrefix("NEON")
+        expectMaskedMaximumOfNaN(SIMDFloat.self, isNaN: isSVE, isNumber: isNEON)
+        expectMaskedMaximumOfNaN(SIMDDouble.self, isNaN: isSVE, isNumber: isNEON)
+        #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+        expectMaskedMaximumOfNaN(
+            SIMDFloat16.self,
+            isNaN: isSVE,
+            isNumber: isNEON && SIMDTarget.hasNativeFloat16Arithmetic
+        )
+        #endif
+    }
+
+    @Test("All bits clear counts a negative zero as clear, except on the AVX-512 targets")
+    func allBitsClearOfNegativeZero() {
+        let isClear = !SIMDTarget.targetName.hasPrefix("AVX3")
+        expectAllBitsClearOfNegativeZero(SIMDFloat.self, isClear: isClear)
+        expectAllBitsClearOfNegativeZero(SIMDDouble.self, isClear: isClear)
     }
 
     @Test("A repeated block fills every 128-bit block with its lanes")
@@ -1200,6 +1230,19 @@ struct OpsTests {
         }
     }
 
+    @Test("Loaded indices may select the lanes of a second table, below 2 * laneCount")
+    func loadIndicesSelectSecondTable() {
+        typealias H = SIMDUInt32
+        let last = ContiguousArray((0..<H.laneCount).map { UInt32(2 * H.laneCount - 1 - $0) })
+        let first = H.iota(0)
+        let second = H.iota(UInt32(H.laneCount))
+
+        #expect(
+            lanes(H.self, H.twoTablesLookupLanes(first, second, at: H.loadIndices(from: last.span)))
+                == Array(last)
+        )
+    }
+
     @Test("Checked lookups trap on a short or misaligned table or an index outside it")
     func checkedLookupsTrap() async {
         await #expect(processExitsWith: .failure) {
@@ -1349,6 +1392,61 @@ struct OpsTests {
         }
     }
 
+    @Test("Checked gathers and scatters trap on an index or a byte offset outside the span")
+    func checkedGathersAndScattersTrap() async {
+        await #expect(processExitsWith: .failure) {
+            let source = ContiguousArray<UInt32>(repeating: 0, count: SIMDUInt32.laneCount)
+            _ = SIMDUInt32.gather(from: source.span, indices: SIMDInt32.iota(1))
+        }
+        await #expect(processExitsWith: .failure) {
+            let source = ContiguousArray<Float>(repeating: 0, count: SIMDFloat.laneCount)
+            let offset = SIMDInt32.repeating(Int32(SIMDFloat.laneCount * 4 - 3))
+            _ = SIMDFloat.gather(from: source.span, byteOffsets: offset)
+        }
+        await #expect(processExitsWith: .failure) {
+            var output = ContiguousArray<Int32>(repeating: 0, count: SIMDInt32.laneCount)
+            var destination = output.mutableSpan
+            SIMDInt32.scatter(SIMDInt32.zero(), to: &destination, indices: SIMDInt32.repeating(-1))
+        }
+        await #expect(processExitsWith: .failure) {
+            let source = ContiguousArray<Double>(repeating: 0, count: SIMDDouble.laneCount)
+            _ = SIMDDouble.gather(
+                from: source.span,
+                indices: SIMDInt64.repeating(Int64(SIMDDouble.laneCount)),
+                where: SIMDDouble.firstLanes(count: 1)
+            )
+        }
+    }
+
+    @Test("Checked masked gathers and scatters trap on an index outside the span in any mask lane")
+    func checkedMaskedGathersAndScattersTrap() async {
+        await #expect(processExitsWith: .failure) {
+            let lanes = SIMDUInt32.laneCount
+            let source = ContiguousArray<UInt32>(repeating: 0, count: lanes)
+            let bits = ContiguousArray((0..<lanes).map { $0 == 0 ? UInt32(0x8000_0000) : 0 })
+            let mask = SIMDUInt32.mask(from: SIMDUInt32.load(from: bits.span))
+            _ = SIMDUInt32.gather(
+                from: source.span,
+                indices: SIMDInt32.repeating(Int32(lanes)),
+                where: mask
+            )
+        }
+        await #expect(processExitsWith: .failure) {
+            let lanes = SIMDDouble.laneCount
+            var output = ContiguousArray<Double>(repeating: 0, count: lanes)
+            var destination = output.mutableSpan
+            let negative = -Double.leastNonzeroMagnitude
+            let bits = ContiguousArray((0..<lanes).map { $0 == 0 ? negative : 0 })
+            let mask = SIMDDouble.mask(from: SIMDDouble.load(from: bits.span))
+            SIMDDouble.scatter(
+                SIMDDouble.zero(),
+                to: &destination,
+                indices: SIMDInt64.repeating(Int64(lanes)),
+                where: mask
+            )
+        }
+    }
+
     @Test("Checked indices ops trap on an index outside 0..<2 * laneCount")
     func checkedIndicesOpsTrap() async {
         await #expect(processExitsWith: .failure) {
@@ -1359,6 +1457,21 @@ struct OpsTests {
         }
         await #expect(processExitsWith: .failure) {
             _ = SIMDFloat.indices(from: SIMDInt32.repeating(Int32(2 * SIMDFloat.laneCount)))
+        }
+    }
+
+    @Test("Checked index loads trap on an index outside 0..<2 * laneCount")
+    func checkedIndexLoadsTrap() async {
+        await #expect(processExitsWith: .failure) {
+            let indices = ContiguousArray(
+                repeating: UInt32(2 * SIMDUInt32.laneCount),
+                count: SIMDUInt32.laneCount
+            )
+            _ = SIMDUInt32.loadIndices(from: indices.span)
+        }
+        await #expect(processExitsWith: .failure) {
+            let indices = ContiguousArray<Int32>(repeating: -1, count: SIMDInt32.laneCount)
+            _ = SIMDInt32.loadIndices(from: indices.span)
         }
     }
 
@@ -1457,11 +1570,74 @@ struct OpsTests {
     #endif
 }
 
+private func verifyWrappingComplexProducts<H: SIMDIntegerElement>(_ type: H.Type)
+where H.Lane: FixedWidthInteger {
+    let extremes: [H.Lane] = [.max, .min, .max / 3, .min / 3 + 1, .min / 7, 33, -1, .max - 7]
+    let pick = { (offset: Int) in
+        ContiguousArray((0..<H.laneCount).map { extremes[($0 &* 3 &+ offset) % extremes.count] })
+    }
+    let (a, b, c) = (pick(0), pick(5), pick(2))
+    var products: [H.Lane] = []
+    var conjugates: [H.Lane] = []
+    for pair in stride(from: 0, to: H.laneCount, by: 2) {
+        let (u, v, x, y) = (a[pair], a[pair + 1], b[pair], b[pair + 1])
+        products += [u &* x &- v &* y, u &* y &+ v &* x]
+        conjugates += [u &* x &+ v &* y, v &* x &- u &* y]
+    }
+    let (va, vb, vc) = (H.load(from: a.span), H.load(from: b.span), H.load(from: c.span))
+
+    #expect(lanes(H.self, H.multiplyingComplex(va, vb)) == products)
+    #expect(lanes(H.self, H.multiplyingComplexConjugate(va, vb)) == conjugates)
+    #expect(lanes(H.self, H.multiplyAddingComplex(va, vb, vc)) == zip(products, c).map(&+))
+    #expect(
+        lanes(H.self, H.multiplyAddingComplexConjugate(va, vb, vc)) == zip(conjugates, c).map(&+)
+    )
+}
+
 private func lanes<H: SIMDElement>(_ type: H.Type, _ vector: H.Vector) -> [H.Lane] {
     let output = ContiguousArray<H.Lane>(capacity: H.laneCount) { output in
         H.append(vector, to: &output)
     }
     return Array(output)
+}
+
+private func expectMaskedMaximumOfNaN<H: SIMDElement>(
+    _ type: H.Type,
+    isNaN: Bool,
+    isNumber: Bool
+) where H.Lane: BinaryFloatingPoint {
+    let numbers = ContiguousArray((0..<H.laneCount).map { H.Lane($0) + 1.5 })
+    let number = H.load(from: numbers.span)
+    let mask = H.repeatingMask(true)
+    for nanLane in 0..<H.laneCount {
+        var lanes = numbers
+        lanes[nanLane] = .nan
+        let nan = H.load(from: lanes.span)
+        for (a, b) in [(nan, number), (number, nan)] {
+            let maximum = H.lane(H.maximum(a, b, where: mask), at: nanLane)
+            if isNaN {
+                #expect(maximum.isNaN, "\(H.self) lane \(nanLane) is \(maximum)")
+            }
+            if isNumber {
+                #expect(maximum == numbers[nanLane], "\(H.self) lane \(nanLane) is \(maximum)")
+            }
+        }
+    }
+}
+
+private func expectAllBitsClearOfNegativeZero<H: SIMDElement>(
+    _ type: H.Type,
+    isClear: Bool
+) where H.Lane: BinaryFloatingPoint {
+    #expect(H.allBitsClear(H.repeating(-0.0)) == isClear, "\(H.self) of negative zeros")
+    for lane in 0..<H.laneCount {
+        var lanes = ContiguousArray(repeating: H.Lane(0), count: H.laneCount)
+        lanes[lane] = -0.0
+        #expect(
+            H.allBitsClear(H.load(from: lanes.span)) == isClear,
+            "\(H.self) with a negative zero in lane \(lane)"
+        )
+    }
 }
 
 private func withAlignedTable<Lane, Result>(

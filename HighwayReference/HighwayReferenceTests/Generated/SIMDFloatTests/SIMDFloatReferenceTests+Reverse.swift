@@ -15,6 +15,19 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func byteSwapped() {
+        let mismatches = Mismatches("byteSwapped")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFFF9_D20F_0D3C_88FA)
+        for a in aInputs {
+            mismatches.check(
+                H.byteSwapped(a),
+                HighwayReference.byteSwappedF32(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func reversedBlocks() {
         let mismatches = Mismatches("reversedBlocks")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x722B_11B7_2F71_467E)

@@ -13,9 +13,7 @@ extension SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftU64(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.shiftedLeftU64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -35,9 +33,7 @@ extension SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftU64(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.shiftedLeftU64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -51,9 +47,7 @@ extension SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedRightU64(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.shiftedRightU64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -73,9 +67,7 @@ extension SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedRightU64(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.shiftedRightU64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -216,10 +208,7 @@ extension SIMDUInt64ReferenceTests {
             mismatches.check(
                 H.roundingShiftedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.roundingShiftedRightU64(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.roundingShiftedRightU64(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a)), bits: \(bits)"
             )
@@ -241,10 +230,7 @@ extension SIMDUInt64ReferenceTests {
             mismatches.check(
                 H.roundingShiftedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.roundingShiftedRightU64(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.roundingShiftedRightU64(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a)), bits: \(bits)"
             )
@@ -343,9 +329,7 @@ extension SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedLeftU64(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.rotatedLeftU64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -365,9 +349,7 @@ extension SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedLeftU64(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.rotatedLeftU64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -381,9 +363,7 @@ extension SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedRightU64(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.rotatedRightU64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -403,9 +383,7 @@ extension SIMDUInt64ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedRightU64(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.rotatedRightU64(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }

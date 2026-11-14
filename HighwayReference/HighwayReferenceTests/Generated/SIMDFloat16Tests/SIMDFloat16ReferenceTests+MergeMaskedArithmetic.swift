@@ -27,6 +27,26 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func squareRootWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("squareRootWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8563_9B94_9CFA_47B7)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8563_9A94_9CFA_4604)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8563_9D94_9CFA_4B1D)
+        for (otherwise, mask, a) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            seed: 0x5984_67BE_FFF2_8EB1
+        ) {
+            mismatches.check(
+                H.squareRoot(a, where: mask, otherwise: otherwise),
+                HighwayReference.squareRootWhereOtherwiseF16(otherwise, mask.raw, a),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func addingWhereOtherwise() {
         let mismatches = Mismatches("addingWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8561_7CE2_26CE_98FA)
@@ -39,6 +59,28 @@ extension SIMDFloat16ReferenceTests {
             aInputs,
             bInputs,
             seed: 0x2F07_0E38_60C1_5B3E
+        ) where !hasUnorderedNaNs(a, b) {
+            mismatches.check(
+                H.adding(a, b, where: mask, otherwise: otherwise),
+                HighwayReference.addingWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("addingWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB210_6A0C_B4DC_E691)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB210_690C_B4DC_E4DE)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB210_680C_B4DC_E32B)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB210_670C_B4DC_E178)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x8A2F_905A_B2C7_714B
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.adding(a, b, where: mask, otherwise: otherwise),
@@ -71,6 +113,28 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func subtractingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("subtractingWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xE656_E901_910D_2CA2)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xE656_EA01_910D_2E55)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE656_E701_910D_293C)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE656_E801_910D_2AEF)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x9CA9_8E6A_818D_16E6
+        ) {
+            mismatches.check(
+                H.subtracting(a, b, where: mask, otherwise: otherwise),
+                HighwayReference.subtractingWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplyingWhereOtherwise() {
         let mismatches = Mismatches("multiplyingWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x718D_3C66_BE4D_1739)
@@ -83,6 +147,28 @@ extension SIMDFloat16ReferenceTests {
             aInputs,
             bInputs,
             seed: 0x2CBE_0D56_45BE_4573
+        ) where !hasUnorderedNaNs(a, b) {
+            mismatches.check(
+                H.multiplying(a, b, where: mask, otherwise: otherwise),
+                HighwayReference.multiplyingWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("multiplyingWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x471C_38FE_AC9F_7E7E)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x471C_39FE_AC9F_8031)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x471C_36FE_AC9F_7B18)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x471C_37FE_AC9F_7CCB)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x5AFA_09AB_E4E1_951A
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.multiplying(a, b, where: mask, otherwise: otherwise),
@@ -115,6 +201,28 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func dividingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("dividingWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x827D_DFBB_A0DF_66A6)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x827D_E0BB_A0DF_6859)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x827D_DDBB_A0DF_6340)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x827D_DEBB_A0DF_64F3)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0xFF76_F5E9_96AE_60A2
+        ) {
+            mismatches.check(
+                H.dividing(a, b, where: mask, otherwise: otherwise),
+                HighwayReference.dividingWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func minimumWhereOtherwise() {
         let mismatches = Mismatches("minimumWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x4FEC_5855_2114_3AF1)
@@ -137,6 +245,28 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func minimumWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("minimumWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x6845_6B9A_5AE6_A2B6)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6845_6C9A_5AE6_A469)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6845_699A_5AE6_9F50)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6845_6A9A_5AE6_A103)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x4D7E_BBCA_4438_56B2
+        ) where !hasUnorderedNaNs(a, b) {
+            mismatches.check(
+                H.minimum(a, b, where: mask, otherwise: otherwise),
+                HighwayReference.minimumWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func maximumWhereOtherwise() {
         let mismatches = Mismatches("maximumWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB580_2F6F_9C73_7ACB)
@@ -149,6 +279,28 @@ extension SIMDFloat16ReferenceTests {
             aInputs,
             bInputs,
             seed: 0xBA99_550B_47F6_1D2D
+        ) where !hasUnorderedNaNs(a, b) {
+            mismatches.check(
+                H.maximum(a, b, where: mask, otherwise: otherwise),
+                HighwayReference.maximumWhereOtherwiseF16(otherwise, mask.raw, a, b),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("maximumWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5896_2EF2_3D9B_2FE0)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5896_2FF2_3D9B_3193)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5896_30F2_3D9B_3346)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5896_31F2_3D9B_34F9)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x333B_E39F_9282_9BDC
         ) where !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.maximum(a, b, where: mask, otherwise: otherwise),
@@ -183,6 +335,32 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func multiplyAddingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches(
+            "multiplyAddingWhereOtherwise with masks from arbitrary vectors"
+        )
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x406F_31AA_A06F_C631)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x406F_30AA_A06F_C47E)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x406F_2FAA_A06F_C2CB)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x406F_2EAA_A06F_C118)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x406F_35AA_A06F_CCFD)
+        for (otherwise, mask, a, b, c) in mixedQuintuples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0x4BD1_99D9_6EB5_776B
+        ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
+            mismatches.check(
+                H.multiplyAdding(a, b, c, where: mask, otherwise: otherwise),
+                HighwayReference.multiplyAddingWhereOtherwiseF16(otherwise, mask.raw, a, b, c),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplySubtractingWhereOtherwise() {
         let mismatches = Mismatches("multiplySubtractingWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xECC6_4942_8268_7F45)
@@ -197,6 +375,32 @@ extension SIMDFloat16ReferenceTests {
             bInputs,
             cInputs,
             seed: 0xB877_C9F1_EDDD_5AB7
+        ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
+            mismatches.check(
+                H.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
+                HighwayReference.multiplySubtractingWhereOtherwiseF16(otherwise, mask.raw, a, b, c),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches(
+            "multiplySubtractingWhereOtherwise with masks from arbitrary vectors"
+        )
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x604D_EA60_6EC7_63C2)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x604D_EB60_6EC7_6575)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x604D_E860_6EC7_605C)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x604D_E960_6EC7_620F)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x604D_E660_6EC7_5CF6)
+        for (otherwise, mask, a, b, c) in mixedQuintuples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0xC897_AF07_B8D1_C606
         ) where !hasUnorderedNaNs(multiplying: a, b, adding: c) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
@@ -237,6 +441,38 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func negatedMultiplyAddingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches(
+            "negatedMultiplyAddingWhereOtherwise with masks from arbitrary vectors"
+        )
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x6F7A_E6EA_4533_5D15)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6F7A_E5EA_4533_5B62)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6F7A_E4EA_4533_59AF)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6F7A_E3EA_4533_57FC)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6F7A_E2EA_4533_5649)
+        for (otherwise, mask, a, b, c) in mixedQuintuples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0x78CF_2F5B_307F_57C7
+        ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
+            mismatches.check(
+                H.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise),
+                HighwayReference.negatedMultiplyAddingWhereOtherwiseF16(
+                    otherwise,
+                    mask.raw,
+                    a,
+                    b,
+                    c
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func negatedMultiplySubtractingWhereOtherwise() {
         let mismatches = Mismatches("negatedMultiplySubtractingWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x7E51_556E_808B_67D1)
@@ -251,6 +487,38 @@ extension SIMDFloat16ReferenceTests {
             bInputs,
             cInputs,
             seed: 0x5912_037E_F0A9_AA0B
+        ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
+            mismatches.check(
+                H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
+                HighwayReference.negatedMultiplySubtractingWhereOtherwiseF16(
+                    otherwise,
+                    mask.raw,
+                    a,
+                    b,
+                    c
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatedMultiplySubtractingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches(
+            "negatedMultiplySubtractingWhereOtherwise with masks from arbitrary vectors"
+        )
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x6C2A_D93B_5AEE_2D16)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6C2A_DA3B_5AEE_2EC9)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6C2A_D73B_5AEE_29B0)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6C2A_D83B_5AEE_2B63)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6C2A_DD3B_5AEE_33E2)
+        for (otherwise, mask, a, b, c) in mixedQuintuples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0x385E_1CF0_45F9_F912
         ) where !hasUnorderedNaNs(negating: a, b, adding: c) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise),

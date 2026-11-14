@@ -45,6 +45,40 @@ public func highwayFirstLanesI32ConstantCount() -> SIMDInt32.Mask {
 }
 
 @inline(never)
+public func portFirstLanesI32ConstantCountTwo() -> SIMDInt32.Mask {
+    SIMDInt32.firstLanes(count: 2)
+}
+
+@inline(never)
+public func highwayFirstLanesI32ConstantCountTwo() -> SIMDInt32.Mask {
+    SIMDInt32.Mask(raw: HighwayReference.Nothrow.firstLanesI32(2))
+}
+
+@inline(never)
+public func portFirstLanesI32ConstantCountLaneCount() -> SIMDInt32.Mask {
+    SIMDInt32.firstLanes(count: SIMDInt32.laneCount)
+}
+
+@inline(never)
+public func highwayFirstLanesI32ConstantCountLaneCount() -> SIMDInt32.Mask {
+    SIMDInt32.Mask(
+        raw: HighwayReference.Nothrow.firstLanesI32(HighwayReference.Nothrow.laneCountI32())
+    )
+}
+
+@inline(never)
+public func portFirstLanesI32ConstantCountTwiceLaneCount() -> SIMDInt32.Mask {
+    SIMDInt32.firstLanes(count: 2 * SIMDInt32.laneCount)
+}
+
+@inline(never)
+public func highwayFirstLanesI32ConstantCountTwiceLaneCount() -> SIMDInt32.Mask {
+    SIMDInt32.Mask(
+        raw: HighwayReference.Nothrow.firstLanesI32(2 * HighwayReference.Nothrow.laneCountI32())
+    )
+}
+
+@inline(never)
 public func portMaskFromVectorI32(from a: SIMDInt32.Vector) -> SIMDInt32.Mask {
     SIMDInt32.mask(from: a)
 }

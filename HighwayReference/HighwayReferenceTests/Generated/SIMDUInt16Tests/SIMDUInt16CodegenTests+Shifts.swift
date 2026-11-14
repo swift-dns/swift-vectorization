@@ -13,8 +13,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
-                portShiftedLeftU16(a, by: Int32(truncatingIfNeeded: bits)),
-                highwayShiftedLeftU16(a, by: Int32(truncatingIfNeeded: bits)),
+                portShiftedLeftU16(a, by: Int32(clamping: bits)),
+                highwayShiftedLeftU16(a, by: Int32(clamping: bits)),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -26,8 +26,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for bits in bitsInputs {
             mismatches.check(
-                portShiftedLeftU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
-                highwayShiftedLeftU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
+                portShiftedLeftU16ConstantA(by: Int32(clamping: bits)),
+                highwayShiftedLeftU16ConstantA(by: Int32(clamping: bits)),
                 "bits: \(bits)"
             )
         }
@@ -53,8 +53,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
-                portShiftedRightU16(a, by: Int32(truncatingIfNeeded: bits)),
-                highwayShiftedRightU16(a, by: Int32(truncatingIfNeeded: bits)),
+                portShiftedRightU16(a, by: Int32(clamping: bits)),
+                highwayShiftedRightU16(a, by: Int32(clamping: bits)),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -66,8 +66,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for bits in bitsInputs {
             mismatches.check(
-                portShiftedRightU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
-                highwayShiftedRightU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
+                portShiftedRightU16ConstantA(by: Int32(clamping: bits)),
+                highwayShiftedRightU16ConstantA(by: Int32(clamping: bits)),
                 "bits: \(bits)"
             )
         }
@@ -237,8 +237,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
-                portRoundingShiftedRightU16(a, by: Int32(truncatingIfNeeded: bits)),
-                highwayRoundingShiftedRightU16(a, by: Int32(truncatingIfNeeded: bits)),
+                portRoundingShiftedRightU16(a, by: Int32(clamping: bits)),
+                highwayRoundingShiftedRightU16(a, by: Int32(clamping: bits)),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -250,8 +250,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for bits in bitsInputs {
             mismatches.check(
-                portRoundingShiftedRightU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
-                highwayRoundingShiftedRightU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
+                portRoundingShiftedRightU16ConstantA(by: Int32(clamping: bits)),
+                highwayRoundingShiftedRightU16ConstantA(by: Int32(clamping: bits)),
                 "bits: \(bits)"
             )
         }
@@ -373,8 +373,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
-                portRotatedLeftU16(a, by: Int32(truncatingIfNeeded: bits)),
-                highwayRotatedLeftU16(a, by: Int32(truncatingIfNeeded: bits)),
+                portRotatedLeftU16(a, by: Int32(clamping: bits)),
+                highwayRotatedLeftU16(a, by: Int32(clamping: bits)),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -386,8 +386,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for bits in bitsInputs {
             mismatches.check(
-                portRotatedLeftU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
-                highwayRotatedLeftU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
+                portRotatedLeftU16ConstantA(by: Int32(clamping: bits)),
+                highwayRotatedLeftU16ConstantA(by: Int32(clamping: bits)),
                 "bits: \(bits)"
             )
         }
@@ -413,8 +413,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
-                portRotatedRightU16(a, by: Int32(truncatingIfNeeded: bits)),
-                highwayRotatedRightU16(a, by: Int32(truncatingIfNeeded: bits)),
+                portRotatedRightU16(a, by: Int32(clamping: bits)),
+                highwayRotatedRightU16(a, by: Int32(clamping: bits)),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -426,8 +426,8 @@ extension SIMDUInt16CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for bits in bitsInputs {
             mismatches.check(
-                portRotatedRightU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
-                highwayRotatedRightU16ConstantA(by: Int32(truncatingIfNeeded: bits)),
+                portRotatedRightU16ConstantA(by: Int32(clamping: bits)),
+                highwayRotatedRightU16ConstantA(by: Int32(clamping: bits)),
                 "bits: \(bits)"
             )
         }

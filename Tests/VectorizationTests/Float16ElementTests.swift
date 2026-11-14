@@ -225,5 +225,33 @@ struct Float16ElementTests {
         }
         #expect(mismatches.isEmpty, "\(mismatches.count) mismatches: \(mismatches.prefix(2))")
     }
+
+    @Test(
+        "allBitsClear compares Float16 lanes with zero where highway does, so -0.0 counts as zero"
+    )
+    func allBitsClearOfNegativeZero() {
+        typealias H = SIMDFloat16
+        let comparesAsFloat16 =
+            SIMDTarget.hasNativeFloat16Arithmetic || SIMDTarget.targetName == "EMU128"
+        let negativeZeros = ContiguousArray<Float16>(repeating: -0.0, count: H.laneCount)
+        let oneNegativeZero = ContiguousArray((0..<H.laneCount).map { $0 == 1 ? -0.0 : Float16(0) })
+
+        #expect(H.allBitsClear(H.load(from: negativeZeros.span)) == comparesAsFloat16)
+        #expect(H.allBitsClear(H.load(from: oneNegativeZero.span)) == comparesAsFloat16)
+        #expect(H.allBitsClear(H.zero()))
+    }
+
+    @Test("The bit pattern of a constant vector keeps the sign of every zero lane")
+    func bitPatternOfSignedZeros() {
+        var vector = SIMDFloat16.zero()
+        for lane in 0..<SIMDFloat16.laneCount where lane % 2 == 1 {
+            vector[lane] = -0.0
+        }
+
+        #expect(
+            lanes(SIMDUInt16.self, SIMDUInt16.vector(bitPattern: vector))
+                == (0..<SIMDFloat16.laneCount).map { $0 % 2 == 1 ? 0x8000 : 0 }
+        )
+    }
 }
 #endif

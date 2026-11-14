@@ -273,6 +273,94 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkMantissaConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("mantissa with a repeating \(hex(value))")
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.mantissa(H.repeating(value)),
+            HighwayReference.mantissaF32(H.repeating(value)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func mantissaConstantSplatZero() {
+        checkMantissaConstantA(0.0)
+    }
+
+    @Test func mantissaConstantSplatNegativeZero() {
+        checkMantissaConstantA(-0.0)
+    }
+
+    @Test func mantissaConstantSplatOne() {
+        checkMantissaConstantA(1.0)
+    }
+
+    @Test func mantissaConstantSplatMinusOne() {
+        checkMantissaConstantA(-1.0)
+    }
+
+    @Test func mantissaConstantSplatTwo() {
+        checkMantissaConstantA(2.0)
+    }
+
+    @Test func mantissaConstantSplatHalf() {
+        checkMantissaConstantA(0.5)
+    }
+
+    @Test func mantissaConstantSplatFour() {
+        checkMantissaConstantA(4.0)
+    }
+
+    @Test func mantissaConstantSplatQuarter() {
+        checkMantissaConstantA(0.25)
+    }
+
+    @Test func mantissaConstantSplatOnePointFive() {
+        checkMantissaConstantA(1.5)
+    }
+
+    @Test func mantissaConstantSplatMinusTwoPointFive() {
+        checkMantissaConstantA(-2.5)
+    }
+
+    @Test func mantissaConstantSplatInfinity() {
+        checkMantissaConstantA(.infinity)
+    }
+
+    @Test func mantissaConstantSplatMinusInfinity() {
+        checkMantissaConstantA(-.infinity)
+    }
+
+    @Test func mantissaConstantSplatNaN() {
+        checkMantissaConstantA(.nan)
+    }
+
+    @Test func mantissaConstantSplatMinusNaN() {
+        checkMantissaConstantA(-.nan)
+    }
+
+    @Test func mantissaConstantSplatPayloadNaN() {
+        checkMantissaConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func mantissaConstantSplatSignalingNaN() {
+        checkMantissaConstantA(.signalingNaN)
+    }
+
+    @Test func mantissaConstantSplatMinusSignalingNaN() {
+        checkMantissaConstantA(-.signalingNaN)
+    }
+
+    @Test func mantissaConstantSplatLeastNonzero() {
+        checkMantissaConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func mantissaConstantSplatGreatest() {
+        checkMantissaConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkPairwiseAddingConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("pairwiseAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x96F7_9EE7_BD1C_23D1)
@@ -653,4 +741,96 @@ extension SIMDFloatConstantTests {
         checkSumsOf2FromFloat16ConstantA(.greatestFiniteMagnitude)
     }
     #endif
+
+    @inline(__always)
+    private func checkSumsOf2FromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+        let mismatches = Mismatches("sumsOf2FromBFloat16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDBFloat16.repeating(value),
+            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf2(SIMDBFloat16.repeating(value)),
+            HighwayReference.sumsOf2BF16ToF32(SIMDBFloat16.repeating(value).raw),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatZero() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatNegativeZero() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatOne() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatMinusOne() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatTwo() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatHalf() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatFour() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatQuarter() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatOnePointFive() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatMinusTwoPointFive() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatInfinity() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatMinusInfinity() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatNaN() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatMinusNaN() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatPayloadNaN() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatSignalingNaN() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatMinusSignalingNaN() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatLeastNonzero() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantSplatGreatest() {
+        checkSumsOf2FromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+    }
 }

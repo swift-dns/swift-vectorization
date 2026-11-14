@@ -20,6 +20,20 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func expandedNonCanonical() {
+        let mismatches = Mismatches("expanded with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF93F_BD14_76F2_4290)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF93F_BE14_76F2_4443)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            mismatches.check(
+                H.expanded(a, where: mask),
+                HighwayReference.expandedF32(a, mask.raw),
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadExpandedWhere() {
         let mismatches = Mismatches("loadExpandedWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE768_82B1_15A8_2F44)
@@ -59,6 +73,30 @@ extension SIMDFloatReferenceTests {
                     unsafe HighwayReference.loadExpandedWhereF32(mask.raw, source)
                 )
             }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadExpandedWhereNonCanonical() {
+        let mismatches = Mismatches("loadExpandedWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1682_8D1C_4EA9_A3BB)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x1682_8C1C_4EA9_A208
+        )
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.loadExpanded(from: source.baseAddress!, where: mask),
+                    unsafe HighwayReference.loadExpandedWhereF32(mask.raw, source.baseAddress!)
+                )
+            }
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -161,6 +199,44 @@ extension SIMDFloatReferenceTests {
                     )
                 )
             }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadExpandedWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("loadExpandedWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x2338_0E9D_B9B8_F2F7)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2338_0D9D_B9B8_F144)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x2338_109D_B9B8_F65D
+        )
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0xE571_B3D5_2035_E171
+        ) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.loadExpanded(
+                        from: source.baseAddress!,
+                        where: mask,
+                        otherwise: otherwise
+                    ),
+                    unsafe HighwayReference.loadExpandedWhereOtherwiseF32(
+                        otherwise,
+                        mask.raw,
+                        source.baseAddress!
+                    )
+                )
+            }
             mismatches.check(
                 portResult,
                 referenceResult,

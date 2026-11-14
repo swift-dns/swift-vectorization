@@ -121,6 +121,34 @@ extension SIMDUInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func saturatingAdding() {
+        let mismatches = Mismatches("saturatingAdding")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF1DE_9D7B_5E1B_FF96)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF1DE_9E7B_5E1C_0149)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.saturatingAdding(a, b),
+                H.Vector(raw: HighwayReference.saturatingAddingU32(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtracting() {
+        let mismatches = Mismatches("saturatingSubtracting")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x293A_FD75_F411_01C7)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x293A_FC75_F411_0014)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.saturatingSubtracting(a, b),
+                H.Vector(raw: HighwayReference.saturatingSubtractingU32(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func roundedAverage() {
         let mismatches = Mismatches("roundedAverage")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2D66_8C03_2391_1121)

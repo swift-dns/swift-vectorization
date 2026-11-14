@@ -4,6 +4,38 @@ public import CVectorizationOps
 
 extension SIMDUInt8 {
     @export(implementation) @inline(always)
+    public static func halfVector(resizing a: SIMDInt8.QuarterVector) -> HalfVector {
+        HalfVector(raw: cvectorization_ops_half_vector_resizing_quarter_vector_i8_to_u8(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func quarterVector(resizing a: SIMDInt8.QuarterVector) -> QuarterVector {
+        QuarterVector(
+            raw: cvectorization_ops_quarter_vector_resizing_quarter_vector_i8_to_u8(a.raw)
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func eighthVector(resizing a: SIMDInt8.QuarterVector) -> EighthVector {
+        EighthVector(raw: cvectorization_ops_eighth_vector_resizing_quarter_vector_i8_to_u8(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func vector(resizing a: SIMDInt8.EighthVector) -> Vector {
+        Vector(raw: cvectorization_ops_vector_resizing_eighth_vector_i8_to_u8(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func halfVector(resizing a: SIMDInt8.EighthVector) -> HalfVector {
+        HalfVector(raw: cvectorization_ops_half_vector_resizing_eighth_vector_i8_to_u8(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func quarterVector(resizing a: SIMDInt8.EighthVector) -> QuarterVector {
+        QuarterVector(raw: cvectorization_ops_quarter_vector_resizing_eighth_vector_i8_to_u8(a.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func eighthVector(resizing a: SIMDInt8.EighthVector) -> EighthVector {
         EighthVector(raw: cvectorization_ops_eighth_vector_resizing_eighth_vector_i8_to_u8(a.raw))
     }

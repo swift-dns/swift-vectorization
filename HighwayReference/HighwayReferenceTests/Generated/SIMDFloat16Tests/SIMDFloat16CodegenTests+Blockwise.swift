@@ -8,6 +8,112 @@ import Testing
 import Vectorization
 
 extension SIMDFloat16CodegenTests {
+    @Test func tableLookupBytes() {
+        let mismatches = Mismatches("portTableLookupBytesF16")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x99B2_5727_0AC4_EEA5)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            perByte: true,
+            count: 16,
+            seed: 0x99B2_5627_0AC4_ECF2,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTableLookupBytesF16(a, atUnchecked: indices),
+                highwayTableLookupBytesF16(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesConstantA() {
+        let mismatches = Mismatches("portTableLookupBytesF16ConstantA")
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            perByte: true,
+            count: 16,
+            seed: 0x52CD_6C81_DD00_6689,
+            inContract: true
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                portTableLookupBytesF16ConstantA(atUnchecked: indices),
+                highwayTableLookupBytesF16ConstantA(atUnchecked: indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesConstantIndices() {
+        let mismatches = Mismatches("portTableLookupBytesF16ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2913_95F8_4324_3ED8)
+        for a in aInputs {
+            mismatches.check(
+                portTableLookupBytesF16ConstantIndices(a),
+                highwayTableLookupBytesF16ConstantIndices(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZero() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroF16")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAF1F_F373_C730_8C6E)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0xAF1F_F473_C730_8E21,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTableLookupBytesOrZeroF16(a, atUnchecked: indices),
+                highwayTableLookupBytesOrZeroF16(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantA() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroF16ConstantA")
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0x9364_EA65_3B06_56DC,
+            inContract: true
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                portTableLookupBytesOrZeroF16ConstantA(atUnchecked: indices),
+                highwayTableLookupBytesOrZeroF16ConstantA(atUnchecked: indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndices() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroF16ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3A0B_6A50_2B13_9EF1)
+        for a in aInputs {
+            mismatches.check(
+                portTableLookupBytesOrZeroF16ConstantIndices(a),
+                highwayTableLookupBytesOrZeroF16ConstantIndices(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func broadcastingInBlocksConstantA() {
         let mismatches = Mismatches("portBroadcastingInBlocksF16ConstantA")
         mismatches.check(

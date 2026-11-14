@@ -26,6 +26,36 @@ extension SIMDInt8CodegenTests {
         mismatches.record()
     }
 
+    @Test func firstLanesConstantCountTwo() {
+        let mismatches = Mismatches("portFirstLanesI8ConstantCountTwo")
+        mismatches.check(
+            portFirstLanesI8ConstantCountTwo(),
+            highwayFirstLanesI8ConstantCountTwo(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountLaneCount() {
+        let mismatches = Mismatches("portFirstLanesI8ConstantCountLaneCount")
+        mismatches.check(
+            portFirstLanesI8ConstantCountLaneCount(),
+            highwayFirstLanesI8ConstantCountLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portFirstLanesI8ConstantCountTwiceLaneCount")
+        mismatches.check(
+            portFirstLanesI8ConstantCountTwiceLaneCount(),
+            highwayFirstLanesI8ConstantCountTwiceLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
     @Test func maskFromVector() {
         let mismatches = Mismatches("portMaskFromVectorI8")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x66EC_C3B9_BBF0_ECED)

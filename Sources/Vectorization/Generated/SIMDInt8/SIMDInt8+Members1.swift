@@ -350,12 +350,12 @@ extension SIMDInt8 {
 
     @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_shifted_left_i8(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_shifted_left_i8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
     public static func shiftedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_shifted_right_i8(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_shifted_right_i8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -375,12 +375,7 @@ extension SIMDInt8 {
 
     @export(implementation) @inline(always)
     public static func roundingShiftedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(
-            raw: cvectorization_ops_rounding_shifted_right_i8(
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
-        )
+        Vector(raw: cvectorization_ops_rounding_shifted_right_i8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -395,12 +390,12 @@ extension SIMDInt8 {
 
     @export(implementation) @inline(always)
     public static func rotatedLeft(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_rotated_left_i8(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_rotated_left_i8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
     public static func rotatedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_rotated_right_i8(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_rotated_right_i8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -704,6 +699,11 @@ extension SIMDInt8 {
     #endif
 
     @export(implementation) @inline(always)
+    public static func mask(narrowing a: SIMDBFloat16.Mask, _ b: SIMDBFloat16.Mask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_narrowing_bf16_to_i8(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func halfMask(narrowing mask: SIMDUInt16.Mask) -> HalfMask {
         HalfMask(raw: cvectorization_ops_half_mask_narrowing_u16_to_i8(mask.raw))
     }
@@ -721,6 +721,11 @@ extension SIMDInt8 {
     }
 
     #endif
+
+    @export(implementation) @inline(always)
+    public static func halfMask(narrowing mask: SIMDBFloat16.Mask) -> HalfMask {
+        HalfMask(raw: cvectorization_ops_half_mask_narrowing_bf16_to_i8(mask.raw))
+    }
 
     @export(implementation) @inline(always)
     public static func quarterMask(narrowing mask: SIMDUInt32.Mask) -> QuarterMask {
@@ -2095,6 +2100,24 @@ extension SIMDInt8 {
             )
             initializedCount &+= 4 * laneCount
         }
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return unsafe tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_bytes_i8(a.raw, indices.raw))
     }
 
 }

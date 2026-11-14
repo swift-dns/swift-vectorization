@@ -146,6 +146,16 @@ extension SIMDInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func saturatingAdding(_ a: Vector, _ b: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_saturating_adding_i64(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func saturatingSubtracting(_ a: Vector, _ b: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_saturating_subtracting_i64(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func roundedAverage(_ a: Vector, _ b: Vector) -> Vector {
         Vector(raw: cvectorization_ops_rounded_average_i64(a.raw, b.raw))
     }
@@ -375,12 +385,12 @@ extension SIMDInt64 {
 
     @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_shifted_left_i64(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_shifted_left_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
     public static func shiftedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_shifted_right_i64(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_shifted_right_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -400,12 +410,7 @@ extension SIMDInt64 {
 
     @export(implementation) @inline(always)
     public static func roundingShiftedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(
-            raw: cvectorization_ops_rounding_shifted_right_i64(
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
-        )
+        Vector(raw: cvectorization_ops_rounding_shifted_right_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -420,12 +425,12 @@ extension SIMDInt64 {
 
     @export(implementation) @inline(always)
     public static func rotatedLeft(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_rotated_left_i64(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_rotated_left_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
     public static func rotatedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_rotated_right_i64(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_rotated_right_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -754,6 +759,11 @@ extension SIMDInt64 {
     }
 
     #endif
+
+    @export(implementation) @inline(always)
+    public static func mask(widening mask: SIMDBFloat16.QuarterMask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_widening_quarter_vector_bf16_to_i64(mask.raw))
+    }
 
     @export(implementation) @inline(always)
     public static func mask(widening mask: SIMDUInt8.EighthMask) -> Mask {
@@ -1712,6 +1722,35 @@ extension SIMDInt64 {
                 addingCount
             )
             initializedCount &+= addingCount
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func store(_ a: Vector, to: UnsafeMutablePointer<Lane>, where mask: Mask) {
+        unsafe cvectorization_ops_store_where_i64(a.raw, mask.raw, to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func store(_ a: Vector, to span: inout MutableSpan<Lane>, where mask: Mask) {
+        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        unsafe store(a, toUnchecked: &span, where: mask)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func store(
+        _ a: Vector,
+        toUnchecked span: inout MutableSpan<Lane>,
+        where mask: Mask
+    ) {
+        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_store_where_i64(
+                a.raw,
+                mask.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 

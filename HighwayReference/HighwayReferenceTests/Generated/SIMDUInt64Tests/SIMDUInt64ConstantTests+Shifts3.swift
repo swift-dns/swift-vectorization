@@ -14,10 +14,7 @@ extension SIMDUInt64ConstantTests {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.rotatedRightTemplateU64(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.rotatedRightTemplateU64(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )
@@ -296,7 +293,7 @@ extension SIMDUInt64ConstantTests {
                 H.Vector(
                     raw: HighwayReference.rotatedRightU64(
                         H.repeating(value).raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "bits: \(bits)"

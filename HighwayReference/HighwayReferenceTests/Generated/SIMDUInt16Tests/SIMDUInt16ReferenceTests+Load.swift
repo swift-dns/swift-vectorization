@@ -306,6 +306,32 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadWhereNonCanonical() {
+        let mismatches = Mismatches("loadWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7C13_391C_4823_C087)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x7C13_381C_4823_BED4
+        )
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.load(from: source.baseAddress!, where: mask),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadWhereU16(mask.raw, source.baseAddress!)
+                    )
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadWhereUncheckedSpan() {
         let mismatches = Mismatches("loadWhere unchecked span")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA7DB_0272_D123_150A)
@@ -395,6 +421,42 @@ extension SIMDUInt16ReferenceTests {
                     )
                 )
             }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("loadWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5EC2_6C9F_0735_C9B3)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5EC2_6B9F_0735_C800)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x5EC2_6E9F_0735_CD19
+        )
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0x26BD_ABF4_46AE_4B75
+        ) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.load(from: source.baseAddress!, where: mask, otherwise: otherwise),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadWhereOtherwiseU16(
+                            otherwise.raw,
+                            mask.raw,
+                            source.baseAddress!
+                        )
+                    )
+                )
+            }
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -631,6 +693,28 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadHalfResized() {
+        let mismatches = Mismatches("loadHalf resized with its unspecified lanes zeroed")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount / 2,
+            seed: 0x96D1_8498_2599_4E40
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.selectingOrZero(
+                        H.firstLanes(count: H.laneCount / 2),
+                        H.vector(resizing: H.loadHalf(from: source.baseAddress!))
+                    ),
+                    unsafe H.Vector(raw: HighwayReference.resizedLoadHalfU16(source.baseAddress!))
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadHalfUncheckedSpan() {
         let mismatches = Mismatches("loadHalf unchecked span")
         let fromInputs = Inputs.buffers(
@@ -691,6 +775,30 @@ extension SIMDUInt16ReferenceTests {
                     unsafe H.QuarterVector(raw: HighwayReference.loadQuarterU16(source))
                 )
             }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadQuarterResized() {
+        let mismatches = Mismatches("loadQuarter resized with its unspecified lanes zeroed")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount / 4,
+            seed: 0x8BBD_CED8_6605_E7E3
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.selectingOrZero(
+                        H.firstLanes(count: H.laneCount / 4),
+                        H.vector(resizing: H.loadQuarter(from: source.baseAddress!))
+                    ),
+                    unsafe H.Vector(
+                        raw: HighwayReference.resizedLoadQuarterU16(source.baseAddress!)
+                    )
+                )
+            }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
         mismatches.record()

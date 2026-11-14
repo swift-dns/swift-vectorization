@@ -165,4 +165,33 @@ extension SIMDInt32ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func vectorWideningLowerFromHalfUInt8() {
+        let mismatches = Mismatches("vectorWideningLowerFromHalfUInt8")
+        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0x2428_03CB_7296_0C2F)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                H.Vector(raw: HighwayReference.vectorWideningLowerHalfU8ToI32(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromHalfInt8() {
+        let mismatches = Mismatches("vectorWideningLowerFromHalfInt8")
+        let aInputs = Inputs.conversions(SIMDInt8.HalfVector.self, seed: 0x9037_C29E_FB16_BC74).map(
+            poisoningUpperBytes
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                H.Vector(raw: HighwayReference.vectorWideningLowerHalfI8ToI32(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

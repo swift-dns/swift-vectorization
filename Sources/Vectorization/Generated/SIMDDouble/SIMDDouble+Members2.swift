@@ -4,59 +4,6 @@ public import CVectorizationOps
 
 extension SIMDDouble {
     @export(implementation) @inline(always)
-    public static func store(_ a: BlockVector, to: UnsafeMutablePointer<Lane>) {
-        unsafe cvectorization_ops_store_block_f64(a.raw, to)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func store(_ a: BlockVector, to span: inout MutableSpan<Lane>) {
-        precondition(
-            span.count >= 16 / MemoryLayout<Lane>.stride,
-            "Span has fewer elements than a block has lanes"
-        )
-        unsafe store(a, toUnchecked: &span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func store(_ a: BlockVector, toUnchecked span: inout MutableSpan<Lane>) {
-        assert(
-            span.count >= 16 / MemoryLayout<Lane>.stride,
-            "Span has fewer elements than a block has lanes"
-        )
-        span.withUnsafeMutableBufferPointer {
-            unsafe cvectorization_ops_store_block_f64(a.raw, $0.baseAddress.unsafelyUnwrapped)
-        }
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func append(_ a: BlockVector, to output: inout OutputSpan<Lane>) {
-        precondition(
-            output.freeCapacity >= 16 / MemoryLayout<Lane>.stride,
-            "OutputSpan has less free capacity than a block has lanes"
-        )
-        unsafe append(a, toUnchecked: &output)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func append(_ a: BlockVector, toUnchecked output: inout OutputSpan<Lane>) {
-        assert(
-            output.freeCapacity >= 16 / MemoryLayout<Lane>.stride,
-            "OutputSpan has less free capacity than a block has lanes"
-        )
-        unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe cvectorization_ops_store_block_f64(
-                a.raw,
-                buffer.baseAddress.unsafelyUnwrapped + initializedCount
-            )
-            initializedCount &+= 16 / MemoryLayout<Lane>.stride
-        }
-    }
-
-    @export(implementation) @inline(always)
     public static func loadInterleaved2(
         from: UnsafePointer<Lane>,
         _ v0: inout Vector,
@@ -424,6 +371,42 @@ extension SIMDDouble {
     }
 
     @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_bytes_f64(indices, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return unsafe tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_bytes_f64(indices, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return cvectorization_ops_table_lookup_bytes_f64(a, indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_bytes_f64(indices, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return unsafe tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_bytes_f64(indices, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return cvectorization_ops_table_lookup_bytes_or_zero_f64(a, indices)
+    }
+
+    @export(implementation) @inline(always)
     public static func pairwiseAddingBlocks(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_pairwise_adding_blocks_f64(a, b)
     }
@@ -443,6 +426,36 @@ extension SIMDDouble {
     public static func broadcastingInBlocks(_ a: Vector, laneUnchecked lane: Int) -> Vector {
         assert(lane >= 0 && lane <= 1, "Lane is negative or not in a block")
         return cvectorization_ops_broadcasting_in_blocks_f64(a, Int32(truncatingIfNeeded: lane))
+    }
+
+    @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector {
+        precondition(
+            bytes >= 0 && bytes <= 16,
+            "Byte count is negative or more than a block has bytes"
+        )
+        return unsafe shiftedLeftBytes(a, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector {
+        assert(bytes >= 0 && bytes <= 16, "Byte count is negative or more than a block has bytes")
+        return cvectorization_ops_shifted_left_bytes_f64(a, Int32(truncatingIfNeeded: bytes))
+    }
+
+    @export(implementation) @inline(always)
+    public static func shiftedRightBytes(_ a: Vector, by bytes: Int) -> Vector {
+        precondition(
+            bytes >= 0 && bytes <= 16,
+            "Byte count is negative or more than a block has bytes"
+        )
+        return unsafe shiftedRightBytes(a, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func shiftedRightBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector {
+        assert(bytes >= 0 && bytes <= 16, "Byte count is negative or more than a block has bytes")
+        return cvectorization_ops_shifted_right_bytes_f64(a, Int32(truncatingIfNeeded: bytes))
     }
 
     @export(implementation) @inline(always)
@@ -476,6 +489,27 @@ extension SIMDDouble {
     }
 
     @export(implementation) @inline(always)
+    public static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
+    {
+        precondition(bytes >= 1 && bytes <= 15, "Byte count is not between 1 and 15")
+        return unsafe combinedShiftedRightBytes(a, b, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func combinedShiftedRightBytes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked bytes: Int
+    ) -> Vector {
+        assert(bytes >= 1 && bytes <= 15, "Byte count is not between 1 and 15")
+        return cvectorization_ops_combined_shifted_right_bytes_f64(
+            a,
+            b,
+            Int32(truncatingIfNeeded: bytes)
+        )
+    }
+
+    @export(implementation) @inline(always)
     public static func combinedShiftedRightLanes(_ a: Vector, _ b: Vector, by lanes: Int) -> Vector
     {
         precondition(
@@ -505,6 +539,11 @@ extension SIMDDouble {
     @export(implementation) @inline(always)
     public static func reversed(_ a: Vector) -> Vector {
         cvectorization_ops_reversed_f64(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func byteSwapped(_ a: Vector) -> Vector {
+        cvectorization_ops_byte_swapped_f64(a)
     }
 
     @export(implementation) @inline(always)
@@ -734,10 +773,10 @@ extension SIMDDouble {
                 cvectorization_ops_indices_within_i64(
                     unsafe cvectorization_ops_load_indices_f64($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return unsafe loadIndices(fromUnchecked: span)
     }
@@ -751,10 +790,10 @@ extension SIMDDouble {
                 cvectorization_ops_indices_within_i64(
                     unsafe cvectorization_ops_load_indices_f64($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return span.withUnsafeBufferPointer {
             Indices(
@@ -1408,7 +1447,11 @@ extension SIMDDouble {
     @export(implementation) @inline(always)
     public static func gather(from span: Span<Lane>, indices: SIMDInt64.Vector) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_i64(indices.raw, 0, span.count),
+            cvectorization_ops_indices_within_i64(
+                indices.raw,
+                0,
+                SIMDInt64.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         return unsafe gather(fromUnchecked: span, indices: indices)
@@ -1418,7 +1461,11 @@ extension SIMDDouble {
     @unsafe @export(implementation) @inline(always)
     public static func gather(fromUnchecked span: Span<Lane>, indices: SIMDInt64.Vector) -> Vector {
         assert(
-            cvectorization_ops_indices_within_i64(indices.raw, 0, span.count),
+            cvectorization_ops_indices_within_i64(
+                indices.raw,
+                0,
+                SIMDInt64.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         return span.withUnsafeBufferPointer {
@@ -1438,7 +1485,7 @@ extension SIMDDouble {
             cvectorization_ops_indices_within_i64(
                 byteOffsets.raw,
                 0,
-                Swift.max(span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1, 0)
+                SIMDInt64.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
             ),
             "Byte offset is negative or leaves no room for a lane in the span"
         )
@@ -1455,7 +1502,7 @@ extension SIMDDouble {
             cvectorization_ops_indices_within_i64(
                 byteOffsets.raw,
                 0,
-                Swift.max(span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1, 0)
+                SIMDInt64.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
             ),
             "Byte offset is negative or leaves no room for a lane in the span"
         )
@@ -1481,9 +1528,9 @@ extension SIMDDouble {
         count: Int
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f64(
+            cvectorization_ops_gather_indices_within_where_f64(
                 indices.raw,
-                span.count,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1499,15 +1546,75 @@ extension SIMDDouble {
         count: Int
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f64(
+            cvectorization_ops_gather_indices_within_where_f64(
                 indices.raw,
-                span.count,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         return span.withUnsafeBufferPointer {
             unsafe cvectorization_ops_gather_first_f64($0.baseAddress, indices.raw, count)
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func gather(
+        from: UnsafePointer<Lane>,
+        indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        unsafe cvectorization_ops_gather_first_otherwise_f64(otherwise, from, indices.raw, count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func gather(
+        from span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        precondition(
+            cvectorization_ops_gather_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return unsafe gather(
+            fromUnchecked: span,
+            indices: indices,
+            count: count,
+            otherwise: otherwise
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func gather(
+        fromUnchecked span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        assert(
+            cvectorization_ops_gather_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return span.withUnsafeBufferPointer {
+            unsafe cvectorization_ops_gather_first_otherwise_f64(
+                otherwise,
+                $0.baseAddress,
+                indices.raw,
+                count
+            )
         }
     }
 
@@ -1528,7 +1635,11 @@ extension SIMDDouble {
         where mask: Mask
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f64(indices.raw, span.count, mask.raw),
+            cvectorization_ops_gather_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         return unsafe gather(fromUnchecked: span, indices: indices, where: mask)
@@ -1542,7 +1653,11 @@ extension SIMDDouble {
         where mask: Mask
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f64(indices.raw, span.count, mask.raw),
+            cvectorization_ops_gather_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         return span.withUnsafeBufferPointer {
@@ -1569,7 +1684,11 @@ extension SIMDDouble {
         otherwise: Vector
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f64(indices.raw, span.count, mask.raw),
+            cvectorization_ops_gather_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         return unsafe gather(
@@ -1589,7 +1708,11 @@ extension SIMDDouble {
         otherwise: Vector
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f64(indices.raw, span.count, mask.raw),
+            cvectorization_ops_gather_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         return span.withUnsafeBufferPointer {
@@ -1619,7 +1742,11 @@ extension SIMDDouble {
         indices: SIMDInt64.Vector
     ) {
         precondition(
-            cvectorization_ops_indices_within_i64(indices.raw, 0, span.count),
+            cvectorization_ops_indices_within_i64(
+                indices.raw,
+                0,
+                SIMDInt64.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         unsafe scatter(a, toUnchecked: &span, indices: indices)
@@ -1633,58 +1760,15 @@ extension SIMDDouble {
         indices: SIMDInt64.Vector
     ) {
         assert(
-            cvectorization_ops_indices_within_i64(indices.raw, 0, span.count),
+            cvectorization_ops_indices_within_i64(
+                indices.raw,
+                0,
+                SIMDInt64.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         span.withUnsafeMutableBufferPointer {
             unsafe cvectorization_ops_scatter_f64(a, $0.baseAddress, indices.raw)
-        }
-    }
-
-    @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        to: UnsafeMutablePointer<Lane>,
-        byteOffsets: SIMDInt64.Vector
-    ) {
-        unsafe cvectorization_ops_scatter_byte_offsets_f64(a, to, byteOffsets.raw)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        to span: inout MutableSpan<Lane>,
-        byteOffsets: SIMDInt64.Vector
-    ) {
-        precondition(
-            cvectorization_ops_indices_within_i64(
-                byteOffsets.raw,
-                0,
-                Swift.max(span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1, 0)
-            ),
-            "Byte offset is negative or leaves no room for a lane in the span"
-        )
-        unsafe scatter(a, toUnchecked: &span, byteOffsets: byteOffsets)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        toUnchecked span: inout MutableSpan<Lane>,
-        byteOffsets: SIMDInt64.Vector
-    ) {
-        assert(
-            cvectorization_ops_indices_within_i64(
-                byteOffsets.raw,
-                0,
-                Swift.max(span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1, 0)
-            ),
-            "Byte offset is negative or leaves no room for a lane in the span"
-        )
-        span.withUnsafeMutableBufferPointer {
-            unsafe cvectorization_ops_scatter_byte_offsets_f64(a, $0.baseAddress, byteOffsets.raw)
         }
     }
 

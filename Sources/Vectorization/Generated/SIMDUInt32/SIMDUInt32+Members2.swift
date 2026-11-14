@@ -728,10 +728,10 @@ extension SIMDUInt32 {
                 cvectorization_ops_indices_within_u32(
                     unsafe cvectorization_ops_load_indices_u32($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return unsafe loadIndices(fromUnchecked: span)
     }
@@ -745,10 +745,10 @@ extension SIMDUInt32 {
                 cvectorization_ops_indices_within_u32(
                     unsafe cvectorization_ops_load_indices_u32($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return span.withUnsafeBufferPointer {
             Indices(
@@ -1297,11 +1297,7 @@ extension SIMDUInt32 {
     @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int, where mask: Mask) -> Vector {
         Vector(
-            raw: cvectorization_ops_shifted_left_where_u32(
-                mask.raw,
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
+            raw: cvectorization_ops_shifted_left_where_u32(mask.raw, a.raw, Int32(clamping: bits))
         )
     }
 
@@ -1317,7 +1313,7 @@ extension SIMDUInt32 {
                 otherwise.raw,
                 mask.raw,
                 a.raw,
-                Int32(truncatingIfNeeded: bits)
+                Int32(clamping: bits)
             )
         )
     }
@@ -1325,11 +1321,7 @@ extension SIMDUInt32 {
     @export(implementation) @inline(always)
     public static func shiftedRight(_ a: Vector, by bits: Int, where mask: Mask) -> Vector {
         Vector(
-            raw: cvectorization_ops_shifted_right_where_u32(
-                mask.raw,
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
+            raw: cvectorization_ops_shifted_right_where_u32(mask.raw, a.raw, Int32(clamping: bits))
         )
     }
 
@@ -1345,7 +1337,7 @@ extension SIMDUInt32 {
                 otherwise.raw,
                 mask.raw,
                 a.raw,
-                Int32(truncatingIfNeeded: bits)
+                Int32(clamping: bits)
             )
         )
     }
@@ -1622,7 +1614,11 @@ extension SIMDUInt32 {
     @export(implementation) @inline(always)
     public static func gather(from span: Span<Lane>, indices: SIMDInt32.Vector) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_i32(indices.raw, 0, Swift.min(span.count, 1 << 31)),
+            cvectorization_ops_indices_within_i32(
+                indices.raw,
+                0,
+                SIMDInt32.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         return unsafe gather(fromUnchecked: span, indices: indices)
@@ -1632,7 +1628,11 @@ extension SIMDUInt32 {
     @unsafe @export(implementation) @inline(always)
     public static func gather(fromUnchecked span: Span<Lane>, indices: SIMDInt32.Vector) -> Vector {
         assert(
-            cvectorization_ops_indices_within_i32(indices.raw, 0, Swift.min(span.count, 1 << 31)),
+            cvectorization_ops_indices_within_i32(
+                indices.raw,
+                0,
+                SIMDInt32.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         return span.withUnsafeBufferPointer {
@@ -1652,13 +1652,7 @@ extension SIMDUInt32 {
             cvectorization_ops_indices_within_i32(
                 byteOffsets.raw,
                 0,
-                Swift.min(
-                    Swift.max(
-                        span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1,
-                        0
-                    ),
-                    1 << 31
-                )
+                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
             ),
             "Byte offset is negative or leaves no room for a lane in the span"
         )
@@ -1675,13 +1669,7 @@ extension SIMDUInt32 {
             cvectorization_ops_indices_within_i32(
                 byteOffsets.raw,
                 0,
-                Swift.min(
-                    Swift.max(
-                        span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1,
-                        0
-                    ),
-                    1 << 31
-                )
+                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
             ),
             "Byte offset is negative or leaves no room for a lane in the span"
         )
@@ -1712,9 +1700,9 @@ extension SIMDUInt32 {
         count: Int
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1730,9 +1718,9 @@ extension SIMDUInt32 {
         count: Int
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1740,6 +1728,75 @@ extension SIMDUInt32 {
         return span.withUnsafeBufferPointer {
             Vector(
                 raw: unsafe cvectorization_ops_gather_first_u32($0.baseAddress, indices.raw, count)
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func gather(
+        from: UnsafePointer<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        Vector(
+            raw: unsafe cvectorization_ops_gather_first_otherwise_u32(
+                otherwise.raw,
+                from,
+                indices.raw,
+                count
+            )
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func gather(
+        from span: Span<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        precondition(
+            cvectorization_ops_gather_indices_within_where_u32(
+                indices.raw,
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return unsafe gather(
+            fromUnchecked: span,
+            indices: indices,
+            count: count,
+            otherwise: otherwise
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func gather(
+        fromUnchecked span: Span<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        assert(
+            cvectorization_ops_gather_indices_within_where_u32(
+                indices.raw,
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_gather_first_otherwise_u32(
+                    otherwise.raw,
+                    $0.baseAddress,
+                    indices.raw,
+                    count
+                )
             )
         }
     }
@@ -1761,9 +1818,9 @@ extension SIMDUInt32 {
         where mask: Mask
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1779,9 +1836,9 @@ extension SIMDUInt32 {
         where mask: Mask
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1823,9 +1880,9 @@ extension SIMDUInt32 {
         otherwise: Vector
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1847,9 +1904,9 @@ extension SIMDUInt32 {
         otherwise: Vector
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1883,7 +1940,11 @@ extension SIMDUInt32 {
         indices: SIMDInt32.Vector
     ) {
         precondition(
-            cvectorization_ops_indices_within_i32(indices.raw, 0, Swift.min(span.count, 1 << 31)),
+            cvectorization_ops_indices_within_i32(
+                indices.raw,
+                0,
+                SIMDInt32.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         unsafe scatter(a, toUnchecked: &span, indices: indices)
@@ -1897,7 +1958,11 @@ extension SIMDUInt32 {
         indices: SIMDInt32.Vector
     ) {
         assert(
-            cvectorization_ops_indices_within_i32(indices.raw, 0, Swift.min(span.count, 1 << 31)),
+            cvectorization_ops_indices_within_i32(
+                indices.raw,
+                0,
+                SIMDInt32.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         span.withUnsafeMutableBufferPointer {
@@ -1925,13 +1990,7 @@ extension SIMDUInt32 {
             cvectorization_ops_indices_within_i32(
                 byteOffsets.raw,
                 0,
-                Swift.min(
-                    Swift.max(
-                        span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1,
-                        0
-                    ),
-                    1 << 31
-                )
+                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
             ),
             "Byte offset is negative or leaves no room for a lane in the span"
         )
@@ -1949,13 +2008,7 @@ extension SIMDUInt32 {
             cvectorization_ops_indices_within_i32(
                 byteOffsets.raw,
                 0,
-                Swift.min(
-                    Swift.max(
-                        span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1,
-                        0
-                    ),
-                    1 << 31
-                )
+                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
             ),
             "Byte offset is negative or leaves no room for a lane in the span"
         )
@@ -1989,7 +2042,7 @@ extension SIMDUInt32 {
         precondition(
             cvectorization_ops_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -2008,7 +2061,7 @@ extension SIMDUInt32 {
         assert(
             cvectorization_ops_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -2039,7 +2092,7 @@ extension SIMDUInt32 {
         precondition(
             cvectorization_ops_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -2058,7 +2111,7 @@ extension SIMDUInt32 {
         assert(
             cvectorization_ops_indices_within_where_u32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -2109,16 +2162,6 @@ extension SIMDUInt32 {
     @export(implementation) @inline(always)
     public static func compressed(_ a: Vector, where mask: Mask) -> Vector {
         Vector(raw: cvectorization_ops_compressed_u32(a.raw, mask.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func compressedNot(_ a: Vector, where mask: Mask) -> Vector {
-        Vector(raw: cvectorization_ops_compressed_not_u32(a.raw, mask.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func partitioned(_ a: Vector, where mask: Mask) -> Vector {
-        Vector(raw: cvectorization_ops_partitioned_u32(a.raw, mask.raw))
     }
 
 }

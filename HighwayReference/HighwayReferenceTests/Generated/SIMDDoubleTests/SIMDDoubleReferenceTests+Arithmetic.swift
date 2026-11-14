@@ -159,6 +159,15 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func mantissa() {
+        let mismatches = Mismatches("mantissa")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA38D_B48C_7891_5783)
+        for a in aInputs {
+            mismatches.check(H.mantissa(a), HighwayReference.mantissaF64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func pairwiseAdding() {
         let mismatches = Mismatches("pairwiseAdding")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5082_052D_DEC2_6AFA)
@@ -192,6 +201,30 @@ extension SIMDDoubleReferenceTests {
         let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x39D9_6843_D1EE_4C1A)
         for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a) {
             mismatches.check(H.sumsOf2(a), HighwayReference.sumsOf2F32ToF64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf4FromFloat16() {
+        let mismatches = Mismatches("sumsOf4FromFloat16")
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x432A_0DBC_573C_A8BF)
+        for a in aInputs where !hasUnorderedNaNs(adjacentQuadsOf: a) {
+            mismatches.check(H.sumsOf4(a), HighwayReference.sumsOf4F16ToF64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+    #endif
+
+    @Test func sumsOf4FromBFloat16() {
+        let mismatches = Mismatches("sumsOf4FromBFloat16")
+        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x0CB5_3CFE_15C0_C827)
+        for a in aInputs where !hasUnorderedNaNs(adjacentQuadsOf: a) {
+            mismatches.check(
+                H.sumsOf4(a),
+                HighwayReference.sumsOf4BF16ToF64(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }

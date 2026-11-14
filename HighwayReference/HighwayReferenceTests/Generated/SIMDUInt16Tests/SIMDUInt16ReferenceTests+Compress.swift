@@ -24,6 +24,24 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func compressedNonCanonical() {
+        let mismatches = Mismatches("compressed with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD95A_415E_9DAB_5849)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xD95A_405E_9DAB_5696)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let port = H.compressed(a, where: mask)
+            let reference = H.Vector(raw: HighwayReference.compressedU16(a.raw, mask.raw))
+            let checkedLanes =
+                HighwayReference.compressTailIsDeterministicU16() ? H.laneCount : H.trueCount(mask)
+            mismatches.check(
+                (0..<checkedLanes).map { port.simd[$0] },
+                (0..<checkedLanes).map { reference.simd[$0] },
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func compressedNot() {
         let mismatches = Mismatches("compressedNot")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9E96_D48A_E743_6535)
@@ -43,10 +61,43 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func compressedNotNonCanonical() {
+        let mismatches = Mismatches("compressedNot with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1016_5D30_9B36_2F72)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1016_5E30_9B36_3125)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let port = H.compressedNot(a, where: mask)
+            let reference = H.Vector(raw: HighwayReference.compressedNotU16(a.raw, mask.raw))
+            let checkedLanes =
+                HighwayReference.compressTailIsDeterministicU16()
+                ? H.laneCount : H.laneCount - H.trueCount(mask)
+            mismatches.check(
+                (0..<checkedLanes).map { port.simd[$0] },
+                (0..<checkedLanes).map { reference.simd[$0] },
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func partitioned() {
         let mismatches = Mismatches("partitioned")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xADFC_BB74_7076_5DC8)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xADFC_BC74_7076_5F7B)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            mismatches.check(
+                H.partitioned(a, where: mask),
+                H.Vector(raw: HighwayReference.partitionedU16(a.raw, mask.raw)),
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func partitionedNonCanonical() {
+        let mismatches = Mismatches("partitioned with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9183_08AB_00F8_F747)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x9183_07AB_00F8_F594)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.partitioned(a, where: mask),
@@ -101,6 +152,38 @@ extension SIMDUInt16ReferenceTests {
             let (referenceResult, referenceLanes) = unsafe withGuardedLanes(sentinel) {
                 destination in
                 unsafe HighwayReference.storeCompressedU16(a.raw, mask.raw, destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeCompressedNonCanonical() {
+        let mismatches = Mismatches("storeCompressed with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7A71_4823_39C8_C8AC)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7A71_4923_39C8_CA5F)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            var portLanes = sentinel
+            let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe H.storeCompressed(a, where: mask, to: destination.baseAddress!)
+            }
+            var referenceLanes = sentinel
+            let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe HighwayReference.storeCompressedU16(
+                    a.raw,
+                    mask.raw,
+                    destination.baseAddress!
+                )
             }
             mismatches.check(
                 portLanes,
@@ -194,6 +277,38 @@ extension SIMDUInt16ReferenceTests {
             let (referenceResult, referenceLanes) = unsafe withGuardedLanes(sentinel) {
                 destination in
                 unsafe HighwayReference.storeCompressedBlendedU16(a.raw, mask.raw, destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeCompressedBlendedNonCanonical() {
+        let mismatches = Mismatches("storeCompressedBlended with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBEC9_3CAF_005B_3BA2)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xBEC9_3DAF_005B_3D55)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            var portLanes = sentinel
+            let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe H.storeCompressedBlended(a, where: mask, to: destination.baseAddress!)
+            }
+            var referenceLanes = sentinel
+            let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe HighwayReference.storeCompressedBlendedU16(
+                    a.raw,
+                    mask.raw,
+                    destination.baseAddress!
+                )
             }
             mismatches.check(
                 portLanes,

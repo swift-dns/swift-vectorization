@@ -61,4 +61,18 @@ extension SIMDDoubleReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func rearrangedToOddPlusEven() {
+        let mismatches = Mismatches("rearrangedToOddPlusEven")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5795_13E3_0890_DDB6)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5795_14E3_0890_DF69)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.rearrangedToOddPlusEven(a, b),
+                HighwayReference.rearrangedToOddPlusEvenF64(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
 }

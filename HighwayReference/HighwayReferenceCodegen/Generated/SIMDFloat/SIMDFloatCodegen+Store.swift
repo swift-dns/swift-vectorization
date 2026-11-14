@@ -297,6 +297,58 @@ public func highwayStoreFirstF32ConstantCount(
 }
 
 @inline(never)
+public func portStoreFirstF32ConstantCountTwo(
+    _ a: SIMDFloat.Vector,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.storeFirst(a, to: to, count: 2)
+}
+
+@inline(never)
+public func highwayStoreFirstF32ConstantCountTwo(
+    _ a: SIMDFloat.Vector,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstF32(a, to, 2)
+}
+
+@inline(never)
+public func portStoreFirstF32ConstantCountLaneCount(
+    _ a: SIMDFloat.Vector,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.storeFirst(a, to: to, count: SIMDFloat.laneCount)
+}
+
+@inline(never)
+public func highwayStoreFirstF32ConstantCountLaneCount(
+    _ a: SIMDFloat.Vector,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstF32(a, to, HighwayReference.Nothrow.laneCountF32())
+}
+
+@inline(never)
+public func portStoreFirstF32ConstantCountTwiceLaneCount(
+    _ a: SIMDFloat.Vector,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.storeFirst(a, to: to, count: 2 * SIMDFloat.laneCount)
+}
+
+@inline(never)
+public func highwayStoreFirstF32ConstantCountTwiceLaneCount(
+    _ a: SIMDFloat.Vector,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstF32(
+        a,
+        to,
+        2 * HighwayReference.Nothrow.laneCountF32()
+    )
+}
+
+@inline(never)
 public func portStoreWhereF32(
     _ a: SIMDFloat.Vector,
     to: UnsafeMutablePointer<SIMDFloat.Lane>,
@@ -373,6 +425,62 @@ public func highwayStoreRepeatingF32ConstantCount(_ value: Float, to: UnsafeMuta
 }
 
 @inline(never)
+public func portStoreRepeatingF32ConstantCountTwo(
+    _ value: SIMDFloat.Lane,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.storeRepeating(value, count: 2, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingF32ConstantCountTwo(
+    _ value: Float,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.storeRepeatingF32(2, value, to)
+}
+
+@inline(never)
+public func portStoreRepeatingF32ConstantCountLaneCount(
+    _ value: SIMDFloat.Lane,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.storeRepeating(value, count: SIMDFloat.laneCount, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingF32ConstantCountLaneCount(
+    _ value: Float,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.storeRepeatingF32(
+        HighwayReference.Nothrow.laneCountF32(),
+        value,
+        to
+    )
+}
+
+@inline(never)
+public func portStoreRepeatingF32ConstantCountTwiceLaneCount(
+    _ value: SIMDFloat.Lane,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.storeRepeating(value, count: 2 * SIMDFloat.laneCount, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingF32ConstantCountTwiceLaneCount(
+    _ value: Float,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.storeRepeatingF32(
+        2 * HighwayReference.Nothrow.laneCountF32(),
+        value,
+        to
+    )
+}
+
+@inline(never)
 public func portCopyF32(
     count: Int,
     from: UnsafePointer<SIMDFloat.Lane>,
@@ -399,6 +507,54 @@ public func portCopyF32ConstantCount(
 public func highwayCopyF32ConstantCount(from: UnsafePointer<Float>, to: UnsafeMutablePointer<Float>)
 {
     unsafe HighwayReference.Nothrow.copyF32(1, from, to)
+}
+
+@inline(never)
+public func portCopyF32ConstantCountTwo(
+    from: UnsafePointer<SIMDFloat.Lane>,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.copy(count: 2, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyF32ConstantCountTwo(
+    from: UnsafePointer<Float>,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.copyF32(2, from, to)
+}
+
+@inline(never)
+public func portCopyF32ConstantCountLaneCount(
+    from: UnsafePointer<SIMDFloat.Lane>,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.copy(count: SIMDFloat.laneCount, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyF32ConstantCountLaneCount(
+    from: UnsafePointer<Float>,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.copyF32(HighwayReference.Nothrow.laneCountF32(), from, to)
+}
+
+@inline(never)
+public func portCopyF32ConstantCountTwiceLaneCount(
+    from: UnsafePointer<SIMDFloat.Lane>,
+    to: UnsafeMutablePointer<SIMDFloat.Lane>
+) {
+    unsafe SIMDFloat.copy(count: 2 * SIMDFloat.laneCount, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyF32ConstantCountTwiceLaneCount(
+    from: UnsafePointer<Float>,
+    to: UnsafeMutablePointer<Float>
+) {
+    unsafe HighwayReference.Nothrow.copyF32(2 * HighwayReference.Nothrow.laneCountF32(), from, to)
 }
 
 @inline(never)

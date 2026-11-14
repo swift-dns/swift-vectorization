@@ -36,6 +36,76 @@ public func highwayShiftedLeftLanesBF16ConstantLanes(
 }
 
 @inline(never)
+public func portCombinedShiftedRightBytesBF16ConstantA(
+    _ b: SIMDBFloat16.Vector
+) -> SIMDBFloat16.Vector {
+    unsafe SIMDBFloat16.combinedShiftedRightBytes(
+        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        b,
+        byUnchecked: 1
+    )
+}
+
+@inline(never)
+public func highwayCombinedShiftedRightBytesBF16ConstantA(
+    _ b: SIMDBFloat16.Vector
+) -> SIMDBFloat16.Vector {
+    SIMDBFloat16.Vector(
+        raw: HighwayReference.Nothrow.combinedShiftedRightBytesBF16(
+            SIMDBFloat16.Vector(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            1
+        )
+    )
+}
+
+@inline(never)
+public func portCombinedShiftedRightBytesBF16ConstantB(
+    _ a: SIMDBFloat16.Vector
+) -> SIMDBFloat16.Vector {
+    unsafe SIMDBFloat16.combinedShiftedRightBytes(
+        a,
+        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        byUnchecked: 1
+    )
+}
+
+@inline(never)
+public func highwayCombinedShiftedRightBytesBF16ConstantB(
+    _ a: SIMDBFloat16.Vector
+) -> SIMDBFloat16.Vector {
+    SIMDBFloat16.Vector(
+        raw: HighwayReference.Nothrow.combinedShiftedRightBytesBF16(
+            a.raw,
+            SIMDBFloat16.Vector(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw,
+            1
+        )
+    )
+}
+
+@inline(never)
+public func portCombinedShiftedRightBytesBF16ConstantBytes(
+    _ a: SIMDBFloat16.Vector,
+    _ b: SIMDBFloat16.Vector
+) -> SIMDBFloat16.Vector {
+    unsafe SIMDBFloat16.combinedShiftedRightBytes(a, b, byUnchecked: 1)
+}
+
+@inline(never)
+public func highwayCombinedShiftedRightBytesBF16ConstantBytes(
+    _ a: SIMDBFloat16.Vector,
+    _ b: SIMDBFloat16.Vector
+) -> SIMDBFloat16.Vector {
+    SIMDBFloat16.Vector(
+        raw: HighwayReference.Nothrow.combinedShiftedRightBytesBF16(a.raw, b.raw, 1)
+    )
+}
+
+@inline(never)
 public func portCombinedShiftedRightLanesBF16ConstantA(
     _ b: SIMDBFloat16.Vector
 ) -> SIMDBFloat16.Vector {

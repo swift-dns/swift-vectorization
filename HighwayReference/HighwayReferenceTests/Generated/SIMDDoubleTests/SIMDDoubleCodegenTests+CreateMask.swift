@@ -26,6 +26,36 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func firstLanesConstantCountTwo() {
+        let mismatches = Mismatches("portFirstLanesF64ConstantCountTwo")
+        mismatches.check(
+            portFirstLanesF64ConstantCountTwo(),
+            highwayFirstLanesF64ConstantCountTwo(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountLaneCount() {
+        let mismatches = Mismatches("portFirstLanesF64ConstantCountLaneCount")
+        mismatches.check(
+            portFirstLanesF64ConstantCountLaneCount(),
+            highwayFirstLanesF64ConstantCountLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portFirstLanesF64ConstantCountTwiceLaneCount")
+        mismatches.check(
+            portFirstLanesF64ConstantCountTwiceLaneCount(),
+            highwayFirstLanesF64ConstantCountTwiceLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
     @Test func maskFromVector() {
         let mismatches = Mismatches("portMaskFromVectorF64")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB469_9FAB_E5C7_7EBC)

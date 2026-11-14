@@ -262,6 +262,29 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeWhereNonCanonical() {
+        let mismatches = Mismatches("storeWhere with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7B39_6C99_50DA_71DD)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7B39_6B99_50DA_702A)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe H.store(a, to: destination.baseAddress!, where: mask)
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe HighwayReference.storeWhereI8(a.raw, mask.raw, destination.baseAddress!)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeWhereUncheckedSpan() {
         let mismatches = Mismatches("storeWhere unchecked span")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8E44_B1C4_1E79_7DCC)

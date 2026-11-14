@@ -870,9 +870,9 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkRoundedAverageConstantA(_ value: H.Lane) {
-        let mismatches = Mismatches("roundedAverage with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x266F_37A5_9E53_5B8C)
+    private func checkSaturatingAddingConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE893_88CD_D226_72E5)
         mismatches.check(
             H.repeating(value),
             H.Vector(raw: HighwayReference.repeatingI64(value)),
@@ -880,8 +880,8 @@ extension SIMDInt64ConstantTests {
         )
         for b in bInputs {
             mismatches.check(
-                H.roundedAverage(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.roundedAverageI64(H.repeating(value).raw, b.raw)),
+                H.saturatingAdding(H.repeating(value), b),
+                H.Vector(raw: HighwayReference.saturatingAddingI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -889,9 +889,9 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkRoundedAverageConstantB(_ value: H.Lane) {
-        let mismatches = Mismatches("roundedAverage with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3FC1_BDA5_AC7A_FB3E)
+    private func checkSaturatingAddingConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingAdding with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCED4_82CD_C3A2_DAD3)
         mismatches.check(
             H.repeating(value),
             H.Vector(raw: HighwayReference.repeatingI64(value)),
@@ -899,113 +899,113 @@ extension SIMDInt64ConstantTests {
         )
         for a in aInputs {
             mismatches.check(
-                H.roundedAverage(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.roundedAverageI64(a.raw, H.repeating(value).raw)),
+                H.saturatingAdding(a, H.repeating(value)),
+                H.Vector(raw: HighwayReference.saturatingAddingI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
         mismatches.record()
     }
 
-    @Test func roundedAverageConstantSplat0() {
-        checkRoundedAverageConstantA(0)
-        checkRoundedAverageConstantB(0)
+    @Test func saturatingAddingConstantSplat0() {
+        checkSaturatingAddingConstantA(0)
+        checkSaturatingAddingConstantB(0)
     }
 
-    @Test func roundedAverageConstantSplat1() {
-        checkRoundedAverageConstantA(1)
-        checkRoundedAverageConstantB(1)
+    @Test func saturatingAddingConstantSplat1() {
+        checkSaturatingAddingConstantA(1)
+        checkSaturatingAddingConstantB(1)
     }
 
-    @Test func roundedAverageConstantSplat15() {
-        checkRoundedAverageConstantA(15)
-        checkRoundedAverageConstantB(15)
+    @Test func saturatingAddingConstantSplat15() {
+        checkSaturatingAddingConstantA(15)
+        checkSaturatingAddingConstantB(15)
     }
 
-    @Test func roundedAverageConstantSplat16() {
-        checkRoundedAverageConstantA(16)
-        checkRoundedAverageConstantB(16)
+    @Test func saturatingAddingConstantSplat16() {
+        checkSaturatingAddingConstantA(16)
+        checkSaturatingAddingConstantB(16)
     }
 
-    @Test func roundedAverageConstantSplat26() {
-        checkRoundedAverageConstantA(26)
-        checkRoundedAverageConstantB(26)
+    @Test func saturatingAddingConstantSplat26() {
+        checkSaturatingAddingConstantA(26)
+        checkSaturatingAddingConstantB(26)
     }
 
-    @Test func roundedAverageConstantSplat127() {
-        checkRoundedAverageConstantA(127)
-        checkRoundedAverageConstantB(127)
+    @Test func saturatingAddingConstantSplat127() {
+        checkSaturatingAddingConstantA(127)
+        checkSaturatingAddingConstantB(127)
     }
 
-    @Test func roundedAverageConstantSplat128() {
-        checkRoundedAverageConstantA(128)
-        checkRoundedAverageConstantB(128)
+    @Test func saturatingAddingConstantSplat128() {
+        checkSaturatingAddingConstantA(128)
+        checkSaturatingAddingConstantB(128)
     }
 
-    @Test func roundedAverageConstantSplat255() {
-        checkRoundedAverageConstantA(255)
-        checkRoundedAverageConstantB(255)
+    @Test func saturatingAddingConstantSplat255() {
+        checkSaturatingAddingConstantA(255)
+        checkSaturatingAddingConstantB(255)
     }
 
-    @Test func roundedAverageConstantSplat256() {
-        checkRoundedAverageConstantA(256)
-        checkRoundedAverageConstantB(256)
+    @Test func saturatingAddingConstantSplat256() {
+        checkSaturatingAddingConstantA(256)
+        checkSaturatingAddingConstantB(256)
     }
 
-    @Test func roundedAverageConstantSplat257() {
-        checkRoundedAverageConstantA(257)
-        checkRoundedAverageConstantB(257)
+    @Test func saturatingAddingConstantSplat257() {
+        checkSaturatingAddingConstantA(257)
+        checkSaturatingAddingConstantB(257)
     }
 
-    @Test func roundedAverageConstantSplat65280() {
-        checkRoundedAverageConstantA(65280)
-        checkRoundedAverageConstantB(65280)
+    @Test func saturatingAddingConstantSplat65280() {
+        checkSaturatingAddingConstantA(65280)
+        checkSaturatingAddingConstantB(65280)
     }
 
-    @Test func roundedAverageConstantSplat65281() {
-        checkRoundedAverageConstantA(65281)
-        checkRoundedAverageConstantB(65281)
+    @Test func saturatingAddingConstantSplat65281() {
+        checkSaturatingAddingConstantA(65281)
+        checkSaturatingAddingConstantB(65281)
     }
 
-    @Test func roundedAverageConstantSplatMinus1() {
-        checkRoundedAverageConstantA(-1)
-        checkRoundedAverageConstantB(-1)
+    @Test func saturatingAddingConstantSplatMinus1() {
+        checkSaturatingAddingConstantA(-1)
+        checkSaturatingAddingConstantB(-1)
     }
 
-    @Test func roundedAverageConstantSplatMinus16() {
-        checkRoundedAverageConstantA(-16)
-        checkRoundedAverageConstantB(-16)
+    @Test func saturatingAddingConstantSplatMinus16() {
+        checkSaturatingAddingConstantA(-16)
+        checkSaturatingAddingConstantB(-16)
     }
 
-    @Test func roundedAverageConstantSplatMinus17() {
-        checkRoundedAverageConstantA(-17)
-        checkRoundedAverageConstantB(-17)
+    @Test func saturatingAddingConstantSplatMinus17() {
+        checkSaturatingAddingConstantA(-17)
+        checkSaturatingAddingConstantB(-17)
     }
 
-    @Test func roundedAverageConstantSplatMinus128() {
-        checkRoundedAverageConstantA(-128)
-        checkRoundedAverageConstantB(-128)
+    @Test func saturatingAddingConstantSplatMinus128() {
+        checkSaturatingAddingConstantA(-128)
+        checkSaturatingAddingConstantB(-128)
     }
 
-    @Test func roundedAverageConstantSplatMinus129() {
-        checkRoundedAverageConstantA(-129)
-        checkRoundedAverageConstantB(-129)
+    @Test func saturatingAddingConstantSplatMinus129() {
+        checkSaturatingAddingConstantA(-129)
+        checkSaturatingAddingConstantB(-129)
     }
 
-    @Test func roundedAverageConstantSplatMax() {
-        checkRoundedAverageConstantA(H.Lane.max)
-        checkRoundedAverageConstantB(H.Lane.max)
+    @Test func saturatingAddingConstantSplatMax() {
+        checkSaturatingAddingConstantA(H.Lane.max)
+        checkSaturatingAddingConstantB(H.Lane.max)
     }
 
-    @Test func roundedAverageConstantSplatMin() {
-        checkRoundedAverageConstantA(H.Lane.min)
-        checkRoundedAverageConstantB(H.Lane.min)
+    @Test func saturatingAddingConstantSplatMin() {
+        checkSaturatingAddingConstantA(H.Lane.min)
+        checkSaturatingAddingConstantB(H.Lane.min)
     }
 
     @inline(__always)
-    private func checkPairwiseAddingConstantA(_ value: H.Lane) {
-        let mismatches = Mismatches("pairwiseAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB700_8E8A_59AF_9413)
+    private func checkSaturatingSubtractingConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingSubtracting with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC1B3_3596_76CB_D510)
         mismatches.check(
             H.repeating(value),
             H.Vector(raw: HighwayReference.repeatingI64(value)),
@@ -1013,8 +1013,10 @@ extension SIMDInt64ConstantTests {
         )
         for b in bInputs {
             mismatches.check(
-                H.pairwiseAdding(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.pairwiseAddingI64(H.repeating(value).raw, b.raw)),
+                H.saturatingSubtracting(H.repeating(value), b),
+                H.Vector(
+                    raw: HighwayReference.saturatingSubtractingI64(H.repeating(value).raw, b.raw)
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -1022,9 +1024,9 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseAddingConstantB(_ value: H.Lane) {
-        let mismatches = Mismatches("pairwiseAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC002_448A_5EE2_6CD5)
+    private func checkSaturatingSubtractingConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDA98_BB96_8496_A2E2)
         mismatches.check(
             H.repeating(value),
             H.Vector(raw: HighwayReference.repeatingI64(value)),
@@ -1032,106 +1034,108 @@ extension SIMDInt64ConstantTests {
         )
         for a in aInputs {
             mismatches.check(
-                H.pairwiseAdding(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.pairwiseAddingI64(a.raw, H.repeating(value).raw)),
+                H.saturatingSubtracting(a, H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.saturatingSubtractingI64(a.raw, H.repeating(value).raw)
+                ),
                 "a: \(describe(a))"
             )
         }
         mismatches.record()
     }
 
-    @Test func pairwiseAddingConstantSplat0() {
-        checkPairwiseAddingConstantA(0)
-        checkPairwiseAddingConstantB(0)
+    @Test func saturatingSubtractingConstantSplat0() {
+        checkSaturatingSubtractingConstantA(0)
+        checkSaturatingSubtractingConstantB(0)
     }
 
-    @Test func pairwiseAddingConstantSplat1() {
-        checkPairwiseAddingConstantA(1)
-        checkPairwiseAddingConstantB(1)
+    @Test func saturatingSubtractingConstantSplat1() {
+        checkSaturatingSubtractingConstantA(1)
+        checkSaturatingSubtractingConstantB(1)
     }
 
-    @Test func pairwiseAddingConstantSplat15() {
-        checkPairwiseAddingConstantA(15)
-        checkPairwiseAddingConstantB(15)
+    @Test func saturatingSubtractingConstantSplat15() {
+        checkSaturatingSubtractingConstantA(15)
+        checkSaturatingSubtractingConstantB(15)
     }
 
-    @Test func pairwiseAddingConstantSplat16() {
-        checkPairwiseAddingConstantA(16)
-        checkPairwiseAddingConstantB(16)
+    @Test func saturatingSubtractingConstantSplat16() {
+        checkSaturatingSubtractingConstantA(16)
+        checkSaturatingSubtractingConstantB(16)
     }
 
-    @Test func pairwiseAddingConstantSplat26() {
-        checkPairwiseAddingConstantA(26)
-        checkPairwiseAddingConstantB(26)
+    @Test func saturatingSubtractingConstantSplat26() {
+        checkSaturatingSubtractingConstantA(26)
+        checkSaturatingSubtractingConstantB(26)
     }
 
-    @Test func pairwiseAddingConstantSplat127() {
-        checkPairwiseAddingConstantA(127)
-        checkPairwiseAddingConstantB(127)
+    @Test func saturatingSubtractingConstantSplat127() {
+        checkSaturatingSubtractingConstantA(127)
+        checkSaturatingSubtractingConstantB(127)
     }
 
-    @Test func pairwiseAddingConstantSplat128() {
-        checkPairwiseAddingConstantA(128)
-        checkPairwiseAddingConstantB(128)
+    @Test func saturatingSubtractingConstantSplat128() {
+        checkSaturatingSubtractingConstantA(128)
+        checkSaturatingSubtractingConstantB(128)
     }
 
-    @Test func pairwiseAddingConstantSplat255() {
-        checkPairwiseAddingConstantA(255)
-        checkPairwiseAddingConstantB(255)
+    @Test func saturatingSubtractingConstantSplat255() {
+        checkSaturatingSubtractingConstantA(255)
+        checkSaturatingSubtractingConstantB(255)
     }
 
-    @Test func pairwiseAddingConstantSplat256() {
-        checkPairwiseAddingConstantA(256)
-        checkPairwiseAddingConstantB(256)
+    @Test func saturatingSubtractingConstantSplat256() {
+        checkSaturatingSubtractingConstantA(256)
+        checkSaturatingSubtractingConstantB(256)
     }
 
-    @Test func pairwiseAddingConstantSplat257() {
-        checkPairwiseAddingConstantA(257)
-        checkPairwiseAddingConstantB(257)
+    @Test func saturatingSubtractingConstantSplat257() {
+        checkSaturatingSubtractingConstantA(257)
+        checkSaturatingSubtractingConstantB(257)
     }
 
-    @Test func pairwiseAddingConstantSplat65280() {
-        checkPairwiseAddingConstantA(65280)
-        checkPairwiseAddingConstantB(65280)
+    @Test func saturatingSubtractingConstantSplat65280() {
+        checkSaturatingSubtractingConstantA(65280)
+        checkSaturatingSubtractingConstantB(65280)
     }
 
-    @Test func pairwiseAddingConstantSplat65281() {
-        checkPairwiseAddingConstantA(65281)
-        checkPairwiseAddingConstantB(65281)
+    @Test func saturatingSubtractingConstantSplat65281() {
+        checkSaturatingSubtractingConstantA(65281)
+        checkSaturatingSubtractingConstantB(65281)
     }
 
-    @Test func pairwiseAddingConstantSplatMinus1() {
-        checkPairwiseAddingConstantA(-1)
-        checkPairwiseAddingConstantB(-1)
+    @Test func saturatingSubtractingConstantSplatMinus1() {
+        checkSaturatingSubtractingConstantA(-1)
+        checkSaturatingSubtractingConstantB(-1)
     }
 
-    @Test func pairwiseAddingConstantSplatMinus16() {
-        checkPairwiseAddingConstantA(-16)
-        checkPairwiseAddingConstantB(-16)
+    @Test func saturatingSubtractingConstantSplatMinus16() {
+        checkSaturatingSubtractingConstantA(-16)
+        checkSaturatingSubtractingConstantB(-16)
     }
 
-    @Test func pairwiseAddingConstantSplatMinus17() {
-        checkPairwiseAddingConstantA(-17)
-        checkPairwiseAddingConstantB(-17)
+    @Test func saturatingSubtractingConstantSplatMinus17() {
+        checkSaturatingSubtractingConstantA(-17)
+        checkSaturatingSubtractingConstantB(-17)
     }
 
-    @Test func pairwiseAddingConstantSplatMinus128() {
-        checkPairwiseAddingConstantA(-128)
-        checkPairwiseAddingConstantB(-128)
+    @Test func saturatingSubtractingConstantSplatMinus128() {
+        checkSaturatingSubtractingConstantA(-128)
+        checkSaturatingSubtractingConstantB(-128)
     }
 
-    @Test func pairwiseAddingConstantSplatMinus129() {
-        checkPairwiseAddingConstantA(-129)
-        checkPairwiseAddingConstantB(-129)
+    @Test func saturatingSubtractingConstantSplatMinus129() {
+        checkSaturatingSubtractingConstantA(-129)
+        checkSaturatingSubtractingConstantB(-129)
     }
 
-    @Test func pairwiseAddingConstantSplatMax() {
-        checkPairwiseAddingConstantA(H.Lane.max)
-        checkPairwiseAddingConstantB(H.Lane.max)
+    @Test func saturatingSubtractingConstantSplatMax() {
+        checkSaturatingSubtractingConstantA(H.Lane.max)
+        checkSaturatingSubtractingConstantB(H.Lane.max)
     }
 
-    @Test func pairwiseAddingConstantSplatMin() {
-        checkPairwiseAddingConstantA(H.Lane.min)
-        checkPairwiseAddingConstantB(H.Lane.min)
+    @Test func saturatingSubtractingConstantSplatMin() {
+        checkSaturatingSubtractingConstantA(H.Lane.min)
+        checkSaturatingSubtractingConstantB(H.Lane.min)
     }
 }

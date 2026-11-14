@@ -24,6 +24,16 @@ extension SIMDDouble {
     }
 
     @export(implementation) @inline(always)
+    public static func nan() -> Vector {
+        cvectorization_ops_nan_f64()
+    }
+
+    @export(implementation) @inline(always)
+    public static func infinity() -> Vector {
+        cvectorization_ops_infinity_f64()
+    }
+
+    @export(implementation) @inline(always)
     public static func unspecified() -> Vector {
         cvectorization_ops_unspecified_f64()
     }
@@ -149,6 +159,11 @@ extension SIMDDouble {
     }
 
     @export(implementation) @inline(always)
+    public static func mantissa(_ a: Vector) -> Vector {
+        cvectorization_ops_mantissa_f64(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func pairwiseAdding(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_pairwise_adding_f64(a, b)
     }
@@ -161,6 +176,20 @@ extension SIMDDouble {
     @export(implementation) @inline(always)
     public static func sumsOf2(_ a: SIMDFloat.Vector) -> Vector {
         cvectorization_ops_sums_of2_f32_to_f64(a)
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func sumsOf4(_ a: SIMDFloat16.Vector) -> Vector {
+        cvectorization_ops_sums_of4_f16_to_f64(a)
+    }
+
+    #endif
+
+    @export(implementation) @inline(always)
+    public static func sumsOf4(_ a: SIMDBFloat16.Vector) -> Vector {
+        cvectorization_ops_sums_of4_bf16_to_f64(a.raw)
     }
 
     @export(implementation) @inline(always)
@@ -211,6 +240,11 @@ extension SIMDDouble {
     @export(implementation) @inline(always)
     public static func multiplyingByPowerOf2(_ a: Vector, _ b: SIMDInt64.Vector) -> Vector {
         cvectorization_ops_multiplying_by_power_of2_i64_to_f64(a, b.raw)
+    }
+
+    @export(implementation) @inline(always)
+    public static func rearrangedToOddPlusEven(_ a: Vector, _ b: Vector) -> Vector {
+        cvectorization_ops_rearranged_to_odd_plus_even_f64(a, b)
     }
 
     @export(implementation) @inline(always)
@@ -616,6 +650,11 @@ extension SIMDDouble {
     }
 
     #endif
+
+    @export(implementation) @inline(always)
+    public static func mask(widening mask: SIMDBFloat16.QuarterMask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_widening_quarter_vector_bf16_to_f64(mask.raw))
+    }
 
     @export(implementation) @inline(always)
     public static func mask(widening mask: SIMDUInt8.EighthMask) -> Mask {
@@ -1455,6 +1494,59 @@ extension SIMDDouble {
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= laneCount / 2
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, to: UnsafeMutablePointer<Lane>) {
+        unsafe cvectorization_ops_store_block_f64(a.raw, to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, to span: inout MutableSpan<Lane>) {
+        precondition(
+            span.count >= 16 / MemoryLayout<Lane>.stride,
+            "Span has fewer elements than a block has lanes"
+        )
+        unsafe store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, toUnchecked span: inout MutableSpan<Lane>) {
+        assert(
+            span.count >= 16 / MemoryLayout<Lane>.stride,
+            "Span has fewer elements than a block has lanes"
+        )
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_store_block_f64(a.raw, $0.baseAddress.unsafelyUnwrapped)
+        }
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func append(_ a: BlockVector, to output: inout OutputSpan<Lane>) {
+        precondition(
+            output.freeCapacity >= 16 / MemoryLayout<Lane>.stride,
+            "OutputSpan has less free capacity than a block has lanes"
+        )
+        unsafe append(a, toUnchecked: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func append(_ a: BlockVector, toUnchecked output: inout OutputSpan<Lane>) {
+        assert(
+            output.freeCapacity >= 16 / MemoryLayout<Lane>.stride,
+            "OutputSpan has less free capacity than a block has lanes"
+        )
+        unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
+            unsafe cvectorization_ops_store_block_f64(
+                a.raw,
+                buffer.baseAddress.unsafelyUnwrapped + initializedCount
+            )
+            initializedCount &+= 16 / MemoryLayout<Lane>.stride
         }
     }
 

@@ -6,55 +6,6 @@ public import CVectorizationOps
 @available(SwiftStdlib 5.3, *)
 extension SIMDFloat16 {
     @export(implementation) @inline(always)
-    public static func store(_ a: BlockVector, to: UnsafeMutablePointer<Lane>) {
-        unsafe cvectorization_ops_store_block_f16(a.raw, to)
-    }
-
-    @export(implementation) @inline(always)
-    public static func store(_ a: BlockVector, to span: inout MutableSpan<Lane>) {
-        precondition(
-            span.count >= 16 / MemoryLayout<Lane>.stride,
-            "Span has fewer elements than a block has lanes"
-        )
-        unsafe store(a, toUnchecked: &span)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func store(_ a: BlockVector, toUnchecked span: inout MutableSpan<Lane>) {
-        assert(
-            span.count >= 16 / MemoryLayout<Lane>.stride,
-            "Span has fewer elements than a block has lanes"
-        )
-        span.withUnsafeMutableBufferPointer {
-            unsafe cvectorization_ops_store_block_f16(a.raw, $0.baseAddress.unsafelyUnwrapped)
-        }
-    }
-
-    @export(implementation) @inline(always)
-    public static func append(_ a: BlockVector, to output: inout OutputSpan<Lane>) {
-        precondition(
-            output.freeCapacity >= 16 / MemoryLayout<Lane>.stride,
-            "OutputSpan has less free capacity than a block has lanes"
-        )
-        unsafe append(a, toUnchecked: &output)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func append(_ a: BlockVector, toUnchecked output: inout OutputSpan<Lane>) {
-        assert(
-            output.freeCapacity >= 16 / MemoryLayout<Lane>.stride,
-            "OutputSpan has less free capacity than a block has lanes"
-        )
-        unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
-            unsafe cvectorization_ops_store_block_f16(
-                a.raw,
-                buffer.baseAddress.unsafelyUnwrapped + initializedCount
-            )
-            initializedCount &+= 16 / MemoryLayout<Lane>.stride
-        }
-    }
-
-    @export(implementation) @inline(always)
     public static func loadInterleaved2(
         from: UnsafePointer<Lane>,
         _ v0: inout Vector,
@@ -404,6 +355,42 @@ extension SIMDFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_bytes_f16(indices, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return unsafe tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_bytes_f16(indices, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return cvectorization_ops_table_lookup_bytes_f16(a, indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_bytes_f16(indices, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return unsafe tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_bytes_f16(indices, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return cvectorization_ops_table_lookup_bytes_or_zero_f16(a, indices)
+    }
+
+    @export(implementation) @inline(always)
     public static func broadcastingInBlocks(_ a: Vector, lane: Int) -> Vector {
         precondition(lane >= 0 && lane <= 7, "Lane is negative or not in a block")
         return unsafe broadcastingInBlocks(a, laneUnchecked: lane)
@@ -423,6 +410,36 @@ extension SIMDFloat16 {
     @export(implementation) @inline(always)
     public static func pairwiseSubtractingBlocks(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_pairwise_subtracting_blocks_f16(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector {
+        precondition(
+            bytes >= 0 && bytes <= 16,
+            "Byte count is negative or more than a block has bytes"
+        )
+        return unsafe shiftedLeftBytes(a, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector {
+        assert(bytes >= 0 && bytes <= 16, "Byte count is negative or more than a block has bytes")
+        return cvectorization_ops_shifted_left_bytes_f16(a, Int32(truncatingIfNeeded: bytes))
+    }
+
+    @export(implementation) @inline(always)
+    public static func shiftedRightBytes(_ a: Vector, by bytes: Int) -> Vector {
+        precondition(
+            bytes >= 0 && bytes <= 16,
+            "Byte count is negative or more than a block has bytes"
+        )
+        return unsafe shiftedRightBytes(a, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func shiftedRightBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector {
+        assert(bytes >= 0 && bytes <= 16, "Byte count is negative or more than a block has bytes")
+        return cvectorization_ops_shifted_right_bytes_f16(a, Int32(truncatingIfNeeded: bytes))
     }
 
     @export(implementation) @inline(always)
@@ -456,6 +473,27 @@ extension SIMDFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
+    {
+        precondition(bytes >= 1 && bytes <= 15, "Byte count is not between 1 and 15")
+        return unsafe combinedShiftedRightBytes(a, b, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func combinedShiftedRightBytes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked bytes: Int
+    ) -> Vector {
+        assert(bytes >= 1 && bytes <= 15, "Byte count is not between 1 and 15")
+        return cvectorization_ops_combined_shifted_right_bytes_f16(
+            a,
+            b,
+            Int32(truncatingIfNeeded: bytes)
+        )
+    }
+
+    @export(implementation) @inline(always)
     public static func combinedShiftedRightLanes(_ a: Vector, _ b: Vector, by lanes: Int) -> Vector
     {
         precondition(
@@ -485,6 +523,11 @@ extension SIMDFloat16 {
     @export(implementation) @inline(always)
     public static func reversed(_ a: Vector) -> Vector {
         cvectorization_ops_reversed_f16(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func byteSwapped(_ a: Vector) -> Vector {
+        cvectorization_ops_byte_swapped_f16(a)
     }
 
     @export(implementation) @inline(always)
@@ -707,10 +750,10 @@ extension SIMDFloat16 {
                 cvectorization_ops_indices_within_i16(
                     unsafe cvectorization_ops_load_indices_f16($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return unsafe loadIndices(fromUnchecked: span)
     }
@@ -723,10 +766,10 @@ extension SIMDFloat16 {
                 cvectorization_ops_indices_within_i16(
                     unsafe cvectorization_ops_load_indices_f16($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return span.withUnsafeBufferPointer {
             Indices(
@@ -1576,46 +1619,6 @@ extension SIMDFloat16 {
                 $0.baseAddress.unsafelyUnwrapped
             )
         }
-    }
-
-    @export(implementation) @inline(always)
-    public static func loadExpanded(
-        from: UnsafePointer<Lane>,
-        where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
-        unsafe cvectorization_ops_load_expanded_where_otherwise_f16(otherwise, mask.raw, from)
-    }
-
-    @export(implementation) @inline(always)
-    public static func loadExpanded(
-        from span: Span<Lane>,
-        where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
-        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        return unsafe loadExpanded(fromUnchecked: span, where: mask, otherwise: otherwise)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func loadExpanded(
-        fromUnchecked span: Span<Lane>,
-        where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
-        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        return span.withUnsafeBufferPointer {
-            unsafe cvectorization_ops_load_expanded_where_otherwise_f16(
-                otherwise,
-                mask.raw,
-                $0.baseAddress.unsafelyUnwrapped
-            )
-        }
-    }
-
-    @export(implementation) @inline(always)
-    public static func interleavingLower(_ a: Vector, _ b: Vector) -> Vector {
-        cvectorization_ops_interleaving_lower_f16(a, b)
     }
 
 }

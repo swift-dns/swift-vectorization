@@ -19,6 +19,19 @@ extension SIMDBFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func byteSwapped() {
+        let mismatches = Mismatches("byteSwapped")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4624_EB99_07B4_90AC)
+        for a in aInputs {
+            mismatches.check(
+                H.byteSwapped(a),
+                H.Vector(raw: HighwayReference.byteSwappedBF16(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func reversedBlocks() {
         let mismatches = Mismatches("reversedBlocks")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4B0C_0AF6_A92E_4814)

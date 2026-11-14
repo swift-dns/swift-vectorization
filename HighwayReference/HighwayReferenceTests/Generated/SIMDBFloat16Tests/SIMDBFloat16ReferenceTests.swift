@@ -21,6 +21,18 @@ struct SIMDBFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func canLookup8() {
+        let mismatches = Mismatches("canLookup8")
+        mismatches.check(H.canLookup8, HighwayReference.canLookup8BF16(), "")
+        mismatches.record()
+    }
+
+    @Test func canLookup16() {
+        let mismatches = Mismatches("canLookup16")
+        mismatches.check(H.canLookup16, HighwayReference.canLookup16BF16(), "")
+        mismatches.record()
+    }
+
     @Test func canReverse4() {
         let mismatches = Mismatches("canReverse4")
         mismatches.check(H.canReverse4, HighwayReference.canReverse4BF16(), "")

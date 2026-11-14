@@ -372,6 +372,21 @@ extension SIMDFloatCodegenTests {
         mismatches.record()
     }
 
+    @Test func mantissa() {
+        let mismatches = Mismatches("portMantissaF32")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xADD2_EBCD_9A6C_8946)
+        for a in aInputs {
+            mismatches.check(portMantissaF32(a), highwayMantissaF32(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func mantissaConstantA() {
+        let mismatches = Mismatches("portMantissaF32ConstantA")
+        mismatches.check(portMantissaF32ConstantA(), highwayMantissaF32ConstantA(), "")
+        mismatches.record()
+    }
+
     @Test func pairwiseAdding() {
         let mismatches = Mismatches("portPairwiseAddingF32")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0C98_432B_0CDA_D8D3)
@@ -470,4 +485,23 @@ extension SIMDFloatCodegenTests {
         mismatches.record()
     }
     #endif
+
+    @Test func sumsOf2FromBFloat16() {
+        let mismatches = Mismatches("portSumsOf2BF16ToF32")
+        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x230C_12E7_57C8_B6FA)
+        for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a) {
+            mismatches.check(
+                portSumsOf2BF16ToF32(a),
+                highwaySumsOf2BF16ToF32(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOf2FromBFloat16ConstantA() {
+        let mismatches = Mismatches("portSumsOf2BF16ToF32ConstantA")
+        mismatches.check(portSumsOf2BF16ToF32ConstantA(), highwaySumsOf2BF16ToF32ConstantA(), "")
+        mismatches.record()
+    }
 }

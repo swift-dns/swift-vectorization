@@ -457,7 +457,7 @@ extension SIMDDoubleCodegenTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x02EB_C6EA_385E_9510)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x02EB_C7EA_385E_96C3)
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0x7A46_2D55_1DA7_FAF2)
-        where !hasNaNs(in: b) {
+        where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereF64ConstantA(b, c, where: mask),
                 highwayNegatedMultiplyAddingWhereF64ConstantA(b, c, where: mask),
@@ -473,7 +473,7 @@ extension SIMDDoubleCodegenTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE92C_62EA_29DA_5D44)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE92C_64EA_29DA_60AA)
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0x943A_676E_477D_8571)
-        where !hasNaNs(in: a) {
+        where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereF64ConstantB(a, c, where: mask),
                 highwayNegatedMultiplyAddingWhereF64ConstantB(a, c, where: mask),
@@ -489,7 +489,7 @@ extension SIMDDoubleCodegenTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF0E7_FBEA_2DF8_421F)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF0E7_FCEA_2DF8_43D2)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x3F62_CCFC_256E_9A40)
-        where !hasNaNs(in: a, b) {
+        where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereF64ConstantC(a, b, where: mask),
                 highwayNegatedMultiplyAddingWhereF64ConstantC(a, b, where: mask),
@@ -544,7 +544,7 @@ extension SIMDDoubleCodegenTests {
                 bInputs,
                 cInputs,
                 seed: 0x49EE_F623_C226_017D
-            ) where !hasNaNs(in: b) {
+            ) where !hasNaNs(negating: b) {
                 mismatches.check(
                     portNegatedMultiplySubtractingWhereF64ConstantA(b, c, where: mask),
                     highwayNegatedMultiplySubtractingWhereF64ConstantA(b, c, where: mask),
@@ -573,7 +573,7 @@ extension SIMDDoubleCodegenTests {
                 aInputs,
                 cInputs,
                 seed: 0x2433_346A_4FC6_EE1E
-            ) where !hasNaNs(in: a) {
+            ) where !hasNaNs(negating: a) {
                 mismatches.check(
                     portNegatedMultiplySubtractingWhereF64ConstantB(a, c, where: mask),
                     highwayNegatedMultiplySubtractingWhereF64ConstantB(a, c, where: mask),
@@ -602,7 +602,7 @@ extension SIMDDoubleCodegenTests {
                 aInputs,
                 bInputs,
                 seed: 0x37FF_C67D_DF3F_A4F7
-            ) where !hasNaNs(in: a, b) {
+            ) where !hasNaNs(negating: a, b) {
                 mismatches.check(
                     portNegatedMultiplySubtractingWhereF64ConstantC(a, b, where: mask),
                     highwayNegatedMultiplySubtractingWhereF64ConstantC(a, b, where: mask),

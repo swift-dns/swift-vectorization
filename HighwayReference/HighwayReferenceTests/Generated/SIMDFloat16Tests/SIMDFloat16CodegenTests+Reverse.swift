@@ -23,6 +23,21 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func byteSwapped() {
+        let mismatches = Mismatches("portByteSwappedF16")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9F29_1D47_B5E7_014C)
+        for a in aInputs {
+            mismatches.check(portByteSwappedF16(a), highwayByteSwappedF16(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func byteSwappedConstantA() {
+        let mismatches = Mismatches("portByteSwappedF16ConstantA")
+        mismatches.check(portByteSwappedF16ConstantA(), highwayByteSwappedF16ConstantA(), "")
+        mismatches.record()
+    }
+
     @Test func reversedBlocks() {
         let mismatches = Mismatches("portReversedBlocksF16")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6B36_71BC_D0D2_8F34)

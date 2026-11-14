@@ -19,9 +19,35 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func allTrueNonCanonical() {
+        let mismatches = Mismatches("allTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4720_4E62_A693_E159)
+        for mask in maskInputs {
+            mismatches.check(
+                H.allTrue(mask),
+                HighwayReference.allTrueI32(mask.raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func allFalse() {
         let mismatches = Mismatches("allFalse")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1F0B_9160_B364_3DF7)
+        for mask in maskInputs {
+            mismatches.check(
+                H.allFalse(mask),
+                HighwayReference.allFalseI32(mask.raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func allFalseNonCanonical() {
+        let mismatches = Mismatches("allFalse with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF1B9_CBC6_F283_B5C4)
         for mask in maskInputs {
             mismatches.check(
                 H.allFalse(mask),
@@ -45,6 +71,19 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func trueCountNonCanonical() {
+        let mismatches = Mismatches("trueCount with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x3621_7D0D_8D55_95E5)
+        for mask in maskInputs {
+            mismatches.check(
+                H.trueCount(mask),
+                HighwayReference.trueCountI32(mask.raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func firstTrueIndex() {
         let mismatches = Mismatches("firstTrueIndex")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4F53_F540_81B7_CDBF)
@@ -58,9 +97,35 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func firstTrueIndexNonCanonical() {
+        let mismatches = Mismatches("firstTrueIndex with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xE29D_E03B_A7B0_814C)
+        for mask in maskInputs {
+            mismatches.check(
+                H.firstTrueIndex(mask),
+                HighwayReference.firstTrueIndexI32(mask.raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func lastTrueIndex() {
         let mismatches = Mismatches("lastTrueIndex")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB37F_93DC_474E_6505)
+        for mask in maskInputs {
+            mismatches.check(
+                H.lastTrueIndex(mask),
+                HighwayReference.lastTrueIndexI32(mask.raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func lastTrueIndexNonCanonical() {
+        let mismatches = Mismatches("lastTrueIndex with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xD0C3_255F_CC6C_8E82)
         for mask in maskInputs {
             mismatches.check(
                 H.lastTrueIndex(mask),
@@ -102,6 +167,21 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func knownFirstTrueIndexNonCanonical() {
+        let mismatches = Mismatches("knownFirstTrueIndex with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6DDC_D611_7B2F_926F).filter(
+            hasAllOnesLane
+        )
+        for mask in maskInputs {
+            mismatches.check(
+                H.knownFirstTrueIndex(mask),
+                HighwayReference.knownFirstTrueIndexI32(mask.raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func knownLastTrueIndex() {
         let mismatches = Mismatches("knownLastTrueIndex")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9818_1C27_0339_6598).filter {
@@ -123,6 +203,21 @@ extension SIMDInt32ReferenceTests {
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE8D5_E785_AC71_F489).filter {
             !any($0.simd)
         }
+        for mask in maskInputs {
+            mismatches.check(
+                H.knownLastTrueIndex(mask),
+                HighwayReference.knownLastTrueIndexI32(mask.raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func knownLastTrueIndexNonCanonical() {
+        let mismatches = Mismatches("knownLastTrueIndex with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x65F0_D09D_D39D_6497).filter(
+            hasAllOnesLane
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.knownLastTrueIndex(mask),

@@ -44,6 +44,58 @@ extension SIMDBFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func combinedShiftedRightBytes() {
+        let mismatches = Mismatches("combinedShiftedRightBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x28E7_05D5_2AC6_4437)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x28E7_04D5_2AC6_4284)
+        let bytesInputs = Array(1...15)
+        for (a, b, bytes) in mixedTriples(
+            aInputs,
+            bInputs,
+            bytesInputs,
+            seed: 0x2336_4817_9BCF_6831
+        ) {
+            mismatches.check(
+                H.combinedShiftedRightBytes(a, b, by: bytes),
+                H.Vector(
+                    raw: HighwayReference.combinedShiftedRightBytesBF16(
+                        a.raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesUnchecked() {
+        let mismatches = Mismatches("combinedShiftedRightBytes unchecked")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEE43_9D1E_EB4B_D8BB)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEE43_9C1E_EB4B_D708)
+        let bytesInputs = Array(1...15)
+        for (a, b, bytes) in mixedTriples(
+            aInputs,
+            bInputs,
+            bytesInputs,
+            seed: 0x6E02_EF44_08A8_5F5D
+        ) {
+            mismatches.check(
+                unsafe H.combinedShiftedRightBytes(a, b, byUnchecked: bytes),
+                H.Vector(
+                    raw: HighwayReference.combinedShiftedRightBytesBF16(
+                        a.raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func combinedShiftedRightLanes() {
         let mismatches = Mismatches("combinedShiftedRightLanes")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D7D_8F02_FE25_D79F)

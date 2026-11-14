@@ -238,3 +238,239 @@ public func highwaySumWideningSpanU32(_ bytes: Span<UInt8>) -> UInt32 {
     }
     return HighwayReference.Nothrow.sumU32(total.raw)
 }
+
+@available(SwiftStdlib 5.1, *)
+@inline(never)
+public func portSumAboveSpanU32(
+    above t: SIMDUInt32.Lane,
+    in values: Span<SIMDUInt32.Lane>
+) -> SIMDUInt32.Lane {
+    let laneCount = SIMDUInt32.laneCount
+    let threshold = SIMDUInt32.repeating(t)
+    var total: SIMDUInt32.Lane = 0
+    var remainingValuesSpan = values
+    while remainingValuesSpan.count >= laneCount {
+        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
+        total &+= SIMDUInt32.sum(loaded, where: SIMDUInt32.greaterThan(loaded, threshold))
+        let remainingValuesRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingValuesSpan.count)
+        )
+        remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
+    }
+    return total
+}
+
+@available(SwiftStdlib 5.1, *)
+@inline(never)
+public func highwaySumAboveSpanU32(above t: UInt32, in values: Span<UInt32>) -> UInt32 {
+    let laneCount = HighwayReferenceUInt32.laneCount
+    var total: UInt32 = 0
+    var remainingValuesSpan = values
+    while remainingValuesSpan.count >= laneCount {
+        total &+= remainingValuesSpan.withUnsafeBufferPointer { valuesBuffer in
+            unsafe HighwayReference.Nothrow.sumAboveSpanU32(
+                t,
+                valuesBuffer.baseAddress.unsafelyUnwrapped
+            )
+        }
+        let remainingValuesRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingValuesSpan.count)
+        )
+        remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
+    }
+    return total
+}
+
+@available(SwiftStdlib 5.1, *)
+@inline(never)
+public func portCountEqualAboveSpanU32(
+    above t: SIMDUInt32.Lane,
+    in values: Span<SIMDUInt32.Lane>,
+    matching others: Span<SIMDUInt32.Lane>
+) -> Int {
+    let laneCount = SIMDUInt32.laneCount
+    let threshold = SIMDUInt32.repeating(t)
+    var count = 0
+    var remainingValuesSpan = values
+    var remainingOthersSpan = others
+    while remainingValuesSpan.count >= laneCount && remainingOthersSpan.count >= laneCount {
+        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
+        let other = SIMDUInt32.load(from: remainingOthersSpan)
+        count &+= SIMDUInt32.trueCount(
+            SIMDUInt32.equalTo(loaded, other, where: SIMDUInt32.greaterThan(loaded, threshold))
+        )
+        let remainingValuesRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingValuesSpan.count)
+        )
+        remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
+        let remainingOthersRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingOthersSpan.count)
+        )
+        remainingOthersSpan = unsafe remainingOthersSpan.extracting(unchecked: remainingOthersRange)
+    }
+    return count
+}
+
+@available(SwiftStdlib 5.1, *)
+@inline(never)
+public func highwayCountEqualAboveSpanU32(
+    above t: UInt32,
+    in values: Span<UInt32>,
+    matching others: Span<UInt32>
+) -> Int {
+    let laneCount = HighwayReferenceUInt32.laneCount
+    var count = 0
+    var remainingValuesSpan = values
+    var remainingOthersSpan = others
+    while remainingValuesSpan.count >= laneCount && remainingOthersSpan.count >= laneCount {
+        count &+= remainingValuesSpan.withUnsafeBufferPointer { valuesBuffer in
+            remainingOthersSpan.withUnsafeBufferPointer { othersBuffer in
+                unsafe HighwayReference.Nothrow.countEqualAboveSpanU32(
+                    t,
+                    valuesBuffer.baseAddress.unsafelyUnwrapped,
+                    othersBuffer.baseAddress.unsafelyUnwrapped
+                )
+            }
+        }
+        let remainingValuesRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingValuesSpan.count)
+        )
+        remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
+        let remainingOthersRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingOthersSpan.count)
+        )
+        remainingOthersSpan = unsafe remainingOthersSpan.extracting(unchecked: remainingOthersRange)
+    }
+    return count
+}
+
+@available(SwiftStdlib 5.1, *)
+@inline(never)
+public func portClampAboveSpanU32(
+    atMost t: SIMDUInt32.Lane,
+    in values: Span<SIMDUInt32.Lane>,
+    into output: inout MutableSpan<SIMDUInt32.Lane>
+) -> Int {
+    let laneCount = SIMDUInt32.laneCount
+    let limit = SIMDUInt32.repeating(t)
+    var remainingValuesSpan = values
+    var remainingOutputSpan = output._mutatingExtracting(...)
+    while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
+        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
+        SIMDUInt32.store(
+            limit,
+            to: &remainingOutputSpan,
+            where: SIMDUInt32.greaterThan(loaded, limit)
+        )
+        let remainingValuesRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingValuesSpan.count)
+        )
+        remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
+        let remainingOutputRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingOutputSpan.count)
+        )
+        remainingOutputSpan = unsafe remainingOutputSpan._consumingExtracting(
+            unchecked: remainingOutputRange
+        )
+    }
+    return remainingValuesSpan.count
+}
+
+@available(SwiftStdlib 5.1, *)
+@inline(never)
+public func highwayClampAboveSpanU32(
+    atMost t: UInt32,
+    in values: Span<UInt32>,
+    into output: inout MutableSpan<UInt32>
+) -> Int {
+    let laneCount = HighwayReferenceUInt32.laneCount
+    var remainingValuesSpan = values
+    var remainingOutputSpan = output._mutatingExtracting(...)
+    while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
+        remainingOutputSpan.withUnsafeMutableBufferPointer { outputBuffer in
+            remainingValuesSpan.withUnsafeBufferPointer { valuesBuffer in
+                unsafe HighwayReference.Nothrow.clampAboveSpanU32(
+                    t,
+                    valuesBuffer.baseAddress.unsafelyUnwrapped,
+                    outputBuffer.baseAddress.unsafelyUnwrapped
+                )
+            }
+        }
+        let remainingValuesRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingValuesSpan.count)
+        )
+        remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
+        let remainingOutputRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingOutputSpan.count)
+        )
+        remainingOutputSpan = unsafe remainingOutputSpan._consumingExtracting(
+            unchecked: remainingOutputRange
+        )
+    }
+    return remainingValuesSpan.count
+}
+
+@available(SwiftStdlib 5.1, *)
+@inline(never)
+public func portSelectBelowSpanU32(
+    below t: SIMDUInt32.Lane,
+    in values: Span<SIMDUInt32.Lane>,
+    into output: inout MutableSpan<SIMDUInt32.Lane>
+) -> Int {
+    let laneCount = SIMDUInt32.laneCount
+    let threshold = SIMDUInt32.repeating(t)
+    var remainingValuesSpan = values
+    var remainingOutputSpan = output._mutatingExtracting(...)
+    while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
+        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
+        SIMDUInt32.store(
+            SIMDUInt32.selectingOrZero(SIMDUInt32.lessThan(loaded, threshold), loaded),
+            to: &remainingOutputSpan
+        )
+        let remainingValuesRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingValuesSpan.count)
+        )
+        remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
+        let remainingOutputRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingOutputSpan.count)
+        )
+        remainingOutputSpan = unsafe remainingOutputSpan._consumingExtracting(
+            unchecked: remainingOutputRange
+        )
+    }
+    return remainingValuesSpan.count
+}
+
+@available(SwiftStdlib 5.1, *)
+@inline(never)
+public func highwaySelectBelowSpanU32(
+    below t: UInt32,
+    in values: Span<UInt32>,
+    into output: inout MutableSpan<UInt32>
+) -> Int {
+    let laneCount = HighwayReferenceUInt32.laneCount
+    var remainingValuesSpan = values
+    var remainingOutputSpan = output._mutatingExtracting(...)
+    while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
+        remainingOutputSpan.withUnsafeMutableBufferPointer { outputBuffer in
+            remainingValuesSpan.withUnsafeBufferPointer { valuesBuffer in
+                unsafe HighwayReference.Nothrow.selectBelowSpanU32(
+                    t,
+                    valuesBuffer.baseAddress.unsafelyUnwrapped,
+                    outputBuffer.baseAddress.unsafelyUnwrapped
+                )
+            }
+        }
+        let remainingValuesRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingValuesSpan.count)
+        )
+        remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
+        let remainingOutputRange = unsafe Range<Int>(
+            uncheckedBounds: (laneCount, remainingOutputSpan.count)
+        )
+        remainingOutputSpan = unsafe remainingOutputSpan._consumingExtracting(
+            unchecked: remainingOutputRange
+        )
+    }
+    return remainingValuesSpan.count
+}

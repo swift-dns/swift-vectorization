@@ -306,6 +306,32 @@ extension SIMDInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadWhereNonCanonical() {
+        let mismatches = Mismatches("loadWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x31C2_8D24_9AAA_AD92)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x31C2_8E24_9AAA_AF45
+        )
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.load(from: source.baseAddress!, where: mask),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadWhereI64(mask.raw, source.baseAddress!)
+                    )
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadWhereUncheckedSpan() {
         let mismatches = Mismatches("loadWhere unchecked span")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6B29_85F4_8321_26D5)
@@ -395,6 +421,42 @@ extension SIMDInt64ReferenceTests {
                     )
                 )
             }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("loadWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x86A4_DFEB_D447_6BF4)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x86A4_E0EB_D447_6DA7)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x86A4_E1EB_D447_6F5A
+        )
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0x3A3B_C959_1ACC_27A8
+        ) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.load(from: source.baseAddress!, where: mask, otherwise: otherwise),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadWhereOtherwiseI64(
+                            otherwise.raw,
+                            mask.raw,
+                            source.baseAddress!
+                        )
+                    )
+                )
+            }
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -626,6 +688,28 @@ extension SIMDInt64ReferenceTests {
                     unsafe H.HalfVector(raw: HighwayReference.loadHalfI64(source))
                 )
             }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadHalfResized() {
+        let mismatches = Mismatches("loadHalf resized with its unspecified lanes zeroed")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount / 2,
+            seed: 0x0F61_00CD_A510_C2A5
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.selectingOrZero(
+                        H.firstLanes(count: H.laneCount / 2),
+                        H.vector(resizing: H.loadHalf(from: source.baseAddress!))
+                    ),
+                    unsafe H.Vector(raw: HighwayReference.resizedLoadHalfI64(source.baseAddress!))
+                )
+            }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
         mismatches.record()

@@ -371,6 +371,10 @@ package enum Inputs {
         masks(SIMDMask<M.Storage>.self, seed: seed).map(M.init)
     }
 
+    package static func masksAndComplements<M: ReferenceMask>(_ type: M.Type, seed: UInt64) -> [M] {
+        masks(SIMDMask<M.Storage>.self, seed: seed).flatMap { [M($0), M(.!$0)] }
+    }
+
     package static func masks<M: ReferenceNarrowMask>(_ type: M.Type, seed: UInt64) -> [M] {
         var generator = SplitMix64(seed: seed)
         let lanes = M.laneCount
@@ -407,6 +411,43 @@ package enum Inputs {
             return mask
         }
         return [SIMDMask(repeating: false), SIMDMask(repeating: true)] + single + random
+    }
+
+    package static func nonCanonicalMasks<M: ReferenceMask>(_ type: M.Type, seed: UInt64) -> [M] {
+        nonCanonicalMaskLanes(M.Storage.Scalar.self, count: M.Storage.scalarCount, seed: seed).map {
+            M(SIMDMask(M.Storage($0)))
+        }
+    }
+
+    package static func nonCanonicalMasks<M: ReferenceNarrowMask>(
+        _ type: M.Type,
+        seed: UInt64
+    ) -> [M] {
+        nonCanonicalMaskLanes(M.Lane.self, count: M.laneCount, seed: seed).flatMap { lanes in
+            [M.Lane(0), M.Lane(-1)].map { M(lanes: lanes, padding: $0) }
+        }
+    }
+
+    package static func nonCanonicalMaskLanes<Lane: FixedWidthInteger & SignedInteger>(
+        _ type: Lane.Type,
+        count: Int,
+        seed: UInt64
+    ) -> [[Lane]] {
+        var generator = SplitMix64(seed: seed)
+        let middle =
+            Lane(truncatingIfNeeded: UInt64.max >> (64 - Lane.bitWidth / 2)) << (Lane.bitWidth / 4)
+        let patterns: [Lane] = [0, -1, .min, 1, middle, .max]
+        let splats = patterns.map { Array(repeating: $0, count: count) }
+        let rotations = patterns.indices.map { offset in
+            (0..<count).map { patterns[($0 + offset) % patterns.count] }
+        }
+        let mixed = (0..<randomCount).map { _ in
+            (0..<count).map { _ in patterns[Int(generator.next() % UInt64(patterns.count))] }
+        }
+        let random = (0..<randomCount / 4).map { _ in
+            (0..<count).map { _ in Lane(truncatingIfNeeded: generator.next()) }
+        }
+        return splats + rotations + mixed + random
     }
 
     package static func maskBits(lanes: Int, seed: UInt64) -> [UInt] {
@@ -540,6 +581,28 @@ package enum Inputs {
                 inContract: inContract
             ).map { V($0) }
         }
+        return byteIndices(V.self, offset: offset, count: count, seed: seed, inContract: inContract)
+    }
+
+    package static func tableIndices<V: SIMD>(
+        _ type: V.Type,
+        offset: Int = 0,
+        perByte: Bool,
+        count: Int,
+        seed: UInt64,
+        inContract: Bool
+    ) -> [V] where V.Scalar: ReferenceLane & BinaryFloatingPoint {
+        precondition(perByte, "Floating-point lanes only take byte indices")
+        return byteIndices(V.self, offset: offset, count: count, seed: seed, inContract: inContract)
+    }
+
+    private static func byteIndices<V: SIMD>(
+        _ type: V.Type,
+        offset: Int,
+        count: Int,
+        seed: UInt64,
+        inContract: Bool
+    ) -> [V] where V.Scalar: ReferenceLane {
         let size = MemoryLayout<V.Scalar>.size
         return indexLanes(
             UInt8.self,
@@ -581,7 +644,8 @@ package enum Inputs {
         guard !inContract else { return Array(0..<bits) }
         let candidates = [
             bits, bits + 1, 2 * bits, 31, 32, 33, 63, 64, 65, 127, 128, 255, 256, -1, -2, -bits,
-            Int(Int32.max), Int(Int32.min),
+            Int(Int32.max), Int(Int32.min), Int(Int32.max) &+ 1, Int(Int32.min) &- 1, Int.max,
+            Int.min,
         ]
         return candidates.reduce(into: []) { unique, amount in
             if (amount < 0 || amount >= bits) && !unique.contains(amount) {
@@ -599,7 +663,10 @@ package enum Inputs {
         let bits = V.Scalar.bitWidth
         func lane(_ amount: Int) -> V.Scalar { V.Scalar(truncatingIfNeeded: amount) }
         func inRange() -> V.Scalar { lane(Int(generator.next() % UInt64(bits))) }
-        let amounts = inContract ? Array(0..<bits) : shiftAmounts(bits: bits, inContract: false)
+        let amounts =
+            inContract
+            ? Array(0..<bits)
+            : shiftAmounts(bits: bits, inContract: false).filter { Int32(exactly: $0) != nil }
         let splats = amounts.map { V(repeating: lane($0)) }
         let rotations = amounts.indices.map { offset in
             V((0..<V.scalarCount).map { lane(amounts[($0 + offset) % amounts.count]) })
@@ -737,10 +804,14 @@ package func poisoned<Indices: ReferenceVector, Mask: ReferenceMask>(
     with poison: Int
 ) -> Indices where Indices.Simd.Scalar: FixedWidthInteger {
     var lanes = indices.simd
-    for lane in 0..<Indices.Simd.scalarCount where !mask.simd[lane] {
+    for lane in 0..<Indices.Simd.scalarCount where mask.simd._storage[lane] == 0 {
         lanes[lane] = Indices.Simd.Scalar(truncatingIfNeeded: poison)
     }
     return Indices(lanes)
+}
+
+package func hasAllOnesLane<M: ReferenceMask>(_ mask: M) -> Bool {
+    (0..<M.Storage.scalarCount).contains { mask.simd._storage[$0] == -1 }
 }
 
 package func poisoned<Indices: ReferenceVector>(
@@ -793,6 +864,20 @@ package func withOutputSpan<Lane: ReferenceLane, Result>(
     return (result, unsafe Array(buffer))
 }
 
+package func withMutableSpan<Lane: ReferenceLane, Result>(
+    of lanes: [Lane],
+    _ body: (inout MutableSpan<Lane>) -> Result
+) -> (result: Result, lanes: [Lane]) {
+    let sentinel = Inputs.sentinel(Lane.self, count: 4)
+    let buffer = UnsafeMutableBufferPointer<Lane>.allocate(capacity: lanes.count + sentinel.count)
+    defer { unsafe buffer.deallocate() }
+    _ = unsafe buffer.initialize(from: lanes + sentinel)
+    let region = unsafe UnsafeMutableBufferPointer(rebasing: buffer[0..<lanes.count])
+    var span = unsafe region.mutableSpan
+    let result = body(&span)
+    return (result, unsafe Array(buffer))
+}
+
 package func withGuardedLanes<Lane: ReferenceLane, Result>(
     _ lanes: [Lane],
     _ body: (UnsafeMutablePointer<Lane>) -> Result
@@ -842,15 +927,16 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasNaNs<V: SIMD>(in operands: V...) -> Bool
+package func hasNaNs<V: SIMD>(negating operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
-    operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
+    HighwayReference.hasNativeFusedMultiplyAdd()
+        && operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
 }
 
 @inlinable
 package func hasUnorderedNaNs<V: SIMD>(negating a: V, _ b: V, adding c: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
-    hasNaNs(in: a, b) || hasUnorderedNaNs(multiplying: a, b, adding: c)
+    hasNaNs(negating: a, b) || hasUnorderedNaNs(multiplying: a, b, adding: c)
 }
 
 @inlinable
@@ -875,6 +961,16 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
         stride(from: 0, to: V.scalarCount, by: 2).contains { lane in
             let (first, second) = (operand[lane], operand[lane + 1])
             return first.isNaN && second.isNaN && first.bits != second.bits
+        }
+    }
+}
+
+@inlinable
+package func hasUnorderedNaNs<V: SIMD>(adjacentQuadsOf operands: V...) -> Bool
+where V.Scalar: ReferenceLane & BinaryFloatingPoint & SIMDScalar {
+    operands.contains { operand in
+        stride(from: 0, to: V.scalarCount, by: 4).contains { lane in
+            hasUnorderedNaNs(lanesOf: SIMD4((0..<4).map { operand[lane + $0] }))
         }
     }
 }

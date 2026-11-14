@@ -7,6 +7,53 @@ extension SIMDDouble {
     public static func scatter(
         _ a: Vector,
         to: UnsafeMutablePointer<Lane>,
+        byteOffsets: SIMDInt64.Vector
+    ) {
+        unsafe cvectorization_ops_scatter_byte_offsets_f64(a, to, byteOffsets.raw)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        to span: inout MutableSpan<Lane>,
+        byteOffsets: SIMDInt64.Vector
+    ) {
+        precondition(
+            cvectorization_ops_indices_within_i64(
+                byteOffsets.raw,
+                0,
+                SIMDInt64.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
+            ),
+            "Byte offset is negative or leaves no room for a lane in the span"
+        )
+        unsafe scatter(a, toUnchecked: &span, byteOffsets: byteOffsets)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        toUnchecked span: inout MutableSpan<Lane>,
+        byteOffsets: SIMDInt64.Vector
+    ) {
+        assert(
+            cvectorization_ops_indices_within_i64(
+                byteOffsets.raw,
+                0,
+                SIMDInt64.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
+            ),
+            "Byte offset is negative or leaves no room for a lane in the span"
+        )
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_scatter_byte_offsets_f64(a, $0.baseAddress, byteOffsets.raw)
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        to: UnsafeMutablePointer<Lane>,
         indices: SIMDInt64.Vector,
         count: Int
     ) {
@@ -24,7 +71,7 @@ extension SIMDDouble {
         precondition(
             cvectorization_ops_indices_within_where_f64(
                 indices.raw,
-                span.count,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -43,7 +90,7 @@ extension SIMDDouble {
         assert(
             cvectorization_ops_indices_within_where_f64(
                 indices.raw,
-                span.count,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -72,7 +119,11 @@ extension SIMDDouble {
         where mask: Mask
     ) {
         precondition(
-            cvectorization_ops_indices_within_where_f64(indices.raw, span.count, mask.raw),
+            cvectorization_ops_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         unsafe scatter(a, toUnchecked: &span, indices: indices, where: mask)
@@ -87,7 +138,11 @@ extension SIMDDouble {
         where mask: Mask
     ) {
         assert(
-            cvectorization_ops_indices_within_where_f64(indices.raw, span.count, mask.raw),
+            cvectorization_ops_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         span.withUnsafeMutableBufferPointer {
@@ -1409,6 +1464,15 @@ extension SIMDDouble {
     @export(implementation) @inline(always)
     public static func vector(widening a: SIMDFloat16.QuarterVector) -> Vector {
         cvectorization_ops_vector_widening_quarter_vector_f16_to_f64(a.raw)
+    }
+
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func vector(wideningLower a: SIMDFloat16.HalfVector) -> Vector {
+        cvectorization_ops_vector_widening_lower_half_vector_f16_to_f64(a.raw)
     }
 
     #endif

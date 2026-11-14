@@ -325,4 +325,60 @@ extension SIMDInt64ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func vectorWideningLowerFromHalfUInt16() {
+        let mismatches = Mismatches("vectorWideningLowerFromHalfUInt16")
+        let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0x263F_13C7_AC60_B58F)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                H.Vector(raw: HighwayReference.vectorWideningLowerHalfU16ToI64(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromHalfInt16() {
+        let mismatches = Mismatches("vectorWideningLowerFromHalfInt16")
+        let aInputs = Inputs.conversions(SIMDInt16.HalfVector.self, seed: 0x60A7_0741_B8AB_10EC)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                H.Vector(raw: HighwayReference.vectorWideningLowerHalfI16ToI64(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromQuarterUInt8() {
+        let mismatches = Mismatches("vectorWideningLowerFromQuarterUInt8")
+        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x38E8_534A_887B_CB71)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                H.Vector(raw: HighwayReference.vectorWideningLowerQuarterU8ToI64(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromQuarterInt8() {
+        let mismatches = Mismatches("vectorWideningLowerFromQuarterInt8")
+        let aInputs = Inputs.conversions(SIMDInt8.QuarterVector.self, seed: 0x49E9_9E04_5658_C512)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                H.Vector(raw: HighwayReference.vectorWideningLowerQuarterI8ToI64(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

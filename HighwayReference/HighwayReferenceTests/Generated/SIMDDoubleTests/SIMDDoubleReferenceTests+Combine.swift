@@ -131,6 +131,22 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func lowerHalfResized() {
+        let mismatches = Mismatches("lowerHalf resized with its unspecified lanes zeroed")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7451_43BC_8E66_129B)
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 2),
+                    H.vector(resizing: H.lowerHalf(a))
+                ),
+                HighwayReference.resizedLowerHalfF64(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func upperHalf() {
         let mismatches = Mismatches("upperHalf")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3924_BCE1_393F_CE56)
@@ -138,6 +154,22 @@ extension SIMDDoubleReferenceTests {
             mismatches.check(
                 H.upperHalf(a),
                 H.HalfVector(raw: HighwayReference.upperHalfF64(a)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func upperHalfResized() {
+        let mismatches = Mismatches("upperHalf resized with its unspecified lanes zeroed")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7F6B_E957_00A2_7BBC)
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 2),
+                    H.vector(resizing: H.upperHalf(a))
+                ),
+                HighwayReference.resizedUpperHalfF64(a),
                 "a: \(describe(a))"
             )
         }

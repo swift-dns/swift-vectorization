@@ -534,6 +534,216 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingAddingConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x843C_3878_521F_A041)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.saturatingAdding(H.repeating(value), b),
+                H.Vector(raw: HighwayReference.saturatingAddingU64(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSaturatingAddingConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingAdding with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6AE9_B278_43F8_008F)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.saturatingAdding(a, H.repeating(value)),
+                H.Vector(raw: HighwayReference.saturatingAddingU64(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantSplat0() {
+        checkSaturatingAddingConstantA(0)
+        checkSaturatingAddingConstantB(0)
+    }
+
+    @Test func saturatingAddingConstantSplat1() {
+        checkSaturatingAddingConstantA(1)
+        checkSaturatingAddingConstantB(1)
+    }
+
+    @Test func saturatingAddingConstantSplat15() {
+        checkSaturatingAddingConstantA(15)
+        checkSaturatingAddingConstantB(15)
+    }
+
+    @Test func saturatingAddingConstantSplat16() {
+        checkSaturatingAddingConstantA(16)
+        checkSaturatingAddingConstantB(16)
+    }
+
+    @Test func saturatingAddingConstantSplat26() {
+        checkSaturatingAddingConstantA(26)
+        checkSaturatingAddingConstantB(26)
+    }
+
+    @Test func saturatingAddingConstantSplat127() {
+        checkSaturatingAddingConstantA(127)
+        checkSaturatingAddingConstantB(127)
+    }
+
+    @Test func saturatingAddingConstantSplat128() {
+        checkSaturatingAddingConstantA(128)
+        checkSaturatingAddingConstantB(128)
+    }
+
+    @Test func saturatingAddingConstantSplat255() {
+        checkSaturatingAddingConstantA(255)
+        checkSaturatingAddingConstantB(255)
+    }
+
+    @Test func saturatingAddingConstantSplat256() {
+        checkSaturatingAddingConstantA(256)
+        checkSaturatingAddingConstantB(256)
+    }
+
+    @Test func saturatingAddingConstantSplat257() {
+        checkSaturatingAddingConstantA(257)
+        checkSaturatingAddingConstantB(257)
+    }
+
+    @Test func saturatingAddingConstantSplat65280() {
+        checkSaturatingAddingConstantA(65280)
+        checkSaturatingAddingConstantB(65280)
+    }
+
+    @Test func saturatingAddingConstantSplat65281() {
+        checkSaturatingAddingConstantA(65281)
+        checkSaturatingAddingConstantB(65281)
+    }
+
+    @Test func saturatingAddingConstantSplatMax() {
+        checkSaturatingAddingConstantA(H.Lane.max)
+        checkSaturatingAddingConstantB(H.Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSaturatingSubtractingConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingSubtracting with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3728_CDEB_BDE6_A19C)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.saturatingSubtracting(H.repeating(value), b),
+                H.Vector(
+                    raw: HighwayReference.saturatingSubtractingU64(H.repeating(value).raw, b.raw)
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSaturatingSubtractingConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x507B_53EB_CC0E_414E)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.saturatingSubtracting(a, H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.saturatingSubtractingU64(a.raw, H.repeating(value).raw)
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantSplat0() {
+        checkSaturatingSubtractingConstantA(0)
+        checkSaturatingSubtractingConstantB(0)
+    }
+
+    @Test func saturatingSubtractingConstantSplat1() {
+        checkSaturatingSubtractingConstantA(1)
+        checkSaturatingSubtractingConstantB(1)
+    }
+
+    @Test func saturatingSubtractingConstantSplat15() {
+        checkSaturatingSubtractingConstantA(15)
+        checkSaturatingSubtractingConstantB(15)
+    }
+
+    @Test func saturatingSubtractingConstantSplat16() {
+        checkSaturatingSubtractingConstantA(16)
+        checkSaturatingSubtractingConstantB(16)
+    }
+
+    @Test func saturatingSubtractingConstantSplat26() {
+        checkSaturatingSubtractingConstantA(26)
+        checkSaturatingSubtractingConstantB(26)
+    }
+
+    @Test func saturatingSubtractingConstantSplat127() {
+        checkSaturatingSubtractingConstantA(127)
+        checkSaturatingSubtractingConstantB(127)
+    }
+
+    @Test func saturatingSubtractingConstantSplat128() {
+        checkSaturatingSubtractingConstantA(128)
+        checkSaturatingSubtractingConstantB(128)
+    }
+
+    @Test func saturatingSubtractingConstantSplat255() {
+        checkSaturatingSubtractingConstantA(255)
+        checkSaturatingSubtractingConstantB(255)
+    }
+
+    @Test func saturatingSubtractingConstantSplat256() {
+        checkSaturatingSubtractingConstantA(256)
+        checkSaturatingSubtractingConstantB(256)
+    }
+
+    @Test func saturatingSubtractingConstantSplat257() {
+        checkSaturatingSubtractingConstantA(257)
+        checkSaturatingSubtractingConstantB(257)
+    }
+
+    @Test func saturatingSubtractingConstantSplat65280() {
+        checkSaturatingSubtractingConstantA(65280)
+        checkSaturatingSubtractingConstantB(65280)
+    }
+
+    @Test func saturatingSubtractingConstantSplat65281() {
+        checkSaturatingSubtractingConstantA(65281)
+        checkSaturatingSubtractingConstantB(65281)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMax() {
+        checkSaturatingSubtractingConstantA(H.Lane.max)
+        checkSaturatingSubtractingConstantB(H.Lane.max)
+    }
+
+    @inline(__always)
     private func checkRoundedAverageConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("roundedAverage with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2365_5562_5A8B_4D70)
