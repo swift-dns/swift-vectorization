@@ -59113,18 +59113,6 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_g
     }
   }
   return (cvectorization_ops_raw_vector_u64)(v);
-#elif CVECTORIZATION_OPS_NEON
-  const int64_t index0 = indices[0];
-  const int64_t index1 = indices[1];
-  cvectorization_ops_vector_u64 v;
-  __builtin_memset(&v, 0, sizeof v);
-  if (0 < count) {
-    v[0] = from[index0];
-  }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  return (cvectorization_ops_raw_vector_u64)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_gatherdiv8di((cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}, (const void*)from, (cvectorization_ops_x86_i64)indices, (unsigned char)__builtin_ia32_bzhi_di(~0ull, (count < 8 ? count : 8)), (int)8));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -59159,17 +59147,6 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_g
     if (i < count) {
       v[i] = from[indices[i]];
     }
-  }
-  return (cvectorization_ops_raw_vector_u64)(v);
-#elif CVECTORIZATION_OPS_NEON
-  const int64_t index0 = indices[0];
-  const int64_t index1 = indices[1];
-  cvectorization_ops_vector_u64 v = otherwise;
-  if (0 < count) {
-    v[0] = from[index0];
-  }
-  if (1 < count) {
-    v[1] = from[index1];
   }
   return (cvectorization_ops_raw_vector_u64)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -116015,18 +115992,6 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_g
     }
   }
   return (cvectorization_ops_raw_vector_i64)(v);
-#elif CVECTORIZATION_OPS_NEON
-  const int64_t index0 = indices[0];
-  const int64_t index1 = indices[1];
-  cvectorization_ops_vector_i64 v;
-  __builtin_memset(&v, 0, sizeof v);
-  if (0 < count) {
-    v[0] = from[index0];
-  }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  return (cvectorization_ops_raw_vector_i64)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_gatherdiv8di((cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}, (const void*)from, (cvectorization_ops_x86_i64)indices, (unsigned char)__builtin_ia32_bzhi_di(~0ull, (count < 8 ? count : 8)), (int)8));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -116061,17 +116026,6 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_g
     if (i < count) {
       v[i] = from[indices[i]];
     }
-  }
-  return (cvectorization_ops_raw_vector_i64)(v);
-#elif CVECTORIZATION_OPS_NEON
-  const int64_t index0 = indices[0];
-  const int64_t index1 = indices[1];
-  cvectorization_ops_vector_i64 v = otherwise;
-  if (0 < count) {
-    v[0] = from[index0];
-  }
-  if (1 < count) {
-    v[1] = from[index1];
   }
   return (cvectorization_ops_raw_vector_i64)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -140747,18 +140701,6 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_g
     }
   }
   return (cvectorization_ops_raw_vector_f64)(v);
-#elif CVECTORIZATION_OPS_NEON
-  const int64_t index0 = indices[0];
-  const int64_t index1 = indices[1];
-  cvectorization_ops_vector_f64 v;
-  __builtin_memset(&v, 0, sizeof v);
-  if (0 < count) {
-    v[0] = from[index0];
-  }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  return (cvectorization_ops_raw_vector_f64)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_gatherdiv8df((cvectorization_ops_x86_f64)(cvectorization_ops_x86_f64){0}, (const void*)from, (cvectorization_ops_x86_i64)indices, (unsigned char)__builtin_ia32_bzhi_di(~0ull, (count < 8 ? count : 8)), (int)8));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -140793,17 +140735,6 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_g
     if (i < count) {
       v[i] = from[indices[i]];
     }
-  }
-  return (cvectorization_ops_raw_vector_f64)(v);
-#elif CVECTORIZATION_OPS_NEON
-  const int64_t index0 = indices[0];
-  const int64_t index1 = indices[1];
-  cvectorization_ops_vector_f64 v = otherwise;
-  if (0 < count) {
-    v[0] = from[index0];
-  }
-  if (1 < count) {
-    v[1] = from[index1];
   }
   return (cvectorization_ops_raw_vector_f64)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6

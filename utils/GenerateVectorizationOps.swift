@@ -26049,7 +26049,8 @@ func x86GatherTargets(
     }
     return TargetBodies(
         neon: { element in
-            firstLanes ? hoistedGatheredFirst(otherwise: otherwise, for: element) : nil
+            firstLanes && element.bits == 32
+                ? hoistedGatheredFirst(otherwise: otherwise, for: element) : nil
         },
         sve2_128: { element in
             sveGathering(
