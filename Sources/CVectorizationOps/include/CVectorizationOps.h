@@ -35803,6 +35803,39 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_r
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)cvectorization_ops_negated_multiply_adding_u32((cvectorization_ops_raw_vector_u32)quotient, (cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)a));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_saturating_adding_u32(cvectorization_ops_raw_vector_u32 rawA, cvectorization_ops_raw_vector_u32 rawB) {
+  const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
+  const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  if (cvectorization_ops_sve_splat_u32(b) && ((uint32_t)b[0] <= 255 || (((uint32_t)b[0] & 255) == 0 && (uint32_t)b[0] <= 65280))) {
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqadd_u32((cvectorization_ops_sve_u32)a, __builtin_sve_svdup_n_u32(b[0])));
+  }
+  if (cvectorization_ops_sve_splat_u32(a) && ((uint32_t)a[0] <= 255 || (((uint32_t)a[0] & 255) == 0 && (uint32_t)a[0] <= 65280))) {
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqadd_u32((cvectorization_ops_sve_u32)b, __builtin_sve_svdup_n_u32(a[0])));
+  }
+  return (cvectorization_ops_raw_vector_u32)(__builtin_elementwise_add_sat(a, b));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u32)(a + (cvectorization_ops_vector_u32)cvectorization_ops_minimum_u32((cvectorization_ops_raw_vector_u32)b, (cvectorization_ops_raw_vector_u32)~a));
+#else
+  return (cvectorization_ops_raw_vector_u32)(__builtin_elementwise_add_sat(a, b));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_saturating_subtracting_u32(cvectorization_ops_raw_vector_u32 rawA, cvectorization_ops_raw_vector_u32 rawB) {
+  const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
+  const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  if (cvectorization_ops_sve_splat_u32(b) && ((uint32_t)b[0] <= 255 || (((uint32_t)b[0] & 255) == 0 && (uint32_t)b[0] <= 65280))) {
+    return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqsub_u32((cvectorization_ops_sve_u32)a, __builtin_sve_svdup_n_u32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_neon_vqsubq_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 50));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_neon_vqsubq_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 50));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u32)(a - (cvectorization_ops_vector_u32)cvectorization_ops_minimum_u32((cvectorization_ops_raw_vector_u32)a, (cvectorization_ops_raw_vector_u32)b));
+#else
+  return (cvectorization_ops_raw_vector_u32)(__builtin_elementwise_sub_sat(a, b));
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_rounded_average_u32(cvectorization_ops_raw_vector_u32 rawA, cvectorization_ops_raw_vector_u32 rawB) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
@@ -48177,6 +48210,42 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_r
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
   const cvectorization_ops_vector_u64 quotient = (cvectorization_ops_vector_u64)cvectorization_ops_dividing_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b);
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)cvectorization_ops_negated_multiply_adding_u64((cvectorization_ops_raw_vector_u64)quotient, (cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)a));
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_saturating_adding_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB) {
+  const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
+  const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  if (cvectorization_ops_sve_splat_u64(b)) {
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svqadd_u64((cvectorization_ops_sve_u64)a, __builtin_sve_svdup_n_u64(b[0])));
+  }
+  if (cvectorization_ops_sve_splat_u64(a)) {
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svqadd_u64((cvectorization_ops_sve_u64)b, __builtin_sve_svdup_n_u64(a[0])));
+  }
+  return (cvectorization_ops_raw_vector_u64)(__builtin_elementwise_add_sat(a, b));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u64)(a + (cvectorization_ops_vector_u64)cvectorization_ops_minimum_u64((cvectorization_ops_raw_vector_u64)b, (cvectorization_ops_raw_vector_u64)~a));
+#else
+  return (cvectorization_ops_raw_vector_u64)(__builtin_elementwise_add_sat(a, b));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_saturating_subtracting_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB) {
+  const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
+  const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  if (cvectorization_ops_sve_splat_u64(b)) {
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svqsub_u64((cvectorization_ops_sve_u64)a, __builtin_sve_svdup_n_u64(b[0])));
+  }
+  if (cvectorization_ops_sve_splat_u64(a)) {
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svqsub_u64(__builtin_sve_svdup_n_u64(a[0]), (cvectorization_ops_sve_u64)b));
+  }
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vqsubq_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 51));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vqsubq_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 51));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_u64)(a - (cvectorization_ops_vector_u64)cvectorization_ops_minimum_u64((cvectorization_ops_raw_vector_u64)a, (cvectorization_ops_raw_vector_u64)b));
+#else
+  return (cvectorization_ops_raw_vector_u64)(__builtin_elementwise_sub_sat(a, b));
+#endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_rounded_average_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
@@ -92622,6 +92691,75 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_r
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)cvectorization_ops_negated_multiply_adding_i32((cvectorization_ops_raw_vector_i32)quotient, (cvectorization_ops_raw_vector_i32)b, (cvectorization_ops_raw_vector_i32)a));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_saturating_adding_i32(cvectorization_ops_raw_vector_i32 rawA, cvectorization_ops_raw_vector_i32 rawB) {
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
+  const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  if (cvectorization_ops_sve_splat_i32(b) && ((uint32_t)b[0] <= 255 || (((uint32_t)b[0] & 255) == 0 && (uint32_t)b[0] <= 65280))) {
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqadd_s32((cvectorization_ops_sve_i32)a, __builtin_sve_svdup_n_s32(b[0])));
+  }
+  if (cvectorization_ops_sve_splat_i32(a) && ((uint32_t)a[0] <= 255 || (((uint32_t)a[0] & 255) == 0 && (uint32_t)a[0] <= 65280))) {
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqadd_s32((cvectorization_ops_sve_i32)b, __builtin_sve_svdup_n_s32(a[0])));
+  }
+  return (cvectorization_ops_raw_vector_i32)(__builtin_elementwise_add_sat(a, b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const cvectorization_ops_vector_i32 result = (cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a + (cvectorization_ops_vector_u32)b);
+  const cvectorization_ops_vector_i32 maximum = (cvectorization_ops_vector_i32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)__builtin_ia32_pternlogq512_mask((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)b, (cvectorization_ops_x86_i64)result, (int)0x42, (unsigned char)-1)), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)__builtin_ia32_pternlogd512_mask((cvectorization_ops_x86_i32)maximum, (cvectorization_ops_x86_i32)maximum, (cvectorization_ops_x86_i32)maximum, (int)0x55, (unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)a)), (cvectorization_ops_x86_i32)result));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_vector_i32 result = (cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a + (cvectorization_ops_vector_u32)b);
+  const cvectorization_ops_x86_i64 overflow = ~((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)(a >> 31) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_blendvps256((cvectorization_ops_x86_f32)result, (cvectorization_ops_x86_f32)saturated, (cvectorization_ops_x86_f32)overflow));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_i32 result = (cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a + (cvectorization_ops_vector_u32)b);
+  const cvectorization_ops_x86_i64 overflow = ~((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)(a >> 31) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_blendvps((cvectorization_ops_x86_f32)result, (cvectorization_ops_x86_f32)saturated, (cvectorization_ops_x86_f32)overflow));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_i32 result = (cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a + (cvectorization_ops_vector_u32)b);
+  const cvectorization_ops_x86_i64 overflow = ~((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)cvectorization_ops_x86_negative_lanes_i32((cvectorization_ops_x86_i32)a) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+  const cvectorization_ops_x86_i64 negative = (cvectorization_ops_x86_i64)cvectorization_ops_x86_negative_lanes_i32((cvectorization_ops_x86_i32)overflow);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(((cvectorization_ops_x86_i64)negative & (cvectorization_ops_x86_i64)saturated) | (~(cvectorization_ops_x86_i64)negative & (cvectorization_ops_x86_i64)result)));
+#else
+  return (cvectorization_ops_raw_vector_i32)(__builtin_elementwise_add_sat(a, b));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_saturating_subtracting_i32(cvectorization_ops_raw_vector_i32 rawA, cvectorization_ops_raw_vector_i32 rawB) {
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
+  const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  if (cvectorization_ops_sve_splat_i32(b) && ((uint32_t)b[0] <= 255 || (((uint32_t)b[0] & 255) == 0 && (uint32_t)b[0] <= 65280))) {
+    return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqsub_s32((cvectorization_ops_sve_i32)a, __builtin_sve_svdup_n_s32(b[0])));
+  }
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_neon_vqsubq_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 34));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_neon_vqsubq_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 34));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const cvectorization_ops_vector_i32 result = (cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a - (cvectorization_ops_vector_u32)b);
+  const cvectorization_ops_vector_i32 maximum = (cvectorization_ops_vector_i32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)__builtin_ia32_pternlogq512_mask((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)b, (cvectorization_ops_x86_i64)result, (int)0x18, (unsigned char)-1)), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)__builtin_ia32_pternlogd512_mask((cvectorization_ops_x86_i32)maximum, (cvectorization_ops_x86_i32)maximum, (cvectorization_ops_x86_i32)maximum, (int)0x55, (unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)a)), (cvectorization_ops_x86_i32)result));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_vector_i32 result = (cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a - (cvectorization_ops_vector_u32)b);
+  const cvectorization_ops_x86_i64 overflow = ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)(a >> 31) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_blendvps256((cvectorization_ops_x86_f32)result, (cvectorization_ops_x86_f32)saturated, (cvectorization_ops_x86_f32)overflow));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_i32 result = (cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a - (cvectorization_ops_vector_u32)b);
+  const cvectorization_ops_x86_i64 overflow = ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)(a >> 31) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_blendvps((cvectorization_ops_x86_f32)result, (cvectorization_ops_x86_f32)saturated, (cvectorization_ops_x86_f32)overflow));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_i32 result = (cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a - (cvectorization_ops_vector_u32)b);
+  const cvectorization_ops_x86_i64 overflow = ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)cvectorization_ops_x86_negative_lanes_i32((cvectorization_ops_x86_i32)a) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX};
+  const cvectorization_ops_x86_i64 negative = (cvectorization_ops_x86_i64)cvectorization_ops_x86_negative_lanes_i32((cvectorization_ops_x86_i32)overflow);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(((cvectorization_ops_x86_i64)negative & (cvectorization_ops_x86_i64)saturated) | (~(cvectorization_ops_x86_i64)negative & (cvectorization_ops_x86_i64)result)));
+#else
+  return (cvectorization_ops_raw_vector_i32)(__builtin_elementwise_sub_sat(a, b));
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_rounded_average_i32(cvectorization_ops_raw_vector_i32 rawA, cvectorization_ops_raw_vector_i32 rawB) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
@@ -105330,6 +105468,78 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_r
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
   const cvectorization_ops_vector_i64 quotient = (cvectorization_ops_vector_i64)cvectorization_ops_dividing_i64((cvectorization_ops_raw_vector_i64)a, (cvectorization_ops_raw_vector_i64)b);
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)cvectorization_ops_negated_multiply_adding_i64((cvectorization_ops_raw_vector_i64)quotient, (cvectorization_ops_raw_vector_i64)b, (cvectorization_ops_raw_vector_i64)a));
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_saturating_adding_i64(cvectorization_ops_raw_vector_i64 rawA, cvectorization_ops_raw_vector_i64 rawB) {
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
+  const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  if (cvectorization_ops_sve_splat_i64(b)) {
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svqadd_s64((cvectorization_ops_sve_i64)a, __builtin_sve_svdup_n_s64(b[0])));
+  }
+  if (cvectorization_ops_sve_splat_i64(a)) {
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svqadd_s64((cvectorization_ops_sve_i64)b, __builtin_sve_svdup_n_s64(a[0])));
+  }
+  return (cvectorization_ops_raw_vector_i64)(__builtin_elementwise_add_sat(a, b));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const cvectorization_ops_vector_i64 result = (cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a + (cvectorization_ops_vector_u64)b);
+  const cvectorization_ops_vector_i64 maximum = (cvectorization_ops_vector_i64){INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)__builtin_ia32_pternlogq512_mask((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)b, (cvectorization_ops_x86_i64)result, (int)0x42, (unsigned char)-1)), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)__builtin_ia32_pternlogq512_mask((cvectorization_ops_x86_i64)maximum, (cvectorization_ops_x86_i64)maximum, (cvectorization_ops_x86_i64)maximum, (int)0x55, (unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)a)), (cvectorization_ops_x86_i64)result));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_vector_i64 result = (cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a + (cvectorization_ops_vector_u64)b);
+  const cvectorization_ops_x86_i64 overflow = ~((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)(a >> 63) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64){INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_blendvpd256((cvectorization_ops_x86_f64)result, (cvectorization_ops_x86_f64)saturated, (cvectorization_ops_x86_f64)overflow));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_i64 result = (cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a + (cvectorization_ops_vector_u64)b);
+  const cvectorization_ops_x86_i64 overflow = ~((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)(a >> 63) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64){INT64_MAX, INT64_MAX};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_blendvpd((cvectorization_ops_x86_f64)result, (cvectorization_ops_x86_f64)saturated, (cvectorization_ops_x86_f64)overflow));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_i64 result = (cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a + (cvectorization_ops_vector_u64)b);
+  const cvectorization_ops_x86_i64 overflow = ~((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)cvectorization_ops_x86_negative_lanes_i64((cvectorization_ops_x86_i64)a) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64){INT64_MAX, INT64_MAX};
+  const cvectorization_ops_x86_i64 negative = (cvectorization_ops_x86_i64)cvectorization_ops_x86_negative_lanes_i64((cvectorization_ops_x86_i64)overflow);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(((cvectorization_ops_x86_i64)negative & (cvectorization_ops_x86_i64)saturated) | (~(cvectorization_ops_x86_i64)negative & (cvectorization_ops_x86_i64)result)));
+#else
+  return (cvectorization_ops_raw_vector_i64)(__builtin_elementwise_add_sat(a, b));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_saturating_subtracting_i64(cvectorization_ops_raw_vector_i64 rawA, cvectorization_ops_raw_vector_i64 rawB) {
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
+  const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  if (cvectorization_ops_sve_splat_i64(b)) {
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svqsub_s64((cvectorization_ops_sve_i64)a, __builtin_sve_svdup_n_s64(b[0])));
+  }
+  if (cvectorization_ops_sve_splat_i64(a)) {
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svqsub_s64(__builtin_sve_svdup_n_s64(a[0]), (cvectorization_ops_sve_i64)b));
+  }
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vqsubq_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 35));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vqsubq_v((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)b, 35));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const cvectorization_ops_vector_i64 result = (cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a - (cvectorization_ops_vector_u64)b);
+  const cvectorization_ops_vector_i64 maximum = (cvectorization_ops_vector_i64){INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)__builtin_ia32_pternlogq512_mask((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)b, (cvectorization_ops_x86_i64)result, (int)0x18, (unsigned char)-1)), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)__builtin_ia32_pternlogq512_mask((cvectorization_ops_x86_i64)maximum, (cvectorization_ops_x86_i64)maximum, (cvectorization_ops_x86_i64)maximum, (int)0x55, (unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)a)), (cvectorization_ops_x86_i64)result));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_vector_i64 result = (cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a - (cvectorization_ops_vector_u64)b);
+  const cvectorization_ops_x86_i64 overflow = ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)(a >> 63) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64){INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_blendvpd256((cvectorization_ops_x86_f64)result, (cvectorization_ops_x86_f64)saturated, (cvectorization_ops_x86_f64)overflow));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_i64 result = (cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a - (cvectorization_ops_vector_u64)b);
+  const cvectorization_ops_x86_i64 overflow = ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)(a >> 63) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64){INT64_MAX, INT64_MAX};
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_blendvpd((cvectorization_ops_x86_f64)result, (cvectorization_ops_x86_f64)saturated, (cvectorization_ops_x86_f64)overflow));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  const cvectorization_ops_vector_i64 result = (cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a - (cvectorization_ops_vector_u64)b);
+  const cvectorization_ops_x86_i64 overflow = ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)b) & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)result);
+  const cvectorization_ops_x86_i64 saturated = (cvectorization_ops_x86_i64)cvectorization_ops_x86_negative_lanes_i64((cvectorization_ops_x86_i64)a) ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64){INT64_MAX, INT64_MAX};
+  const cvectorization_ops_x86_i64 negative = (cvectorization_ops_x86_i64)cvectorization_ops_x86_negative_lanes_i64((cvectorization_ops_x86_i64)overflow);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(((cvectorization_ops_x86_i64)negative & (cvectorization_ops_x86_i64)saturated) | (~(cvectorization_ops_x86_i64)negative & (cvectorization_ops_x86_i64)result)));
+#else
+  return (cvectorization_ops_raw_vector_i64)(__builtin_elementwise_sub_sat(a, b));
+#endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_rounded_average_i64(cvectorization_ops_raw_vector_i64 rawA, cvectorization_ops_raw_vector_i64 rawB) {
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;

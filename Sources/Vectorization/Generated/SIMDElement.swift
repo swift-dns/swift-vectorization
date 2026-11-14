@@ -695,6 +695,8 @@ public protocol SIMDElement {
 /// The ops that only the integer element types have.
 public protocol SIMDIntegerElement: SIMDElement {
     static func remainder(_ a: Vector, _ b: Vector) -> Vector
+    static func saturatingAdding(_ a: Vector, _ b: Vector) -> Vector
+    static func saturatingSubtracting(_ a: Vector, _ b: Vector) -> Vector
     static func roundedAverage(_ a: Vector, _ b: Vector) -> Vector
     static func bitwiseNot(_ a: Vector) -> Vector
     static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector

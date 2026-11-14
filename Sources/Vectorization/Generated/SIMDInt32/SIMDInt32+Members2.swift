@@ -2263,9 +2263,4 @@ extension SIMDInt32 {
         }
     }
 
-    @export(implementation) @inline(always)
-    public static func compressed(_ a: Vector, where mask: Mask) -> Vector {
-        Vector(raw: cvectorization_ops_compressed_i32(a.raw, mask.raw))
-    }
-
 }

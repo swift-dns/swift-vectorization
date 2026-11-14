@@ -4,6 +4,11 @@ public import CVectorizationOps
 
 extension SIMDUInt32 {
     @export(implementation) @inline(always)
+    public static func compressedNot(_ a: Vector, where mask: Mask) -> Vector {
+        Vector(raw: cvectorization_ops_compressed_not_u32(a.raw, mask.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func partitioned(_ a: Vector, where mask: Mask) -> Vector {
         Vector(raw: cvectorization_ops_partitioned_u32(a.raw, mask.raw))
     }

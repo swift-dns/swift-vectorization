@@ -146,6 +146,16 @@ extension SIMDInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func saturatingAdding(_ a: Vector, _ b: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_saturating_adding_i64(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func saturatingSubtracting(_ a: Vector, _ b: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_saturating_subtracting_i64(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func roundedAverage(_ a: Vector, _ b: Vector) -> Vector {
         Vector(raw: cvectorization_ops_rounded_average_i64(a.raw, b.raw))
     }

@@ -420,6 +420,86 @@ extension SIMDInt64CodegenTests {
         mismatches.record()
     }
 
+    @Test func saturatingAdding() {
+        let mismatches = Mismatches("portSaturatingAddingI64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0922_D660_261A_BB6B)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0922_D560_261A_B9B8)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portSaturatingAddingI64(a, b),
+                highwaySaturatingAddingI64(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantA() {
+        let mismatches = Mismatches("portSaturatingAddingI64ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8792_E6E1_300B_7C27)
+        for b in bInputs {
+            mismatches.check(
+                portSaturatingAddingI64ConstantA(b),
+                highwaySaturatingAddingI64ConstantA(b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantB() {
+        let mismatches = Mismatches("portSaturatingAddingI64ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9101_7CE1_359A_F069)
+        for a in aInputs {
+            mismatches.check(
+                portSaturatingAddingI64ConstantB(a),
+                highwaySaturatingAddingI64ConstantB(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtracting() {
+        let mismatches = Mismatches("portSaturatingSubtractingI64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4E23_28DB_D864_2F48)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4E23_29DB_D864_30FB)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portSaturatingSubtractingI64(a, b),
+                highwaySaturatingSubtractingI64(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantA() {
+        let mismatches = Mismatches("portSaturatingSubtractingI64ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1069_4E4E_0B01_DD5E)
+        for b in bInputs {
+            mismatches.check(
+                portSaturatingSubtractingI64ConstantA(b),
+                highwaySaturatingSubtractingI64ConstantA(b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantB() {
+        let mismatches = Mismatches("portSaturatingSubtractingI64ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x06FA_984E_0572_32BC)
+        for a in aInputs {
+            mismatches.check(
+                portSaturatingSubtractingI64ConstantB(a),
+                highwaySaturatingSubtractingI64ConstantB(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func roundedAverage() {
         let mismatches = Mismatches("portRoundedAverageI64")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x109D_D3BE_23C4_68B0)

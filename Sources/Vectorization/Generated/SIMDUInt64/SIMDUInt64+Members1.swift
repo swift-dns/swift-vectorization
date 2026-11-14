@@ -126,6 +126,16 @@ extension SIMDUInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func saturatingAdding(_ a: Vector, _ b: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_saturating_adding_u64(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func saturatingSubtracting(_ a: Vector, _ b: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_saturating_subtracting_u64(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func roundedAverage(_ a: Vector, _ b: Vector) -> Vector {
         Vector(raw: cvectorization_ops_rounded_average_u64(a.raw, b.raw))
     }
@@ -1684,30 +1694,6 @@ extension SIMDUInt64 {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         span.withUnsafeMutableBufferPointer {
             unsafe cvectorization_ops_store_truncating_u8_u64(
-                a.raw,
-                $0.baseAddress.unsafelyUnwrapped
-            )
-        }
-    }
-
-    @export(implementation) @inline(always)
-    public static func storeTruncating(_ a: Vector, to: UnsafeMutablePointer<UInt16>) {
-        unsafe cvectorization_ops_store_truncating_u16_u64(a.raw, to)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func storeTruncating(_ a: Vector, to span: inout MutableSpan<UInt16>) {
-        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        unsafe storeTruncating(a, toUnchecked: &span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func storeTruncating(_ a: Vector, toUnchecked span: inout MutableSpan<UInt16>) {
-        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        span.withUnsafeMutableBufferPointer {
-            unsafe cvectorization_ops_store_truncating_u16_u64(
                 a.raw,
                 $0.baseAddress.unsafelyUnwrapped
             )

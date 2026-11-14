@@ -14449,38 +14449,22 @@ let basicOps: [Op] = [
         "SaturatedAdd",
         [.vector, .vector],
         .vector,
-        .integer(bits: [8, 16]),
+        .integer,
         section: .arithmetic,
-        targets: TargetBodies(
-            sve2_128Splat: { element in
-                sveSplatBinary("qadd", .arithmetic, predicated: false, for: element)
-            }
-        )
+        targets: saturatedTargets(subtracting: false)
     ) { element in
-        vectorResult("__builtin_elementwise_add_sat(a, b)", for: element)
+        elementwiseSaturated(subtracting: false, for: element)
     },
     Op(
         "saturatingSubtracting",
         "SaturatedSub",
         [.vector, .vector],
         .vector,
-        .integer(bits: [8, 16]),
+        .integer,
         section: .arithmetic,
-        targets: TargetBodies(
-            neon: { element in neonSaturatingSubtraction(for: element) },
-            sve2_128Splat: { element in
-                sveSplatBinary(
-                    "qsub",
-                    .arithmetic,
-                    commutative: false,
-                    splattingFirst: false,
-                    predicated: false,
-                    for: element
-                )
-            }
-        )
+        targets: saturatedTargets(subtracting: true)
     ) { element in
-        vectorResult("__builtin_elementwise_sub_sat(a, b)", for: element)
+        elementwiseSaturated(subtracting: true, for: element)
     },
     Op(
         "roundedAverage",
@@ -17154,10 +17138,12 @@ func x86NegativeLanesHelpers() -> [String] {
     }
 }
 
-func x86NegativeLanes(level: X86Level, for element: Element) -> String {
+func x86NegativeLanes(_ selector: String, level: X86Level, for element: Element) -> String {
     let lanes = x86NegativeLanesType(for: element)
-    guard level <= .ssse3 else { return x86NegativeLanes(of: element, operand: "a", lanes: lanes) }
-    let operand = "(\(x86Vector(x86LaneSuffix(of: element))))a"
+    guard level <= .ssse3 else {
+        return x86NegativeLanes(of: element, operand: selector, lanes: lanes)
+    }
+    let operand = "(\(x86Vector(x86LaneSuffix(of: element))))\(selector)"
     return "(\(lanes))\(x86NegativeLanesName(for: element))(\(operand))"
 }
 
@@ -17176,7 +17162,12 @@ func x86NegativeLanes(of element: Element, operand: String, lanes: String) -> St
     }
 }
 
-func x86BlendBySign(_ yes: String, _ no: String, for element: Element) -> String {
+func x86BlendBySign(
+    _ yes: String,
+    _ no: String,
+    by selector: String,
+    for element: Element
+) -> String {
     let (name, suffix) =
         element.bits <= 16
         ? ("pblendvb\(x86Bits(element.width))", "i8")
@@ -17184,13 +17175,14 @@ func x86BlendBySign(_ yes: String, _ no: String, for element: Element) -> String
             "blendv\(element.bits == 32 ? "ps" : "pd")\(x86UnsuffixedBits(element.width))",
             "f\(element.bits)"
         )
-    return x86Builtin(name, [no, yes, "a"], as: suffix, returning: element.cVector)
+    return x86Builtin(name, [no, yes, selector], as: suffix, returning: element.cVector)
 }
 
 func x86NegativeSelect(
     _ yes: String?,
     _ no: String?,
     declarations: [String] = [],
+    selector: String = "a",
     level: X86Level,
     for element: Element
 ) -> String {
@@ -17198,12 +17190,13 @@ func x86NegativeSelect(
     let lanes = x86NegativeLanesType(for: element)
     let lines: [String]
     if level >= .avx3 {
-        let bits = x86Avx3MaskBits("a", for: element)
+        let bits = x86Avx3MaskBits(selector, for: element)
         lines = [
             vectorResult(x86Avx3Select(bits, yes ?? zero, no ?? zero, for: element), for: element)
         ]
     } else if level >= .sse4 && element.bits != 16 {
-        lines = [vectorResult(x86BlendBySign(yes ?? zero, no ?? zero, for: element), for: element)]
+        let blended = x86BlendBySign(yes ?? zero, no ?? zero, by: selector, for: element)
+        lines = [vectorResult(blended, for: element)]
     } else {
         let combined =
             switch (yes, no) {
@@ -17219,7 +17212,7 @@ func x86NegativeSelect(
                 fatalError("A selection by sign needs a vector to select")
             }
         lines = [
-            "const \(lanes) negative = \(x86NegativeLanes(level: level, for: element));",
+            "const \(lanes) negative = \(x86NegativeLanes(selector, level: level, for: element));",
             vectorResult(combined, for: element),
         ]
     }
@@ -17240,6 +17233,96 @@ func x86NegatingIfNegative(level: X86Level, for element: Element) -> String? {
     }
     let negated = "const \(element.cVector) negated = \(negatedLanes("b", for: element));"
     return x86NegativeSelect("negated", "b", declarations: [negated], level: level, for: element)
+}
+
+func elementwiseSaturated(subtracting: Bool, for element: Element) -> String {
+    vectorResult("__builtin_elementwise_\(subtracting ? "sub" : "add")_sat(a, b)", for: element)
+}
+
+func x86Avx3SaturatedSigned(subtracting: Bool, for element: Element) -> String {
+    let lanes = x86Vector(x86LaneSuffix(of: element))
+    let overflow = x86Avx3TernaryLogic(
+        subtracting ? 0x18 : 0x42,
+        ["a", "b", "result"],
+        for: element
+    )
+    let negative = x86Avx3MaskBits("a", for: element)
+    let saturated = x86Builtin(
+        "pternlog\(x86LaneLetter(bits: element.bits))\(x86Bits(element.width))_mask",
+        [
+            (value: "maximum", type: lanes),
+            (value: "maximum", type: lanes),
+            (value: "maximum", type: lanes),
+            (value: "0x55", type: "int"),
+            (value: negative, type: x86MaskType(lanes: element.laneCount)),
+        ],
+        returning: element.cVector
+    )
+    let selected = x86Avx3Select(
+        x86Avx3MaskBits(overflow, for: element),
+        saturated,
+        "result",
+        for: element
+    )
+    return """
+        const \(element.cVector) result = \(arithmetic(subtracting ? "-" : "+", "a", "b", for: element));
+        const \(element.cVector) maximum = \(splat(highestValue(of: element), as: element.cVector, lanes: element.laneCount));
+        \(vectorResult(selected, for: element))
+        """
+}
+
+func x86Saturated(subtracting: Bool, level: X86Level, for element: Element) -> String? {
+    guard element.bits >= 32 else { return nil }
+    if element.category == .unsignedInteger {
+        let smaller =
+            subtracting
+            ? operationCall("minimum", ["a", "b"], for: element)
+            : operationCall("minimum", ["b", "~a"], for: element)
+        return vectorResult("a \(subtracting ? "-" : "+") \(smaller)", for: element)
+    }
+    guard level < .avx3 else {
+        return x86Avx3SaturatedSigned(subtracting: subtracting, for: element)
+    }
+    let i64 = x86Vector("i64")
+    let signs =
+        level <= .ssse3
+        ? x86NegativeLanes("a", level: level, for: element)
+        : "(\(i64))(a >> \(element.bits - 1))"
+    let maximum = splat(highestValue(of: element), as: element.cVector, lanes: element.laneCount)
+    let differing = "((\(i64))a ^ (\(i64))b)"
+    let declarations = [
+        "const \(element.cVector) result = \(arithmetic(subtracting ? "-" : "+", "a", "b", for: element));",
+        "const \(i64) overflow = \(subtracting ? differing : "~\(differing)") & ((\(i64))a ^ (\(i64))result);",
+        "const \(i64) saturated = \(signs) ^ (\(i64))\(maximum);",
+    ]
+    return x86NegativeSelect(
+        "saturated",
+        "result",
+        declarations: declarations,
+        selector: "overflow",
+        level: level,
+        for: element
+    )
+}
+
+func saturatedTargets(subtracting: Bool) -> TargetBodies<Element> {
+    TargetBodies(
+        neon: subtracting ? { element in neonSaturatingSubtraction(for: element) } : nil,
+        sve2_128Splat: { element in
+            sveSplatBinary(
+                subtracting ? "qsub" : "qadd",
+                .arithmetic,
+                commutative: !subtracting,
+                splattingFirst: !subtracting || element.bits == 64,
+                predicated: false,
+                for: element
+            )
+        },
+        avx3: { element in x86Saturated(subtracting: subtracting, level: .avx3, for: element) },
+        avx2: { element in x86Saturated(subtracting: subtracting, level: .avx2, for: element) },
+        sse4: { element in x86Saturated(subtracting: subtracting, level: .sse4, for: element) },
+        sse2: { element in x86Saturated(subtracting: subtracting, level: .sse2, for: element) }
+    )
 }
 
 func bitTest(allBits: Bool, for element: Element) -> String {
