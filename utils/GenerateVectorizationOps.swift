@@ -25266,9 +25266,12 @@ func x86Avx3ExpandLoad(otherwise: Bool, for element: Element) -> String {
     return vectorResult(expanded, for: element)
 }
 
+let x86SlowCompressStoreCondition =
+    "defined(HWY_X86_SLOW_COMPRESS_STORE) ? HWY_X86_SLOW_COMPRESS_STORE : \(staticTargetCondition(of: ["AVX3_ZEN4", "AVX3_SPR"]))"
+
 func x86Avx3CompressStoreUnlessSlow(blended: Bool, for element: Element) -> String {
     """
-    #if \(staticTargetCondition(of: ["AVX3_ZEN4", "AVX3_SPR"]))
+    #if \(x86SlowCompressStoreCondition)
     \(registeredCompressedStore(blended: blended, for: element))
     #else
     \(x86Avx3CompressStore(for: element))
@@ -25293,7 +25296,7 @@ func compressedStoreTargets(blended: Bool) -> TargetBodies<Element> {
             guard x86Avx3IsNative(.avx3, for: element) else {
                 return blended ? registered(element) : x86Avx3EmulatedCompressedStore(for: element)
             }
-            return x86Avx3CompressStore(for: element)
+            return x86Avx3CompressStoreUnlessSlow(blended: blended, for: element)
         },
         avx2: { element in bytes(.avx2, element) },
         ssse3: { element in bytes(.ssse3, element) },
@@ -30812,8 +30815,11 @@ let reorderMulNeonKeepsFirstCondition =
 let reorderMulSveKeepsFirstCondition =
     "HWY_COMPILER_CLANG >= 1700 || HWY_COMPILER_GCC_ACTUAL >= 1400"
 
+let x86Bfloat16EnabledCondition =
+    "defined(HWY_AVX3_ENABLE_AVX512BF16) ? HWY_AVX3_ENABLE_AVX512BF16 : !defined(HWY_AVX3_DISABLE_AVX512BF16) && !HWY_COMPILER_CLANGCL"
+
 let reorderMulAvx3KeepsFirstCondition =
-    "(HWY_STATIC_TARGET & (HWY_AVX3_SPR | HWY_AVX3_ZEN4)) && !defined(HWY_AVX3_DISABLE_AVX512BF16) && !HWY_COMPILER_CLANGCL"
+    "(HWY_STATIC_TARGET & (HWY_AVX3_SPR | HWY_AVX3_ZEN4)) && (\(x86Bfloat16EnabledCondition))"
 
 func reorderMulFloatRearranging(keepingFirstIf condition: String, for element: Element) -> String {
     """
@@ -34932,6 +34938,8 @@ let bfloat16SveConvertCondition =
 
 let bfloat16Avx3Condition = reorderMulAvx3KeepsFirstCondition
 
+let bfloat16Avx3ConversionCondition = "\(bfloat16Avx3Condition) && !HWY_COMPILER_CLANGCL"
+
 func bfloat16DemotesFromFloat(_ source: Element, _ result: Element) -> Bool {
     source.category == .float && source.bits == 32 && result.category == .bfloat16
 }
@@ -35073,7 +35081,12 @@ func bfloat16DemoteAvx3Half(from source: Element, to result: Element) -> String 
     ]
     let converted = x86Builtin("cvtneps2bf16_512_mask", operands, returning: "bfloat_lanes")
     return widenMulChoice(
-        [(bfloat16Avx3Condition, "\(typedef)\n\(narrowResult(converted, .half, for: result))")],
+        [
+            (
+                bfloat16Avx3ConversionCondition,
+                "\(typedef)\n\(narrowResult(converted, .half, for: result))"
+            )
+        ],
         otherwise: bfloat16DemoteHalf(arm: false, using: .classified, from: source, to: result)
     )
 }
@@ -35092,7 +35105,7 @@ func bfloat16DemoteAvx3TwoVectors(
     let operands = ["b", "a"].map { (value: $0, type: x86Vector("f32")) }
     let converted = x86Builtin("cvtne2ps2bf16_512", operands, returning: "bfloat_lanes")
     return widenMulChoice(
-        [(bfloat16Avx3Condition, "\(typedef)\n\(vectorResult(converted, for: result))")],
+        [(bfloat16Avx3ConversionCondition, "\(typedef)\n\(vectorResult(converted, for: result))")],
         otherwise: ordered
             ? bfloat16DemoteOrdered(using: .classified, from: source, to: result)
             : bfloat16DemoteReordered(using: .classified, from: source, to: result)
