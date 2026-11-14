@@ -10642,6 +10642,9 @@ func x86Avx3LoadFirstWidening(from narrow: Element, to wide: Element) -> String 
         returning: register
     )
     return """
+        if (__builtin_constant_p(count) && count >= \(lanes)) {
+        \(indented(x86Avx3Widening(from: narrow, to: wide)))
+        }
         typedef \(x86LaneType(of: narrow)) \(register) __attribute__((vector_size(\(registerBytes))));
         typedef \(narrow.cType) narrow_vector __attribute__((vector_size(\(bytes))));
         const \(register) loaded = \(loaded);

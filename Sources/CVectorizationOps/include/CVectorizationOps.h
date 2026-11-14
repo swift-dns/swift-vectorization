@@ -34997,6 +34997,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_u16)(__builtin_convertvector(v, cvectorization_ops_vector_u16));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 32) {
+    typedef uint8_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_u16)(__builtin_convertvector(v, cvectorization_ops_vector_u16));
+  }
   typedef char register_vector __attribute__((vector_size(32)));
   typedef uint8_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned int)__builtin_ia32_bzhi_di(0xffffffffull, (count < 32 ? count : 32)));
@@ -47308,6 +47314,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_u32)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1, 2, 3), cvectorization_ops_vector_u32));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 16) {
+    typedef uint8_t narrow_vector __attribute__((vector_size(16)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_u32)(__builtin_convertvector(v, cvectorization_ops_vector_u32));
+  }
   typedef char register_vector __attribute__((vector_size(16)));
   typedef uint8_t narrow_vector __attribute__((vector_size(16)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffffull, (count < 16 ? count : 16)));
@@ -47378,6 +47390,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_u32)(__builtin_convertvector(v, cvectorization_ops_vector_u32));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 16) {
+    typedef uint16_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_u32)(__builtin_convertvector(v, cvectorization_ops_vector_u32));
+  }
   typedef short register_vector __attribute__((vector_size(32)));
   typedef uint16_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquhi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffffull, (count < 16 ? count : 16)));
@@ -60669,6 +60687,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1), cvectorization_ops_vector_u64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef uint8_t narrow_vector __attribute__((vector_size(8)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(v, cvectorization_ops_vector_u64));
+  }
   typedef char register_vector __attribute__((vector_size(16)));
   typedef uint8_t narrow_vector __attribute__((vector_size(8)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -60735,6 +60759,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1), cvectorization_ops_vector_u64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef uint16_t narrow_vector __attribute__((vector_size(16)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(v, cvectorization_ops_vector_u64));
+  }
   typedef short register_vector __attribute__((vector_size(16)));
   typedef uint16_t narrow_vector __attribute__((vector_size(16)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquhi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -60797,6 +60827,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(v, cvectorization_ops_vector_u64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef uint32_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(v, cvectorization_ops_vector_u64));
+  }
   typedef int register_vector __attribute__((vector_size(32)));
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddqusi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -92145,6 +92181,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 32) {
+    typedef uint8_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  }
   typedef char register_vector __attribute__((vector_size(32)));
   typedef uint8_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned int)__builtin_ia32_bzhi_di(0xffffffffull, (count < 32 ? count : 32)));
@@ -92239,6 +92281,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 32) {
+    typedef int8_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  }
   typedef char register_vector __attribute__((vector_size(32)));
   typedef int8_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned int)__builtin_ia32_bzhi_di(0xffffffffull, (count < 32 ? count : 32)));
@@ -104791,6 +104839,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1, 2, 3), cvectorization_ops_vector_i32));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 16) {
+    typedef uint8_t narrow_vector __attribute__((vector_size(16)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  }
   typedef char register_vector __attribute__((vector_size(16)));
   typedef uint8_t narrow_vector __attribute__((vector_size(16)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffffull, (count < 16 ? count : 16)));
@@ -104861,6 +104915,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 16) {
+    typedef uint16_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  }
   typedef short register_vector __attribute__((vector_size(32)));
   typedef uint16_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquhi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffffull, (count < 16 ? count : 16)));
@@ -104935,6 +104995,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1, 2, 3), cvectorization_ops_vector_i32));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 16) {
+    typedef int8_t narrow_vector __attribute__((vector_size(16)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  }
   typedef char register_vector __attribute__((vector_size(16)));
   typedef int8_t narrow_vector __attribute__((vector_size(16)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffffull, (count < 16 ? count : 16)));
@@ -105005,6 +105071,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 16) {
+    typedef int16_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  }
   typedef short register_vector __attribute__((vector_size(32)));
   typedef int16_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquhi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffffull, (count < 16 ? count : 16)));
@@ -117609,6 +117681,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1), cvectorization_ops_vector_i64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef uint8_t narrow_vector __attribute__((vector_size(8)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  }
   typedef char register_vector __attribute__((vector_size(16)));
   typedef uint8_t narrow_vector __attribute__((vector_size(8)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -117675,6 +117753,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1), cvectorization_ops_vector_i64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef uint16_t narrow_vector __attribute__((vector_size(16)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  }
   typedef short register_vector __attribute__((vector_size(16)));
   typedef uint16_t narrow_vector __attribute__((vector_size(16)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquhi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -117737,6 +117821,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef uint32_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  }
   typedef int register_vector __attribute__((vector_size(32)));
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddqusi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -117803,6 +117893,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1), cvectorization_ops_vector_i64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef int8_t narrow_vector __attribute__((vector_size(8)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  }
   typedef char register_vector __attribute__((vector_size(16)));
   typedef int8_t narrow_vector __attribute__((vector_size(8)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquqi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned short)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -117869,6 +117965,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(__builtin_shufflevector(v, v, 0, 1), cvectorization_ops_vector_i64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef int16_t narrow_vector __attribute__((vector_size(16)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  }
   typedef short register_vector __attribute__((vector_size(16)));
   typedef int16_t narrow_vector __attribute__((vector_size(16)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddquhi128_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -117931,6 +118033,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef int32_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  }
   typedef int register_vector __attribute__((vector_size(32)));
   typedef int32_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddqusi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -130372,6 +130480,15 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vcvtq_u64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(v, cvectorization_ops_neon_f64)), 51));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef float narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    typedef int32_t integer_vector __attribute__((vector_size(32)));
+    const unsigned char negative = __builtin_ia32_cvtd2mask256((integer_vector)v);
+    const narrow_vector nonNegative = __builtin_ia32_selectps_256(negative, (narrow_vector){0}, v);
+    return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_x86_i64)__builtin_ia32_cvttps2uqq512_mask((narrow_vector)nonNegative, (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}, (unsigned char)-1, (int)4));
+  }
   typedef float register_vector __attribute__((vector_size(32)));
   typedef float narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loadups256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -130463,6 +130580,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vcvtq_s64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(v, cvectorization_ops_neon_f64)), 35));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef float narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    const unsigned char overflow = (unsigned char)__builtin_ia32_cmpps256_mask((narrow_vector)v, (narrow_vector)(narrow_vector){9.223372e18f, 9.223372e18f, 9.223372e18f, 9.223372e18f, 9.223372e18f, 9.223372e18f, 9.223372e18f, 9.223372e18f}, (int)29, (unsigned char)-1);
+    const cvectorization_ops_x86_i64 truncated = (cvectorization_ops_x86_i64)__builtin_ia32_cvttps2qq512_mask((narrow_vector)v, (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){0}, (unsigned char)-1, (int)4);
+    return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)overflow, (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i64){INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX, INT64_MAX}, (cvectorization_ops_x86_i64)truncated));
+  }
   typedef float register_vector __attribute__((vector_size(32)));
   typedef float narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loadups256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -141921,6 +142046,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef uint32_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  }
   typedef int register_vector __attribute__((vector_size(32)));
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddqusi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -142000,6 +142131,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef int32_t narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  }
   typedef int register_vector __attribute__((vector_size(32)));
   typedef int32_t narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loaddqusi256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
@@ -142079,6 +142216,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_l
   }
   return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  if (__builtin_constant_p(count) && count >= 8) {
+    typedef float narrow_vector __attribute__((vector_size(32)));
+    narrow_vector v;
+    __builtin_memcpy(&v, from, sizeof v);
+    return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  }
   typedef float register_vector __attribute__((vector_size(32)));
   typedef float narrow_vector __attribute__((vector_size(32)));
   const register_vector loaded = (register_vector)__builtin_ia32_loadups256_mask((const register_vector*)from, (register_vector)(register_vector){0}, (unsigned char)__builtin_ia32_bzhi_di(0xffull, (count < 8 ? count : 8)));
