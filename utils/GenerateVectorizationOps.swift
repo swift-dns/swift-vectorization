@@ -24562,7 +24562,7 @@ let cacheControlOps = [
         highwayName: "FlushStream",
         pointerLabel: nil,
         body: """
-            #if defined(__x86_64__) || defined(__i386__)
+            #if HWY_ARCH_X86 && !defined(HWY_DISABLE_CACHE_CONTROL)
             __builtin_ia32_sfence();
             #endif
             """
@@ -24572,7 +24572,7 @@ let cacheControlOps = [
         highwayName: "FlushCacheline",
         pointerLabel: "containing",
         body: """
-            #if defined(__x86_64__) || defined(__i386__)
+            #if HWY_ARCH_X86 && !defined(HWY_DISABLE_CACHE_CONTROL)
             __builtin_ia32_clflush(p);
             #else
             (void)p;
@@ -24583,17 +24583,29 @@ let cacheControlOps = [
         swiftName: "prefetch",
         highwayName: "Prefetch",
         pointerLabel: "_",
-        body: "__builtin_prefetch(p, 0, 3);"
+        body: """
+            #ifndef HWY_DISABLE_CACHE_CONTROL
+            __builtin_prefetch(p, 0, 3);
+            #else
+            (void)p;
+            #endif
+            """
     ),
     CacheControlOp(
         swiftName: "pause",
         highwayName: "Pause",
         pointerLabel: nil,
         body: """
-            #if defined(__x86_64__) || defined(__i386__)
+            #ifndef HWY_DISABLE_CACHE_CONTROL
+            #if HWY_ARCH_X86
             __builtin_ia32_pause();
-            #elif defined(__aarch64__)
+            #elif HWY_ARCH_ARM_A64
             __builtin_arm_yield();
+            #elif HWY_ARCH_ARM
+            __asm__ volatile("yield" ::: "memory");
+            #elif HWY_ARCH_PPC
+            __asm__ volatile("or 27,27,27" ::: "memory");
+            #endif
             #endif
             """
     ),

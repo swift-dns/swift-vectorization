@@ -838,25 +838,35 @@ CVECTORIZATION_OPS_INLINE int32_t cvectorization_ops_set_mask(bool value) {
 }
 
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_flush_streams(void) {
-#if defined(__x86_64__) || defined(__i386__)
+#if HWY_ARCH_X86 && !defined(HWY_DISABLE_CACHE_CONTROL)
   __builtin_ia32_sfence();
 #endif
 }
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_flush_cache_line(const void* p) {
-#if defined(__x86_64__) || defined(__i386__)
+#if HWY_ARCH_X86 && !defined(HWY_DISABLE_CACHE_CONTROL)
   __builtin_ia32_clflush(p);
 #else
   (void)p;
 #endif
 }
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_prefetch(const void* p) {
+#ifndef HWY_DISABLE_CACHE_CONTROL
   __builtin_prefetch(p, 0, 3);
+#else
+  (void)p;
+#endif
 }
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_pause(void) {
-#if defined(__x86_64__) || defined(__i386__)
+#ifndef HWY_DISABLE_CACHE_CONTROL
+#if HWY_ARCH_X86
   __builtin_ia32_pause();
-#elif defined(__aarch64__)
+#elif HWY_ARCH_ARM_A64
   __builtin_arm_yield();
+#elif HWY_ARCH_ARM
+  __asm__ volatile("yield" ::: "memory");
+#elif HWY_ARCH_PPC
+  __asm__ volatile("or 27,27,27" ::: "memory");
+#endif
 #endif
 }
 typedef uint8_t cvectorization_ops_vector_u8 __attribute__((vector_size(CVECTORIZATION_OPS_VECTOR_BYTES)));
