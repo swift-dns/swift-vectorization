@@ -471,3 +471,27 @@ public func highwaySumsOf2F16ToF32ConstantA() -> SIMDFloat.Vector {
     )
 }
 #endif
+
+@inline(never)
+public func portSumsOf2BF16ToF32(_ a: SIMDBFloat16.Vector) -> SIMDFloat.Vector {
+    SIMDFloat.sumsOf2(a)
+}
+
+@inline(never)
+public func highwaySumsOf2BF16ToF32(_ a: SIMDBFloat16.Vector) -> SIMDFloat.Vector {
+    HighwayReference.Nothrow.sumsOf2BF16ToF32(a.raw)
+}
+
+@inline(never)
+public func portSumsOf2BF16ToF32ConstantA() -> SIMDFloat.Vector {
+    SIMDFloat.sumsOf2(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+}
+
+@inline(never)
+public func highwaySumsOf2BF16ToF32ConstantA() -> SIMDFloat.Vector {
+    HighwayReference.Nothrow.sumsOf2BF16ToF32(
+        SIMDBFloat16.Vector(
+            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+        ).raw
+    )
+}

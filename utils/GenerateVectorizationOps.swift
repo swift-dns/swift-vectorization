@@ -474,6 +474,7 @@ enum UnorderedNaNs {
     case alternatingNegatedAddend
     case acrossLanes
     case adjacentLanes
+    case adjacentQuads
     case alternatingNegation
     case complexLanes
     case widenedPairs
@@ -35002,37 +35003,57 @@ let float16IntegerOps: [Op] =
     + float16ToIntegerOps(.saturating, "MaskedConvertTo", label: "converting", masked: true)
     + float16FromIntegerOps(masked: false) + float16FromIntegerOps(masked: true)
 
-func float16SumsOf2(from source: Element, to result: Element) -> String {
-    let promoted = [Float16Promotion.even, .odd].map { promotion in
-        float16ComposedCall(
-            float16PromotionOpList,
-            promotion.highwayName,
-            from: source,
-            to: result,
-            [rawName("a")]
-        )
+func halfPrecisionSumsOf2(from source: Element, to result: Element) -> String {
+    let promotions = source.category == .bfloat16 ? bfloat16PromoteOps : float16PromotionOpList
+    let promoted = ["PromoteEvenTo", "PromoteOddTo"].map { name in
+        float16ComposedCall(promotions, name, from: source, to: result, [rawName("a")])
     }
     return "return \(cFunctionName("adding", result))(\(promoted.joined(separator: ", ")));"
 }
 
-let float16SumsOf2Ops = sourcedOps(
-    accepting: Float16Promotion.even.accepts,
-    includingHalfPrecision: true
-) { source, results in
-    Op(
-        "sumsOf2",
+func halfPrecisionSumsOf4(from source: Element, to result: Element) -> String {
+    let single = floatElement(bits: 32).at(width: result.width)
+    let pairs = float16ComposedCall(
+        float16SumsOps + bfloat16SumsOps,
         "SumsOf2",
-        [.sourceVector],
-        .vector,
-        results,
-        section: .arithmetic,
-        unorderedNaNs: .adjacentLanes,
-        filtersUnorderedNaNs: true,
-        vectorLabels: ["_"],
-        source: source,
-        portable: sourced(source) { source, result in float16SumsOf2(from: source, to: result) }
+        from: source,
+        to: single,
+        [rawName("a")]
     )
+    return "return \(float16ComposedCall(sumsOps, "SumsOf2", from: single, to: result, [pairs]));"
 }
+
+func halfPrecisionSumsOps(from category: Category) -> [Op] {
+    [(2, UnorderedNaNs.adjacentLanes), (4, .adjacentQuads)].flatMap { factor, unorderedNaNs in
+        sourcedOps(
+            accepting: { source, result in
+                source.category == category && result.category == .float
+                    && result.bits == factor * source.bits
+            },
+            includingHalfPrecision: true
+        ) { source, results in
+            Op(
+                "sumsOf\(factor)",
+                "SumsOf\(factor)",
+                [.sourceVector],
+                .vector,
+                results,
+                section: .arithmetic,
+                unorderedNaNs: unorderedNaNs,
+                filtersUnorderedNaNs: true,
+                vectorLabels: ["_"],
+                source: source,
+                portable: sourced(source) { source, result in
+                    factor == 2
+                        ? halfPrecisionSumsOf2(from: source, to: result)
+                        : halfPrecisionSumsOf4(from: source, to: result)
+                }
+            )
+        }
+    }
+}
+
+let float16SumsOps = halfPrecisionSumsOps(from: .float16)
 
 func float16BiasedExponentAccepts(_ source: Element, _ result: Element) -> Bool {
     source.category == .float16 && result.category == .unsignedInteger
@@ -35173,7 +35194,7 @@ let float16PowerOf2Ops = sourcedOps(
 }
 
 let float16WidenArithmeticOps: [Op] =
-    float16SumsOf2Ops + float16BiasedExponentOps + float16PowerOf2Ops
+    float16SumsOps + float16BiasedExponentOps + float16PowerOf2Ops
 
 let convertFloat16Ops: [Op] =
     float16PromotionOpList + float16DemotionOpList + float16IntegerOps + float16WidenArithmeticOps
@@ -35992,7 +36013,10 @@ let bfloat16MultiplyOps: [Op] =
     bfloat16PairwiseOps(masked: false) + bfloat16PairwiseOps(masked: true) + bfloat16ReorderOps
     + bfloat16MulAddOps
 
-let bfloat16ConvertOps: [Op] = bfloat16PromoteOps + bfloat16DemoteOps + bfloat16MultiplyOps
+let bfloat16SumsOps = halfPrecisionSumsOps(from: .bfloat16)
+
+let bfloat16ConvertOps: [Op] =
+    bfloat16PromoteOps + bfloat16DemoteOps + bfloat16MultiplyOps + bfloat16SumsOps
 
 let float16ArithmeticIdentifiers: [String] = [
     "adding",
@@ -45233,6 +45257,8 @@ func unorderedNaNsCondition(
         return "!hasUnorderedNaNs(\(vectors.joined(separator: ", ")))"
     case (.adjacentLanes, _):
         return "!hasUnorderedNaNs(adjacentLanesOf: \(vectors.joined(separator: ", ")))"
+    case (.adjacentQuads, _):
+        return "!hasUnorderedNaNs(adjacentQuadsOf: \(vectors.joined(separator: ", ")))"
     case (.alternatingNegation, 2):
         return "!hasUnorderedNaNs(alternatingNegation: \(vectors.joined(separator: ", ")))"
     case (.alternatingNegation, 1):

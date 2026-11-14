@@ -920,6 +920,16 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
+package func hasUnorderedNaNs<V: SIMD>(adjacentQuadsOf operands: V...) -> Bool
+where V.Scalar: ReferenceLane & BinaryFloatingPoint & SIMDScalar {
+    operands.contains { operand in
+        stride(from: 0, to: V.scalarCount, by: 4).contains { lane in
+            hasUnorderedNaNs(lanesOf: SIMD4((0..<4).map { operand[lane + $0] }))
+        }
+    }
+}
+
+@inlinable
 package func hasUnorderedNaNs<V: SIMD>(complexLanesOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     let large = V.Scalar.greatestFiniteMagnitude.squareRoot() / 4

@@ -206,4 +206,17 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
     #endif
+
+    @Test func sumsOf2FromBFloat16() {
+        let mismatches = Mismatches("sumsOf2FromBFloat16")
+        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x230C_12E7_57C8_B6FA)
+        for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a) {
+            mismatches.check(
+                H.sumsOf2(a),
+                HighwayReference.sumsOf2BF16ToF32(a.raw),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

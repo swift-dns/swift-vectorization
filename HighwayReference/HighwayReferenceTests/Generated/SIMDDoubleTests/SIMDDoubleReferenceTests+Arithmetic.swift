@@ -204,4 +204,28 @@ extension SIMDDoubleReferenceTests {
         }
         mismatches.record()
     }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf4FromFloat16() {
+        let mismatches = Mismatches("sumsOf4FromFloat16")
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x432A_0DBC_573C_A8BF)
+        for a in aInputs where !hasUnorderedNaNs(adjacentQuadsOf: a) {
+            mismatches.check(H.sumsOf4(a), HighwayReference.sumsOf4F16ToF64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+    #endif
+
+    @Test func sumsOf4FromBFloat16() {
+        let mismatches = Mismatches("sumsOf4FromBFloat16")
+        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x0CB5_3CFE_15C0_C827)
+        for a in aInputs where !hasUnorderedNaNs(adjacentQuadsOf: a) {
+            mismatches.check(
+                H.sumsOf4(a),
+                HighwayReference.sumsOf4BF16ToF64(a.raw),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

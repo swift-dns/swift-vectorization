@@ -183,6 +183,11 @@ extension SIMDFloat {
     #endif
 
     @export(implementation) @inline(always)
+    public static func sumsOf2(_ a: SIMDBFloat16.Vector) -> Vector {
+        cvectorization_ops_sums_of2_bf16_to_f32(a.raw)
+    }
+
+    @export(implementation) @inline(always)
     public static func minimum(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_minimum_f32(a, b)
     }

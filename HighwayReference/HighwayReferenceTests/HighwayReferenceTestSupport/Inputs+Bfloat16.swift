@@ -92,6 +92,29 @@ package func hasUnorderedNaNs<A: ReferenceVector, V: SIMD>(
     }
 }
 
+package func hasUnorderedNaNs<A: ReferenceVector>(adjacentLanesOf operands: A...) -> Bool
+where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
+    operands.contains { operand in
+        stride(from: 0, to: A.Simd.scalarCount, by: 2).contains { lane in
+            hasUnorderedNaNs(adjacentLanesOf: SIMD2(singles(of: operand, lane..<lane + 2)))
+        }
+    }
+}
+
+package func hasUnorderedNaNs<A: ReferenceVector>(adjacentQuadsOf operands: A...) -> Bool
+where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
+    operands.contains { operand in
+        stride(from: 0, to: A.Simd.scalarCount, by: 4).contains { lane in
+            hasUnorderedNaNs(lanesOf: SIMD4(singles(of: operand, lane..<lane + 4)))
+        }
+    }
+}
+
+private func singles<A: ReferenceVector>(of vector: A, _ lanes: Range<Int>) -> [Float]
+where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
+    lanes.map { Float(BFloat16(bitPattern: vector.simd[$0])) }
+}
+
 package func hasFoldedNaNs<A: ReferenceVector>(
     multiplier: BFloat16,
     _ other: A,

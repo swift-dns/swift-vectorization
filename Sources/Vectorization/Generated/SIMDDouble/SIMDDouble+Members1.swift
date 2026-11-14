@@ -178,6 +178,20 @@ extension SIMDDouble {
         cvectorization_ops_sums_of2_f32_to_f64(a)
     }
 
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func sumsOf4(_ a: SIMDFloat16.Vector) -> Vector {
+        cvectorization_ops_sums_of4_f16_to_f64(a)
+    }
+
+    #endif
+
+    @export(implementation) @inline(always)
+    public static func sumsOf4(_ a: SIMDBFloat16.Vector) -> Vector {
+        cvectorization_ops_sums_of4_bf16_to_f64(a.raw)
+    }
+
     @export(implementation) @inline(always)
     public static func minimum(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_minimum_f64(a, b)

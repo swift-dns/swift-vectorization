@@ -179223,6 +179223,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
   const cvectorization_ops_vector_f16 a = (cvectorization_ops_vector_f16)rawA;
   return cvectorization_ops_adding_f32(cvectorization_ops_vector_widening_even_f16_to_f32(rawA), cvectorization_ops_vector_widening_odd_f16_to_f32(rawA));
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_sums_of4_f16_to_f64(cvectorization_ops_raw_vector_f16 rawA) {
+  const cvectorization_ops_vector_f16 a = (cvectorization_ops_vector_f16)rawA;
+  return cvectorization_ops_sums_of2_f32_to_f64(cvectorization_ops_sums_of2_f16_to_f32(rawA));
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_biased_exponent_f16_to_u16(cvectorization_ops_raw_vector_f16 rawA) {
   const cvectorization_ops_vector_f16 a = (cvectorization_ops_vector_f16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
@@ -180002,6 +180006,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_m
 #else
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)cvectorization_ops_multiply_adding_f32((cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_vector_widening_odd_bf16_to_f32((cvectorization_ops_raw_vector_bf16)a), (cvectorization_ops_raw_vector_f32)(cvectorization_ops_vector_f32)cvectorization_ops_vector_widening_odd_bf16_to_f32((cvectorization_ops_raw_vector_bf16)b), (cvectorization_ops_raw_vector_f32)c));
 #endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_sums_of2_bf16_to_f32(cvectorization_ops_raw_vector_bf16 rawA) {
+  const cvectorization_ops_vector_bf16 a = (cvectorization_ops_vector_bf16)rawA;
+  return cvectorization_ops_adding_f32(cvectorization_ops_vector_widening_even_bf16_to_f32(rawA), cvectorization_ops_vector_widening_odd_bf16_to_f32(rawA));
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_sums_of4_bf16_to_f64(cvectorization_ops_raw_vector_bf16 rawA) {
+  const cvectorization_ops_vector_bf16 a = (cvectorization_ops_vector_bf16)rawA;
+  return cvectorization_ops_sums_of2_f32_to_f64(cvectorization_ops_sums_of2_bf16_to_f32(rawA));
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_adding_f16(cvectorization_ops_raw_vector_f16 rawA, cvectorization_ops_raw_vector_f16 rawB) {
   const cvectorization_ops_vector_f16 a = (cvectorization_ops_vector_f16)rawA;

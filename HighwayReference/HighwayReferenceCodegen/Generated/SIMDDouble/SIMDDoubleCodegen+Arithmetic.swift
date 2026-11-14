@@ -469,3 +469,55 @@ public func portSumsOf2F32ToF64ConstantA() -> SIMDDouble.Vector {
 public func highwaySumsOf2F32ToF64ConstantA() -> SIMDDouble.Vector {
     HighwayReference.Nothrow.sumsOf2F32ToF64(HighwayReference.Nothrow.repeatingF32(1.5))
 }
+
+#if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portSumsOf4F16ToF64(_ a: SIMDFloat16.Vector) -> SIMDDouble.Vector {
+    SIMDDouble.sumsOf4(a)
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwaySumsOf4F16ToF64(_ a: SIMDFloat16.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.sumsOf4F16ToF64(a)
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portSumsOf4F16ToF64ConstantA() -> SIMDDouble.Vector {
+    SIMDDouble.sumsOf4(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwaySumsOf4F16ToF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.sumsOf4F16ToF64(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    )
+}
+#endif
+
+@inline(never)
+public func portSumsOf4BF16ToF64(_ a: SIMDBFloat16.Vector) -> SIMDDouble.Vector {
+    SIMDDouble.sumsOf4(a)
+}
+
+@inline(never)
+public func highwaySumsOf4BF16ToF64(_ a: SIMDBFloat16.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.sumsOf4BF16ToF64(a.raw)
+}
+
+@inline(never)
+public func portSumsOf4BF16ToF64ConstantA() -> SIMDDouble.Vector {
+    SIMDDouble.sumsOf4(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+}
+
+@inline(never)
+public func highwaySumsOf4BF16ToF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.sumsOf4BF16ToF64(
+        SIMDBFloat16.Vector(
+            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+        ).raw
+    )
+}

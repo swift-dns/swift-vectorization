@@ -23990,6 +23990,7 @@ hn::IfThenElseZero(maskFromPortF16(mask), hn::Combine(TagF16(), hn::DemoteTo(Hal
 #endif
 ); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 sumsOf2F16ToF32(cvectorization_ops_raw_vector_f16 a) { return toPortF32(hn::SumsOf2(fromPortF16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 sumsOf4F16ToF64(cvectorization_ops_raw_vector_f16 a) { return toPortF64(hn::SumsOf4(fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 biasedExponentF16ToU16(cvectorization_ops_raw_vector_f16 a) { return toPortU16(
 #if HWY_HAVE_FLOAT16
 hn::GetBiasedExponent(fromPortF16(a))
@@ -24041,6 +24042,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAccumulatingInAnyOrderBF16T
 }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingEvenBF16ToF32(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::MulEvenAdd(TagF32(), fromPortBF16(a), fromPortBF16(b), fromPortF32(c))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingOddBF16ToF32(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::MulOddAdd(TagF32(), fromPortBF16(a), fromPortBF16(b), fromPortF32(c))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 sumsOf2BF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(hn::SumsOf2(fromPortBF16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 sumsOf4BF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(hn::SumsOf4(fromPortBF16(a))); }
 /// Swift calls a C++ function that might throw as an `invoke` with a landing pad, which makes
 /// LLVM schedule the code around the call differently from the code around the port's C
 /// functions. The codegen comparison calls these `noexcept` forwarders instead, which the
@@ -30189,6 +30192,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 vectorConvertingI16ToF16(cvectoriza
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorConvertingWhereU16ToF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::vectorConvertingWhereU16ToF16(mask, a); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 vectorConvertingWhereI16ToF16(cvectorization_ops_raw_mask_f16 mask, cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::vectorConvertingWhereI16ToF16(mask, a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 sumsOf2F16ToF32(cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::sumsOf2F16ToF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 sumsOf4F16ToF64(cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::sumsOf4F16ToF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 biasedExponentF16ToU16(cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::biasedExponentF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 multiplyingByPowerOf2I16ToF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::multiplyingByPowerOf2I16ToF16(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 vectorWideningLowerHalfU8ToU32(cvectorization_ops_raw_half_vector_u8 a) noexcept { return ::HighwayReference::vectorWideningLowerHalfU8ToU32(a); }
@@ -30214,6 +30218,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyPairwiseAddingWhereBF16ToF3
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAccumulatingInAnyOrderBF16ToF32(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_f32 c, OutVectorF32& v0) noexcept { return ::HighwayReference::multiplyAccumulatingInAnyOrderBF16ToF32(a, b, c, v0); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingEvenBF16ToF32(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_f32 c) noexcept { return ::HighwayReference::multiplyAddingEvenBF16ToF32(a, b, c); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingOddBF16ToF32(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_f32 c) noexcept { return ::HighwayReference::multiplyAddingOddBF16ToF32(a, b, c); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 sumsOf2BF16ToF32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::sumsOf2BF16ToF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 sumsOf4BF16ToF64(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::sumsOf4BF16ToF64(a); }
 }  // namespace Nothrow
 
 }  // namespace HighwayReference
