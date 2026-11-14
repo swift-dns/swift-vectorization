@@ -121,6 +121,100 @@ public func highwayGatherFirstF64ConstantCount(
 }
 
 @inline(never)
+public func portGatherFirstOtherwiseF64(
+    from: UnsafePointer<SIMDDouble.Lane>,
+    indices: SIMDInt64.Vector,
+    count: Int,
+    otherwise: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.gather(from: from, indices: indices, count: count, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayGatherFirstOtherwiseF64(
+    from: UnsafePointer<Double>,
+    indices: SIMDInt64.Vector,
+    count: Int,
+    otherwise: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.gatherFirstOtherwiseF64(otherwise, from, indices.raw, count)
+}
+
+@inline(never)
+public func portGatherFirstOtherwiseF64ConstantIndices(
+    from: UnsafePointer<SIMDDouble.Lane>,
+    count: Int,
+    otherwise: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.gather(
+        from: from,
+        indices: SIMDInt64.repeating(1),
+        count: count,
+        otherwise: otherwise
+    )
+}
+
+@inline(never)
+public func highwayGatherFirstOtherwiseF64ConstantIndices(
+    from: UnsafePointer<Double>,
+    count: Int,
+    otherwise: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.gatherFirstOtherwiseF64(
+        otherwise,
+        from,
+        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw,
+        count
+    )
+}
+
+@inline(never)
+public func portGatherFirstOtherwiseF64ConstantCount(
+    from: UnsafePointer<SIMDDouble.Lane>,
+    indices: SIMDInt64.Vector,
+    otherwise: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.gather(from: from, indices: indices, count: 1, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayGatherFirstOtherwiseF64ConstantCount(
+    from: UnsafePointer<Double>,
+    indices: SIMDInt64.Vector,
+    otherwise: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.gatherFirstOtherwiseF64(otherwise, from, indices.raw, 1)
+}
+
+@inline(never)
+public func portGatherFirstOtherwiseF64ConstantOtherwise(
+    from: UnsafePointer<SIMDDouble.Lane>,
+    indices: SIMDInt64.Vector,
+    count: Int
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.gather(
+        from: from,
+        indices: indices,
+        count: count,
+        otherwise: SIMDDouble.repeating(1.5)
+    )
+}
+
+@inline(never)
+public func highwayGatherFirstOtherwiseF64ConstantOtherwise(
+    from: UnsafePointer<Double>,
+    indices: SIMDInt64.Vector,
+    count: Int
+) -> SIMDDouble.Vector {
+    unsafe HighwayReference.Nothrow.gatherFirstOtherwiseF64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        from,
+        indices.raw,
+        count
+    )
+}
+
+@inline(never)
 public func portGatherWhereF64(
     from: UnsafePointer<SIMDDouble.Lane>,
     indices: SIMDInt64.Vector,

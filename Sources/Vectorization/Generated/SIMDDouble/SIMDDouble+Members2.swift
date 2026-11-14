@@ -1523,6 +1523,66 @@ extension SIMDDouble {
     public static func gather(
         from: UnsafePointer<Lane>,
         indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        unsafe cvectorization_ops_gather_first_otherwise_f64(otherwise, from, indices.raw, count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func gather(
+        from span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        precondition(
+            cvectorization_ops_gather_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return unsafe gather(
+            fromUnchecked: span,
+            indices: indices,
+            count: count,
+            otherwise: otherwise
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func gather(
+        fromUnchecked span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        assert(
+            cvectorization_ops_gather_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return span.withUnsafeBufferPointer {
+            unsafe cvectorization_ops_gather_first_otherwise_f64(
+                otherwise,
+                $0.baseAddress,
+                indices.raw,
+                count
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func gather(
+        from: UnsafePointer<Lane>,
+        indices: SIMDInt64.Vector,
         where mask: Mask
     ) -> Vector {
         unsafe cvectorization_ops_gather_where_f64(mask.raw, from, indices.raw)

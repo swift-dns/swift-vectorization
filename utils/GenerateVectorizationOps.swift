@@ -24506,9 +24506,13 @@ func extractedIndices(for element: Element) -> String {
         .map { "const \(index) index\($0) = indices[\($0)];" }.joined(separator: "\n")
 }
 
-func gatheredFirst(for element: Element) -> String {
+func gatheredFirstStart(otherwise: Bool, for element: Element) -> String {
+    otherwise ? "\(element.cVector) v = otherwise;" : zeroedVector(of: element.cVector)
+}
+
+func gatheredFirst(otherwise: Bool = false, for element: Element) -> String {
     """
-    \(zeroedVector(of: element.cVector))
+    \(gatheredFirstStart(otherwise: otherwise, for: element))
     for (size_t i = 0; i < \(element.laneCount); ++i) {
       if (i < count) {
         v[i] = from[indices[i]];
@@ -24518,7 +24522,7 @@ func gatheredFirst(for element: Element) -> String {
     """
 }
 
-func x86BlendedGatheredFirst(for element: Element) -> String? {
+func x86BlendedGatheredFirst(otherwise: Bool, for element: Element) -> String? {
     guard element.category != .float, element.bits == 32 else { return nil }
     let unsigned = element.cUnsignedVector
     let masks = (0..<element.laneCount).map { lane in
@@ -24529,7 +24533,7 @@ func x86BlendedGatheredFirst(for element: Element) -> String? {
     return """
         typedef long long wide_lane_vector __attribute__((vector_size(16)));
         const wide_lane_vector masks[\(element.laneCount)] = {\(masks.joined(separator: ", "))};
-        wide_lane_vector v = {0, 0};
+        wide_lane_vector v = \(otherwise ? "(wide_lane_vector)otherwise" : "{0, 0}");
         for (size_t i = 0; i < \(element.laneCount); ++i) {
           if (i < count) {
             const \(element.cType) lane = from[indices[i]];
@@ -24540,13 +24544,13 @@ func x86BlendedGatheredFirst(for element: Element) -> String? {
         """
 }
 
-func hoistedGatheredFirst(for element: Element) -> String {
+func hoistedGatheredFirst(otherwise: Bool, for element: Element) -> String {
     let lanes = (0..<element.laneCount).map { lane in
         "if (\(lane) < count) {\n  v[\(lane)] = from[index\(lane)];\n}"
     }
     return """
         \(extractedIndices(for: element))
-        \(zeroedVector(of: element.cVector))
+        \(gatheredFirstStart(otherwise: otherwise, for: element))
         \(lanes.joined(separator: "\n"))
         \(vectorResult("v", for: element))
         """
@@ -25388,7 +25392,9 @@ func x86GatherTargets(
         }
     }
     return TargetBodies(
-        neon: { element in firstLanes ? hoistedGatheredFirst(for: element) : nil },
+        neon: { element in
+            firstLanes ? hoistedGatheredFirst(otherwise: otherwise, for: element) : nil
+        },
         sve2_128: { element in
             sveGathering(
                 index: index,
@@ -25401,8 +25407,12 @@ func x86GatherTargets(
         },
         avx3: body(avx3: true),
         avx2: body(avx3: false),
-        sse4: { element in firstLanes ? gatheredFirst(for: element) : nil },
-        sse2: { element in firstLanes ? x86BlendedGatheredFirst(for: element) : nil },
+        sse4: { element in
+            firstLanes ? gatheredFirst(otherwise: otherwise, for: element) : nil
+        },
+        sse2: { element in
+            firstLanes ? x86BlendedGatheredFirst(otherwise: otherwise, for: element) : nil
+        },
         emu128: { element in
             selecting && !otherwise && element.category == .float
                 ? copiedMaskGatheredIndices(for: element) : nil
@@ -25913,6 +25923,19 @@ let memoryOps: [Op] =
             targets: x86GatherTargets(firstLanes: true)
         ) { element in
             gatheredFirst(for: element)
+        },
+        Op(
+            "gather",
+            "GatherIndexNOr",
+            [.otherwiseVector, .tag, .constLanePointer, .pointerIndices, .count],
+            .vector,
+            .all(bits: [32, 64]),
+            section: .scatterGather,
+            span: .gathered,
+            identifier: "gatherFirstOtherwise",
+            targets: x86GatherTargets(otherwise: true, firstLanes: true)
+        ) { element in
+            gatheredFirst(otherwise: true, for: element)
         },
         Op(
             "gather",

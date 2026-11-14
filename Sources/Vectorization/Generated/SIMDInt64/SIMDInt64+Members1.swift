@@ -1715,4 +1715,33 @@ extension SIMDInt64 {
         }
     }
 
+    @export(implementation) @inline(always)
+    public static func store(_ a: Vector, to: UnsafeMutablePointer<Lane>, where mask: Mask) {
+        unsafe cvectorization_ops_store_where_i64(a.raw, mask.raw, to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func store(_ a: Vector, to span: inout MutableSpan<Lane>, where mask: Mask) {
+        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        unsafe store(a, toUnchecked: &span, where: mask)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func store(
+        _ a: Vector,
+        toUnchecked span: inout MutableSpan<Lane>,
+        where mask: Mask
+    ) {
+        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_store_where_i64(
+                a.raw,
+                mask.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
+        }
+    }
+
 }

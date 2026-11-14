@@ -129,6 +129,113 @@ public func highwayGatherFirstU32ConstantCount(
 }
 
 @inline(never)
+public func portGatherFirstOtherwiseU32(
+    from: UnsafePointer<SIMDUInt32.Lane>,
+    indices: SIMDInt32.Vector,
+    count: Int,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.gather(from: from, indices: indices, count: count, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayGatherFirstOtherwiseU32(
+    from: UnsafePointer<UInt32>,
+    indices: SIMDInt32.Vector,
+    count: Int,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.Vector(
+        raw: HighwayReference.Nothrow.gatherFirstOtherwiseU32(
+            otherwise.raw,
+            from,
+            indices.raw,
+            count
+        )
+    )
+}
+
+@inline(never)
+public func portGatherFirstOtherwiseU32ConstantIndices(
+    from: UnsafePointer<SIMDUInt32.Lane>,
+    count: Int,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.gather(
+        from: from,
+        indices: SIMDInt32.repeating(1),
+        count: count,
+        otherwise: otherwise
+    )
+}
+
+@inline(never)
+public func highwayGatherFirstOtherwiseU32ConstantIndices(
+    from: UnsafePointer<UInt32>,
+    count: Int,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.Vector(
+        raw: HighwayReference.Nothrow.gatherFirstOtherwiseU32(
+            otherwise.raw,
+            from,
+            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw,
+            count
+        )
+    )
+}
+
+@inline(never)
+public func portGatherFirstOtherwiseU32ConstantCount(
+    from: UnsafePointer<SIMDUInt32.Lane>,
+    indices: SIMDInt32.Vector,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.gather(from: from, indices: indices, count: 1, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayGatherFirstOtherwiseU32ConstantCount(
+    from: UnsafePointer<UInt32>,
+    indices: SIMDInt32.Vector,
+    otherwise: SIMDUInt32.Vector
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.Vector(
+        raw: HighwayReference.Nothrow.gatherFirstOtherwiseU32(otherwise.raw, from, indices.raw, 1)
+    )
+}
+
+@inline(never)
+public func portGatherFirstOtherwiseU32ConstantOtherwise(
+    from: UnsafePointer<SIMDUInt32.Lane>,
+    indices: SIMDInt32.Vector,
+    count: Int
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.gather(
+        from: from,
+        indices: indices,
+        count: count,
+        otherwise: SIMDUInt32.repeating(26)
+    )
+}
+
+@inline(never)
+public func highwayGatherFirstOtherwiseU32ConstantOtherwise(
+    from: UnsafePointer<UInt32>,
+    indices: SIMDInt32.Vector,
+    count: Int
+) -> SIMDUInt32.Vector {
+    unsafe SIMDUInt32.Vector(
+        raw: HighwayReference.Nothrow.gatherFirstOtherwiseU32(
+            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            from,
+            indices.raw,
+            count
+        )
+    )
+}
+
+@inline(never)
 public func portGatherWhereU32(
     from: UnsafePointer<SIMDUInt32.Lane>,
     indices: SIMDInt32.Vector,

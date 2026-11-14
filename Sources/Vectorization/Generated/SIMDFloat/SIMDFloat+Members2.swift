@@ -1478,6 +1478,66 @@ extension SIMDFloat {
     public static func gather(
         from: UnsafePointer<Lane>,
         indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        unsafe cvectorization_ops_gather_first_otherwise_f32(otherwise, from, indices.raw, count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func gather(
+        from span: Span<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        precondition(
+            cvectorization_ops_gather_indices_within_where_f32(
+                indices.raw,
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return unsafe gather(
+            fromUnchecked: span,
+            indices: indices,
+            count: count,
+            otherwise: otherwise
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func gather(
+        fromUnchecked span: Span<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        assert(
+            cvectorization_ops_gather_indices_within_where_f32(
+                indices.raw,
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return span.withUnsafeBufferPointer {
+            unsafe cvectorization_ops_gather_first_otherwise_f32(
+                otherwise,
+                $0.baseAddress,
+                indices.raw,
+                count
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func gather(
+        from: UnsafePointer<Lane>,
+        indices: SIMDInt32.Vector,
         where mask: Mask
     ) -> Vector {
         unsafe cvectorization_ops_gather_where_f32(mask.raw, from, indices.raw)
@@ -1672,56 +1732,6 @@ extension SIMDFloat {
         )
         span.withUnsafeMutableBufferPointer {
             unsafe cvectorization_ops_scatter_byte_offsets_f32(a, $0.baseAddress, byteOffsets.raw)
-        }
-    }
-
-    @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        to: UnsafeMutablePointer<Lane>,
-        indices: SIMDInt32.Vector,
-        count: Int
-    ) {
-        unsafe cvectorization_ops_scatter_first_f32(a, to, indices.raw, count)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        to span: inout MutableSpan<Lane>,
-        indices: SIMDInt32.Vector,
-        count: Int
-    ) {
-        precondition(
-            cvectorization_ops_indices_within_where_f32(
-                indices.raw,
-                SIMDInt32.indexLimit(count: span.count, stride: 1),
-                firstLanes(count: count).raw
-            ),
-            "Index is negative or past the end of the span, for a lane in use"
-        )
-        unsafe scatter(a, toUnchecked: &span, indices: indices, count: count)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        toUnchecked span: inout MutableSpan<Lane>,
-        indices: SIMDInt32.Vector,
-        count: Int
-    ) {
-        assert(
-            cvectorization_ops_indices_within_where_f32(
-                indices.raw,
-                SIMDInt32.indexLimit(count: span.count, stride: 1),
-                firstLanes(count: count).raw
-            ),
-            "Index is negative or past the end of the span, for a lane in use"
-        )
-        span.withUnsafeMutableBufferPointer {
-            unsafe cvectorization_ops_scatter_first_f32(a, $0.baseAddress, indices.raw, count)
         }
     }
 

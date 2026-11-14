@@ -4,35 +4,6 @@ public import CVectorizationOps
 
 extension SIMDInt64 {
     @export(implementation) @inline(always)
-    public static func store(_ a: Vector, to: UnsafeMutablePointer<Lane>, where mask: Mask) {
-        unsafe cvectorization_ops_store_where_i64(a.raw, mask.raw, to)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func store(_ a: Vector, to span: inout MutableSpan<Lane>, where mask: Mask) {
-        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        unsafe store(a, toUnchecked: &span, where: mask)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func store(
-        _ a: Vector,
-        toUnchecked span: inout MutableSpan<Lane>,
-        where mask: Mask
-    ) {
-        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        span.withUnsafeMutableBufferPointer {
-            unsafe cvectorization_ops_store_where_i64(
-                a.raw,
-                mask.raw,
-                $0.baseAddress.unsafelyUnwrapped
-            )
-        }
-    }
-
-    @export(implementation) @inline(always)
     public static func storeRepeating(_ value: Lane, count: Int, to: UnsafeMutablePointer<Lane>) {
         unsafe cvectorization_ops_store_repeating_i64(count, value, to)
     }
@@ -1996,6 +1967,75 @@ extension SIMDInt64 {
         return span.withUnsafeBufferPointer {
             Vector(
                 raw: unsafe cvectorization_ops_gather_first_i64($0.baseAddress, indices.raw, count)
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func gather(
+        from: UnsafePointer<Lane>,
+        indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        Vector(
+            raw: unsafe cvectorization_ops_gather_first_otherwise_i64(
+                otherwise.raw,
+                from,
+                indices.raw,
+                count
+            )
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func gather(
+        from span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        precondition(
+            cvectorization_ops_gather_indices_within_where_i64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return unsafe gather(
+            fromUnchecked: span,
+            indices: indices,
+            count: count,
+            otherwise: otherwise
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func gather(
+        fromUnchecked span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        assert(
+            cvectorization_ops_gather_indices_within_where_i64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_gather_first_otherwise_i64(
+                    otherwise.raw,
+                    $0.baseAddress,
+                    indices.raw,
+                    count
+                )
             )
         }
     }

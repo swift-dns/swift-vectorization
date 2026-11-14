@@ -1744,6 +1744,75 @@ extension SIMDUInt32 {
     public static func gather(
         from: UnsafePointer<Lane>,
         indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        Vector(
+            raw: unsafe cvectorization_ops_gather_first_otherwise_u32(
+                otherwise.raw,
+                from,
+                indices.raw,
+                count
+            )
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func gather(
+        from span: Span<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        precondition(
+            cvectorization_ops_gather_indices_within_where_u32(
+                indices.raw,
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return unsafe gather(
+            fromUnchecked: span,
+            indices: indices,
+            count: count,
+            otherwise: otherwise
+        )
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func gather(
+        fromUnchecked span: Span<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int,
+        otherwise: Vector
+    ) -> Vector {
+        assert(
+            cvectorization_ops_gather_indices_within_where_u32(
+                indices.raw,
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_gather_first_otherwise_u32(
+                    otherwise.raw,
+                    $0.baseAddress,
+                    indices.raw,
+                    count
+                )
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func gather(
+        from: UnsafePointer<Lane>,
+        indices: SIMDInt32.Vector,
         where mask: Mask
     ) -> Vector {
         Vector(raw: unsafe cvectorization_ops_gather_where_u32(mask.raw, from, indices.raw))
@@ -2101,16 +2170,6 @@ extension SIMDUInt32 {
     @export(implementation) @inline(always)
     public static func compressed(_ a: Vector, where mask: Mask) -> Vector {
         Vector(raw: cvectorization_ops_compressed_u32(a.raw, mask.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func compressedNot(_ a: Vector, where mask: Mask) -> Vector {
-        Vector(raw: cvectorization_ops_compressed_not_u32(a.raw, mask.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func partitioned(_ a: Vector, where mask: Mask) -> Vector {
-        Vector(raw: cvectorization_ops_partitioned_u32(a.raw, mask.raw))
     }
 
 }
