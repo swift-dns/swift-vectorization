@@ -11163,32 +11163,6 @@ func x86Avx3StoreInterleaved2Halves(for element: Element) -> String {
         """
 }
 
-func x86Avx3StoreInterleaved2Spread(for element: Element) -> String {
-    let bytes = x86Vector("i8")
-    let quads = x86Vector("i64")
-    let quadLanes = element.width / 8
-    let unpacked = laneIndices(unpackIndices(lanes: 16, upper: false, blocks: element.width / 16))
-    func spread(_ name: String, _ operand: String, from start: Int) -> String {
-        let indices = laneIndices((start..<start + quadLanes / 2).flatMap { [$0, -1] })
-        let source = "(\(quads))\(operand)"
-        return "const \(quads) \(name) = __builtin_shufflevector(\(source), \(source), \(indices));"
-    }
-    func interleave(_ name: String, _ first: String, _ second: String) -> String {
-        let operands = "(\(bytes))\(first), (\(bytes))\(second)"
-        return "const \(bytes) \(name) = __builtin_shufflevector(\(operands), \(unpacked));"
-    }
-    return """
-        \(spread("lowA", "rawA", from: 0))
-        \(spread("highA", "rawA", from: quadLanes / 2))
-        \(spread("lowB", "rawB", from: 0))
-        \(spread("highB", "rawB", from: quadLanes / 2))
-        \(interleave("out0", "lowA", "lowB"))
-        \(interleave("out1", "highA", "highB"))
-        __builtin_memcpy(to, &out0, sizeof out0);
-        __builtin_memcpy(to + \(element.laneCount), &out1, sizeof out1);
-        """
-}
-
 func x86Avx3StoreInterleaved4Permutes(for element: Element) -> String {
     let lane = x86Avx3LaneVector(of: element)
     let wide = x86Vector("i\(2 * element.bits)")
@@ -11238,10 +11212,7 @@ func x86Avx3StoreInterleaved2Body(level: X86Level, for element: Element) -> Stri
     if element.bits == 64 {
         return shuffleStoreInterleaved(channels: 2, for: element)
     }
-    if element.bits == 8 && level < .avx3dl {
-        return x86Avx3StoreInterleaved2Spread(for: element)
-    }
-    return element.category == .float
+    return element.category == .float || (element.bits == 8 && level < .avx3dl)
         ? x86Avx3StoreInterleaved2(for: element)
         : x86Avx3StoreInterleaved2Halves(for: element)
 }
@@ -20281,7 +20252,7 @@ func x86InterleavedParity(
     level: X86Level,
     for element: Element
 ) -> String? {
-    guard element.width <= 32 else { return nil }
+    guard element.width <= 32 || (level == .avx3 && element.bits == 8) else { return nil }
     if element.width == 16 && element.bits == 32 && element.category != .float {
         let lanes = isEven ? "0, 2, 4, 6" : "1, 3, 5, 7"
         let pairs =
@@ -20579,31 +20550,30 @@ func portableConcatenatedParity(parity: Int, for element: Element) -> String {
     shuffled("b", "a", concatenatedParityLanes(parity: parity, for: element), for: element)
 }
 
-func x86Avx3ConcatenatedOdd(for element: Element) -> String? {
-    guard element.width == 64, element.bits == 8 else { return nil }
-    let wide = unsignedElement(bits: 16)
-    let typedef = vectorTypedef("wide_vector", of: wide, lanes: element.laneCount / 2)
+func x86Avx3PackedBytes(_ low: String, _ high: String, parity: Int) -> String {
     let words = x86Vector("i16")
+    let operand = { (name: String) in
+        parity == 1 ? "((wide_vector)\(name) >> 8)" : "((wide_vector)\(name) & 0x00FF)"
+    }
     let packed = x86Builtin(
         "packuswb512",
-        [
-            (value: "((wide_vector)b >> 8)", type: words),
-            (value: "((wide_vector)a >> 8)", type: words),
-        ],
+        [(value: operand(low), type: words), (value: operand(high), type: words)],
         returning: x86Vector("i64")
     )
     let indices = compoundLiteral(x86Vector("i64"), ["0", "2", "4", "6", "1", "3", "5", "7"])
-    let permuted = x86Builtin(
+    return x86Builtin(
         "permvardi512",
         [(value: packed, type: x86Vector("i64")), (value: indices, type: x86Vector("i64"))],
-        returning: element.cVector
+        returning: x86Vector("i64")
     )
-    return x86ConstantOperandDispatch(
-        ["a", "b"],
-        constant: "\(typedef)\n\(vectorResult(permuted, for: element))",
-        otherwise: portableConcatenatedParity(parity: 1, for: element),
-        for: element
-    )
+}
+
+func x86Avx3ConcatenatedParity(parity: Int, level: X86Level, for element: Element) -> String? {
+    guard element.width == 64, element.bits == 8 else { return nil }
+    guard level < .avx3dl else { return portableConcatenatedParity(parity: parity, for: element) }
+    let typedef = vectorTypedef("wide_vector", of: unsignedElement(bits: 16), lanes: 32)
+    let permuted = "(\(element.cVector))\(x86Avx3PackedBytes("b", "a", parity: parity))"
+    return "\(typedef)\n\(vectorResult(permuted, for: element))"
 }
 
 func x86ConcatenatedParity(parity: Int, level: X86Level, for element: Element) -> String? {
@@ -20838,6 +20808,22 @@ func x86Avx3InterleavedWholeHelpers(upper: Bool, for element: Element) -> String
         alignment: 64,
         isHidden: true
     )
+}
+
+func x86Avx3InterleavedWholeBytes(upper: Bool, level: X86Level, for element: Element) -> String? {
+    guard element.width == 64, element.bits == 8 else { return nil }
+    guard level < .avx3dl else {
+        return shuffled("a", "b", wholeInterleavedLanes(upper: upper, for: element), for: element)
+    }
+    let quads = x86Vector("i64")
+    let lower = laneIndices(unpackIndices(lanes: 16, upper: false, blocks: 4))
+    let higher = laneIndices(unpackIndices(lanes: 16, upper: true, blocks: 4))
+    let order = upper ? "4, 5, 12, 13, 6, 7, 14, 15" : "0, 1, 8, 9, 2, 3, 10, 11"
+    return """
+        const \(quads) lower = (\(quads))__builtin_shufflevector(a, b, \(lower));
+        const \(quads) higher = (\(quads))__builtin_shufflevector(a, b, \(higher));
+        \(vectorResult("__builtin_shufflevector(lower, higher, \(order))", for: element))
+        """
 }
 
 func x86Avx3InterleavedWhole(upper: Bool, for element: Element) -> String? {
@@ -21306,6 +21292,12 @@ let fixedPermutations: [FixedPermutation] = [
         section: .interleave,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("trn1", "a", "b", for: element) },
+            avx3dl: { element in
+                element.bits == 8
+                    ? shuffled("a", "b", interleavedLanes(parity: 0, for: element), for: element)
+                    : nil
+            },
+            avx3: { element in x86InterleavedParity(even: true, level: .avx3, for: element) },
             avx2: { element in x86InterleavedParity(even: true, level: .avx2, for: element) },
             sse4: { element in x86InterleavedParity(even: true, level: .sse4, for: element) },
             ssse3: { element in x86InterleavedParity(even: true, level: .ssse3, for: element) },
@@ -21322,6 +21314,12 @@ let fixedPermutations: [FixedPermutation] = [
         section: .interleave,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("trn2", "a", "b", for: element) },
+            avx3dl: { element in
+                element.bits == 8
+                    ? shuffled("a", "b", interleavedLanes(parity: 1, for: element), for: element)
+                    : nil
+            },
+            avx3: { element in x86InterleavedParity(even: false, level: .avx3, for: element) },
             avx2: { element in x86InterleavedParity(even: false, level: .avx2, for: element) },
             sse4: { element in x86InterleavedParity(even: false, level: .sse4, for: element) },
             ssse3: { element in x86InterleavedParity(even: false, level: .ssse3, for: element) },
@@ -21505,9 +21503,9 @@ let fixedPermutations: [FixedPermutation] = [
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("uzp2", "b", "a", for: element) },
             avx3dl: { element in
-                element.bits == 8 ? portableConcatenatedParity(parity: 1, for: element) : nil
+                x86Avx3ConcatenatedParity(parity: 1, level: .avx3dl, for: element)
             },
-            avx3: { element in x86Avx3ConcatenatedOdd(for: element) },
+            avx3: { element in x86Avx3ConcatenatedParity(parity: 1, level: .avx3, for: element) },
             avx2: { element in x86Avx2ConcatenatedParity(parity: 1, for: element) },
             sse4: { element in x86ConcatenatedParity(parity: 1, level: .sse4, for: element) },
             ssse3: { element in x86ConcatenatedParity(parity: 1, level: .ssse3, for: element) },
@@ -21525,6 +21523,10 @@ let fixedPermutations: [FixedPermutation] = [
         section: .combine,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("uzp1", "b", "a", for: element) },
+            avx3dl: { element in
+                x86Avx3ConcatenatedParity(parity: 0, level: .avx3dl, for: element)
+            },
+            avx3: { element in x86Avx3ConcatenatedParity(parity: 0, level: .avx3, for: element) },
             avx2: { element in x86Avx2ConcatenatedParity(parity: 0, for: element) },
             sse4: { element in x86ConcatenatedParity(parity: 0, level: .sse4, for: element) },
             ssse3: { element in x86ConcatenatedParity(parity: 0, level: .ssse3, for: element) },
@@ -21542,7 +21544,13 @@ let fixedPermutations: [FixedPermutation] = [
         section: .combine,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("zip1", "a", "b", for: element) },
-            avx3: { element in x86Avx3InterleavedWhole(upper: false, for: element) },
+            avx3dl: { element in
+                x86Avx3InterleavedWholeBytes(upper: false, level: .avx3dl, for: element)
+            },
+            avx3: { element in
+                x86Avx3InterleavedWholeBytes(upper: false, level: .avx3, for: element)
+                    ?? x86Avx3InterleavedWhole(upper: false, for: element)
+            },
             avx2: { element in x86Avx2InterleavedWhole(upper: false, for: element) }
         ),
         helpers: TargetBodies(
@@ -21559,7 +21567,13 @@ let fixedPermutations: [FixedPermutation] = [
         section: .combine,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("zip2", "a", "b", for: element) },
-            avx3: { element in x86Avx3InterleavedWhole(upper: true, for: element) },
+            avx3dl: { element in
+                x86Avx3InterleavedWholeBytes(upper: true, level: .avx3dl, for: element)
+            },
+            avx3: { element in
+                x86Avx3InterleavedWholeBytes(upper: true, level: .avx3, for: element)
+                    ?? x86Avx3InterleavedWhole(upper: true, for: element)
+            },
             avx2: { element in x86Avx2InterleavedWhole(upper: true, for: element) }
         ),
         helpers: TargetBodies(
@@ -28761,7 +28775,10 @@ func demoteX86Truncated(
             width: source.width
         )
         return DemoteKernel(value: "(\(words))\(packed)")
-    case (.avx3, 64):
+    case (.avx3, 16):
+        let typedef = vectorTypedef("wide_vector", of: unsignedElement(bits: 16), lanes: 32)
+        return DemoteKernel(statements: [typedef], value: x86Avx3PackedBytes("a", "b", parity: 0))
+    case (.avx3, 64), (.avx3dl, 64):
         let table = demoteX86OrderTableName("OrderedTruncate2To", from: source, to: result)
         let indices = x86Vector("i32")
         return DemoteKernel(
@@ -28978,6 +28995,7 @@ let demoteTruncatingOps = sourcedOps(accepting: demoteUnsignedIntegers) { source
             sve2_128: sourced(source) { source, result in
                 demoteSveTruncated(from: source, to: result)
             },
+            avx3dl: x86(.avx3dl),
             avx3: x86(.avx3),
             avx2: x86(.avx2),
             sse4: x86(.sse4),
