@@ -8,6 +8,46 @@ import Testing
 import Vectorization
 
 extension SIMDFloat16CodegenTests {
+    @Test func multiplyingByPowerOf2FromInt16() {
+        let mismatches = Mismatches("portMultiplyingByPowerOf2I16ToF16")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F0D_A96A_E627_051B)
+        let bInputs = Inputs.exponents(SIMDInt16.Vector.self, seed: 0x2F0D_A86A_E627_0368)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portMultiplyingByPowerOf2I16ToF16(a, b),
+                highwayMultiplyingByPowerOf2I16ToF16(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantA() {
+        let mismatches = Mismatches("portMultiplyingByPowerOf2I16ToF16ConstantA")
+        let bInputs = Inputs.exponents(SIMDInt16.Vector.self, seed: 0xA170_E69E_4438_2117)
+        for b in bInputs {
+            mismatches.check(
+                portMultiplyingByPowerOf2I16ToF16ConstantA(b),
+                highwayMultiplyingByPowerOf2I16ToF16ConstantA(b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingByPowerOf2FromInt16ConstantB() {
+        let mismatches = Mismatches("portMultiplyingByPowerOf2I16ToF16ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAA05_FC9E_490E_CB19)
+        for a in aInputs {
+            mismatches.check(
+                portMultiplyingByPowerOf2I16ToF16ConstantB(a),
+                highwayMultiplyingByPowerOf2I16ToF16ConstantB(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplying() {
         let mismatches = Mismatches("portMultiplyingF16")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE9DD_C041_B1D9_B7F6)

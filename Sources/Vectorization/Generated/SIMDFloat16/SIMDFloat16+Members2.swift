@@ -503,6 +503,11 @@ extension SIMDFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func reversed8(_ a: Vector) -> Vector {
+        cvectorization_ops_reversed8_f16(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector {
         precondition(
             cvectorization_ops_indices_within_i16(indices.raw, 0, laneCount),

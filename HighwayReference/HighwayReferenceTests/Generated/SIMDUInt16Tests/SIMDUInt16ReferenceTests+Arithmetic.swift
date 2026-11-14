@@ -336,4 +336,19 @@ extension SIMDUInt16ReferenceTests {
         }
         mismatches.record()
     }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func biasedExponentFromFloat16() {
+        let mismatches = Mismatches("biasedExponentFromFloat16")
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xA4ED_EE2B_C81B_A33F)
+        for a in aInputs {
+            mismatches.check(
+                H.biasedExponent(a),
+                H.Vector(raw: HighwayReference.biasedExponentF16ToU16(a)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+    #endif
 }

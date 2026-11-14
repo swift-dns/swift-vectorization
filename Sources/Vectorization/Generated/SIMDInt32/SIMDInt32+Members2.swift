@@ -588,6 +588,12 @@ extension SIMDInt32 {
     }
 
     @export(implementation) @inline(always)
+    public static func reversed8(_ a: Vector) -> Vector {
+        precondition(canReverse8, "Vector has too few lanes for this reversal")
+        return Vector(raw: cvectorization_ops_reversed8_i32(a.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector {
         precondition(
             cvectorization_ops_indices_within_i32(indices.raw, 0, laneCount),

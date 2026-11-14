@@ -470,6 +470,12 @@ extension SIMDFloat {
     }
 
     @export(implementation) @inline(always)
+    public static func reversed8(_ a: Vector) -> Vector {
+        precondition(canReverse8, "Vector has too few lanes for this reversal")
+        return cvectorization_ops_reversed8_f32(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector {
         precondition(
             cvectorization_ops_indices_within_i32(indices.raw, 0, laneCount),

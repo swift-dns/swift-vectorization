@@ -103,6 +103,12 @@ public enum SIMDDouble: SIMDElement, SIMDFloatElement, SendableMetatype {
     @export(implementation) @inline(always)
     public static var canLookup16: Bool { cvectorization_ops_can_lookup16_f64() }
 
+    @export(implementation) @inline(always)
+    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_f64() }
+
+    @export(implementation) @inline(always)
+    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_f64() }
+
 }
 
 @available(*, unavailable)

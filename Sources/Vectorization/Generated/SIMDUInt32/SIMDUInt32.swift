@@ -122,6 +122,12 @@ public enum SIMDUInt32: SIMDElement, SIMDIntegerElement, SendableMetatype {
     @export(implementation) @inline(always)
     public static var canLookup16: Bool { cvectorization_ops_can_lookup16_u32() }
 
+    @export(implementation) @inline(always)
+    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_u32() }
+
+    @export(implementation) @inline(always)
+    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_u32() }
+
 }
 
 @available(*, unavailable)

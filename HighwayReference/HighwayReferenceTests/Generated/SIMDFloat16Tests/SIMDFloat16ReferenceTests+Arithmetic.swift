@@ -30,7 +30,7 @@ extension SIMDFloat16ReferenceTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC205_5053_F751_0C21)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC205_4F53_F751_0A6E)
         for (a, b) in everyPair(aInputs, bInputs)
-        where HighwayReference.hasFloat16Arithmetic() || !hasUnorderedNaNs(a, b) {
+        where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(a, b) {
             mismatches.check(
                 H.adding(a, b),
                 HighwayReference.addingF16(a, b),

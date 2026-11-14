@@ -146,3 +146,27 @@ public func highwayReversed4U32ConstantA() -> SIMDUInt32.Vector {
         )
     )
 }
+
+@inline(never)
+public func portReversed8U32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+    SIMDUInt32.reversed8(a)
+}
+
+@inline(never)
+public func highwayReversed8U32(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
+    SIMDUInt32.Vector(raw: HighwayReference.Nothrow.reversed8U32(a.raw))
+}
+
+@inline(never)
+public func portReversed8U32ConstantA() -> SIMDUInt32.Vector {
+    SIMDUInt32.reversed8(SIMDUInt32.repeating(26))
+}
+
+@inline(never)
+public func highwayReversed8U32ConstantA() -> SIMDUInt32.Vector {
+    SIMDUInt32.Vector(
+        raw: HighwayReference.Nothrow.reversed8U32(
+            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+        )
+    )
+}

@@ -4,6 +4,11 @@ public import CVectorizationOps
 
 extension SIMDBFloat16 {
     @export(implementation) @inline(always)
+    public static func compressed(_ a: Vector, where mask: Mask) -> Vector {
+        Vector(raw: cvectorization_ops_compressed_bf16(a.raw, mask.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func compressedNot(_ a: Vector, where mask: Mask) -> Vector {
         Vector(raw: cvectorization_ops_compressed_not_bf16(a.raw, mask.raw))
     }

@@ -156,6 +156,12 @@ public enum SIMDBFloat16: SendableMetatype {
     @export(implementation) @inline(always)
     public static var blockCount: Int { Int(cvectorization_ops_block_count_bf16()) }
 
+    @export(implementation) @inline(always)
+    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_bf16() }
+
+    @export(implementation) @inline(always)
+    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_bf16() }
+
 }
 
 @available(*, unavailable)

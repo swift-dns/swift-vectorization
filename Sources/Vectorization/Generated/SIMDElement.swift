@@ -16,6 +16,12 @@ public protocol SIMDElement {
     /// How many 16-byte blocks a `Vector` holds on the target this was compiled for.
     static var blockCount: Int { get }
 
+    /// Whether a `Vector` holds enough lanes for `reversed4` on the target this was compiled for.
+    static var canReverse4: Bool { get }
+
+    /// Whether a `Vector` holds enough lanes for `reversed8` on the target this was compiled for.
+    static var canReverse8: Bool { get }
+
     static func zero() -> Vector
     static func repeating(_ value: Lane) -> Vector
     static func iota(_ value: Lane) -> Vector
@@ -364,6 +370,8 @@ public protocol SIMDElement {
     static func interleavingWholeUpper(_ a: Vector, _ b: Vector) -> Vector
     static func reversedBlocks(_ a: Vector) -> Vector
     static func reversed2(_ a: Vector) -> Vector
+    static func reversed4(_ a: Vector) -> Vector
+    static func reversed8(_ a: Vector) -> Vector
     static func oddEvenBlocks(_ a: Vector, _ b: Vector) -> Vector
     static func swappingAdjacentBlocks(_ a: Vector) -> Vector
     static func interleavingEvenBlocks(_ a: Vector, _ b: Vector) -> Vector

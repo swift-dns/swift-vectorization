@@ -374,5 +374,97 @@ extension SIMDFloat16ConstantTests {
     @Test func reversed4ConstantSplatGreatest() {
         checkReversed4ConstantA(.greatestFiniteMagnitude)
     }
+
+    @inline(__always)
+    private func checkReversed8ConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("reversed8 with a repeating \(hex(value))")
+        mismatches.check(
+            H.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        mismatches.check(
+            H.reversed8(H.repeating(value)),
+            HighwayReference.reversed8F16(H.repeating(value)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func reversed8ConstantSplatZero() {
+        checkReversed8ConstantA(0.0)
+    }
+
+    @Test func reversed8ConstantSplatNegativeZero() {
+        checkReversed8ConstantA(-0.0)
+    }
+
+    @Test func reversed8ConstantSplatOne() {
+        checkReversed8ConstantA(1.0)
+    }
+
+    @Test func reversed8ConstantSplatMinusOne() {
+        checkReversed8ConstantA(-1.0)
+    }
+
+    @Test func reversed8ConstantSplatTwo() {
+        checkReversed8ConstantA(2.0)
+    }
+
+    @Test func reversed8ConstantSplatHalf() {
+        checkReversed8ConstantA(0.5)
+    }
+
+    @Test func reversed8ConstantSplatFour() {
+        checkReversed8ConstantA(4.0)
+    }
+
+    @Test func reversed8ConstantSplatQuarter() {
+        checkReversed8ConstantA(0.25)
+    }
+
+    @Test func reversed8ConstantSplatOnePointFive() {
+        checkReversed8ConstantA(1.5)
+    }
+
+    @Test func reversed8ConstantSplatMinusTwoPointFive() {
+        checkReversed8ConstantA(-2.5)
+    }
+
+    @Test func reversed8ConstantSplatInfinity() {
+        checkReversed8ConstantA(.infinity)
+    }
+
+    @Test func reversed8ConstantSplatMinusInfinity() {
+        checkReversed8ConstantA(-.infinity)
+    }
+
+    @Test func reversed8ConstantSplatNaN() {
+        checkReversed8ConstantA(.nan)
+    }
+
+    @Test func reversed8ConstantSplatMinusNaN() {
+        checkReversed8ConstantA(-.nan)
+    }
+
+    @Test func reversed8ConstantSplatPayloadNaN() {
+        checkReversed8ConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func reversed8ConstantSplatSignalingNaN() {
+        checkReversed8ConstantA(.signalingNaN)
+    }
+
+    @Test func reversed8ConstantSplatMinusSignalingNaN() {
+        checkReversed8ConstantA(-.signalingNaN)
+    }
+
+    @Test func reversed8ConstantSplatLeastNonzero() {
+        checkReversed8ConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func reversed8ConstantSplatGreatest() {
+        checkReversed8ConstantA(.greatestFiniteMagnitude)
+    }
 }
 #endif

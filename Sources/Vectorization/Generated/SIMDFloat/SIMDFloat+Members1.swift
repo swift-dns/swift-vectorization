@@ -158,6 +158,15 @@ extension SIMDFloat {
         cvectorization_ops_pairwise_subtracting_f32(a, b)
     }
 
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func sumsOf2(_ a: SIMDFloat16.Vector) -> Vector {
+        cvectorization_ops_sums_of2_f16_to_f32(a)
+    }
+
+    #endif
+
     @export(implementation) @inline(always)
     public static func minimum(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_minimum_f32(a, b)

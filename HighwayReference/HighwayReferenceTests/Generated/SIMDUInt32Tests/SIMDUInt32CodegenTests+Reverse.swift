@@ -100,4 +100,21 @@ extension SIMDUInt32CodegenTests {
         mismatches.check(portReversed4U32ConstantA(), highwayReversed4U32ConstantA(), "")
         mismatches.record()
     }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8() {
+        let mismatches = Mismatches("portReversed8U32")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1D7F_D78D_8664_002F)
+        for a in aInputs {
+            mismatches.check(portReversed8U32(a), highwayReversed8U32(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantA() {
+        let mismatches = Mismatches("portReversed8U32ConstantA")
+        mismatches.check(portReversed8U32ConstantA(), highwayReversed8U32ConstantA(), "")
+        mismatches.record()
+    }
 }

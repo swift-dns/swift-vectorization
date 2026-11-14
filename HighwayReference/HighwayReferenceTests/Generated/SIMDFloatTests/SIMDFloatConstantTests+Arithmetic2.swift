@@ -521,4 +521,136 @@ extension SIMDFloatConstantTests {
         checkPairwiseSubtractingConstantA(.greatestFiniteMagnitude)
         checkPairwiseSubtractingConstantB(.greatestFiniteMagnitude)
     }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @inline(__always)
+    private func checkSumsOf2FromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+        let mismatches = Mismatches("sumsOf2FromFloat16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDFloat16.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf2(SIMDFloat16.repeating(value)),
+            HighwayReference.sumsOf2F16ToF32(SIMDFloat16.repeating(value)),
+            ""
+        )
+        mismatches.record()
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatZero() {
+        checkSumsOf2FromFloat16ConstantA(0.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatNegativeZero() {
+        checkSumsOf2FromFloat16ConstantA(-0.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatOne() {
+        checkSumsOf2FromFloat16ConstantA(1.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatMinusOne() {
+        checkSumsOf2FromFloat16ConstantA(-1.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatTwo() {
+        checkSumsOf2FromFloat16ConstantA(2.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatHalf() {
+        checkSumsOf2FromFloat16ConstantA(0.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatFour() {
+        checkSumsOf2FromFloat16ConstantA(4.0)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatQuarter() {
+        checkSumsOf2FromFloat16ConstantA(0.25)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatOnePointFive() {
+        checkSumsOf2FromFloat16ConstantA(1.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatMinusTwoPointFive() {
+        checkSumsOf2FromFloat16ConstantA(-2.5)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatInfinity() {
+        checkSumsOf2FromFloat16ConstantA(.infinity)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatMinusInfinity() {
+        checkSumsOf2FromFloat16ConstantA(-.infinity)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatNaN() {
+        checkSumsOf2FromFloat16ConstantA(.nan)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatMinusNaN() {
+        checkSumsOf2FromFloat16ConstantA(-.nan)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatPayloadNaN() {
+        checkSumsOf2FromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatSignalingNaN() {
+        checkSumsOf2FromFloat16ConstantA(.signalingNaN)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatMinusSignalingNaN() {
+        checkSumsOf2FromFloat16ConstantA(-.signalingNaN)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatLeastNonzero() {
+        checkSumsOf2FromFloat16ConstantA(.leastNonzeroMagnitude)
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantSplatGreatest() {
+        checkSumsOf2FromFloat16ConstantA(.greatestFiniteMagnitude)
+    }
+    #endif
 }

@@ -13,7 +13,7 @@ extension SIMDFloat16ReferenceTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDD3A_F859_5766_3A0E)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDD3A_F759_5766_385B)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xB398_6062_2807_283B)
-        where HighwayReference.hasFloat16Arithmetic()
+        where HighwayReference.hasNativeFloat16Arithmetic()
             || !hasUnorderedNaNs(multiplying: a, b, adding: c)
         {
             mismatches.check(

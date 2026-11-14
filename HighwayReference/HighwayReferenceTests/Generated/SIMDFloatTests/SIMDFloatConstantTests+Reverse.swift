@@ -357,4 +357,111 @@ extension SIMDFloatConstantTests {
     @Test func reversed4ConstantSplatGreatest() {
         checkReversed4ConstantA(.greatestFiniteMagnitude)
     }
+
+    @inline(__always)
+    private func checkReversed8ConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("reversed8 with a repeating \(hex(value))")
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.reversed8(H.repeating(value)),
+            HighwayReference.reversed8F32(H.repeating(value)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatZero() {
+        checkReversed8ConstantA(0.0)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatNegativeZero() {
+        checkReversed8ConstantA(-0.0)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatOne() {
+        checkReversed8ConstantA(1.0)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatMinusOne() {
+        checkReversed8ConstantA(-1.0)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatTwo() {
+        checkReversed8ConstantA(2.0)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatHalf() {
+        checkReversed8ConstantA(0.5)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatFour() {
+        checkReversed8ConstantA(4.0)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatQuarter() {
+        checkReversed8ConstantA(0.25)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatOnePointFive() {
+        checkReversed8ConstantA(1.5)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatMinusTwoPointFive() {
+        checkReversed8ConstantA(-2.5)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatInfinity() {
+        checkReversed8ConstantA(.infinity)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatMinusInfinity() {
+        checkReversed8ConstantA(-.infinity)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatNaN() {
+        checkReversed8ConstantA(.nan)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatMinusNaN() {
+        checkReversed8ConstantA(-.nan)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatPayloadNaN() {
+        checkReversed8ConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatSignalingNaN() {
+        checkReversed8ConstantA(.signalingNaN)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatMinusSignalingNaN() {
+        checkReversed8ConstantA(-.signalingNaN)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatLeastNonzero() {
+        checkReversed8ConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantSplatGreatest() {
+        checkReversed8ConstantA(.greatestFiniteMagnitude)
+    }
 }

@@ -761,6 +761,18 @@ extension SIMDInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func reversed4(_ a: Vector) -> Vector {
+        precondition(canReverse4, "Vector has too few lanes for this reversal")
+        return Vector(raw: cvectorization_ops_reversed4_i64(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func reversed8(_ a: Vector) -> Vector {
+        precondition(canReverse8, "Vector has too few lanes for this reversal")
+        return Vector(raw: cvectorization_ops_reversed8_i64(a.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector {
         precondition(
             cvectorization_ops_indices_within_i64(indices.raw, 0, laneCount),

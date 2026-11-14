@@ -2,8 +2,12 @@ extension Inputs {
     package static func exponents<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane & FixedWidthInteger & SignedInteger {
         var generator = SplitMix64(seed: seed)
-        let bias = V.Scalar.bitWidth == 32 ? 127 : 1023
-        let mantissaBits = V.Scalar.bitWidth == 32 ? 23 : 52
+        let (bias, mantissaBits) =
+            switch V.Scalar.bitWidth {
+            case 16: (15, 10)
+            case 32: (127, 23)
+            default: (1023, 52)
+            }
         var critical: [Int] = [Int(V.Scalar.min), Int(V.Scalar.min) + 1]
         critical += [Int(V.Scalar.max) - 1, Int(V.Scalar.max)]
         for multiple in -3...3 {

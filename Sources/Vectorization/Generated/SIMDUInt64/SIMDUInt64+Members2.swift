@@ -744,6 +744,18 @@ extension SIMDUInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func reversed4(_ a: Vector) -> Vector {
+        precondition(canReverse4, "Vector has too few lanes for this reversal")
+        return Vector(raw: cvectorization_ops_reversed4_u64(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func reversed8(_ a: Vector) -> Vector {
+        precondition(canReverse8, "Vector has too few lanes for this reversal")
+        return Vector(raw: cvectorization_ops_reversed8_u64(a.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector {
         precondition(
             cvectorization_ops_indices_within_u64(indices.raw, 0, laneCount),
@@ -1957,51 +1969,6 @@ extension SIMDUInt64 {
         return span.withUnsafeBufferPointer {
             Vector(
                 raw: unsafe cvectorization_ops_gather_first_u64($0.baseAddress, indices.raw, count)
-            )
-        }
-    }
-
-    @export(implementation) @inline(always)
-    public static func gather(
-        from: UnsafePointer<Lane>,
-        indices: SIMDInt64.Vector,
-        where mask: Mask
-    ) -> Vector {
-        Vector(raw: unsafe cvectorization_ops_gather_where_u64(mask.raw, from, indices.raw))
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func gather(
-        from span: Span<Lane>,
-        indices: SIMDInt64.Vector,
-        where mask: Mask
-    ) -> Vector {
-        precondition(
-            cvectorization_ops_indices_within_where_u64(indices.raw, span.count, mask.raw),
-            "Index is negative or past the end of the span, for a lane in use"
-        )
-        return unsafe gather(fromUnchecked: span, indices: indices, where: mask)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func gather(
-        fromUnchecked span: Span<Lane>,
-        indices: SIMDInt64.Vector,
-        where mask: Mask
-    ) -> Vector {
-        assert(
-            cvectorization_ops_indices_within_where_u64(indices.raw, span.count, mask.raw),
-            "Index is negative or past the end of the span, for a lane in use"
-        )
-        return span.withUnsafeBufferPointer {
-            Vector(
-                raw: unsafe cvectorization_ops_gather_where_u64(
-                    mask.raw,
-                    $0.baseAddress,
-                    indices.raw
-                )
             )
         }
     }

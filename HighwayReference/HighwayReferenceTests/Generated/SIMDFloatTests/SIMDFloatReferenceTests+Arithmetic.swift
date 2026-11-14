@@ -186,4 +186,15 @@ extension SIMDFloatReferenceTests {
         }
         mismatches.record()
     }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16() {
+        let mismatches = Mismatches("sumsOf2FromFloat16")
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xD7CD_402F_938A_7E00)
+        for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a) {
+            mismatches.check(H.sumsOf2(a), HighwayReference.sumsOf2F16ToF32(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+    #endif
 }

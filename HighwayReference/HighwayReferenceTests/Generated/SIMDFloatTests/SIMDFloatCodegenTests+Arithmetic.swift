@@ -451,4 +451,23 @@ extension SIMDFloatCodegenTests {
         }
         mismatches.record()
     }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16() {
+        let mismatches = Mismatches("portSumsOf2F16ToF32")
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xD7CD_402F_938A_7E00)
+        for a in aInputs where !hasUnorderedNaNs(adjacentLanesOf: a) {
+            mismatches.check(portSumsOf2F16ToF32(a), highwaySumsOf2F16ToF32(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf2FromFloat16ConstantA() {
+        let mismatches = Mismatches("portSumsOf2F16ToF32ConstantA")
+        mismatches.check(portSumsOf2F16ToF32ConstantA(), highwaySumsOf2F16ToF32ConstantA(), "")
+        mismatches.record()
+    }
+    #endif
 }

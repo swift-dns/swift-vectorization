@@ -70,4 +70,32 @@ extension SIMDUInt64ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test(.disabled(if: !H.canReverse4, "Highway's reversal needs more lanes than this target has"))
+    func reversed4() {
+        let mismatches = Mismatches("reversed4")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB0B9_731D_1124_D8DC)
+        for a in aInputs {
+            mismatches.check(
+                H.reversed4(a),
+                H.Vector(raw: HighwayReference.reversed4U64(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8() {
+        let mismatches = Mismatches("reversed8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x17B6_671D_4B34_AEF8)
+        for a in aInputs {
+            mismatches.check(
+                H.reversed8(a),
+                H.Vector(raw: HighwayReference.reversed8U64(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

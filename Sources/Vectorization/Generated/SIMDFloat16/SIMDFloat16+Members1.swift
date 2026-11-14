@@ -209,6 +209,11 @@ extension SIMDFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func multiplyingByPowerOf2(_ a: Vector, _ b: SIMDInt16.Vector) -> Vector {
+        cvectorization_ops_multiplying_by_power_of2_i16_to_f16(a, b.raw)
+    }
+
+    @export(implementation) @inline(always)
     public static func multiplying(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_multiplying_f16(a, b)
     }

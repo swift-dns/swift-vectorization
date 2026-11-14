@@ -32,4 +32,16 @@ struct SIMDFloatReferenceTests {
         mismatches.check(H.canLookup16, HighwayReference.canLookup16F32(), "")
         mismatches.record()
     }
+
+    @Test func canReverse4() {
+        let mismatches = Mismatches("canReverse4")
+        mismatches.check(H.canReverse4, HighwayReference.canReverse4F32(), "")
+        mismatches.record()
+    }
+
+    @Test func canReverse8() {
+        let mismatches = Mismatches("canReverse8")
+        mismatches.check(H.canReverse8, HighwayReference.canReverse8F32(), "")
+        mismatches.record()
+    }
 }

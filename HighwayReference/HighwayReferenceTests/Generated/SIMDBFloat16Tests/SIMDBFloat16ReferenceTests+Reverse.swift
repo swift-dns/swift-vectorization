@@ -57,4 +57,17 @@ extension SIMDBFloat16ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func reversed8() {
+        let mismatches = Mismatches("reversed8")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x20A0_20AC_B4F5_D360)
+        for a in aInputs {
+            mismatches.check(
+                H.reversed8(a),
+                H.Vector(raw: HighwayReference.reversed8BF16(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

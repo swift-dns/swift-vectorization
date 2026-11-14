@@ -7,6 +7,51 @@ extension SIMDUInt64 {
     public static func gather(
         from: UnsafePointer<Lane>,
         indices: SIMDInt64.Vector,
+        where mask: Mask
+    ) -> Vector {
+        Vector(raw: unsafe cvectorization_ops_gather_where_u64(mask.raw, from, indices.raw))
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func gather(
+        from span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        where mask: Mask
+    ) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_where_u64(indices.raw, span.count, mask.raw),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return unsafe gather(fromUnchecked: span, indices: indices, where: mask)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func gather(
+        fromUnchecked span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        where mask: Mask
+    ) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_where_u64(indices.raw, span.count, mask.raw),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_gather_where_u64(
+                    mask.raw,
+                    $0.baseAddress,
+                    indices.raw
+                )
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func gather(
+        from: UnsafePointer<Lane>,
+        indices: SIMDInt64.Vector,
         where mask: Mask,
         otherwise: Vector
     ) -> Vector {

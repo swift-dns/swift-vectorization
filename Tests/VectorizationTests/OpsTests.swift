@@ -946,6 +946,108 @@ struct OpsTests {
         #expect(output == input)
     }
 
+    @Test("A 4-lane reversal reverses every group of 4 lanes of 64 bits")
+    func reversed4Of64BitLanes() {
+        typealias U = SIMDUInt64
+        typealias I = SIMDInt64
+        typealias D = SIMDDouble
+        guard U.canReverse4, I.canReverse4, D.canReverse4 else { return }
+        let unsigned = ContiguousArray(
+            (0..<U.laneCount).map { UInt64($0) &* 0x0101_0101_0101_0101 }
+        )
+        let signed = ContiguousArray((0..<I.laneCount).map { Int64($0) - 3 })
+        let doubles = ContiguousArray((0..<D.laneCount).map { Double($0) - 2.5 })
+
+        #expect(
+            lanes(U.self, U.reversed4(U.load(from: unsigned.span)))
+                == unsigned.indices.map { unsigned[$0 ^ 3] }
+        )
+        #expect(
+            lanes(I.self, I.reversed4(I.load(from: signed.span)))
+                == signed.indices.map { signed[$0 ^ 3] }
+        )
+        #expect(
+            lanes(D.self, D.reversed4(D.load(from: doubles.span)))
+                == doubles.indices.map { doubles[$0 ^ 3] }
+        )
+    }
+
+    @Test("An 8-lane reversal reverses every group of 8 lanes of 32 bits")
+    func reversed8Of32BitLanes() {
+        typealias U = SIMDUInt32
+        typealias I = SIMDInt32
+        typealias F = SIMDFloat
+        guard U.canReverse8, I.canReverse8, F.canReverse8 else { return }
+        let unsigned = ContiguousArray((0..<U.laneCount).map { UInt32($0) &* 0x0101_0101 })
+        let signed = ContiguousArray((0..<I.laneCount).map { Int32($0) - 5 })
+        let floats = ContiguousArray((0..<F.laneCount).map { Float($0) * 0.5 - 3 })
+
+        #expect(
+            lanes(U.self, U.reversed8(U.load(from: unsigned.span)))
+                == unsigned.indices.map { unsigned[$0 ^ 7] }
+        )
+        #expect(
+            lanes(I.self, I.reversed8(I.load(from: signed.span)))
+                == signed.indices.map { signed[$0 ^ 7] }
+        )
+        #expect(
+            lanes(F.self, F.reversed8(F.load(from: floats.span)))
+                == floats.indices.map { floats[$0 ^ 7] }
+        )
+    }
+
+    @Test("An 8-lane reversal reverses every group of 8 lanes of 64 bits")
+    func reversed8Of64BitLanes() {
+        typealias U = SIMDUInt64
+        typealias I = SIMDInt64
+        typealias D = SIMDDouble
+        guard U.canReverse8, I.canReverse8, D.canReverse8 else { return }
+        let unsigned = ContiguousArray(
+            (0..<U.laneCount).map { UInt64($0) &* 0x0101_0101_0101_0101 }
+        )
+        let signed = ContiguousArray((0..<I.laneCount).map { Int64($0) - 3 })
+        let doubles = ContiguousArray((0..<D.laneCount).map { Double($0) - 2.5 })
+
+        #expect(
+            lanes(U.self, U.reversed8(U.load(from: unsigned.span)))
+                == unsigned.indices.map { unsigned[$0 ^ 7] }
+        )
+        #expect(
+            lanes(I.self, I.reversed8(I.load(from: signed.span)))
+                == signed.indices.map { signed[$0 ^ 7] }
+        )
+        #expect(
+            lanes(D.self, D.reversed8(D.load(from: doubles.span)))
+                == doubles.indices.map { doubles[$0 ^ 7] }
+        )
+    }
+
+    @Test("An 8-lane reversal reverses every group of 8 bfloat16 lanes")
+    func reversed8OfBFloat16Lanes() {
+        typealias H = SIMDBFloat16
+        guard H.canReverse8 else { return }
+        let input = ContiguousArray((0..<H.laneCount).map { BFloat16(Float($0) - 2.5) })
+        let output = ContiguousArray<BFloat16>(capacity: H.laneCount) { output in
+            H.append(H.reversed8(H.load(from: input.span)), to: &output)
+        }
+
+        #expect(Array(output) == input.indices.map { input[$0 ^ 7] })
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test("An 8-lane reversal reverses every group of 8 float16 lanes")
+    func reversed8OfFloat16Lanes() {
+        typealias H = SIMDFloat16
+        guard H.canReverse8 else { return }
+        let input = ContiguousArray((0..<H.laneCount).map { Float16($0) - 2.5 })
+
+        #expect(
+            lanes(H.self, H.reversed8(H.load(from: input.span)))
+                == input.indices.map { input[$0 ^ 7] }
+        )
+    }
+    #endif
+
     #if os(macOS) || os(Linux) || os(Windows) || os(FreeBSD) || os(OpenBSD)
     @Test("Checked span ops trap on a span that is too short")
     func checkedSpanOpsTrap() async {
@@ -1115,6 +1217,20 @@ struct OpsTests {
         await #expect(processExitsWith: .failure) {
             withAlignedTable([UInt32](repeating: 0, count: 8)) { span in
                 _ = SIMDUInt32.lookup8(at: SIMDUInt32.repeating(8), from: span)
+            }
+        }
+    }
+
+    @Test("Reversals trap where a vector has too few lanes for them")
+    func reversalsTrapWithTooFewLanes() async {
+        if !SIMDUInt64.canReverse4 {
+            await #expect(processExitsWith: .failure) {
+                _ = SIMDUInt64.reversed4(SIMDUInt64.zero())
+            }
+        }
+        if !SIMDUInt32.canReverse8 {
+            await #expect(processExitsWith: .failure) {
+                _ = SIMDUInt32.reversed8(SIMDUInt32.zero())
             }
         }
     }

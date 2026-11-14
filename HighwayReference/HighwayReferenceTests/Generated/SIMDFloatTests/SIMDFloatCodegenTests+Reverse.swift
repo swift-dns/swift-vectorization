@@ -70,4 +70,21 @@ extension SIMDFloatCodegenTests {
         mismatches.check(portReversed4F32ConstantA(), highwayReversed4F32ConstantA(), "")
         mismatches.record()
     }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8() {
+        let mismatches = Mismatches("portReversed8F32")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71CC_722A_4929_ADC2)
+        for a in aInputs {
+            mismatches.check(portReversed8F32(a), highwayReversed8F32(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: !H.canReverse8, "Highway's reversal needs more lanes than this target has"))
+    func reversed8ConstantA() {
+        let mismatches = Mismatches("portReversed8F32ConstantA")
+        mismatches.check(portReversed8F32ConstantA(), highwayReversed8F32ConstantA(), "")
+        mismatches.record()
+    }
 }

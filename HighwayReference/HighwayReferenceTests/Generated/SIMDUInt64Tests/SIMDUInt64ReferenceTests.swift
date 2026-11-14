@@ -32,4 +32,16 @@ struct SIMDUInt64ReferenceTests {
         mismatches.check(H.canLookup16, HighwayReference.canLookup16U64(), "")
         mismatches.record()
     }
+
+    @Test func canReverse4() {
+        let mismatches = Mismatches("canReverse4")
+        mismatches.check(H.canReverse4, HighwayReference.canReverse4U64(), "")
+        mismatches.record()
+    }
+
+    @Test func canReverse8() {
+        let mismatches = Mismatches("canReverse8")
+        mismatches.check(H.canReverse8, HighwayReference.canReverse8U64(), "")
+        mismatches.record()
+    }
 }

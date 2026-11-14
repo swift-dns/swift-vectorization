@@ -122,3 +122,51 @@ public func highwayReversed2I64ConstantA() -> SIMDInt64.Vector {
         )
     )
 }
+
+@inline(never)
+public func portReversed4I64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.reversed4(a)
+}
+
+@inline(never)
+public func highwayReversed4I64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(raw: HighwayReference.Nothrow.reversed4I64(a.raw))
+}
+
+@inline(never)
+public func portReversed4I64ConstantA() -> SIMDInt64.Vector {
+    SIMDInt64.reversed4(SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwayReversed4I64ConstantA() -> SIMDInt64.Vector {
+    SIMDInt64.Vector(
+        raw: HighwayReference.Nothrow.reversed4I64(
+            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portReversed8I64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.reversed8(a)
+}
+
+@inline(never)
+public func highwayReversed8I64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(raw: HighwayReference.Nothrow.reversed8I64(a.raw))
+}
+
+@inline(never)
+public func portReversed8I64ConstantA() -> SIMDInt64.Vector {
+    SIMDInt64.reversed8(SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwayReversed8I64ConstantA() -> SIMDInt64.Vector {
+    SIMDInt64.Vector(
+        raw: HighwayReference.Nothrow.reversed8I64(
+            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+        )
+    )
+}
