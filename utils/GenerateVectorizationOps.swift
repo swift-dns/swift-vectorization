@@ -43,6 +43,7 @@ struct Element {
     var cFromRawMask: String { "cvectorization_ops_from_raw_mask_\(cSuffix)" }
     var cReadMask: String { "cvectorization_ops_read_mask_\(cSuffix)" }
     var hasOpaqueVector: Bool { category != .float && category != .float16 }
+    var isFloatingPoint: Bool { category == .float || category == .float16 }
     var isHalfPrecision: Bool { category == .float16 || category == .bfloat16 }
     var cScalar: String { isHalfPrecision ? "uint16_t" : cType }
     var cPointee: String { isHalfPrecision ? "void" : cType }
@@ -2493,7 +2494,7 @@ func sveNestedBitwise(
 }
 
 func sveMaskedBitwise(_ name: String, for element: Element) -> String? {
-    guard element.category == .float else { return nil }
+    guard element.isFloatingPoint else { return nil }
     let operation = "\(cFunctionName(name, element))(rawA, rawB)"
     return "return \(cFunctionName("selectingOrZero", element))(rawMask, \(operation));"
 }
@@ -16179,7 +16180,7 @@ func neonMaskedSelectingByBytes(_ operation: String, for element: Element) -> St
 }
 
 func sveMaskedComparison(of family: MaskedFamily, for element: Element) -> String? {
-    guard element.category == .float || isInteger64(element),
+    guard element.isFloatingPoint || isInteger64(element),
         let comparison = family.sveComparison
     else { return nil }
     let compared =
@@ -16207,6 +16208,16 @@ func sveMergingSelecting(_ operation: String, for element: Element) -> String {
         const __SVBool_t active = \(active);
         \(vectorResult(sveResult(selected, for: element), for: element))
         """
+}
+
+func sveMergingDividing(for element: Element) -> String {
+    let divided = sveBuiltin(
+        "div",
+        ["active", sveOperand("a", for: element), sveOperand("b", for: element)],
+        for: element,
+        predication: "m"
+    )
+    return sveMergingSelecting(divided, for: element)
 }
 
 func x86Avx3Zeros(for element: Element) -> String {
@@ -19532,8 +19543,12 @@ func x86Avx3FirstTrueSet(_ kind: FirstTrueSet, for element: Element) -> String {
         """
 }
 
+func sveComparedMask(for element: Element) -> Element {
+    element.isFloatingPoint ? element : unsignedElement(of: element)
+}
+
 func svePredicate(of operand: String, for element: Element) -> String {
-    let compared = element.category == .float ? element : unsignedElement(of: element)
+    let compared = sveComparedMask(for: element)
     let lanes = "(\(sveVector(compared.cSuffix)))\(rawName(operand))"
     return sveBuiltin("cmpne_n", [sveAllLanes(of: element), lanes, "0"], for: compared)
 }
@@ -20357,7 +20372,7 @@ func sveSplicedPairs(not: Bool, for element: Element) -> String {
 }
 
 func sveExpandTableName(for element: Element) -> String {
-    "cvectorization_ops_sve_expand_table_16x8_\(element.cSuffix)"
+    "cvectorization_ops_sve_expand_table_16x8_\(tableSuffix(of: element))"
 }
 
 func sveExpandHelpers(for element: Element) -> String? {
@@ -20496,25 +20511,26 @@ func sveSourceSplat(for element: Element) -> (condition: String, lane: String) {
 }
 
 func sveCompressedNarrow(not: Bool, for element: Element) -> String {
-    let unsigned = unsignedElement(of: element)
+    let compared = sveComparedMask(for: element)
+    let data = element.category == .float16 ? unsignedElement(of: element) : element
     let selected = sveBuiltin(
         not ? "cmpeq_n" : "cmpne_n",
-        ["all", "(\(sveVector(unsigned.cSuffix)))\(rawName("mask"))", "0"],
-        for: unsigned
+        ["all", "(\(sveVector(compared.cSuffix)))\(rawName("mask"))", "0"],
+        for: compared
     )
     let compressed = sveCompressedLanes(
         of: "source",
         active: "active",
         prefix: "compressed",
-        splat: sveSourceSplat(for: element),
-        for: element
+        splat: sveSourceSplat(for: data),
+        for: data
     )
     return """
-        const \(sveVector(element.cSuffix)) source = \(sveOperand("a", for: element));
+        const \(sveVector(data.cSuffix)) source = \(sveOperand("a", for: data));
         const __SVBool_t all = \(sveAllLanes(of: element));
         const __SVBool_t active = \(selected);
         \(compressed.statements.joined(separator: "\n"))
-        \(vectorResult(sveResult(compressed.result, for: element), for: element))
+        \(vectorResult(sveResult(compressed.result, for: data), for: element))
         """
 }
 
@@ -21758,8 +21774,12 @@ func compressTableRows(lanes: Int, not: Bool, entry: (Int) -> [Int]) -> [Int] {
     }
 }
 
+func tableSuffix(of element: Element) -> String {
+    element.category == .float16 ? unsignedElement(of: element).cSuffix : element.cSuffix
+}
+
 func neonCompressTableName(_ name: String, not: Bool, for element: Element) -> String {
-    "cvectorization_ops_neon_compress\(not ? "_not" : "")_\(name)_\(element.cSuffix)"
+    "cvectorization_ops_neon_compress\(not ? "_not" : "")_\(name)_\(tableSuffix(of: element))"
 }
 
 let neonCompressTableShapes: [Int: (name: String, lanes: Int, entry: (Int) -> [Int])] = [
@@ -21815,7 +21835,7 @@ func expandTableRows(lanes: Int, entry: (Int) -> [Int]) -> [Int] {
 }
 
 func neonExpandTableName(_ name: String, for element: Element) -> String {
-    "cvectorization_ops_neon_expand_\(name)_\(element.cSuffix)"
+    "cvectorization_ops_neon_expand_\(name)_\(tableSuffix(of: element))"
 }
 
 func neonExpandHelpers(for element: Element) -> String? {
@@ -25522,9 +25542,18 @@ func unboundedLaneLoop(_ statement: String) -> String {
     """
 }
 
+func sveMemory(_ pointer: String, isConst: Bool = false, for element: Element) -> String {
+    guard element.category == .float16 else { return pointer }
+    return "(\(isConst ? "const " : "")\(element.cType)*)\(pointer)"
+}
+
 func sveMaskedLoad(otherwise: Bool, for element: Element) -> String {
     let predicate = svePredicate(of: "mask", for: element)
-    let loaded = sveBuiltin("ld1", [predicate, "from"], for: element)
+    let loaded = sveBuiltin(
+        "ld1",
+        [predicate, sveMemory("from", isConst: true, for: element)],
+        for: element
+    )
     let selected = sveBuiltin(
         "sel",
         [predicate, loaded, sveOperand("otherwise", for: element, splat: true)],
@@ -25536,7 +25565,10 @@ func sveMaskedLoad(otherwise: Bool, for element: Element) -> String {
 func sveBlendedStore(for element: Element) -> String {
     let stored = sveBuiltin(
         "st1",
-        [svePredicate(of: "mask", for: element), "to", sveOperand("a", for: element, splat: true)],
+        [
+            svePredicate(of: "mask", for: element), sveMemory("to", for: element),
+            sveOperand("a", for: element, splat: true),
+        ],
         for: element
     )
     return "\(stored);"
@@ -26301,7 +26333,8 @@ func sveCompressedStore(blended: Bool, for element: Element) -> String {
     let stored = sveBuiltin(
         "st1",
         [
-            blended ? sveActiveLanes("count", for: element) : sveAllLanes(of: element), "to",
+            blended ? sveActiveLanes("count", for: element) : sveAllLanes(of: element),
+            sveMemory("to", for: element),
             element.bits >= 32 ? "compacted" : sveOperand("compacted", for: element),
         ],
         for: element
@@ -37691,10 +37724,11 @@ let float16SveHelpers: [String: (Element) -> String?] = [
 func float16SveMaskedArithmetic(of op: Op) -> ((Element) -> String?)? {
     let merging = op.parameters.contains(.otherwiseVector)
     guard let base = float16BaseIdentifier(ofMasked: op.identifier),
-        let family = maskedFamilies.first(where: { $0.swiftName == base }),
-        let arithmetic = family.sveArithmetic,
-        !(merging && family.divides)
+        let family = maskedFamilies.first(where: { $0.swiftName == base })
     else { return nil }
+    if family.sveComparison != nil { return { sveMaskedComparison(of: family, for: $0) } }
+    guard let arithmetic = family.sveArithmetic else { return nil }
+    if merging && family.divides { return { sveMergingDividing(for: $0) } }
     return { sveMaskedArithmetic(arithmetic, merging: merging, for: $0) }
 }
 
@@ -39039,10 +39073,23 @@ func neonBridgeFromSve(_ expression: String, of element: Element, as type: Strin
     "(\(type))svget_neonq_\(sveSuffix(of: element))(\(expression))"
 }
 
-func referenceMask(fromSigned vector: String, tag: String, of element: Element) -> String {
-    element.isHalfPrecision
+func referenceMask(
+    fromSigned vector: String,
+    tag: String,
+    of element: Element,
+    comparingFloat16: Bool = false
+) -> String {
+    element.isHalfPrecision && !(comparingFloat16 && element.category == .float16)
         ? "hn::RebindMask(\(tag)(), hn::MaskFromVec(\(vector)))"
         : "hn::MaskFromVec(hn::BitCast(\(tag)(), \(vector)))"
+}
+
+func referenceMaskReturn(fromSigned vector: String, tag: String, of element: Element) -> String {
+    let rebound = "return \(referenceMask(fromSigned: vector, tag: tag, of: element));"
+    guard element.category == .float16 else { return " \(rebound) " }
+    let compared =
+        "return \(referenceMask(fromSigned: vector, tag: tag, of: element, comparingFloat16: true));"
+    return "\n#if HWY_TARGET_IS_SVE\n\(compared)\n#else\n\(rebound)\n#endif\n"
 }
 
 func referenceSignedVector(fromMask mask: String, tag: String, of element: Element) -> String {
@@ -39066,7 +39113,8 @@ func bridgedPortConversions(of element: Element) -> String {
     output += referenceMask(
         fromSigned: neonBridgeToSve("m", of: signed),
         tag: element.tag,
-        of: element
+        of: element,
+        comparingFloat16: true
     )
     output += "; }\n"
     output += "HWY_INLINE \(element.cRawMask) \(referenceFunctionName("maskToPort", element))"
@@ -39093,13 +39141,13 @@ func memoryPortConversions(of element: Element) -> String {
     output += "hn::StoreU(v, \(element.tag)(), reinterpret_cast<\(element.hwyType)*>(&port)); "
     output += "return port; }\n"
     output += "HWY_INLINE \(element.mask) \(referenceFunctionName("maskFromPort", element))"
-    output += "(\(element.cRawMask) m) { \(signedTag) return "
-    output += referenceMask(
+    output += "(\(element.cRawMask) m) { \(signedTag)"
+    output += referenceMaskReturn(
         fromSigned: "hn::LoadU(di, reinterpret_cast<const \(element.cMaskLane)*>(&m))",
         tag: element.tag,
         of: element
     )
-    output += "; }\n"
+    output += "}\n"
     output += "HWY_INLINE \(element.cRawMask) \(referenceFunctionName("maskToPort", element))"
     output +=
         "(\(element.mask) m) { \(signedTag) \(element.cRawMask) port; "
@@ -39169,7 +39217,8 @@ func bridgedNarrowMaskPortConversions(of element: Element, shape: Shape) -> Stri
     output += referenceMask(
         fromSigned: "svset_neonq_\(suffix)(svundef_\(suffix)(), \(widened))",
         tag: tag,
-        of: element
+        of: element,
+        comparingFloat16: true
     )
     output += "; }\n"
     output += "HWY_INLINE \(raw) \(referenceFunctionName(shape.conversion("maskToPort"), element))"
@@ -39211,13 +39260,13 @@ func memoryNarrowMaskPortConversions(of element: Element, shape: Shape) -> Strin
     var output = ""
     output +=
         "HWY_INLINE \(mask) \(referenceFunctionName(shape.conversion("maskFromPort"), element))"
-    output += "(\(raw) m) { \(signedTag) return "
-    output += referenceMask(
+    output += "(\(raw) m) { \(signedTag)"
+    output += referenceMaskReturn(
         fromSigned: "hn::LoadU(di, reinterpret_cast<const \(element.cMaskLane)*>(&m))",
         tag: tag,
         of: element
     )
-    output += "; }\n"
+    output += "}\n"
     output += "HWY_INLINE \(raw) \(referenceFunctionName(shape.conversion("maskToPort"), element))"
     output += "(\(mask) m) { \(signedTag) \(raw) port; "
     output += "hn::StoreU(\(referenceSignedVector(fromMask: "m", tag: tag, of: element)), di, "
@@ -41608,7 +41657,13 @@ func cMaskReads(of element: Element) -> String {
         let nonzero =
             element.category == .float
             ? "(\(lanes))v != (\(lanes)){0}" : "(\(mask))v != 0"
-        let sve = { (_: Element) in "return (\(mask))(\(nonzero));" }
+        let sve = { (_: Element) in
+            guard element.category == .float16 else { return "return (\(mask))(\(nonzero));" }
+            return """
+                typedef _Float16 native_vector __attribute__((vector_size(sizeof v)));
+                return (\(mask))((native_vector)v != (native_vector){0});
+                """
+        }
         let body = cBody(
             TargetBodies(
                 sve2_128: sve,
@@ -41643,6 +41698,7 @@ func halfPrecisionDelegate(of op: Op, for element: Element) -> Element {
 func halfPrecisionCall(
     of op: Op,
     for element: Element,
+    readingMasks: Bool = false,
     callee: (Element) -> String,
     declaration: (Binding) -> String
 ) -> String {
@@ -41660,6 +41716,9 @@ func halfPrecisionCall(
         }
         let type = String(text.dropLast(name.count + 1))
         let delegatedType = String(declaration(delegated).dropLast(name.count + 1))
+        if readingMasks && (parameter.isMask || parameter == .whereMask) {
+            return "(\(delegatedType))\(element.cReadMask(of: parameter.shape))(\(name))"
+        }
         return type == delegatedType ? name : "(\(delegatedType))\(name)"
     }
     let call = "\(callee(delegate))(\(arguments.joined(separator: ", ")))"
@@ -41701,10 +41760,53 @@ func halfPrecisionComposition(of op: Op, for element: Element, declarations: Str
 
 func halfPrecisionBody(of op: Op, for element: Element) -> String? {
     guard element.isHalfPrecision, let body = halfPrecisionBodies[op.identifier] else { return nil }
-    return cBody(
-        halfPrecisionTargetBodies[op.identifier] ?? TargetBodies(),
+    var targets = halfPrecisionTargetBodies[op.identifier] ?? TargetBodies()
+    if takesFloat16Mask(op, for: element) {
+        let sve = float16MaskTargets(
+            of: op,
+            delegating: halfPrecisionDelegating(op, for: element, readingMasks: true)
+        )
+        targets.sve2_128 = sve.sve2_128
+        targets.sve = sve.sve
+    }
+    return cBody(targets, for: element, portable: body)
+}
+
+func takesFloat16Mask(_ op: Op, for element: Element) -> Bool {
+    element.category == .float16 && op.takesMask
+}
+
+func float16MaskTargets(
+    of op: Op,
+    delegating delegation: String,
+    prologue: @escaping (Element) -> [String] = { _ in [] }
+) -> TargetBodies<Element> {
+    let targets = op.targets
+    return TargetBodies(
+        sve2_128: { element in
+            let fallback = targets.neon?(element) ?? op.portable(element)
+            let splat = targets.sve2_128Splat?(element).map { "\($0)\n\(fallback)" }
+            let body = targets.sve2_128?(element) ?? splat ?? fallback
+            return (prologue(element) + [body]).joined(separator: "\n")
+        },
+        sve: { _ in delegation }
+    )
+}
+
+func halfPrecisionDelegating(
+    _ op: Op,
+    for element: Element,
+    readingMasks: Bool = false,
+    spanned: Bool = false
+) -> String {
+    halfPrecisionCall(
+        of: op,
         for: element,
-        portable: body
+        readingMasks: readingMasks,
+        callee: {
+            spanned ? cFunctionName(op.identifier + "Span", $0) : cFunctionName(of: op, for: $0)
+        },
+        declaration: \.cDeclaration
     )
 }
 
@@ -41719,13 +41821,13 @@ func halfPrecisionDelegation(
             || (element.isHalfPrecision && bitwiseHalfPrecisionOps[op.identifier] != nil
                 && halfPrecisionBodies[op.identifier] == nil)
     else { return nil }
-    return halfPrecisionCall(
-        of: op,
+    let delegation = halfPrecisionDelegating(op, for: element, spanned: spanned)
+    guard takesFloat16Mask(op, for: element) else { return delegation }
+    let reading = halfPrecisionDelegating(op, for: element, readingMasks: true, spanned: spanned)
+    return cBody(
+        float16MaskTargets(of: op, delegating: reading) { cPrologue(of: op, for: $0) },
         for: element,
-        callee: {
-            spanned ? cFunctionName(op.identifier + "Span", $0) : cFunctionName(of: op, for: $0)
-        },
-        declaration: \.cDeclaration
+        portable: { _ in delegation }
     )
 }
 

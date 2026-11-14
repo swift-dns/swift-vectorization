@@ -117,8 +117,8 @@ A mask made from a vector whose lanes are not all zeros or all ones, with `mask(
 `Mask(raw:)`, behaves in every op as highway's `MaskFromVec` of the same vector does on the same
 target, which highway leaves to the target. On NEON, SSE2 through AVX2 and EMU128 each op reads the
 bits of the mask that highway's op reads, on the AVX-512 targets only the sign bit of each lane
-counts, and on SVE2_128 a lane is true when it is not zero, compared as a number for `SIMDFloat` and
-`SIMDDouble`, so that `-0.0` is false there.
+counts, and on SVE2_128 a lane is true when it is not zero, compared as a number for `SIMDFloat`,
+`SIMDDouble` and `SIMDFloat16`, so that `-0.0` is false there.
 
 On the targets without a carry-less multiply instruction, SSE2, SSSE3, NEON_WITHOUT_AES, SVE2_128
 without SVE2-AES, and EMU128, highway's `CLMulLower` and `CLMulUpper` return a wrong upper 64 bits
