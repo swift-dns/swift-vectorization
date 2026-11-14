@@ -61,7 +61,9 @@ public func portFirstLanesU64ConstantCountLaneCount() -> SIMDUInt64.Mask {
 
 @inline(never)
 public func highwayFirstLanesU64ConstantCountLaneCount() -> SIMDUInt64.Mask {
-    SIMDUInt64.Mask(raw: HighwayReference.Nothrow.firstLanesU64(SIMDUInt64.laneCount))
+    SIMDUInt64.Mask(
+        raw: HighwayReference.Nothrow.firstLanesU64(HighwayReference.Nothrow.laneCountU64())
+    )
 }
 
 @inline(never)
@@ -71,7 +73,9 @@ public func portFirstLanesU64ConstantCountTwiceLaneCount() -> SIMDUInt64.Mask {
 
 @inline(never)
 public func highwayFirstLanesU64ConstantCountTwiceLaneCount() -> SIMDUInt64.Mask {
-    SIMDUInt64.Mask(raw: HighwayReference.Nothrow.firstLanesU64(2 * SIMDUInt64.laneCount))
+    SIMDUInt64.Mask(
+        raw: HighwayReference.Nothrow.firstLanesU64(2 * HighwayReference.Nothrow.laneCountU64())
+    )
 }
 
 @inline(never)

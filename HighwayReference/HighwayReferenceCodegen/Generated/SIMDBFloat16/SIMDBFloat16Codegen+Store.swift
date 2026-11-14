@@ -350,7 +350,11 @@ public func highwayStoreFirstBF16ConstantCountLaneCount(
     _ a: SIMDBFloat16.Vector,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstBF16(a.raw, to, SIMDBFloat16.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstBF16(
+        a.raw,
+        to,
+        HighwayReference.Nothrow.laneCountBF16()
+    )
 }
 
 @inline(never)
@@ -366,7 +370,11 @@ public func highwayStoreFirstBF16ConstantCountTwiceLaneCount(
     _ a: SIMDBFloat16.Vector,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstBF16(a.raw, to, 2 * SIMDBFloat16.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstBF16(
+        a.raw,
+        to,
+        2 * HighwayReference.Nothrow.laneCountBF16()
+    )
 }
 
 @inline(never)
@@ -489,7 +497,11 @@ public func highwayStoreRepeatingBF16ConstantCountLaneCount(
     _ value: BFloat16,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingBF16(SIMDBFloat16.laneCount, value.bitPattern, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingBF16(
+        HighwayReference.Nothrow.laneCountBF16(),
+        value.bitPattern,
+        to
+    )
 }
 
 @inline(never)
@@ -506,7 +518,7 @@ public func highwayStoreRepeatingBF16ConstantCountTwiceLaneCount(
     to: UnsafeMutablePointer<BFloat16>
 ) {
     unsafe HighwayReference.Nothrow.storeRepeatingBF16(
-        2 * SIMDBFloat16.laneCount,
+        2 * HighwayReference.Nothrow.laneCountBF16(),
         value.bitPattern,
         to
     )
@@ -575,7 +587,7 @@ public func highwayCopyBF16ConstantCountLaneCount(
     from: UnsafePointer<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe HighwayReference.Nothrow.copyBF16(SIMDBFloat16.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyBF16(HighwayReference.Nothrow.laneCountBF16(), from, to)
 }
 
 @inline(never)
@@ -591,7 +603,7 @@ public func highwayCopyBF16ConstantCountTwiceLaneCount(
     from: UnsafePointer<BFloat16>,
     to: UnsafeMutablePointer<BFloat16>
 ) {
-    unsafe HighwayReference.Nothrow.copyBF16(2 * SIMDBFloat16.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyBF16(2 * HighwayReference.Nothrow.laneCountBF16(), from, to)
 }
 
 @inline(never)

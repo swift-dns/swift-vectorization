@@ -326,7 +326,7 @@ public func highwayStoreFirstF16ConstantCountLaneCount(
     _ a: SIMDFloat16.Vector,
     to: UnsafeMutablePointer<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstF16(a, to, SIMDFloat16.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstF16(a, to, HighwayReference.Nothrow.laneCountF16())
 }
 
 @inline(never)
@@ -342,7 +342,11 @@ public func highwayStoreFirstF16ConstantCountTwiceLaneCount(
     _ a: SIMDFloat16.Vector,
     to: UnsafeMutablePointer<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstF16(a, to, 2 * SIMDFloat16.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstF16(
+        a,
+        to,
+        2 * HighwayReference.Nothrow.laneCountF16()
+    )
 }
 
 @inline(never)
@@ -459,7 +463,11 @@ public func highwayStoreRepeatingF16ConstantCountLaneCount(
     _ value: Float16,
     to: UnsafeMutablePointer<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingF16(SIMDFloat16.laneCount, value.bitPattern, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingF16(
+        HighwayReference.Nothrow.laneCountF16(),
+        value.bitPattern,
+        to
+    )
 }
 
 @inline(never)
@@ -476,7 +484,7 @@ public func highwayStoreRepeatingF16ConstantCountTwiceLaneCount(
     to: UnsafeMutablePointer<Float16>
 ) {
     unsafe HighwayReference.Nothrow.storeRepeatingF16(
-        2 * SIMDFloat16.laneCount,
+        2 * HighwayReference.Nothrow.laneCountF16(),
         value.bitPattern,
         to
     )
@@ -545,7 +553,7 @@ public func highwayCopyF16ConstantCountLaneCount(
     from: UnsafePointer<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.copyF16(SIMDFloat16.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyF16(HighwayReference.Nothrow.laneCountF16(), from, to)
 }
 
 @inline(never)
@@ -561,7 +569,7 @@ public func highwayCopyF16ConstantCountTwiceLaneCount(
     from: UnsafePointer<Float16>,
     to: UnsafeMutablePointer<Float16>
 ) {
-    unsafe HighwayReference.Nothrow.copyF16(2 * SIMDFloat16.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyF16(2 * HighwayReference.Nothrow.laneCountF16(), from, to)
 }
 
 @inline(never)

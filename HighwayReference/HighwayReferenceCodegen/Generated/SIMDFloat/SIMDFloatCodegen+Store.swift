@@ -325,7 +325,7 @@ public func highwayStoreFirstF32ConstantCountLaneCount(
     _ a: SIMDFloat.Vector,
     to: UnsafeMutablePointer<Float>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstF32(a, to, SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstF32(a, to, HighwayReference.Nothrow.laneCountF32())
 }
 
 @inline(never)
@@ -341,7 +341,11 @@ public func highwayStoreFirstF32ConstantCountTwiceLaneCount(
     _ a: SIMDFloat.Vector,
     to: UnsafeMutablePointer<Float>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstF32(a, to, 2 * SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstF32(
+        a,
+        to,
+        2 * HighwayReference.Nothrow.laneCountF32()
+    )
 }
 
 @inline(never)
@@ -449,7 +453,11 @@ public func highwayStoreRepeatingF32ConstantCountLaneCount(
     _ value: Float,
     to: UnsafeMutablePointer<Float>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingF32(SIMDFloat.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingF32(
+        HighwayReference.Nothrow.laneCountF32(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -465,7 +473,11 @@ public func highwayStoreRepeatingF32ConstantCountTwiceLaneCount(
     _ value: Float,
     to: UnsafeMutablePointer<Float>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingF32(2 * SIMDFloat.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingF32(
+        2 * HighwayReference.Nothrow.laneCountF32(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -526,7 +538,7 @@ public func highwayCopyF32ConstantCountLaneCount(
     from: UnsafePointer<Float>,
     to: UnsafeMutablePointer<Float>
 ) {
-    unsafe HighwayReference.Nothrow.copyF32(SIMDFloat.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyF32(HighwayReference.Nothrow.laneCountF32(), from, to)
 }
 
 @inline(never)
@@ -542,7 +554,7 @@ public func highwayCopyF32ConstantCountTwiceLaneCount(
     from: UnsafePointer<Float>,
     to: UnsafeMutablePointer<Float>
 ) {
-    unsafe HighwayReference.Nothrow.copyF32(2 * SIMDFloat.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyF32(2 * HighwayReference.Nothrow.laneCountF32(), from, to)
 }
 
 @inline(never)

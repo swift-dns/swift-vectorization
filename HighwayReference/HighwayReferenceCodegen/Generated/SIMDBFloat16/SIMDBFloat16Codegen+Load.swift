@@ -250,7 +250,7 @@ public func highwayLoadFirstBF16ConstantCountLaneCount(
     from: UnsafePointer<BFloat16>
 ) -> SIMDBFloat16.Vector {
     unsafe SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.loadFirstBF16(from, SIMDBFloat16.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstBF16(from, HighwayReference.Nothrow.laneCountBF16())
     )
 }
 
@@ -266,7 +266,10 @@ public func highwayLoadFirstBF16ConstantCountTwiceLaneCount(
     from: UnsafePointer<BFloat16>
 ) -> SIMDBFloat16.Vector {
     unsafe SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.loadFirstBF16(from, 2 * SIMDBFloat16.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstBF16(
+            from,
+            2 * HighwayReference.Nothrow.laneCountBF16()
+        )
     )
 }
 
@@ -447,7 +450,7 @@ public func highwayLoadFirstOtherwiseBF16ConstantCountLaneCount(
         raw: HighwayReference.Nothrow.loadFirstOtherwiseBF16(
             otherwise.raw,
             from,
-            SIMDBFloat16.laneCount
+            HighwayReference.Nothrow.laneCountBF16()
         )
     )
 }
@@ -473,7 +476,7 @@ public func highwayLoadFirstOtherwiseBF16ConstantCountTwiceLaneCount(
         raw: HighwayReference.Nothrow.loadFirstOtherwiseBF16(
             otherwise.raw,
             from,
-            2 * SIMDBFloat16.laneCount
+            2 * HighwayReference.Nothrow.laneCountBF16()
         )
     )
 }

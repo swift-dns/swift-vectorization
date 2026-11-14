@@ -237,7 +237,9 @@ public func portLoadFirstU8ConstantCountLaneCount(
 @inline(never)
 public func highwayLoadFirstU8ConstantCountLaneCount(from: UnsafePointer<UInt8>) -> SIMDUInt8.Vector
 {
-    unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.loadFirstU8(from, SIMDUInt8.laneCount))
+    unsafe SIMDUInt8.Vector(
+        raw: HighwayReference.Nothrow.loadFirstU8(from, HighwayReference.Nothrow.laneCountU8())
+    )
 }
 
 @inline(never)
@@ -252,7 +254,7 @@ public func highwayLoadFirstU8ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt8>
 ) -> SIMDUInt8.Vector {
     unsafe SIMDUInt8.Vector(
-        raw: HighwayReference.Nothrow.loadFirstU8(from, 2 * SIMDUInt8.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstU8(from, 2 * HighwayReference.Nothrow.laneCountU8())
     )
 }
 
@@ -416,7 +418,11 @@ public func highwayLoadFirstOtherwiseU8ConstantCountLaneCount(
     otherwise: SIMDUInt8.Vector
 ) -> SIMDUInt8.Vector {
     unsafe SIMDUInt8.Vector(
-        raw: HighwayReference.Nothrow.loadFirstOtherwiseU8(otherwise.raw, from, SIMDUInt8.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstOtherwiseU8(
+            otherwise.raw,
+            from,
+            HighwayReference.Nothrow.laneCountU8()
+        )
     )
 }
 
@@ -437,7 +443,7 @@ public func highwayLoadFirstOtherwiseU8ConstantCountTwiceLaneCount(
         raw: HighwayReference.Nothrow.loadFirstOtherwiseU8(
             otherwise.raw,
             from,
-            2 * SIMDUInt8.laneCount
+            2 * HighwayReference.Nothrow.laneCountU8()
         )
     )
 }

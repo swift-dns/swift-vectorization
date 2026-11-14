@@ -158,7 +158,11 @@ public func highwayGatherFirstU64ConstantCountLaneCount(
     indices: SIMDInt64.Vector
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.gatherFirstU64(from, indices.raw, SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.gatherFirstU64(
+            from,
+            indices.raw,
+            HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -176,7 +180,11 @@ public func highwayGatherFirstU64ConstantCountTwiceLaneCount(
     indices: SIMDInt64.Vector
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.gatherFirstU64(from, indices.raw, 2 * SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.gatherFirstU64(
+            from,
+            indices.raw,
+            2 * HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -332,7 +340,7 @@ public func highwayGatherFirstOtherwiseU64ConstantCountLaneCount(
             otherwise.raw,
             from,
             indices.raw,
-            SIMDUInt64.laneCount
+            HighwayReference.Nothrow.laneCountU64()
         )
     )
 }
@@ -362,7 +370,7 @@ public func highwayGatherFirstOtherwiseU64ConstantCountTwiceLaneCount(
             otherwise.raw,
             from,
             indices.raw,
-            2 * SIMDUInt64.laneCount
+            2 * HighwayReference.Nothrow.laneCountU64()
         )
     )
 }
@@ -727,7 +735,12 @@ public func highwayScatterFirstU64ConstantCountLaneCount(
     to: UnsafeMutablePointer<UInt64>,
     indices: SIMDInt64.Vector
 ) {
-    unsafe HighwayReference.Nothrow.scatterFirstU64(a.raw, to, indices.raw, SIMDUInt64.laneCount)
+    unsafe HighwayReference.Nothrow.scatterFirstU64(
+        a.raw,
+        to,
+        indices.raw,
+        HighwayReference.Nothrow.laneCountU64()
+    )
 }
 
 @inline(never)
@@ -749,7 +762,7 @@ public func highwayScatterFirstU64ConstantCountTwiceLaneCount(
         a.raw,
         to,
         indices.raw,
-        2 * SIMDUInt64.laneCount
+        2 * HighwayReference.Nothrow.laneCountU64()
     )
 }
 

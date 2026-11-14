@@ -148,7 +148,11 @@ public func highwayGatherFirstF32ConstantCountLaneCount(
     from: UnsafePointer<Float>,
     indices: SIMDInt32.Vector
 ) -> SIMDFloat.Vector {
-    unsafe HighwayReference.Nothrow.gatherFirstF32(from, indices.raw, SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.gatherFirstF32(
+        from,
+        indices.raw,
+        HighwayReference.Nothrow.laneCountF32()
+    )
 }
 
 @inline(never)
@@ -164,7 +168,11 @@ public func highwayGatherFirstF32ConstantCountTwiceLaneCount(
     from: UnsafePointer<Float>,
     indices: SIMDInt32.Vector
 ) -> SIMDFloat.Vector {
-    unsafe HighwayReference.Nothrow.gatherFirstF32(from, indices.raw, 2 * SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.gatherFirstF32(
+        from,
+        indices.raw,
+        2 * HighwayReference.Nothrow.laneCountF32()
+    )
 }
 
 @inline(never)
@@ -303,7 +311,7 @@ public func highwayGatherFirstOtherwiseF32ConstantCountLaneCount(
         otherwise,
         from,
         indices.raw,
-        SIMDFloat.laneCount
+        HighwayReference.Nothrow.laneCountF32()
     )
 }
 
@@ -331,7 +339,7 @@ public func highwayGatherFirstOtherwiseF32ConstantCountTwiceLaneCount(
         otherwise,
         from,
         indices.raw,
-        2 * SIMDFloat.laneCount
+        2 * HighwayReference.Nothrow.laneCountF32()
     )
 }
 
@@ -677,7 +685,12 @@ public func highwayScatterFirstF32ConstantCountLaneCount(
     to: UnsafeMutablePointer<Float>,
     indices: SIMDInt32.Vector
 ) {
-    unsafe HighwayReference.Nothrow.scatterFirstF32(a, to, indices.raw, SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.scatterFirstF32(
+        a,
+        to,
+        indices.raw,
+        HighwayReference.Nothrow.laneCountF32()
+    )
 }
 
 @inline(never)
@@ -695,7 +708,12 @@ public func highwayScatterFirstF32ConstantCountTwiceLaneCount(
     to: UnsafeMutablePointer<Float>,
     indices: SIMDInt32.Vector
 ) {
-    unsafe HighwayReference.Nothrow.scatterFirstF32(a, to, indices.raw, 2 * SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.scatterFirstF32(
+        a,
+        to,
+        indices.raw,
+        2 * HighwayReference.Nothrow.laneCountF32()
+    )
 }
 
 @inline(never)

@@ -327,7 +327,7 @@ public func highwayStoreFirstI8ConstantCountLaneCount(
     _ a: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstI8(a.raw, to, SIMDInt8.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstI8(a.raw, to, HighwayReference.Nothrow.laneCountI8())
 }
 
 @inline(never)
@@ -343,7 +343,11 @@ public func highwayStoreFirstI8ConstantCountTwiceLaneCount(
     _ a: SIMDInt8.Vector,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstI8(a.raw, to, 2 * SIMDInt8.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstI8(
+        a.raw,
+        to,
+        2 * HighwayReference.Nothrow.laneCountI8()
+    )
 }
 
 @inline(never)
@@ -445,7 +449,11 @@ public func highwayStoreRepeatingI8ConstantCountLaneCount(
     _ value: Int8,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingI8(SIMDInt8.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingI8(
+        HighwayReference.Nothrow.laneCountI8(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -461,7 +469,11 @@ public func highwayStoreRepeatingI8ConstantCountTwiceLaneCount(
     _ value: Int8,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingI8(2 * SIMDInt8.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingI8(
+        2 * HighwayReference.Nothrow.laneCountI8(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -518,7 +530,7 @@ public func highwayCopyI8ConstantCountLaneCount(
     from: UnsafePointer<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.Nothrow.copyI8(SIMDInt8.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyI8(HighwayReference.Nothrow.laneCountI8(), from, to)
 }
 
 @inline(never)
@@ -534,7 +546,7 @@ public func highwayCopyI8ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe HighwayReference.Nothrow.copyI8(2 * SIMDInt8.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyI8(2 * HighwayReference.Nothrow.laneCountI8(), from, to)
 }
 
 @inline(never)

@@ -61,7 +61,9 @@ public func portFirstLanesF32ConstantCountLaneCount() -> SIMDFloat.Mask {
 
 @inline(never)
 public func highwayFirstLanesF32ConstantCountLaneCount() -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.firstLanesF32(SIMDFloat.laneCount))
+    SIMDFloat.Mask(
+        raw: HighwayReference.Nothrow.firstLanesF32(HighwayReference.Nothrow.laneCountF32())
+    )
 }
 
 @inline(never)
@@ -71,7 +73,9 @@ public func portFirstLanesF32ConstantCountTwiceLaneCount() -> SIMDFloat.Mask {
 
 @inline(never)
 public func highwayFirstLanesF32ConstantCountTwiceLaneCount() -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.firstLanesF32(2 * SIMDFloat.laneCount))
+    SIMDFloat.Mask(
+        raw: HighwayReference.Nothrow.firstLanesF32(2 * HighwayReference.Nothrow.laneCountF32())
+    )
 }
 
 @inline(never)

@@ -157,7 +157,11 @@ public func highwayGatherFirstI64ConstantCountLaneCount(
     indices: SIMDInt64.Vector
 ) -> SIMDInt64.Vector {
     unsafe SIMDInt64.Vector(
-        raw: HighwayReference.Nothrow.gatherFirstI64(from, indices.raw, SIMDInt64.laneCount)
+        raw: HighwayReference.Nothrow.gatherFirstI64(
+            from,
+            indices.raw,
+            HighwayReference.Nothrow.laneCountI64()
+        )
     )
 }
 
@@ -175,7 +179,11 @@ public func highwayGatherFirstI64ConstantCountTwiceLaneCount(
     indices: SIMDInt64.Vector
 ) -> SIMDInt64.Vector {
     unsafe SIMDInt64.Vector(
-        raw: HighwayReference.Nothrow.gatherFirstI64(from, indices.raw, 2 * SIMDInt64.laneCount)
+        raw: HighwayReference.Nothrow.gatherFirstI64(
+            from,
+            indices.raw,
+            2 * HighwayReference.Nothrow.laneCountI64()
+        )
     )
 }
 
@@ -331,7 +339,7 @@ public func highwayGatherFirstOtherwiseI64ConstantCountLaneCount(
             otherwise.raw,
             from,
             indices.raw,
-            SIMDInt64.laneCount
+            HighwayReference.Nothrow.laneCountI64()
         )
     )
 }
@@ -361,7 +369,7 @@ public func highwayGatherFirstOtherwiseI64ConstantCountTwiceLaneCount(
             otherwise.raw,
             from,
             indices.raw,
-            2 * SIMDInt64.laneCount
+            2 * HighwayReference.Nothrow.laneCountI64()
         )
     )
 }
@@ -723,7 +731,12 @@ public func highwayScatterFirstI64ConstantCountLaneCount(
     to: UnsafeMutablePointer<Int64>,
     indices: SIMDInt64.Vector
 ) {
-    unsafe HighwayReference.Nothrow.scatterFirstI64(a.raw, to, indices.raw, SIMDInt64.laneCount)
+    unsafe HighwayReference.Nothrow.scatterFirstI64(
+        a.raw,
+        to,
+        indices.raw,
+        HighwayReference.Nothrow.laneCountI64()
+    )
 }
 
 @inline(never)
@@ -741,7 +754,12 @@ public func highwayScatterFirstI64ConstantCountTwiceLaneCount(
     to: UnsafeMutablePointer<Int64>,
     indices: SIMDInt64.Vector
 ) {
-    unsafe HighwayReference.Nothrow.scatterFirstI64(a.raw, to, indices.raw, 2 * SIMDInt64.laneCount)
+    unsafe HighwayReference.Nothrow.scatterFirstI64(
+        a.raw,
+        to,
+        indices.raw,
+        2 * HighwayReference.Nothrow.laneCountI64()
+    )
 }
 
 @inline(never)

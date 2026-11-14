@@ -331,7 +331,11 @@ public func highwayStoreFirstI32ConstantCountLaneCount(
     _ a: SIMDInt32.Vector,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstI32(a.raw, to, SIMDInt32.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstI32(
+        a.raw,
+        to,
+        HighwayReference.Nothrow.laneCountI32()
+    )
 }
 
 @inline(never)
@@ -347,7 +351,11 @@ public func highwayStoreFirstI32ConstantCountTwiceLaneCount(
     _ a: SIMDInt32.Vector,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstI32(a.raw, to, 2 * SIMDInt32.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstI32(
+        a.raw,
+        to,
+        2 * HighwayReference.Nothrow.laneCountI32()
+    )
 }
 
 @inline(never)
@@ -455,7 +463,11 @@ public func highwayStoreRepeatingI32ConstantCountLaneCount(
     _ value: Int32,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingI32(SIMDInt32.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingI32(
+        HighwayReference.Nothrow.laneCountI32(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -471,7 +483,11 @@ public func highwayStoreRepeatingI32ConstantCountTwiceLaneCount(
     _ value: Int32,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingI32(2 * SIMDInt32.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingI32(
+        2 * HighwayReference.Nothrow.laneCountI32(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -532,7 +548,7 @@ public func highwayCopyI32ConstantCountLaneCount(
     from: UnsafePointer<Int32>,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe HighwayReference.Nothrow.copyI32(SIMDInt32.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyI32(HighwayReference.Nothrow.laneCountI32(), from, to)
 }
 
 @inline(never)
@@ -548,7 +564,7 @@ public func highwayCopyI32ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int32>,
     to: UnsafeMutablePointer<Int32>
 ) {
-    unsafe HighwayReference.Nothrow.copyI32(2 * SIMDInt32.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyI32(2 * HighwayReference.Nothrow.laneCountI32(), from, to)
 }
 
 @inline(never)

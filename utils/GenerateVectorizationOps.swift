@@ -733,15 +733,29 @@ enum ImmediateBound {
 struct CodegenAlternative {
     let name: String
     let value: (Element) -> String
+    var highwayValue: ((Element) -> String)?
     var fitsOneVector = true
+}
+
+func highwayLaneCount(of element: Element) -> String {
+    referenceCall(
+        referenceFunctionName("laneCount", element),
+        [],
+        in: referenceNothrowNamespace
+    )
 }
 
 let codegenCountAlternatives = [
     CodegenAlternative(name: "two", value: { _ in "2" }),
-    CodegenAlternative(name: "laneCount", value: { "\($0.namespace).laneCount" }),
+    CodegenAlternative(
+        name: "laneCount",
+        value: { "\($0.namespace).laneCount" },
+        highwayValue: highwayLaneCount
+    ),
     CodegenAlternative(
         name: "twiceLaneCount",
         value: { "2 * \($0.namespace).laneCount" },
+        highwayValue: { "2 * \(highwayLaneCount(of: $0))" },
         fitsOneVector: false
     ),
 ]
@@ -44970,7 +44984,7 @@ func codegenConstant(
     case .laneAmount, .roundConstant, .laneIndex, .tupleIndex: return ("1", "1")
     case .count:
         let value = alternative?.value(element) ?? "1"
-        return (value, value)
+        return (value, alternative?.highwayValue?(element) ?? value)
     case .immediate:
         let value = alternative?.value(element) ?? String(immediate?.codegenValue ?? 1)
         return (value, value)

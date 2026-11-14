@@ -353,7 +353,11 @@ public func highwayStoreFirstU16ConstantCountLaneCount(
     _ a: SIMDUInt16.Vector,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstU16(a.raw, to, SIMDUInt16.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstU16(
+        a.raw,
+        to,
+        HighwayReference.Nothrow.laneCountU16()
+    )
 }
 
 @inline(never)
@@ -369,7 +373,11 @@ public func highwayStoreFirstU16ConstantCountTwiceLaneCount(
     _ a: SIMDUInt16.Vector,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstU16(a.raw, to, 2 * SIMDUInt16.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstU16(
+        a.raw,
+        to,
+        2 * HighwayReference.Nothrow.laneCountU16()
+    )
 }
 
 @inline(never)
@@ -481,7 +489,11 @@ public func highwayStoreRepeatingU16ConstantCountLaneCount(
     _ value: UInt16,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingU16(SIMDUInt16.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingU16(
+        HighwayReference.Nothrow.laneCountU16(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -497,7 +509,11 @@ public func highwayStoreRepeatingU16ConstantCountTwiceLaneCount(
     _ value: UInt16,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingU16(2 * SIMDUInt16.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingU16(
+        2 * HighwayReference.Nothrow.laneCountU16(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -563,7 +579,7 @@ public func highwayCopyU16ConstantCountLaneCount(
     from: UnsafePointer<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe HighwayReference.Nothrow.copyU16(SIMDUInt16.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyU16(HighwayReference.Nothrow.laneCountU16(), from, to)
 }
 
 @inline(never)
@@ -579,7 +595,7 @@ public func highwayCopyU16ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt16>,
     to: UnsafeMutablePointer<UInt16>
 ) {
-    unsafe HighwayReference.Nothrow.copyU16(2 * SIMDUInt16.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyU16(2 * HighwayReference.Nothrow.laneCountU16(), from, to)
 }
 
 @inline(never)

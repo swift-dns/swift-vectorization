@@ -367,7 +367,9 @@ public func portLoadFirstU64ConstantCountLaneCount(
 public func highwayLoadFirstU64ConstantCountLaneCount(
     from: UnsafePointer<UInt64>
 ) -> SIMDUInt64.Vector {
-    unsafe SIMDUInt64.Vector(raw: HighwayReference.Nothrow.loadFirstU64(from, SIMDUInt64.laneCount))
+    unsafe SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.loadFirstU64(from, HighwayReference.Nothrow.laneCountU64())
+    )
 }
 
 @inline(never)
@@ -382,7 +384,10 @@ public func highwayLoadFirstU64ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt64>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstU64(from, 2 * SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstU64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -549,7 +554,7 @@ public func highwayLoadFirstOtherwiseU64ConstantCountLaneCount(
         raw: HighwayReference.Nothrow.loadFirstOtherwiseU64(
             otherwise.raw,
             from,
-            SIMDUInt64.laneCount
+            HighwayReference.Nothrow.laneCountU64()
         )
     )
 }
@@ -571,7 +576,7 @@ public func highwayLoadFirstOtherwiseU64ConstantCountTwiceLaneCount(
         raw: HighwayReference.Nothrow.loadFirstOtherwiseU64(
             otherwise.raw,
             from,
-            2 * SIMDUInt64.laneCount
+            2 * HighwayReference.Nothrow.laneCountU64()
         )
     )
 }
@@ -725,7 +730,10 @@ public func highwayLoadFirstWideningU8ToU64ConstantCountLaneCount(
     from: UnsafePointer<UInt8>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstWideningU8ToU64(from, SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstWideningU8ToU64(
+            from,
+            HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -741,7 +749,10 @@ public func highwayLoadFirstWideningU8ToU64ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt8>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstWideningU8ToU64(from, 2 * SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstWideningU8ToU64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -801,7 +812,10 @@ public func highwayLoadFirstWideningU16ToU64ConstantCountLaneCount(
     from: UnsafePointer<UInt16>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstWideningU16ToU64(from, SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstWideningU16ToU64(
+            from,
+            HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -817,7 +831,10 @@ public func highwayLoadFirstWideningU16ToU64ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt16>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstWideningU16ToU64(from, 2 * SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstWideningU16ToU64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -877,7 +894,10 @@ public func highwayLoadFirstWideningU32ToU64ConstantCountLaneCount(
     from: UnsafePointer<UInt32>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstWideningU32ToU64(from, SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstWideningU32ToU64(
+            from,
+            HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -893,7 +913,10 @@ public func highwayLoadFirstWideningU32ToU64ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt32>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstWideningU32ToU64(from, 2 * SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstWideningU32ToU64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -953,7 +976,10 @@ public func highwayLoadFirstWideningF32ToU64ConstantCountLaneCount(
     from: UnsafePointer<Float>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstWideningF32ToU64(from, SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstWideningF32ToU64(
+            from,
+            HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }
 
@@ -969,6 +995,9 @@ public func highwayLoadFirstWideningF32ToU64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Float>
 ) -> SIMDUInt64.Vector {
     unsafe SIMDUInt64.Vector(
-        raw: HighwayReference.Nothrow.loadFirstWideningF32ToU64(from, 2 * SIMDUInt64.laneCount)
+        raw: HighwayReference.Nothrow.loadFirstWideningF32ToU64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountU64()
+        )
     )
 }

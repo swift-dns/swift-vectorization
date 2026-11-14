@@ -328,7 +328,7 @@ public func highwayStoreFirstF64ConstantCountLaneCount(
     _ a: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstF64(a, to, SIMDDouble.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstF64(a, to, HighwayReference.Nothrow.laneCountF64())
 }
 
 @inline(never)
@@ -344,7 +344,11 @@ public func highwayStoreFirstF64ConstantCountTwiceLaneCount(
     _ a: SIMDDouble.Vector,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.Nothrow.storeFirstF64(a, to, 2 * SIMDDouble.laneCount)
+    unsafe HighwayReference.Nothrow.storeFirstF64(
+        a,
+        to,
+        2 * HighwayReference.Nothrow.laneCountF64()
+    )
 }
 
 @inline(never)
@@ -456,7 +460,11 @@ public func highwayStoreRepeatingF64ConstantCountLaneCount(
     _ value: Double,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingF64(SIMDDouble.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingF64(
+        HighwayReference.Nothrow.laneCountF64(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -472,7 +480,11 @@ public func highwayStoreRepeatingF64ConstantCountTwiceLaneCount(
     _ value: Double,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.Nothrow.storeRepeatingF64(2 * SIMDDouble.laneCount, value, to)
+    unsafe HighwayReference.Nothrow.storeRepeatingF64(
+        2 * HighwayReference.Nothrow.laneCountF64(),
+        value,
+        to
+    )
 }
 
 @inline(never)
@@ -538,7 +550,7 @@ public func highwayCopyF64ConstantCountLaneCount(
     from: UnsafePointer<Double>,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.Nothrow.copyF64(SIMDDouble.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyF64(HighwayReference.Nothrow.laneCountF64(), from, to)
 }
 
 @inline(never)
@@ -554,7 +566,7 @@ public func highwayCopyF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Double>,
     to: UnsafeMutablePointer<Double>
 ) {
-    unsafe HighwayReference.Nothrow.copyF64(2 * SIMDDouble.laneCount, from, to)
+    unsafe HighwayReference.Nothrow.copyF64(2 * HighwayReference.Nothrow.laneCountF64(), from, to)
 }
 
 @inline(never)

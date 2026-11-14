@@ -217,7 +217,7 @@ public func portLoadFirstF32ConstantCountLaneCount(
 public func highwayLoadFirstF32ConstantCountLaneCount(
     from: UnsafePointer<Float>
 ) -> SIMDFloat.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstF32(from, SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.loadFirstF32(from, HighwayReference.Nothrow.laneCountF32())
 }
 
 @inline(never)
@@ -231,7 +231,7 @@ public func portLoadFirstF32ConstantCountTwiceLaneCount(
 public func highwayLoadFirstF32ConstantCountTwiceLaneCount(
     from: UnsafePointer<Float>
 ) -> SIMDFloat.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstF32(from, 2 * SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.loadFirstF32(from, 2 * HighwayReference.Nothrow.laneCountF32())
 }
 
 @inline(never)
@@ -381,7 +381,11 @@ public func highwayLoadFirstOtherwiseF32ConstantCountLaneCount(
     from: UnsafePointer<Float>,
     otherwise: SIMDFloat.Vector
 ) -> SIMDFloat.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF32(otherwise, from, SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF32(
+        otherwise,
+        from,
+        HighwayReference.Nothrow.laneCountF32()
+    )
 }
 
 @inline(never)
@@ -397,7 +401,11 @@ public func highwayLoadFirstOtherwiseF32ConstantCountTwiceLaneCount(
     from: UnsafePointer<Float>,
     otherwise: SIMDFloat.Vector
 ) -> SIMDFloat.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF32(otherwise, from, 2 * SIMDFloat.laneCount)
+    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF32(
+        otherwise,
+        from,
+        2 * HighwayReference.Nothrow.laneCountF32()
+    )
 }
 
 @inline(never)
