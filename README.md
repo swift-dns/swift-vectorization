@@ -97,10 +97,11 @@ on the portable C targets, whose ops follow highway's EMU128, they take EMU128's
 
 `SIMDTarget.target` is the target the ops were compiled for, as a `SIMDTargetSet`, which has
 highway's bit and name for each of highway's targets. `SIMDTarget.supportedTargets` is highway's
-`SupportedTargets()`: it mirrors highway's detection on x86 and arm, and where highway has none, as
-on other architectures, it reports the compiled baseline. `SIMDTarget.isSupported` is whether it
-contains `SIMDTarget.target`. Like highway's, the detection reports what the CPU advertises, so
-under Rosetta, which advertises no AVX, an AVX2 build reports itself unsupported although it runs.
+`SupportedTargets()`: it mirrors highway's detection on x86 and arm, and on other architectures,
+where highway also detects the CPU's targets, it reports the compiled baseline.
+`SIMDTarget.isSupported` is whether it contains `SIMDTarget.target`. Like highway's, the detection
+reports what the CPU advertises, so under Rosetta, which advertises no AVX, an AVX2 build reports
+itself unsupported although it runs.
 
 ## How it relates to highway
 

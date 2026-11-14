@@ -9,9 +9,9 @@ extension SIMDTarget {
 
     /// The targets the CPU supports, as highway's `SupportedTargets()` detects them.
     ///
-    /// Each call detects them anew, which on x86 runs the slow CPUID instruction. Where highway has
-    /// no detection, as on architectures other than x86 and arm, they are the targets the compiler
-    /// flags enable.
+    /// Each call detects them anew, which on x86 runs the slow CPUID instruction. On architectures
+    /// other than x86 and arm, where highway also detects the CPU's targets, they are the targets
+    /// the compiler flags enable.
     @export(implementation) @inline(always)
     public static var supportedTargets: SIMDTargetSet {
         SIMDTargetSet(rawValue: cvectorization_ops_supported_targets())
