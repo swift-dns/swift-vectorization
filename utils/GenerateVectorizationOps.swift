@@ -2366,7 +2366,8 @@ func sveAllLanesEqual(
 }
 
 func sveSplatFunction(for element: Element) -> String {
-    let bits = element.category == .float ? "(\(unsignedBits("v", of: element)))" : "v"
+    let isFloat = element.category == .float || element.category == .float16
+    let bits = isFloat ? "(\(unsignedBits("v", of: element)))" : "v"
     let function = cFunction(
         returns: "bool",
         name: cFunctionName("sveSplat", element),
@@ -33823,19 +33824,19 @@ let halfPrecisionBodies: [String: (Element) -> String] = [
     },
     "allBitsClear": { element in
         let unsigned = unsignedElement(of: element).at(width: element.width)
-        let zero = compoundLiteral(element.cVector, ["0"])
+        let zero = compoundLiteral(unsigned.cVector, ["0"])
         let allTrue = cFunctionName("allTrue", element)
         func allEqualToZero(_ operand: String, _ zero: String) -> String {
             "return \(allTrue)((\(element.cRawMask))(\(element.cMask))(\(operand) == \(zero)));"
         }
         return """
-            #if CVECTORIZATION_OPS_X86 || (\(neonCondition) == \(ArmLevel.neon.rawValue) && !(\(neonHasFloat16Condition)))
+            #if CVECTORIZATION_OPS_X86 || (\(neonCondition) == \(ArmLevel.neon.rawValue) && !(\(neonHasFloat16Condition))) || (!\(neonCondition) && HWY_STATIC_TARGET != HWY_EMU128)
             return \(cFunctionName("allBitsClear", unsigned))((\(unsigned.cRawVector))rawA);
             #elif \(neonHasFloat16Condition)
             \(halfPrecisionNativeVector(for: element))
             \(allEqualToZero("(native_vector)a", "(native_vector){0}"))
             #else
-            \(allEqualToZero("a", zero))
+            \(allEqualToZero("((\(unsigned.cVector))a << 1)", zero))
             #endif
             """
     },

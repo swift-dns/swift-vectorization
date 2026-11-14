@@ -106369,7 +106369,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_constant_lane_f16(cvectorizati
 #endif
 #if CVECTORIZATION_OPS_NEON == 2
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_f16(cvectorization_ops_vector_f16 v) {
-  const bool splat = __builtin_reduce_and(v == v[0]) != 0;
+  const bool splat = __builtin_reduce_and(((cvectorization_ops_vector_u16)v) == ((cvectorization_ops_vector_u16)v)[0]) != 0;
   return __builtin_constant_p(splat) && splat;
 }
 #endif
@@ -106653,31 +106653,31 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_all_bits_set_f16(cvectorizatio
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_all_bits_clear_f16(cvectorization_ops_raw_vector_f16 rawA) {
   const cvectorization_ops_vector_f16 a = (cvectorization_ops_vector_f16)rawA;
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
-#if CVECTORIZATION_OPS_X86 || (CVECTORIZATION_OPS_NEON == 1 && !(defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16))
+#if CVECTORIZATION_OPS_X86 || (CVECTORIZATION_OPS_NEON == 1 && !(defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16)) || (!CVECTORIZATION_OPS_NEON && HWY_STATIC_TARGET != HWY_EMU128)
   return cvectorization_ops_all_bits_clear_u16((cvectorization_ops_raw_vector_u16)rawA);
 #elif defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16
   typedef _Float16 native_vector __attribute__((vector_size(64)));
   return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)((native_vector)a == (native_vector){0}));
 #else
-  return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)(a == (cvectorization_ops_vector_f16){0}));
+  return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)(((cvectorization_ops_vector_u16)a << 1) == (cvectorization_ops_vector_u16){0}));
 #endif
 #elif CVECTORIZATION_OPS_X86 == 4
-#if CVECTORIZATION_OPS_X86 || (CVECTORIZATION_OPS_NEON == 1 && !(defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16))
+#if CVECTORIZATION_OPS_X86 || (CVECTORIZATION_OPS_NEON == 1 && !(defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16)) || (!CVECTORIZATION_OPS_NEON && HWY_STATIC_TARGET != HWY_EMU128)
   return cvectorization_ops_all_bits_clear_u16((cvectorization_ops_raw_vector_u16)rawA);
 #elif defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16
   typedef _Float16 native_vector __attribute__((vector_size(32)));
   return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)((native_vector)a == (native_vector){0}));
 #else
-  return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)(a == (cvectorization_ops_vector_f16){0}));
+  return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)(((cvectorization_ops_vector_u16)a << 1) == (cvectorization_ops_vector_u16){0}));
 #endif
 #else
-#if CVECTORIZATION_OPS_X86 || (CVECTORIZATION_OPS_NEON == 1 && !(defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16))
+#if CVECTORIZATION_OPS_X86 || (CVECTORIZATION_OPS_NEON == 1 && !(defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16)) || (!CVECTORIZATION_OPS_NEON && HWY_STATIC_TARGET != HWY_EMU128)
   return cvectorization_ops_all_bits_clear_u16((cvectorization_ops_raw_vector_u16)rawA);
 #elif defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16
   typedef _Float16 native_vector __attribute__((vector_size(16)));
   return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)((native_vector)a == (native_vector){0}));
 #else
-  return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)(a == (cvectorization_ops_vector_f16){0}));
+  return cvectorization_ops_all_true_f16((cvectorization_ops_raw_mask_f16)(cvectorization_ops_mask_f16)(((cvectorization_ops_vector_u16)a << 1) == (cvectorization_ops_vector_u16){0}));
 #endif
 #endif
 }
