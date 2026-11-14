@@ -141678,6 +141678,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_tuple4_bf16 cvectorization_ops_set4
   const cvectorization_ops_tuple4_u16 result = cvectorization_ops_set4_u16((cvectorization_ops_tuple4_u16){(cvectorization_ops_tuple_vector_u16)tuple.v0, (cvectorization_ops_tuple_vector_u16)tuple.v1, (cvectorization_ops_tuple_vector_u16)tuple.v2, (cvectorization_ops_tuple_vector_u16)tuple.v3}, index, (cvectorization_ops_raw_vector_u16)rawA);
   return (cvectorization_ops_tuple4_bf16){(cvectorization_ops_tuple_vector_bf16)result.v0, (cvectorization_ops_tuple_vector_bf16)result.v1, (cvectorization_ops_tuple_vector_bf16)result.v2, (cvectorization_ops_tuple_vector_bf16)result.v3};
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_indices_bf16(cvectorization_ops_raw_vector_i16 rawVector) {
+  return (cvectorization_ops_raw_vector_i16)cvectorization_ops_indices_u16((cvectorization_ops_raw_vector_u16)rawVector);
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_compressed_bf16(cvectorization_ops_raw_vector_bf16 rawA, cvectorization_ops_raw_mask_bf16 rawMask) {
   return (cvectorization_ops_raw_vector_bf16)cvectorization_ops_compressed_u16((cvectorization_ops_raw_vector_u16)rawA, (cvectorization_ops_raw_mask_u16)rawMask);
 }
@@ -141749,6 +141752,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_load_expanded_where_otherwise_bf16(cvectorization_ops_raw_vector_bf16 rawOtherwise, cvectorization_ops_raw_mask_bf16 rawMask, const void* from) {
   return (cvectorization_ops_raw_vector_bf16)cvectorization_ops_load_expanded_where_otherwise_u16((cvectorization_ops_raw_vector_u16)rawOtherwise, (cvectorization_ops_raw_mask_u16)rawMask, (const uint16_t*)from);
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_load_indices_bf16(const int16_t* from) {
+  return (cvectorization_ops_raw_vector_i16)cvectorization_ops_load_indices_u16((const uint16_t*)from);
+}
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_bf16(cvectorization_ops_raw_vector_bf16 rawA, void* to) {
   cvectorization_ops_store_streaming_u16((cvectorization_ops_raw_vector_u16)rawA, (uint16_t*)to);
 }
@@ -141781,6 +141787,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_zero_extending_bf16(cvectorization_ops_raw_half_vector_bf16 rawA) {
   return (cvectorization_ops_raw_vector_bf16)cvectorization_ops_zero_extending_u16((cvectorization_ops_raw_half_vector_u16)rawA);
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_bf16 cvectorization_ops_lower_half_of_mask_bf16(cvectorization_ops_raw_mask_bf16 rawMask) {
+  return (cvectorization_ops_raw_half_mask_bf16)cvectorization_ops_lower_half_of_mask_u16((cvectorization_ops_raw_mask_u16)rawMask);
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_block_bf16 cvectorization_ops_extracting_block_bf16(cvectorization_ops_raw_vector_bf16 rawA, int index) {
   return (cvectorization_ops_raw_block_bf16)cvectorization_ops_extracting_block_u16((cvectorization_ops_raw_vector_u16)rawA, index);

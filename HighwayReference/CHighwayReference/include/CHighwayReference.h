@@ -15794,6 +15794,11 @@ const auto result = hn::Set4<3>(hn::Create4(TupleTagBF16(), fromPortBF16(tuple.v
 return {toPortBF16(hn::Get4<0>(result)), toPortBF16(hn::Get4<1>(result)), toPortBF16(hn::Get4<2>(result)), toPortBF16(hn::Get4<3>(result))};
 }
 } }
+#if HWY_ARCH_ARM || HWY_TARGET == HWY_EMU128
+HWY_INLINE cvectorization_ops_raw_vector_i16 indicesBF16(cvectorization_ops_raw_vector_i16 vector) { return toPortI16(hn::BitCast(TagI16(), hn::TwoTablesLookupLanes(TagBF16(), hn::BitCast(TagBF16(), hn::Iota(TagI16(), static_cast<int16_t>(0))), hn::BitCast(TagBF16(), hn::Iota(TagI16(), static_cast<int16_t>(hn::Lanes(TagI16())))), hn::IndicesFromVec(TagBF16(), fromPortI16(vector))))); }
+#else
+HWY_INLINE cvectorization_ops_raw_vector_i16 indicesBF16(cvectorization_ops_raw_vector_i16 vector) { return (cvectorization_ops_raw_vector_i16)indicesU16((cvectorization_ops_raw_vector_u16)vector); }
+#endif
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask) { return toPortBF16(hn::Compress(fromPortBF16(a), maskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedNotBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask) { return toPortBF16(hn::CompressNot(fromPortBF16(a), maskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 expandedBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask) { return toPortBF16(hn::Expand(fromPortBF16(a), maskFromPortBF16(mask))); }
@@ -15985,6 +15990,11 @@ HWY_INLINE void copyBF16(size_t count, const void* from, void* to) { hn::SafeCop
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedBitsBF16(cvectorization_ops_raw_vector_bf16 a, const uint8_t* bits) { return toPortBF16(hn::CompressBits(fromPortBF16(a), bits)); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadExpandedWhereBF16(cvectorization_ops_raw_mask_bf16 mask, const void* from) { return toPortBF16(hn::LoadExpand(maskFromPortBF16(mask), TagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(from))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadExpandedWhereOtherwiseBF16(cvectorization_ops_raw_vector_bf16 otherwise, cvectorization_ops_raw_mask_bf16 mask, const void* from) { return toPortBF16(hn::MaskedLoadExpandOr(fromPortBF16(otherwise), maskFromPortBF16(mask), TagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(from))); }
+#if HWY_ARCH_ARM || HWY_TARGET == HWY_EMU128
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadIndicesBF16(const int16_t* from) { return toPortI16(hn::BitCast(TagI16(), hn::TableLookupLanes(hn::BitCast(TagBF16(), hn::Iota(TagI16(), 0)), hn::SetTableIndices(TagBF16(), from)))); }
+#else
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadIndicesBF16(const int16_t* from) { return (cvectorization_ops_raw_vector_i16)loadIndicesU16((const uint16_t*)from); }
+#endif
 HWY_INLINE void storeStreamingBF16(cvectorization_ops_raw_vector_bf16 a, void* to) { 
 #if HWY_TARGET_IS_SVE && !HWY_SVE_HAVE_BF16_FEATURE
 hn::Stream(hn::BitCast(hn::RebindToUnsigned<TagBF16>(), fromPortBF16(a)), hn::RebindToUnsigned<TagBF16>(), reinterpret_cast<uint16_t*>(to))
@@ -16002,6 +16012,7 @@ HWY_INLINE cvectorization_ops_raw_half_vector_bf16 lowerHalfBF16(cvectorization_
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 upperHalfBF16(cvectorization_ops_raw_vector_bf16 a) { return halfToPortBF16(hn::UpperHalf(HalfTagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 combiningBF16(cvectorization_ops_raw_half_vector_bf16 a, cvectorization_ops_raw_half_vector_bf16 b) { return toPortBF16(hn::Combine(TagBF16(), halfFromPortBF16(a), halfFromPortBF16(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 zeroExtendingBF16(cvectorization_ops_raw_half_vector_bf16 a) { return toPortBF16(hn::ZeroExtendVector(TagBF16(), halfFromPortBF16(a))); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 lowerHalfOfMaskBF16(cvectorization_ops_raw_mask_bf16 mask) { return halfMaskToPortBF16(hn::LowerHalfOfMask(HalfTagBF16(), maskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_block_bf16 extractingBlockBF16(cvectorization_ops_raw_vector_bf16 a, int index) {
   switch (index) {
   case 0: return blockToPortBF16(hn::ExtractBlock<0>(fromPortBF16(a)));
@@ -27478,6 +27489,7 @@ HWY_INLINE cvectorization_ops_tuple3_bf16 set3BF16(cvectorization_ops_tuple3_bf1
 HWY_INLINE cvectorization_ops_tuple4_bf16 create4BF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_bf16 c, cvectorization_ops_raw_vector_bf16 d) noexcept { return ::HighwayReference::create4BF16(a, b, c, d); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 get4BF16(cvectorization_ops_tuple4_bf16 tuple, size_t index) noexcept { return ::HighwayReference::get4BF16(tuple, index); }
 HWY_INLINE cvectorization_ops_tuple4_bf16 set4BF16(cvectorization_ops_tuple4_bf16 tuple, size_t index, cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::set4BF16(tuple, index, a); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 indicesBF16(cvectorization_ops_raw_vector_i16 vector) noexcept { return ::HighwayReference::indicesBF16(vector); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask) noexcept { return ::HighwayReference::compressedBF16(a, mask); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedNotBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask) noexcept { return ::HighwayReference::compressedNotBF16(a, mask); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 expandedBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask) noexcept { return ::HighwayReference::expandedBF16(a, mask); }
@@ -27501,6 +27513,7 @@ HWY_INLINE void copyBF16(size_t count, const void* from, void* to) noexcept { ::
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedBitsBF16(cvectorization_ops_raw_vector_bf16 a, const uint8_t* bits) noexcept { return ::HighwayReference::compressedBitsBF16(a, bits); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadExpandedWhereBF16(cvectorization_ops_raw_mask_bf16 mask, const void* from) noexcept { return ::HighwayReference::loadExpandedWhereBF16(mask, from); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadExpandedWhereOtherwiseBF16(cvectorization_ops_raw_vector_bf16 otherwise, cvectorization_ops_raw_mask_bf16 mask, const void* from) noexcept { return ::HighwayReference::loadExpandedWhereOtherwiseBF16(otherwise, mask, from); }
+HWY_INLINE cvectorization_ops_raw_vector_i16 loadIndicesBF16(const int16_t* from) noexcept { return ::HighwayReference::loadIndicesBF16(from); }
 HWY_INLINE void storeStreamingBF16(cvectorization_ops_raw_vector_bf16 a, void* to) noexcept { ::HighwayReference::storeStreamingBF16(a, to); }
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 loadHalfBF16(const void* from) noexcept { return ::HighwayReference::loadHalfBF16(from); }
 HWY_INLINE void storeHalfBF16(cvectorization_ops_raw_half_vector_bf16 a, void* to) noexcept { ::HighwayReference::storeHalfBF16(a, to); }
@@ -27512,6 +27525,7 @@ HWY_INLINE cvectorization_ops_raw_half_vector_bf16 lowerHalfBF16(cvectorization_
 HWY_INLINE cvectorization_ops_raw_half_vector_bf16 upperHalfBF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::upperHalfBF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 combiningBF16(cvectorization_ops_raw_half_vector_bf16 a, cvectorization_ops_raw_half_vector_bf16 b) noexcept { return ::HighwayReference::combiningBF16(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 zeroExtendingBF16(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::zeroExtendingBF16(a); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 lowerHalfOfMaskBF16(cvectorization_ops_raw_mask_bf16 mask) noexcept { return ::HighwayReference::lowerHalfOfMaskBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_block_bf16 extractingBlockBF16(cvectorization_ops_raw_vector_bf16 a, int index) noexcept { return ::HighwayReference::extractingBlockBF16(a, index); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 replacingBlockBF16(cvectorization_ops_raw_vector_bf16 a, int index, cvectorization_ops_raw_block_bf16 b) noexcept { return ::HighwayReference::replacingBlockBF16(a, index, b); }
 HWY_INLINE cvectorization_ops_raw_mask_bf16 maskRebindingU16ToBF16(cvectorization_ops_raw_mask_u16 mask) noexcept { return ::HighwayReference::maskRebindingU16ToBF16(mask); }

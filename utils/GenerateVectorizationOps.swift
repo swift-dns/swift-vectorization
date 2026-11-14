@@ -33863,7 +33863,7 @@ let bitwiseHalfPrecisionOps: [String: [Element]] = [
     "create4": halfPrecisionElements,
     "get4": halfPrecisionElements,
     "set4": halfPrecisionElements,
-    "indices": [float16],
+    "indices": halfPrecisionElements,
     "compressed": halfPrecisionElements,
     "compressedNot": halfPrecisionElements,
     "partitioned": [float16],
@@ -33899,13 +33899,13 @@ let bitwiseHalfPrecisionOps: [String: [Element]] = [
     "storeCompressedBits": [float16],
     "loadExpandedWhere": halfPrecisionElements,
     "loadExpandedWhereOtherwise": halfPrecisionElements,
-    "loadIndices": [float16],
+    "loadIndices": halfPrecisionElements,
     "storeStreaming": halfPrecisionElements,
     "lowerHalf": halfPrecisionElements,
     "upperHalf": halfPrecisionElements,
     "combining": halfPrecisionElements,
     "zeroExtending": halfPrecisionElements,
-    "lowerHalfOfMask": [float16],
+    "lowerHalfOfMask": halfPrecisionElements,
     "upperHalfOfMask": [float16],
     "combiningMasks": [float16],
     "extractingBlock": halfPrecisionElements,
@@ -34169,6 +34169,10 @@ let float16ComposedOps: Set<String> = [
 ]
 
 let nativeFloat16Condition = "(HWY_HAVE_FLOAT16 && HWY_ARCH_ARM) || HWY_TARGET == HWY_EMU128"
+
+let bfloat16ComposedOps: Set<String> = ["indices", "loadIndices"]
+
+let bfloat16LookupCondition = "HWY_ARCH_ARM || HWY_TARGET == HWY_EMU128"
 
 let float16ReferenceCompositions: [String: ([String]) -> String] = [
     "magnitude": { arguments in
@@ -38457,6 +38461,9 @@ func referenceOpFunctions(of op: Op, for element: Element) -> ReferenceFunctions
     if element.category == .float16 && float16ComposedOps.contains(op.identifier) {
         let composition = halfPrecisionComposition(of: op, for: element, declarations: declarations)
         functions = "#if \(nativeFloat16Condition)\n\(functions)#else\n\(composition)#endif\n"
+    } else if element.category == .bfloat16 && bfloat16ComposedOps.contains(op.identifier) {
+        let composition = halfPrecisionComposition(of: op, for: element, declarations: declarations)
+        functions = "#if \(bfloat16LookupCondition)\n\(functions)#else\n\(composition)#endif\n"
     }
     return (functions, nothrow)
 }

@@ -246,6 +246,11 @@ extension SIMDBFloat16 {
     #endif
 
     @export(implementation) @inline(always)
+    public static func lowerHalf(_ mask: Mask) -> HalfMask {
+        HalfMask(raw: cvectorization_ops_lower_half_of_mask_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func allFalse(_ mask: Mask) -> Bool {
         cvectorization_ops_all_false_bf16(mask.raw)
     }
@@ -1495,6 +1500,67 @@ extension SIMDBFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func indices(from vector: Indices) -> Indices {
+        precondition(
+            cvectorization_ops_indices_within_i16(vector.raw, 0, 2 * laneCount),
+            "Lane index is negative or at least twice as many as a vector has lanes"
+        )
+        return unsafe indices(fromUnchecked: vector)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func indices(fromUnchecked vector: Indices) -> Indices {
+        assert(
+            cvectorization_ops_indices_within_i16(vector.raw, 0, 2 * laneCount),
+            "Lane index is negative or at least twice as many as a vector has lanes"
+        )
+        return Indices(raw: cvectorization_ops_indices_bf16(vector.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func loadIndices(from: UnsafePointer<Int16>) -> Indices {
+        Indices(raw: unsafe cvectorization_ops_load_indices_bf16(from))
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func loadIndices(from span: Span<Int16>) -> Indices {
+        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        precondition(
+            span.withUnsafeBufferPointer {
+                cvectorization_ops_indices_within_i16(
+                    unsafe cvectorization_ops_load_indices_bf16($0.baseAddress.unsafelyUnwrapped),
+                    0,
+                    2 * laneCount
+                )
+            },
+            "Lane index is negative or at least twice as many as a vector has lanes"
+        )
+        return unsafe loadIndices(fromUnchecked: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func loadIndices(fromUnchecked span: Span<Int16>) -> Indices {
+        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        assert(
+            span.withUnsafeBufferPointer {
+                cvectorization_ops_indices_within_i16(
+                    unsafe cvectorization_ops_load_indices_bf16($0.baseAddress.unsafelyUnwrapped),
+                    0,
+                    2 * laneCount
+                )
+            },
+            "Lane index is negative or at least twice as many as a vector has lanes"
+        )
+        return span.withUnsafeBufferPointer {
+            Indices(
+                raw: unsafe cvectorization_ops_load_indices_bf16($0.baseAddress.unsafelyUnwrapped)
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
     public static func slide1Up(_ a: Vector) -> Vector {
         Vector(raw: cvectorization_ops_slide1_up_bf16(a.raw))
     }
@@ -1755,42 +1821,6 @@ extension SIMDBFloat16 {
                     v3: tuple.3.raw
                 ),
                 index
-            )
-        )
-    }
-
-    @export(implementation) @inline(always)
-    public static func set4(
-        _ tuple: (Vector, Vector, Vector, Vector),
-        at index: Int,
-        to a: Vector
-    ) -> (Vector, Vector, Vector, Vector) {
-        precondition(index >= 0 && index < 4, "Tuple index is negative or at least 4")
-        return unsafe set4(tuple, atUnchecked: index, to: a)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func set4(
-        _ tuple: (Vector, Vector, Vector, Vector),
-        atUnchecked index: Int,
-        to a: Vector
-    ) -> (Vector, Vector, Vector, Vector) {
-        assert(index >= 0 && index < 4, "Tuple index is negative or at least 4")
-        return { tuple in
-            (
-                Vector(raw: tuple.v0), Vector(raw: tuple.v1), Vector(raw: tuple.v2),
-                Vector(raw: tuple.v3)
-            )
-        }(
-            cvectorization_ops_set4_bf16(
-                cvectorization_ops_tuple4_bf16(
-                    v0: tuple.0.raw,
-                    v1: tuple.1.raw,
-                    v2: tuple.2.raw,
-                    v3: tuple.3.raw
-                ),
-                index,
-                a.raw
             )
         )
     }
