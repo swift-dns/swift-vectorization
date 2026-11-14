@@ -359,6 +359,26 @@ public func highwayExponentF64ConstantA() -> SIMDDouble.Vector {
 }
 
 @inline(never)
+public func portMantissaF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    SIMDDouble.mantissa(a)
+}
+
+@inline(never)
+public func highwayMantissaF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.mantissaF64(a)
+}
+
+@inline(never)
+public func portMantissaF64ConstantA() -> SIMDDouble.Vector {
+    SIMDDouble.mantissa(SIMDDouble.repeating(1.5))
+}
+
+@inline(never)
+public func highwayMantissaF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.mantissaF64(HighwayReference.Nothrow.repeatingF64(1.5))
+}
+
+@inline(never)
 public func portPairwiseAddingF64(
     _ a: SIMDDouble.Vector,
     _ b: SIMDDouble.Vector

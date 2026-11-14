@@ -12022,6 +12022,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 squareRootF32(cvectorization_ops_ra
 HWY_INLINE cvectorization_ops_raw_vector_f32 approximateReciprocalSquareRootF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::ApproximateReciprocalSqrt(fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 approximateReciprocalF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::ApproximateReciprocal(fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 exponentF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::GetExponent(fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 mantissaF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::GetMantissa0p75_1p5(fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::MulAdd(fromPortF32(a), fromPortF32(b), fromPortF32(c))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 negatedMultiplyAddingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::NegMulAdd(fromPortF32(a), fromPortF32(b), fromPortF32(c))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplySubtractingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::MulSub(fromPortF32(a), fromPortF32(b), fromPortF32(c))); }
@@ -12912,6 +12913,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 squareRootF64(cvectorization_ops_ra
 HWY_INLINE cvectorization_ops_raw_vector_f64 approximateReciprocalSquareRootF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::ApproximateReciprocalSqrt(fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 approximateReciprocalF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::ApproximateReciprocal(fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 exponentF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::GetExponent(fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 mantissaF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::GetMantissa0p75_1p5(fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 multiplyAddingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) { return toPortF64(hn::MulAdd(fromPortF64(a), fromPortF64(b), fromPortF64(c))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 negatedMultiplyAddingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) { return toPortF64(hn::NegMulAdd(fromPortF64(a), fromPortF64(b), fromPortF64(c))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 multiplySubtractingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) { return toPortF64(hn::MulSub(fromPortF64(a), fromPortF64(b), fromPortF64(c))); }
@@ -26297,6 +26299,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 squareRootF32(cvectorization_ops_ra
 HWY_INLINE cvectorization_ops_raw_vector_f32 approximateReciprocalSquareRootF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::approximateReciprocalSquareRootF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 approximateReciprocalF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::approximateReciprocalF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 exponentF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::exponentF32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 mantissaF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::mantissaF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) noexcept { return ::HighwayReference::multiplyAddingF32(a, b, c); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 negatedMultiplyAddingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) noexcept { return ::HighwayReference::negatedMultiplyAddingF32(a, b, c); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplySubtractingF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) noexcept { return ::HighwayReference::multiplySubtractingF32(a, b, c); }
@@ -26589,6 +26592,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 squareRootF64(cvectorization_ops_ra
 HWY_INLINE cvectorization_ops_raw_vector_f64 approximateReciprocalSquareRootF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::approximateReciprocalSquareRootF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 approximateReciprocalF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::approximateReciprocalF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 exponentF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::exponentF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 mantissaF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::mantissaF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 multiplyAddingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) noexcept { return ::HighwayReference::multiplyAddingF64(a, b, c); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 negatedMultiplyAddingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) noexcept { return ::HighwayReference::negatedMultiplyAddingF64(a, b, c); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 multiplySubtractingF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) noexcept { return ::HighwayReference::multiplySubtractingF64(a, b, c); }

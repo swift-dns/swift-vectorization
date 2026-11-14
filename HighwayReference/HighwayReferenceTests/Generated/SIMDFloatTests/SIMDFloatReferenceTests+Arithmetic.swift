@@ -159,6 +159,15 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func mantissa() {
+        let mismatches = Mismatches("mantissa")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xADD2_EBCD_9A6C_8946)
+        for a in aInputs {
+            mismatches.check(H.mantissa(a), HighwayReference.mantissaF32(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func pairwiseAdding() {
         let mismatches = Mismatches("pairwiseAdding")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0C98_432B_0CDA_D8D3)

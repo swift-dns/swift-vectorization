@@ -381,6 +381,21 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func mantissa() {
+        let mismatches = Mismatches("portMantissaF64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA38D_B48C_7891_5783)
+        for a in aInputs {
+            mismatches.check(portMantissaF64(a), highwayMantissaF64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func mantissaConstantA() {
+        let mismatches = Mismatches("portMantissaF64ConstantA")
+        mismatches.check(portMantissaF64ConstantA(), highwayMantissaF64ConstantA(), "")
+        mismatches.record()
+    }
+
     @Test func pairwiseAdding() {
         let mismatches = Mismatches("portPairwiseAddingF64")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5082_052D_DEC2_6AFA)

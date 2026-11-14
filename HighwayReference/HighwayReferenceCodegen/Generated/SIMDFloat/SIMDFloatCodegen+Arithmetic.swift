@@ -355,6 +355,26 @@ public func highwayExponentF32ConstantA() -> SIMDFloat.Vector {
 }
 
 @inline(never)
+public func portMantissaF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+    SIMDFloat.mantissa(a)
+}
+
+@inline(never)
+public func highwayMantissaF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
+    HighwayReference.Nothrow.mantissaF32(a)
+}
+
+@inline(never)
+public func portMantissaF32ConstantA() -> SIMDFloat.Vector {
+    SIMDFloat.mantissa(SIMDFloat.repeating(1.5))
+}
+
+@inline(never)
+public func highwayMantissaF32ConstantA() -> SIMDFloat.Vector {
+    HighwayReference.Nothrow.mantissaF32(HighwayReference.Nothrow.repeatingF32(1.5))
+}
+
+@inline(never)
 public func portPairwiseAddingF32(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> SIMDFloat.Vector
 {
     SIMDFloat.pairwiseAdding(a, b)

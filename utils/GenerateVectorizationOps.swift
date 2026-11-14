@@ -2950,6 +2950,7 @@ func x86UnsuffixedBits(_ width: Int) -> String {
 
 let x86CurrentRounding = 4
 let x86FloorRounding = 9
+let x86PositiveMantissaFrom0p75To1p5 = 7
 
 func x86LaneLetter(bits: Int) -> String {
     guard let letter = [8: "b", 16: "w", 32: "d", 64: "q"][bits] else {
@@ -12478,6 +12479,48 @@ func portableExponent(for element: Element) -> String {
         """
 }
 
+func mantissaMask(of element: Element) -> UInt64 {
+    (UInt64(1) << UInt64(mantissaBits(of: element))) - 1
+}
+
+func threeQuartersBits(of element: Element) -> UInt64 {
+    element.bits == 32 ? UInt64(Float(0.75).bitPattern) : (0.75).bitPattern
+}
+
+func portableMantissa(for element: Element) -> String {
+    let unsigned = element.cUnsignedVector
+    let mask = mantissaMask(of: element)
+    func lanes(_ bits: UInt64) -> String {
+        splat("0x\(String(bits, radix: 16))", as: unsigned, lanes: element.laneCount)
+    }
+    let wrapped = "(((\(unsigned))a + \(lanes(mask / 2 + 1))) & \(lanes(mask)))"
+    return vectorResult(
+        fromUnsignedBits("\(wrapped) + \(lanes(threeQuartersBits(of: element)))", of: element),
+        for: element
+    )
+}
+
+func sveMantissa(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let all = sveAllLanes(of: unsigned)
+    let mask = mantissaMask(of: element)
+    func applied(_ name: String, _ operand: String, _ bits: UInt64) -> String {
+        sveBuiltin(
+            name,
+            [all, operand, "0x\(String(bits, radix: 16))"],
+            for: unsigned,
+            predication: "x"
+        )
+    }
+    let bits = sveReinterpreted(sveSplatOperand("a", for: element), from: element, to: unsigned)
+    let wrapped = applied("and_n", applied("add_n", bits, mask / 2 + 1), mask)
+    let mantissa = applied("add_n", wrapped, threeQuartersBits(of: element))
+    return vectorResult(
+        sveResult(sveReinterpreted(mantissa, from: unsigned, to: element), for: element),
+        for: element
+    )
+}
+
 func sveExponent(for element: Element) -> String {
     let all = sveAllLanes(of: element)
     let integer = signedElement(of: element)
@@ -12496,19 +12539,21 @@ func sveExponent(for element: Element) -> String {
     return vectorResult(sveResult(converted, for: element), for: element)
 }
 
-func x86Exponent(for element: Element) -> String {
+func x86FloatPart(_ name: String, immediate: Int? = nil, for element: Element) -> String {
     let float = x86Vector(element.cSuffix)
-    let arguments = [
-        (value: "a", type: float), (value: compoundLiteral(float, ["0"]), type: float),
-        (value: "-1", type: x86MaskType(lanes: element.laneCount)),
-        (value: "\(x86CurrentRounding)", type: "int"),
-    ]
-    let exponent = x86Builtin(
-        "getexp\(element.bits == 32 ? "ps" : "pd")512_mask",
+    let control = immediate.map { [(value: String($0), type: "int")] } ?? []
+    let arguments =
+        [(value: "a", type: float)] + control + [
+            (value: compoundLiteral(float, ["0"]), type: float),
+            (value: "-1", type: x86MaskType(lanes: element.laneCount)),
+            (value: "\(x86CurrentRounding)", type: "int"),
+        ]
+    let part = x86Builtin(
+        "\(name)\(element.bits == 32 ? "ps" : "pd")512_mask",
         arguments,
         returning: element.cVector
     )
-    return vectorResult(exponent, for: element)
+    return vectorResult(part, for: element)
 }
 
 func doubledInfinity(for element: Element) -> String {
@@ -14051,10 +14096,26 @@ let basicOps: [Op] = [
         section: .arithmetic,
         targets: TargetBodies(
             sve2_128: { element in sveExponent(for: element) },
-            avx3: { element in x86Exponent(for: element) }
+            avx3: { element in x86FloatPart("getexp", for: element) }
         )
     ) { element in
         portableExponent(for: element)
+    },
+    Op(
+        "mantissa",
+        "GetMantissa0p75_1p5",
+        [.vector],
+        .vector,
+        .float,
+        section: .arithmetic,
+        targets: TargetBodies(
+            sve2_128: { element in sveMantissa(for: element) },
+            avx3: { element in
+                x86FloatPart("getmant", immediate: x86PositiveMantissaFrom0p75To1p5, for: element)
+            }
+        )
+    ) { element in
+        portableMantissa(for: element)
     },
     Op(
         "multiplyAdding",
@@ -41634,6 +41695,7 @@ let integerOnlyOps = opsApplyingToAll(integerElements)
     .filter { op in !universalOps.contains { $0.identifier == op.identifier } }
 let floatOnlyOps = opsApplyingToAll(floatElements)
     .filter { op in !universalOps.contains { $0.identifier == op.identifier } }
+    .filter { op in hasAll([op], for: float16) }
 
 func protocolRequirements(_ requirementOps: [Op], indent: String) -> String {
     var output = ""

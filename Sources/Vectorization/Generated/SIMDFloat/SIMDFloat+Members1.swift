@@ -159,6 +159,11 @@ extension SIMDFloat {
     }
 
     @export(implementation) @inline(always)
+    public static func mantissa(_ a: Vector) -> Vector {
+        cvectorization_ops_mantissa_f32(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func pairwiseAdding(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_pairwise_adding_f32(a, b)
     }

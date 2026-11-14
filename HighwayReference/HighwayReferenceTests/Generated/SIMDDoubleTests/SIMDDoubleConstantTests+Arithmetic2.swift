@@ -318,6 +318,94 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkMantissaConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("mantissa with a repeating \(hex(value))")
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.mantissa(H.repeating(value)),
+            HighwayReference.mantissaF64(H.repeating(value)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func mantissaConstantSplatZero() {
+        checkMantissaConstantA(0.0)
+    }
+
+    @Test func mantissaConstantSplatNegativeZero() {
+        checkMantissaConstantA(-0.0)
+    }
+
+    @Test func mantissaConstantSplatOne() {
+        checkMantissaConstantA(1.0)
+    }
+
+    @Test func mantissaConstantSplatMinusOne() {
+        checkMantissaConstantA(-1.0)
+    }
+
+    @Test func mantissaConstantSplatTwo() {
+        checkMantissaConstantA(2.0)
+    }
+
+    @Test func mantissaConstantSplatHalf() {
+        checkMantissaConstantA(0.5)
+    }
+
+    @Test func mantissaConstantSplatFour() {
+        checkMantissaConstantA(4.0)
+    }
+
+    @Test func mantissaConstantSplatQuarter() {
+        checkMantissaConstantA(0.25)
+    }
+
+    @Test func mantissaConstantSplatOnePointFive() {
+        checkMantissaConstantA(1.5)
+    }
+
+    @Test func mantissaConstantSplatMinusTwoPointFive() {
+        checkMantissaConstantA(-2.5)
+    }
+
+    @Test func mantissaConstantSplatInfinity() {
+        checkMantissaConstantA(.infinity)
+    }
+
+    @Test func mantissaConstantSplatMinusInfinity() {
+        checkMantissaConstantA(-.infinity)
+    }
+
+    @Test func mantissaConstantSplatNaN() {
+        checkMantissaConstantA(.nan)
+    }
+
+    @Test func mantissaConstantSplatMinusNaN() {
+        checkMantissaConstantA(-.nan)
+    }
+
+    @Test func mantissaConstantSplatPayloadNaN() {
+        checkMantissaConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func mantissaConstantSplatSignalingNaN() {
+        checkMantissaConstantA(.signalingNaN)
+    }
+
+    @Test func mantissaConstantSplatMinusSignalingNaN() {
+        checkMantissaConstantA(-.signalingNaN)
+    }
+
+    @Test func mantissaConstantSplatLeastNonzero() {
+        checkMantissaConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func mantissaConstantSplatGreatest() {
+        checkMantissaConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkPairwiseAddingConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("pairwiseAdding with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC2A0_9C2A_F846_08F0)
