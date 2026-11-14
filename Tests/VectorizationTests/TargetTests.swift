@@ -15,16 +15,24 @@ import WASILibc
 import ucrt
 #endif
 
-private func expectedTarget() -> String? {
+private func environmentValue(_ name: String) -> String? {
     #if os(Windows)
     var value: UnsafeMutablePointer<CChar>?
-    guard unsafe _dupenv_s(&value, nil, "SIMD_EXPECTED_TARGET") == 0, let value = unsafe value
+    guard unsafe _dupenv_s(&value, nil, name) == 0, let value = unsafe value
     else { return nil }
     defer { unsafe free(value) }
     return unsafe String(cString: value)
     #else
-    unsafe getenv("SIMD_EXPECTED_TARGET").map { unsafe String(cString: $0) }
+    unsafe getenv(name).map { unsafe String(cString: $0) }
     #endif
+}
+
+private func expectedTarget() -> String? {
+    environmentValue("SIMD_EXPECTED_TARGET")
+}
+
+private func expectedVectorBytes() -> Int? {
+    environmentValue("SIMD_EXPECTED_VECTOR_BYTES").flatMap { Int($0) }
 }
 
 private func vectorBytes<E: SIMDElement>(of type: E.Type) -> Int {
@@ -39,6 +47,7 @@ struct TargetTests {
         "NEON": 16,
         "NEON_BF16": 16,
         "SVE2_128": 16,
+        "SVE_256": 32,
         "SSE2": 16,
         "SSSE3": 16,
         "SSE4": 16,
@@ -94,8 +103,8 @@ struct TargetTests {
     @Test("Every element type fills the vector width of the target")
     func laneCountsFillTheVector() throws {
         let bytes = try #require(
-            Self.vectorBytesOfTarget[SIMDTarget.targetName],
-            "\(SIMDTarget.targetName) has no vector width in this test"
+            Self.vectorBytesOfTarget[SIMDTarget.targetName] ?? expectedVectorBytes(),
+            "\(SIMDTarget.targetName) has no vector width in this test or SIMD_EXPECTED_VECTOR_BYTES"
         )
         #expect(vectorBytes(of: SIMDUInt8.self) == bytes)
         #expect(vectorBytes(of: SIMDUInt16.self) == bytes)
@@ -116,5 +125,14 @@ struct TargetTests {
     func matchesExpectedTarget() throws {
         let expected = try #require(expectedTarget())
         #expect(SIMDTarget.targetName == expected)
+    }
+
+    @Test(
+        "Compiles for the vector width the environment expects",
+        .enabled(if: expectedVectorBytes() != nil, "SIMD_EXPECTED_VECTOR_BYTES is not set")
+    )
+    func matchesExpectedVectorBytes() throws {
+        let expected = try #require(expectedVectorBytes())
+        #expect(vectorBytes(of: SIMDUInt8.self) == expected)
     }
 }
