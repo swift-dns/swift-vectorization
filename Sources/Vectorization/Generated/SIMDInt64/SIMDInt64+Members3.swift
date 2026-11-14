@@ -29,7 +29,7 @@ extension SIMDInt64 {
         otherwise: Vector
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_i64(
+            cvectorization_ops_gather_indices_within_where_i64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -53,7 +53,7 @@ extension SIMDInt64 {
         otherwise: Vector
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_i64(
+            cvectorization_ops_gather_indices_within_where_i64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 mask.raw

@@ -13277,7 +13277,8 @@ func gatherChecks(of op: Op, for element: Element) -> [Check] {
         )
         return [("\(within)(\(operand).raw, 0, \(limit))", message)]
     }
-    let within = cFunctionName("indicesWithinWhere", element)
+    let gathering = op.parameters.contains(.constLanePointer)
+    let within = cFunctionName(indicesWithinWhereName(gathering: gathering), element)
     return [("\(within)(\(operand).raw, \(limit), \(used))", "\(message), for a lane in use")]
 }
 
@@ -38710,23 +38711,32 @@ func indicesWithinFunction(perByte: Bool, for element: Element) -> String {
     )
 }
 
-func indicesWithinWhereBody(for element: Element) -> String {
+func indicesWithinWhereBody(signBits: Bool, for element: Element) -> String {
     let indices = signedElement(of: element).at(width: element.width)
     let unsigned = indices.cUnsignedVector
     let limit = splat("limit", as: unsigned, lanes: element.laneCount)
     let exceedsLane = element.bits < 64 ? "count > UINT\(element.bits)_MAX || " : ""
+    let used = signBits ? "(mask < 0)" : "mask"
     return """
         const \(indices.cUnsignedLane) limit = (\(indices.cUnsignedLane))count;
         const \(indices.cMask) within = (\(indices.cMask))((\(unsigned))indices < \(limit));
-        return \(exceedsLane)__builtin_reduce_and(within | ~mask) != 0;
+        return \(exceedsLane)__builtin_reduce_or(\(used) & ~within) == 0;
         """
 }
 
-func indicesWithinWhereFunction(for element: Element) -> String {
+func indicesWithinWhereName(gathering: Bool) -> String {
+    gathering ? "gatherIndicesWithinWhere" : "indicesWithinWhere"
+}
+
+/// What a masked gather or scatter checks: the indices of the lanes it uses, those with any bit of
+/// the mask set, except that the gathers of AVX2 and AVX-512 and the scatters of AVX-512 only use
+/// those with the sign bit set.
+func indicesWithinWhereFunction(gathering: Bool, for element: Element) -> String {
     let indices = signedElement(of: element).at(width: element.width)
+    let signBits: (Element) -> String? = { indicesWithinWhereBody(signBits: true, for: $0) }
     return cOpFunction(
         returns: .boolean,
-        name: cFunctionName("indicesWithinWhere", element),
+        name: cFunctionName(indicesWithinWhereName(gathering: gathering), element),
         parameters: [
             "\(indices.cRawVector) rawIndices", "size_t count", "\(element.cRawMask) rawMask",
         ],
@@ -38734,7 +38744,11 @@ func indicesWithinWhereFunction(for element: Element) -> String {
             "const \(indices.cVector) indices = (\(indices.cVector))rawIndices;",
             "const \(indices.cMask) mask = (\(indices.cMask))(\(element.cMask))rawMask;",
         ],
-        body: cBody(TargetBodies(), for: element, portable: indicesWithinWhereBody),
+        body: cBody(
+            TargetBodies(avx3: signBits, avx2: gathering ? signBits : nil),
+            for: element,
+            portable: { indicesWithinWhereBody(signBits: false, for: $0) }
+        ),
         for: element
     )
 }
@@ -40352,7 +40366,8 @@ func generateHeader() -> String {
             }
         }
         if element.bits >= 32 {
-            output += indicesWithinWhereFunction(for: element)
+            output += indicesWithinWhereFunction(gathering: true, for: element)
+            output += indicesWithinWhereFunction(gathering: false, for: element)
         }
         output += sveConstantFunction(for: element)
         if element.category == .float || element.category == .float16 {

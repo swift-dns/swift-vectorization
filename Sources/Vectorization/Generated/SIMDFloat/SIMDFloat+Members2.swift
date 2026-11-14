@@ -1444,7 +1444,7 @@ extension SIMDFloat {
         count: Int
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f32(
+            cvectorization_ops_gather_indices_within_where_f32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
@@ -1462,7 +1462,7 @@ extension SIMDFloat {
         count: Int
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f32(
+            cvectorization_ops_gather_indices_within_where_f32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
@@ -1491,7 +1491,7 @@ extension SIMDFloat {
         where mask: Mask
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f32(
+            cvectorization_ops_gather_indices_within_where_f32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1509,7 +1509,7 @@ extension SIMDFloat {
         where mask: Mask
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f32(
+            cvectorization_ops_gather_indices_within_where_f32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1540,7 +1540,7 @@ extension SIMDFloat {
         otherwise: Vector
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f32(
+            cvectorization_ops_gather_indices_within_where_f32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1564,7 +1564,7 @@ extension SIMDFloat {
         otherwise: Vector
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f32(
+            cvectorization_ops_gather_indices_within_where_f32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw

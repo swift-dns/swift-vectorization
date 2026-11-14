@@ -27021,21 +27021,38 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_bytes_u32(cvect
   return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
 #endif
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_gather_indices_within_where_u32(cvectorization_ops_raw_vector_i32 rawIndices, size_t count, cvectorization_ops_raw_mask_u32 rawMask) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+  const cvectorization_ops_mask_i32 mask = (cvectorization_ops_mask_i32)(cvectorization_ops_mask_u32)rawMask;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
+#else
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
+#endif
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_where_u32(cvectorization_ops_raw_vector_i32 rawIndices, size_t count, cvectorization_ops_raw_mask_u32 rawMask) {
   const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
   const cvectorization_ops_mask_i32 mask = (cvectorization_ops_mask_i32)(cvectorization_ops_mask_u32)rawMask;
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
 #elif CVECTORIZATION_OPS_X86 == 4
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
 #else
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
 #endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
@@ -36291,21 +36308,38 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_bytes_u64(cvect
   return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
 #endif
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_gather_indices_within_where_u64(cvectorization_ops_raw_vector_i64 rawIndices, size_t count, cvectorization_ops_raw_mask_u64 rawMask) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+  const cvectorization_ops_mask_i64 mask = (cvectorization_ops_mask_i64)(cvectorization_ops_mask_u64)rawMask;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit, limit, limit, limit, limit});
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit});
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
+#else
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit});
+  return __builtin_reduce_or(mask & ~within) == 0;
+#endif
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_where_u64(cvectorization_ops_raw_vector_i64 rawIndices, size_t count, cvectorization_ops_raw_mask_u64 rawMask) {
   const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
   const cvectorization_ops_mask_i64 mask = (cvectorization_ops_mask_i64)(cvectorization_ops_mask_u64)rawMask;
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit, limit, limit, limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
 #elif CVECTORIZATION_OPS_X86 == 4
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or(mask & ~within) == 0;
 #else
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or(mask & ~within) == 0;
 #endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
@@ -70155,21 +70189,38 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_bytes_i32(cvect
   return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
 #endif
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_gather_indices_within_where_i32(cvectorization_ops_raw_vector_i32 rawIndices, size_t count, cvectorization_ops_raw_mask_i32 rawMask) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+  const cvectorization_ops_mask_i32 mask = (cvectorization_ops_mask_i32)(cvectorization_ops_mask_i32)rawMask;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
+#else
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
+#endif
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_where_i32(cvectorization_ops_raw_vector_i32 rawIndices, size_t count, cvectorization_ops_raw_mask_i32 rawMask) {
   const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
   const cvectorization_ops_mask_i32 mask = (cvectorization_ops_mask_i32)(cvectorization_ops_mask_i32)rawMask;
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
 #elif CVECTORIZATION_OPS_X86 == 4
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
 #else
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
 #endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
@@ -79700,21 +79751,38 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_bytes_i64(cvect
   return count > UINT8_MAX || __builtin_reduce_and(shifted < (cvectorization_ops_vector_u8){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit}) != 0;
 #endif
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_gather_indices_within_where_i64(cvectorization_ops_raw_vector_i64 rawIndices, size_t count, cvectorization_ops_raw_mask_i64 rawMask) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+  const cvectorization_ops_mask_i64 mask = (cvectorization_ops_mask_i64)(cvectorization_ops_mask_i64)rawMask;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit, limit, limit, limit, limit});
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit});
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
+#else
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit});
+  return __builtin_reduce_or(mask & ~within) == 0;
+#endif
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_where_i64(cvectorization_ops_raw_vector_i64 rawIndices, size_t count, cvectorization_ops_raw_mask_i64 rawMask) {
   const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
   const cvectorization_ops_mask_i64 mask = (cvectorization_ops_mask_i64)(cvectorization_ops_mask_i64)rawMask;
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit, limit, limit, limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
 #elif CVECTORIZATION_OPS_X86 == 4
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or(mask & ~within) == 0;
 #else
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or(mask & ~within) == 0;
 #endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
@@ -89139,21 +89207,38 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_f32(void) {
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse8_f32(void) {
   return sizeof(cvectorization_ops_vector_f32) / sizeof(float) >= 8;
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_gather_indices_within_where_f32(cvectorization_ops_raw_vector_i32 rawIndices, size_t count, cvectorization_ops_raw_mask_f32 rawMask) {
+  const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
+  const cvectorization_ops_mask_i32 mask = (cvectorization_ops_mask_i32)(cvectorization_ops_mask_f32)rawMask;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
+#else
+  const uint32_t limit = (uint32_t)count;
+  const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit});
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
+#endif
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_where_f32(cvectorization_ops_raw_vector_i32 rawIndices, size_t count, cvectorization_ops_raw_mask_f32 rawMask) {
   const cvectorization_ops_vector_i32 indices = (cvectorization_ops_vector_i32)rawIndices;
   const cvectorization_ops_mask_i32 mask = (cvectorization_ops_mask_i32)(cvectorization_ops_mask_f32)rawMask;
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or((mask < 0) & ~within) == 0;
 #elif CVECTORIZATION_OPS_X86 == 4
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit, limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
 #else
   const uint32_t limit = (uint32_t)count;
   const cvectorization_ops_mask_i32 within = (cvectorization_ops_mask_i32)((cvectorization_ops_vector_u32)indices < (cvectorization_ops_vector_u32){limit, limit, limit, limit});
-  return count > UINT32_MAX || __builtin_reduce_and(within | ~mask) != 0;
+  return count > UINT32_MAX || __builtin_reduce_or(mask & ~within) == 0;
 #endif
 }
 #if CVECTORIZATION_OPS_NEON == 2
@@ -98114,21 +98199,38 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_f64(void) {
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse8_f64(void) {
   return sizeof(cvectorization_ops_vector_f64) / sizeof(double) >= 8;
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_gather_indices_within_where_f64(cvectorization_ops_raw_vector_i64 rawIndices, size_t count, cvectorization_ops_raw_mask_f64 rawMask) {
+  const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
+  const cvectorization_ops_mask_i64 mask = (cvectorization_ops_mask_i64)(cvectorization_ops_mask_f64)rawMask;
+#if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit, limit, limit, limit, limit});
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
+#elif CVECTORIZATION_OPS_X86 == 4
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit});
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
+#else
+  const uint64_t limit = (uint64_t)count;
+  const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit});
+  return __builtin_reduce_or(mask & ~within) == 0;
+#endif
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_indices_within_where_f64(cvectorization_ops_raw_vector_i64 rawIndices, size_t count, cvectorization_ops_raw_mask_f64 rawMask) {
   const cvectorization_ops_vector_i64 indices = (cvectorization_ops_vector_i64)rawIndices;
   const cvectorization_ops_mask_i64 mask = (cvectorization_ops_mask_i64)(cvectorization_ops_mask_f64)rawMask;
 #if CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit, limit, limit, limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or((mask < 0) & ~within) == 0;
 #elif CVECTORIZATION_OPS_X86 == 4
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit, limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or(mask & ~within) == 0;
 #else
   const uint64_t limit = (uint64_t)count;
   const cvectorization_ops_mask_i64 within = (cvectorization_ops_mask_i64)((cvectorization_ops_vector_u64)indices < (cvectorization_ops_vector_u64){limit, limit});
-  return __builtin_reduce_and(within | ~mask) != 0;
+  return __builtin_reduce_or(mask & ~within) == 0;
 #endif
 }
 #if CVECTORIZATION_OPS_NEON == 2

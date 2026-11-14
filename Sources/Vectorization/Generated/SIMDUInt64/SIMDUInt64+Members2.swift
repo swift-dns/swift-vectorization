@@ -1949,7 +1949,7 @@ extension SIMDUInt64 {
         count: Int
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_u64(
+            cvectorization_ops_gather_indices_within_where_u64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
@@ -1967,7 +1967,7 @@ extension SIMDUInt64 {
         count: Int
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_u64(
+            cvectorization_ops_gather_indices_within_where_u64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
@@ -1998,7 +1998,7 @@ extension SIMDUInt64 {
         where mask: Mask
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_u64(
+            cvectorization_ops_gather_indices_within_where_u64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -2016,7 +2016,7 @@ extension SIMDUInt64 {
         where mask: Mask
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_u64(
+            cvectorization_ops_gather_indices_within_where_u64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 mask.raw

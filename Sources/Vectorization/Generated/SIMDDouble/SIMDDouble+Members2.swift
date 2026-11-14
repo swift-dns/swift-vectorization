@@ -1489,7 +1489,7 @@ extension SIMDDouble {
         count: Int
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f64(
+            cvectorization_ops_gather_indices_within_where_f64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
@@ -1507,7 +1507,7 @@ extension SIMDDouble {
         count: Int
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f64(
+            cvectorization_ops_gather_indices_within_where_f64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
@@ -1536,7 +1536,7 @@ extension SIMDDouble {
         where mask: Mask
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f64(
+            cvectorization_ops_gather_indices_within_where_f64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1554,7 +1554,7 @@ extension SIMDDouble {
         where mask: Mask
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f64(
+            cvectorization_ops_gather_indices_within_where_f64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1585,7 +1585,7 @@ extension SIMDDouble {
         otherwise: Vector
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_f64(
+            cvectorization_ops_gather_indices_within_where_f64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1609,7 +1609,7 @@ extension SIMDDouble {
         otherwise: Vector
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_f64(
+            cvectorization_ops_gather_indices_within_where_f64(
                 indices.raw,
                 SIMDInt64.indexLimit(count: span.count, stride: 1),
                 mask.raw

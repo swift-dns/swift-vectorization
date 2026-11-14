@@ -1708,7 +1708,7 @@ extension SIMDUInt32 {
         count: Int
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
@@ -1726,7 +1726,7 @@ extension SIMDUInt32 {
         count: Int
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
@@ -1757,7 +1757,7 @@ extension SIMDUInt32 {
         where mask: Mask
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1775,7 +1775,7 @@ extension SIMDUInt32 {
         where mask: Mask
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1819,7 +1819,7 @@ extension SIMDUInt32 {
         otherwise: Vector
     ) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
@@ -1843,7 +1843,7 @@ extension SIMDUInt32 {
         otherwise: Vector
     ) -> Vector {
         assert(
-            cvectorization_ops_indices_within_where_u32(
+            cvectorization_ops_gather_indices_within_where_u32(
                 indices.raw,
                 SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw

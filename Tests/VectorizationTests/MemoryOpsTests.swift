@@ -1,3 +1,4 @@
+import CVectorizationOps
 import Testing
 import Vectorization
 
@@ -98,6 +99,61 @@ struct MemoryOpsTests {
         )
 
         #expect(stored(gathered) == [Int32](repeating: 9, count: lanes))
+    }
+
+    @Test(
+        "The index checks of masked gathers and scatters reject an index outside the span in a used lane"
+    )
+    func maskedIndexChecksOfNonCanonicalMasks() {
+        typealias U = SIMDUInt32
+        typealias D = SIMDDouble
+        let scattersBySignBit = SIMDTarget.targetName.hasPrefix("AVX3")
+        let gathersBySignBit = scattersBySignBit || SIMDTarget.targetName == "AVX2"
+        let indices32 = SIMDInt32.load(
+            from: ContiguousArray((0..<U.laneCount).map { $0 == U.laneCount - 1 ? 64 : 0 }).span
+        )
+        let indices64 = SIMDInt64.load(
+            from: ContiguousArray((0..<D.laneCount).map { $0 == D.laneCount - 1 ? 64 : 0 }).span
+        )
+
+        for bits: UInt64 in [0, 1, 0x7FFF_FFFF, 0x8000_0000, 0x8000_0000_0000_0000, ~0] {
+            let low = UInt32(truncatingIfNeeded: bits)
+            let lanes32 = ContiguousArray((0..<U.laneCount).map { $0 < U.laneCount - 1 ? ~0 : low })
+            let lanes64 = ContiguousArray(
+                (0..<D.laneCount).map { Double(bitPattern: $0 == D.laneCount - 1 ? bits : ~0) }
+            )
+            let mask32 = U.mask(from: U.load(from: lanes32.span))
+            let mask64 = D.mask(from: D.load(from: lanes64.span))
+            let lane32 = U.lane(U.vector(from: mask32), at: U.laneCount - 1)
+            let lane64 = D.lane(D.vector(from: mask64), at: D.laneCount - 1).bitPattern
+            let isUsed32 = { (bySignBit: Bool) in bySignBit ? lane32 >> 31 != 0 : lane32 != 0 }
+            let isUsed64 = { (bySignBit: Bool) in bySignBit ? lane64 >> 63 != 0 : lane64 != 0 }
+
+            #expect(
+                cvectorization_ops_gather_indices_within_where_u32(indices32.raw, 65, mask32.raw)
+            )
+            #expect(cvectorization_ops_indices_within_where_u32(indices32.raw, 65, mask32.raw))
+            #expect(
+                cvectorization_ops_gather_indices_within_where_f64(indices64.raw, 65, mask64.raw)
+            )
+            #expect(cvectorization_ops_indices_within_where_f64(indices64.raw, 65, mask64.raw))
+            #expect(
+                cvectorization_ops_gather_indices_within_where_u32(indices32.raw, 64, mask32.raw)
+                    == !isUsed32(gathersBySignBit)
+            )
+            #expect(
+                cvectorization_ops_indices_within_where_u32(indices32.raw, 64, mask32.raw)
+                    == !isUsed32(scattersBySignBit)
+            )
+            #expect(
+                cvectorization_ops_gather_indices_within_where_f64(indices64.raw, 64, mask64.raw)
+                    == !isUsed64(gathersBySignBit)
+            )
+            #expect(
+                cvectorization_ops_indices_within_where_f64(indices64.raw, 64, mask64.raw)
+                    == !isUsed64(scattersBySignBit)
+            )
+        }
     }
 
     @Test("A compress store writes the lanes of the mask, from the start")

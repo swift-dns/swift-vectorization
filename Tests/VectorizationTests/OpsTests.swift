@@ -1397,6 +1397,35 @@ struct OpsTests {
         }
     }
 
+    @Test("Checked masked gathers and scatters trap on an index outside the span in any mask lane")
+    func checkedMaskedGathersAndScattersTrap() async {
+        await #expect(processExitsWith: .failure) {
+            let lanes = SIMDUInt32.laneCount
+            let source = ContiguousArray<UInt32>(repeating: 0, count: lanes)
+            let bits = ContiguousArray((0..<lanes).map { $0 == 0 ? UInt32(0x8000_0000) : 0 })
+            let mask = SIMDUInt32.mask(from: SIMDUInt32.load(from: bits.span))
+            _ = SIMDUInt32.gather(
+                from: source.span,
+                indices: SIMDInt32.repeating(Int32(lanes)),
+                where: mask
+            )
+        }
+        await #expect(processExitsWith: .failure) {
+            let lanes = SIMDDouble.laneCount
+            var output = ContiguousArray<Double>(repeating: 0, count: lanes)
+            var destination = output.mutableSpan
+            let negative = -Double.leastNonzeroMagnitude
+            let bits = ContiguousArray((0..<lanes).map { $0 == 0 ? negative : 0 })
+            let mask = SIMDDouble.mask(from: SIMDDouble.load(from: bits.span))
+            SIMDDouble.scatter(
+                SIMDDouble.zero(),
+                to: &destination,
+                indices: SIMDInt64.repeating(Int64(lanes)),
+                where: mask
+            )
+        }
+    }
+
     @Test("Checked indices ops trap on an index outside 0..<2 * laneCount")
     func checkedIndicesOpsTrap() async {
         await #expect(processExitsWith: .failure) {
