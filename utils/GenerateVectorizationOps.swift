@@ -39267,8 +39267,36 @@ func referenceOpFunctions(of op: Op, for element: Element) -> ReferenceFunctions
     } else if element.category == .bfloat16 && bfloat16ComposedOps.contains(op.identifier) {
         let composition = halfPrecisionComposition(of: op, for: element, declarations: declarations)
         functions = "#if \(bfloat16LookupCondition)\n\(functions)#else\n\(composition)#endif\n"
+    } else if let shape = resizedNarrowShape(of: op) {
+        let produced =
+            op.referenceCall.map { $0(element, argumentList) }
+            ?? "hn::\(op.highwayName)(\(arguments))"
+        let tag = "\(element.tag)()"
+        let kept = "hn::FirstN(\(tag), hn::Lanes(\(element.tag(of: shape))()))"
+        let resized = "hn::IfThenElseZero(\(kept), hn::ResizeBitCast(\(tag), \(produced)))"
+        let name = resizedReferenceName(of: op, for: element)
+        functions += "HWY_INLINE \(element.cRawVector) \(name)(\(declarations))"
+        functions += " { return \(referenceFunctionName("toPort", element))(\(resized)); }\n"
+        nothrow += referenceNothrowWrapper(
+            returning: element.cRawVector,
+            named: name,
+            declarations: declarations
+        )
     }
     return (functions, nothrow)
+}
+
+func resizedNarrowShape(of op: Op) -> Shape? {
+    guard case .narrowVector(let shape) = op.returns, shape != .block,
+        !op.parameters.contains(where: { $0 == .tupleIndex || $0 == .outVector }),
+        !op.parameters.contains(.roundConstant), !op.parameters.contains(where: \.isMutablePointer),
+        op.immediates.isEmpty, op.template == nil
+    else { return nil }
+    return shape
+}
+
+func resizedReferenceName(of op: Op, for element: Element) -> String {
+    "resized\(uppercasedFirst(referenceFunctionName(of: op, for: element)))"
 }
 
 func generateReferenceHeader() -> String {
@@ -43383,6 +43411,7 @@ func referenceCalls(
     destination: String? = nil,
     checked: Bool = true,
     referenceName: String? = nil,
+    returning returnType: ReturnType? = nil,
     constants: [String: (port: String, reference: String)] = [:]
 ) -> (port: String, reference: String) {
     var portArguments: [String] = []
@@ -43433,7 +43462,7 @@ func referenceCalls(
         referenceName ?? referenceFunctionName(of: op, for: element),
         referenceArguments
     )
-    let reference = referenceResult(call, returning: op.returns, for: element)
+    let reference = referenceResult(call, returning: returnType ?? op.returns, for: element)
     let port = portCall(op.swiftName, op.swiftOrdered(portArguments))
     return ("\(portKeyword)\(port)", "\(keyword)\(reference)")
 }
@@ -44147,8 +44176,57 @@ func referenceTests(of op: Op, for element: Element) -> [String] {
     if op.takesMask {
         tests.append(referenceTest(of: op, for: element, inContract: true, nonCanonical: true))
     }
+    if let resized = resizedReferenceTest(of: op, for: element) {
+        tests.append(resized)
+    }
     return tests + uncheckedSpanTests(of: op, for: element)
         + widenMulCornerTests(of: op, for: element)
+}
+
+func resizedReferenceTest(of op: Op, for element: Element) -> String? {
+    guard let shape = resizedNarrowShape(of: op),
+        !(element.category == .float16 && float16ComposedOps.contains(op.identifier))
+    else { return nil }
+    let test = "\(op.testIdentifier)Resized"
+    let inputs = referenceInputs(of: op, for: element, test: test, inContract: true)
+    let calls = referenceCalls(
+        of: op,
+        for: element,
+        pointer: referencePointer(of: op, guarded: false),
+        referencePointer: paddedPointer(of: op),
+        destination: referenceDestination(of: op, guarded: false),
+        referenceName: resizedReferenceName(of: op, for: element),
+        returning: .vector
+    )
+    let produced = calls.port.hasPrefix("unsafe ") ? String(calls.port.dropFirst(7)) : calls.port
+    let kept = portCall("firstLanes", ["count: H.laneCount / \(shape.fraction ?? 1)"])
+    let resized = portCall("vector", ["resizing: \(produced)"])
+    let keyword = produced == calls.port ? "" : "unsafe "
+    let port = "\(keyword)\(portCall("selectingOrZero", [kept, resized]))"
+    let hasSource = inputs.contains(where: { $0.parameter.isConstPointer })
+    let (declarations, statements) =
+        hasSource
+        ? referenceStatements(
+            of: op,
+            for: element,
+            inputs: inputs,
+            guarded: false,
+            calls: (port: port, reference: calls.reference)
+        )
+        : (
+            [],
+            "mismatches.check(\(port), \(calls.reference), \(referenceDescription(of: inputs)))"
+        )
+    return referenceTestFunction(
+        test,
+        label: "\(op.testIdentifier) resized with its unspecified lanes zeroed",
+        for: element,
+        inputs: inputs,
+        declarations: declarations,
+        disabling: laneCapabilityDisabling(of: op, for: element),
+        loopCondition: referenceLoopCondition(of: op, for: element, inputs: inputs),
+        statements: statements
+    )
 }
 
 func uncheckedSpanTests(of op: Op, for element: Element) -> [String] {
