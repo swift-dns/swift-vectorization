@@ -5,6 +5,115 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
+public func portTableLookupBytesF16(
+    _ a: SIMDFloat16.Vector,
+    atUnchecked indices: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.tableLookupBytes(a, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupBytesF16(
+    _ a: SIMDFloat16.Vector,
+    atUnchecked indices: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.tableLookupBytesF16(a, indices)
+}
+
+@inline(never)
+public func portTableLookupBytesF16ConstantA(
+    atUnchecked indices: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.tableLookupBytes(
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        atUnchecked: indices
+    )
+}
+
+@inline(never)
+public func highwayTableLookupBytesF16ConstantA(
+    atUnchecked indices: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.tableLookupBytesF16(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        indices
+    )
+}
+
+@inline(never)
+public func portTableLookupBytesF16ConstantIndices(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.tableLookupBytes(
+        a,
+        atUnchecked: SIMDFloat16.repeating(Float16(bitPattern: 3))
+    )
+}
+
+@inline(never)
+public func highwayTableLookupBytesF16ConstantIndices(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector
+{
+    HighwayReference.Nothrow.tableLookupBytesF16(
+        a,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 3).bitPattern)
+    )
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroF16(
+    _ a: SIMDFloat16.Vector,
+    atUnchecked indices: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.tableLookupBytesOrZero(a, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroF16(
+    _ a: SIMDFloat16.Vector,
+    atUnchecked indices: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.tableLookupBytesOrZeroF16(a, indices)
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroF16ConstantA(
+    atUnchecked indices: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.tableLookupBytesOrZero(
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        atUnchecked: indices
+    )
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroF16ConstantA(
+    atUnchecked indices: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.tableLookupBytesOrZeroF16(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        indices
+    )
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroF16ConstantIndices(
+    _ a: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.tableLookupBytesOrZero(
+        a,
+        atUnchecked: SIMDFloat16.repeating(Float16(bitPattern: 3))
+    )
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroF16ConstantIndices(
+    _ a: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.tableLookupBytesOrZeroF16(
+        a,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 3).bitPattern)
+    )
+}
+
+@inline(never)
 public func portBroadcastingInBlocksF16ConstantA() -> SIMDFloat16.Vector {
     unsafe SIMDFloat16.broadcastingInBlocks(
         SIMDFloat16.repeating(Float16(bitPattern: 26)),

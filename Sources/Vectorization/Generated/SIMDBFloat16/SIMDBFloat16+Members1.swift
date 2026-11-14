@@ -1360,6 +1360,42 @@ extension SIMDBFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_bytes_bf16(indices.raw, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return unsafe tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_bytes_bf16(indices.raw, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_bytes_bf16(a.raw, indices.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_bytes_bf16(indices.raw, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return unsafe tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_bytes_bf16(indices.raw, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_bytes_or_zero_bf16(a.raw, indices.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func shiftedLeftLanes(_ a: Vector, by lanes: Int) -> Vector {
         precondition(
             lanes >= 0 && lanes <= 8,
@@ -1373,6 +1409,29 @@ extension SIMDBFloat16 {
         assert(lanes >= 0 && lanes <= 8, "Lane count is negative or more than a block has lanes")
         return Vector(
             raw: cvectorization_ops_shifted_left_lanes_bf16(a.raw, Int32(truncatingIfNeeded: lanes))
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
+    {
+        precondition(bytes >= 1 && bytes <= 15, "Byte count is not between 1 and 15")
+        return unsafe combinedShiftedRightBytes(a, b, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func combinedShiftedRightBytes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked bytes: Int
+    ) -> Vector {
+        assert(bytes >= 1 && bytes <= 15, "Byte count is not between 1 and 15")
+        return Vector(
+            raw: cvectorization_ops_combined_shifted_right_bytes_bf16(
+                a.raw,
+                b.raw,
+                Int32(truncatingIfNeeded: bytes)
+            )
         )
     }
 
@@ -1408,6 +1467,11 @@ extension SIMDBFloat16 {
     @export(implementation) @inline(always)
     public static func reversed(_ a: Vector) -> Vector {
         Vector(raw: cvectorization_ops_reversed_bf16(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func byteSwapped(_ a: Vector) -> Vector {
+        Vector(raw: cvectorization_ops_byte_swapped_bf16(a.raw))
     }
 
     @export(implementation) @inline(always)
@@ -1729,39 +1793,6 @@ extension SIMDBFloat16 {
                 a.raw
             )
         )
-    }
-
-    @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, to: UnsafeMutablePointer<Lane>) {
-        unsafe cvectorization_ops_store_streaming_bf16(a.raw, to)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>) {
-        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        precondition(
-            span.withUnsafeBufferPointer {
-                UInt(bitPattern: $0.baseAddress) % UInt(laneCount * MemoryLayout<Lane>.stride) == 0
-            },
-            "Span does not start at an address aligned to the vector size"
-        )
-        unsafe storeStreaming(a, toUnchecked: &span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
-        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        assert(
-            span.withUnsafeBufferPointer {
-                UInt(bitPattern: $0.baseAddress) % UInt(laneCount * MemoryLayout<Lane>.stride) == 0
-            },
-            "Span does not start at an address aligned to the vector size"
-        )
-        span.withUnsafeMutableBufferPointer {
-            unsafe cvectorization_ops_store_streaming_bf16(a.raw, $0.baseAddress.unsafelyUnwrapped)
-        }
     }
 
 }

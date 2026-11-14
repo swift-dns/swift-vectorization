@@ -24,6 +24,26 @@ public func highwayReversedF64ConstantA() -> SIMDDouble.Vector {
 }
 
 @inline(never)
+public func portByteSwappedF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    SIMDDouble.byteSwapped(a)
+}
+
+@inline(never)
+public func highwayByteSwappedF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.byteSwappedF64(a)
+}
+
+@inline(never)
+public func portByteSwappedF64ConstantA() -> SIMDDouble.Vector {
+    SIMDDouble.byteSwapped(SIMDDouble.repeating(1.5))
+}
+
+@inline(never)
+public func highwayByteSwappedF64ConstantA() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.byteSwappedF64(HighwayReference.Nothrow.repeatingF64(1.5))
+}
+
+@inline(never)
 public func portReversedBlocksF64(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
     SIMDDouble.reversedBlocks(a)
 }

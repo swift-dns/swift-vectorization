@@ -1489,4 +1489,44 @@ extension SIMDFloat {
         }
     }
 
+    @export(implementation) @inline(always)
+    public static func loadInterleaved2(
+        from: UnsafePointer<Lane>,
+        _ v0: inout Vector,
+        _ v1: inout Vector
+    ) {
+        unsafe cvectorization_ops_load_interleaved2_f32(from, &v0, &v1)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func loadInterleaved2(
+        from span: Span<Lane>,
+        _ v0: inout Vector,
+        _ v1: inout Vector
+    ) {
+        precondition(
+            span.count >= 2 * laneCount,
+            "Span has fewer elements than 2 vectors have lanes"
+        )
+        unsafe loadInterleaved2(fromUnchecked: span, &v0, &v1)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func loadInterleaved2(
+        fromUnchecked span: Span<Lane>,
+        _ v0: inout Vector,
+        _ v1: inout Vector
+    ) {
+        assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
+        span.withUnsafeBufferPointer {
+            unsafe cvectorization_ops_load_interleaved2_f32(
+                $0.baseAddress.unsafelyUnwrapped,
+                &v0,
+                &v1
+            )
+        }
+    }
+
 }

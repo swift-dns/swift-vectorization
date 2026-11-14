@@ -4,6 +4,39 @@ public import CVectorizationOps
 
 extension SIMDBFloat16 {
     @export(implementation) @inline(always)
+    public static func storeStreaming(_ a: Vector, to: UnsafeMutablePointer<Lane>) {
+        unsafe cvectorization_ops_store_streaming_bf16(a.raw, to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>) {
+        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        precondition(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(laneCount * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the vector size"
+        )
+        unsafe storeStreaming(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
+        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        assert(
+            span.withUnsafeBufferPointer {
+                UInt(bitPattern: $0.baseAddress) % UInt(laneCount * MemoryLayout<Lane>.stride) == 0
+            },
+            "Span does not start at an address aligned to the vector size"
+        )
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_store_streaming_bf16(a.raw, $0.baseAddress.unsafelyUnwrapped)
+        }
+    }
+
+    @export(implementation) @inline(always)
     public static func compressed(_ a: Vector, where mask: Mask) -> Vector {
         Vector(raw: cvectorization_ops_compressed_bf16(a.raw, mask.raw))
     }

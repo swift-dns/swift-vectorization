@@ -7,6 +7,53 @@ extension SIMDFloat {
     public static func scatter(
         _ a: Vector,
         to: UnsafeMutablePointer<Lane>,
+        byteOffsets: SIMDInt32.Vector
+    ) {
+        unsafe cvectorization_ops_scatter_byte_offsets_f32(a, to, byteOffsets.raw)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        to span: inout MutableSpan<Lane>,
+        byteOffsets: SIMDInt32.Vector
+    ) {
+        precondition(
+            cvectorization_ops_indices_within_i32(
+                byteOffsets.raw,
+                0,
+                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
+            ),
+            "Byte offset is negative or leaves no room for a lane in the span"
+        )
+        unsafe scatter(a, toUnchecked: &span, byteOffsets: byteOffsets)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        toUnchecked span: inout MutableSpan<Lane>,
+        byteOffsets: SIMDInt32.Vector
+    ) {
+        assert(
+            cvectorization_ops_indices_within_i32(
+                byteOffsets.raw,
+                0,
+                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
+            ),
+            "Byte offset is negative or leaves no room for a lane in the span"
+        )
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_scatter_byte_offsets_f32(a, $0.baseAddress, byteOffsets.raw)
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        to: UnsafeMutablePointer<Lane>,
         indices: SIMDInt32.Vector,
         count: Int
     ) {

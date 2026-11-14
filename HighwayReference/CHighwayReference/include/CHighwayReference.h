@@ -12109,6 +12109,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpF32(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1UpOr(fill, TagF32(), fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1Down(TagF32(), fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::Slide1DownOr(fill, TagF32(), fromPortF32(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 tableLookupBytesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 indices) { return toPortF32(hn::TableLookupBytes(fromPortF32(a), fromPortF32(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 tableLookupBytesOrZeroF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 indices) { return toPortF32(hn::TableLookupBytesOr0(fromPortF32(a), fromPortF32(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 tableLookupLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_i32 indices) { return toPortF32(hn::TableLookupLanes(fromPortF32(a), hn::IndicesFromVec(TagF32(), fromPortI32(indices)))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 twoTablesLookupLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_i32 indices) { return toPortF32(hn::TwoTablesLookupLanes(TagF32(), fromPortF32(a), fromPortF32(b), hn::IndicesFromVec(TagF32(), fromPortI32(indices)))); }
 HWY_INLINE void loadInterleaved2F32(const float* from, OutVectorF32& v0, OutVectorF32& v1) {
@@ -12209,6 +12211,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingSmallestF32(cvectorization
 HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingLargestF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::MaxOfLanes(TagF32(), fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 pairwiseAddingBlocksF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::PairwiseAdd128(TagF32(), fromPortF32(a), fromPortF32(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 pairwiseSubtractingBlocksF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::PairwiseSub128(TagF32(), fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 byteSwappedF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::ReverseLaneBytes(fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 interleavingLowerF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::InterleaveLower(TagF32(), fromPortF32(a), fromPortF32(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 interleavingUpperF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::InterleaveUpper(TagF32(), fromPortF32(a), fromPortF32(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 interleavingEvenF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF32(hn::InterleaveEven(TagF32(), fromPortF32(a), fromPortF32(b))); }
@@ -12365,6 +12368,50 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingWhereOtherwiseF32(cvectori
 HWY_INLINE float sumWhereF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) { return hn::MaskedReduceSum(TagF32(), maskFromPortF32(mask), fromPortF32(a)); }
 HWY_INLINE float smallestWhereF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) { return hn::MaskedReduceMin(TagF32(), maskFromPortF32(mask), fromPortF32(a)); }
 HWY_INLINE float largestWhereF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) { return hn::MaskedReduceMax(TagF32(), maskFromPortF32(mask), fromPortF32(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 shiftedLeftBytesF32(cvectorization_ops_raw_vector_f32 a, int bytes) {
+  switch (bytes) {
+  case 0: return toPortF32(hn::ShiftLeftBytes<0>(TagF32(), fromPortF32(a)));
+  case 1: return toPortF32(hn::ShiftLeftBytes<1>(TagF32(), fromPortF32(a)));
+  case 2: return toPortF32(hn::ShiftLeftBytes<2>(TagF32(), fromPortF32(a)));
+  case 3: return toPortF32(hn::ShiftLeftBytes<3>(TagF32(), fromPortF32(a)));
+  case 4: return toPortF32(hn::ShiftLeftBytes<4>(TagF32(), fromPortF32(a)));
+  case 5: return toPortF32(hn::ShiftLeftBytes<5>(TagF32(), fromPortF32(a)));
+  case 6: return toPortF32(hn::ShiftLeftBytes<6>(TagF32(), fromPortF32(a)));
+  case 7: return toPortF32(hn::ShiftLeftBytes<7>(TagF32(), fromPortF32(a)));
+  case 8: return toPortF32(hn::ShiftLeftBytes<8>(TagF32(), fromPortF32(a)));
+  case 9: return toPortF32(hn::ShiftLeftBytes<9>(TagF32(), fromPortF32(a)));
+  case 10: return toPortF32(hn::ShiftLeftBytes<10>(TagF32(), fromPortF32(a)));
+  case 11: return toPortF32(hn::ShiftLeftBytes<11>(TagF32(), fromPortF32(a)));
+  case 12: return toPortF32(hn::ShiftLeftBytes<12>(TagF32(), fromPortF32(a)));
+  case 13: return toPortF32(hn::ShiftLeftBytes<13>(TagF32(), fromPortF32(a)));
+  case 14: return toPortF32(hn::ShiftLeftBytes<14>(TagF32(), fromPortF32(a)));
+  case 15: return toPortF32(hn::ShiftLeftBytes<15>(TagF32(), fromPortF32(a)));
+  case 16: return toPortF32(hn::ShiftLeftBytes<16>(TagF32(), fromPortF32(a)));
+  default: return toPortF32(hn::ShiftLeftBytes<0>(TagF32(), fromPortF32(a)));
+  }
+}
+HWY_INLINE cvectorization_ops_raw_vector_f32 shiftedRightBytesF32(cvectorization_ops_raw_vector_f32 a, int bytes) {
+  switch (bytes) {
+  case 0: return toPortF32(hn::ShiftRightBytes<0>(TagF32(), fromPortF32(a)));
+  case 1: return toPortF32(hn::ShiftRightBytes<1>(TagF32(), fromPortF32(a)));
+  case 2: return toPortF32(hn::ShiftRightBytes<2>(TagF32(), fromPortF32(a)));
+  case 3: return toPortF32(hn::ShiftRightBytes<3>(TagF32(), fromPortF32(a)));
+  case 4: return toPortF32(hn::ShiftRightBytes<4>(TagF32(), fromPortF32(a)));
+  case 5: return toPortF32(hn::ShiftRightBytes<5>(TagF32(), fromPortF32(a)));
+  case 6: return toPortF32(hn::ShiftRightBytes<6>(TagF32(), fromPortF32(a)));
+  case 7: return toPortF32(hn::ShiftRightBytes<7>(TagF32(), fromPortF32(a)));
+  case 8: return toPortF32(hn::ShiftRightBytes<8>(TagF32(), fromPortF32(a)));
+  case 9: return toPortF32(hn::ShiftRightBytes<9>(TagF32(), fromPortF32(a)));
+  case 10: return toPortF32(hn::ShiftRightBytes<10>(TagF32(), fromPortF32(a)));
+  case 11: return toPortF32(hn::ShiftRightBytes<11>(TagF32(), fromPortF32(a)));
+  case 12: return toPortF32(hn::ShiftRightBytes<12>(TagF32(), fromPortF32(a)));
+  case 13: return toPortF32(hn::ShiftRightBytes<13>(TagF32(), fromPortF32(a)));
+  case 14: return toPortF32(hn::ShiftRightBytes<14>(TagF32(), fromPortF32(a)));
+  case 15: return toPortF32(hn::ShiftRightBytes<15>(TagF32(), fromPortF32(a)));
+  case 16: return toPortF32(hn::ShiftRightBytes<16>(TagF32(), fromPortF32(a)));
+  default: return toPortF32(hn::ShiftRightBytes<0>(TagF32(), fromPortF32(a)));
+  }
+}
 HWY_INLINE cvectorization_ops_raw_vector_f32 shiftedLeftLanesF32(cvectorization_ops_raw_vector_f32 a, int lanes) {
   switch (lanes) {
   case 0: return toPortF32(hn::ShiftLeftLanes<0>(TagF32(), fromPortF32(a)));
@@ -12383,6 +12430,26 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 shiftedRightLanesF32(cvectorization
   case 3: return toPortF32(hn::ShiftRightLanes<3>(TagF32(), fromPortF32(a)));
   case 4: return toPortF32(hn::ShiftRightLanes<4>(TagF32(), fromPortF32(a)));
   default: return toPortF32(hn::ShiftRightLanes<0>(TagF32(), fromPortF32(a)));
+  }
+}
+HWY_INLINE cvectorization_ops_raw_vector_f32 combinedShiftedRightBytesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, int bytes) {
+  switch (bytes) {
+  case 1: return toPortF32(hn::CombineShiftRightBytes<1>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 2: return toPortF32(hn::CombineShiftRightBytes<2>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 3: return toPortF32(hn::CombineShiftRightBytes<3>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 4: return toPortF32(hn::CombineShiftRightBytes<4>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 5: return toPortF32(hn::CombineShiftRightBytes<5>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 6: return toPortF32(hn::CombineShiftRightBytes<6>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 7: return toPortF32(hn::CombineShiftRightBytes<7>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 8: return toPortF32(hn::CombineShiftRightBytes<8>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 9: return toPortF32(hn::CombineShiftRightBytes<9>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 10: return toPortF32(hn::CombineShiftRightBytes<10>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 11: return toPortF32(hn::CombineShiftRightBytes<11>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 12: return toPortF32(hn::CombineShiftRightBytes<12>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 13: return toPortF32(hn::CombineShiftRightBytes<13>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 14: return toPortF32(hn::CombineShiftRightBytes<14>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  case 15: return toPortF32(hn::CombineShiftRightBytes<15>(TagF32(), fromPortF32(a), fromPortF32(b)));
+  default: return toPortF32(hn::CombineShiftRightBytes<1>(TagF32(), fromPortF32(a), fromPortF32(b)));
   }
 }
 HWY_INLINE cvectorization_ops_raw_vector_f32 combinedShiftedRightLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, int lanes) {
@@ -13001,6 +13068,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpF64(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1UpOr(fill, TagF64(), fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1Down(TagF64(), fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::Slide1DownOr(fill, TagF64(), fromPortF64(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 tableLookupBytesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 indices) { return toPortF64(hn::TableLookupBytes(fromPortF64(a), fromPortF64(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 tableLookupBytesOrZeroF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 indices) { return toPortF64(hn::TableLookupBytesOr0(fromPortF64(a), fromPortF64(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 tableLookupLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_i64 indices) { return toPortF64(hn::TableLookupLanes(fromPortF64(a), hn::IndicesFromVec(TagF64(), fromPortI64(indices)))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 twoTablesLookupLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_i64 indices) { return toPortF64(hn::TwoTablesLookupLanes(TagF64(), fromPortF64(a), fromPortF64(b), hn::IndicesFromVec(TagF64(), fromPortI64(indices)))); }
 HWY_INLINE void loadInterleaved2F64(const double* from, OutVectorF64& v0, OutVectorF64& v1) {
@@ -13101,6 +13170,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingSmallestF64(cvectorization
 HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingLargestF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::MaxOfLanes(TagF64(), fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 pairwiseAddingBlocksF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::PairwiseAdd128(TagF64(), fromPortF64(a), fromPortF64(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 pairwiseSubtractingBlocksF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::PairwiseSub128(TagF64(), fromPortF64(a), fromPortF64(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 byteSwappedF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::ReverseLaneBytes(fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 interleavingLowerF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::InterleaveLower(TagF64(), fromPortF64(a), fromPortF64(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 interleavingUpperF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::InterleaveUpper(TagF64(), fromPortF64(a), fromPortF64(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 interleavingEvenF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) { return toPortF64(hn::InterleaveEven(TagF64(), fromPortF64(a), fromPortF64(b))); }
@@ -13253,6 +13323,50 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingWhereOtherwiseF64(cvectori
 HWY_INLINE double sumWhereF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) { return hn::MaskedReduceSum(TagF64(), maskFromPortF64(mask), fromPortF64(a)); }
 HWY_INLINE double smallestWhereF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) { return hn::MaskedReduceMin(TagF64(), maskFromPortF64(mask), fromPortF64(a)); }
 HWY_INLINE double largestWhereF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) { return hn::MaskedReduceMax(TagF64(), maskFromPortF64(mask), fromPortF64(a)); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 shiftedLeftBytesF64(cvectorization_ops_raw_vector_f64 a, int bytes) {
+  switch (bytes) {
+  case 0: return toPortF64(hn::ShiftLeftBytes<0>(TagF64(), fromPortF64(a)));
+  case 1: return toPortF64(hn::ShiftLeftBytes<1>(TagF64(), fromPortF64(a)));
+  case 2: return toPortF64(hn::ShiftLeftBytes<2>(TagF64(), fromPortF64(a)));
+  case 3: return toPortF64(hn::ShiftLeftBytes<3>(TagF64(), fromPortF64(a)));
+  case 4: return toPortF64(hn::ShiftLeftBytes<4>(TagF64(), fromPortF64(a)));
+  case 5: return toPortF64(hn::ShiftLeftBytes<5>(TagF64(), fromPortF64(a)));
+  case 6: return toPortF64(hn::ShiftLeftBytes<6>(TagF64(), fromPortF64(a)));
+  case 7: return toPortF64(hn::ShiftLeftBytes<7>(TagF64(), fromPortF64(a)));
+  case 8: return toPortF64(hn::ShiftLeftBytes<8>(TagF64(), fromPortF64(a)));
+  case 9: return toPortF64(hn::ShiftLeftBytes<9>(TagF64(), fromPortF64(a)));
+  case 10: return toPortF64(hn::ShiftLeftBytes<10>(TagF64(), fromPortF64(a)));
+  case 11: return toPortF64(hn::ShiftLeftBytes<11>(TagF64(), fromPortF64(a)));
+  case 12: return toPortF64(hn::ShiftLeftBytes<12>(TagF64(), fromPortF64(a)));
+  case 13: return toPortF64(hn::ShiftLeftBytes<13>(TagF64(), fromPortF64(a)));
+  case 14: return toPortF64(hn::ShiftLeftBytes<14>(TagF64(), fromPortF64(a)));
+  case 15: return toPortF64(hn::ShiftLeftBytes<15>(TagF64(), fromPortF64(a)));
+  case 16: return toPortF64(hn::ShiftLeftBytes<16>(TagF64(), fromPortF64(a)));
+  default: return toPortF64(hn::ShiftLeftBytes<0>(TagF64(), fromPortF64(a)));
+  }
+}
+HWY_INLINE cvectorization_ops_raw_vector_f64 shiftedRightBytesF64(cvectorization_ops_raw_vector_f64 a, int bytes) {
+  switch (bytes) {
+  case 0: return toPortF64(hn::ShiftRightBytes<0>(TagF64(), fromPortF64(a)));
+  case 1: return toPortF64(hn::ShiftRightBytes<1>(TagF64(), fromPortF64(a)));
+  case 2: return toPortF64(hn::ShiftRightBytes<2>(TagF64(), fromPortF64(a)));
+  case 3: return toPortF64(hn::ShiftRightBytes<3>(TagF64(), fromPortF64(a)));
+  case 4: return toPortF64(hn::ShiftRightBytes<4>(TagF64(), fromPortF64(a)));
+  case 5: return toPortF64(hn::ShiftRightBytes<5>(TagF64(), fromPortF64(a)));
+  case 6: return toPortF64(hn::ShiftRightBytes<6>(TagF64(), fromPortF64(a)));
+  case 7: return toPortF64(hn::ShiftRightBytes<7>(TagF64(), fromPortF64(a)));
+  case 8: return toPortF64(hn::ShiftRightBytes<8>(TagF64(), fromPortF64(a)));
+  case 9: return toPortF64(hn::ShiftRightBytes<9>(TagF64(), fromPortF64(a)));
+  case 10: return toPortF64(hn::ShiftRightBytes<10>(TagF64(), fromPortF64(a)));
+  case 11: return toPortF64(hn::ShiftRightBytes<11>(TagF64(), fromPortF64(a)));
+  case 12: return toPortF64(hn::ShiftRightBytes<12>(TagF64(), fromPortF64(a)));
+  case 13: return toPortF64(hn::ShiftRightBytes<13>(TagF64(), fromPortF64(a)));
+  case 14: return toPortF64(hn::ShiftRightBytes<14>(TagF64(), fromPortF64(a)));
+  case 15: return toPortF64(hn::ShiftRightBytes<15>(TagF64(), fromPortF64(a)));
+  case 16: return toPortF64(hn::ShiftRightBytes<16>(TagF64(), fromPortF64(a)));
+  default: return toPortF64(hn::ShiftRightBytes<0>(TagF64(), fromPortF64(a)));
+  }
+}
 HWY_INLINE cvectorization_ops_raw_vector_f64 shiftedLeftLanesF64(cvectorization_ops_raw_vector_f64 a, int lanes) {
   switch (lanes) {
   case 0: return toPortF64(hn::ShiftLeftLanes<0>(TagF64(), fromPortF64(a)));
@@ -13267,6 +13381,26 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 shiftedRightLanesF64(cvectorization
   case 1: return toPortF64(hn::ShiftRightLanes<1>(TagF64(), fromPortF64(a)));
   case 2: return toPortF64(hn::ShiftRightLanes<2>(TagF64(), fromPortF64(a)));
   default: return toPortF64(hn::ShiftRightLanes<0>(TagF64(), fromPortF64(a)));
+  }
+}
+HWY_INLINE cvectorization_ops_raw_vector_f64 combinedShiftedRightBytesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, int bytes) {
+  switch (bytes) {
+  case 1: return toPortF64(hn::CombineShiftRightBytes<1>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 2: return toPortF64(hn::CombineShiftRightBytes<2>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 3: return toPortF64(hn::CombineShiftRightBytes<3>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 4: return toPortF64(hn::CombineShiftRightBytes<4>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 5: return toPortF64(hn::CombineShiftRightBytes<5>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 6: return toPortF64(hn::CombineShiftRightBytes<6>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 7: return toPortF64(hn::CombineShiftRightBytes<7>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 8: return toPortF64(hn::CombineShiftRightBytes<8>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 9: return toPortF64(hn::CombineShiftRightBytes<9>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 10: return toPortF64(hn::CombineShiftRightBytes<10>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 11: return toPortF64(hn::CombineShiftRightBytes<11>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 12: return toPortF64(hn::CombineShiftRightBytes<12>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 13: return toPortF64(hn::CombineShiftRightBytes<13>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 14: return toPortF64(hn::CombineShiftRightBytes<14>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  case 15: return toPortF64(hn::CombineShiftRightBytes<15>(TagF64(), fromPortF64(a), fromPortF64(b)));
+  default: return toPortF64(hn::CombineShiftRightBytes<1>(TagF64(), fromPortF64(a), fromPortF64(b)));
   }
 }
 HWY_INLINE cvectorization_ops_raw_vector_f64 combinedShiftedRightLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, int lanes) {
@@ -13824,6 +13958,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 slide1DownF16(cvectorization_ops_ra
 HWY_INLINE cvectorization_ops_raw_vector_f16 slide1DownF16(cvectorization_ops_raw_vector_f16 a) { return (cvectorization_ops_raw_vector_f16)slide1DownU16((cvectorization_ops_raw_vector_u16)a); }
 #endif
 HWY_INLINE cvectorization_ops_raw_vector_f16 slide1DownFillingWithF16(uint16_t fill, cvectorization_ops_raw_vector_f16 a) { return toPortF16(hn::Slide1DownOr(hwy::BitCastScalar<hwy::float16_t>(fill), TagF16(), fromPortF16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 tableLookupBytesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 indices) { return toPortF16(hn::TableLookupBytes(fromPortF16(a), fromPortF16(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 tableLookupBytesOrZeroF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 indices) { return toPortF16(hn::TableLookupBytesOr0(fromPortF16(a), fromPortF16(indices))); }
 #if (HWY_HAVE_FLOAT16 && HWY_ARCH_ARM) || HWY_TARGET == HWY_EMU128
 HWY_INLINE cvectorization_ops_raw_vector_f16 tableLookupLanesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_i16 indices) { return toPortF16(hn::TableLookupLanes(fromPortF16(a), hn::IndicesFromVec(TagF16(), fromPortI16(indices)))); }
 #else
@@ -13937,6 +14073,7 @@ HWY_INLINE uint16_t laneF16(cvectorization_ops_raw_vector_f16 a, size_t index) {
 HWY_INLINE uint16_t laneF16(cvectorization_ops_raw_vector_f16 a, size_t index) { return laneU16((cvectorization_ops_raw_vector_u16)a, index); }
 #endif
 HWY_INLINE cvectorization_ops_raw_vector_f16 replacingLaneF16(cvectorization_ops_raw_vector_f16 a, size_t index, uint16_t value) { return toPortF16(hn::InsertLane(fromPortF16(a), index, hwy::BitCastScalar<hwy::float16_t>(value))); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 byteSwappedF16(cvectorization_ops_raw_vector_f16 a) { return toPortF16(hn::ReverseLaneBytes(fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 interleavingLowerF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) { return toPortF16(hn::InterleaveLower(TagF16(), fromPortF16(a), fromPortF16(b))); }
 #if (HWY_HAVE_FLOAT16 && HWY_ARCH_ARM) || HWY_TARGET == HWY_EMU128
 HWY_INLINE cvectorization_ops_raw_vector_f16 interleavingUpperF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) { return toPortF16(hn::InterleaveUpper(TagF16(), fromPortF16(a), fromPortF16(b))); }
@@ -14092,6 +14229,50 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 lookup16F16(const void* from, cvect
 #endif
 HWY_INLINE cvectorization_ops_raw_vector_f16 repeatingWhereF16(cvectorization_ops_raw_mask_f16 mask, uint16_t value) { return toPortF16(hn::MaskedSet(TagF16(), maskFromPortF16(mask), hwy::BitCastScalar<hwy::float16_t>(value))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 repeatingWhereOtherwiseF16(cvectorization_ops_raw_vector_f16 otherwise, cvectorization_ops_raw_mask_f16 mask, uint16_t value) { return toPortF16(hn::MaskedSetOr(fromPortF16(otherwise), maskFromPortF16(mask), hwy::BitCastScalar<hwy::float16_t>(value))); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 shiftedLeftBytesF16(cvectorization_ops_raw_vector_f16 a, int bytes) {
+  switch (bytes) {
+  case 0: return toPortF16(hn::ShiftLeftBytes<0>(TagF16(), fromPortF16(a)));
+  case 1: return toPortF16(hn::ShiftLeftBytes<1>(TagF16(), fromPortF16(a)));
+  case 2: return toPortF16(hn::ShiftLeftBytes<2>(TagF16(), fromPortF16(a)));
+  case 3: return toPortF16(hn::ShiftLeftBytes<3>(TagF16(), fromPortF16(a)));
+  case 4: return toPortF16(hn::ShiftLeftBytes<4>(TagF16(), fromPortF16(a)));
+  case 5: return toPortF16(hn::ShiftLeftBytes<5>(TagF16(), fromPortF16(a)));
+  case 6: return toPortF16(hn::ShiftLeftBytes<6>(TagF16(), fromPortF16(a)));
+  case 7: return toPortF16(hn::ShiftLeftBytes<7>(TagF16(), fromPortF16(a)));
+  case 8: return toPortF16(hn::ShiftLeftBytes<8>(TagF16(), fromPortF16(a)));
+  case 9: return toPortF16(hn::ShiftLeftBytes<9>(TagF16(), fromPortF16(a)));
+  case 10: return toPortF16(hn::ShiftLeftBytes<10>(TagF16(), fromPortF16(a)));
+  case 11: return toPortF16(hn::ShiftLeftBytes<11>(TagF16(), fromPortF16(a)));
+  case 12: return toPortF16(hn::ShiftLeftBytes<12>(TagF16(), fromPortF16(a)));
+  case 13: return toPortF16(hn::ShiftLeftBytes<13>(TagF16(), fromPortF16(a)));
+  case 14: return toPortF16(hn::ShiftLeftBytes<14>(TagF16(), fromPortF16(a)));
+  case 15: return toPortF16(hn::ShiftLeftBytes<15>(TagF16(), fromPortF16(a)));
+  case 16: return toPortF16(hn::ShiftLeftBytes<16>(TagF16(), fromPortF16(a)));
+  default: return toPortF16(hn::ShiftLeftBytes<0>(TagF16(), fromPortF16(a)));
+  }
+}
+HWY_INLINE cvectorization_ops_raw_vector_f16 shiftedRightBytesF16(cvectorization_ops_raw_vector_f16 a, int bytes) {
+  switch (bytes) {
+  case 0: return toPortF16(hn::ShiftRightBytes<0>(TagF16(), fromPortF16(a)));
+  case 1: return toPortF16(hn::ShiftRightBytes<1>(TagF16(), fromPortF16(a)));
+  case 2: return toPortF16(hn::ShiftRightBytes<2>(TagF16(), fromPortF16(a)));
+  case 3: return toPortF16(hn::ShiftRightBytes<3>(TagF16(), fromPortF16(a)));
+  case 4: return toPortF16(hn::ShiftRightBytes<4>(TagF16(), fromPortF16(a)));
+  case 5: return toPortF16(hn::ShiftRightBytes<5>(TagF16(), fromPortF16(a)));
+  case 6: return toPortF16(hn::ShiftRightBytes<6>(TagF16(), fromPortF16(a)));
+  case 7: return toPortF16(hn::ShiftRightBytes<7>(TagF16(), fromPortF16(a)));
+  case 8: return toPortF16(hn::ShiftRightBytes<8>(TagF16(), fromPortF16(a)));
+  case 9: return toPortF16(hn::ShiftRightBytes<9>(TagF16(), fromPortF16(a)));
+  case 10: return toPortF16(hn::ShiftRightBytes<10>(TagF16(), fromPortF16(a)));
+  case 11: return toPortF16(hn::ShiftRightBytes<11>(TagF16(), fromPortF16(a)));
+  case 12: return toPortF16(hn::ShiftRightBytes<12>(TagF16(), fromPortF16(a)));
+  case 13: return toPortF16(hn::ShiftRightBytes<13>(TagF16(), fromPortF16(a)));
+  case 14: return toPortF16(hn::ShiftRightBytes<14>(TagF16(), fromPortF16(a)));
+  case 15: return toPortF16(hn::ShiftRightBytes<15>(TagF16(), fromPortF16(a)));
+  case 16: return toPortF16(hn::ShiftRightBytes<16>(TagF16(), fromPortF16(a)));
+  default: return toPortF16(hn::ShiftRightBytes<0>(TagF16(), fromPortF16(a)));
+  }
+}
 HWY_INLINE cvectorization_ops_raw_vector_f16 shiftedLeftLanesF16(cvectorization_ops_raw_vector_f16 a, int lanes) {
   switch (lanes) {
   case 0: return toPortF16(hn::ShiftLeftLanes<0>(TagF16(), fromPortF16(a)));
@@ -14118,6 +14299,26 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 shiftedRightLanesF16(cvectorization
   case 7: return toPortF16(hn::ShiftRightLanes<7>(TagF16(), fromPortF16(a)));
   case 8: return toPortF16(hn::ShiftRightLanes<8>(TagF16(), fromPortF16(a)));
   default: return toPortF16(hn::ShiftRightLanes<0>(TagF16(), fromPortF16(a)));
+  }
+}
+HWY_INLINE cvectorization_ops_raw_vector_f16 combinedShiftedRightBytesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, int bytes) {
+  switch (bytes) {
+  case 1: return toPortF16(hn::CombineShiftRightBytes<1>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 2: return toPortF16(hn::CombineShiftRightBytes<2>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 3: return toPortF16(hn::CombineShiftRightBytes<3>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 4: return toPortF16(hn::CombineShiftRightBytes<4>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 5: return toPortF16(hn::CombineShiftRightBytes<5>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 6: return toPortF16(hn::CombineShiftRightBytes<6>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 7: return toPortF16(hn::CombineShiftRightBytes<7>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 8: return toPortF16(hn::CombineShiftRightBytes<8>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 9: return toPortF16(hn::CombineShiftRightBytes<9>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 10: return toPortF16(hn::CombineShiftRightBytes<10>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 11: return toPortF16(hn::CombineShiftRightBytes<11>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 12: return toPortF16(hn::CombineShiftRightBytes<12>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 13: return toPortF16(hn::CombineShiftRightBytes<13>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 14: return toPortF16(hn::CombineShiftRightBytes<14>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  case 15: return toPortF16(hn::CombineShiftRightBytes<15>(TagF16(), fromPortF16(a), fromPortF16(b)));
+  default: return toPortF16(hn::CombineShiftRightBytes<1>(TagF16(), fromPortF16(a), fromPortF16(b)));
   }
 }
 HWY_INLINE cvectorization_ops_raw_vector_f16 combinedShiftedRightLanesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, int lanes) {
@@ -15377,6 +15578,8 @@ HWY_INLINE cvectorization_ops_raw_vector_bf16 reversedBF16(cvectorization_ops_ra
 HWY_INLINE cvectorization_ops_raw_vector_bf16 slide1UpBF16(cvectorization_ops_raw_vector_bf16 a) { return toPortBF16(hn::Slide1Up(TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 slide1UpFillingWithBF16(uint16_t fill, cvectorization_ops_raw_vector_bf16 a) { return toPortBF16(hn::Slide1UpOr(hwy::BitCastScalar<hwy::bfloat16_t>(fill), TagBF16(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 slide1DownFillingWithBF16(uint16_t fill, cvectorization_ops_raw_vector_bf16 a) { return toPortBF16(hn::Slide1DownOr(hwy::BitCastScalar<hwy::bfloat16_t>(fill), TagBF16(), fromPortBF16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 tableLookupBytesBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 indices) { return toPortBF16(hn::TableLookupBytes(fromPortBF16(a), fromPortBF16(indices))); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 tableLookupBytesOrZeroBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 indices) { return toPortBF16(hn::TableLookupBytesOr0(fromPortBF16(a), fromPortBF16(indices))); }
 HWY_INLINE void loadInterleaved2BF16(const void* from, OutVectorBF16& v0, OutVectorBF16& v1) {
 #if HWY_TARGET_IS_SVE
   VectorBF16 h0, h1;
@@ -15484,6 +15687,7 @@ HWY_INLINE cvectorization_ops_raw_mask_bf16 beforeFirstTrueBF16(cvectorization_o
 HWY_INLINE cvectorization_ops_raw_mask_bf16 atOrBeforeFirstTrueBF16(cvectorization_ops_raw_mask_bf16 mask) { return maskToPortBF16(hn::SetAtOrBeforeFirst(maskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_bf16 atOrAfterFirstTrueBF16(cvectorization_ops_raw_mask_bf16 mask) { return maskToPortBF16(hn::SetAtOrAfterFirst(maskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 replacingLaneBF16(cvectorization_ops_raw_vector_bf16 a, size_t index, uint16_t value) { return toPortBF16(hn::InsertLane(fromPortBF16(a), index, hwy::BitCastScalar<hwy::bfloat16_t>(value))); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 byteSwappedBF16(cvectorization_ops_raw_vector_bf16 a) { return toPortBF16(hn::ReverseLaneBytes(fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 concatenatingLowerLowerBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b) { return toPortBF16(hn::ConcatLowerLower(TagBF16(), fromPortBF16(a), fromPortBF16(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 concatenatingUpperUpperBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b) { return toPortBF16(hn::ConcatUpperUpper(TagBF16(), fromPortBF16(a), fromPortBF16(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 concatenatingUpperLowerBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b) { return toPortBF16(hn::ConcatUpperLower(TagBF16(), fromPortBF16(a), fromPortBF16(b))); }
@@ -15607,6 +15811,26 @@ HWY_INLINE cvectorization_ops_raw_vector_bf16 shiftedLeftLanesBF16(cvectorizatio
   case 7: return toPortBF16(hn::ShiftLeftLanes<7>(TagBF16(), fromPortBF16(a)));
   case 8: return toPortBF16(hn::ShiftLeftLanes<8>(TagBF16(), fromPortBF16(a)));
   default: return toPortBF16(hn::ShiftLeftLanes<0>(TagBF16(), fromPortBF16(a)));
+  }
+}
+HWY_INLINE cvectorization_ops_raw_vector_bf16 combinedShiftedRightBytesBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, int bytes) {
+  switch (bytes) {
+  case 1: return toPortBF16(hn::CombineShiftRightBytes<1>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 2: return toPortBF16(hn::CombineShiftRightBytes<2>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 3: return toPortBF16(hn::CombineShiftRightBytes<3>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 4: return toPortBF16(hn::CombineShiftRightBytes<4>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 5: return toPortBF16(hn::CombineShiftRightBytes<5>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 6: return toPortBF16(hn::CombineShiftRightBytes<6>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 7: return toPortBF16(hn::CombineShiftRightBytes<7>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 8: return toPortBF16(hn::CombineShiftRightBytes<8>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 9: return toPortBF16(hn::CombineShiftRightBytes<9>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 10: return toPortBF16(hn::CombineShiftRightBytes<10>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 11: return toPortBF16(hn::CombineShiftRightBytes<11>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 12: return toPortBF16(hn::CombineShiftRightBytes<12>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 13: return toPortBF16(hn::CombineShiftRightBytes<13>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 14: return toPortBF16(hn::CombineShiftRightBytes<14>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  case 15: return toPortBF16(hn::CombineShiftRightBytes<15>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
+  default: return toPortBF16(hn::CombineShiftRightBytes<1>(TagBF16(), fromPortBF16(a), fromPortBF16(b)));
   }
 }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 combinedShiftedRightLanesBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, int lanes) {
@@ -26397,6 +26621,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpF32(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1UpFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1UpFillingWithF32(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1DownF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 slide1DownFillingWithF32(float fill, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::slide1DownFillingWithF32(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 tableLookupBytesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 indices) noexcept { return ::HighwayReference::tableLookupBytesF32(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 tableLookupBytesOrZeroF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 indices) noexcept { return ::HighwayReference::tableLookupBytesOrZeroF32(a, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 tableLookupLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::tableLookupLanesF32(a, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 twoTablesLookupLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesF32(a, b, indices); }
 HWY_INLINE void loadInterleaved2F32(const float* from, OutVectorF32& v0, OutVectorF32& v1) noexcept { ::HighwayReference::loadInterleaved2F32(from, v0, v1); }
@@ -26449,6 +26675,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingSmallestF32(cvectorization
 HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingLargestF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::repeatingLargestF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 pairwiseAddingBlocksF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::pairwiseAddingBlocksF32(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 pairwiseSubtractingBlocksF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::pairwiseSubtractingBlocksF32(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 byteSwappedF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::byteSwappedF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 interleavingLowerF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::interleavingLowerF32(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 interleavingUpperF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::interleavingUpperF32(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 interleavingEvenF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::interleavingEvenF32(a, b); }
@@ -26533,8 +26760,11 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 repeatingWhereOtherwiseF32(cvectori
 HWY_INLINE float sumWhereF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::sumWhereF32(mask, a); }
 HWY_INLINE float smallestWhereF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::smallestWhereF32(mask, a); }
 HWY_INLINE float largestWhereF32(cvectorization_ops_raw_mask_f32 mask, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::largestWhereF32(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 shiftedLeftBytesF32(cvectorization_ops_raw_vector_f32 a, int bytes) noexcept { return ::HighwayReference::shiftedLeftBytesF32(a, bytes); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 shiftedRightBytesF32(cvectorization_ops_raw_vector_f32 a, int bytes) noexcept { return ::HighwayReference::shiftedRightBytesF32(a, bytes); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 shiftedLeftLanesF32(cvectorization_ops_raw_vector_f32 a, int lanes) noexcept { return ::HighwayReference::shiftedLeftLanesF32(a, lanes); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 shiftedRightLanesF32(cvectorization_ops_raw_vector_f32 a, int lanes) noexcept { return ::HighwayReference::shiftedRightLanesF32(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 combinedShiftedRightBytesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, int bytes) noexcept { return ::HighwayReference::combinedShiftedRightBytesF32(a, b, bytes); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 combinedShiftedRightLanesF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, int lanes) noexcept { return ::HighwayReference::combinedShiftedRightLanesF32(a, b, lanes); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 broadcastingInBlocksF32(cvectorization_ops_raw_vector_f32 a, int lane) noexcept { return ::HighwayReference::broadcastingInBlocksF32(a, lane); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 broadcastingLaneF32(cvectorization_ops_raw_vector_f32 a, int lane) noexcept { return ::HighwayReference::broadcastingLaneF32(a, lane); }
@@ -26691,6 +26921,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpF64(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1UpFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1UpFillingWithF64(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1DownF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 slide1DownFillingWithF64(double fill, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::slide1DownFillingWithF64(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 tableLookupBytesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 indices) noexcept { return ::HighwayReference::tableLookupBytesF64(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 tableLookupBytesOrZeroF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 indices) noexcept { return ::HighwayReference::tableLookupBytesOrZeroF64(a, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 tableLookupLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::tableLookupLanesF64(a, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 twoTablesLookupLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesF64(a, b, indices); }
 HWY_INLINE void loadInterleaved2F64(const double* from, OutVectorF64& v0, OutVectorF64& v1) noexcept { ::HighwayReference::loadInterleaved2F64(from, v0, v1); }
@@ -26743,6 +26975,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingSmallestF64(cvectorization
 HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingLargestF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::repeatingLargestF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 pairwiseAddingBlocksF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::pairwiseAddingBlocksF64(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 pairwiseSubtractingBlocksF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::pairwiseSubtractingBlocksF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 byteSwappedF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::byteSwappedF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 interleavingLowerF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::interleavingLowerF64(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 interleavingUpperF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::interleavingUpperF64(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 interleavingEvenF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b) noexcept { return ::HighwayReference::interleavingEvenF64(a, b); }
@@ -26823,8 +27056,11 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 repeatingWhereOtherwiseF64(cvectori
 HWY_INLINE double sumWhereF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::sumWhereF64(mask, a); }
 HWY_INLINE double smallestWhereF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::smallestWhereF64(mask, a); }
 HWY_INLINE double largestWhereF64(cvectorization_ops_raw_mask_f64 mask, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::largestWhereF64(mask, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 shiftedLeftBytesF64(cvectorization_ops_raw_vector_f64 a, int bytes) noexcept { return ::HighwayReference::shiftedLeftBytesF64(a, bytes); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 shiftedRightBytesF64(cvectorization_ops_raw_vector_f64 a, int bytes) noexcept { return ::HighwayReference::shiftedRightBytesF64(a, bytes); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 shiftedLeftLanesF64(cvectorization_ops_raw_vector_f64 a, int lanes) noexcept { return ::HighwayReference::shiftedLeftLanesF64(a, lanes); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 shiftedRightLanesF64(cvectorization_ops_raw_vector_f64 a, int lanes) noexcept { return ::HighwayReference::shiftedRightLanesF64(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 combinedShiftedRightBytesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, int bytes) noexcept { return ::HighwayReference::combinedShiftedRightBytesF64(a, b, bytes); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 combinedShiftedRightLanesF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, int lanes) noexcept { return ::HighwayReference::combinedShiftedRightLanesF64(a, b, lanes); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 broadcastingInBlocksF64(cvectorization_ops_raw_vector_f64 a, int lane) noexcept { return ::HighwayReference::broadcastingInBlocksF64(a, lane); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 broadcastingLaneF64(cvectorization_ops_raw_vector_f64 a, int lane) noexcept { return ::HighwayReference::broadcastingLaneF64(a, lane); }
@@ -26936,6 +27172,8 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 slide1UpF16(cvectorization_ops_raw_
 HWY_INLINE cvectorization_ops_raw_vector_f16 slide1UpFillingWithF16(uint16_t fill, cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::slide1UpFillingWithF16(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 slide1DownF16(cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::slide1DownF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 slide1DownFillingWithF16(uint16_t fill, cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::slide1DownFillingWithF16(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 tableLookupBytesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 indices) noexcept { return ::HighwayReference::tableLookupBytesF16(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 tableLookupBytesOrZeroF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 indices) noexcept { return ::HighwayReference::tableLookupBytesOrZeroF16(a, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 tableLookupLanesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_i16 indices) noexcept { return ::HighwayReference::tableLookupLanesF16(a, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 twoTablesLookupLanesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_i16 indices) noexcept { return ::HighwayReference::twoTablesLookupLanesF16(a, b, indices); }
 HWY_INLINE void loadInterleaved2F16(const void* from, OutVectorF16& v0, OutVectorF16& v1) noexcept { ::HighwayReference::loadInterleaved2F16(from, v0, v1); }
@@ -26981,6 +27219,7 @@ HWY_INLINE cvectorization_ops_raw_mask_f16 atOrBeforeFirstTrueF16(cvectorization
 HWY_INLINE cvectorization_ops_raw_mask_f16 atOrAfterFirstTrueF16(cvectorization_ops_raw_mask_f16 mask) noexcept { return ::HighwayReference::atOrAfterFirstTrueF16(mask); }
 HWY_INLINE uint16_t laneF16(cvectorization_ops_raw_vector_f16 a, size_t index) noexcept { return ::HighwayReference::laneF16(a, index); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 replacingLaneF16(cvectorization_ops_raw_vector_f16 a, size_t index, uint16_t value) noexcept { return ::HighwayReference::replacingLaneF16(a, index, value); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 byteSwappedF16(cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::byteSwappedF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 interleavingLowerF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::interleavingLowerF16(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 interleavingUpperF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::interleavingUpperF16(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 interleavingEvenF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::interleavingEvenF16(a, b); }
@@ -27024,8 +27263,11 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 lookup8F16(const void* from, cvecto
 HWY_INLINE cvectorization_ops_raw_vector_f16 lookup16F16(const void* from, cvectorization_ops_raw_vector_i16 indices) noexcept { return ::HighwayReference::lookup16F16(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 repeatingWhereF16(cvectorization_ops_raw_mask_f16 mask, uint16_t value) noexcept { return ::HighwayReference::repeatingWhereF16(mask, value); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 repeatingWhereOtherwiseF16(cvectorization_ops_raw_vector_f16 otherwise, cvectorization_ops_raw_mask_f16 mask, uint16_t value) noexcept { return ::HighwayReference::repeatingWhereOtherwiseF16(otherwise, mask, value); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 shiftedLeftBytesF16(cvectorization_ops_raw_vector_f16 a, int bytes) noexcept { return ::HighwayReference::shiftedLeftBytesF16(a, bytes); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 shiftedRightBytesF16(cvectorization_ops_raw_vector_f16 a, int bytes) noexcept { return ::HighwayReference::shiftedRightBytesF16(a, bytes); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 shiftedLeftLanesF16(cvectorization_ops_raw_vector_f16 a, int lanes) noexcept { return ::HighwayReference::shiftedLeftLanesF16(a, lanes); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 shiftedRightLanesF16(cvectorization_ops_raw_vector_f16 a, int lanes) noexcept { return ::HighwayReference::shiftedRightLanesF16(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 combinedShiftedRightBytesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, int bytes) noexcept { return ::HighwayReference::combinedShiftedRightBytesF16(a, b, bytes); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 combinedShiftedRightLanesF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, int lanes) noexcept { return ::HighwayReference::combinedShiftedRightLanesF16(a, b, lanes); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 broadcastingInBlocksF16(cvectorization_ops_raw_vector_f16 a, int lane) noexcept { return ::HighwayReference::broadcastingInBlocksF16(a, lane); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 broadcastingLaneF16(cvectorization_ops_raw_vector_f16 a, int lane) noexcept { return ::HighwayReference::broadcastingLaneF16(a, lane); }
@@ -27182,6 +27424,8 @@ HWY_INLINE cvectorization_ops_raw_vector_bf16 reversedBF16(cvectorization_ops_ra
 HWY_INLINE cvectorization_ops_raw_vector_bf16 slide1UpBF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::slide1UpBF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 slide1UpFillingWithBF16(uint16_t fill, cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::slide1UpFillingWithBF16(fill, a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 slide1DownFillingWithBF16(uint16_t fill, cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::slide1DownFillingWithBF16(fill, a); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 tableLookupBytesBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 indices) noexcept { return ::HighwayReference::tableLookupBytesBF16(a, indices); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 tableLookupBytesOrZeroBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 indices) noexcept { return ::HighwayReference::tableLookupBytesOrZeroBF16(a, indices); }
 HWY_INLINE void loadInterleaved2BF16(const void* from, OutVectorBF16& v0, OutVectorBF16& v1) noexcept { ::HighwayReference::loadInterleaved2BF16(from, v0, v1); }
 HWY_INLINE void loadInterleaved3BF16(const void* from, OutVectorBF16& v0, OutVectorBF16& v1, OutVectorBF16& v2) noexcept { ::HighwayReference::loadInterleaved3BF16(from, v0, v1, v2); }
 HWY_INLINE void loadInterleaved4BF16(const void* from, OutVectorBF16& v0, OutVectorBF16& v1, OutVectorBF16& v2, OutVectorBF16& v3) noexcept { ::HighwayReference::loadInterleaved4BF16(from, v0, v1, v2, v3); }
@@ -27211,6 +27455,7 @@ HWY_INLINE cvectorization_ops_raw_mask_bf16 beforeFirstTrueBF16(cvectorization_o
 HWY_INLINE cvectorization_ops_raw_mask_bf16 atOrBeforeFirstTrueBF16(cvectorization_ops_raw_mask_bf16 mask) noexcept { return ::HighwayReference::atOrBeforeFirstTrueBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_bf16 atOrAfterFirstTrueBF16(cvectorization_ops_raw_mask_bf16 mask) noexcept { return ::HighwayReference::atOrAfterFirstTrueBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 replacingLaneBF16(cvectorization_ops_raw_vector_bf16 a, size_t index, uint16_t value) noexcept { return ::HighwayReference::replacingLaneBF16(a, index, value); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 byteSwappedBF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::byteSwappedBF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 concatenatingLowerLowerBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b) noexcept { return ::HighwayReference::concatenatingLowerLowerBF16(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 concatenatingUpperUpperBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b) noexcept { return ::HighwayReference::concatenatingUpperUpperBF16(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 concatenatingUpperLowerBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b) noexcept { return ::HighwayReference::concatenatingUpperLowerBF16(a, b); }
@@ -27239,6 +27484,7 @@ HWY_INLINE cvectorization_ops_raw_vector_bf16 expandedBF16(cvectorization_ops_ra
 HWY_INLINE cvectorization_ops_raw_vector_bf16 repeatingWhereBF16(cvectorization_ops_raw_mask_bf16 mask, uint16_t value) noexcept { return ::HighwayReference::repeatingWhereBF16(mask, value); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 repeatingWhereOtherwiseBF16(cvectorization_ops_raw_vector_bf16 otherwise, cvectorization_ops_raw_mask_bf16 mask, uint16_t value) noexcept { return ::HighwayReference::repeatingWhereOtherwiseBF16(otherwise, mask, value); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 shiftedLeftLanesBF16(cvectorization_ops_raw_vector_bf16 a, int lanes) noexcept { return ::HighwayReference::shiftedLeftLanesBF16(a, lanes); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 combinedShiftedRightBytesBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, int bytes) noexcept { return ::HighwayReference::combinedShiftedRightBytesBF16(a, b, bytes); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 combinedShiftedRightLanesBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, int lanes) noexcept { return ::HighwayReference::combinedShiftedRightLanesBF16(a, b, lanes); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 broadcastingBlockBF16(cvectorization_ops_raw_vector_bf16 a, int block) noexcept { return ::HighwayReference::broadcastingBlockBF16(a, block); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 slideUpBlocksBF16(cvectorization_ops_raw_vector_bf16 a, int blocks) noexcept { return ::HighwayReference::slideUpBlocksBF16(a, blocks); }

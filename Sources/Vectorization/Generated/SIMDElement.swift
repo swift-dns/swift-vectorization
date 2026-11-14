@@ -153,6 +153,10 @@ public protocol SIMDElement {
     static func slide1Up(_ a: Vector, fillingWith fill: Lane) -> Vector
     static func slide1Down(_ a: Vector) -> Vector
     static func slide1Down(_ a: Vector, fillingWith fill: Lane) -> Vector
+    static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector
+    @unsafe static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector
+    static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector
+    @unsafe static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector
     static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector
     @unsafe static func tableLookupLanes(_ a: Vector, atUnchecked indices: Indices) -> Vector
     static func twoTablesLookupLanes(_ a: Vector, _ b: Vector, at indices: Indices) -> Vector
@@ -525,10 +529,20 @@ public protocol SIMDElement {
     static func sum(_ a: Vector, where mask: Mask) -> Lane
     static func smallest(_ a: Vector, where mask: Mask) -> Lane
     static func largest(_ a: Vector, where mask: Mask) -> Lane
+    static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector
+    @unsafe static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
+    static func shiftedRightBytes(_ a: Vector, by bytes: Int) -> Vector
+    @unsafe static func shiftedRightBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
     static func shiftedLeftLanes(_ a: Vector, by lanes: Int) -> Vector
     @unsafe static func shiftedLeftLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector
     static func shiftedRightLanes(_ a: Vector, by lanes: Int) -> Vector
     @unsafe static func shiftedRightLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector
+    static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
+    @unsafe static func combinedShiftedRightBytes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked bytes: Int
+    ) -> Vector
     static func combinedShiftedRightLanes(_ a: Vector, _ b: Vector, by lanes: Int) -> Vector
     @unsafe static func combinedShiftedRightLanes(
         _ a: Vector,
@@ -697,10 +711,6 @@ public protocol SIMDIntegerElement: SIMDElement {
     static func leadingZeroBitCount(_ a: Vector) -> Vector
     static func trailingZeroBitCount(_ a: Vector) -> Vector
     static func highestSetBitIndex(_ a: Vector) -> Vector
-    static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector
-    @unsafe static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector
-    static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector
-    @unsafe static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector
     static func testingBit(_ a: Vector, _ b: Vector) -> Mask
     static func bitReversed(_ a: Vector) -> Vector
     static func remainder(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
@@ -719,16 +729,6 @@ public protocol SIMDIntegerElement: SIMDElement {
         otherwise: Vector
     ) -> Vector
     static func leadingZeroBitCount(_ a: Vector, where mask: Mask) -> Vector
-    static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector
-    @unsafe static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
-    static func shiftedRightBytes(_ a: Vector, by bytes: Int) -> Vector
-    @unsafe static func shiftedRightBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
-    static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
-    @unsafe static func combinedShiftedRightBytes(
-        _ a: Vector,
-        _ b: Vector,
-        byUnchecked bytes: Int
-    ) -> Vector
     static func shiftedLeft(_ a: Vector, by bits: Int, where mask: Mask) -> Vector
     static func shiftedLeft(
         _ a: Vector,
@@ -776,6 +776,7 @@ public protocol SIMDFloatElement: SIMDElement {
     static func zeroingIfNegative(_ a: Vector, _ b: Vector) -> Vector
     static func negatingIfNegative(_ a: Vector, _ b: Vector) -> Vector
     static func isNegative(_ a: Vector) -> Mask
+    static func byteSwapped(_ a: Vector) -> Vector
     static func squareRoot(_ a: Vector, where mask: Mask) -> Vector
     static func squareRoot(_ a: Vector, where mask: Mask, otherwise: Vector) -> Vector
     static func approximateReciprocal(_ a: Vector, where mask: Mask) -> Vector

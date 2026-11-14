@@ -544,6 +544,28 @@ package enum Inputs {
                 inContract: inContract
             ).map { V($0) }
         }
+        return byteIndices(V.self, offset: offset, count: count, seed: seed, inContract: inContract)
+    }
+
+    package static func tableIndices<V: SIMD>(
+        _ type: V.Type,
+        offset: Int = 0,
+        perByte: Bool,
+        count: Int,
+        seed: UInt64,
+        inContract: Bool
+    ) -> [V] where V.Scalar: ReferenceLane & BinaryFloatingPoint {
+        precondition(perByte, "Floating-point lanes only take byte indices")
+        return byteIndices(V.self, offset: offset, count: count, seed: seed, inContract: inContract)
+    }
+
+    private static func byteIndices<V: SIMD>(
+        _ type: V.Type,
+        offset: Int,
+        count: Int,
+        seed: UInt64,
+        inContract: Bool
+    ) -> [V] where V.Scalar: ReferenceLane {
         let size = MemoryLayout<V.Scalar>.size
         return indexLanes(
             UInt8.self,

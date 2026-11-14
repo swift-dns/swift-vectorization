@@ -33789,6 +33789,8 @@ let bitwiseHalfPrecisionOps: [String: [Element]] = [
     "slide1UpFillingWith": halfPrecisionElements,
     "slide1Down": [float16],
     "slide1DownFillingWith": halfPrecisionElements,
+    "tableLookupBytes": halfPrecisionElements,
+    "tableLookupBytesOrZero": halfPrecisionElements,
     "tableLookupLanes": [float16],
     "twoTablesLookupLanes": [float16],
     "loadInterleaved2": halfPrecisionElements,
@@ -33845,6 +33847,7 @@ let bitwiseHalfPrecisionOps: [String: [Element]] = [
     "reversed2": halfPrecisionElements,
     "reversed4": halfPrecisionElements,
     "reversed8": halfPrecisionElements,
+    "byteSwapped": halfPrecisionElements,
     "oddEvenBlocks": halfPrecisionElements,
     "swappingAdjacentBlocks": halfPrecisionElements,
     "interleavingEvenBlocks": halfPrecisionElements,
@@ -33872,6 +33875,9 @@ let bitwiseHalfPrecisionOps: [String: [Element]] = [
     "shiftedLeftLanes": halfPrecisionElements,
     "shiftedRightLanes": [float16],
     "combinedShiftedRightLanes": halfPrecisionElements,
+    "shiftedLeftBytes": [float16],
+    "shiftedRightBytes": [float16],
+    "combinedShiftedRightBytes": halfPrecisionElements,
     "broadcastingInBlocks": [float16],
     "broadcastingLane": [float16],
     "broadcastingBlock": halfPrecisionElements,
@@ -33904,6 +33910,15 @@ let bitwiseHalfPrecisionOps: [String: [Element]] = [
     "combiningMasks": [float16],
     "extractingBlock": halfPrecisionElements,
     "replacingBlock": halfPrecisionElements,
+]
+
+let bytewiseFloatOps: Set<String> = [
+    "byteSwapped",
+    "combinedShiftedRightBytes",
+    "shiftedLeftBytes",
+    "shiftedRightBytes",
+    "tableLookupBytes",
+    "tableLookupBytesOrZero",
 ]
 
 let signedHalfPrecisionDelegations: Set<String> = [
@@ -34169,6 +34184,13 @@ func extendedToHalfPrecision(_ op: Op) -> Op {
     guard op.source == nil, let extra = bitwiseHalfPrecisionOps[op.identifier] else { return op }
     var extended = op
     extended.applies = op.applies.including(extra)
+    return extended
+}
+
+func extendedToFloat(_ op: Op) -> Op {
+    guard op.source == nil, bytewiseFloatOps.contains(op.identifier) else { return op }
+    var extended = op
+    extended.applies = op.applies.including(classicElements.filter { $0.category == .float })
     return extended
 }
 
@@ -37192,9 +37214,7 @@ let ops =
     (basicOps + signAndComparisonOps + cryptoOps + maskOps + swizzleOps + compressOps
     + lookupSizes.map(lookupOp) + maskedOps + immediateOps + memoryOps + conversionOps
     + widenArithmeticOps + narrowOps + convertFloat16Ops + bfloat16ConvertOps + float16ArithmeticOps)
-    .map(
-        extendedToHalfPrecision
-    )
+    .map(extendedToHalfPrecision).map(extendedToFloat)
 
 // A widening load reads lanes of a narrower element type and promotes each of them to the
 // element type of the vector it returns. It is two Highway ops rather than one, and its pointer
@@ -40692,9 +40712,11 @@ func halfPrecisionDelegation(
     for element: Element,
     spanned: Bool = false
 ) -> String? {
+    let isBytewiseFloat = element.category == .float && bytewiseFloatOps.contains(op.identifier)
     guard
-        element.isHalfPrecision, bitwiseHalfPrecisionOps[op.identifier] != nil,
-        halfPrecisionBodies[op.identifier] == nil
+        isBytewiseFloat
+            || (element.isHalfPrecision && bitwiseHalfPrecisionOps[op.identifier] != nil
+                && halfPrecisionBodies[op.identifier] == nil)
     else { return nil }
     return halfPrecisionCall(
         of: op,
@@ -40843,9 +40865,9 @@ func generateHeader() -> String {
         }
         if element.category != .float {
             output += indicesWithinFunction(perByte: false, for: element)
-            if element.bits > 8 {
-                output += indicesWithinFunction(perByte: true, for: element)
-            }
+        }
+        if element.bits > 8 {
+            output += indicesWithinFunction(perByte: true, for: element)
         }
         if element.bits >= 32 {
             output += indicesWithinWhereFunction(gathering: true, for: element)
@@ -41506,9 +41528,13 @@ func indexChecks(of op: Op, for element: Element) -> [Check] {
         indicesWithinName(perByte: contract.isPerByte, for: indexElement),
         indexElement
     )
-    let name = parameter == .indexVector ? "vector" : "indices"
+    let name = rawArgument(
+        parameter == .indexVector ? "vector" : "indices",
+        parameter,
+        for: element
+    )
     let count = contract.count.expression(laneCount: "laneCount")
-    return [("\(function)(\(name).raw, \(contract.offset), \(count))", contract.message)]
+    return [("\(function)(\(name), \(contract.offset), \(count))", contract.message)]
 }
 
 func laneIndexChecks() -> [Check] {
@@ -43777,11 +43803,16 @@ func codegenConstant(
         case .float16, .bfloat16: "\(operand.swiftType)(bitPattern: 26)"
         case .unsignedInteger, .signedInteger: "26"
         }
+    let byteIndex =
+        switch operand.category {
+        case .float, .float16, .bfloat16: "\(operand.swiftType)(bitPattern: 3)"
+        case .unsignedInteger, .signedInteger: "3"
+        }
     switch parameter {
     case .vector, .fillVector, .otherwiseVector, .sourceVector, .signedSourceVector:
         return (port.repeating(lane), highway.repeating(lane))
     case .shiftCounts: return (port.repeating("3"), highway.repeating("3"))
-    case .indices: return (port.repeating("3"), highway.repeating("3"))
+    case .indices: return (port.repeating(byteIndex), highway.repeating(byteIndex))
     case .laneIndices, .lookupIndices, .indexVector, .pointerIndices, .pointerOffsets:
         let indices = operandElement(of: parameter, for: element)
         return (

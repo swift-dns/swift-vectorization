@@ -6,6 +6,41 @@ public import CVectorizationOps
 @available(SwiftStdlib 5.3, *)
 extension SIMDFloat16 {
     @export(implementation) @inline(always)
+    public static func loadExpanded(
+        from: UnsafePointer<Lane>,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector {
+        unsafe cvectorization_ops_load_expanded_where_otherwise_f16(otherwise, mask.raw, from)
+    }
+
+    @export(implementation) @inline(always)
+    public static func loadExpanded(
+        from span: Span<Lane>,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector {
+        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        return unsafe loadExpanded(fromUnchecked: span, where: mask, otherwise: otherwise)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func loadExpanded(
+        fromUnchecked span: Span<Lane>,
+        where mask: Mask,
+        otherwise: Vector
+    ) -> Vector {
+        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        return span.withUnsafeBufferPointer {
+            unsafe cvectorization_ops_load_expanded_where_otherwise_f16(
+                otherwise,
+                mask.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
     public static func interleavingLower(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_interleaving_lower_f16(a, b)
     }

@@ -4,46 +4,6 @@ public import CVectorizationOps
 
 extension SIMDFloat {
     @export(implementation) @inline(always)
-    public static func loadInterleaved2(
-        from: UnsafePointer<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector
-    ) {
-        unsafe cvectorization_ops_load_interleaved2_f32(from, &v0, &v1)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func loadInterleaved2(
-        from span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector
-    ) {
-        precondition(
-            span.count >= 2 * laneCount,
-            "Span has fewer elements than 2 vectors have lanes"
-        )
-        unsafe loadInterleaved2(fromUnchecked: span, &v0, &v1)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func loadInterleaved2(
-        fromUnchecked span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector
-    ) {
-        assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
-        span.withUnsafeBufferPointer {
-            unsafe cvectorization_ops_load_interleaved2_f32(
-                $0.baseAddress.unsafelyUnwrapped,
-                &v0,
-                &v1
-            )
-        }
-    }
-
-    @export(implementation) @inline(always)
     public static func loadInterleaved3(
         from: UnsafePointer<Lane>,
         _ v0: inout Vector,
@@ -371,6 +331,42 @@ extension SIMDFloat {
     }
 
     @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_bytes_f32(indices, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return unsafe tableLookupBytes(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_bytes_f32(indices, 0, 16),
+            "Byte index is negative or more than 15"
+        )
+        return cvectorization_ops_table_lookup_bytes_f32(a, indices)
+    }
+
+    @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_bytes_f32(indices, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return unsafe tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_bytes_f32(indices, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return cvectorization_ops_table_lookup_bytes_or_zero_f32(a, indices)
+    }
+
+    @export(implementation) @inline(always)
     public static func pairwiseAddingBlocks(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_pairwise_adding_blocks_f32(a, b)
     }
@@ -390,6 +386,36 @@ extension SIMDFloat {
     public static func broadcastingInBlocks(_ a: Vector, laneUnchecked lane: Int) -> Vector {
         assert(lane >= 0 && lane <= 3, "Lane is negative or not in a block")
         return cvectorization_ops_broadcasting_in_blocks_f32(a, Int32(truncatingIfNeeded: lane))
+    }
+
+    @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector {
+        precondition(
+            bytes >= 0 && bytes <= 16,
+            "Byte count is negative or more than a block has bytes"
+        )
+        return unsafe shiftedLeftBytes(a, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector {
+        assert(bytes >= 0 && bytes <= 16, "Byte count is negative or more than a block has bytes")
+        return cvectorization_ops_shifted_left_bytes_f32(a, Int32(truncatingIfNeeded: bytes))
+    }
+
+    @export(implementation) @inline(always)
+    public static func shiftedRightBytes(_ a: Vector, by bytes: Int) -> Vector {
+        precondition(
+            bytes >= 0 && bytes <= 16,
+            "Byte count is negative or more than a block has bytes"
+        )
+        return unsafe shiftedRightBytes(a, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func shiftedRightBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector {
+        assert(bytes >= 0 && bytes <= 16, "Byte count is negative or more than a block has bytes")
+        return cvectorization_ops_shifted_right_bytes_f32(a, Int32(truncatingIfNeeded: bytes))
     }
 
     @export(implementation) @inline(always)
@@ -423,6 +449,27 @@ extension SIMDFloat {
     }
 
     @export(implementation) @inline(always)
+    public static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
+    {
+        precondition(bytes >= 1 && bytes <= 15, "Byte count is not between 1 and 15")
+        return unsafe combinedShiftedRightBytes(a, b, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func combinedShiftedRightBytes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked bytes: Int
+    ) -> Vector {
+        assert(bytes >= 1 && bytes <= 15, "Byte count is not between 1 and 15")
+        return cvectorization_ops_combined_shifted_right_bytes_f32(
+            a,
+            b,
+            Int32(truncatingIfNeeded: bytes)
+        )
+    }
+
+    @export(implementation) @inline(always)
     public static func combinedShiftedRightLanes(_ a: Vector, _ b: Vector, by lanes: Int) -> Vector
     {
         precondition(
@@ -452,6 +499,11 @@ extension SIMDFloat {
     @export(implementation) @inline(always)
     public static func reversed(_ a: Vector) -> Vector {
         cvectorization_ops_reversed_f32(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func byteSwapped(_ a: Vector) -> Vector {
+        cvectorization_ops_byte_swapped_f32(a)
     }
 
     @export(implementation) @inline(always)
@@ -1685,53 +1737,6 @@ extension SIMDFloat {
         )
         span.withUnsafeMutableBufferPointer {
             unsafe cvectorization_ops_scatter_f32(a, $0.baseAddress, indices.raw)
-        }
-    }
-
-    @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        to: UnsafeMutablePointer<Lane>,
-        byteOffsets: SIMDInt32.Vector
-    ) {
-        unsafe cvectorization_ops_scatter_byte_offsets_f32(a, to, byteOffsets.raw)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        to span: inout MutableSpan<Lane>,
-        byteOffsets: SIMDInt32.Vector
-    ) {
-        precondition(
-            cvectorization_ops_indices_within_i32(
-                byteOffsets.raw,
-                0,
-                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
-            ),
-            "Byte offset is negative or leaves no room for a lane in the span"
-        )
-        unsafe scatter(a, toUnchecked: &span, byteOffsets: byteOffsets)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func scatter(
-        _ a: Vector,
-        toUnchecked span: inout MutableSpan<Lane>,
-        byteOffsets: SIMDInt32.Vector
-    ) {
-        assert(
-            cvectorization_ops_indices_within_i32(
-                byteOffsets.raw,
-                0,
-                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
-            ),
-            "Byte offset is negative or leaves no room for a lane in the span"
-        )
-        span.withUnsafeMutableBufferPointer {
-            unsafe cvectorization_ops_scatter_byte_offsets_f32(a, $0.baseAddress, byteOffsets.raw)
         }
     }
 

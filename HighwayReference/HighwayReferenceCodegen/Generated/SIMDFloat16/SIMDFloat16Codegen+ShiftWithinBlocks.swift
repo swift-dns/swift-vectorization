@@ -5,6 +5,59 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
+public func portShiftedLeftBytesF16ConstantA() -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.shiftedLeftBytes(
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        byUnchecked: 1
+    )
+}
+
+@inline(never)
+public func highwayShiftedLeftBytesF16ConstantA() -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.shiftedLeftBytesF16(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        1
+    )
+}
+
+@inline(never)
+public func portShiftedLeftBytesF16ConstantBytes(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.shiftedLeftBytes(a, byUnchecked: 1)
+}
+
+@inline(never)
+public func highwayShiftedLeftBytesF16ConstantBytes(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.shiftedLeftBytesF16(a, 1)
+}
+
+@inline(never)
+public func portShiftedRightBytesF16ConstantA() -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.shiftedRightBytes(
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        byUnchecked: 1
+    )
+}
+
+@inline(never)
+public func highwayShiftedRightBytesF16ConstantA() -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.shiftedRightBytesF16(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        1
+    )
+}
+
+@inline(never)
+public func portShiftedRightBytesF16ConstantBytes(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.shiftedRightBytes(a, byUnchecked: 1)
+}
+
+@inline(never)
+public func highwayShiftedRightBytesF16ConstantBytes(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector
+{
+    HighwayReference.Nothrow.shiftedRightBytesF16(a, 1)
+}
+
+@inline(never)
 public func portShiftedLeftLanesF16ConstantA() -> SIMDFloat16.Vector {
     unsafe SIMDFloat16.shiftedLeftLanes(
         SIMDFloat16.repeating(Float16(bitPattern: 26)),
@@ -55,6 +108,64 @@ public func portShiftedRightLanesF16ConstantLanes(_ a: SIMDFloat16.Vector) -> SI
 public func highwayShiftedRightLanesF16ConstantLanes(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector
 {
     HighwayReference.Nothrow.shiftedRightLanesF16(a, 1)
+}
+
+@inline(never)
+public func portCombinedShiftedRightBytesF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector
+{
+    unsafe SIMDFloat16.combinedShiftedRightBytes(
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        b,
+        byUnchecked: 1
+    )
+}
+
+@inline(never)
+public func highwayCombinedShiftedRightBytesF16ConstantA(
+    _ b: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.combinedShiftedRightBytesF16(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        b,
+        1
+    )
+}
+
+@inline(never)
+public func portCombinedShiftedRightBytesF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector
+{
+    unsafe SIMDFloat16.combinedShiftedRightBytes(
+        a,
+        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        byUnchecked: 1
+    )
+}
+
+@inline(never)
+public func highwayCombinedShiftedRightBytesF16ConstantB(
+    _ a: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.combinedShiftedRightBytesF16(
+        a,
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        1
+    )
+}
+
+@inline(never)
+public func portCombinedShiftedRightBytesF16ConstantBytes(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.combinedShiftedRightBytes(a, b, byUnchecked: 1)
+}
+
+@inline(never)
+public func highwayCombinedShiftedRightBytesF16ConstantBytes(
+    _ a: SIMDFloat16.Vector,
+    _ b: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.combinedShiftedRightBytesF16(a, b, 1)
 }
 
 @inline(never)

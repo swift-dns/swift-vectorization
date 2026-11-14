@@ -15,6 +15,19 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func byteSwapped() {
+        let mismatches = Mismatches("byteSwapped")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x18B2_A407_40CB_7D45)
+        for a in aInputs {
+            mismatches.check(
+                H.byteSwapped(a),
+                HighwayReference.byteSwappedF64(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func reversedBlocks() {
         let mismatches = Mismatches("reversedBlocks")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5C8B_BA60_C36E_4DA3)

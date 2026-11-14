@@ -8,6 +8,52 @@ import Testing
 import Vectorization
 
 extension SIMDFloat16CodegenTests {
+    @Test func shiftedLeftBytesConstantA() {
+        let mismatches = Mismatches("portShiftedLeftBytesF16ConstantA")
+        mismatches.check(
+            portShiftedLeftBytesF16ConstantA(),
+            highwayShiftedLeftBytesF16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func shiftedLeftBytesConstantBytes() {
+        let mismatches = Mismatches("portShiftedLeftBytesF16ConstantBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5A38_2EBA_78E9_FA2C)
+        for a in aInputs {
+            mismatches.check(
+                portShiftedLeftBytesF16ConstantBytes(a),
+                highwayShiftedLeftBytesF16ConstantBytes(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightBytesConstantA() {
+        let mismatches = Mismatches("portShiftedRightBytesF16ConstantA")
+        mismatches.check(
+            portShiftedRightBytesF16ConstantA(),
+            highwayShiftedRightBytesF16ConstantA(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func shiftedRightBytesConstantBytes() {
+        let mismatches = Mismatches("portShiftedRightBytesF16ConstantBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8E9D_76EB_F968_CA9B)
+        for a in aInputs {
+            mismatches.check(
+                portShiftedRightBytesF16ConstantBytes(a),
+                highwayShiftedRightBytesF16ConstantBytes(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func shiftedLeftLanesConstantA() {
         let mismatches = Mismatches("portShiftedLeftLanesF16ConstantA")
         mismatches.check(
@@ -49,6 +95,46 @@ extension SIMDFloat16CodegenTests {
                 portShiftedRightLanesF16ConstantLanes(a),
                 highwayShiftedRightLanesF16ConstantLanes(a),
                 "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesConstantA() {
+        let mismatches = Mismatches("portCombinedShiftedRightBytesF16ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x83E6_3F7D_331C_41E3)
+        for b in bInputs {
+            mismatches.check(
+                portCombinedShiftedRightBytesF16ConstantA(b),
+                highwayCombinedShiftedRightBytesF16ConstantA(b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesConstantB() {
+        let mismatches = Mismatches("portCombinedShiftedRightBytesF16ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8CE7_F57D_384F_1AA5)
+        for a in aInputs {
+            mismatches.check(
+                portCombinedShiftedRightBytesF16ConstantB(a),
+                highwayCombinedShiftedRightBytesF16ConstantB(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesConstantBytes() {
+        let mismatches = Mismatches("portCombinedShiftedRightBytesF16ConstantBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x01CA_6A4A_4E8D_A028)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x01CA_6B4A_4E8D_A1DB)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portCombinedShiftedRightBytesF16ConstantBytes(a, b),
+                highwayCombinedShiftedRightBytesF16ConstantBytes(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
             )
         }
         mismatches.record()

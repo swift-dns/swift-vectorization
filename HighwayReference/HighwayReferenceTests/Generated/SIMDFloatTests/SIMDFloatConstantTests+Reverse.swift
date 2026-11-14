@@ -95,6 +95,94 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
+    private func checkByteSwappedConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("byteSwapped with a repeating \(hex(value))")
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.byteSwapped(H.repeating(value)),
+            HighwayReference.byteSwappedF32(H.repeating(value)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func byteSwappedConstantSplatZero() {
+        checkByteSwappedConstantA(0.0)
+    }
+
+    @Test func byteSwappedConstantSplatNegativeZero() {
+        checkByteSwappedConstantA(-0.0)
+    }
+
+    @Test func byteSwappedConstantSplatOne() {
+        checkByteSwappedConstantA(1.0)
+    }
+
+    @Test func byteSwappedConstantSplatMinusOne() {
+        checkByteSwappedConstantA(-1.0)
+    }
+
+    @Test func byteSwappedConstantSplatTwo() {
+        checkByteSwappedConstantA(2.0)
+    }
+
+    @Test func byteSwappedConstantSplatHalf() {
+        checkByteSwappedConstantA(0.5)
+    }
+
+    @Test func byteSwappedConstantSplatFour() {
+        checkByteSwappedConstantA(4.0)
+    }
+
+    @Test func byteSwappedConstantSplatQuarter() {
+        checkByteSwappedConstantA(0.25)
+    }
+
+    @Test func byteSwappedConstantSplatOnePointFive() {
+        checkByteSwappedConstantA(1.5)
+    }
+
+    @Test func byteSwappedConstantSplatMinusTwoPointFive() {
+        checkByteSwappedConstantA(-2.5)
+    }
+
+    @Test func byteSwappedConstantSplatInfinity() {
+        checkByteSwappedConstantA(.infinity)
+    }
+
+    @Test func byteSwappedConstantSplatMinusInfinity() {
+        checkByteSwappedConstantA(-.infinity)
+    }
+
+    @Test func byteSwappedConstantSplatNaN() {
+        checkByteSwappedConstantA(.nan)
+    }
+
+    @Test func byteSwappedConstantSplatMinusNaN() {
+        checkByteSwappedConstantA(-.nan)
+    }
+
+    @Test func byteSwappedConstantSplatPayloadNaN() {
+        checkByteSwappedConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func byteSwappedConstantSplatSignalingNaN() {
+        checkByteSwappedConstantA(.signalingNaN)
+    }
+
+    @Test func byteSwappedConstantSplatMinusSignalingNaN() {
+        checkByteSwappedConstantA(-.signalingNaN)
+    }
+
+    @Test func byteSwappedConstantSplatLeastNonzero() {
+        checkByteSwappedConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func byteSwappedConstantSplatGreatest() {
+        checkByteSwappedConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkReversedBlocksConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("reversedBlocks with a repeating \(hex(value))")
         mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")

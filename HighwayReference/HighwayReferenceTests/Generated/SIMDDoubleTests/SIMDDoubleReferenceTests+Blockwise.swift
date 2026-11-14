@@ -6,6 +6,131 @@ import Testing
 import Vectorization
 
 extension SIMDDoubleReferenceTests {
+    @Test func tableLookupBytes() {
+        let mismatches = Mismatches("tableLookupBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x41AA_D85E_A80C_CC32)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            perByte: true,
+            count: 16,
+            seed: 0x41AA_D95E_A80C_CDE5,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                H.tableLookupBytes(a, at: indices),
+                HighwayReference.tableLookupBytesF64(a, indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesUnchecked() {
+        let mismatches = Mismatches("tableLookupBytes unchecked")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE563_2929_3BF7_A66C)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            perByte: true,
+            count: 16,
+            seed: 0xE563_2A29_3BF7_A81F,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                unsafe H.tableLookupBytes(a, atUnchecked: indices),
+                HighwayReference.tableLookupBytesF64(a, indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"))
+    func tableLookupBytesOutOfContract() {
+        let mismatches = Mismatches("tableLookupBytes out of contract")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x25D7_324A_67FD_6C3F)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            perByte: true,
+            count: 16,
+            seed: 0x25D7_314A_67FD_6A8C,
+            inContract: false
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                unsafe H.tableLookupBytes(a, atUnchecked: indices),
+                HighwayReference.tableLookupBytesF64(a, indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZero() {
+        let mismatches = Mismatches("tableLookupBytesOrZero")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5278_ACE8_2415_FF99)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0x5278_ABE8_2415_FDE6,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                H.tableLookupBytesOrZero(a, at: indices),
+                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroUnchecked() {
+        let mismatches = Mismatches("tableLookupBytesOrZero unchecked")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3F89_72AB_CF45_6579)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0x3F89_71AB_CF45_63C6,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                unsafe H.tableLookupBytesOrZero(a, atUnchecked: indices),
+                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"))
+    func tableLookupBytesOrZeroOutOfContract() {
+        let mismatches = Mismatches("tableLookupBytesOrZero out of contract")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8FA5_0E55_B61D_C352)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0x8FA5_0F55_B61D_C505,
+            inContract: false
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                unsafe H.tableLookupBytesOrZero(a, atUnchecked: indices),
+                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func pairwiseAddingBlocks() {
         let mismatches = Mismatches("pairwiseAddingBlocks")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8ED5_0234_AF84_976C)

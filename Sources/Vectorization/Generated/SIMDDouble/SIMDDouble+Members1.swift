@@ -1478,4 +1478,57 @@ extension SIMDDouble {
         }
     }
 
+    @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, to: UnsafeMutablePointer<Lane>) {
+        unsafe cvectorization_ops_store_block_f64(a.raw, to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, to span: inout MutableSpan<Lane>) {
+        precondition(
+            span.count >= 16 / MemoryLayout<Lane>.stride,
+            "Span has fewer elements than a block has lanes"
+        )
+        unsafe store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, toUnchecked span: inout MutableSpan<Lane>) {
+        assert(
+            span.count >= 16 / MemoryLayout<Lane>.stride,
+            "Span has fewer elements than a block has lanes"
+        )
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_store_block_f64(a.raw, $0.baseAddress.unsafelyUnwrapped)
+        }
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func append(_ a: BlockVector, to output: inout OutputSpan<Lane>) {
+        precondition(
+            output.freeCapacity >= 16 / MemoryLayout<Lane>.stride,
+            "OutputSpan has less free capacity than a block has lanes"
+        )
+        unsafe append(a, toUnchecked: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func append(_ a: BlockVector, toUnchecked output: inout OutputSpan<Lane>) {
+        assert(
+            output.freeCapacity >= 16 / MemoryLayout<Lane>.stride,
+            "OutputSpan has less free capacity than a block has lanes"
+        )
+        unsafe output.withUnsafeMutableBufferPointer { buffer, initializedCount in
+            unsafe cvectorization_ops_store_block_f64(
+                a.raw,
+                buffer.baseAddress.unsafelyUnwrapped + initializedCount
+            )
+            initializedCount &+= 16 / MemoryLayout<Lane>.stride
+        }
+    }
+
 }
