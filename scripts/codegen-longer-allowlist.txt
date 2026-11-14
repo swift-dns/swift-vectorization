@@ -30,6 +30,12 @@ NEON ClampAboveSpanU64
 NEON SelectBelowSpanU64
 NEON ClampAboveSpanU8
 NEON SelectBelowSpanU8
+NEON GatherFirstF32ConstantIndices
+NEON GatherFirstI32ConstantIndices
+NEON GatherFirstU32ConstantIndices
+NEON GatherFirstF64ConstantIndices
+NEON GatherFirstI64ConstantIndices
+NEON GatherFirstU64ConstantIndices
 NEON_WITHOUT_AES FirstLanesF32
 NEON_WITHOUT_AES FirstLanesF64
 NEON_WITHOUT_AES FirstLanesI16
