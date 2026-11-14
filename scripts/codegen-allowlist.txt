@@ -16552,8 +16552,6 @@ AVX3_SPR RoundingShiftedRightU8ConstantA the port and highway have 22 instructio
 AVX3_SPR CombinedSlideDownLanesU8ConstantA the port and highway have 15 instructions each; the port has movl, vmovd that highway lacks; highway has movabsq, vmovq that the port lacks
 AVX3_SPR CombinedSlideDownLanesU8ConstantB the port has 11 instructions against highway's 13; the port has vmovdqa, vpermi2b that highway lacks; highway has vpalignr, vpbroadcastq, vpermt2q, vpshufb that the port lacks
 AVX3_SPR CombinedSlideDownLanesU8ConstantLanes the port has 13 instructions against highway's 15; the port has valignq that highway lacks; highway has vinserti128 (x2), vinserti64x4 that the port lacks
-AVX3_SPR StoreCompressedBlendedF64 the port has 15 instructions against highway's 22; the port has vcompresspd that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovupd, vpbroadcastq, vpermq, vpsrlvq that the port lacks
-AVX3_SPR StoreCompressedBlendedF64ConstantA the port has 13 instructions against highway's 19; the port has vcompresspd that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovupd, vpermpd, vpsrlvq that the port lacks
 AVX3_SPR LoadExpandedWhereF64 the port and highway have 13 instructions each; the port has vexpandpd that highway lacks, and highway has vpexpandq that the port lacks
 AVX3_SPR LoadExpandedWhereOtherwiseF64 the port and highway have 16 instructions each; the port has vexpandpd that highway lacks, and highway has vpexpandq that the port lacks
 AVX3_SPR LoadExpandedWhereOtherwiseF64ConstantOtherwise the port and highway have 14 instructions each; the port has vexpandpd that highway lacks, and highway has vpexpandq that the port lacks
@@ -16562,8 +16560,6 @@ AVX3_SPR CompressedNotF32 the port and highway have 17 instructions each; the po
 AVX3_SPR CompressedNotF32ConstantA the port and highway have 15 instructions each; the port has vpcmpnltd, vpxor that highway lacks, and highway has vpcmpgtd, vpternlogd that the port lacks
 AVX3_SPR PartitionedF32 the port has 28 instructions against highway's 29; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
 AVX3_SPR PartitionedF32ConstantA the port has 26 instructions against highway's 27; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
-AVX3_SPR StoreCompressedBlendedF32 the port has 15 instructions against highway's 19; the port has vcompressps that highway lacks, highway has bzhiq, kmovd, movq, vmovups, vpcompressd that the port lacks
-AVX3_SPR StoreCompressedBlendedF32ConstantA the port has 13 instructions against highway's 17; the port has vcompressps that highway lacks, highway has bzhiq, kmovd, movq, vmovups, vpcompressd that the port lacks
 AVX3_SPR LoadExpandedWhereF32 the port and highway have 13 instructions each; the port has vexpandps that highway lacks, and highway has vpexpandd that the port lacks
 AVX3_SPR LoadExpandedWhereOtherwiseF32 the port and highway have 16 instructions each; the port has vexpandps that highway lacks, and highway has vpexpandd that the port lacks
 AVX3_SPR LoadExpandedWhereOtherwiseF32ConstantOtherwise the port and highway have 14 instructions each; the port has vexpandps that highway lacks, and highway has vpexpandd that the port lacks
@@ -16572,37 +16568,27 @@ AVX3_SPR CompressedNotI16 the port and highway have 17 instructions each; the po
 AVX3_SPR CompressedNotI16ConstantA the port and highway have 15 instructions each; the port has vpcmpnltw, vpxor that highway lacks, and highway has vpcmpgtw, vpternlogd that the port lacks
 AVX3_SPR PartitionedI16 the port and highway have 29 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
 AVX3_SPR PartitionedI16ConstantA the port and highway have 27 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
-AVX3_SPR StoreCompressedBlendedI16 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
-AVX3_SPR StoreCompressedBlendedI16ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
 AVX3_SPR LoadingUpperHalfI16ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_SPR LoadIndicesI16 the port has 8 instructions against highway's 10; the port has vmovups x4 that highway lacks, highway has vextracti128, vextracti32x4 x2, vmovdqu64, vpermw, vzeroupper that the port lacks
 AVX3_SPR CompressedNotI32 the port and highway have 17 instructions each; the port has vpcmpnltd, vpxor that highway lacks, and highway has vpcmpgtd, vpternlogd that the port lacks
 AVX3_SPR CompressedNotI32ConstantA the port and highway have 15 instructions each; the port has vpcmpnltd, vpxor that highway lacks, and highway has vpcmpgtd, vpternlogd that the port lacks
 AVX3_SPR PartitionedI32 the port has 28 instructions against highway's 29; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
 AVX3_SPR PartitionedI32ConstantA the port has 26 instructions against highway's 27; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
-AVX3_SPR StoreCompressedBlendedI32 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu32 that the port lacks
-AVX3_SPR StoreCompressedBlendedI32ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu32 that the port lacks
 AVX3_SPR LoadingUpperHalfI32ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_SPR GatherWhereOtherwiseI32 the port and highway have 17 instructions each; the port and highway emit the same instructions; LLVM orders them and assigns registers differently; 3 listing lines differ, the first at position 8 (port `vinserti64x4 $0x1, %ymm0, %zmm2, %zmm2`, highway `vinserti64x4 $0x1, %ymm0, %zmm2, %zmm0`)
 AVX3_SPR LoadIndicesI32 the port has 8 instructions against highway's 10; the port has vmovups x3 that highway lacks, highway has vextractf128, vextractf32x4 x2, vpermps, vzeroupper that the port lacks
-AVX3_SPR StoreCompressedBlendedI64 the port has 15 instructions against highway's 22; the port has vpcompressq that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovdqu64, vpbroadcastq, vpermq, vpsrlvq that the port lacks
-AVX3_SPR StoreCompressedBlendedI64ConstantA the port has 13 instructions against highway's 19; the port has vpcompressq that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovdqu64, vpermq, vpsrlvq that the port lacks
 AVX3_SPR LoadingUpperHalfI64ConstantA the port and highway have 8 instructions each; the port and highway emit the same instructions; LLVM orders them and assigns registers differently; 4 listing lines differ, the first at position 3 (port `vmovups (%rdi), %xmm2`, highway `vmovddup (%rip), %xmm0 {const:1a00000000000000}`)
 AVX3_SPR LoadIndicesI64 the port has 8 instructions against highway's 10; the port has vmovups x3 that highway lacks, highway has vextractf128, vextractf32x4 x2, vpermpd, vzeroupper that the port lacks
 AVX3_SPR CompressedNotI8 the port and highway have 17 instructions each; the port has vpcmpnltb, vpxor that highway lacks, and highway has vpcmpgtb, vpternlogd that the port lacks
 AVX3_SPR CompressedNotI8ConstantA the port and highway have 15 instructions each; the port has vpcmpnltb, vpxor that highway lacks, and highway has vpcmpgtb, vpternlogd that the port lacks
 AVX3_SPR PartitionedI8 the port has 28 instructions against highway's 29; the port has knotq that highway lacks, highway has vpcmpnltb, vpxor that the port lacks
 AVX3_SPR PartitionedI8ConstantA the port has 26 instructions against highway's 27; the port has knotq that highway lacks, highway has vpcmpnltb, vpxor that the port lacks
-AVX3_SPR StoreCompressedBlendedI8 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovq, movq, vmovdqu8 that the port lacks
-AVX3_SPR StoreCompressedBlendedI8ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovq, movq, vmovdqu8 that the port lacks
 AVX3_SPR LoadingUpperHalfI8ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_SPR LoadIndicesI8 the port has 8 instructions against highway's 10; the port has vmovups x4 that highway lacks, highway has vextracti128, vextracti32x4 x2, vmovdqu64, vpermb, vzeroupper that the port lacks
 AVX3_SPR CompressedNotU16 the port and highway have 17 instructions each; the port has vpcmpnltw, vpxor that highway lacks, and highway has vpcmpgtw, vpternlogd that the port lacks
 AVX3_SPR CompressedNotU16ConstantA the port and highway have 15 instructions each; the port has vpcmpnltw, vpxor that highway lacks, and highway has vpcmpgtw, vpternlogd that the port lacks
 AVX3_SPR PartitionedU16 the port and highway have 29 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
 AVX3_SPR PartitionedU16ConstantA the port and highway have 27 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
-AVX3_SPR StoreCompressedBlendedU16 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
-AVX3_SPR StoreCompressedBlendedU16ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
 AVX3_SPR LoadingUpperHalfU16ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_SPR StoreTruncatingU8U16 the port has 9 instructions against highway's 11; the port has vpmovwb that highway lacks, highway has vmovdqa64, vmovdqu, vpermb that the port lacks
 AVX3_SPR StoreTruncatingU8U16ConstantA the port has 7 instructions against highway's 8; the port has vbroadcastss, vmovups that highway lacks, highway has vmovdqa64, vmovdqu, vpermb that the port lacks
@@ -16611,8 +16597,6 @@ AVX3_SPR CompressedNotU32 the port and highway have 17 instructions each; the po
 AVX3_SPR CompressedNotU32ConstantA the port and highway have 15 instructions each; the port has vpcmpnltd, vpxor that highway lacks, and highway has vpcmpgtd, vpternlogd that the port lacks
 AVX3_SPR PartitionedU32 the port has 28 instructions against highway's 29; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
 AVX3_SPR PartitionedU32ConstantA the port has 26 instructions against highway's 27; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
-AVX3_SPR StoreCompressedBlendedU32 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu32 that the port lacks
-AVX3_SPR StoreCompressedBlendedU32ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu32 that the port lacks
 AVX3_SPR LoadingUpperHalfU32ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_SPR GatherWhereOtherwiseU32 the port and highway have 17 instructions each; the port and highway emit the same instructions; LLVM orders them and assigns registers differently; 3 listing lines differ, the first at position 8 (port `vinserti64x4 $0x1, %ymm0, %zmm2, %zmm2`, highway `vinserti64x4 $0x1, %ymm0, %zmm2, %zmm0`)
 AVX3_SPR StoreTruncatingU8U32 the port has 9 instructions against highway's 14; the port has vinserti128, vinserti64x4, vpmovdb that highway lacks, highway has vinserti32x4 x2, vmovdqa, vmovdqu, vpermd, vporq, vpshufb x2 that the port lacks
@@ -16620,8 +16604,6 @@ AVX3_SPR StoreTruncatingU8U32ConstantA the port and highway have 6 instructions 
 AVX3_SPR StoreTruncatingU16U32 the port has 9 instructions against highway's 11; the port has vpmovdw that highway lacks, highway has vmovdqa64, vmovdqu, vpermw that the port lacks
 AVX3_SPR StoreTruncatingU16U32ConstantA the port has 7 instructions against highway's 8; the port has vbroadcastss, vmovups that highway lacks, highway has vmovdqa64, vmovdqu, vpermw that the port lacks
 AVX3_SPR LoadIndicesU32 the port has 8 instructions against highway's 10; the port has vmovups x3 that highway lacks, highway has vextractf128, vextractf32x4 x2, vpermps, vzeroupper that the port lacks
-AVX3_SPR StoreCompressedBlendedU64 the port has 15 instructions against highway's 22; the port has vpcompressq that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovdqu64, vpbroadcastq, vpermq, vpsrlvq that the port lacks
-AVX3_SPR StoreCompressedBlendedU64ConstantA the port has 13 instructions against highway's 19; the port has vpcompressq that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovdqu64, vpermq, vpsrlvq that the port lacks
 AVX3_SPR LoadingUpperHalfU64ConstantA the port and highway have 8 instructions each; the port and highway emit the same instructions; LLVM orders them and assigns registers differently; 4 listing lines differ, the first at position 3 (port `vmovups (%rdi), %xmm2`, highway `vmovddup (%rip), %xmm0 {const:1a00000000000000}`)
 AVX3_SPR StoreTruncatingU8U64 the port has 9 instructions against highway's 11; the port has vinserti128, vinserti64x4, vpmovqb that highway lacks, highway has vinserti32x4 x2, vmovq x2, vpermi2b that the port lacks
 AVX3_SPR StoreTruncatingU16U64 the port has 9 instructions against highway's 11; the port has vinserti128, vinserti64x4, vpmovqw that highway lacks, highway has vinserti32x4 x2, vmovdqa, vmovdqu, vpermi2w that the port lacks
@@ -16633,8 +16615,6 @@ AVX3_SPR CompressedNotU8 the port and highway have 17 instructions each; the por
 AVX3_SPR CompressedNotU8ConstantA the port and highway have 15 instructions each; the port has vpcmpnltb, vpxor that highway lacks, and highway has vpcmpgtb, vpternlogd that the port lacks
 AVX3_SPR PartitionedU8 the port has 28 instructions against highway's 29; the port has knotq that highway lacks, highway has vpcmpnltb, vpxor that the port lacks
 AVX3_SPR PartitionedU8ConstantA the port has 26 instructions against highway's 27; the port has knotq that highway lacks, highway has vpcmpnltb, vpxor that the port lacks
-AVX3_SPR StoreCompressedBlendedU8 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovq, movq, vmovdqu8 that the port lacks
-AVX3_SPR StoreCompressedBlendedU8ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovq, movq, vmovdqu8 that the port lacks
 AVX3_SPR LoadingUpperHalfU8ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_SPR LoadIndicesU8 the port has 8 instructions against highway's 10; the port has vmovups x4 that highway lacks, highway has vextracti128, vextracti32x4 x2, vmovdqu64, vpermb, vzeroupper that the port lacks
 AVX3_SPR VectorWideningEvenU32ToF64 the port has 13 instructions against highway's 14; the port has vpmovqd that highway lacks, and highway has vmovdqa64, vpermi2d that the port lacks
@@ -17363,8 +17343,6 @@ AVX3_SPR CompressedNotF16 the port and highway have 17 instructions each; the po
 AVX3_SPR CompressedNotF16ConstantA the port and highway have 15 instructions each; the port has vpcmpnltw, vpxor that highway lacks, and highway has vpcmpgtw, vpternlogd that the port lacks
 AVX3_SPR PartitionedF16 the port and highway have 29 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
 AVX3_SPR PartitionedF16ConstantA the port and highway have 27 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
-AVX3_SPR StoreCompressedBlendedF16 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, and highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
-AVX3_SPR StoreCompressedBlendedF16ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, and highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
 AVX3_SPR StoreCompressedBitsF16 the port and highway have 13 instructions each; the port has kmovd that highway lacks, and highway has movl that the port lacks
 AVX3_SPR StoreCompressedBitsF16ConstantA the port and highway have 11 instructions each; the port has kmovd that highway lacks, and highway has movl that the port lacks
 AVX3_SPR VectorFromMaskF16 the port has 4 instructions against highway's 12; the port has nothing that highway lacks, and highway has vextracti128, vextracti32x4 x2, vinserti128 x2, vinserti64x4, vpsraw, vzeroupper that the port lacks
@@ -19382,8 +19360,6 @@ AVX3_ZEN4 RoundingShiftedRightU8ConstantA the port and highway have 22 instructi
 AVX3_ZEN4 CombinedSlideDownLanesU8ConstantA the port and highway have 15 instructions each; the port has movl, vmovd that highway lacks; highway has movabsq, vmovq that the port lacks
 AVX3_ZEN4 CombinedSlideDownLanesU8ConstantB the port has 11 instructions against highway's 13; the port has vmovdqa, vpermi2b that highway lacks; highway has vpalignr, vpbroadcastq, vpermt2q, vpshufb that the port lacks
 AVX3_ZEN4 CombinedSlideDownLanesU8ConstantLanes the port has 13 instructions against highway's 15; the port has valignq that highway lacks; highway has vinserti128 (x2), vinserti64x4 that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedF64 the port has 15 instructions against highway's 22; the port has vcompresspd that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovupd, vpbroadcastq, vpermq, vpsrlvq that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedF64ConstantA the port has 13 instructions against highway's 19; the port has vcompresspd that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovupd, vpermpd, vpsrlvq that the port lacks
 AVX3_ZEN4 LoadExpandedWhereF64 the port and highway have 13 instructions each; the port has vexpandpd that highway lacks, and highway has vpexpandq that the port lacks
 AVX3_ZEN4 LoadExpandedWhereOtherwiseF64 the port and highway have 16 instructions each; the port has vexpandpd that highway lacks, and highway has vpexpandq that the port lacks
 AVX3_ZEN4 LoadExpandedWhereOtherwiseF64ConstantOtherwise the port and highway have 14 instructions each; the port has vexpandpd that highway lacks, and highway has vpexpandq that the port lacks
@@ -19392,8 +19368,6 @@ AVX3_ZEN4 CompressedNotF32 the port and highway have 17 instructions each; the p
 AVX3_ZEN4 CompressedNotF32ConstantA the port and highway have 15 instructions each; the port has vpcmpnltd, vpxor that highway lacks, and highway has vpcmpgtd, vpternlogd that the port lacks
 AVX3_ZEN4 PartitionedF32 the port has 28 instructions against highway's 29; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
 AVX3_ZEN4 PartitionedF32ConstantA the port has 26 instructions against highway's 27; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedF32 the port has 15 instructions against highway's 19; the port has vcompressps that highway lacks, highway has bzhiq, kmovd, movq, vmovups, vpcompressd that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedF32ConstantA the port has 13 instructions against highway's 17; the port has vcompressps that highway lacks, highway has bzhiq, kmovd, movq, vmovups, vpcompressd that the port lacks
 AVX3_ZEN4 LoadExpandedWhereF32 the port and highway have 13 instructions each; the port has vexpandps that highway lacks, and highway has vpexpandd that the port lacks
 AVX3_ZEN4 LoadExpandedWhereOtherwiseF32 the port and highway have 16 instructions each; the port has vexpandps that highway lacks, and highway has vpexpandd that the port lacks
 AVX3_ZEN4 LoadExpandedWhereOtherwiseF32ConstantOtherwise the port and highway have 14 instructions each; the port has vexpandps that highway lacks, and highway has vpexpandd that the port lacks
@@ -19402,37 +19376,27 @@ AVX3_ZEN4 CompressedNotI16 the port and highway have 17 instructions each; the p
 AVX3_ZEN4 CompressedNotI16ConstantA the port and highway have 15 instructions each; the port has vpcmpnltw, vpxor that highway lacks, and highway has vpcmpgtw, vpternlogd that the port lacks
 AVX3_ZEN4 PartitionedI16 the port and highway have 29 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
 AVX3_ZEN4 PartitionedI16ConstantA the port and highway have 27 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedI16 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedI16ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
 AVX3_ZEN4 LoadingUpperHalfI16ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_ZEN4 LoadIndicesI16 the port has 8 instructions against highway's 10; the port has vmovups x4 that highway lacks, highway has vextracti128, vextracti32x4 x2, vmovdqu64, vpermw, vzeroupper that the port lacks
 AVX3_ZEN4 CompressedNotI32 the port and highway have 17 instructions each; the port has vpcmpnltd, vpxor that highway lacks, and highway has vpcmpgtd, vpternlogd that the port lacks
 AVX3_ZEN4 CompressedNotI32ConstantA the port and highway have 15 instructions each; the port has vpcmpnltd, vpxor that highway lacks, and highway has vpcmpgtd, vpternlogd that the port lacks
 AVX3_ZEN4 PartitionedI32 the port has 28 instructions against highway's 29; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
 AVX3_ZEN4 PartitionedI32ConstantA the port has 26 instructions against highway's 27; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedI32 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu32 that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedI32ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu32 that the port lacks
 AVX3_ZEN4 LoadingUpperHalfI32ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_ZEN4 GatherWhereOtherwiseI32 the port and highway have 17 instructions each; the port and highway emit the same instructions; LLVM orders them and assigns registers differently; 3 listing lines differ, the first at position 8 (port `vinserti64x4 $0x1, %ymm0, %zmm2, %zmm2`, highway `vinserti64x4 $0x1, %ymm0, %zmm2, %zmm0`)
 AVX3_ZEN4 LoadIndicesI32 the port has 8 instructions against highway's 10; the port has vmovups x3 that highway lacks, highway has vextractf128, vextractf32x4 x2, vpermps, vzeroupper that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedI64 the port has 15 instructions against highway's 22; the port has vpcompressq that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovdqu64, vpbroadcastq, vpermq, vpsrlvq that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedI64ConstantA the port has 13 instructions against highway's 19; the port has vpcompressq that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovdqu64, vpermq, vpsrlvq that the port lacks
 AVX3_ZEN4 LoadingUpperHalfI64ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vpmovsxbq that the port lacks
 AVX3_ZEN4 LoadIndicesI64 the port has 8 instructions against highway's 10; the port has vmovups x3 that highway lacks, highway has vextractf128, vextractf32x4 x2, vpermpd, vzeroupper that the port lacks
 AVX3_ZEN4 CompressedNotI8 the port and highway have 17 instructions each; the port has vpcmpnltb, vpxor that highway lacks, and highway has vpcmpgtb, vpternlogd that the port lacks
 AVX3_ZEN4 CompressedNotI8ConstantA the port and highway have 15 instructions each; the port has vpcmpnltb, vpxor that highway lacks, and highway has vpcmpgtb, vpternlogd that the port lacks
 AVX3_ZEN4 PartitionedI8 the port has 28 instructions against highway's 29; the port has knotq that highway lacks, highway has vpcmpnltb, vpxor that the port lacks
 AVX3_ZEN4 PartitionedI8ConstantA the port has 26 instructions against highway's 27; the port has knotq that highway lacks, highway has vpcmpnltb, vpxor that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedI8 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovq, movq, vmovdqu8 that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedI8ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovq, movq, vmovdqu8 that the port lacks
 AVX3_ZEN4 LoadingUpperHalfI8ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_ZEN4 LoadIndicesI8 the port has 8 instructions against highway's 10; the port has vmovups x4 that highway lacks, highway has vextracti128, vextracti32x4 x2, vmovdqu64, vpermb, vzeroupper that the port lacks
 AVX3_ZEN4 CompressedNotU16 the port and highway have 17 instructions each; the port has vpcmpnltw, vpxor that highway lacks, and highway has vpcmpgtw, vpternlogd that the port lacks
 AVX3_ZEN4 CompressedNotU16ConstantA the port and highway have 15 instructions each; the port has vpcmpnltw, vpxor that highway lacks, and highway has vpcmpgtw, vpternlogd that the port lacks
 AVX3_ZEN4 PartitionedU16 the port and highway have 29 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
 AVX3_ZEN4 PartitionedU16ConstantA the port and highway have 27 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedU16 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedU16ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
 AVX3_ZEN4 LoadingUpperHalfU16ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_ZEN4 StoreTruncatingU8U16 the port has 9 instructions against highway's 11; the port has vpmovwb that highway lacks, highway has vmovdqa64, vmovdqu, vpermb that the port lacks
 AVX3_ZEN4 StoreTruncatingU8U16ConstantA the port has 7 instructions against highway's 8; the port has vbroadcastf128, vmovups that highway lacks, highway has vmovdqa64, vmovdqu, vpermb that the port lacks
@@ -19441,16 +19405,12 @@ AVX3_ZEN4 CompressedNotU32 the port and highway have 17 instructions each; the p
 AVX3_ZEN4 CompressedNotU32ConstantA the port and highway have 15 instructions each; the port has vpcmpnltd, vpxor that highway lacks, and highway has vpcmpgtd, vpternlogd that the port lacks
 AVX3_ZEN4 PartitionedU32 the port has 28 instructions against highway's 29; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
 AVX3_ZEN4 PartitionedU32ConstantA the port has 26 instructions against highway's 27; the port has knotw that highway lacks, highway has vpcmpnltd, vpxor that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedU32 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu32 that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedU32ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovd, movq, vmovdqu32 that the port lacks
 AVX3_ZEN4 LoadingUpperHalfU32ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_ZEN4 GatherWhereOtherwiseU32 the port and highway have 17 instructions each; the port and highway emit the same instructions; LLVM orders them and assigns registers differently; 3 listing lines differ, the first at position 8 (port `vinserti64x4 $0x1, %ymm0, %zmm2, %zmm2`, highway `vinserti64x4 $0x1, %ymm0, %zmm2, %zmm0`)
 AVX3_ZEN4 StoreTruncatingU8U32 the port has 9 instructions against highway's 14; the port has vinserti128, vinserti64x4, vpmovdb that highway lacks, highway has vinserti32x4 x2, vmovdqu, vpermd, vpmovsxbd, vporq, vpshufb x2 that the port lacks
 AVX3_ZEN4 StoreTruncatingU16U32 the port has 9 instructions against highway's 11; the port has vpmovdw that highway lacks, highway has vmovdqa64, vmovdqu, vpermw that the port lacks
 AVX3_ZEN4 StoreTruncatingU16U32ConstantA the port has 7 instructions against highway's 8; the port has vbroadcastf128, vmovups that highway lacks, highway has vmovdqa64, vmovdqu, vpermw that the port lacks
 AVX3_ZEN4 LoadIndicesU32 the port has 8 instructions against highway's 10; the port has vmovups x3 that highway lacks, highway has vextractf128, vextractf32x4 x2, vpermps, vzeroupper that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedU64 the port has 15 instructions against highway's 22; the port has vpcompressq that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovdqu64, vpbroadcastq, vpermq, vpsrlvq that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedU64ConstantA the port has 13 instructions against highway's 19; the port has vpcompressq that highway lacks, highway has bzhiq, kmovd, leaq, movq, vmovdqu64, vpermq, vpsrlvq that the port lacks
 AVX3_ZEN4 LoadingUpperHalfU64ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vpmovsxbq that the port lacks
 AVX3_ZEN4 StoreTruncatingU8U64 the port has 9 instructions against highway's 11; the port has vinserti128, vinserti64x4, vpmovqb that highway lacks, highway has vinserti32x4 x2, vmovq x2, vpermi2b that the port lacks
 AVX3_ZEN4 StoreTruncatingU16U64 the port has 9 instructions against highway's 11; the port has vinserti128, vinserti64x4, vpmovqw that highway lacks, highway has vinserti32x4 x2, vmovdqu, vpermi2w, vpmovsxbw that the port lacks
@@ -19461,8 +19421,6 @@ AVX3_ZEN4 CompressedNotU8 the port and highway have 17 instructions each; the po
 AVX3_ZEN4 CompressedNotU8ConstantA the port and highway have 15 instructions each; the port has vpcmpnltb, vpxor that highway lacks, and highway has vpcmpgtb, vpternlogd that the port lacks
 AVX3_ZEN4 PartitionedU8 the port has 28 instructions against highway's 29; the port has knotq that highway lacks, highway has vpcmpnltb, vpxor that the port lacks
 AVX3_ZEN4 PartitionedU8ConstantA the port has 26 instructions against highway's 27; the port has knotq that highway lacks, highway has vpcmpnltb, vpxor that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedU8 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, highway has bzhiq, kmovq, movq, vmovdqu8 that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedU8ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, highway has bzhiq, kmovq, movq, vmovdqu8 that the port lacks
 AVX3_ZEN4 LoadingUpperHalfU8ConstantA the port and highway have 8 instructions each; the port has vmovddup that highway lacks, and highway has vbroadcastss that the port lacks
 AVX3_ZEN4 LoadIndicesU8 the port has 8 instructions against highway's 10; the port has vmovups x4 that highway lacks, highway has vextracti128, vextracti32x4 x2, vmovdqu64, vpermb, vzeroupper that the port lacks
 AVX3_ZEN4 VectorWideningEvenU32ToF64 the port has 13 instructions against highway's 14; the port has vpmovqd that highway lacks, and highway has vmovdqa64, vpermi2d that the port lacks
@@ -20213,8 +20171,6 @@ AVX3_ZEN4 CompressedNotF16 the port and highway have 17 instructions each; the p
 AVX3_ZEN4 CompressedNotF16ConstantA the port and highway have 15 instructions each; the port has vpcmpnltw, vpxor that highway lacks, and highway has vpcmpgtw, vpternlogd that the port lacks
 AVX3_ZEN4 PartitionedF16 the port and highway have 29 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
 AVX3_ZEN4 PartitionedF16ConstantA the port and highway have 27 instructions each; the port has knotd that highway lacks, and highway has vpcmpnltw that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedF16 the port has 15 instructions against highway's 19; the port has nothing that highway lacks, and highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
-AVX3_ZEN4 StoreCompressedBlendedF16ConstantA the port has 13 instructions against highway's 17; the port has nothing that highway lacks, and highway has bzhiq, kmovd, movq, vmovdqu16 that the port lacks
 AVX3_ZEN4 StoreCompressedBitsF16 the port and highway have 13 instructions each; the port has kmovd that highway lacks, and highway has movl that the port lacks
 AVX3_ZEN4 StoreCompressedBitsF16ConstantA the port and highway have 11 instructions each; the port has kmovd that highway lacks, and highway has movl that the port lacks
 AVX3_ZEN4 VectorFromMaskF16 the port has 4 instructions against highway's 12; the port has nothing that highway lacks, and highway has vextracti128, vextracti32x4 x2, vinserti128 x2, vinserti64x4, vpsraw, vzeroupper that the port lacks
