@@ -11778,20 +11778,6 @@ func portableRemainder(for element: Element) -> String {
         """
 }
 
-func emulatedMultiplyingHigh(for element: Element) -> String? {
-    guard !isInteger64(element) else { return nil }
-    let wide = widenedElement(of: element)
-    let highs = laneIndices(Array(stride(from: 1, to: 2 * element.laneCount, by: 2)))
-    let halves = "(half_vector)product"
-    let narrowed = "__builtin_shufflevector(\(halves), \(halves), \(highs))"
-    return """
-        \(vectorTypedef("wide_vector", of: wide, lanes: element.laneCount))
-        \(vectorTypedef("half_vector", of: element, lanes: 2 * element.laneCount))
-        const wide_vector product = __builtin_convertvector(a, wide_vector) * __builtin_convertvector(b, wide_vector);
-        \(vectorResult(narrowed, for: element))
-        """
-}
-
 func portableMultiplyingHigh(for element: Element) -> String {
     guard isInteger64(element) else {
         let wide = widenedElement(of: element)
@@ -14924,8 +14910,7 @@ let basicOps: [Op] = [
             avx3: { element in x86MultiplyingHigh(level: .avx3, for: element) },
             avx2: { element in x86MultiplyingHigh(level: .avx2, for: element) },
             sse4: { element in x86MultiplyingHigh(level: .sse4, for: element) },
-            sse2: { element in x86MultiplyingHigh(level: .sse2, for: element) },
-            emu128: { element in emulatedMultiplyingHigh(for: element) }
+            sse2: { element in x86MultiplyingHigh(level: .sse2, for: element) }
         )
     ) { element in
         portableMultiplyingHigh(for: element)
@@ -20645,8 +20630,7 @@ let fixedPermutations: [FixedPermutation] = [
             neon: { element in wordSelectedOddEven(for: element) },
             sse4: { element in x86OddEvenLanes(level: .sse4, for: element) },
             ssse3: { element in x86OddEvenLanes(level: .ssse3, for: element) },
-            sse2: { element in x86OddEvenLanes(level: .sse2, for: element) },
-            emu128: { element in wordSelectedOddEven(for: element) }
+            sse2: { element in x86OddEvenLanes(level: .sse2, for: element) }
         )
     ) { element in
         (0..<element.laneCount).map { $0 % 2 == 1 ? $0 : element.laneCount + $0 }
@@ -26935,6 +26919,12 @@ func promoteEvenOddPortable(
         """
 }
 
+func promoteEvenOddEmulated(parity: Int, from source: Element, to result: Element) -> String? {
+    guard source.category != .float && result.category != .float else { return nil }
+    let lanes = (0..<result.laneCount).map { 2 * $0 + parity }
+    return promotePortable(of: lanes, inRange: false, from: source, to: result)
+}
+
 func promoteEvenOddNeon(parity: Int, from source: Element, to result: Element) -> String? {
     guard convertsFloatToInteger(from: source, to: result) else { return nil }
     let kept = promoteEvenOddKeptLanes(parity: parity, count: result.laneCount)
@@ -27210,7 +27200,10 @@ func promoteEvenOddFamily(
                 },
                 avx3: x86(.avx3),
                 avx2: x86(.avx2),
-                sse2: x86(.sse2)
+                sse2: x86(.sse2),
+                emu128: sourced(source) { source, result -> String? in
+                    promoteEvenOddEmulated(parity: parity, from: source, to: result)
+                }
             ),
             helpers: TargetBodies(
                 avx3: { result in
@@ -29229,21 +29222,16 @@ func mulBitsMultiplying(odd: Bool, from source: Element, to result: Element) -> 
     return vectorResult("\(first) * \(second)", for: result)
 }
 
-func mulBitsMultiplyingEmulated(odd: Bool, from source: Element, to result: Element) -> String? {
-    guard !odd && source.category == .signedInteger else { return nil }
+func mulBitsMultiplyingEmulated(odd: Bool, from source: Element, to result: Element) -> String {
     let (first, second) = (
-        mulBitsConvertedEvenLanes("a", from: source, to: result),
-        mulBitsConvertedEvenLanes("b", from: source, to: result)
+        mulBitsConvertedLanes("a", odd: odd, to: result),
+        mulBitsConvertedLanes("b", odd: odd, to: result)
     )
     return vectorResult("\(first) * \(second)", for: result)
 }
 
-func mulBitsConvertedEvenLanes(
-    _ operand: String,
-    from source: Element,
-    to result: Element
-) -> String {
-    let kept = mulBitsKeptLanes(operand, odd: false, count: result.laneCount)
+func mulBitsConvertedLanes(_ operand: String, odd: Bool, to result: Element) -> String {
+    let kept = mulBitsKeptLanes(operand, odd: odd, count: result.laneCount)
     return "__builtin_convertvector(\(kept), \(result.cVector))"
 }
 
@@ -34018,10 +34006,14 @@ func float16SoftwareTypedefs(lanes: Int) -> [String] {
     ]
 }
 
-func float16PromotedSoftware(_ promotion: Float16Promotion, to result: Element) -> String {
+func float16PromotedSoftware(
+    _ promotion: Float16Promotion,
+    shuffling: Bool = false,
+    to result: Element
+) -> String {
     let lanes = promotion.lanes(to: result)
     var statements = float16SoftwareTypedefs(lanes: lanes.count)
-    switch promotion.parity {
+    switch shuffling ? nil : promotion.parity {
     case 0: statements.append("const words bits = (words)a & 0xFFFF;")
     case 1: statements.append("const words bits = (words)a >> 16;")
     default:
@@ -34087,7 +34079,12 @@ func float16PromotionOps(_ promotion: Float16Promotion) -> [Op] {
                 },
                 avx3: hardware,
                 avx2: hardware,
-                sse2: software
+                sse2: software,
+                emu128: sourced(source) { _, result in
+                    promotion.parity.map { _ in
+                        float16PromotedSoftware(promotion, shuffling: true, to: result)
+                    }
+                }
             ),
             portable: software
         )
@@ -34917,6 +34914,10 @@ let bfloat16PromoteOps: [Op] =
                 targets: TargetBodies(
                     sve2_128: sourced(source) { _, result in
                         bfloat16PromoteEvenOddSve(parity: parity, for: result)
+                    },
+                    emu128: sourced(source) { source, result in
+                        let lanes = (0..<result.laneCount).map { 2 * $0 + parity }
+                        return bfloat16PromotePortable(of: lanes, from: source, to: result)
                     }
                 ),
                 portable: sourced(source) { _, result in
@@ -35032,6 +35033,18 @@ func bfloat16DemoteOrdered(
         \(bfloat16DemoteRounded("a", from: source, using: rounding))
         \(bfloat16DemoteRounded("b", from: source, using: rounding))
         \(vectorResult("__builtin_shufflevector((narrow_lanes)aRounded, (narrow_lanes)bRounded, \(odds))", for: result))
+        """
+}
+
+func bfloat16DemoteOrderedEmulated(from source: Element, to result: Element) -> String {
+    let narrow = result.cVector(of: .half)
+    let lanes = laneIndices(0..<result.laneCount)
+    return """
+        \(bfloat16DemoteRounded("a", from: source))
+        \(bfloat16DemoteRounded("b", from: source))
+        const \(narrow) aConverted = __builtin_convertvector(aRounded >> 16, \(narrow));
+        const \(narrow) bConverted = __builtin_convertvector(bRounded >> 16, \(narrow));
+        \(vectorResult("__builtin_shufflevector(aConverted, bConverted, \(lanes))", for: result))
         """
 }
 
@@ -35333,11 +35346,11 @@ let bfloat16DemoteOps: [Op] =
                             ? bfloat16DemoteX86Ordered(using: .masked, from: source, to: result)
                             : bfloat16DemoteReordered(using: .masked, from: source, to: result)
                     },
-                    emu128: ordered
-                        ? nil
-                        : sourced(source) { source, result in
-                            bfloat16DemoteTruncated(from: source, to: result)
-                        }
+                    emu128: sourced(source) { source, result in
+                        ordered
+                            ? bfloat16DemoteOrderedEmulated(from: source, to: result)
+                            : bfloat16DemoteTruncated(from: source, to: result)
+                    }
                 ),
                 portable: sourced(source) { source, result in
                     ordered
