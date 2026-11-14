@@ -76,13 +76,13 @@ struct MemoryOpsTests {
         let limits64 = [(0, 1), (4, 1), (Int.max, 1), (4, 8), ((1 << 28) + 1, 8), (1 << 29, 8)]
             .map { UInt64(UInt(bitPattern: SIMDInt64.indexLimit(count: $0.0, stride: $0.1))) }
 
-        #expect(
-            limits32 == [
-                0, 4, Swift.min(UInt64(Int.max), 1 << 31), 0, 1, 13, (1 << 31) - 3, 1 << 31,
-                1 << 31,
-            ]
-        )
-        #expect(limits64 == [0, 4, UInt64(Int.max), 25, (1 << 31) + 1, (1 << 32) - 7])
+        let expected32: [UInt64] = [
+            0, 4, Swift.min(UInt64(Int.max), 1 << 31), 0, 1, 13, (1 << 31) - 3, 1 << 31, 1 << 31,
+        ]
+        let expected64: [UInt64] = [0, 4, UInt64(Int.max), 25, (1 << 31) + 1, (1 << 32) - 7]
+
+        #expect(limits32 == expected32)
+        #expect(limits64 == expected64)
     }
 
     @Test("A masked gather leaves out the lanes of a mask that select nothing in the span")
