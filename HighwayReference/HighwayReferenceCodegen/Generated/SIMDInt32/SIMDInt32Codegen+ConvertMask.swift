@@ -161,6 +161,17 @@ public func highwayMaskWideningHalfF16ToI32(widening mask: SIMDFloat16.HalfMask)
 #endif
 
 @inline(never)
+public func portMaskWideningHalfBF16ToI32(widening mask: SIMDBFloat16.HalfMask) -> SIMDInt32.Mask {
+    SIMDInt32.mask(widening: mask)
+}
+
+@inline(never)
+public func highwayMaskWideningHalfBF16ToI32(widening mask: SIMDBFloat16.HalfMask) -> SIMDInt32.Mask
+{
+    SIMDInt32.Mask(raw: HighwayReference.Nothrow.maskWideningHalfBF16ToI32(mask.raw))
+}
+
+@inline(never)
 public func portMaskWideningQuarterU8ToI32(widening mask: SIMDUInt8.QuarterMask) -> SIMDInt32.Mask {
     SIMDInt32.mask(widening: mask)
 }

@@ -18374,6 +18374,8 @@ HWY_INLINE cvectorization_ops_raw_mask_i32 maskNarrowingF64ToI32(cvectorization_
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskNarrowingF64ToF32(cvectorization_ops_raw_mask_f64 a, cvectorization_ops_raw_mask_f64 b) { return maskToPortF32(hn::OrderedDemote2MasksTo(TagF32(), TagF64(), maskFromPortF64(a), maskFromPortF64(b))); }
 HWY_INLINE cvectorization_ops_raw_mask_u8 maskNarrowingF16ToU8(cvectorization_ops_raw_mask_f16 a, cvectorization_ops_raw_mask_f16 b) { return maskToPortU8(hn::OrderedDemote2MasksTo(TagU8(), TagF16(), maskFromPortF16(a), maskFromPortF16(b))); }
 HWY_INLINE cvectorization_ops_raw_mask_i8 maskNarrowingF16ToI8(cvectorization_ops_raw_mask_f16 a, cvectorization_ops_raw_mask_f16 b) { return maskToPortI8(hn::OrderedDemote2MasksTo(TagI8(), TagF16(), maskFromPortF16(a), maskFromPortF16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 maskNarrowingBF16ToU8(cvectorization_ops_raw_mask_bf16 a, cvectorization_ops_raw_mask_bf16 b) { return maskToPortU8(hn::OrderedDemote2MasksTo(TagU8(), TagBF16(), maskFromPortBF16(a), maskFromPortBF16(b))); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 maskNarrowingBF16ToI8(cvectorization_ops_raw_mask_bf16 a, cvectorization_ops_raw_mask_bf16 b) { return maskToPortI8(hn::OrderedDemote2MasksTo(TagI8(), TagBF16(), maskFromPortBF16(a), maskFromPortBF16(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 sumsOf2U8ToU16(cvectorization_ops_raw_vector_u8 a) { return toPortU16(hn::SumsOf2(fromPortU8(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 sumsOf2U16ToU32(cvectorization_ops_raw_vector_u16 a) { return toPortU32(hn::SumsOf2(fromPortU16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 sumsOf2U32ToU64(cvectorization_ops_raw_vector_u32 a) { return toPortU64(hn::SumsOf2(fromPortU32(a))); }
@@ -21576,6 +21578,7 @@ HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorConvertingInRan
 HWY_INLINE cvectorization_ops_raw_mask_u16 maskWideningHalfU8ToU16(cvectorization_ops_raw_half_mask_u8 mask) { return maskToPortU16(hn::PromoteMaskTo(TagU16(), HalfTagU8(), halfMaskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_i16 maskWideningHalfU8ToI16(cvectorization_ops_raw_half_mask_u8 mask) { return maskToPortI16(hn::PromoteMaskTo(TagI16(), HalfTagU8(), halfMaskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 maskWideningHalfU8ToF16(cvectorization_ops_raw_half_mask_u8 mask) { return maskToPortF16(hn::PromoteMaskTo(TagF16(), HalfTagU8(), halfMaskFromPortU8(mask))); }
+HWY_INLINE cvectorization_ops_raw_mask_bf16 maskWideningHalfU8ToBF16(cvectorization_ops_raw_half_mask_u8 mask) { return maskToPortBF16(hn::PromoteMaskTo(TagBF16(), HalfTagU8(), halfMaskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningHalfU16ToU32(cvectorization_ops_raw_half_mask_u16 mask) { return maskToPortU32(hn::PromoteMaskTo(TagU32(), HalfTagU16(), halfMaskFromPortU16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningHalfU16ToI32(cvectorization_ops_raw_half_mask_u16 mask) { return maskToPortI32(hn::PromoteMaskTo(TagI32(), HalfTagU16(), halfMaskFromPortU16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningHalfU16ToF32(cvectorization_ops_raw_half_mask_u16 mask) { return maskToPortF32(hn::PromoteMaskTo(TagF32(), HalfTagU16(), halfMaskFromPortU16(mask))); }
@@ -21585,6 +21588,7 @@ HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningHalfU32ToF64(cvectorizati
 HWY_INLINE cvectorization_ops_raw_mask_u16 maskWideningHalfI8ToU16(cvectorization_ops_raw_half_mask_i8 mask) { return maskToPortU16(hn::PromoteMaskTo(TagU16(), HalfTagI8(), halfMaskFromPortI8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_i16 maskWideningHalfI8ToI16(cvectorization_ops_raw_half_mask_i8 mask) { return maskToPortI16(hn::PromoteMaskTo(TagI16(), HalfTagI8(), halfMaskFromPortI8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 maskWideningHalfI8ToF16(cvectorization_ops_raw_half_mask_i8 mask) { return maskToPortF16(hn::PromoteMaskTo(TagF16(), HalfTagI8(), halfMaskFromPortI8(mask))); }
+HWY_INLINE cvectorization_ops_raw_mask_bf16 maskWideningHalfI8ToBF16(cvectorization_ops_raw_half_mask_i8 mask) { return maskToPortBF16(hn::PromoteMaskTo(TagBF16(), HalfTagI8(), halfMaskFromPortI8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningHalfI16ToU32(cvectorization_ops_raw_half_mask_i16 mask) { return maskToPortU32(hn::PromoteMaskTo(TagU32(), HalfTagI16(), halfMaskFromPortI16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningHalfI16ToI32(cvectorization_ops_raw_half_mask_i16 mask) { return maskToPortI32(hn::PromoteMaskTo(TagI32(), HalfTagI16(), halfMaskFromPortI16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningHalfI16ToF32(cvectorization_ops_raw_half_mask_i16 mask) { return maskToPortF32(hn::PromoteMaskTo(TagF32(), HalfTagI16(), halfMaskFromPortI16(mask))); }
@@ -21597,6 +21601,9 @@ HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningHalfF32ToF64(cvectorizati
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningHalfF16ToU32(cvectorization_ops_raw_half_mask_f16 mask) { return maskToPortU32(hn::PromoteMaskTo(TagU32(), HalfTagF16(), halfMaskFromPortF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningHalfF16ToI32(cvectorization_ops_raw_half_mask_f16 mask) { return maskToPortI32(hn::PromoteMaskTo(TagI32(), HalfTagF16(), halfMaskFromPortF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningHalfF16ToF32(cvectorization_ops_raw_half_mask_f16 mask) { return maskToPortF32(hn::PromoteMaskTo(TagF32(), HalfTagF16(), halfMaskFromPortF16(mask))); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningHalfBF16ToU32(cvectorization_ops_raw_half_mask_bf16 mask) { return maskToPortU32(hn::PromoteMaskTo(TagU32(), HalfTagBF16(), halfMaskFromPortBF16(mask))); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningHalfBF16ToI32(cvectorization_ops_raw_half_mask_bf16 mask) { return maskToPortI32(hn::PromoteMaskTo(TagI32(), HalfTagBF16(), halfMaskFromPortBF16(mask))); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningHalfBF16ToF32(cvectorization_ops_raw_half_mask_bf16 mask) { return maskToPortF32(hn::PromoteMaskTo(TagF32(), HalfTagBF16(), halfMaskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningQuarterU8ToU32(cvectorization_ops_raw_quarter_mask_u8 mask) { return maskToPortU32(hn::PromoteMaskTo(TagU32(), QuarterTagU8(), quarterMaskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningQuarterU8ToI32(cvectorization_ops_raw_quarter_mask_u8 mask) { return maskToPortI32(hn::PromoteMaskTo(TagI32(), QuarterTagU8(), quarterMaskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningQuarterU8ToF32(cvectorization_ops_raw_quarter_mask_u8 mask) { return maskToPortF32(hn::PromoteMaskTo(TagF32(), QuarterTagU8(), quarterMaskFromPortU8(mask))); }
@@ -21612,6 +21619,9 @@ HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningQuarterI16ToF64(cvectoriz
 HWY_INLINE cvectorization_ops_raw_mask_u64 maskWideningQuarterF16ToU64(cvectorization_ops_raw_quarter_mask_f16 mask) { return maskToPortU64(hn::PromoteMaskTo(TagU64(), QuarterTagF16(), quarterMaskFromPortF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 maskWideningQuarterF16ToI64(cvectorization_ops_raw_quarter_mask_f16 mask) { return maskToPortI64(hn::PromoteMaskTo(TagI64(), QuarterTagF16(), quarterMaskFromPortF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningQuarterF16ToF64(cvectorization_ops_raw_quarter_mask_f16 mask) { return maskToPortF64(hn::PromoteMaskTo(TagF64(), QuarterTagF16(), quarterMaskFromPortF16(mask))); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 maskWideningQuarterBF16ToU64(cvectorization_ops_raw_quarter_mask_bf16 mask) { return maskToPortU64(hn::PromoteMaskTo(TagU64(), QuarterTagBF16(), quarterMaskFromPortBF16(mask))); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 maskWideningQuarterBF16ToI64(cvectorization_ops_raw_quarter_mask_bf16 mask) { return maskToPortI64(hn::PromoteMaskTo(TagI64(), QuarterTagBF16(), quarterMaskFromPortBF16(mask))); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningQuarterBF16ToF64(cvectorization_ops_raw_quarter_mask_bf16 mask) { return maskToPortF64(hn::PromoteMaskTo(TagF64(), QuarterTagBF16(), quarterMaskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_u64 maskWideningEighthU8ToU64(cvectorization_ops_raw_eighth_mask_u8 mask) { return maskToPortU64(hn::PromoteMaskTo(TagU64(), EighthTagU8(), eighthMaskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 maskWideningEighthU8ToI64(cvectorization_ops_raw_eighth_mask_u8 mask) { return maskToPortI64(hn::PromoteMaskTo(TagI64(), EighthTagU8(), eighthMaskFromPortU8(mask))); }
 HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningEighthU8ToF64(cvectorization_ops_raw_eighth_mask_u8 mask) { return maskToPortF64(hn::PromoteMaskTo(TagF64(), EighthTagU8(), eighthMaskFromPortU8(mask))); }
@@ -21623,6 +21633,7 @@ HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskNarrowingU16ToI8(cvectori
 HWY_INLINE cvectorization_ops_raw_half_mask_u16 halfMaskNarrowingU32ToU16(cvectorization_ops_raw_mask_u32 mask) { return halfMaskToPortU16(hn::DemoteMaskTo(HalfTagU16(), TagU32(), maskFromPortU32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i16 halfMaskNarrowingU32ToI16(cvectorization_ops_raw_mask_u32 mask) { return halfMaskToPortI16(hn::DemoteMaskTo(HalfTagI16(), TagU32(), maskFromPortU32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f16 halfMaskNarrowingU32ToF16(cvectorization_ops_raw_mask_u32 mask) { return halfMaskToPortF16(hn::DemoteMaskTo(HalfTagF16(), TagU32(), maskFromPortU32(mask))); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 halfMaskNarrowingU32ToBF16(cvectorization_ops_raw_mask_u32 mask) { return halfMaskToPortBF16(hn::DemoteMaskTo(HalfTagBF16(), TagU32(), maskFromPortU32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u32 halfMaskNarrowingU64ToU32(cvectorization_ops_raw_mask_u64 mask) { return halfMaskToPortU32(hn::DemoteMaskTo(HalfTagU32(), TagU64(), maskFromPortU64(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i32 halfMaskNarrowingU64ToI32(cvectorization_ops_raw_mask_u64 mask) { return halfMaskToPortI32(hn::DemoteMaskTo(HalfTagI32(), TagU64(), maskFromPortU64(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f32 halfMaskNarrowingU64ToF32(cvectorization_ops_raw_mask_u64 mask) { return halfMaskToPortF32(hn::DemoteMaskTo(HalfTagF32(), TagU64(), maskFromPortU64(mask))); }
@@ -21631,32 +21642,39 @@ HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskNarrowingI16ToI8(cvectori
 HWY_INLINE cvectorization_ops_raw_half_mask_u16 halfMaskNarrowingI32ToU16(cvectorization_ops_raw_mask_i32 mask) { return halfMaskToPortU16(hn::DemoteMaskTo(HalfTagU16(), TagI32(), maskFromPortI32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i16 halfMaskNarrowingI32ToI16(cvectorization_ops_raw_mask_i32 mask) { return halfMaskToPortI16(hn::DemoteMaskTo(HalfTagI16(), TagI32(), maskFromPortI32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f16 halfMaskNarrowingI32ToF16(cvectorization_ops_raw_mask_i32 mask) { return halfMaskToPortF16(hn::DemoteMaskTo(HalfTagF16(), TagI32(), maskFromPortI32(mask))); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 halfMaskNarrowingI32ToBF16(cvectorization_ops_raw_mask_i32 mask) { return halfMaskToPortBF16(hn::DemoteMaskTo(HalfTagBF16(), TagI32(), maskFromPortI32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u32 halfMaskNarrowingI64ToU32(cvectorization_ops_raw_mask_i64 mask) { return halfMaskToPortU32(hn::DemoteMaskTo(HalfTagU32(), TagI64(), maskFromPortI64(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i32 halfMaskNarrowingI64ToI32(cvectorization_ops_raw_mask_i64 mask) { return halfMaskToPortI32(hn::DemoteMaskTo(HalfTagI32(), TagI64(), maskFromPortI64(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f32 halfMaskNarrowingI64ToF32(cvectorization_ops_raw_mask_i64 mask) { return halfMaskToPortF32(hn::DemoteMaskTo(HalfTagF32(), TagI64(), maskFromPortI64(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u16 halfMaskNarrowingF32ToU16(cvectorization_ops_raw_mask_f32 mask) { return halfMaskToPortU16(hn::DemoteMaskTo(HalfTagU16(), TagF32(), maskFromPortF32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i16 halfMaskNarrowingF32ToI16(cvectorization_ops_raw_mask_f32 mask) { return halfMaskToPortI16(hn::DemoteMaskTo(HalfTagI16(), TagF32(), maskFromPortF32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f16 halfMaskNarrowingF32ToF16(cvectorization_ops_raw_mask_f32 mask) { return halfMaskToPortF16(hn::DemoteMaskTo(HalfTagF16(), TagF32(), maskFromPortF32(mask))); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 halfMaskNarrowingF32ToBF16(cvectorization_ops_raw_mask_f32 mask) { return halfMaskToPortBF16(hn::DemoteMaskTo(HalfTagBF16(), TagF32(), maskFromPortF32(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u32 halfMaskNarrowingF64ToU32(cvectorization_ops_raw_mask_f64 mask) { return halfMaskToPortU32(hn::DemoteMaskTo(HalfTagU32(), TagF64(), maskFromPortF64(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i32 halfMaskNarrowingF64ToI32(cvectorization_ops_raw_mask_f64 mask) { return halfMaskToPortI32(hn::DemoteMaskTo(HalfTagI32(), TagF64(), maskFromPortF64(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f32 halfMaskNarrowingF64ToF32(cvectorization_ops_raw_mask_f64 mask) { return halfMaskToPortF32(hn::DemoteMaskTo(HalfTagF32(), TagF64(), maskFromPortF64(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u8 halfMaskNarrowingF16ToU8(cvectorization_ops_raw_mask_f16 mask) { return halfMaskToPortU8(hn::DemoteMaskTo(HalfTagU8(), TagF16(), maskFromPortF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskNarrowingF16ToI8(cvectorization_ops_raw_mask_f16 mask) { return halfMaskToPortI8(hn::DemoteMaskTo(HalfTagI8(), TagF16(), maskFromPortF16(mask))); }
+HWY_INLINE cvectorization_ops_raw_half_mask_u8 halfMaskNarrowingBF16ToU8(cvectorization_ops_raw_mask_bf16 mask) { return halfMaskToPortU8(hn::DemoteMaskTo(HalfTagU8(), TagBF16(), maskFromPortBF16(mask))); }
+HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskNarrowingBF16ToI8(cvectorization_ops_raw_mask_bf16 mask) { return halfMaskToPortI8(hn::DemoteMaskTo(HalfTagI8(), TagBF16(), maskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u8 quarterMaskNarrowingU32ToU8(cvectorization_ops_raw_mask_u32 mask) { return quarterMaskToPortU8(hn::DemoteMaskTo(QuarterTagU8(), TagU32(), maskFromPortU32(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i8 quarterMaskNarrowingU32ToI8(cvectorization_ops_raw_mask_u32 mask) { return quarterMaskToPortI8(hn::DemoteMaskTo(QuarterTagI8(), TagU32(), maskFromPortU32(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u16 quarterMaskNarrowingU64ToU16(cvectorization_ops_raw_mask_u64 mask) { return quarterMaskToPortU16(hn::DemoteMaskTo(QuarterTagU16(), TagU64(), maskFromPortU64(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i16 quarterMaskNarrowingU64ToI16(cvectorization_ops_raw_mask_u64 mask) { return quarterMaskToPortI16(hn::DemoteMaskTo(QuarterTagI16(), TagU64(), maskFromPortU64(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_f16 quarterMaskNarrowingU64ToF16(cvectorization_ops_raw_mask_u64 mask) { return quarterMaskToPortF16(hn::DemoteMaskTo(QuarterTagF16(), TagU64(), maskFromPortU64(mask))); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_bf16 quarterMaskNarrowingU64ToBF16(cvectorization_ops_raw_mask_u64 mask) { return quarterMaskToPortBF16(hn::DemoteMaskTo(QuarterTagBF16(), TagU64(), maskFromPortU64(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u8 quarterMaskNarrowingI32ToU8(cvectorization_ops_raw_mask_i32 mask) { return quarterMaskToPortU8(hn::DemoteMaskTo(QuarterTagU8(), TagI32(), maskFromPortI32(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i8 quarterMaskNarrowingI32ToI8(cvectorization_ops_raw_mask_i32 mask) { return quarterMaskToPortI8(hn::DemoteMaskTo(QuarterTagI8(), TagI32(), maskFromPortI32(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u16 quarterMaskNarrowingI64ToU16(cvectorization_ops_raw_mask_i64 mask) { return quarterMaskToPortU16(hn::DemoteMaskTo(QuarterTagU16(), TagI64(), maskFromPortI64(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i16 quarterMaskNarrowingI64ToI16(cvectorization_ops_raw_mask_i64 mask) { return quarterMaskToPortI16(hn::DemoteMaskTo(QuarterTagI16(), TagI64(), maskFromPortI64(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_f16 quarterMaskNarrowingI64ToF16(cvectorization_ops_raw_mask_i64 mask) { return quarterMaskToPortF16(hn::DemoteMaskTo(QuarterTagF16(), TagI64(), maskFromPortI64(mask))); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_bf16 quarterMaskNarrowingI64ToBF16(cvectorization_ops_raw_mask_i64 mask) { return quarterMaskToPortBF16(hn::DemoteMaskTo(QuarterTagBF16(), TagI64(), maskFromPortI64(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u8 quarterMaskNarrowingF32ToU8(cvectorization_ops_raw_mask_f32 mask) { return quarterMaskToPortU8(hn::DemoteMaskTo(QuarterTagU8(), TagF32(), maskFromPortF32(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i8 quarterMaskNarrowingF32ToI8(cvectorization_ops_raw_mask_f32 mask) { return quarterMaskToPortI8(hn::DemoteMaskTo(QuarterTagI8(), TagF32(), maskFromPortF32(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u16 quarterMaskNarrowingF64ToU16(cvectorization_ops_raw_mask_f64 mask) { return quarterMaskToPortU16(hn::DemoteMaskTo(QuarterTagU16(), TagF64(), maskFromPortF64(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i16 quarterMaskNarrowingF64ToI16(cvectorization_ops_raw_mask_f64 mask) { return quarterMaskToPortI16(hn::DemoteMaskTo(QuarterTagI16(), TagF64(), maskFromPortF64(mask))); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_f16 quarterMaskNarrowingF64ToF16(cvectorization_ops_raw_mask_f64 mask) { return quarterMaskToPortF16(hn::DemoteMaskTo(QuarterTagF16(), TagF64(), maskFromPortF64(mask))); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_bf16 quarterMaskNarrowingF64ToBF16(cvectorization_ops_raw_mask_f64 mask) { return quarterMaskToPortBF16(hn::DemoteMaskTo(QuarterTagBF16(), TagF64(), maskFromPortF64(mask))); }
 HWY_INLINE cvectorization_ops_raw_eighth_mask_u8 eighthMaskNarrowingU64ToU8(cvectorization_ops_raw_mask_u64 mask) { return eighthMaskToPortU8(hn::DemoteMaskTo(EighthTagU8(), TagU64(), maskFromPortU64(mask))); }
 HWY_INLINE cvectorization_ops_raw_eighth_mask_i8 eighthMaskNarrowingU64ToI8(cvectorization_ops_raw_mask_u64 mask) { return eighthMaskToPortI8(hn::DemoteMaskTo(EighthTagI8(), TagU64(), maskFromPortU64(mask))); }
 HWY_INLINE cvectorization_ops_raw_eighth_mask_u8 eighthMaskNarrowingI64ToU8(cvectorization_ops_raw_mask_i64 mask) { return eighthMaskToPortU8(hn::DemoteMaskTo(EighthTagU8(), TagI64(), maskFromPortI64(mask))); }
@@ -27870,6 +27888,8 @@ HWY_INLINE cvectorization_ops_raw_mask_i32 maskNarrowingF64ToI32(cvectorization_
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskNarrowingF64ToF32(cvectorization_ops_raw_mask_f64 a, cvectorization_ops_raw_mask_f64 b) noexcept { return ::HighwayReference::maskNarrowingF64ToF32(a, b); }
 HWY_INLINE cvectorization_ops_raw_mask_u8 maskNarrowingF16ToU8(cvectorization_ops_raw_mask_f16 a, cvectorization_ops_raw_mask_f16 b) noexcept { return ::HighwayReference::maskNarrowingF16ToU8(a, b); }
 HWY_INLINE cvectorization_ops_raw_mask_i8 maskNarrowingF16ToI8(cvectorization_ops_raw_mask_f16 a, cvectorization_ops_raw_mask_f16 b) noexcept { return ::HighwayReference::maskNarrowingF16ToI8(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_u8 maskNarrowingBF16ToU8(cvectorization_ops_raw_mask_bf16 a, cvectorization_ops_raw_mask_bf16 b) noexcept { return ::HighwayReference::maskNarrowingBF16ToU8(a, b); }
+HWY_INLINE cvectorization_ops_raw_mask_i8 maskNarrowingBF16ToI8(cvectorization_ops_raw_mask_bf16 a, cvectorization_ops_raw_mask_bf16 b) noexcept { return ::HighwayReference::maskNarrowingBF16ToI8(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 sumsOf2U8ToU16(cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::sumsOf2U8ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 sumsOf2U16ToU32(cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::sumsOf2U16ToU32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 sumsOf2U32ToU64(cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::sumsOf2U32ToU64(a); }
@@ -28048,6 +28068,7 @@ HWY_INLINE cvectorization_ops_raw_quarter_vector_u8 quarterVectorConvertingInRan
 HWY_INLINE cvectorization_ops_raw_mask_u16 maskWideningHalfU8ToU16(cvectorization_ops_raw_half_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningHalfU8ToU16(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i16 maskWideningHalfU8ToI16(cvectorization_ops_raw_half_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningHalfU8ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 maskWideningHalfU8ToF16(cvectorization_ops_raw_half_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningHalfU8ToF16(mask); }
+HWY_INLINE cvectorization_ops_raw_mask_bf16 maskWideningHalfU8ToBF16(cvectorization_ops_raw_half_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningHalfU8ToBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningHalfU16ToU32(cvectorization_ops_raw_half_mask_u16 mask) noexcept { return ::HighwayReference::maskWideningHalfU16ToU32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningHalfU16ToI32(cvectorization_ops_raw_half_mask_u16 mask) noexcept { return ::HighwayReference::maskWideningHalfU16ToI32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningHalfU16ToF32(cvectorization_ops_raw_half_mask_u16 mask) noexcept { return ::HighwayReference::maskWideningHalfU16ToF32(mask); }
@@ -28057,6 +28078,7 @@ HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningHalfU32ToF64(cvectorizati
 HWY_INLINE cvectorization_ops_raw_mask_u16 maskWideningHalfI8ToU16(cvectorization_ops_raw_half_mask_i8 mask) noexcept { return ::HighwayReference::maskWideningHalfI8ToU16(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i16 maskWideningHalfI8ToI16(cvectorization_ops_raw_half_mask_i8 mask) noexcept { return ::HighwayReference::maskWideningHalfI8ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f16 maskWideningHalfI8ToF16(cvectorization_ops_raw_half_mask_i8 mask) noexcept { return ::HighwayReference::maskWideningHalfI8ToF16(mask); }
+HWY_INLINE cvectorization_ops_raw_mask_bf16 maskWideningHalfI8ToBF16(cvectorization_ops_raw_half_mask_i8 mask) noexcept { return ::HighwayReference::maskWideningHalfI8ToBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningHalfI16ToU32(cvectorization_ops_raw_half_mask_i16 mask) noexcept { return ::HighwayReference::maskWideningHalfI16ToU32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningHalfI16ToI32(cvectorization_ops_raw_half_mask_i16 mask) noexcept { return ::HighwayReference::maskWideningHalfI16ToI32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningHalfI16ToF32(cvectorization_ops_raw_half_mask_i16 mask) noexcept { return ::HighwayReference::maskWideningHalfI16ToF32(mask); }
@@ -28069,6 +28091,9 @@ HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningHalfF32ToF64(cvectorizati
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningHalfF16ToU32(cvectorization_ops_raw_half_mask_f16 mask) noexcept { return ::HighwayReference::maskWideningHalfF16ToU32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningHalfF16ToI32(cvectorization_ops_raw_half_mask_f16 mask) noexcept { return ::HighwayReference::maskWideningHalfF16ToI32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningHalfF16ToF32(cvectorization_ops_raw_half_mask_f16 mask) noexcept { return ::HighwayReference::maskWideningHalfF16ToF32(mask); }
+HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningHalfBF16ToU32(cvectorization_ops_raw_half_mask_bf16 mask) noexcept { return ::HighwayReference::maskWideningHalfBF16ToU32(mask); }
+HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningHalfBF16ToI32(cvectorization_ops_raw_half_mask_bf16 mask) noexcept { return ::HighwayReference::maskWideningHalfBF16ToI32(mask); }
+HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningHalfBF16ToF32(cvectorization_ops_raw_half_mask_bf16 mask) noexcept { return ::HighwayReference::maskWideningHalfBF16ToF32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_u32 maskWideningQuarterU8ToU32(cvectorization_ops_raw_quarter_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningQuarterU8ToU32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i32 maskWideningQuarterU8ToI32(cvectorization_ops_raw_quarter_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningQuarterU8ToI32(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f32 maskWideningQuarterU8ToF32(cvectorization_ops_raw_quarter_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningQuarterU8ToF32(mask); }
@@ -28084,6 +28109,9 @@ HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningQuarterI16ToF64(cvectoriz
 HWY_INLINE cvectorization_ops_raw_mask_u64 maskWideningQuarterF16ToU64(cvectorization_ops_raw_quarter_mask_f16 mask) noexcept { return ::HighwayReference::maskWideningQuarterF16ToU64(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 maskWideningQuarterF16ToI64(cvectorization_ops_raw_quarter_mask_f16 mask) noexcept { return ::HighwayReference::maskWideningQuarterF16ToI64(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningQuarterF16ToF64(cvectorization_ops_raw_quarter_mask_f16 mask) noexcept { return ::HighwayReference::maskWideningQuarterF16ToF64(mask); }
+HWY_INLINE cvectorization_ops_raw_mask_u64 maskWideningQuarterBF16ToU64(cvectorization_ops_raw_quarter_mask_bf16 mask) noexcept { return ::HighwayReference::maskWideningQuarterBF16ToU64(mask); }
+HWY_INLINE cvectorization_ops_raw_mask_i64 maskWideningQuarterBF16ToI64(cvectorization_ops_raw_quarter_mask_bf16 mask) noexcept { return ::HighwayReference::maskWideningQuarterBF16ToI64(mask); }
+HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningQuarterBF16ToF64(cvectorization_ops_raw_quarter_mask_bf16 mask) noexcept { return ::HighwayReference::maskWideningQuarterBF16ToF64(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_u64 maskWideningEighthU8ToU64(cvectorization_ops_raw_eighth_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningEighthU8ToU64(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_i64 maskWideningEighthU8ToI64(cvectorization_ops_raw_eighth_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningEighthU8ToI64(mask); }
 HWY_INLINE cvectorization_ops_raw_mask_f64 maskWideningEighthU8ToF64(cvectorization_ops_raw_eighth_mask_u8 mask) noexcept { return ::HighwayReference::maskWideningEighthU8ToF64(mask); }
@@ -28095,6 +28123,7 @@ HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskNarrowingU16ToI8(cvectori
 HWY_INLINE cvectorization_ops_raw_half_mask_u16 halfMaskNarrowingU32ToU16(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingU32ToU16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i16 halfMaskNarrowingU32ToI16(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingU32ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f16 halfMaskNarrowingU32ToF16(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingU32ToF16(mask); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 halfMaskNarrowingU32ToBF16(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingU32ToBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u32 halfMaskNarrowingU64ToU32(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingU64ToU32(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i32 halfMaskNarrowingU64ToI32(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingU64ToI32(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f32 halfMaskNarrowingU64ToF32(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingU64ToF32(mask); }
@@ -28103,32 +28132,39 @@ HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskNarrowingI16ToI8(cvectori
 HWY_INLINE cvectorization_ops_raw_half_mask_u16 halfMaskNarrowingI32ToU16(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingI32ToU16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i16 halfMaskNarrowingI32ToI16(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingI32ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f16 halfMaskNarrowingI32ToF16(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingI32ToF16(mask); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 halfMaskNarrowingI32ToBF16(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingI32ToBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u32 halfMaskNarrowingI64ToU32(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingI64ToU32(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i32 halfMaskNarrowingI64ToI32(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingI64ToI32(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f32 halfMaskNarrowingI64ToF32(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingI64ToF32(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u16 halfMaskNarrowingF32ToU16(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF32ToU16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i16 halfMaskNarrowingF32ToI16(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF32ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f16 halfMaskNarrowingF32ToF16(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF32ToF16(mask); }
+HWY_INLINE cvectorization_ops_raw_half_mask_bf16 halfMaskNarrowingF32ToBF16(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF32ToBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u32 halfMaskNarrowingF64ToU32(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF64ToU32(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i32 halfMaskNarrowingF64ToI32(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF64ToI32(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_f32 halfMaskNarrowingF64ToF32(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF64ToF32(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_u8 halfMaskNarrowingF16ToU8(cvectorization_ops_raw_mask_f16 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF16ToU8(mask); }
 HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskNarrowingF16ToI8(cvectorization_ops_raw_mask_f16 mask) noexcept { return ::HighwayReference::halfMaskNarrowingF16ToI8(mask); }
+HWY_INLINE cvectorization_ops_raw_half_mask_u8 halfMaskNarrowingBF16ToU8(cvectorization_ops_raw_mask_bf16 mask) noexcept { return ::HighwayReference::halfMaskNarrowingBF16ToU8(mask); }
+HWY_INLINE cvectorization_ops_raw_half_mask_i8 halfMaskNarrowingBF16ToI8(cvectorization_ops_raw_mask_bf16 mask) noexcept { return ::HighwayReference::halfMaskNarrowingBF16ToI8(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u8 quarterMaskNarrowingU32ToU8(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingU32ToU8(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i8 quarterMaskNarrowingU32ToI8(cvectorization_ops_raw_mask_u32 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingU32ToI8(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u16 quarterMaskNarrowingU64ToU16(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingU64ToU16(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i16 quarterMaskNarrowingU64ToI16(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingU64ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_f16 quarterMaskNarrowingU64ToF16(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingU64ToF16(mask); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_bf16 quarterMaskNarrowingU64ToBF16(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingU64ToBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u8 quarterMaskNarrowingI32ToU8(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingI32ToU8(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i8 quarterMaskNarrowingI32ToI8(cvectorization_ops_raw_mask_i32 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingI32ToI8(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u16 quarterMaskNarrowingI64ToU16(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingI64ToU16(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i16 quarterMaskNarrowingI64ToI16(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingI64ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_f16 quarterMaskNarrowingI64ToF16(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingI64ToF16(mask); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_bf16 quarterMaskNarrowingI64ToBF16(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingI64ToBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u8 quarterMaskNarrowingF32ToU8(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingF32ToU8(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i8 quarterMaskNarrowingF32ToI8(cvectorization_ops_raw_mask_f32 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingF32ToI8(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_u16 quarterMaskNarrowingF64ToU16(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingF64ToU16(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_i16 quarterMaskNarrowingF64ToI16(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingF64ToI16(mask); }
 HWY_INLINE cvectorization_ops_raw_quarter_mask_f16 quarterMaskNarrowingF64ToF16(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingF64ToF16(mask); }
+HWY_INLINE cvectorization_ops_raw_quarter_mask_bf16 quarterMaskNarrowingF64ToBF16(cvectorization_ops_raw_mask_f64 mask) noexcept { return ::HighwayReference::quarterMaskNarrowingF64ToBF16(mask); }
 HWY_INLINE cvectorization_ops_raw_eighth_mask_u8 eighthMaskNarrowingU64ToU8(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::eighthMaskNarrowingU64ToU8(mask); }
 HWY_INLINE cvectorization_ops_raw_eighth_mask_i8 eighthMaskNarrowingU64ToI8(cvectorization_ops_raw_mask_u64 mask) noexcept { return ::HighwayReference::eighthMaskNarrowingU64ToI8(mask); }
 HWY_INLINE cvectorization_ops_raw_eighth_mask_u8 eighthMaskNarrowingI64ToU8(cvectorization_ops_raw_mask_i64 mask) noexcept { return ::HighwayReference::eighthMaskNarrowingI64ToU8(mask); }

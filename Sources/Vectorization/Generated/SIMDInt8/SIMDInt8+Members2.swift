@@ -4,6 +4,24 @@ public import CVectorizationOps
 
 extension SIMDInt8 {
     @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_i8(indices.raw, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return unsafe tableLookupBytesOrZero(a, atUnchecked: indices)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_i8(indices.raw, 128, 144),
+            "Byte index is 16 through 127"
+        )
+        return Vector(raw: cvectorization_ops_table_lookup_bytes_or_zero_i8(a.raw, indices.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func pairwiseAddingBlocks(_ a: Vector, _ b: Vector) -> Vector {
         Vector(raw: cvectorization_ops_pairwise_adding_blocks_i8(a.raw, b.raw))
     }

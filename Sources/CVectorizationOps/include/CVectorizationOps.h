@@ -152634,6 +152634,72 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_mask
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_mask_narrowing_bf16_to_u8(cvectorization_ops_raw_mask_bf16 rawA, cvectorization_ops_raw_mask_bf16 rawB) {
+  const cvectorization_ops_mask_bf16 a = (cvectorization_ops_mask_bf16)rawA;
+  const cvectorization_ops_mask_bf16 b = (cvectorization_ops_mask_bf16)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
+  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(__builtin_convertvector(a, narrow_lanes), __builtin_convertvector(b, narrow_lanes), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i64 reordered = (cvectorization_ops_x86_i64)((cvectorization_ops_x86_i8)__builtin_ia32_packsswb256((cvectorization_ops_x86_i16)a, (cvectorization_ops_x86_i16)b));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(reordered, reordered, 0, 2, 1, 3));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_mask_u8)((cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)a, (cvectorization_ops_x86_i16)b));
+#else
+  typedef int8_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_mask_narrowing_bf16_to_i8(cvectorization_ops_raw_mask_bf16 rawA, cvectorization_ops_raw_mask_bf16 rawB) {
+  const cvectorization_ops_mask_bf16 a = (cvectorization_ops_mask_bf16)rawA;
+  const cvectorization_ops_mask_bf16 b = (cvectorization_ops_mask_bf16)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
+  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(__builtin_convertvector(a, narrow_lanes), __builtin_convertvector(b, narrow_lanes), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_x86_i64 reordered = (cvectorization_ops_x86_i64)((cvectorization_ops_x86_i8)__builtin_ia32_packsswb256((cvectorization_ops_x86_i16)a, (cvectorization_ops_x86_i16)b));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(reordered, reordered, 0, 2, 1, 3));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_mask_i8)((cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)a, (cvectorization_ops_x86_i16)b));
+#else
+  typedef int8_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_sums_of2_u8_to_u16(cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
@@ -163856,6 +163922,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f16 cvectorization_ops_mas
   return (cvectorization_ops_raw_mask_f16)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3, 4, 5, 6, 7), cvectorization_ops_mask_f16));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_bf16 cvectorization_ops_mask_widening_half_vector_u8_to_bf16(cvectorization_ops_raw_half_mask_u8 rawMask) {
+  const cvectorization_ops_raw_half_mask_u8 mask = rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_mask_bf16));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_mask_bf16));
+#elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 4 && CVECTORIZATION_OPS_X86 <= 6)
+  return (cvectorization_ops_raw_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_mask_bf16));
+#else
+  return (cvectorization_ops_raw_mask_bf16)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3, 4, 5, 6, 7), cvectorization_ops_mask_bf16));
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_mask_widening_half_vector_u16_to_u32(cvectorization_ops_raw_half_mask_u16 rawMask) {
   const cvectorization_ops_raw_half_mask_u16 mask = rawMask;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
@@ -163962,6 +164040,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f16 cvectorization_ops_mas
   return (cvectorization_ops_raw_mask_f16)(__builtin_convertvector(mask, cvectorization_ops_mask_f16));
 #else
   return (cvectorization_ops_raw_mask_f16)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3, 4, 5, 6, 7), cvectorization_ops_mask_f16));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_bf16 cvectorization_ops_mask_widening_half_vector_i8_to_bf16(cvectorization_ops_raw_half_mask_i8 rawMask) {
+  const cvectorization_ops_raw_half_mask_i8 mask = rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_mask_bf16));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_mask_bf16));
+#elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 4 && CVECTORIZATION_OPS_X86 <= 6)
+  return (cvectorization_ops_raw_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_mask_bf16));
+#else
+  return (cvectorization_ops_raw_mask_bf16)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3, 4, 5, 6, 7), cvectorization_ops_mask_bf16));
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_mask_widening_half_vector_i16_to_u32(cvectorization_ops_raw_half_mask_i16 rawMask) {
@@ -164098,6 +164188,42 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_mas
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_mask_widening_half_vector_f16_to_f32(cvectorization_ops_raw_half_mask_f16 rawMask) {
   const cvectorization_ops_raw_half_mask_f16 mask = rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_mask_f32)(__builtin_convertvector(mask, cvectorization_ops_mask_f32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_mask_f32)(__builtin_convertvector(mask, cvectorization_ops_mask_f32));
+#elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 4 && CVECTORIZATION_OPS_X86 <= 6)
+  return (cvectorization_ops_raw_mask_f32)(__builtin_convertvector(mask, cvectorization_ops_mask_f32));
+#else
+  return (cvectorization_ops_raw_mask_f32)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_f32));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_mask_widening_half_vector_bf16_to_u32(cvectorization_ops_raw_half_mask_bf16 rawMask) {
+  const cvectorization_ops_raw_half_mask_bf16 mask = rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_mask_u32)(__builtin_convertvector(mask, cvectorization_ops_mask_u32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_mask_u32)(__builtin_convertvector(mask, cvectorization_ops_mask_u32));
+#elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 4 && CVECTORIZATION_OPS_X86 <= 6)
+  return (cvectorization_ops_raw_mask_u32)(__builtin_convertvector(mask, cvectorization_ops_mask_u32));
+#else
+  return (cvectorization_ops_raw_mask_u32)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_u32));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_mask_widening_half_vector_bf16_to_i32(cvectorization_ops_raw_half_mask_bf16 rawMask) {
+  const cvectorization_ops_raw_half_mask_bf16 mask = rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_mask_i32)(__builtin_convertvector(mask, cvectorization_ops_mask_i32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_mask_i32)(__builtin_convertvector(mask, cvectorization_ops_mask_i32));
+#elif CVECTORIZATION_OPS_NEON || (CVECTORIZATION_OPS_X86 >= 4 && CVECTORIZATION_OPS_X86 <= 6)
+  return (cvectorization_ops_raw_mask_i32)(__builtin_convertvector(mask, cvectorization_ops_mask_i32));
+#else
+  return (cvectorization_ops_raw_mask_i32)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_i32));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_mask_widening_half_vector_bf16_to_f32(cvectorization_ops_raw_half_mask_bf16 rawMask) {
+  const cvectorization_ops_raw_half_mask_bf16 mask = rawMask;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
   return (cvectorization_ops_raw_mask_f32)(__builtin_convertvector(mask, cvectorization_ops_mask_f32));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
@@ -164338,6 +164464,60 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i64 cvectorization_ops_mas
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f64 cvectorization_ops_mask_widening_quarter_vector_f16_to_f64(cvectorization_ops_raw_quarter_mask_f16 rawMask) {
   const cvectorization_ops_raw_quarter_mask_f16 mask = rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_mask_f64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_f64));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_mask_f64)(__builtin_convertvector(mask, cvectorization_ops_mask_f64));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_mask_f64)(__builtin_convertvector(mask, cvectorization_ops_mask_f64));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_mask_f64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_f64));
+#elif CVECTORIZATION_OPS_X86 == 2
+  const cvectorization_ops_x86_block_i32 extended = (cvectorization_ops_x86_block_i32)__builtin_shufflevector((cvectorization_ops_x86_block_i8)mask, (cvectorization_ops_x86_block_i8){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 16, 16, 0, 1, 16, 16, 2, 3, 16, 16, 16, 16, 16, 16, 16, 16) >> 16;
+  const cvectorization_ops_x86_block_i16 signs = __builtin_shufflevector((cvectorization_ops_x86_block_i16)extended, (cvectorization_ops_x86_block_i16)extended, 1, 1, 3, 3, 4, 5, 6, 7);
+  return (cvectorization_ops_raw_mask_f64)((cvectorization_ops_x86_block_i64)__builtin_shufflevector(extended, (cvectorization_ops_x86_block_i32)signs, 0, 4, 1, 5));
+#else
+  return (cvectorization_ops_raw_mask_f64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1), cvectorization_ops_mask_f64));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u64 cvectorization_ops_mask_widening_quarter_vector_bf16_to_u64(cvectorization_ops_raw_quarter_mask_bf16 rawMask) {
+  const cvectorization_ops_raw_quarter_mask_bf16 mask = rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_mask_u64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_u64));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_mask_u64)(__builtin_convertvector(mask, cvectorization_ops_mask_u64));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_mask_u64)(__builtin_convertvector(mask, cvectorization_ops_mask_u64));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_mask_u64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_u64));
+#elif CVECTORIZATION_OPS_X86 == 2
+  const cvectorization_ops_x86_block_i32 extended = (cvectorization_ops_x86_block_i32)__builtin_shufflevector((cvectorization_ops_x86_block_i8)mask, (cvectorization_ops_x86_block_i8){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 16, 16, 0, 1, 16, 16, 2, 3, 16, 16, 16, 16, 16, 16, 16, 16) >> 16;
+  const cvectorization_ops_x86_block_i16 signs = __builtin_shufflevector((cvectorization_ops_x86_block_i16)extended, (cvectorization_ops_x86_block_i16)extended, 1, 1, 3, 3, 4, 5, 6, 7);
+  return (cvectorization_ops_raw_mask_u64)((cvectorization_ops_x86_block_i64)__builtin_shufflevector(extended, (cvectorization_ops_x86_block_i32)signs, 0, 4, 1, 5));
+#else
+  return (cvectorization_ops_raw_mask_u64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1), cvectorization_ops_mask_u64));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i64 cvectorization_ops_mask_widening_quarter_vector_bf16_to_i64(cvectorization_ops_raw_quarter_mask_bf16 rawMask) {
+  const cvectorization_ops_raw_quarter_mask_bf16 mask = rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_mask_i64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_i64));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_mask_i64)(__builtin_convertvector(mask, cvectorization_ops_mask_i64));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_mask_i64)(__builtin_convertvector(mask, cvectorization_ops_mask_i64));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_mask_i64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_i64));
+#elif CVECTORIZATION_OPS_X86 == 2
+  const cvectorization_ops_x86_block_i32 extended = (cvectorization_ops_x86_block_i32)__builtin_shufflevector((cvectorization_ops_x86_block_i8)mask, (cvectorization_ops_x86_block_i8){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, 16, 16, 0, 1, 16, 16, 2, 3, 16, 16, 16, 16, 16, 16, 16, 16) >> 16;
+  const cvectorization_ops_x86_block_i16 signs = __builtin_shufflevector((cvectorization_ops_x86_block_i16)extended, (cvectorization_ops_x86_block_i16)extended, 1, 1, 3, 3, 4, 5, 6, 7);
+  return (cvectorization_ops_raw_mask_i64)((cvectorization_ops_x86_block_i64)__builtin_shufflevector(extended, (cvectorization_ops_x86_block_i32)signs, 0, 4, 1, 5));
+#else
+  return (cvectorization_ops_raw_mask_i64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1), cvectorization_ops_mask_i64));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f64 cvectorization_ops_mask_widening_quarter_vector_bf16_to_f64(cvectorization_ops_raw_quarter_mask_bf16 rawMask) {
+  const cvectorization_ops_raw_quarter_mask_bf16 mask = rawMask;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
   return (cvectorization_ops_raw_mask_f64)(__builtin_convertvector(__builtin_shufflevector(mask, mask, 0, 1, 2, 3), cvectorization_ops_mask_f64));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
@@ -164595,6 +164775,34 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_f16 cvectorization_op
   return (cvectorization_ops_raw_half_mask_f16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_block_i32)__builtin_shufflevector(mask, mask, 0, 1, 2, 3), (cvectorization_ops_x86_block_i32)__builtin_shufflevector(mask, mask, 4, 5, 6, 7)));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return (cvectorization_ops_raw_half_mask_f16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_block_i32)mask, (cvectorization_ops_x86_block_i32)mask));
+#else
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, -1, -1, -1, -1));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_bf16 cvectorization_ops_half_mask_narrowing_u32_to_bf16(cvectorization_ops_raw_mask_u32 rawMask) {
+  const cvectorization_ops_mask_u32 mask = (cvectorization_ops_mask_u32)rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_neon_i8x8 narrowed1 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)mask, 1);
+  return (cvectorization_ops_raw_half_mask_bf16)(narrowed1);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_half_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_half_mask_bf16));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_half_mask_bf16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_block_i32)__builtin_shufflevector(mask, mask, 0, 1, 2, 3), (cvectorization_ops_x86_block_i32)__builtin_shufflevector(mask, mask, 4, 5, 6, 7)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_half_mask_bf16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_block_i32)mask, (cvectorization_ops_x86_block_i32)mask));
 #else
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
   typedef int16_t narrow_lanes __attribute__((vector_size(8)));
@@ -164919,6 +165127,34 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_f16 cvectorization_op
   return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, -1, -1, -1, -1));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_bf16 cvectorization_ops_half_mask_narrowing_i32_to_bf16(cvectorization_ops_raw_mask_i32 rawMask) {
+  const cvectorization_ops_mask_i32 mask = (cvectorization_ops_mask_i32)rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_neon_i8x8 narrowed1 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)mask, 1);
+  return (cvectorization_ops_raw_half_mask_bf16)(narrowed1);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_half_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_half_mask_bf16));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_half_mask_bf16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_block_i32)__builtin_shufflevector(mask, mask, 0, 1, 2, 3), (cvectorization_ops_x86_block_i32)__builtin_shufflevector(mask, mask, 4, 5, 6, 7)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_half_mask_bf16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_block_i32)mask, (cvectorization_ops_x86_block_i32)mask));
+#else
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, -1, -1, -1, -1));
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 __attribute__((visibility("hidden"))) CVECTORIZATION_OPS_INLINE const int32_t* cvectorization_ops_x86_demote_mask_to_table_i64_to_u32(void) {
   static const int32_t table[8] __attribute__((aligned(64))) = {0, 2, 4, 6, 0, 2, 4, 6};
@@ -165180,6 +165416,34 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_f16 cvectorization_op
   return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, -1, -1, -1, -1));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_bf16 cvectorization_ops_half_mask_narrowing_f32_to_bf16(cvectorization_ops_raw_mask_f32 rawMask) {
+  const cvectorization_ops_mask_f32 mask = (cvectorization_ops_mask_f32)rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_neon_i8x8 narrowed1 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)mask, 1);
+  return (cvectorization_ops_raw_half_mask_bf16)(narrowed1);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_half_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_half_mask_bf16));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_half_mask_bf16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_block_i32)__builtin_shufflevector(mask, mask, 0, 1, 2, 3), (cvectorization_ops_x86_block_i32)__builtin_shufflevector(mask, mask, 4, 5, 6, 7)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_half_mask_bf16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_block_i32)mask, (cvectorization_ops_x86_block_i32)mask));
+#else
+  const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, -1, -1, -1, -1));
+#endif
+}
 #if CVECTORIZATION_OPS_X86 == 4
 __attribute__((visibility("hidden"))) CVECTORIZATION_OPS_INLINE const int32_t* cvectorization_ops_x86_demote_mask_to_table_f64_to_u32(void) {
   static const int32_t table[8] __attribute__((aligned(64))) = {0, 2, 4, 6, 0, 2, 4, 6};
@@ -165387,6 +165651,62 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_u8 cvectorization_ops
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_i8 cvectorization_ops_half_mask_narrowing_f16_to_i8(cvectorization_ops_raw_mask_f16 rawMask) {
   const cvectorization_ops_mask_f16 mask = (cvectorization_ops_mask_f16)rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)mask;
+  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i8)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)mask;
+  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i8)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_neon_i8x8 narrowed1 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)mask, 0);
+  return (cvectorization_ops_raw_half_mask_i8)(narrowed1);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_half_mask_i8)(__builtin_convertvector(mask, cvectorization_ops_half_mask_i8));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_half_mask_i8)((cvectorization_ops_x86_block_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_block_i16)__builtin_shufflevector(mask, mask, 0, 1, 2, 3, 4, 5, 6, 7), (cvectorization_ops_x86_block_i16)__builtin_shufflevector(mask, mask, 8, 9, 10, 11, 12, 13, 14, 15)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_half_mask_i8)((cvectorization_ops_x86_block_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_block_i16)mask, (cvectorization_ops_x86_block_i16)mask));
+#else
+  const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)mask;
+  typedef int8_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i8)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_u8 cvectorization_ops_half_mask_narrowing_bf16_to_u8(cvectorization_ops_raw_mask_bf16 rawMask) {
+  const cvectorization_ops_mask_bf16 mask = (cvectorization_ops_mask_bf16)rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)mask;
+  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i8)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)mask;
+  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i8)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_neon_i8x8 narrowed1 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)mask, 0);
+  return (cvectorization_ops_raw_half_mask_u8)(narrowed1);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_half_mask_u8)(__builtin_convertvector(mask, cvectorization_ops_half_mask_u8));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_half_mask_u8)((cvectorization_ops_x86_block_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_block_i16)__builtin_shufflevector(mask, mask, 0, 1, 2, 3, 4, 5, 6, 7), (cvectorization_ops_x86_block_i16)__builtin_shufflevector(mask, mask, 8, 9, 10, 11, 12, 13, 14, 15)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  return (cvectorization_ops_raw_half_mask_u8)((cvectorization_ops_x86_block_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_block_i16)mask, (cvectorization_ops_x86_block_i16)mask));
+#else
+  const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)mask;
+  typedef int8_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_half_mask_i8)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_i8 cvectorization_ops_half_mask_narrowing_bf16_to_i8(cvectorization_ops_raw_mask_bf16 rawMask) {
+  const cvectorization_ops_mask_bf16 mask = (cvectorization_ops_mask_bf16)rawMask;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)mask;
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
@@ -165623,6 +165943,71 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_f16 cvectorization
   return (cvectorization_ops_raw_quarter_mask_f16)(narrowed2);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_quarter_mask_f16)(__builtin_convertvector(mask, cvectorization_ops_quarter_mask_f16));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)a < 0);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF}));
+  const cvectorization_ops_x86_i8 looked = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)saturatedLane, (cvectorization_ops_x86_i8){0, 1, -1, -1, 8, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, -1, -1, 8, 9, -1, -1});
+  const cvectorization_ops_x86_block_i64 half = __builtin_shufflevector((cvectorization_ops_x86_i64)looked, (cvectorization_ops_x86_i64)looked, 0, 3);
+  return (cvectorization_ops_raw_quarter_mask_i16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packusdw128((cvectorization_ops_x86_block_i32)half, (cvectorization_ops_x86_block_i32)half));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)a < 0);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)saturatedLane, 0, 4, 0, 4, 0, 4, 0, 4));
+#elif CVECTORIZATION_OPS_X86 == 2
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)a >> 31, (cvectorization_ops_vector_i32)a >> 31, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLaneEqual = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane == 0);
+  const cvectorization_ops_vector_u64 bigLaneGreater = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 bigLaneUpper = (bigLaneEqual & (0 - shiftedLane)) | bigLaneGreater;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)bigLaneUpper, (cvectorization_ops_vector_i32)bigLaneUpper, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)saturatedLane, 0, 4, 0, 4, 0, 4, 0, 4));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)a >> 31, (cvectorization_ops_vector_i32)a >> 31, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLaneEqual = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane == 0);
+  const cvectorization_ops_vector_u64 bigLaneGreater = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 bigLaneUpper = (bigLaneEqual & (0 - shiftedLane)) | bigLaneGreater;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)bigLaneUpper, (cvectorization_ops_vector_i32)bigLaneUpper, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_x86_i64)saturatedLane, (cvectorization_ops_x86_i64)saturatedLane, 1, 1), 0, 8, 1, 9, 2, 10, 3, 11));
+#else
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(4)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, -1, -1, -1, -1, -1, -1));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_bf16 cvectorization_ops_quarter_mask_narrowing_u64_to_bf16(cvectorization_ops_raw_mask_u64 rawMask) {
+  const cvectorization_ops_mask_u64 mask = (cvectorization_ops_mask_u64)rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, -1, -1, -1, -1));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_neon_i8x8 narrowed1 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)mask, 2);
+  const cvectorization_ops_neon_i8x8 narrowed2 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)__builtin_shufflevector(narrowed1, narrowed1, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1), 1);
+  return (cvectorization_ops_raw_quarter_mask_bf16)(narrowed2);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_quarter_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_quarter_mask_bf16));
 #elif CVECTORIZATION_OPS_X86 == 4
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
   const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)a < 0);
@@ -165927,6 +166312,71 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_f16 cvectorization
   return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, -1, -1, -1, -1, -1, -1));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_bf16 cvectorization_ops_quarter_mask_narrowing_i64_to_bf16(cvectorization_ops_raw_mask_i64 rawMask) {
+  const cvectorization_ops_mask_i64 mask = (cvectorization_ops_mask_i64)rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, -1, -1, -1, -1));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_neon_i8x8 narrowed1 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)mask, 2);
+  const cvectorization_ops_neon_i8x8 narrowed2 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)__builtin_shufflevector(narrowed1, narrowed1, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1), 1);
+  return (cvectorization_ops_raw_quarter_mask_bf16)(narrowed2);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_quarter_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_quarter_mask_bf16));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)a < 0);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF}));
+  const cvectorization_ops_x86_i8 looked = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)saturatedLane, (cvectorization_ops_x86_i8){0, 1, -1, -1, 8, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, -1, -1, 8, 9, -1, -1});
+  const cvectorization_ops_x86_block_i64 half = __builtin_shufflevector((cvectorization_ops_x86_i64)looked, (cvectorization_ops_x86_i64)looked, 0, 3);
+  return (cvectorization_ops_raw_quarter_mask_i16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packusdw128((cvectorization_ops_x86_block_i32)half, (cvectorization_ops_x86_block_i32)half));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)a < 0);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)saturatedLane, 0, 4, 0, 4, 0, 4, 0, 4));
+#elif CVECTORIZATION_OPS_X86 == 2
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)a >> 31, (cvectorization_ops_vector_i32)a >> 31, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLaneEqual = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane == 0);
+  const cvectorization_ops_vector_u64 bigLaneGreater = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 bigLaneUpper = (bigLaneEqual & (0 - shiftedLane)) | bigLaneGreater;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)bigLaneUpper, (cvectorization_ops_vector_i32)bigLaneUpper, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)saturatedLane, 0, 4, 0, 4, 0, 4, 0, 4));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)a >> 31, (cvectorization_ops_vector_i32)a >> 31, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLaneEqual = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane == 0);
+  const cvectorization_ops_vector_u64 bigLaneGreater = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 bigLaneUpper = (bigLaneEqual & (0 - shiftedLane)) | bigLaneGreater;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)bigLaneUpper, (cvectorization_ops_vector_i32)bigLaneUpper, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_x86_i64)saturatedLane, (cvectorization_ops_x86_i64)saturatedLane, 1, 1), 0, 8, 1, 9, 2, 10, 3, 11));
+#else
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(4)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, -1, -1, -1, -1, -1, -1));
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_u8 cvectorization_ops_quarter_mask_narrowing_f32_to_u8(cvectorization_ops_raw_mask_f32 rawMask) {
   const cvectorization_ops_mask_f32 mask = (cvectorization_ops_mask_f32)rawMask;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
@@ -166137,6 +166587,71 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_f16 cvectorization
   return (cvectorization_ops_raw_quarter_mask_f16)(narrowed2);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_quarter_mask_f16)(__builtin_convertvector(mask, cvectorization_ops_quarter_mask_f16));
+#elif CVECTORIZATION_OPS_X86 == 4
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)a < 0);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF}));
+  const cvectorization_ops_x86_i8 looked = (cvectorization_ops_x86_i8)__builtin_ia32_pshufb256((cvectorization_ops_x86_i8)saturatedLane, (cvectorization_ops_x86_i8){0, 1, -1, -1, 8, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, -1, -1, 8, 9, -1, -1});
+  const cvectorization_ops_x86_block_i64 half = __builtin_shufflevector((cvectorization_ops_x86_i64)looked, (cvectorization_ops_x86_i64)looked, 0, 3);
+  return (cvectorization_ops_raw_quarter_mask_i16)((cvectorization_ops_x86_block_i16)__builtin_ia32_packusdw128((cvectorization_ops_x86_block_i32)half, (cvectorization_ops_x86_block_i32)half));
+#elif CVECTORIZATION_OPS_X86 == 3
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)a < 0);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)saturatedLane, 0, 4, 0, 4, 0, 4, 0, 4));
+#elif CVECTORIZATION_OPS_X86 == 2
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)a >> 31, (cvectorization_ops_vector_i32)a >> 31, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLaneEqual = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane == 0);
+  const cvectorization_ops_vector_u64 bigLaneGreater = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 bigLaneUpper = (bigLaneEqual & (0 - shiftedLane)) | bigLaneGreater;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)bigLaneUpper, (cvectorization_ops_vector_i32)bigLaneUpper, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)saturatedLane, 0, 4, 0, 4, 0, 4, 0, 4));
+#elif CVECTORIZATION_OPS_X86 == 1
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)a >> 31, (cvectorization_ops_vector_i32)a >> 31, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 operandLane = invertedLane ^ (cvectorization_ops_vector_u64)a;
+  const cvectorization_ops_vector_u64 shiftedLane = operandLane >> 15;
+  const cvectorization_ops_vector_u64 bigLaneEqual = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane == 0);
+  const cvectorization_ops_vector_u64 bigLaneGreater = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i32)shiftedLane > 0);
+  const cvectorization_ops_vector_u64 bigLaneUpper = (bigLaneEqual & (0 - shiftedLane)) | bigLaneGreater;
+  const cvectorization_ops_vector_u64 bigLane = (cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_i32)bigLaneUpper, (cvectorization_ops_vector_i32)bigLaneUpper, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u64 saturatedLane = (invertedLane ^ ((operandLane | bigLane) & (cvectorization_ops_vector_u64){0x7FFF, 0x7FFF}));
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector((cvectorization_ops_vector_u16)saturatedLane, (cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_x86_i64)saturatedLane, (cvectorization_ops_x86_i64)saturatedLane, 1, 1), 0, 8, 1, 9, 2, 10, 3, 11));
+#else
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(4)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, -1, -1, -1, -1, -1, -1));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_bf16 cvectorization_ops_quarter_mask_narrowing_f64_to_bf16(cvectorization_ops_raw_mask_f64 rawMask) {
+  const cvectorization_ops_mask_f64 mask = (cvectorization_ops_mask_f64)rawMask;
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(8)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, -1, -1, -1, -1));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
+  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
+  const narrow_lanes narrowed = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i64){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
+  return (cvectorization_ops_raw_quarter_mask_i16)(__builtin_shufflevector(narrowed, narrowed, 0, 1, 2, 3, 4, 5, 6, 7));
+#elif CVECTORIZATION_OPS_NEON
+  const cvectorization_ops_neon_i8x8 narrowed1 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)mask, 2);
+  const cvectorization_ops_neon_i8x8 narrowed2 = (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)__builtin_shufflevector(narrowed1, narrowed1, 0, 1, 2, 3, 4, 5, 6, 7, -1, -1, -1, -1, -1, -1, -1, -1), 1);
+  return (cvectorization_ops_raw_quarter_mask_bf16)(narrowed2);
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_quarter_mask_bf16)(__builtin_convertvector(mask, cvectorization_ops_quarter_mask_bf16));
 #elif CVECTORIZATION_OPS_X86 == 4
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)mask;
   const cvectorization_ops_vector_u64 invertedLane = (cvectorization_ops_vector_u64)((cvectorization_ops_vector_i64)a < 0);

@@ -286,6 +286,36 @@ extension SIMDUInt64ReferenceTests {
     }
     #endif
 
+    @Test func maskWideningFromQuarterBFloat16() {
+        let mismatches = Mismatches("maskWideningFromQuarterBFloat16")
+        let maskInputs = Inputs.masks(SIMDBFloat16.QuarterMask.self, seed: 0x1083_EAB0_3AF9_4CB6)
+        for mask in maskInputs {
+            mismatches.check(
+                H.mask(widening: mask),
+                H.Mask(raw: HighwayReference.maskWideningQuarterBF16ToU64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maskWideningFromQuarterBFloat16NonCanonical() {
+        let mismatches = Mismatches(
+            "maskWideningFromQuarterBFloat16 with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x07C9_A7EE_E48A_04A5).map {
+            SIMDBFloat16.quarterMask(narrowing: SIMDUInt64.mask(from: $0))
+        }
+        for mask in maskInputs {
+            mismatches.check(
+                H.mask(widening: mask),
+                H.Mask(raw: HighwayReference.maskWideningQuarterBF16ToU64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func maskWideningFromEighthUInt8() {
         let mismatches = Mismatches("maskWideningFromEighthUInt8")
         let maskInputs = Inputs.masks(SIMDUInt8.EighthMask.self, seed: 0x6574_AD71_97FC_209E)

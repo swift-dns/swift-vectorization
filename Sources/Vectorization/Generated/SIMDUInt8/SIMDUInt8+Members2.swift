@@ -2129,9 +2129,4 @@ extension SIMDUInt8 {
         EighthVector(raw: cvectorization_ops_eighth_vector_resizing_half_vector_i8_to_u8(a.raw))
     }
 
-    @export(implementation) @inline(always)
-    public static func vector(resizing a: SIMDInt8.QuarterVector) -> Vector {
-        Vector(raw: cvectorization_ops_vector_resizing_quarter_vector_i8_to_u8(a.raw))
-    }
-
 }

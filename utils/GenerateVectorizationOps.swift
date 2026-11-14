@@ -26180,12 +26180,10 @@ func sourced<Output>(
     { result in body(source.at(width: result.width), result) }
 }
 
-func includingFloat16(
+func excludingBfloat16Results(
     _ accepts: @escaping (Element, Element) -> Bool
 ) -> (Element, Element) -> Bool {
-    { source, result in
-        source.category != .bfloat16 && result.category != .bfloat16 && accepts(source, result)
-    }
+    { source, result in result.category != .bfloat16 && accepts(source, result) }
 }
 
 func differentElements(_ source: Element, _ result: Element) -> Bool {
@@ -28496,7 +28494,7 @@ let demoteTruncatingOps = sourcedOps(accepting: demoteUnsignedIntegers) { source
 }
 
 let demoteMasksOps = sourcedOps(
-    accepting: includingFloat16(halvesOfWidth),
+    accepting: excludingBfloat16Results(halvesOfWidth),
     includingHalfPrecision: true
 ) { source, results in
     let shuffled = sourced(source) { source, result in
@@ -33228,7 +33226,7 @@ let narrowMaskHalfOps: [Op] = [
 let narrowMaskPromotionOps: [Op] = Shape.allCases.filter { $0 != .full && $0.hasMask }.flatMap {
     shape in
     sourcedOps(
-        accepting: includingFloat16 { source, result in
+        accepting: { source, result in
             source.supports(shape) && result.bits == source.bits * (shape.fraction ?? 1)
         },
         includingHalfPrecision: true
@@ -33265,7 +33263,7 @@ let narrowMaskPromotionOps: [Op] = Shape.allCases.filter { $0 != .full && $0.has
 let narrowMaskDemotionOps: [Op] = Shape.allCases.filter { $0 != .full && $0.hasMask }.flatMap {
     shape in
     sourcedOps(
-        accepting: includingFloat16 { source, result in
+        accepting: { source, result in
             result.supports(shape) && source.bits == result.bits * (shape.fraction ?? 1)
         },
         includingHalfPrecision: true

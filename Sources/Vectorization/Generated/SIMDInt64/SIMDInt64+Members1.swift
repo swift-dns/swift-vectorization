@@ -756,6 +756,11 @@ extension SIMDInt64 {
     #endif
 
     @export(implementation) @inline(always)
+    public static func mask(widening mask: SIMDBFloat16.QuarterMask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_widening_quarter_vector_bf16_to_i64(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func mask(widening mask: SIMDUInt8.EighthMask) -> Mask {
         Mask(raw: cvectorization_ops_mask_widening_eighth_vector_u8_to_i64(mask.raw))
     }

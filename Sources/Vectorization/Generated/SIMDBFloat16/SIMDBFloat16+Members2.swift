@@ -4,6 +4,46 @@ public import CVectorizationOps
 
 extension SIMDBFloat16 {
     @export(implementation) @inline(always)
+    public static func create4(
+        _ a: Vector,
+        _ b: Vector,
+        _ c: Vector,
+        _ d: Vector
+    ) -> (Vector, Vector, Vector, Vector) {
+        { tuple in
+            (
+                Vector(raw: tuple.v0), Vector(raw: tuple.v1), Vector(raw: tuple.v2),
+                Vector(raw: tuple.v3)
+            )
+        }(cvectorization_ops_create4_bf16(a.raw, b.raw, c.raw, d.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func get4(_ tuple: (Vector, Vector, Vector, Vector), at index: Int) -> Vector {
+        precondition(index >= 0 && index < 4, "Tuple index is negative or at least 4")
+        return unsafe get4(tuple, atUnchecked: index)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func get4(
+        _ tuple: (Vector, Vector, Vector, Vector),
+        atUnchecked index: Int
+    ) -> Vector {
+        assert(index >= 0 && index < 4, "Tuple index is negative or at least 4")
+        return Vector(
+            raw: cvectorization_ops_get4_bf16(
+                cvectorization_ops_tuple4_bf16(
+                    v0: tuple.0.raw,
+                    v1: tuple.1.raw,
+                    v2: tuple.2.raw,
+                    v3: tuple.3.raw
+                ),
+                index
+            )
+        )
+    }
+
+    @export(implementation) @inline(always)
     public static func set4(
         _ tuple: (Vector, Vector, Vector, Vector),
         at index: Int,

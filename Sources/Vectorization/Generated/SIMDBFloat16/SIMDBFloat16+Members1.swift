@@ -227,6 +227,46 @@ extension SIMDBFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func mask(widening mask: SIMDUInt8.HalfMask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_widening_half_vector_u8_to_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func mask(widening mask: SIMDInt8.HalfMask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_widening_half_vector_i8_to_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func halfMask(narrowing mask: SIMDUInt32.Mask) -> HalfMask {
+        HalfMask(raw: cvectorization_ops_half_mask_narrowing_u32_to_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func halfMask(narrowing mask: SIMDInt32.Mask) -> HalfMask {
+        HalfMask(raw: cvectorization_ops_half_mask_narrowing_i32_to_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func halfMask(narrowing mask: SIMDFloat.Mask) -> HalfMask {
+        HalfMask(raw: cvectorization_ops_half_mask_narrowing_f32_to_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func quarterMask(narrowing mask: SIMDUInt64.Mask) -> QuarterMask {
+        QuarterMask(raw: cvectorization_ops_quarter_mask_narrowing_u64_to_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func quarterMask(narrowing mask: SIMDInt64.Mask) -> QuarterMask {
+        QuarterMask(raw: cvectorization_ops_quarter_mask_narrowing_i64_to_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func quarterMask(narrowing mask: SIMDDouble.Mask) -> QuarterMask {
+        QuarterMask(raw: cvectorization_ops_quarter_mask_narrowing_f64_to_bf16(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func mask(rebinding mask: SIMDUInt16.Mask) -> Mask {
         Mask(raw: cvectorization_ops_mask_rebinding_u16_to_bf16(mask.raw))
     }
@@ -1781,46 +1821,6 @@ extension SIMDBFloat16 {
                 cvectorization_ops_tuple3_bf16(v0: tuple.0.raw, v1: tuple.1.raw, v2: tuple.2.raw),
                 index,
                 a.raw
-            )
-        )
-    }
-
-    @export(implementation) @inline(always)
-    public static func create4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector
-    ) -> (Vector, Vector, Vector, Vector) {
-        { tuple in
-            (
-                Vector(raw: tuple.v0), Vector(raw: tuple.v1), Vector(raw: tuple.v2),
-                Vector(raw: tuple.v3)
-            )
-        }(cvectorization_ops_create4_bf16(a.raw, b.raw, c.raw, d.raw))
-    }
-
-    @export(implementation) @inline(always)
-    public static func get4(_ tuple: (Vector, Vector, Vector, Vector), at index: Int) -> Vector {
-        precondition(index >= 0 && index < 4, "Tuple index is negative or at least 4")
-        return unsafe get4(tuple, atUnchecked: index)
-    }
-
-    @unsafe @export(implementation) @inline(always)
-    public static func get4(
-        _ tuple: (Vector, Vector, Vector, Vector),
-        atUnchecked index: Int
-    ) -> Vector {
-        assert(index >= 0 && index < 4, "Tuple index is negative or at least 4")
-        return Vector(
-            raw: cvectorization_ops_get4_bf16(
-                cvectorization_ops_tuple4_bf16(
-                    v0: tuple.0.raw,
-                    v1: tuple.1.raw,
-                    v2: tuple.2.raw,
-                    v3: tuple.3.raw
-                ),
-                index
             )
         )
     }

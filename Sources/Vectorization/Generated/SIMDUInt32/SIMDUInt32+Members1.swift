@@ -708,6 +708,11 @@ extension SIMDUInt32 {
     #endif
 
     @export(implementation) @inline(always)
+    public static func mask(widening mask: SIMDBFloat16.HalfMask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_widening_half_vector_bf16_to_u32(mask.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func mask(widening mask: SIMDUInt8.QuarterMask) -> Mask {
         Mask(raw: cvectorization_ops_mask_widening_quarter_vector_u8_to_u32(mask.raw))
     }

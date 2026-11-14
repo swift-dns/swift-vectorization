@@ -208,6 +208,38 @@ extension SIMDInt8ReferenceTests {
     }
     #endif
 
+    @Test func maskNarrowingFromBFloat16() {
+        let mismatches = Mismatches("maskNarrowingFromBFloat16")
+        let aInputs = Inputs.masks(SIMDBFloat16.Mask.self, seed: 0x42B9_6808_6410_E802)
+        let bInputs = Inputs.masks(SIMDBFloat16.Mask.self, seed: 0x42B9_6908_6410_E9B5)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.mask(narrowing: a, b),
+                H.Mask(raw: HighwayReference.maskNarrowingBF16ToI8(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maskNarrowingFromBFloat16NonCanonical() {
+        let mismatches = Mismatches("maskNarrowingFromBFloat16 with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(SIMDBFloat16.Vector.self, seed: 0x2437_5D41_78A7_0CB9).map {
+            SIMDBFloat16.mask(rebinding: SIMDUInt16.mask(from: SIMDUInt16.vector(bitPattern: $0)))
+        }
+        let bInputs = Inputs.vectors(SIMDBFloat16.Vector.self, seed: 0x2437_5C41_78A7_0B06).map {
+            SIMDBFloat16.mask(rebinding: SIMDUInt16.mask(from: SIMDUInt16.vector(bitPattern: $0)))
+        }
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.mask(narrowing: a, b),
+                H.Mask(raw: HighwayReference.maskNarrowingBF16ToI8(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func halfMaskNarrowingFromUInt16() {
         let mismatches = Mismatches("halfMaskNarrowingFromUInt16")
         let maskInputs = Inputs.masks(SIMDUInt16.Mask.self, seed: 0x5318_0757_441C_D939)
@@ -297,6 +329,36 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
     #endif
+
+    @Test func halfMaskNarrowingFromBFloat16() {
+        let mismatches = Mismatches("halfMaskNarrowingFromBFloat16")
+        let maskInputs = Inputs.masks(SIMDBFloat16.Mask.self, seed: 0x509A_9893_8991_8885)
+        for mask in maskInputs {
+            mismatches.check(
+                H.halfMask(narrowing: mask),
+                H.HalfMask(raw: HighwayReference.halfMaskNarrowingBF16ToI8(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func halfMaskNarrowingFromBFloat16NonCanonical() {
+        let mismatches = Mismatches(
+            "halfMaskNarrowingFromBFloat16 with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.vectors(SIMDBFloat16.Vector.self, seed: 0x21DD_1B14_DD9C_1A02).map {
+            SIMDBFloat16.mask(rebinding: SIMDUInt16.mask(from: SIMDUInt16.vector(bitPattern: $0)))
+        }
+        for mask in maskInputs {
+            mismatches.check(
+                H.halfMask(narrowing: mask),
+                H.HalfMask(raw: HighwayReference.halfMaskNarrowingBF16ToI8(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
 
     @Test func quarterMaskNarrowingFromUInt32() {
         let mismatches = Mismatches("quarterMaskNarrowingFromUInt32")

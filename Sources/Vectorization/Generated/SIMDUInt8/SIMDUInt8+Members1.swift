@@ -654,6 +654,11 @@ extension SIMDUInt8 {
     #endif
 
     @export(implementation) @inline(always)
+    public static func mask(narrowing a: SIMDBFloat16.Mask, _ b: SIMDBFloat16.Mask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_narrowing_bf16_to_u8(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func halfMask(narrowing mask: SIMDUInt16.Mask) -> HalfMask {
         HalfMask(raw: cvectorization_ops_half_mask_narrowing_u16_to_u8(mask.raw))
     }
@@ -671,6 +676,11 @@ extension SIMDUInt8 {
     }
 
     #endif
+
+    @export(implementation) @inline(always)
+    public static func halfMask(narrowing mask: SIMDBFloat16.Mask) -> HalfMask {
+        HalfMask(raw: cvectorization_ops_half_mask_narrowing_bf16_to_u8(mask.raw))
+    }
 
     @export(implementation) @inline(always)
     public static func quarterMask(narrowing mask: SIMDUInt32.Mask) -> QuarterMask {
