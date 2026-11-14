@@ -25266,10 +25266,10 @@ func x86Avx3ExpandLoad(otherwise: Bool, for element: Element) -> String {
     return vectorResult(expanded, for: element)
 }
 
-func x86Avx3CompressStoreUnlessSlow(for element: Element) -> String {
+func x86Avx3CompressStoreUnlessSlow(blended: Bool, for element: Element) -> String {
     """
     #if \(staticTargetCondition(of: ["AVX3_ZEN4", "AVX3_SPR"]))
-    \(registeredCompressedStore(blended: false, for: element))
+    \(registeredCompressedStore(blended: blended, for: element))
     #else
     \(x86Avx3CompressStore(for: element))
     #endif
@@ -25288,11 +25288,7 @@ func compressedStoreTargets(blended: Bool) -> TargetBodies<Element> {
     return TargetBodies(
         neon: { element in neonCompressedStore(blended: blended, for: element) },
         sve2_128: { element in sveCompressedStore(blended: blended, for: element) },
-        avx3dl: { element in
-            blended
-                ? x86Avx3CompressStore(for: element)
-                : x86Avx3CompressStoreUnlessSlow(for: element)
-        },
+        avx3dl: { element in x86Avx3CompressStoreUnlessSlow(blended: blended, for: element) },
         avx3: { element in
             guard x86Avx3IsNative(.avx3, for: element) else {
                 return blended ? registered(element) : x86Avx3EmulatedCompressedStore(for: element)

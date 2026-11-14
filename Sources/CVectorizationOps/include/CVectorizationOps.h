@@ -15877,9 +15877,21 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_u8(
   );
   return count;
 #elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_u8(rawMask);
+  const cvectorization_ops_vector_u8 compressed = (cvectorization_ops_vector_u8)cvectorization_ops_compressed_u8(rawA, rawMask);
+  const cvectorization_ops_raw_mask_u8 active = cvectorization_ops_first_lanes_u8(count);
+  cvectorization_ops_store_where_u8(
+      (cvectorization_ops_raw_vector_u8)compressed,
+      (cvectorization_ops_raw_mask_u8)active,
+      to
+  );
+  return count;
+#else
   const unsigned long long active = (unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask);
   (void)__builtin_ia32_compressstoreqi512_mask((cvectorization_ops_x86_i8*)to, (cvectorization_ops_x86_i8)a, (unsigned long long)active);
   return __builtin_popcountll(active);
+#endif
 #elif CVECTORIZATION_OPS_X86 == 5
   const size_t count = cvectorization_ops_true_count_u8(rawMask);
   const cvectorization_ops_vector_u8 compressed = (cvectorization_ops_vector_u8)cvectorization_ops_compressed_u8(rawA, rawMask);
@@ -26199,9 +26211,21 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_u16
   );
   return count;
 #elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_u16(rawMask);
+  const cvectorization_ops_vector_u16 compressed = (cvectorization_ops_vector_u16)cvectorization_ops_compressed_u16(rawA, rawMask);
+  const cvectorization_ops_raw_mask_u16 active = cvectorization_ops_first_lanes_u16(count);
+  cvectorization_ops_store_where_u16(
+      (cvectorization_ops_raw_vector_u16)compressed,
+      (cvectorization_ops_raw_mask_u16)active,
+      to
+  );
+  return count;
+#else
   const unsigned int active = (unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask);
   (void)__builtin_ia32_compressstorehi512_mask((cvectorization_ops_x86_i16*)to, (cvectorization_ops_x86_i16)a, (unsigned int)active);
   return __builtin_popcountll(active);
+#endif
 #elif CVECTORIZATION_OPS_X86 == 5
   const size_t count = cvectorization_ops_true_count_u16(rawMask);
   const cvectorization_ops_vector_u16 compressed = (cvectorization_ops_vector_u16)cvectorization_ops_compressed_u16(rawA, rawMask);
@@ -35491,7 +35515,23 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_u32
       to
   );
   return count;
-#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_u32(rawMask);
+  const cvectorization_ops_vector_u32 compressed = (cvectorization_ops_vector_u32)cvectorization_ops_compressed_u32(rawA, rawMask);
+  const cvectorization_ops_raw_mask_u32 active = cvectorization_ops_first_lanes_u32(count);
+  cvectorization_ops_store_where_u32(
+      (cvectorization_ops_raw_vector_u32)compressed,
+      (cvectorization_ops_raw_mask_u32)active,
+      to
+  );
+  return count;
+#else
+  const unsigned short active = (unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask);
+  (void)__builtin_ia32_compressstoresi512_mask((cvectorization_ops_x86_i32*)to, (cvectorization_ops_x86_i32)a, (unsigned short)active);
+  return __builtin_popcountll(active);
+#endif
+#elif CVECTORIZATION_OPS_X86 == 5
   const unsigned short active = (unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask);
   (void)__builtin_ia32_compressstoresi512_mask((cvectorization_ops_x86_i32*)to, (cvectorization_ops_x86_i32)a, (unsigned short)active);
   return __builtin_popcountll(active);
@@ -45195,7 +45235,23 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_u64
       to
   );
   return count;
-#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_u64(rawMask);
+  const cvectorization_ops_vector_u64 compressed = (cvectorization_ops_vector_u64)cvectorization_ops_compressed_u64(rawA, rawMask);
+  const cvectorization_ops_raw_mask_u64 active = cvectorization_ops_first_lanes_u64(count);
+  cvectorization_ops_store_where_u64(
+      (cvectorization_ops_raw_vector_u64)compressed,
+      (cvectorization_ops_raw_mask_u64)active,
+      to
+  );
+  return count;
+#else
+  const unsigned char active = (unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask);
+  (void)__builtin_ia32_compressstoredi512_mask((cvectorization_ops_x86_i64*)to, (cvectorization_ops_x86_i64)a, (unsigned char)active);
+  return __builtin_popcountll(active);
+#endif
+#elif CVECTORIZATION_OPS_X86 == 5
   const unsigned char active = (unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask);
   (void)__builtin_ia32_compressstoredi512_mask((cvectorization_ops_x86_i64*)to, (cvectorization_ops_x86_i64)a, (unsigned char)active);
   return __builtin_popcountll(active);
@@ -58763,9 +58819,21 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_i8(
   );
   return count;
 #elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_i8(rawMask);
+  const cvectorization_ops_vector_i8 compressed = (cvectorization_ops_vector_i8)cvectorization_ops_compressed_i8(rawA, rawMask);
+  const cvectorization_ops_raw_mask_i8 active = cvectorization_ops_first_lanes_i8(count);
+  cvectorization_ops_store_where_i8(
+      (cvectorization_ops_raw_vector_i8)compressed,
+      (cvectorization_ops_raw_mask_i8)active,
+      to
+  );
+  return count;
+#else
   const unsigned long long active = (unsigned long long)__builtin_ia32_cvtb2mask512((cvectorization_ops_x86_i8)mask);
   (void)__builtin_ia32_compressstoreqi512_mask((cvectorization_ops_x86_i8*)to, (cvectorization_ops_x86_i8)a, (unsigned long long)active);
   return __builtin_popcountll(active);
+#endif
 #elif CVECTORIZATION_OPS_X86 == 5
   const size_t count = cvectorization_ops_true_count_i8(rawMask);
   const cvectorization_ops_vector_i8 compressed = (cvectorization_ops_vector_i8)cvectorization_ops_compressed_i8(rawA, rawMask);
@@ -69244,9 +69312,21 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_i16
   );
   return count;
 #elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_i16(rawMask);
+  const cvectorization_ops_vector_i16 compressed = (cvectorization_ops_vector_i16)cvectorization_ops_compressed_i16(rawA, rawMask);
+  const cvectorization_ops_raw_mask_i16 active = cvectorization_ops_first_lanes_i16(count);
+  cvectorization_ops_store_where_i16(
+      (cvectorization_ops_raw_vector_i16)compressed,
+      (cvectorization_ops_raw_mask_i16)active,
+      to
+  );
+  return count;
+#else
   const unsigned int active = (unsigned int)__builtin_ia32_cvtw2mask512((cvectorization_ops_x86_i16)mask);
   (void)__builtin_ia32_compressstorehi512_mask((cvectorization_ops_x86_i16*)to, (cvectorization_ops_x86_i16)a, (unsigned int)active);
   return __builtin_popcountll(active);
+#endif
 #elif CVECTORIZATION_OPS_X86 == 5
   const size_t count = cvectorization_ops_true_count_i16(rawMask);
   const cvectorization_ops_vector_i16 compressed = (cvectorization_ops_vector_i16)cvectorization_ops_compressed_i16(rawA, rawMask);
@@ -78760,7 +78840,23 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_i32
       to
   );
   return count;
-#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_i32(rawMask);
+  const cvectorization_ops_vector_i32 compressed = (cvectorization_ops_vector_i32)cvectorization_ops_compressed_i32(rawA, rawMask);
+  const cvectorization_ops_raw_mask_i32 active = cvectorization_ops_first_lanes_i32(count);
+  cvectorization_ops_store_where_i32(
+      (cvectorization_ops_raw_vector_i32)compressed,
+      (cvectorization_ops_raw_mask_i32)active,
+      to
+  );
+  return count;
+#else
+  const unsigned short active = (unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask);
+  (void)__builtin_ia32_compressstoresi512_mask((cvectorization_ops_x86_i32*)to, (cvectorization_ops_x86_i32)a, (unsigned short)active);
+  return __builtin_popcountll(active);
+#endif
+#elif CVECTORIZATION_OPS_X86 == 5
   const unsigned short active = (unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask);
   (void)__builtin_ia32_compressstoresi512_mask((cvectorization_ops_x86_i32*)to, (cvectorization_ops_x86_i32)a, (unsigned short)active);
   return __builtin_popcountll(active);
@@ -88016,7 +88112,23 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_i64
       to
   );
   return count;
-#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_i64(rawMask);
+  const cvectorization_ops_vector_i64 compressed = (cvectorization_ops_vector_i64)cvectorization_ops_compressed_i64(rawA, rawMask);
+  const cvectorization_ops_raw_mask_i64 active = cvectorization_ops_first_lanes_i64(count);
+  cvectorization_ops_store_where_i64(
+      (cvectorization_ops_raw_vector_i64)compressed,
+      (cvectorization_ops_raw_mask_i64)active,
+      to
+  );
+  return count;
+#else
+  const unsigned char active = (unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask);
+  (void)__builtin_ia32_compressstoredi512_mask((cvectorization_ops_x86_i64*)to, (cvectorization_ops_x86_i64)a, (unsigned char)active);
+  return __builtin_popcountll(active);
+#endif
+#elif CVECTORIZATION_OPS_X86 == 5
   const unsigned char active = (unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask);
   (void)__builtin_ia32_compressstoredi512_mask((cvectorization_ops_x86_i64*)to, (cvectorization_ops_x86_i64)a, (unsigned char)active);
   return __builtin_popcountll(active);
@@ -97333,7 +97445,23 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_f32
       to
   );
   return count;
-#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_f32(rawMask);
+  const cvectorization_ops_vector_f32 compressed = (cvectorization_ops_vector_f32)cvectorization_ops_compressed_f32(rawA, rawMask);
+  const cvectorization_ops_raw_mask_f32 active = cvectorization_ops_first_lanes_f32(count);
+  cvectorization_ops_store_where_f32(
+      (cvectorization_ops_raw_vector_f32)compressed,
+      (cvectorization_ops_raw_mask_f32)active,
+      to
+  );
+  return count;
+#else
+  const unsigned short active = (unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask);
+  (void)__builtin_ia32_compressstoresf512_mask((cvectorization_ops_x86_f32*)to, (cvectorization_ops_x86_f32)a, (unsigned short)active);
+  return __builtin_popcountll(active);
+#endif
+#elif CVECTORIZATION_OPS_X86 == 5
   const unsigned short active = (unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask);
   (void)__builtin_ia32_compressstoresf512_mask((cvectorization_ops_x86_f32*)to, (cvectorization_ops_x86_f32)a, (unsigned short)active);
   return __builtin_popcountll(active);
@@ -105443,7 +105571,23 @@ CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_blended_f64
       to
   );
   return count;
-#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+#elif CVECTORIZATION_OPS_X86 == 6
+#if HWY_STATIC_TARGET & (HWY_AVX3_ZEN4 | HWY_AVX3_SPR)
+  const size_t count = cvectorization_ops_true_count_f64(rawMask);
+  const cvectorization_ops_vector_f64 compressed = (cvectorization_ops_vector_f64)cvectorization_ops_compressed_f64(rawA, rawMask);
+  const cvectorization_ops_raw_mask_f64 active = cvectorization_ops_first_lanes_f64(count);
+  cvectorization_ops_store_where_f64(
+      (cvectorization_ops_raw_vector_f64)compressed,
+      (cvectorization_ops_raw_mask_f64)active,
+      to
+  );
+  return count;
+#else
+  const unsigned char active = (unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask);
+  (void)__builtin_ia32_compressstoredf512_mask((cvectorization_ops_x86_f64*)to, (cvectorization_ops_x86_f64)a, (unsigned char)active);
+  return __builtin_popcountll(active);
+#endif
+#elif CVECTORIZATION_OPS_X86 == 5
   const unsigned char active = (unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask);
   (void)__builtin_ia32_compressstoredf512_mask((cvectorization_ops_x86_f64*)to, (cvectorization_ops_x86_f64)a, (unsigned char)active);
   return __builtin_popcountll(active);
