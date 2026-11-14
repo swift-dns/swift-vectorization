@@ -13261,10 +13261,8 @@ func gatherChecks(of op: Op, for element: Element) -> [Check] {
     let indexElement = signedElement(of: element)
     let isOffsets = parameter == .pointerOffsets
     let operand = isOffsets ? "byteOffsets" : "indices"
-    let stride = "MemoryLayout<Lane>.stride"
-    let selectable =
-        isOffsets ? "Swift.max(span.count * \(stride) - \(stride) + 1, 0)" : "span.count"
-    let limit = indexElement.bits == 32 ? "Swift.min(\(selectable), 1 << 31)" : selectable
+    let stride = isOffsets ? "MemoryLayout<Lane>.stride" : "1"
+    let limit = "\(indexElement.namespace).indexLimit(count: span.count, stride: \(stride))"
     let message =
         isOffsets
         ? "Byte offset is negative or leaves no room for a lane in the span"
@@ -13297,6 +13295,32 @@ func loadedIndexChecks(of op: Op, for element: Element) -> [Check] {
             IndexContract.lanes.message
         )
     ]
+}
+
+/// The members of an element that indexes gathers and scatters: the limit their span forms check
+/// the indices, or the byte offsets, against, as the `size_t` the check takes. It counts those that
+/// select a whole lane, up to `1 << (bits - 1)` so that negative ones fail, without overflowing for
+/// any count, also where `Int` has 32 bits.
+func indexLimitMembers(for element: Element) -> String {
+    let gathered = elements.filter { indexed in
+        ops.contains { op in
+            op.parameters.contains(where: \.isPointerIndices) && op.applies.matches(indexed)
+        }
+    }
+    guard gathered.contains(where: { signedElement(of: $0).suffix == element.suffix }) else {
+        return ""
+    }
+    let maximum = "1 << \(element.bits - 1)"
+    return """
+            @export(implementation) @inline(always)
+            package static func indexLimit(count: Int, stride: Int) -> Int {
+                guard count > 0 else { return 0 }
+                let lanes = Swift.min(UInt64(count), (\(maximum)) / UInt64(stride) + 1)
+                return Int(truncatingIfNeeded: Swift.min((lanes - 1) * UInt64(stride) + 1, \(maximum)))
+            }
+
+
+        """
 }
 
 func spanOpChecks(of op: Op, for element: Element) -> [Check] {
@@ -41592,6 +41616,7 @@ func generateElement(_ element: Element) -> String {
 
         """
     output += laneCapabilityMembers(for: element)
+    output += indexLimitMembers(for: element)
     output += "}\n\n\(unavailableSendableConformance(of: element.namespace))\n"
 
     return output

@@ -49,6 +49,41 @@ struct MemoryOpsTests {
         #expect(output == source)
     }
 
+    @Test("A gather and a scatter reach the last lane of the span by index and by byte offset")
+    func gatherAndScatterReachLastLane() {
+        let source = ContiguousArray((0..<lanes).map { Int32($0) * 10 })
+        let last = Int32(lanes - 1)
+        let byIndex = H.gather(from: source.span, indices: H.repeating(last))
+        let byOffset = H.gather(from: source.span, byteOffsets: H.repeating(last * 4))
+
+        #expect(stored(byIndex) == [Int32](repeating: last * 10, count: lanes))
+        #expect(stored(byOffset) == [Int32](repeating: last * 10, count: lanes))
+
+        var output = ContiguousArray<Int32>(repeating: -1, count: lanes)
+        var destination = output.mutableSpan
+        H.scatter(H.repeating(5), to: &destination, indices: H.repeating(last))
+
+        #expect(Array(output) == (0..<lanes).map { $0 == lanes - 1 ? 5 : -1 })
+    }
+
+    @Test("The index limit of a gather counts the indices or byte offsets that select a lane")
+    func gatherIndexLimit() {
+        let limits32 = [
+            (0, 1), (4, 1), (Int.max, 1), (0, 4), (1, 4), (4, 4), (1 << 29, 4), ((1 << 29) + 1, 4),
+            (Int.max, 4),
+        ].map { UInt64(UInt(bitPattern: SIMDInt32.indexLimit(count: $0.0, stride: $0.1))) }
+        let limits64 = [(0, 1), (4, 1), (Int.max, 1), (4, 8), ((1 << 28) + 1, 8), (1 << 29, 8)]
+            .map { UInt64(UInt(bitPattern: SIMDInt64.indexLimit(count: $0.0, stride: $0.1))) }
+
+        #expect(
+            limits32 == [
+                0, 4, Swift.min(UInt64(Int.max), 1 << 31), 0, 1, 13, (1 << 31) - 3, 1 << 31,
+                1 << 31,
+            ]
+        )
+        #expect(limits64 == [0, 4, UInt64(Int.max), 25, (1 << 31) + 1, (1 << 32) - 7])
+    }
+
     @Test("A masked gather leaves out the lanes of a mask that select nothing in the span")
     func maskedGather() {
         let source = ContiguousArray<Int32>(repeating: 3, count: lanes)

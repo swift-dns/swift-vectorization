@@ -1863,7 +1863,11 @@ extension SIMDUInt64 {
     @export(implementation) @inline(always)
     public static func gather(from span: Span<Lane>, indices: SIMDInt64.Vector) -> Vector {
         precondition(
-            cvectorization_ops_indices_within_i64(indices.raw, 0, span.count),
+            cvectorization_ops_indices_within_i64(
+                indices.raw,
+                0,
+                SIMDInt64.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         return unsafe gather(fromUnchecked: span, indices: indices)
@@ -1873,7 +1877,11 @@ extension SIMDUInt64 {
     @unsafe @export(implementation) @inline(always)
     public static func gather(fromUnchecked span: Span<Lane>, indices: SIMDInt64.Vector) -> Vector {
         assert(
-            cvectorization_ops_indices_within_i64(indices.raw, 0, span.count),
+            cvectorization_ops_indices_within_i64(
+                indices.raw,
+                0,
+                SIMDInt64.indexLimit(count: span.count, stride: 1)
+            ),
             "Index is negative or past the end of the span"
         )
         return span.withUnsafeBufferPointer {
@@ -1893,7 +1901,7 @@ extension SIMDUInt64 {
             cvectorization_ops_indices_within_i64(
                 byteOffsets.raw,
                 0,
-                Swift.max(span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1, 0)
+                SIMDInt64.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
             ),
             "Byte offset is negative or leaves no room for a lane in the span"
         )
@@ -1910,7 +1918,7 @@ extension SIMDUInt64 {
             cvectorization_ops_indices_within_i64(
                 byteOffsets.raw,
                 0,
-                Swift.max(span.count * MemoryLayout<Lane>.stride - MemoryLayout<Lane>.stride + 1, 0)
+                SIMDInt64.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
             ),
             "Byte offset is negative or leaves no room for a lane in the span"
         )
@@ -1943,7 +1951,7 @@ extension SIMDUInt64 {
         precondition(
             cvectorization_ops_indices_within_where_u64(
                 indices.raw,
-                span.count,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1961,7 +1969,7 @@ extension SIMDUInt64 {
         assert(
             cvectorization_ops_indices_within_where_u64(
                 indices.raw,
-                span.count,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1969,6 +1977,59 @@ extension SIMDUInt64 {
         return span.withUnsafeBufferPointer {
             Vector(
                 raw: unsafe cvectorization_ops_gather_first_u64($0.baseAddress, indices.raw, count)
+            )
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func gather(
+        from: UnsafePointer<Lane>,
+        indices: SIMDInt64.Vector,
+        where mask: Mask
+    ) -> Vector {
+        Vector(raw: unsafe cvectorization_ops_gather_where_u64(mask.raw, from, indices.raw))
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func gather(
+        from span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        where mask: Mask
+    ) -> Vector {
+        precondition(
+            cvectorization_ops_indices_within_where_u64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return unsafe gather(fromUnchecked: span, indices: indices, where: mask)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func gather(
+        fromUnchecked span: Span<Lane>,
+        indices: SIMDInt64.Vector,
+        where mask: Mask
+    ) -> Vector {
+        assert(
+            cvectorization_ops_indices_within_where_u64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        return span.withUnsafeBufferPointer {
+            Vector(
+                raw: unsafe cvectorization_ops_gather_where_u64(
+                    mask.raw,
+                    $0.baseAddress,
+                    indices.raw
+                )
             )
         }
     }

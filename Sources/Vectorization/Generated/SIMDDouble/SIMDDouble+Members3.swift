@@ -24,7 +24,7 @@ extension SIMDDouble {
         precondition(
             cvectorization_ops_indices_within_where_f64(
                 indices.raw,
-                span.count,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -43,7 +43,7 @@ extension SIMDDouble {
         assert(
             cvectorization_ops_indices_within_where_f64(
                 indices.raw,
-                span.count,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
                 firstLanes(count: count).raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -72,7 +72,11 @@ extension SIMDDouble {
         where mask: Mask
     ) {
         precondition(
-            cvectorization_ops_indices_within_where_f64(indices.raw, span.count, mask.raw),
+            cvectorization_ops_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         unsafe scatter(a, toUnchecked: &span, indices: indices, where: mask)
@@ -87,7 +91,11 @@ extension SIMDDouble {
         where mask: Mask
     ) {
         assert(
-            cvectorization_ops_indices_within_where_f64(indices.raw, span.count, mask.raw),
+            cvectorization_ops_indices_within_where_f64(
+                indices.raw,
+                SIMDInt64.indexLimit(count: span.count, stride: 1),
+                mask.raw
+            ),
             "Index is negative or past the end of the span, for a lane in use"
         )
         span.withUnsafeMutableBufferPointer {

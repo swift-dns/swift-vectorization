@@ -24,7 +24,7 @@ extension SIMDFloat {
         precondition(
             cvectorization_ops_indices_within_where_f32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -43,7 +43,7 @@ extension SIMDFloat {
         assert(
             cvectorization_ops_indices_within_where_f32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"

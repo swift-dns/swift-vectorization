@@ -1371,6 +1371,32 @@ struct OpsTests {
         }
     }
 
+    @Test("Checked gathers and scatters trap on an index or a byte offset outside the span")
+    func checkedGathersAndScattersTrap() async {
+        await #expect(processExitsWith: .failure) {
+            let source = ContiguousArray<UInt32>(repeating: 0, count: SIMDUInt32.laneCount)
+            _ = SIMDUInt32.gather(from: source.span, indices: SIMDInt32.iota(1))
+        }
+        await #expect(processExitsWith: .failure) {
+            let source = ContiguousArray<Float>(repeating: 0, count: SIMDFloat.laneCount)
+            let offset = SIMDInt32.repeating(Int32(SIMDFloat.laneCount * 4 - 3))
+            _ = SIMDFloat.gather(from: source.span, byteOffsets: offset)
+        }
+        await #expect(processExitsWith: .failure) {
+            var output = ContiguousArray<Int32>(repeating: 0, count: SIMDInt32.laneCount)
+            var destination = output.mutableSpan
+            SIMDInt32.scatter(SIMDInt32.zero(), to: &destination, indices: SIMDInt32.repeating(-1))
+        }
+        await #expect(processExitsWith: .failure) {
+            let source = ContiguousArray<Double>(repeating: 0, count: SIMDDouble.laneCount)
+            _ = SIMDDouble.gather(
+                from: source.span,
+                indices: SIMDInt64.repeating(Int64(SIMDDouble.laneCount)),
+                where: SIMDDouble.firstLanes(count: 1)
+            )
+        }
+    }
+
     @Test("Checked indices ops trap on an index outside 0..<2 * laneCount")
     func checkedIndicesOpsTrap() async {
         await #expect(processExitsWith: .failure) {
