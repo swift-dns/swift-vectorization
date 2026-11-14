@@ -991,10 +991,10 @@ extension SIMDInt64 {
                 cvectorization_ops_indices_within_i64(
                     unsafe cvectorization_ops_load_indices_i64($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return unsafe loadIndices(fromUnchecked: span)
     }
@@ -1008,10 +1008,10 @@ extension SIMDInt64 {
                 cvectorization_ops_indices_within_i64(
                     unsafe cvectorization_ops_load_indices_i64($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return span.withUnsafeBufferPointer {
             Indices(

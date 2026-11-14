@@ -13282,18 +13282,20 @@ func gatherChecks(of op: Op, for element: Element) -> [Check] {
     return [("\(within)(\(operand).raw, \(limit), \(used))", "\(message), for a lane in use")]
 }
 
-/// What a span form of `loadIndices` checks of the indices it loads: that they select lanes of a
-/// vector.
+/// What a span form of `loadIndices` checks of the indices it loads: that they select lanes of two
+/// vectors, as `indices(from:)` checks them.
 func loadedIndexChecks(of op: Op, for element: Element) -> [Check] {
     guard op.parameters.contains(.constIndexPointer) else { return [] }
     let indexElement = laneIndexElement(of: element)
     let within = cFunctionName(indicesWithinName(perByte: false, for: indexElement), indexElement)
     let load = cFunctionName(op.identifier, element)
+    let contract = IndexContract.lanesOfTwoTables
+    let count = contract.count.expression(laneCount: "laneCount")
+    let indices = "unsafe \(load)($0.baseAddress.unsafelyUnwrapped)"
     return [
         (
-            "span.withUnsafeBufferPointer { "
-                + "\(within)(unsafe \(load)($0.baseAddress.unsafelyUnwrapped), 0, laneCount) }",
-            IndexContract.lanes.message
+            "span.withUnsafeBufferPointer { \(within)(\(indices), \(contract.offset), \(count)) }",
+            contract.message
         )
     ]
 }

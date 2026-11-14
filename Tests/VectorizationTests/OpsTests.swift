@@ -1222,6 +1222,19 @@ struct OpsTests {
         }
     }
 
+    @Test("Loaded indices may select the lanes of a second table, below 2 * laneCount")
+    func loadIndicesSelectSecondTable() {
+        typealias H = SIMDUInt32
+        let last = ContiguousArray((0..<H.laneCount).map { UInt32(2 * H.laneCount - 1 - $0) })
+        let first = H.iota(0)
+        let second = H.iota(UInt32(H.laneCount))
+
+        #expect(
+            lanes(H.self, H.twoTablesLookupLanes(first, second, at: H.loadIndices(from: last.span)))
+                == Array(last)
+        )
+    }
+
     @Test("Checked lookups trap on a short or misaligned table or an index outside it")
     func checkedLookupsTrap() async {
         await #expect(processExitsWith: .failure) {
@@ -1436,6 +1449,21 @@ struct OpsTests {
         }
         await #expect(processExitsWith: .failure) {
             _ = SIMDFloat.indices(from: SIMDInt32.repeating(Int32(2 * SIMDFloat.laneCount)))
+        }
+    }
+
+    @Test("Checked index loads trap on an index outside 0..<2 * laneCount")
+    func checkedIndexLoadsTrap() async {
+        await #expect(processExitsWith: .failure) {
+            let indices = ContiguousArray(
+                repeating: UInt32(2 * SIMDUInt32.laneCount),
+                count: SIMDUInt32.laneCount
+            )
+            _ = SIMDUInt32.loadIndices(from: indices.span)
+        }
+        await #expect(processExitsWith: .failure) {
+            let indices = ContiguousArray<Int32>(repeating: -1, count: SIMDInt32.laneCount)
+            _ = SIMDInt32.loadIndices(from: indices.span)
         }
     }
 
