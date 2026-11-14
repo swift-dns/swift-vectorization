@@ -70897,8 +70897,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_m
   }
   cvectorization_ops_vector_i32 result;
   for (size_t i = 0; i < 4; ++i) {
-    const uint32_t odds = u[i] * y[i] + v[i] * x[i];
-    const uint32_t evens = u[i] * x[i] - v[i] * y[i];
+    const uint32_t odds = (uint32_t)u[i] * y[i] + (uint32_t)v[i] * x[i];
+    const uint32_t evens = (uint32_t)u[i] * x[i] - (uint32_t)v[i] * y[i];
     result[i] = (int32_t)((i % 2 == 0 ? evens : odds));
   }
   return (cvectorization_ops_raw_vector_i32)(result);
@@ -70951,8 +70951,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_m
   }
   cvectorization_ops_vector_i32 result;
   for (size_t i = 0; i < 4; ++i) {
-    const uint32_t odds = v[i] * x[i] - u[i] * y[i];
-    const uint32_t evens = u[i] * x[i] + v[i] * y[i];
+    const uint32_t odds = (uint32_t)v[i] * x[i] - (uint32_t)u[i] * y[i];
+    const uint32_t evens = (uint32_t)u[i] * x[i] + (uint32_t)v[i] * y[i];
     result[i] = (int32_t)((i % 2 == 0 ? evens : odds));
   }
   return (cvectorization_ops_raw_vector_i32)(result);
@@ -71006,8 +71006,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_m
   }
   cvectorization_ops_vector_i32 result;
   for (size_t i = 0; i < 4; ++i) {
-    const uint32_t odds = u[i] * y[i] + v[i] * x[i];
-    const uint32_t evens = u[i] * x[i] - v[i] * y[i];
+    const uint32_t odds = (uint32_t)u[i] * y[i] + (uint32_t)v[i] * x[i];
+    const uint32_t evens = (uint32_t)u[i] * x[i] - (uint32_t)v[i] * y[i];
     result[i] = (int32_t)((i % 2 == 0 ? evens : odds) + (uint32_t)c[i]);
   }
   return (cvectorization_ops_raw_vector_i32)(result);
@@ -71061,8 +71061,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_m
   }
   cvectorization_ops_vector_i32 result;
   for (size_t i = 0; i < 4; ++i) {
-    const uint32_t odds = v[i] * x[i] - u[i] * y[i];
-    const uint32_t evens = u[i] * x[i] + v[i] * y[i];
+    const uint32_t odds = (uint32_t)v[i] * x[i] - (uint32_t)u[i] * y[i];
+    const uint32_t evens = (uint32_t)u[i] * x[i] + (uint32_t)v[i] * y[i];
     result[i] = (int32_t)((i % 2 == 0 ? evens : odds) + (uint32_t)c[i]);
   }
   return (cvectorization_ops_raw_vector_i32)(result);
@@ -80503,8 +80503,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_m
   }
   cvectorization_ops_vector_i64 result;
   for (size_t i = 0; i < 2; ++i) {
-    const uint64_t odds = u[i] * y[i] + v[i] * x[i];
-    const uint64_t evens = u[i] * x[i] - v[i] * y[i];
+    const uint64_t odds = (uint64_t)u[i] * y[i] + (uint64_t)v[i] * x[i];
+    const uint64_t evens = (uint64_t)u[i] * x[i] - (uint64_t)v[i] * y[i];
     result[i] = (int64_t)((i % 2 == 0 ? evens : odds));
   }
   return (cvectorization_ops_raw_vector_i64)(result);
@@ -80557,8 +80557,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_m
   }
   cvectorization_ops_vector_i64 result;
   for (size_t i = 0; i < 2; ++i) {
-    const uint64_t odds = v[i] * x[i] - u[i] * y[i];
-    const uint64_t evens = u[i] * x[i] + v[i] * y[i];
+    const uint64_t odds = (uint64_t)v[i] * x[i] - (uint64_t)u[i] * y[i];
+    const uint64_t evens = (uint64_t)u[i] * x[i] + (uint64_t)v[i] * y[i];
     result[i] = (int64_t)((i % 2 == 0 ? evens : odds));
   }
   return (cvectorization_ops_raw_vector_i64)(result);
@@ -80612,8 +80612,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_m
   }
   cvectorization_ops_vector_i64 result;
   for (size_t i = 0; i < 2; ++i) {
-    const uint64_t odds = u[i] * y[i] + v[i] * x[i];
-    const uint64_t evens = u[i] * x[i] - v[i] * y[i];
+    const uint64_t odds = (uint64_t)u[i] * y[i] + (uint64_t)v[i] * x[i];
+    const uint64_t evens = (uint64_t)u[i] * x[i] - (uint64_t)v[i] * y[i];
     result[i] = (int64_t)((i % 2 == 0 ? evens : odds) + (uint64_t)c[i]);
   }
   return (cvectorization_ops_raw_vector_i64)(result);
@@ -80667,8 +80667,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_m
   }
   cvectorization_ops_vector_i64 result;
   for (size_t i = 0; i < 2; ++i) {
-    const uint64_t odds = v[i] * x[i] - u[i] * y[i];
-    const uint64_t evens = u[i] * x[i] + v[i] * y[i];
+    const uint64_t odds = (uint64_t)v[i] * x[i] - (uint64_t)u[i] * y[i];
+    const uint64_t evens = (uint64_t)u[i] * x[i] + (uint64_t)v[i] * y[i];
     result[i] = (int64_t)((i % 2 == 0 ? evens : odds) + (uint64_t)c[i]);
   }
   return (cvectorization_ops_raw_vector_i64)(result);

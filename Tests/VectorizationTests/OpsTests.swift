@@ -286,6 +286,14 @@ struct OpsTests {
         }
     }
 
+    @Test("Complex products of integer lanes wrap around as the scalar ones do")
+    func integerComplexProductsWrap() {
+        verifyWrappingComplexProducts(SIMDInt8.self)
+        verifyWrappingComplexProducts(SIMDInt16.self)
+        verifyWrappingComplexProducts(SIMDInt32.self)
+        verifyWrappingComplexProducts(SIMDInt64.self)
+    }
+
     @Test("Reductions match the scalar result")
     func reductions() {
         typealias H = SIMDInt32
@@ -1560,6 +1568,30 @@ struct OpsTests {
         }
     }
     #endif
+}
+
+private func verifyWrappingComplexProducts<H: SIMDIntegerElement>(_ type: H.Type)
+where H.Lane: FixedWidthInteger {
+    let extremes: [H.Lane] = [.max, .min, .max / 3, .min / 3 + 1, .min / 7, 33, -1, .max - 7]
+    let pick = { (offset: Int) in
+        ContiguousArray((0..<H.laneCount).map { extremes[($0 &* 3 &+ offset) % extremes.count] })
+    }
+    let (a, b, c) = (pick(0), pick(5), pick(2))
+    var products: [H.Lane] = []
+    var conjugates: [H.Lane] = []
+    for pair in stride(from: 0, to: H.laneCount, by: 2) {
+        let (u, v, x, y) = (a[pair], a[pair + 1], b[pair], b[pair + 1])
+        products += [u &* x &- v &* y, u &* y &+ v &* x]
+        conjugates += [u &* x &+ v &* y, v &* x &- u &* y]
+    }
+    let (va, vb, vc) = (H.load(from: a.span), H.load(from: b.span), H.load(from: c.span))
+
+    #expect(lanes(H.self, H.multiplyingComplex(va, vb)) == products)
+    #expect(lanes(H.self, H.multiplyingComplexConjugate(va, vb)) == conjugates)
+    #expect(lanes(H.self, H.multiplyAddingComplex(va, vb, vc)) == zip(products, c).map(&+))
+    #expect(
+        lanes(H.self, H.multiplyAddingComplexConjugate(va, vb, vc)) == zip(conjugates, c).map(&+)
+    )
 }
 
 private func lanes<H: SIMDElement>(_ type: H.Type, _ vector: H.Vector) -> [H.Lane] {

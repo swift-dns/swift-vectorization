@@ -12734,10 +12734,12 @@ func complexMultiplyingBody(
 func emulatedComplexMultiplying(conjugating: Bool, adding: Bool, for element: Element) -> String {
     let isFloat = element.category == .float
     let lane = isFloat ? element.cType : element.cUnsignedLane
+    let wrapping = element.category == .signedInteger ? "(\(lane))" : ""
+    let (u, v) = ("\(wrapping)u[i]", "\(wrapping)v[i]")
     let (evens, odds) =
         conjugating
-        ? ("u[i] * x[i] + v[i] * y[i]", "v[i] * x[i] - u[i] * y[i]")
-        : ("u[i] * x[i] - v[i] * y[i]", "u[i] * y[i] + v[i] * x[i]")
+        ? ("\(u) * x[i] + \(v) * y[i]", "\(v) * x[i] - \(u) * y[i]")
+        : ("\(u) * x[i] - \(v) * y[i]", "\(u) * y[i] + \(v) * x[i]")
     let addend = adding ? " + (\(lane))c[i]" : ""
     let body = """
         \(element.cVector) u, v, x, y;
