@@ -231,6 +231,118 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func storeFirstConstantCountTwo() {
+        let mismatches = Mismatches("portStoreFirstF64ConstantCountTwo")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x434C_5C33_1A7C_3955)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe portStoreFirstF64ConstantCountTwo(a, to: destination.baseAddress!)
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe highwayStoreFirstF64ConstantCountTwo(a, to: destination.baseAddress!)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstConstantCountTwoBeforeGuardPage() {
+        let mismatches = Mismatches("portStoreFirstF64ConstantCountTwo before a guard page")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x49DC_A06B_F159_C2C2)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) { destination in
+                unsafe portStoreFirstF64ConstantCountTwo(a, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) {
+                destination in unsafe highwayStoreFirstF64ConstantCountTwo(a, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstConstantCountLaneCount() {
+        let mismatches = Mismatches("portStoreFirstF64ConstantCountLaneCount")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x58A8_5425_D991_500E)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe portStoreFirstF64ConstantCountLaneCount(a, to: destination.baseAddress!)
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe highwayStoreFirstF64ConstantCountLaneCount(a, to: destination.baseAddress!)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstConstantCountLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches("portStoreFirstF64ConstantCountLaneCount before a guard page")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D43_D5CC_BAB2_3D3F)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(SIMDDouble.laneCount))
+            ) { destination in unsafe portStoreFirstF64ConstantCountLaneCount(a, to: destination) }
+            let (_, referenceLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(SIMDDouble.laneCount))
+            ) { destination in unsafe highwayStoreFirstF64ConstantCountLaneCount(a, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portStoreFirstF64ConstantCountTwiceLaneCount")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC55B_7178_4C0E_4062)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe portStoreFirstF64ConstantCountTwiceLaneCount(a, to: destination.baseAddress!)
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe highwayStoreFirstF64ConstantCountTwiceLaneCount(
+                    a,
+                    to: destination.baseAddress!
+                )
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstConstantCountTwiceLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portStoreFirstF64ConstantCountTwiceLaneCount before a guard page"
+        )
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3EA9_7E6D_987A_C423)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(2 * SIMDDouble.laneCount))
+            ) { destination in
+                unsafe portStoreFirstF64ConstantCountTwiceLaneCount(a, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(2 * SIMDDouble.laneCount))
+            ) { destination in
+                unsafe highwayStoreFirstF64ConstantCountTwiceLaneCount(a, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeWhere() {
         let mismatches = Mismatches("portStoreWhereF64")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7419_5B44_BADA_5567)
@@ -421,6 +533,111 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func storeRepeatingConstantCountTwo() {
+        let mismatches = Mismatches("portStoreRepeatingF64ConstantCountTwo")
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x4EE3_1516_BEA1_6FE9)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        for value in valueInputs {
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe portStoreRepeatingF64ConstantCountTwo(value, to: destination.baseAddress!)
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe highwayStoreRepeatingF64ConstantCountTwo(value, to: destination.baseAddress!)
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeRepeatingConstantCountTwoBeforeGuardPage() {
+        let mismatches = Mismatches("portStoreRepeatingF64ConstantCountTwo before a guard page")
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x6C56_9A36_034B_7914)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for value in valueInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) { destination in
+                unsafe portStoreRepeatingF64ConstantCountTwo(value, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) {
+                destination in
+                unsafe highwayStoreRepeatingF64ConstantCountTwo(value, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeRepeatingConstantCountLaneCount() {
+        let mismatches = Mismatches("portStoreRepeatingF64ConstantCountLaneCount")
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xD317_205A_5B44_D06E)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        for value in valueInputs {
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe portStoreRepeatingF64ConstantCountLaneCount(
+                    value,
+                    to: destination.baseAddress!
+                )
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe highwayStoreRepeatingF64ConstantCountLaneCount(
+                    value,
+                    to: destination.baseAddress!
+                )
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeRepeatingConstantCountLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portStoreRepeatingF64ConstantCountLaneCount before a guard page"
+        )
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x855E_E63E_8FD5_16D1)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for value in valueInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(SIMDDouble.laneCount))
+            ) { destination in
+                unsafe portStoreRepeatingF64ConstantCountLaneCount(value, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(SIMDDouble.laneCount))
+            ) { destination in
+                unsafe highwayStoreRepeatingF64ConstantCountLaneCount(value, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeRepeatingConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portStoreRepeatingF64ConstantCountTwiceLaneCount")
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x17D4_4AC4_B34D_D4BC)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        for value in valueInputs {
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe portStoreRepeatingF64ConstantCountTwiceLaneCount(
+                    value,
+                    to: destination.baseAddress!
+                )
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe highwayStoreRepeatingF64ConstantCountTwiceLaneCount(
+                    value,
+                    to: destination.baseAddress!
+                )
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
     @Test func copy() {
         let mismatches = Mismatches("portCopyF64")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
@@ -530,6 +747,149 @@ extension SIMDDoubleCodegenTests {
                 unsafe withGuardedLanes(Array(from.prefix(1))) { source in
                     unsafe highwayCopyF64ConstantCount(from: source, to: destination)
                 }.result
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func copyConstantCountTwo() {
+        let mismatches = Mismatches("portCopyF64ConstantCountTwo")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x4295_A7F1_74B8_0DEA
+        )
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        for from in fromInputs {
+            var portLanes = sentinel
+            var referenceLanes = sentinel
+            from.withUnsafeBufferPointer { source in
+                portLanes.withUnsafeMutableBufferPointer { destination in
+                    unsafe portCopyF64ConstantCountTwo(
+                        from: source.baseAddress!,
+                        to: destination.baseAddress!
+                    )
+                }
+                referenceLanes.withUnsafeMutableBufferPointer { destination in
+                    unsafe highwayCopyF64ConstantCountTwo(
+                        from: source.baseAddress!,
+                        to: destination.baseAddress!
+                    )
+                }
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func copyConstantCountTwoBeforeGuardPage() {
+        let mismatches = Mismatches("portCopyF64ConstantCountTwo before a guard page")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x736F_1BA6_23E0_E43D
+        )
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for from in fromInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) { destination in
+                unsafe withGuardedLanes(Array(from.prefix(2))) { source in
+                    unsafe portCopyF64ConstantCountTwo(from: source, to: destination)
+                }.result
+            }
+            let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) {
+                destination in
+                unsafe withGuardedLanes(Array(from.prefix(2))) { source in
+                    unsafe highwayCopyF64ConstantCountTwo(from: source, to: destination)
+                }.result
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func copyConstantCountLaneCount() {
+        let mismatches = Mismatches("portCopyF64ConstantCountLaneCount")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x03F6_9C1D_9676_C199
+        )
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        for from in fromInputs {
+            var portLanes = sentinel
+            var referenceLanes = sentinel
+            from.withUnsafeBufferPointer { source in
+                portLanes.withUnsafeMutableBufferPointer { destination in
+                    unsafe portCopyF64ConstantCountLaneCount(
+                        from: source.baseAddress!,
+                        to: destination.baseAddress!
+                    )
+                }
+                referenceLanes.withUnsafeMutableBufferPointer { destination in
+                    unsafe highwayCopyF64ConstantCountLaneCount(
+                        from: source.baseAddress!,
+                        to: destination.baseAddress!
+                    )
+                }
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func copyConstantCountLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches("portCopyF64ConstantCountLaneCount before a guard page")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xF3BD_9AED_D0CF_50E4
+        )
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for from in fromInputs {
+            let (_, portLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(SIMDDouble.laneCount))
+            ) { destination in
+                unsafe withGuardedLanes(Array(from.prefix(SIMDDouble.laneCount))) { source in
+                    unsafe portCopyF64ConstantCountLaneCount(from: source, to: destination)
+                }.result
+            }
+            let (_, referenceLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(SIMDDouble.laneCount))
+            ) { destination in
+                unsafe withGuardedLanes(Array(from.prefix(SIMDDouble.laneCount))) { source in
+                    unsafe highwayCopyF64ConstantCountLaneCount(from: source, to: destination)
+                }.result
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func copyConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portCopyF64ConstantCountTwiceLaneCount")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x90B7_98F1_1098_4F4D
+        )
+        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        for from in fromInputs {
+            var portLanes = sentinel
+            var referenceLanes = sentinel
+            from.withUnsafeBufferPointer { source in
+                portLanes.withUnsafeMutableBufferPointer { destination in
+                    unsafe portCopyF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!,
+                        to: destination.baseAddress!
+                    )
+                }
+                referenceLanes.withUnsafeMutableBufferPointer { destination in
+                    unsafe highwayCopyF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!,
+                        to: destination.baseAddress!
+                    )
+                }
             }
             mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
         }

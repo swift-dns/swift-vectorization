@@ -26,6 +26,36 @@ extension SIMDFloatCodegenTests {
         mismatches.record()
     }
 
+    @Test func firstLanesConstantCountTwo() {
+        let mismatches = Mismatches("portFirstLanesF32ConstantCountTwo")
+        mismatches.check(
+            portFirstLanesF32ConstantCountTwo(),
+            highwayFirstLanesF32ConstantCountTwo(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountLaneCount() {
+        let mismatches = Mismatches("portFirstLanesF32ConstantCountLaneCount")
+        mismatches.check(
+            portFirstLanesF32ConstantCountLaneCount(),
+            highwayFirstLanesF32ConstantCountLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portFirstLanesF32ConstantCountTwiceLaneCount")
+        mismatches.check(
+            portFirstLanesF32ConstantCountTwiceLaneCount(),
+            highwayFirstLanesF32ConstantCountTwiceLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
     @Test func maskFromVector() {
         let mismatches = Mismatches("portMaskFromVectorF32")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB2CD_76AF_85D0_437D)

@@ -45,6 +45,36 @@ public func highwayFirstLanesU16ConstantCount() -> SIMDUInt16.Mask {
 }
 
 @inline(never)
+public func portFirstLanesU16ConstantCountTwo() -> SIMDUInt16.Mask {
+    SIMDUInt16.firstLanes(count: 2)
+}
+
+@inline(never)
+public func highwayFirstLanesU16ConstantCountTwo() -> SIMDUInt16.Mask {
+    SIMDUInt16.Mask(raw: HighwayReference.Nothrow.firstLanesU16(2))
+}
+
+@inline(never)
+public func portFirstLanesU16ConstantCountLaneCount() -> SIMDUInt16.Mask {
+    SIMDUInt16.firstLanes(count: SIMDUInt16.laneCount)
+}
+
+@inline(never)
+public func highwayFirstLanesU16ConstantCountLaneCount() -> SIMDUInt16.Mask {
+    SIMDUInt16.Mask(raw: HighwayReference.Nothrow.firstLanesU16(SIMDUInt16.laneCount))
+}
+
+@inline(never)
+public func portFirstLanesU16ConstantCountTwiceLaneCount() -> SIMDUInt16.Mask {
+    SIMDUInt16.firstLanes(count: 2 * SIMDUInt16.laneCount)
+}
+
+@inline(never)
+public func highwayFirstLanesU16ConstantCountTwiceLaneCount() -> SIMDUInt16.Mask {
+    SIMDUInt16.Mask(raw: HighwayReference.Nothrow.firstLanesU16(2 * SIMDUInt16.laneCount))
+}
+
+@inline(never)
 public func portMaskFromVectorU16(from a: SIMDUInt16.Vector) -> SIMDUInt16.Mask {
     SIMDUInt16.mask(from: a)
 }

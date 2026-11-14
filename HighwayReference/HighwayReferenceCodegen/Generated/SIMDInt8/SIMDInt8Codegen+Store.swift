@@ -299,6 +299,54 @@ public func highwayStoreFirstI8ConstantCount(_ a: SIMDInt8.Vector, to: UnsafeMut
 }
 
 @inline(never)
+public func portStoreFirstI8ConstantCountTwo(
+    _ a: SIMDInt8.Vector,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.storeFirst(a, to: to, count: 2)
+}
+
+@inline(never)
+public func highwayStoreFirstI8ConstantCountTwo(
+    _ a: SIMDInt8.Vector,
+    to: UnsafeMutablePointer<Int8>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstI8(a.raw, to, 2)
+}
+
+@inline(never)
+public func portStoreFirstI8ConstantCountLaneCount(
+    _ a: SIMDInt8.Vector,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.storeFirst(a, to: to, count: SIMDInt8.laneCount)
+}
+
+@inline(never)
+public func highwayStoreFirstI8ConstantCountLaneCount(
+    _ a: SIMDInt8.Vector,
+    to: UnsafeMutablePointer<Int8>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstI8(a.raw, to, SIMDInt8.laneCount)
+}
+
+@inline(never)
+public func portStoreFirstI8ConstantCountTwiceLaneCount(
+    _ a: SIMDInt8.Vector,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.storeFirst(a, to: to, count: 2 * SIMDInt8.laneCount)
+}
+
+@inline(never)
+public func highwayStoreFirstI8ConstantCountTwiceLaneCount(
+    _ a: SIMDInt8.Vector,
+    to: UnsafeMutablePointer<Int8>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstI8(a.raw, to, 2 * SIMDInt8.laneCount)
+}
+
+@inline(never)
 public func portStoreWhereI8(
     _ a: SIMDInt8.Vector,
     to: UnsafeMutablePointer<SIMDInt8.Lane>,
@@ -372,6 +420,51 @@ public func highwayStoreRepeatingI8ConstantCount(_ value: Int8, to: UnsafeMutabl
 }
 
 @inline(never)
+public func portStoreRepeatingI8ConstantCountTwo(
+    _ value: SIMDInt8.Lane,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.storeRepeating(value, count: 2, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingI8ConstantCountTwo(_ value: Int8, to: UnsafeMutablePointer<Int8>) {
+    unsafe HighwayReference.Nothrow.storeRepeatingI8(2, value, to)
+}
+
+@inline(never)
+public func portStoreRepeatingI8ConstantCountLaneCount(
+    _ value: SIMDInt8.Lane,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.storeRepeating(value, count: SIMDInt8.laneCount, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingI8ConstantCountLaneCount(
+    _ value: Int8,
+    to: UnsafeMutablePointer<Int8>
+) {
+    unsafe HighwayReference.Nothrow.storeRepeatingI8(SIMDInt8.laneCount, value, to)
+}
+
+@inline(never)
+public func portStoreRepeatingI8ConstantCountTwiceLaneCount(
+    _ value: SIMDInt8.Lane,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.storeRepeating(value, count: 2 * SIMDInt8.laneCount, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingI8ConstantCountTwiceLaneCount(
+    _ value: Int8,
+    to: UnsafeMutablePointer<Int8>
+) {
+    unsafe HighwayReference.Nothrow.storeRepeatingI8(2 * SIMDInt8.laneCount, value, to)
+}
+
+@inline(never)
 public func portCopyI8(
     count: Int,
     from: UnsafePointer<SIMDInt8.Lane>,
@@ -396,6 +489,52 @@ public func portCopyI8ConstantCount(
 @inline(never)
 public func highwayCopyI8ConstantCount(from: UnsafePointer<Int8>, to: UnsafeMutablePointer<Int8>) {
     unsafe HighwayReference.Nothrow.copyI8(1, from, to)
+}
+
+@inline(never)
+public func portCopyI8ConstantCountTwo(
+    from: UnsafePointer<SIMDInt8.Lane>,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.copy(count: 2, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyI8ConstantCountTwo(from: UnsafePointer<Int8>, to: UnsafeMutablePointer<Int8>)
+{
+    unsafe HighwayReference.Nothrow.copyI8(2, from, to)
+}
+
+@inline(never)
+public func portCopyI8ConstantCountLaneCount(
+    from: UnsafePointer<SIMDInt8.Lane>,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.copy(count: SIMDInt8.laneCount, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyI8ConstantCountLaneCount(
+    from: UnsafePointer<Int8>,
+    to: UnsafeMutablePointer<Int8>
+) {
+    unsafe HighwayReference.Nothrow.copyI8(SIMDInt8.laneCount, from, to)
+}
+
+@inline(never)
+public func portCopyI8ConstantCountTwiceLaneCount(
+    from: UnsafePointer<SIMDInt8.Lane>,
+    to: UnsafeMutablePointer<SIMDInt8.Lane>
+) {
+    unsafe SIMDInt8.copy(count: 2 * SIMDInt8.laneCount, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyI8ConstantCountTwiceLaneCount(
+    from: UnsafePointer<Int8>,
+    to: UnsafeMutablePointer<Int8>
+) {
+    unsafe HighwayReference.Nothrow.copyI8(2 * SIMDInt8.laneCount, from, to)
 }
 
 @inline(never)

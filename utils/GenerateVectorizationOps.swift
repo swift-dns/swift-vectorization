@@ -727,12 +727,23 @@ enum ImmediateBound {
     }
 }
 
-// Another value of an immediate that the codegen pairs of its op are also made for, which `name`
-// tells apart in their names, and which may depend on the element that the op returns.
-struct CodegenImmediate {
+// Another value of an immediate or a count that the codegen pairs of its op are also made for,
+// which `name` tells apart in their names, and which may depend on the element that the op returns.
+struct CodegenAlternative {
     let name: String
-    let value: (Element) -> Int
+    let value: (Element) -> String
+    var fitsOneVector = true
 }
+
+let codegenCountAlternatives = [
+    CodegenAlternative(name: "two", value: { _ in "2" }),
+    CodegenAlternative(name: "laneCount", value: { "\($0.namespace).laneCount" }),
+    CodegenAlternative(
+        name: "twiceLaneCount",
+        value: { "2 * \($0.namespace).laneCount" },
+        fitsOneVector: false
+    ),
+]
 
 // A constant that an op takes as a template argument in Highway, and as an `Int` that is checked
 // to be within its bounds in Swift. An `…Unchecked` form takes it without the check.
@@ -743,7 +754,7 @@ struct ImmediateArgument {
     var lowerBound = 0
     let upperBound: ImmediateBound
     var codegenValue = 1
-    var codegenAlternatives: [CodegenImmediate] = []
+    var codegenAlternatives: [CodegenAlternative] = []
     let message: String
 
     func values(for element: Element) -> ClosedRange<Int> {
@@ -9821,9 +9832,9 @@ func neonLoadFirstWidening(from narrow: Element, to wide: Element) -> String {
               if (count & 1) {
             \(indented(indented(third)))
                 const half_vector upper = \(zip("duplicated", "zero", unitBytes: 1));
-                trailing = \(zip("lower", "upper", unitBytes: 2));
+                trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)upper, 0, 4, -1, -1);
               } else {
-                trailing = \(zip("lower", "zero", unitBytes: 1, groupBytes: 2));
+                trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)zero, 0, 4, -1, -1);
               }
             } else if (count & 1) {
             \(indented(lone))
@@ -28137,7 +28148,7 @@ func demoteShiftAmount(of source: Element, _ shift: DemoteShift) -> ImmediateArg
         label: shift.label,
         upperBound: .fixed(source.bits - 1),
         codegenAlternatives: [
-            CodegenImmediate(name: "widthDifference", value: { source.bits - $0.bits })
+            CodegenAlternative(name: "widthDifference", value: { String(source.bits - $0.bits) })
         ],
         message: "Shift amount is negative or at least as many as a source lane has bits"
     )
@@ -38050,6 +38061,8 @@ func bindings(
     var immediates = op.immediates.makeIterator()
     var outVectorIndex = 0
     var result: [Binding] = []
+    let copies = op.parameters.contains(.constLanePointer) && op.parameters.contains(.lanePointer)
+    let restriction = copies ? " __restrict__" : ""
 
     for parameter in op.parameters {
         switch parameter {
@@ -38225,8 +38238,8 @@ func bindings(
         case .constLanePointer:
             result.append(
                 Binding(
-                    declaration: "const \(element.cPointee)* from",
-                    cDeclaration: "const \(element.cPointee)* from",
+                    declaration: "const \(element.cPointee)*\(restriction) from",
+                    cDeclaration: "const \(element.cPointee)*\(restriction) from",
                     argument: element.hwyPointer("from", isConst: true),
                     swiftLabel: "from",
                     swiftName: "from",
@@ -38237,8 +38250,8 @@ func bindings(
         case .lanePointer:
             result.append(
                 Binding(
-                    declaration: "\(element.cPointee)* to",
-                    cDeclaration: "\(element.cPointee)* to",
+                    declaration: "\(element.cPointee)*\(restriction) to",
+                    cDeclaration: "\(element.cPointee)*\(restriction) to",
                     argument: element.hwyPointer("to", isConst: false),
                     swiftLabel: "to",
                     swiftName: "to",
@@ -44448,7 +44461,7 @@ func codegenOp(_ identifier: String, for element: Element) -> Op {
 func codegenConstant(
     of parameter: Parameter,
     immediate: ImmediateArgument? = nil,
-    alternative: CodegenImmediate? = nil,
+    alternative: CodegenAlternative? = nil,
     source: Element? = nil,
     for element: Element
 ) -> (port: String, reference: String)? {
@@ -44479,9 +44492,12 @@ func codegenConstant(
         )
     case .lane, .fillLane, .insertedLane: return (lane, lane)
     case .shiftAmount: return ("3", "3")
-    case .laneAmount, .count, .roundConstant, .laneIndex, .tupleIndex: return ("1", "1")
+    case .laneAmount, .roundConstant, .laneIndex, .tupleIndex: return ("1", "1")
+    case .count:
+        let value = alternative?.value(element) ?? "1"
+        return (value, value)
     case .immediate:
-        let value = String(alternative?.value(element) ?? immediate?.codegenValue ?? 1)
+        let value = alternative?.value(element) ?? String(immediate?.codegenValue ?? 1)
         return (value, value)
     case .flag: return ("false", "false")
     case .maskBits: return ("5", "5")
@@ -44495,7 +44511,7 @@ func codegenConstant(
 
 struct CodegenVariant {
     var constant: Int?
-    var alternative: CodegenImmediate?
+    var alternative: CodegenAlternative?
 }
 
 func codegenVariants(of parameters: [CodegenParameter], for element: Element) -> [CodegenVariant] {
@@ -44511,14 +44527,19 @@ func codegenVariants(of parameters: [CodegenParameter], for element: Element) ->
     let variants = constants.filter { parameters[$0].kind != .immediate || $0 == firstImmediate }
     let alternatives =
         firstImmediate.flatMap { parameters[$0].immediate?.codegenAlternatives } ?? []
+    let count = parameters.firstIndex { $0.kind == .count }
+    let counts = count.map { index in
+        codegenCountAlternatives.map { CodegenVariant(constant: index, alternative: $0) }
+    }
     return ((firstImmediate == nil ? [nil] : []) + variants).map { CodegenVariant(constant: $0) }
         + alternatives.map { CodegenVariant(constant: firstImmediate, alternative: $0) }
+        + (counts ?? [])
 }
 
 func codegenConstantName(
     of parameters: [CodegenParameter],
     constant: Int?,
-    alternative: CodegenImmediate? = nil
+    alternative: CodegenAlternative? = nil
 ) -> String? {
     constant.map { parameters[$0].binding.swiftName + uppercasedFirst(alternative?.name ?? "") }
 }
@@ -45681,7 +45702,7 @@ func codegenCalls(
     for element: Element,
     referenceName: String,
     constant: Int?,
-    alternative: CodegenImmediate? = nil,
+    alternative: CodegenAlternative? = nil,
     keyword: String,
     pointer: String,
     referencePointer: String? = nil,
@@ -45744,10 +45765,11 @@ func codegenCalls(
 func codegenGuardedCount(
     of parameters: [CodegenParameter],
     for element: Element,
-    constant: Int?
+    constant: Int?,
+    alternative: CodegenAlternative? = nil
 ) -> String {
     guard let constant, parameters[constant].kind == .count,
-        let value = codegenConstant(of: .count, for: element)
+        let value = codegenConstant(of: .count, alternative: alternative, for: element)
     else { return "count" }
     return value.port
 }
@@ -45867,7 +45889,7 @@ func codegenTest(
     of op: Op,
     for element: Element,
     constant: Int?,
-    alternative: CodegenImmediate? = nil,
+    alternative: CodegenAlternative? = nil,
     guarded: Bool = false
 ) -> String {
     let parameters = codegenParameters(of: op, for: element)
@@ -45906,7 +45928,12 @@ func codegenTest(
         for: element,
         inputs: inputs,
         guarded: guarded,
-        count: codegenGuardedCount(of: parameters, for: element, constant: constant),
+        count: codegenGuardedCount(
+            of: parameters,
+            for: element,
+            constant: constant,
+            alternative: alternative
+        ),
         calls: calls
     )
 
@@ -45933,10 +45960,15 @@ func codegenWideningTest(
     from narrow: Element,
     to wide: Element,
     constant: Int?,
+    alternative: CodegenAlternative? = nil,
     guarded: Bool = false
 ) -> String {
     let parameters = codegenParameters(of: op, from: narrow)
-    let constantName = constant.map { parameters[$0].binding.swiftName }
+    let constantName = codegenConstantName(
+        of: parameters,
+        constant: constant,
+        alternative: alternative
+    )
     let name = "\(op.swiftName)From\(narrow.swiftType)\(codegenConstantSuffix(constantName))"
     let test = guarded ? "\(name)BeforeGuardPage" : name
     let referenceName = wideningFunctionName(op, from: narrow, to: wide)
@@ -45963,11 +45995,17 @@ func codegenWideningTest(
         for: wide,
         referenceName: referenceName,
         constant: constant,
+        alternative: alternative,
         keyword: "unsafe ",
         pointer: pointerExpression("source", aligned: guarded),
         highwayCount: guarded ? "min(count, H.laneCount)" : nil
     )
-    let count = codegenGuardedCount(of: parameters, for: wide, constant: constant)
+    let count = codegenGuardedCount(
+        of: parameters,
+        for: wide,
+        constant: constant,
+        alternative: alternative
+    )
 
     return referenceTestFunction(
         test,
@@ -46186,7 +46224,7 @@ func codegenTests(of op: Op, for element: Element) -> [String] {
                 alternative: variant.alternative
             )
         )
-        if op.span != nil {
+        if op.span != nil && (variant.alternative?.fitsOneVector ?? true || !op.clampsSpanCount) {
             tests.append(
                 codegenTest(
                     of: op,
@@ -46212,6 +46250,7 @@ func codegenWideningTests(_ op: WideningOp, from narrow: Element, to wide: Eleme
                     from: narrow,
                     to: wide,
                     constant: variant.constant,
+                    alternative: variant.alternative,
                     guarded: guarded
                 )
             )

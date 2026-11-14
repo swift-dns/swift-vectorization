@@ -2390,7 +2390,7 @@ HWY_INLINE cvectorization_ops_raw_vector_u8 loadFirstOtherwiseU8(cvectorization_
 HWY_INLINE cvectorization_ops_raw_vector_u8 loadingUpperHalfU8(const uint8_t* from, cvectorization_ops_raw_vector_u8 a) { return toPortU8(hn::InsertIntoUpper(TagU8(), from, fromPortU8(a))); }
 HWY_INLINE void storeWhereU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask, uint8_t* to) { hn::BlendedStore(fromPortU8(a), maskFromPortU8(mask), TagU8(), to); }
 HWY_INLINE void storeRepeatingU8(size_t count, uint8_t value, uint8_t* to) { hn::SafeFillN(count, value, TagU8(), to); }
-HWY_INLINE void copyU8(size_t count, const uint8_t* from, uint8_t* to) { hn::SafeCopyN(count, TagU8(), from, to); }
+HWY_INLINE void copyU8(size_t count, const uint8_t* __restrict__ from, uint8_t* __restrict__ to) { hn::SafeCopyN(count, TagU8(), from, to); }
 HWY_INLINE size_t storeCompressedU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask, uint8_t* to) { return hn::CompressStore(fromPortU8(a), maskFromPortU8(mask), TagU8(), to); }
 HWY_INLINE size_t storeCompressedBlendedU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask, uint8_t* to) { return hn::CompressBlendedStore(fromPortU8(a), maskFromPortU8(mask), TagU8(), to); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 compressedBitsU8(cvectorization_ops_raw_vector_u8 a, const uint8_t* bits) { return toPortU8(hn::CompressBits(fromPortU8(a), bits)); }
@@ -3619,7 +3619,7 @@ HWY_INLINE cvectorization_ops_raw_vector_u16 loadFirstOtherwiseU16(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_u16 loadingUpperHalfU16(const uint16_t* from, cvectorization_ops_raw_vector_u16 a) { return toPortU16(hn::InsertIntoUpper(TagU16(), from, fromPortU16(a))); }
 HWY_INLINE void storeWhereU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_mask_u16 mask, uint16_t* to) { hn::BlendedStore(fromPortU16(a), maskFromPortU16(mask), TagU16(), to); }
 HWY_INLINE void storeRepeatingU16(size_t count, uint16_t value, uint16_t* to) { hn::SafeFillN(count, value, TagU16(), to); }
-HWY_INLINE void copyU16(size_t count, const uint16_t* from, uint16_t* to) { hn::SafeCopyN(count, TagU16(), from, to); }
+HWY_INLINE void copyU16(size_t count, const uint16_t* __restrict__ from, uint16_t* __restrict__ to) { hn::SafeCopyN(count, TagU16(), from, to); }
 HWY_INLINE size_t storeCompressedU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_mask_u16 mask, uint16_t* to) { return hn::CompressStore(fromPortU16(a), maskFromPortU16(mask), TagU16(), to); }
 HWY_INLINE size_t storeCompressedBlendedU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_mask_u16 mask, uint16_t* to) { return hn::CompressBlendedStore(fromPortU16(a), maskFromPortU16(mask), TagU16(), to); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 compressedBitsU16(cvectorization_ops_raw_vector_u16 a, const uint8_t* bits) { return toPortU16(hn::CompressBits(fromPortU16(a), bits)); }
@@ -4898,7 +4898,7 @@ HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstOtherwiseU32(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_u32 loadingUpperHalfU32(const uint32_t* from, cvectorization_ops_raw_vector_u32 a) { return toPortU32(hn::InsertIntoUpper(TagU32(), from, fromPortU32(a))); }
 HWY_INLINE void storeWhereU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_mask_u32 mask, uint32_t* to) { hn::BlendedStore(fromPortU32(a), maskFromPortU32(mask), TagU32(), to); }
 HWY_INLINE void storeRepeatingU32(size_t count, uint32_t value, uint32_t* to) { hn::SafeFillN(count, value, TagU32(), to); }
-HWY_INLINE void copyU32(size_t count, const uint32_t* from, uint32_t* to) { hn::SafeCopyN(count, TagU32(), from, to); }
+HWY_INLINE void copyU32(size_t count, const uint32_t* __restrict__ from, uint32_t* __restrict__ to) { hn::SafeCopyN(count, TagU32(), from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 gatherU32(const uint32_t* from, cvectorization_ops_raw_vector_i32 indices) { return toPortU32(hn::GatherIndex(TagU32(), from, fromPortI32(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 gatherByteOffsetsU32(const uint32_t* from, cvectorization_ops_raw_vector_i32 byteOffsets) { return toPortU32(hn::GatherOffset(TagU32(), from, fromPortI32(byteOffsets))); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 gatherFirstU32(const uint32_t* from, cvectorization_ops_raw_vector_i32 indices, size_t count) { return toPortU32(hn::GatherIndexN(TagU32(), from, fromPortI32(indices), count)); }
@@ -6440,7 +6440,7 @@ HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstOtherwiseU64(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_u64 loadingUpperHalfU64(const uint64_t* from, cvectorization_ops_raw_vector_u64 a) { return toPortU64(hn::InsertIntoUpper(TagU64(), from, fromPortU64(a))); }
 HWY_INLINE void storeWhereU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_mask_u64 mask, uint64_t* to) { hn::BlendedStore(fromPortU64(a), maskFromPortU64(mask), TagU64(), to); }
 HWY_INLINE void storeRepeatingU64(size_t count, uint64_t value, uint64_t* to) { hn::SafeFillN(count, value, TagU64(), to); }
-HWY_INLINE void copyU64(size_t count, const uint64_t* from, uint64_t* to) { hn::SafeCopyN(count, TagU64(), from, to); }
+HWY_INLINE void copyU64(size_t count, const uint64_t* __restrict__ from, uint64_t* __restrict__ to) { hn::SafeCopyN(count, TagU64(), from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 gatherU64(const uint64_t* from, cvectorization_ops_raw_vector_i64 indices) { return toPortU64(hn::GatherIndex(TagU64(), from, fromPortI64(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 gatherByteOffsetsU64(const uint64_t* from, cvectorization_ops_raw_vector_i64 byteOffsets) { return toPortU64(hn::GatherOffset(TagU64(), from, fromPortI64(byteOffsets))); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 gatherFirstU64(const uint64_t* from, cvectorization_ops_raw_vector_i64 indices, size_t count) { return toPortU64(hn::GatherIndexN(TagU64(), from, fromPortI64(indices), count)); }
@@ -7822,7 +7822,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 loadFirstOtherwiseI8(cvectorization_
 HWY_INLINE cvectorization_ops_raw_vector_i8 loadingUpperHalfI8(const int8_t* from, cvectorization_ops_raw_vector_i8 a) { return toPortI8(hn::InsertIntoUpper(TagI8(), from, fromPortI8(a))); }
 HWY_INLINE void storeWhereI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask, int8_t* to) { hn::BlendedStore(fromPortI8(a), maskFromPortI8(mask), TagI8(), to); }
 HWY_INLINE void storeRepeatingI8(size_t count, int8_t value, int8_t* to) { hn::SafeFillN(count, value, TagI8(), to); }
-HWY_INLINE void copyI8(size_t count, const int8_t* from, int8_t* to) { hn::SafeCopyN(count, TagI8(), from, to); }
+HWY_INLINE void copyI8(size_t count, const int8_t* __restrict__ from, int8_t* __restrict__ to) { hn::SafeCopyN(count, TagI8(), from, to); }
 HWY_INLINE size_t storeCompressedI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask, int8_t* to) { return hn::CompressStore(fromPortI8(a), maskFromPortI8(mask), TagI8(), to); }
 HWY_INLINE size_t storeCompressedBlendedI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask, int8_t* to) { return hn::CompressBlendedStore(fromPortI8(a), maskFromPortI8(mask), TagI8(), to); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 compressedBitsI8(cvectorization_ops_raw_vector_i8 a, const uint8_t* bits) { return toPortI8(hn::CompressBits(fromPortI8(a), bits)); }
@@ -9068,7 +9068,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 loadFirstOtherwiseI16(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_i16 loadingUpperHalfI16(const int16_t* from, cvectorization_ops_raw_vector_i16 a) { return toPortI16(hn::InsertIntoUpper(TagI16(), from, fromPortI16(a))); }
 HWY_INLINE void storeWhereI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_mask_i16 mask, int16_t* to) { hn::BlendedStore(fromPortI16(a), maskFromPortI16(mask), TagI16(), to); }
 HWY_INLINE void storeRepeatingI16(size_t count, int16_t value, int16_t* to) { hn::SafeFillN(count, value, TagI16(), to); }
-HWY_INLINE void copyI16(size_t count, const int16_t* from, int16_t* to) { hn::SafeCopyN(count, TagI16(), from, to); }
+HWY_INLINE void copyI16(size_t count, const int16_t* __restrict__ from, int16_t* __restrict__ to) { hn::SafeCopyN(count, TagI16(), from, to); }
 HWY_INLINE size_t storeCompressedI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_mask_i16 mask, int16_t* to) { return hn::CompressStore(fromPortI16(a), maskFromPortI16(mask), TagI16(), to); }
 HWY_INLINE size_t storeCompressedBlendedI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_mask_i16 mask, int16_t* to) { return hn::CompressBlendedStore(fromPortI16(a), maskFromPortI16(mask), TagI16(), to); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 compressedBitsI16(cvectorization_ops_raw_vector_i16 a, const uint8_t* bits) { return toPortI16(hn::CompressBits(fromPortI16(a), bits)); }
@@ -10363,7 +10363,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstOtherwiseI32(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_i32 loadingUpperHalfI32(const int32_t* from, cvectorization_ops_raw_vector_i32 a) { return toPortI32(hn::InsertIntoUpper(TagI32(), from, fromPortI32(a))); }
 HWY_INLINE void storeWhereI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_mask_i32 mask, int32_t* to) { hn::BlendedStore(fromPortI32(a), maskFromPortI32(mask), TagI32(), to); }
 HWY_INLINE void storeRepeatingI32(size_t count, int32_t value, int32_t* to) { hn::SafeFillN(count, value, TagI32(), to); }
-HWY_INLINE void copyI32(size_t count, const int32_t* from, int32_t* to) { hn::SafeCopyN(count, TagI32(), from, to); }
+HWY_INLINE void copyI32(size_t count, const int32_t* __restrict__ from, int32_t* __restrict__ to) { hn::SafeCopyN(count, TagI32(), from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 gatherI32(const int32_t* from, cvectorization_ops_raw_vector_i32 indices) { return toPortI32(hn::GatherIndex(TagI32(), from, fromPortI32(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 gatherByteOffsetsI32(const int32_t* from, cvectorization_ops_raw_vector_i32 byteOffsets) { return toPortI32(hn::GatherOffset(TagI32(), from, fromPortI32(byteOffsets))); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 gatherFirstI32(const int32_t* from, cvectorization_ops_raw_vector_i32 indices, size_t count) { return toPortI32(hn::GatherIndexN(TagI32(), from, fromPortI32(indices), count)); }
@@ -11907,7 +11907,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstOtherwiseI64(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_i64 loadingUpperHalfI64(const int64_t* from, cvectorization_ops_raw_vector_i64 a) { return toPortI64(hn::InsertIntoUpper(TagI64(), from, fromPortI64(a))); }
 HWY_INLINE void storeWhereI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_mask_i64 mask, int64_t* to) { hn::BlendedStore(fromPortI64(a), maskFromPortI64(mask), TagI64(), to); }
 HWY_INLINE void storeRepeatingI64(size_t count, int64_t value, int64_t* to) { hn::SafeFillN(count, value, TagI64(), to); }
-HWY_INLINE void copyI64(size_t count, const int64_t* from, int64_t* to) { hn::SafeCopyN(count, TagI64(), from, to); }
+HWY_INLINE void copyI64(size_t count, const int64_t* __restrict__ from, int64_t* __restrict__ to) { hn::SafeCopyN(count, TagI64(), from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 gatherI64(const int64_t* from, cvectorization_ops_raw_vector_i64 indices) { return toPortI64(hn::GatherIndex(TagI64(), from, fromPortI64(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 gatherByteOffsetsI64(const int64_t* from, cvectorization_ops_raw_vector_i64 byteOffsets) { return toPortI64(hn::GatherOffset(TagI64(), from, fromPortI64(byteOffsets))); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 gatherFirstI64(const int64_t* from, cvectorization_ops_raw_vector_i64 indices, size_t count) { return toPortI64(hn::GatherIndexN(TagI64(), from, fromPortI64(indices), count)); }
@@ -12879,7 +12879,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 loadFirstOtherwiseF32(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_f32 loadingUpperHalfF32(const float* from, cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::InsertIntoUpper(TagF32(), from, fromPortF32(a))); }
 HWY_INLINE void storeWhereF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_mask_f32 mask, float* to) { hn::BlendedStore(fromPortF32(a), maskFromPortF32(mask), TagF32(), to); }
 HWY_INLINE void storeRepeatingF32(size_t count, float value, float* to) { hn::SafeFillN(count, value, TagF32(), to); }
-HWY_INLINE void copyF32(size_t count, const float* from, float* to) { hn::SafeCopyN(count, TagF32(), from, to); }
+HWY_INLINE void copyF32(size_t count, const float* __restrict__ from, float* __restrict__ to) { hn::SafeCopyN(count, TagF32(), from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 gatherF32(const float* from, cvectorization_ops_raw_vector_i32 indices) { return toPortF32(hn::GatherIndex(TagF32(), from, fromPortI32(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 gatherByteOffsetsF32(const float* from, cvectorization_ops_raw_vector_i32 byteOffsets) { return toPortF32(hn::GatherOffset(TagF32(), from, fromPortI32(byteOffsets))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 gatherFirstF32(const float* from, cvectorization_ops_raw_vector_i32 indices, size_t count) { return toPortF32(hn::GatherIndexN(TagF32(), from, fromPortI32(indices), count)); }
@@ -13786,7 +13786,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 loadFirstOtherwiseF64(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_f64 loadingUpperHalfF64(const double* from, cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::InsertIntoUpper(TagF64(), from, fromPortF64(a))); }
 HWY_INLINE void storeWhereF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_mask_f64 mask, double* to) { hn::BlendedStore(fromPortF64(a), maskFromPortF64(mask), TagF64(), to); }
 HWY_INLINE void storeRepeatingF64(size_t count, double value, double* to) { hn::SafeFillN(count, value, TagF64(), to); }
-HWY_INLINE void copyF64(size_t count, const double* from, double* to) { hn::SafeCopyN(count, TagF64(), from, to); }
+HWY_INLINE void copyF64(size_t count, const double* __restrict__ from, double* __restrict__ to) { hn::SafeCopyN(count, TagF64(), from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 gatherF64(const double* from, cvectorization_ops_raw_vector_i64 indices) { return toPortF64(hn::GatherIndex(TagF64(), from, fromPortI64(indices))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 gatherByteOffsetsF64(const double* from, cvectorization_ops_raw_vector_i64 byteOffsets) { return toPortF64(hn::GatherOffset(TagF64(), from, fromPortI64(byteOffsets))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 gatherFirstF64(const double* from, cvectorization_ops_raw_vector_i64 indices, size_t count) { return toPortF64(hn::GatherIndexN(TagF64(), from, fromPortI64(indices), count)); }
@@ -14840,7 +14840,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 loadFirstOtherwiseF16(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_f16 loadingUpperHalfF16(const void* from, cvectorization_ops_raw_vector_f16 a) { return toPortF16(hn::InsertIntoUpper(TagF16(), reinterpret_cast<const hwy::float16_t*>(from), fromPortF16(a))); }
 HWY_INLINE void storeWhereF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_mask_f16 mask, void* to) { hn::BlendedStore(fromPortF16(a), maskFromPortF16(mask), TagF16(), reinterpret_cast<hwy::float16_t*>(to)); }
 HWY_INLINE void storeRepeatingF16(size_t count, uint16_t value, void* to) { hn::SafeFillN(count, hwy::BitCastScalar<hwy::float16_t>(value), TagF16(), reinterpret_cast<hwy::float16_t*>(to)); }
-HWY_INLINE void copyF16(size_t count, const void* from, void* to) { hn::SafeCopyN(count, TagF16(), reinterpret_cast<const hwy::float16_t*>(from), reinterpret_cast<hwy::float16_t*>(to)); }
+HWY_INLINE void copyF16(size_t count, const void* __restrict__ from, void* __restrict__ to) { hn::SafeCopyN(count, TagF16(), reinterpret_cast<const hwy::float16_t*>(from), reinterpret_cast<hwy::float16_t*>(to)); }
 HWY_INLINE size_t storeCompressedF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_mask_f16 mask, void* to) { return hn::CompressStore(fromPortF16(a), maskFromPortF16(mask), TagF16(), reinterpret_cast<hwy::float16_t*>(to)); }
 HWY_INLINE size_t storeCompressedBlendedF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_mask_f16 mask, void* to) { return hn::CompressBlendedStore(fromPortF16(a), maskFromPortF16(mask), TagF16(), reinterpret_cast<hwy::float16_t*>(to)); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 compressedBitsF16(cvectorization_ops_raw_vector_f16 a, const uint8_t* bits) { return toPortF16(hn::CompressBits(fromPortF16(a), bits)); }
@@ -15994,7 +15994,7 @@ HWY_INLINE cvectorization_ops_raw_vector_bf16 loadFirstOtherwiseBF16(cvectorizat
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadingUpperHalfBF16(const void* from, cvectorization_ops_raw_vector_bf16 a) { return toPortBF16(hn::InsertIntoUpper(TagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(from), fromPortBF16(a))); }
 HWY_INLINE void storeWhereBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask, void* to) { hn::BlendedStore(fromPortBF16(a), maskFromPortBF16(mask), TagBF16(), reinterpret_cast<hwy::bfloat16_t*>(to)); }
 HWY_INLINE void storeRepeatingBF16(size_t count, uint16_t value, void* to) { hn::SafeFillN(count, hwy::BitCastScalar<hwy::bfloat16_t>(value), TagBF16(), reinterpret_cast<hwy::bfloat16_t*>(to)); }
-HWY_INLINE void copyBF16(size_t count, const void* from, void* to) { hn::SafeCopyN(count, TagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(from), reinterpret_cast<hwy::bfloat16_t*>(to)); }
+HWY_INLINE void copyBF16(size_t count, const void* __restrict__ from, void* __restrict__ to) { hn::SafeCopyN(count, TagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(from), reinterpret_cast<hwy::bfloat16_t*>(to)); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedBitsBF16(cvectorization_ops_raw_vector_bf16 a, const uint8_t* bits) { return toPortBF16(hn::CompressBits(fromPortBF16(a), bits)); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadExpandedWhereBF16(cvectorization_ops_raw_mask_bf16 mask, const void* from) { return toPortBF16(hn::LoadExpand(maskFromPortBF16(mask), TagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(from))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadExpandedWhereOtherwiseBF16(cvectorization_ops_raw_vector_bf16 otherwise, cvectorization_ops_raw_mask_bf16 mask, const void* from) { return toPortBF16(hn::MaskedLoadExpandOr(fromPortBF16(otherwise), maskFromPortBF16(mask), TagBF16(), reinterpret_cast<const hwy::bfloat16_t*>(from))); }
@@ -24346,7 +24346,7 @@ HWY_INLINE cvectorization_ops_raw_vector_u8 loadFirstOtherwiseU8(cvectorization_
 HWY_INLINE cvectorization_ops_raw_vector_u8 loadingUpperHalfU8(const uint8_t* from, cvectorization_ops_raw_vector_u8 a) noexcept { return ::HighwayReference::loadingUpperHalfU8(from, a); }
 HWY_INLINE void storeWhereU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask, uint8_t* to) noexcept { ::HighwayReference::storeWhereU8(a, mask, to); }
 HWY_INLINE void storeRepeatingU8(size_t count, uint8_t value, uint8_t* to) noexcept { ::HighwayReference::storeRepeatingU8(count, value, to); }
-HWY_INLINE void copyU8(size_t count, const uint8_t* from, uint8_t* to) noexcept { ::HighwayReference::copyU8(count, from, to); }
+HWY_INLINE void copyU8(size_t count, const uint8_t* __restrict__ from, uint8_t* __restrict__ to) noexcept { ::HighwayReference::copyU8(count, from, to); }
 HWY_INLINE size_t storeCompressedU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask, uint8_t* to) noexcept { return ::HighwayReference::storeCompressedU8(a, mask, to); }
 HWY_INLINE size_t storeCompressedBlendedU8(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_mask_u8 mask, uint8_t* to) noexcept { return ::HighwayReference::storeCompressedBlendedU8(a, mask, to); }
 HWY_INLINE cvectorization_ops_raw_vector_u8 compressedBitsU8(cvectorization_ops_raw_vector_u8 a, const uint8_t* bits) noexcept { return ::HighwayReference::compressedBitsU8(a, bits); }
@@ -24640,7 +24640,7 @@ HWY_INLINE cvectorization_ops_raw_vector_u16 loadFirstOtherwiseU16(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_u16 loadingUpperHalfU16(const uint16_t* from, cvectorization_ops_raw_vector_u16 a) noexcept { return ::HighwayReference::loadingUpperHalfU16(from, a); }
 HWY_INLINE void storeWhereU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_mask_u16 mask, uint16_t* to) noexcept { ::HighwayReference::storeWhereU16(a, mask, to); }
 HWY_INLINE void storeRepeatingU16(size_t count, uint16_t value, uint16_t* to) noexcept { ::HighwayReference::storeRepeatingU16(count, value, to); }
-HWY_INLINE void copyU16(size_t count, const uint16_t* from, uint16_t* to) noexcept { ::HighwayReference::copyU16(count, from, to); }
+HWY_INLINE void copyU16(size_t count, const uint16_t* __restrict__ from, uint16_t* __restrict__ to) noexcept { ::HighwayReference::copyU16(count, from, to); }
 HWY_INLINE size_t storeCompressedU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_mask_u16 mask, uint16_t* to) noexcept { return ::HighwayReference::storeCompressedU16(a, mask, to); }
 HWY_INLINE size_t storeCompressedBlendedU16(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_mask_u16 mask, uint16_t* to) noexcept { return ::HighwayReference::storeCompressedBlendedU16(a, mask, to); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 compressedBitsU16(cvectorization_ops_raw_vector_u16 a, const uint8_t* bits) noexcept { return ::HighwayReference::compressedBitsU16(a, bits); }
@@ -24936,7 +24936,7 @@ HWY_INLINE cvectorization_ops_raw_vector_u32 loadFirstOtherwiseU32(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_u32 loadingUpperHalfU32(const uint32_t* from, cvectorization_ops_raw_vector_u32 a) noexcept { return ::HighwayReference::loadingUpperHalfU32(from, a); }
 HWY_INLINE void storeWhereU32(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_mask_u32 mask, uint32_t* to) noexcept { ::HighwayReference::storeWhereU32(a, mask, to); }
 HWY_INLINE void storeRepeatingU32(size_t count, uint32_t value, uint32_t* to) noexcept { ::HighwayReference::storeRepeatingU32(count, value, to); }
-HWY_INLINE void copyU32(size_t count, const uint32_t* from, uint32_t* to) noexcept { ::HighwayReference::copyU32(count, from, to); }
+HWY_INLINE void copyU32(size_t count, const uint32_t* __restrict__ from, uint32_t* __restrict__ to) noexcept { ::HighwayReference::copyU32(count, from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 gatherU32(const uint32_t* from, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::gatherU32(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 gatherByteOffsetsU32(const uint32_t* from, cvectorization_ops_raw_vector_i32 byteOffsets) noexcept { return ::HighwayReference::gatherByteOffsetsU32(from, byteOffsets); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 gatherFirstU32(const uint32_t* from, cvectorization_ops_raw_vector_i32 indices, size_t count) noexcept { return ::HighwayReference::gatherFirstU32(from, indices, count); }
@@ -25255,7 +25255,7 @@ HWY_INLINE cvectorization_ops_raw_vector_u64 loadFirstOtherwiseU64(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_u64 loadingUpperHalfU64(const uint64_t* from, cvectorization_ops_raw_vector_u64 a) noexcept { return ::HighwayReference::loadingUpperHalfU64(from, a); }
 HWY_INLINE void storeWhereU64(cvectorization_ops_raw_vector_u64 a, cvectorization_ops_raw_mask_u64 mask, uint64_t* to) noexcept { ::HighwayReference::storeWhereU64(a, mask, to); }
 HWY_INLINE void storeRepeatingU64(size_t count, uint64_t value, uint64_t* to) noexcept { ::HighwayReference::storeRepeatingU64(count, value, to); }
-HWY_INLINE void copyU64(size_t count, const uint64_t* from, uint64_t* to) noexcept { ::HighwayReference::copyU64(count, from, to); }
+HWY_INLINE void copyU64(size_t count, const uint64_t* __restrict__ from, uint64_t* __restrict__ to) noexcept { ::HighwayReference::copyU64(count, from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 gatherU64(const uint64_t* from, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::gatherU64(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 gatherByteOffsetsU64(const uint64_t* from, cvectorization_ops_raw_vector_i64 byteOffsets) noexcept { return ::HighwayReference::gatherByteOffsetsU64(from, byteOffsets); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 gatherFirstU64(const uint64_t* from, cvectorization_ops_raw_vector_i64 indices, size_t count) noexcept { return ::HighwayReference::gatherFirstU64(from, indices, count); }
@@ -25582,7 +25582,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i8 loadFirstOtherwiseI8(cvectorization_
 HWY_INLINE cvectorization_ops_raw_vector_i8 loadingUpperHalfI8(const int8_t* from, cvectorization_ops_raw_vector_i8 a) noexcept { return ::HighwayReference::loadingUpperHalfI8(from, a); }
 HWY_INLINE void storeWhereI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask, int8_t* to) noexcept { ::HighwayReference::storeWhereI8(a, mask, to); }
 HWY_INLINE void storeRepeatingI8(size_t count, int8_t value, int8_t* to) noexcept { ::HighwayReference::storeRepeatingI8(count, value, to); }
-HWY_INLINE void copyI8(size_t count, const int8_t* from, int8_t* to) noexcept { ::HighwayReference::copyI8(count, from, to); }
+HWY_INLINE void copyI8(size_t count, const int8_t* __restrict__ from, int8_t* __restrict__ to) noexcept { ::HighwayReference::copyI8(count, from, to); }
 HWY_INLINE size_t storeCompressedI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask, int8_t* to) noexcept { return ::HighwayReference::storeCompressedI8(a, mask, to); }
 HWY_INLINE size_t storeCompressedBlendedI8(cvectorization_ops_raw_vector_i8 a, cvectorization_ops_raw_mask_i8 mask, int8_t* to) noexcept { return ::HighwayReference::storeCompressedBlendedI8(a, mask, to); }
 HWY_INLINE cvectorization_ops_raw_vector_i8 compressedBitsI8(cvectorization_ops_raw_vector_i8 a, const uint8_t* bits) noexcept { return ::HighwayReference::compressedBitsI8(a, bits); }
@@ -25893,7 +25893,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 loadFirstOtherwiseI16(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_i16 loadingUpperHalfI16(const int16_t* from, cvectorization_ops_raw_vector_i16 a) noexcept { return ::HighwayReference::loadingUpperHalfI16(from, a); }
 HWY_INLINE void storeWhereI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_mask_i16 mask, int16_t* to) noexcept { ::HighwayReference::storeWhereI16(a, mask, to); }
 HWY_INLINE void storeRepeatingI16(size_t count, int16_t value, int16_t* to) noexcept { ::HighwayReference::storeRepeatingI16(count, value, to); }
-HWY_INLINE void copyI16(size_t count, const int16_t* from, int16_t* to) noexcept { ::HighwayReference::copyI16(count, from, to); }
+HWY_INLINE void copyI16(size_t count, const int16_t* __restrict__ from, int16_t* __restrict__ to) noexcept { ::HighwayReference::copyI16(count, from, to); }
 HWY_INLINE size_t storeCompressedI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_mask_i16 mask, int16_t* to) noexcept { return ::HighwayReference::storeCompressedI16(a, mask, to); }
 HWY_INLINE size_t storeCompressedBlendedI16(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_mask_i16 mask, int16_t* to) noexcept { return ::HighwayReference::storeCompressedBlendedI16(a, mask, to); }
 HWY_INLINE cvectorization_ops_raw_vector_i16 compressedBitsI16(cvectorization_ops_raw_vector_i16 a, const uint8_t* bits) noexcept { return ::HighwayReference::compressedBitsI16(a, bits); }
@@ -26205,7 +26205,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i32 loadFirstOtherwiseI32(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_i32 loadingUpperHalfI32(const int32_t* from, cvectorization_ops_raw_vector_i32 a) noexcept { return ::HighwayReference::loadingUpperHalfI32(from, a); }
 HWY_INLINE void storeWhereI32(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_mask_i32 mask, int32_t* to) noexcept { ::HighwayReference::storeWhereI32(a, mask, to); }
 HWY_INLINE void storeRepeatingI32(size_t count, int32_t value, int32_t* to) noexcept { ::HighwayReference::storeRepeatingI32(count, value, to); }
-HWY_INLINE void copyI32(size_t count, const int32_t* from, int32_t* to) noexcept { ::HighwayReference::copyI32(count, from, to); }
+HWY_INLINE void copyI32(size_t count, const int32_t* __restrict__ from, int32_t* __restrict__ to) noexcept { ::HighwayReference::copyI32(count, from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 gatherI32(const int32_t* from, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::gatherI32(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 gatherByteOffsetsI32(const int32_t* from, cvectorization_ops_raw_vector_i32 byteOffsets) noexcept { return ::HighwayReference::gatherByteOffsetsI32(from, byteOffsets); }
 HWY_INLINE cvectorization_ops_raw_vector_i32 gatherFirstI32(const int32_t* from, cvectorization_ops_raw_vector_i32 indices, size_t count) noexcept { return ::HighwayReference::gatherFirstI32(from, indices, count); }
@@ -26526,7 +26526,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i64 loadFirstOtherwiseI64(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_i64 loadingUpperHalfI64(const int64_t* from, cvectorization_ops_raw_vector_i64 a) noexcept { return ::HighwayReference::loadingUpperHalfI64(from, a); }
 HWY_INLINE void storeWhereI64(cvectorization_ops_raw_vector_i64 a, cvectorization_ops_raw_mask_i64 mask, int64_t* to) noexcept { ::HighwayReference::storeWhereI64(a, mask, to); }
 HWY_INLINE void storeRepeatingI64(size_t count, int64_t value, int64_t* to) noexcept { ::HighwayReference::storeRepeatingI64(count, value, to); }
-HWY_INLINE void copyI64(size_t count, const int64_t* from, int64_t* to) noexcept { ::HighwayReference::copyI64(count, from, to); }
+HWY_INLINE void copyI64(size_t count, const int64_t* __restrict__ from, int64_t* __restrict__ to) noexcept { ::HighwayReference::copyI64(count, from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 gatherI64(const int64_t* from, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::gatherI64(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 gatherByteOffsetsI64(const int64_t* from, cvectorization_ops_raw_vector_i64 byteOffsets) noexcept { return ::HighwayReference::gatherByteOffsetsI64(from, byteOffsets); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 gatherFirstI64(const int64_t* from, cvectorization_ops_raw_vector_i64 indices, size_t count) noexcept { return ::HighwayReference::gatherFirstI64(from, indices, count); }
@@ -26839,7 +26839,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 loadFirstOtherwiseF32(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_f32 loadingUpperHalfF32(const float* from, cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::loadingUpperHalfF32(from, a); }
 HWY_INLINE void storeWhereF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_mask_f32 mask, float* to) noexcept { ::HighwayReference::storeWhereF32(a, mask, to); }
 HWY_INLINE void storeRepeatingF32(size_t count, float value, float* to) noexcept { ::HighwayReference::storeRepeatingF32(count, value, to); }
-HWY_INLINE void copyF32(size_t count, const float* from, float* to) noexcept { ::HighwayReference::copyF32(count, from, to); }
+HWY_INLINE void copyF32(size_t count, const float* __restrict__ from, float* __restrict__ to) noexcept { ::HighwayReference::copyF32(count, from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 gatherF32(const float* from, cvectorization_ops_raw_vector_i32 indices) noexcept { return ::HighwayReference::gatherF32(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 gatherByteOffsetsF32(const float* from, cvectorization_ops_raw_vector_i32 byteOffsets) noexcept { return ::HighwayReference::gatherByteOffsetsF32(from, byteOffsets); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 gatherFirstF32(const float* from, cvectorization_ops_raw_vector_i32 indices, size_t count) noexcept { return ::HighwayReference::gatherFirstF32(from, indices, count); }
@@ -27135,7 +27135,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f64 loadFirstOtherwiseF64(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_f64 loadingUpperHalfF64(const double* from, cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::loadingUpperHalfF64(from, a); }
 HWY_INLINE void storeWhereF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_mask_f64 mask, double* to) noexcept { ::HighwayReference::storeWhereF64(a, mask, to); }
 HWY_INLINE void storeRepeatingF64(size_t count, double value, double* to) noexcept { ::HighwayReference::storeRepeatingF64(count, value, to); }
-HWY_INLINE void copyF64(size_t count, const double* from, double* to) noexcept { ::HighwayReference::copyF64(count, from, to); }
+HWY_INLINE void copyF64(size_t count, const double* __restrict__ from, double* __restrict__ to) noexcept { ::HighwayReference::copyF64(count, from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 gatherF64(const double* from, cvectorization_ops_raw_vector_i64 indices) noexcept { return ::HighwayReference::gatherF64(from, indices); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 gatherByteOffsetsF64(const double* from, cvectorization_ops_raw_vector_i64 byteOffsets) noexcept { return ::HighwayReference::gatherByteOffsetsF64(from, byteOffsets); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 gatherFirstF64(const double* from, cvectorization_ops_raw_vector_i64 indices, size_t count) noexcept { return ::HighwayReference::gatherFirstF64(from, indices, count); }
@@ -27342,7 +27342,7 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 loadFirstOtherwiseF16(cvectorizatio
 HWY_INLINE cvectorization_ops_raw_vector_f16 loadingUpperHalfF16(const void* from, cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::loadingUpperHalfF16(from, a); }
 HWY_INLINE void storeWhereF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_mask_f16 mask, void* to) noexcept { ::HighwayReference::storeWhereF16(a, mask, to); }
 HWY_INLINE void storeRepeatingF16(size_t count, uint16_t value, void* to) noexcept { ::HighwayReference::storeRepeatingF16(count, value, to); }
-HWY_INLINE void copyF16(size_t count, const void* from, void* to) noexcept { ::HighwayReference::copyF16(count, from, to); }
+HWY_INLINE void copyF16(size_t count, const void* __restrict__ from, void* __restrict__ to) noexcept { ::HighwayReference::copyF16(count, from, to); }
 HWY_INLINE size_t storeCompressedF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_mask_f16 mask, void* to) noexcept { return ::HighwayReference::storeCompressedF16(a, mask, to); }
 HWY_INLINE size_t storeCompressedBlendedF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_mask_f16 mask, void* to) noexcept { return ::HighwayReference::storeCompressedBlendedF16(a, mask, to); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 compressedBitsF16(cvectorization_ops_raw_vector_f16 a, const uint8_t* bits) noexcept { return ::HighwayReference::compressedBitsF16(a, bits); }
@@ -27557,7 +27557,7 @@ HWY_INLINE cvectorization_ops_raw_vector_bf16 loadFirstOtherwiseBF16(cvectorizat
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadingUpperHalfBF16(const void* from, cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::loadingUpperHalfBF16(from, a); }
 HWY_INLINE void storeWhereBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask, void* to) noexcept { ::HighwayReference::storeWhereBF16(a, mask, to); }
 HWY_INLINE void storeRepeatingBF16(size_t count, uint16_t value, void* to) noexcept { ::HighwayReference::storeRepeatingBF16(count, value, to); }
-HWY_INLINE void copyBF16(size_t count, const void* from, void* to) noexcept { ::HighwayReference::copyBF16(count, from, to); }
+HWY_INLINE void copyBF16(size_t count, const void* __restrict__ from, void* __restrict__ to) noexcept { ::HighwayReference::copyBF16(count, from, to); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedBitsBF16(cvectorization_ops_raw_vector_bf16 a, const uint8_t* bits) noexcept { return ::HighwayReference::compressedBitsBF16(a, bits); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadExpandedWhereBF16(cvectorization_ops_raw_mask_bf16 mask, const void* from) noexcept { return ::HighwayReference::loadExpandedWhereBF16(mask, from); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 loadExpandedWhereOtherwiseBF16(cvectorization_ops_raw_vector_bf16 otherwise, cvectorization_ops_raw_mask_bf16 mask, const void* from) noexcept { return ::HighwayReference::loadExpandedWhereOtherwiseBF16(otherwise, mask, from); }

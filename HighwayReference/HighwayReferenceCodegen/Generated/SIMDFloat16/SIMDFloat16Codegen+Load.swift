@@ -188,6 +188,47 @@ public func highwayLoadFirstF16ConstantCount(from: UnsafePointer<Float16>) -> SI
 }
 
 @inline(never)
+public func portLoadFirstF16ConstantCountTwo(
+    from: UnsafePointer<SIMDFloat16.Lane>
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.loadFirst(from: from, count: 2)
+}
+
+@inline(never)
+public func highwayLoadFirstF16ConstantCountTwo(from: UnsafePointer<Float16>) -> SIMDFloat16.Vector
+{
+    unsafe HighwayReference.Nothrow.loadFirstF16(from, 2)
+}
+
+@inline(never)
+public func portLoadFirstF16ConstantCountLaneCount(
+    from: UnsafePointer<SIMDFloat16.Lane>
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.loadFirst(from: from, count: SIMDFloat16.laneCount)
+}
+
+@inline(never)
+public func highwayLoadFirstF16ConstantCountLaneCount(
+    from: UnsafePointer<Float16>
+) -> SIMDFloat16.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstF16(from, SIMDFloat16.laneCount)
+}
+
+@inline(never)
+public func portLoadFirstF16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<SIMDFloat16.Lane>
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.loadFirst(from: from, count: 2 * SIMDFloat16.laneCount)
+}
+
+@inline(never)
+public func highwayLoadFirstF16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<Float16>
+) -> SIMDFloat16.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstF16(from, 2 * SIMDFloat16.laneCount)
+}
+
+@inline(never)
 public func portLoadRepeatingBlockF16(from: UnsafePointer<SIMDFloat16.Lane>) -> SIMDFloat16.Vector {
     unsafe SIMDFloat16.loadRepeatingBlock(from: from)
 }
@@ -310,6 +351,58 @@ public func highwayLoadFirstOtherwiseF16ConstantOtherwise(
         HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
         from,
         count
+    )
+}
+
+@inline(never)
+public func portLoadFirstOtherwiseF16ConstantCountTwo(
+    from: UnsafePointer<SIMDFloat16.Lane>,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.loadFirst(from: from, count: 2, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayLoadFirstOtherwiseF16ConstantCountTwo(
+    from: UnsafePointer<Float16>,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF16(otherwise, from, 2)
+}
+
+@inline(never)
+public func portLoadFirstOtherwiseF16ConstantCountLaneCount(
+    from: UnsafePointer<SIMDFloat16.Lane>,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.loadFirst(from: from, count: SIMDFloat16.laneCount, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayLoadFirstOtherwiseF16ConstantCountLaneCount(
+    from: UnsafePointer<Float16>,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF16(otherwise, from, SIMDFloat16.laneCount)
+}
+
+@inline(never)
+public func portLoadFirstOtherwiseF16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<SIMDFloat16.Lane>,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe SIMDFloat16.loadFirst(from: from, count: 2 * SIMDFloat16.laneCount, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayLoadFirstOtherwiseF16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<Float16>,
+    otherwise: SIMDFloat16.Vector
+) -> SIMDFloat16.Vector {
+    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF16(
+        otherwise,
+        from,
+        2 * SIMDFloat16.laneCount
     )
 }
 

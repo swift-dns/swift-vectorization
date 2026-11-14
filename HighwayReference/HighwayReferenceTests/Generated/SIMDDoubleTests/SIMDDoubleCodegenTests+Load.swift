@@ -171,6 +171,127 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func loadFirstConstantCountTwo() {
+        let mismatches = Mismatches("portLoadFirstF64ConstantCountTwo")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x99B8_96B6_2CEE_DC16
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstF64ConstantCountTwo(from: source.baseAddress!),
+                    unsafe highwayLoadFirstF64ConstantCountTwo(from: source.baseAddress!)
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstConstantCountTwoBeforeGuardPage() {
+        let mismatches = Mismatches("portLoadFirstF64ConstantCountTwo before a guard page")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xE553_CE5F_0946_3EE7
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(2))) {
+                source in
+                (
+                    unsafe portLoadFirstF64ConstantCountTwo(from: source),
+                    unsafe highwayLoadFirstF64ConstantCountTwo(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstConstantCountLaneCount() {
+        let mismatches = Mismatches("portLoadFirstF64ConstantCountLaneCount")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x6DC1_351D_A6B0_32C1
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstF64ConstantCountLaneCount(from: source.baseAddress!),
+                    unsafe highwayLoadFirstF64ConstantCountLaneCount(from: source.baseAddress!)
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstConstantCountLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches("portLoadFirstF64ConstantCountLaneCount before a guard page")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xCFCD_5740_8632_BBFE
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstF64ConstantCountLaneCount(from: source),
+                    unsafe highwayLoadFirstF64ConstantCountLaneCount(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portLoadFirstF64ConstantCountTwiceLaneCount")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x5C2B_7A52_274D_444F
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstF64ConstantCountTwiceLaneCount(from: source.baseAddress!),
+                    unsafe highwayLoadFirstF64ConstantCountTwiceLaneCount(from: source.baseAddress!)
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstConstantCountTwiceLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstF64ConstantCountTwiceLaneCount before a guard page"
+        )
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x2145_DB3F_88CC_2074
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(2 * SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstF64ConstantCountTwiceLaneCount(from: source),
+                    unsafe highwayLoadFirstF64ConstantCountTwiceLaneCount(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadRepeatingBlock() {
         let mismatches = Mismatches("portLoadRepeatingBlockF64")
         let fromInputs = Inputs.buffers(
@@ -584,6 +705,195 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func loadFirstOtherwiseConstantCountTwo() {
+        let mismatches = Mismatches("portLoadFirstOtherwiseF64ConstantCountTwo")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF9A1_203C_4C1C_60D0)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xF9A1_213C_4C1C_6283
+        )
+        for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstOtherwiseF64ConstantCountTwo(
+                        from: source.baseAddress!,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayLoadFirstOtherwiseF64ConstantCountTwo(
+                        from: source.baseAddress!,
+                        otherwise: otherwise
+                    )
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstOtherwiseConstantCountTwoBeforeGuardPage() {
+        let mismatches = Mismatches("portLoadFirstOtherwiseF64ConstantCountTwo before a guard page")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x041B_F23A_E155_71E9)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x041B_F13A_E155_7036
+        )
+        for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(2))) {
+                source in
+                (
+                    unsafe portLoadFirstOtherwiseF64ConstantCountTwo(
+                        from: source,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayLoadFirstOtherwiseF64ConstantCountTwo(
+                        from: source,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstOtherwiseConstantCountLaneCount() {
+        let mismatches = Mismatches("portLoadFirstOtherwiseF64ConstantCountLaneCount")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xCF42_DBBE_5571_83AB)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xCF42_DABE_5571_81F8
+        )
+        for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstOtherwiseF64ConstantCountLaneCount(
+                        from: source.baseAddress!,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayLoadFirstOtherwiseF64ConstantCountLaneCount(
+                        from: source.baseAddress!,
+                        otherwise: otherwise
+                    )
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstOtherwiseConstantCountLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstOtherwiseF64ConstantCountLaneCount before a guard page"
+        )
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xEBC2_7DC1_3EDC_DEB0)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xEBC2_7EC1_3EDC_E063
+        )
+        for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstOtherwiseF64ConstantCountLaneCount(
+                        from: source,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayLoadFirstOtherwiseF64ConstantCountLaneCount(
+                        from: source,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstOtherwiseConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portLoadFirstOtherwiseF64ConstantCountTwiceLaneCount")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xD66B_F82D_42D8_3015)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xD66B_F72D_42D8_2E62
+        )
+        for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstOtherwiseF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayLoadFirstOtherwiseF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!,
+                        otherwise: otherwise
+                    )
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstOtherwiseConstantCountTwiceLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstOtherwiseF64ConstantCountTwiceLaneCount before a guard page"
+        )
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x2993_FEAA_511B_1882)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x2993_FFAA_511B_1A35
+        )
+        for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(2 * SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstOtherwiseF64ConstantCountTwiceLaneCount(
+                        from: source,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayLoadFirstOtherwiseF64ConstantCountTwiceLaneCount(
+                        from: source,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadingUpperHalf() {
         let mismatches = Mismatches("portLoadingUpperHalfF64")
         let fromInputs = Inputs.buffers(
@@ -931,6 +1241,141 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func loadFirstWideningFromUInt32ConstantCountTwo() {
+        let mismatches = Mismatches("portLoadFirstWideningU32ToF64ConstantCountTwo")
+        let fromInputs = Inputs.buffers(
+            UInt32.self,
+            count: H.laneCount,
+            seed: 0x0188_E10C_229E_04AA
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningU32ToF64ConstantCountTwo(from: source.baseAddress!),
+                    unsafe highwayLoadFirstWideningU32ToF64ConstantCountTwo(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt32ConstantCountTwoBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningU32ToF64ConstantCountTwo before a guard page"
+        )
+        let fromInputs = Inputs.buffers(
+            UInt32.self,
+            count: H.laneCount,
+            seed: 0x1F4A_2DB2_3B14_174B
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(2))) {
+                source in
+                (
+                    unsafe portLoadFirstWideningU32ToF64ConstantCountTwo(from: source),
+                    unsafe highwayLoadFirstWideningU32ToF64ConstantCountTwo(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt32ConstantCountLaneCount() {
+        let mismatches = Mismatches("portLoadFirstWideningU32ToF64ConstantCountLaneCount")
+        let fromInputs = Inputs.buffers(
+            UInt32.self,
+            count: H.laneCount,
+            seed: 0x3127_8C9D_A130_2615
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningU32ToF64ConstantCountLaneCount(
+                        from: source.baseAddress!
+                    ),
+                    unsafe highwayLoadFirstWideningU32ToF64ConstantCountLaneCount(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt32ConstantCountLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningU32ToF64ConstantCountLaneCount before a guard page"
+        )
+        let fromInputs = Inputs.buffers(
+            UInt32.self,
+            count: H.laneCount,
+            seed: 0xA91D_18F5_8E88_CA82
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstWideningU32ToF64ConstantCountLaneCount(from: source),
+                    unsafe highwayLoadFirstWideningU32ToF64ConstantCountLaneCount(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt32ConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portLoadFirstWideningU32ToF64ConstantCountTwiceLaneCount")
+        let fromInputs = Inputs.buffers(
+            UInt32.self,
+            count: H.laneCount,
+            seed: 0xDC53_4F33_4147_2073
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningU32ToF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!
+                    ),
+                    unsafe highwayLoadFirstWideningU32ToF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt32ConstantCountTwiceLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningU32ToF64ConstantCountTwiceLaneCount before a guard page"
+        )
+        let fromInputs = Inputs.buffers(
+            UInt32.self,
+            count: H.laneCount,
+            seed: 0x651F_B310_BD6B_A598
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(2 * SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstWideningU32ToF64ConstantCountTwiceLaneCount(from: source),
+                    unsafe highwayLoadFirstWideningU32ToF64ConstantCountTwiceLaneCount(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadFirstWideningFromInt32() {
         let mismatches = Mismatches("portLoadFirstWideningI32ToF64")
         let fromInputs = Inputs.buffers(Int32.self, count: H.laneCount, seed: 0xA708_5C9A_156A_F1A6)
@@ -1008,6 +1453,117 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func loadFirstWideningFromInt32ConstantCountTwo() {
+        let mismatches = Mismatches("portLoadFirstWideningI32ToF64ConstantCountTwo")
+        let fromInputs = Inputs.buffers(Int32.self, count: H.laneCount, seed: 0xD99A_707F_E2CE_32E5)
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningI32ToF64ConstantCountTwo(from: source.baseAddress!),
+                    unsafe highwayLoadFirstWideningI32ToF64ConstantCountTwo(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromInt32ConstantCountTwoBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningI32ToF64ConstantCountTwo before a guard page"
+        )
+        let fromInputs = Inputs.buffers(Int32.self, count: H.laneCount, seed: 0xA30D_6155_6853_0FB2)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(2))) {
+                source in
+                (
+                    unsafe portLoadFirstWideningI32ToF64ConstantCountTwo(from: source),
+                    unsafe highwayLoadFirstWideningI32ToF64ConstantCountTwo(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromInt32ConstantCountLaneCount() {
+        let mismatches = Mismatches("portLoadFirstWideningI32ToF64ConstantCountLaneCount")
+        let fromInputs = Inputs.buffers(Int32.self, count: H.laneCount, seed: 0x6E3C_28B8_CF13_B45E)
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningI32ToF64ConstantCountLaneCount(
+                        from: source.baseAddress!
+                    ),
+                    unsafe highwayLoadFirstWideningI32ToF64ConstantCountLaneCount(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromInt32ConstantCountLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningI32ToF64ConstantCountLaneCount before a guard page"
+        )
+        let fromInputs = Inputs.buffers(Int32.self, count: H.laneCount, seed: 0x3706_CB0E_4F5F_46EF)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstWideningI32ToF64ConstantCountLaneCount(from: source),
+                    unsafe highwayLoadFirstWideningI32ToF64ConstantCountLaneCount(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromInt32ConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portLoadFirstWideningI32ToF64ConstantCountTwiceLaneCount")
+        let fromInputs = Inputs.buffers(Int32.self, count: H.laneCount, seed: 0xD087_1A76_2AE3_BF12)
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningI32ToF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!
+                    ),
+                    unsafe highwayLoadFirstWideningI32ToF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromInt32ConstantCountTwiceLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningI32ToF64ConstantCountTwiceLaneCount before a guard page"
+        )
+        let fromInputs = Inputs.buffers(Int32.self, count: H.laneCount, seed: 0x3B3B_B70A_8D7A_80B3)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(2 * SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstWideningI32ToF64ConstantCountTwiceLaneCount(from: source),
+                    unsafe highwayLoadFirstWideningI32ToF64ConstantCountTwiceLaneCount(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadFirstWideningFromFloat() {
         let mismatches = Mismatches("portLoadFirstWideningF32ToF64")
         let fromInputs = Inputs.buffers(Float.self, count: H.laneCount, seed: 0x0958_9A10_7F50_FE7C)
@@ -1078,6 +1634,117 @@ extension SIMDDoubleCodegenTests {
                 (
                     unsafe portLoadFirstWideningF32ToF64ConstantCount(from: source),
                     unsafe highwayLoadFirstWideningF32ToF64ConstantCount(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromFloatConstantCountTwo() {
+        let mismatches = Mismatches("portLoadFirstWideningF32ToF64ConstantCountTwo")
+        let fromInputs = Inputs.buffers(Float.self, count: H.laneCount, seed: 0xC50D_1D3C_8DE3_284B)
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningF32ToF64ConstantCountTwo(from: source.baseAddress!),
+                    unsafe highwayLoadFirstWideningF32ToF64ConstantCountTwo(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromFloatConstantCountTwoBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningF32ToF64ConstantCountTwo before a guard page"
+        )
+        let fromInputs = Inputs.buffers(Float.self, count: H.laneCount, seed: 0x8F39_3C13_1B3C_0710)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(2))) {
+                source in
+                (
+                    unsafe portLoadFirstWideningF32ToF64ConstantCountTwo(from: source),
+                    unsafe highwayLoadFirstWideningF32ToF64ConstantCountTwo(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromFloatConstantCountLaneCount() {
+        let mismatches = Mismatches("portLoadFirstWideningF32ToF64ConstantCountLaneCount")
+        let fromInputs = Inputs.buffers(Float.self, count: H.laneCount, seed: 0xFD2A_E499_1278_922C)
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningF32ToF64ConstantCountLaneCount(
+                        from: source.baseAddress!
+                    ),
+                    unsafe highwayLoadFirstWideningF32ToF64ConstantCountLaneCount(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromFloatConstantCountLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningF32ToF64ConstantCountLaneCount before a guard page"
+        )
+        let fromInputs = Inputs.buffers(Float.self, count: H.laneCount, seed: 0xF95D_030C_1F48_2EA5)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstWideningF32ToF64ConstantCountLaneCount(from: source),
+                    unsafe highwayLoadFirstWideningF32ToF64ConstantCountLaneCount(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromFloatConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portLoadFirstWideningF32ToF64ConstantCountTwiceLaneCount")
+        let fromInputs = Inputs.buffers(Float.self, count: H.laneCount, seed: 0x0F8C_61E6_DD86_B09C)
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe portLoadFirstWideningF32ToF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!
+                    ),
+                    unsafe highwayLoadFirstWideningF32ToF64ConstantCountTwiceLaneCount(
+                        from: source.baseAddress!
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromFloatConstantCountTwiceLaneCountBeforeGuardPage() {
+        let mismatches = Mismatches(
+            "portLoadFirstWideningF32ToF64ConstantCountTwiceLaneCount before a guard page"
+        )
+        let fromInputs = Inputs.buffers(Float.self, count: H.laneCount, seed: 0x7CB8_83DA_14F0_0BF5)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(2 * SIMDDouble.laneCount))
+            ) { source in
+                (
+                    unsafe portLoadFirstWideningF32ToF64ConstantCountTwiceLaneCount(from: source),
+                    unsafe highwayLoadFirstWideningF32ToF64ConstantCountTwiceLaneCount(from: source)
                 )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")

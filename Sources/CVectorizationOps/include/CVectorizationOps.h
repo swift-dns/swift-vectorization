@@ -19997,7 +19997,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_u8(size_t coun
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_u8(size_t count, const uint8_t* from, uint8_t* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_u8(size_t count, const uint8_t* __restrict__ from, uint8_t* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -33554,7 +33554,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_u16(size_t cou
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_u16(size_t count, const uint16_t* from, uint16_t* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_u16(size_t count, const uint16_t* __restrict__ from, uint16_t* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_u16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_u16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -34610,9 +34610,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_l
         __builtin_memcpy(&third, from + leading + 2, sizeof third);
         const half_vector duplicated = {third, third, third, third, third, third, third, third};
         const half_vector upper = (half_vector)__builtin_shufflevector((byte_vector)duplicated, (byte_vector)zero, 0, 8, 1, 9, 2, 10, 3, 11);
-        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)upper, 0, 4, 1, 5);
+        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)upper, 0, 4, -1, -1);
       } else {
-        trailing = (half_vector)__builtin_shufflevector((byte_vector)lower, (byte_vector)zero, 0, 1, 8, 9, 2, 3, 10, 11);
+        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)zero, 0, 4, -1, -1);
       }
     } else if (count & 1) {
       uint8_t single;
@@ -45410,7 +45410,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_u32(size_t cou
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_u32(size_t count, const uint32_t* from, uint32_t* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_u32(size_t count, const uint32_t* __restrict__ from, uint32_t* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_u32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_u32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -58517,7 +58517,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_u64(size_t cou
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_u64(size_t count, const uint64_t* from, uint64_t* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_u64(size_t count, const uint64_t* __restrict__ from, uint64_t* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -76515,7 +76515,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_i8(size_t coun
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_i8(size_t count, const int8_t* from, int8_t* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_i8(size_t count, const int8_t* __restrict__ from, int8_t* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_s8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_s8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -90249,7 +90249,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_i16(size_t cou
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_i16(size_t count, const int16_t* from, int16_t* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_i16(size_t count, const int16_t* __restrict__ from, int16_t* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_s16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_s16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -91335,9 +91335,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_l
         __builtin_memcpy(&third, from + leading + 2, sizeof third);
         const half_vector duplicated = {third, third, third, third, third, third, third, third};
         const half_vector upper = (half_vector)__builtin_shufflevector((byte_vector)duplicated, (byte_vector)zero, 0, 8, 1, 9, 2, 10, 3, 11);
-        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)upper, 0, 4, 1, 5);
+        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)upper, 0, 4, -1, -1);
       } else {
-        trailing = (half_vector)__builtin_shufflevector((byte_vector)lower, (byte_vector)zero, 0, 1, 8, 9, 2, 3, 10, 11);
+        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)zero, 0, 4, -1, -1);
       }
     } else if (count & 1) {
       uint8_t single;
@@ -91429,9 +91429,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_l
         __builtin_memcpy(&third, from + leading + 2, sizeof third);
         const half_vector duplicated = {third, third, third, third, third, third, third, third};
         const half_vector upper = (half_vector)__builtin_shufflevector((byte_vector)duplicated, (byte_vector)zero, 0, 8, 1, 9, 2, 10, 3, 11);
-        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)upper, 0, 4, 1, 5);
+        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)upper, 0, 4, -1, -1);
       } else {
-        trailing = (half_vector)__builtin_shufflevector((byte_vector)lower, (byte_vector)zero, 0, 1, 8, 9, 2, 3, 10, 11);
+        trailing = (half_vector)__builtin_shufflevector((short_vector)lower, (short_vector)zero, 0, 4, -1, -1);
       }
     } else if (count & 1) {
       int8_t single;
@@ -102409,7 +102409,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_i32(size_t cou
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_i32(size_t count, const int32_t* from, int32_t* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_i32(size_t count, const int32_t* __restrict__ from, int32_t* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_s32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_s32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -114942,7 +114942,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_i64(size_t cou
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_i64(size_t count, const int64_t* from, int64_t* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_i64(size_t count, const int64_t* __restrict__ from, int64_t* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_s64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_s64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -127922,7 +127922,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_f32(size_t cou
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_f32(size_t count, const float* from, float* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_f32(size_t count, const float* __restrict__ from, float* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_f32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_f32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -139519,7 +139519,7 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_f64(size_t cou
   }
 #endif
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_f64(size_t count, const double* from, double* to) {
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_f64(size_t count, const double* __restrict__ from, double* __restrict__ to) {
 #if CVECTORIZATION_OPS_NEON == 2
   __builtin_sve_svst1_f64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(count)), to, __builtin_sve_svld1_f64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(count)), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -142239,8 +142239,8 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_f16(cvectorization
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_f16(size_t count, uint16_t value, void* to) {
   cvectorization_ops_store_repeating_u16(count, value, (uint16_t*)to);
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_f16(size_t count, const void* from, void* to) {
-  cvectorization_ops_copy_u16(count, (const uint16_t*)from, (uint16_t*)to);
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_f16(size_t count, const void* __restrict__ from, void* __restrict__ to) {
+  cvectorization_ops_copy_u16(count, (const uint16_t* __restrict__)from, (uint16_t* __restrict__)to);
 }
 CVECTORIZATION_OPS_INLINE size_t cvectorization_ops_store_compressed_f16(cvectorization_ops_raw_vector_f16 rawA, cvectorization_ops_raw_mask_f16 rawMask, void* to) {
   return cvectorization_ops_store_compressed_u16((cvectorization_ops_raw_vector_u16)rawA, (cvectorization_ops_raw_mask_u16)rawMask, (uint16_t*)to);
@@ -142943,8 +142943,8 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_where_bf16(cvectorizatio
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_repeating_bf16(size_t count, uint16_t value, void* to) {
   cvectorization_ops_store_repeating_u16(count, value, (uint16_t*)to);
 }
-CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_bf16(size_t count, const void* from, void* to) {
-  cvectorization_ops_copy_u16(count, (const uint16_t*)from, (uint16_t*)to);
+CVECTORIZATION_OPS_INLINE void cvectorization_ops_copy_bf16(size_t count, const void* __restrict__ from, void* __restrict__ to) {
+  cvectorization_ops_copy_u16(count, (const uint16_t* __restrict__)from, (uint16_t* __restrict__)to);
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_compressed_bits_bf16(cvectorization_ops_raw_vector_bf16 rawA, const uint8_t* bits) {
   return (cvectorization_ops_raw_vector_bf16)cvectorization_ops_compressed_bits_u16((cvectorization_ops_raw_vector_u16)rawA, bits);

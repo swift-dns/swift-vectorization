@@ -252,6 +252,48 @@ public func highwayLoadFirstU16ConstantCount(from: UnsafePointer<UInt16>) -> SIM
 }
 
 @inline(never)
+public func portLoadFirstU16ConstantCountTwo(
+    from: UnsafePointer<SIMDUInt16.Lane>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirst(from: from, count: 2)
+}
+
+@inline(never)
+public func highwayLoadFirstU16ConstantCountTwo(from: UnsafePointer<UInt16>) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(raw: HighwayReference.Nothrow.loadFirstU16(from, 2))
+}
+
+@inline(never)
+public func portLoadFirstU16ConstantCountLaneCount(
+    from: UnsafePointer<SIMDUInt16.Lane>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirst(from: from, count: SIMDUInt16.laneCount)
+}
+
+@inline(never)
+public func highwayLoadFirstU16ConstantCountLaneCount(
+    from: UnsafePointer<UInt16>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(raw: HighwayReference.Nothrow.loadFirstU16(from, SIMDUInt16.laneCount))
+}
+
+@inline(never)
+public func portLoadFirstU16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<SIMDUInt16.Lane>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirst(from: from, count: 2 * SIMDUInt16.laneCount)
+}
+
+@inline(never)
+public func highwayLoadFirstU16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<UInt16>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(
+        raw: HighwayReference.Nothrow.loadFirstU16(from, 2 * SIMDUInt16.laneCount)
+    )
+}
+
+@inline(never)
 public func portLoadRepeatingBlockU16(from: UnsafePointer<SIMDUInt16.Lane>) -> SIMDUInt16.Vector {
     unsafe SIMDUInt16.loadRepeatingBlock(from: from)
 }
@@ -380,6 +422,68 @@ public func highwayLoadFirstOtherwiseU16ConstantOtherwise(
 }
 
 @inline(never)
+public func portLoadFirstOtherwiseU16ConstantCountTwo(
+    from: UnsafePointer<SIMDUInt16.Lane>,
+    otherwise: SIMDUInt16.Vector
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirst(from: from, count: 2, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayLoadFirstOtherwiseU16ConstantCountTwo(
+    from: UnsafePointer<UInt16>,
+    otherwise: SIMDUInt16.Vector
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(
+        raw: HighwayReference.Nothrow.loadFirstOtherwiseU16(otherwise.raw, from, 2)
+    )
+}
+
+@inline(never)
+public func portLoadFirstOtherwiseU16ConstantCountLaneCount(
+    from: UnsafePointer<SIMDUInt16.Lane>,
+    otherwise: SIMDUInt16.Vector
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirst(from: from, count: SIMDUInt16.laneCount, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayLoadFirstOtherwiseU16ConstantCountLaneCount(
+    from: UnsafePointer<UInt16>,
+    otherwise: SIMDUInt16.Vector
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(
+        raw: HighwayReference.Nothrow.loadFirstOtherwiseU16(
+            otherwise.raw,
+            from,
+            SIMDUInt16.laneCount
+        )
+    )
+}
+
+@inline(never)
+public func portLoadFirstOtherwiseU16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<SIMDUInt16.Lane>,
+    otherwise: SIMDUInt16.Vector
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirst(from: from, count: 2 * SIMDUInt16.laneCount, otherwise: otherwise)
+}
+
+@inline(never)
+public func highwayLoadFirstOtherwiseU16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<UInt16>,
+    otherwise: SIMDUInt16.Vector
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(
+        raw: HighwayReference.Nothrow.loadFirstOtherwiseU16(
+            otherwise.raw,
+            from,
+            2 * SIMDUInt16.laneCount
+        )
+    )
+}
+
+@inline(never)
 public func portLoadingUpperHalfU16(
     _ a: SIMDUInt16.Vector,
     from: UnsafePointer<SIMDUInt16.Lane>
@@ -480,4 +584,50 @@ public func highwayLoadFirstWideningU8ToU16ConstantCount(
     from: UnsafePointer<UInt8>
 ) -> SIMDUInt16.Vector {
     unsafe SIMDUInt16.Vector(raw: HighwayReference.Nothrow.loadFirstWideningU8ToU16(from, 1))
+}
+
+@inline(never)
+public func portLoadFirstWideningU8ToU16ConstantCountTwo(
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirstWidening(from: from, count: 2)
+}
+
+@inline(never)
+public func highwayLoadFirstWideningU8ToU16ConstantCountTwo(
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(raw: HighwayReference.Nothrow.loadFirstWideningU8ToU16(from, 2))
+}
+
+@inline(never)
+public func portLoadFirstWideningU8ToU16ConstantCountLaneCount(
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirstWidening(from: from, count: SIMDUInt16.laneCount)
+}
+
+@inline(never)
+public func highwayLoadFirstWideningU8ToU16ConstantCountLaneCount(
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(
+        raw: HighwayReference.Nothrow.loadFirstWideningU8ToU16(from, SIMDUInt16.laneCount)
+    )
+}
+
+@inline(never)
+public func portLoadFirstWideningU8ToU16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.loadFirstWidening(from: from, count: 2 * SIMDUInt16.laneCount)
+}
+
+@inline(never)
+public func highwayLoadFirstWideningU8ToU16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<UInt8>
+) -> SIMDUInt16.Vector {
+    unsafe SIMDUInt16.Vector(
+        raw: HighwayReference.Nothrow.loadFirstWideningU8ToU16(from, 2 * SIMDUInt16.laneCount)
+    )
 }
