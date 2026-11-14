@@ -27536,6 +27536,12 @@ func zipWidens(_ source: Element, _ result: Element) -> Bool {
     source.category == result.category && result.bits == 2 * source.bits
 }
 
+func zipLowerWidens(_ source: Element, _ result: Element) -> Bool {
+    zipWidens(source, result)
+        || (source.category == .float16 && result.category == .float
+            && result.bits == 2 * source.bits)
+}
+
 func zipInterleaved(upper: Bool, from source: Element, to result: Element) -> String {
     let indices = unpackIndices(
         lanes: source.blockLaneCount,
@@ -27559,9 +27565,10 @@ func zipSveInterleaved(_ name: String, from source: Element, to result: Element)
 func zipOp(
     _ swiftName: String,
     _ highwayName: String,
-    upper: Bool
+    upper: Bool,
+    accepting accepts: @escaping (Element, Element) -> Bool
 ) -> [Op] {
-    sourcedOps(accepting: zipWidens) { source, results in
+    sourcedOps(accepting: accepts, includingHalfPrecision: true) { source, results in
         Op(
             swiftName,
             highwayName,
@@ -27583,8 +27590,8 @@ func zipOp(
 }
 
 let zipOps: [Op] =
-    zipOp("zippingLower", "ZipLower", upper: false)
-    + zipOp("zippingUpper", "ZipUpper", upper: true)
+    zipOp("zippingLower", "ZipLower", upper: false, accepting: zipLowerWidens)
+    + zipOp("zippingUpper", "ZipUpper", upper: true, accepting: zipWidens)
 
 func halvesOfWidth(_ source: Element, _ result: Element) -> Bool {
     source.bits == 2 * result.bits

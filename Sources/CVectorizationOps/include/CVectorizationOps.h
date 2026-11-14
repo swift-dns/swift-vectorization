@@ -146309,6 +146309,23 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_z
   return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, b, 0, 4, 1, 5));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_zipping_lower_f16_to_f32(cvectorization_ops_raw_vector_f16 rawA, cvectorization_ops_raw_vector_f16 rawB) {
+  const cvectorization_ops_vector_f16 a = (cvectorization_ops_vector_f16)rawA;
+  const cvectorization_ops_vector_f16 b = (cvectorization_ops_vector_f16)rawB;
+#if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f16)(cvectorization_ops_sve_f16)__builtin_sve_svzip1_f16((cvectorization_ops_sve_splat_f16(a) ? __builtin_sve_svdup_n_f16(a[0]) : (__SVFloat16_t)(cvectorization_ops_sve_f16)a), (cvectorization_ops_sve_splat_f16(b) ? __builtin_sve_svdup_n_f16(b[0]) : (__SVFloat16_t)(cvectorization_ops_sve_f16)b)));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 2, 18, 3, 19, 8, 24, 9, 25, 10, 26, 11, 27));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 2, 18, 3, 19, 8, 24, 9, 25, 10, 26, 11, 27));
+#else
+  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 8, 1, 9, 2, 10, 3, 11));
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_zipping_upper_u8_to_u16(cvectorization_ops_raw_vector_u8 rawA, cvectorization_ops_raw_vector_u8 rawB) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;

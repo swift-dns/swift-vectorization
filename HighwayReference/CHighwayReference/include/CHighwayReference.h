@@ -16284,6 +16284,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 zippingLowerI8ToI16(cvectorization_
 HWY_INLINE cvectorization_ops_raw_vector_i32 zippingLowerI16ToI32(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) { return toPortI32(hn::ZipLower(TagI32(), fromPortI16(a), fromPortI16(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 zippingLowerI32ToI64(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) { return toPortI64(hn::ZipLower(TagI64(), fromPortI32(a), fromPortI32(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 zippingLowerF32ToF64(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) { return toPortF64(hn::ZipLower(TagF64(), fromPortF32(a), fromPortF32(b))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 zippingLowerF16ToF32(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) { return toPortF32(hn::ZipLower(TagF32(), fromPortF16(a), fromPortF16(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 zippingUpperU8ToU16(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) { return toPortU16(hn::ZipUpper(TagU16(), fromPortU8(a), fromPortU8(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 zippingUpperU16ToU32(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) { return toPortU32(hn::ZipUpper(TagU32(), fromPortU16(a), fromPortU16(b))); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 zippingUpperU32ToU64(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) { return toPortU64(hn::ZipUpper(TagU64(), fromPortU32(a), fromPortU32(b))); }
@@ -27792,6 +27793,7 @@ HWY_INLINE cvectorization_ops_raw_vector_i16 zippingLowerI8ToI16(cvectorization_
 HWY_INLINE cvectorization_ops_raw_vector_i32 zippingLowerI16ToI32(cvectorization_ops_raw_vector_i16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::zippingLowerI16ToI32(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_i64 zippingLowerI32ToI64(cvectorization_ops_raw_vector_i32 a, cvectorization_ops_raw_vector_i32 b) noexcept { return ::HighwayReference::zippingLowerI32ToI64(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 zippingLowerF32ToF64(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b) noexcept { return ::HighwayReference::zippingLowerF32ToF64(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 zippingLowerF16ToF32(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b) noexcept { return ::HighwayReference::zippingLowerF16ToF32(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 zippingUpperU8ToU16(cvectorization_ops_raw_vector_u8 a, cvectorization_ops_raw_vector_u8 b) noexcept { return ::HighwayReference::zippingUpperU8ToU16(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_u32 zippingUpperU16ToU32(cvectorization_ops_raw_vector_u16 a, cvectorization_ops_raw_vector_u16 b) noexcept { return ::HighwayReference::zippingUpperU16ToU32(a, b); }
 HWY_INLINE cvectorization_ops_raw_vector_u64 zippingUpperU32ToU64(cvectorization_ops_raw_vector_u32 a, cvectorization_ops_raw_vector_u32 b) noexcept { return ::HighwayReference::zippingUpperU32ToU64(a, b); }

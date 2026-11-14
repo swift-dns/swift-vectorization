@@ -1489,4 +1489,12 @@ extension SIMDFloat {
         cvectorization_ops_vector_widening_odd_bf16_to_f32(a.raw)
     }
 
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func zippingLower(_ a: SIMDFloat16.Vector, _ b: SIMDFloat16.Vector) -> Vector {
+        cvectorization_ops_zipping_lower_f16_to_f32(a, b)
+    }
+
+    #endif
 }
