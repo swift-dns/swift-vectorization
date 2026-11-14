@@ -255,3 +255,31 @@ public func highwayVectorWideningQuarterI8ToI32(
 ) -> SIMDInt32.Vector {
     SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningQuarterI8ToI32(a.raw))
 }
+
+@inline(never)
+public func portVectorWideningLowerHalfU8ToI32(
+    wideningLower a: SIMDUInt8.HalfVector
+) -> SIMDInt32.Vector {
+    SIMDInt32.vector(wideningLower: a)
+}
+
+@inline(never)
+public func highwayVectorWideningLowerHalfU8ToI32(
+    wideningLower a: SIMDUInt8.HalfVector
+) -> SIMDInt32.Vector {
+    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerHalfU8ToI32(a.raw))
+}
+
+@inline(never)
+public func portVectorWideningLowerHalfI8ToI32(
+    wideningLower a: SIMDInt8.HalfVector
+) -> SIMDInt32.Vector {
+    SIMDInt32.vector(wideningLower: a)
+}
+
+@inline(never)
+public func highwayVectorWideningLowerHalfI8ToI32(
+    wideningLower a: SIMDInt8.HalfVector
+) -> SIMDInt32.Vector {
+    SIMDInt32.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerHalfI8ToI32(a.raw))
+}

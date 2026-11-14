@@ -519,3 +519,59 @@ public func highwayVectorWideningInRangeHalfF32ToI64(
 ) -> SIMDInt64.Vector {
     SIMDInt64.Vector(raw: HighwayReference.Nothrow.vectorWideningInRangeHalfF32ToI64(a.raw))
 }
+
+@inline(never)
+public func portVectorWideningLowerHalfU16ToI64(
+    wideningLower a: SIMDUInt16.HalfVector
+) -> SIMDInt64.Vector {
+    SIMDInt64.vector(wideningLower: a)
+}
+
+@inline(never)
+public func highwayVectorWideningLowerHalfU16ToI64(
+    wideningLower a: SIMDUInt16.HalfVector
+) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerHalfU16ToI64(a.raw))
+}
+
+@inline(never)
+public func portVectorWideningLowerHalfI16ToI64(
+    wideningLower a: SIMDInt16.HalfVector
+) -> SIMDInt64.Vector {
+    SIMDInt64.vector(wideningLower: a)
+}
+
+@inline(never)
+public func highwayVectorWideningLowerHalfI16ToI64(
+    wideningLower a: SIMDInt16.HalfVector
+) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerHalfI16ToI64(a.raw))
+}
+
+@inline(never)
+public func portVectorWideningLowerQuarterU8ToI64(
+    wideningLower a: SIMDUInt8.QuarterVector
+) -> SIMDInt64.Vector {
+    SIMDInt64.vector(wideningLower: a)
+}
+
+@inline(never)
+public func highwayVectorWideningLowerQuarterU8ToI64(
+    wideningLower a: SIMDUInt8.QuarterVector
+) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerQuarterU8ToI64(a.raw))
+}
+
+@inline(never)
+public func portVectorWideningLowerQuarterI8ToI64(
+    wideningLower a: SIMDInt8.QuarterVector
+) -> SIMDInt64.Vector {
+    SIMDInt64.vector(wideningLower: a)
+}
+
+@inline(never)
+public func highwayVectorWideningLowerQuarterI8ToI64(
+    wideningLower a: SIMDInt8.QuarterVector
+) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(raw: HighwayReference.Nothrow.vectorWideningLowerQuarterI8ToI64(a.raw))
+}

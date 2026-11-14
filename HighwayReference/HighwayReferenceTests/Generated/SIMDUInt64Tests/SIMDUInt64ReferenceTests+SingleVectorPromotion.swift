@@ -231,4 +231,32 @@ extension SIMDUInt64ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func vectorWideningLowerFromHalfUInt16() {
+        let mismatches = Mismatches("vectorWideningLowerFromHalfUInt16")
+        let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0xD298_CF22_0555_4393)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                H.Vector(raw: HighwayReference.vectorWideningLowerHalfU16ToU64(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromQuarterUInt8() {
+        let mismatches = Mismatches("vectorWideningLowerFromQuarterUInt8")
+        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x877C_166F_725E_EE35)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                H.Vector(raw: HighwayReference.vectorWideningLowerQuarterU8ToU64(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

@@ -221,4 +221,20 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
     #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorWideningLowerFromHalfFloat16() {
+        let mismatches = Mismatches("vectorWideningLowerFromHalfFloat16")
+        let aInputs = Inputs.conversions(SIMDFloat16.HalfVector.self, seed: 0xB409_89A5_F802_4A7C)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                H.vector(wideningLower: a),
+                HighwayReference.vectorWideningLowerHalfF16ToF64(a.raw),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+    #endif
 }

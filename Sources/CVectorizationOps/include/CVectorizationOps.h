@@ -179252,6 +179252,82 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_m
   return (cvectorization_ops_raw_vector_f16)cvectorization_ops_combining_u16((cvectorization_ops_raw_half_vector_u16)cvectorization_ops_half_vector_converting_f32_to_f16(cvectorization_ops_multiplying_by_power_of2_i32_to_f32(cvectorization_ops_vector_widening_upper_f16_to_f32(rawA), cvectorization_ops_vector_widening_upper_i16_to_i32(rawB))), (cvectorization_ops_raw_half_vector_u16)cvectorization_ops_half_vector_converting_f32_to_f16(cvectorization_ops_multiplying_by_power_of2_i32_to_f32(cvectorization_ops_vector_widening_lower_f16_to_f32(rawA), cvectorization_ops_vector_widening_lower_i16_to_i32(rawB))));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_vector_widening_lower_half_vector_u8_to_u32(cvectorization_ops_raw_half_vector_u8 rawA) {
+  const cvectorization_ops_raw_half_vector_u8 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_u8_to_u32((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_quarter_vector_u8_to_u32((cvectorization_ops_raw_quarter_vector_u8)cvectorization_ops_resize_half_vector_to_quarter_vector((cvectorization_ops_register_half_vector)a));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_vector_widening_lower_half_vector_u8_to_i32(cvectorization_ops_raw_half_vector_u8 rawA) {
+  const cvectorization_ops_raw_half_vector_u8 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_u8_to_i32((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_quarter_vector_u8_to_i32((cvectorization_ops_raw_quarter_vector_u8)cvectorization_ops_resize_half_vector_to_quarter_vector((cvectorization_ops_register_half_vector)a));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_vector_widening_lower_half_vector_u16_to_u64(cvectorization_ops_raw_half_vector_u16 rawA) {
+  const cvectorization_ops_raw_half_vector_u16 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_u16_to_u64((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_quarter_vector_u16_to_u64((cvectorization_ops_raw_quarter_vector_u16)cvectorization_ops_resize_half_vector_to_quarter_vector((cvectorization_ops_register_half_vector)a));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_lower_half_vector_u16_to_i64(cvectorization_ops_raw_half_vector_u16 rawA) {
+  const cvectorization_ops_raw_half_vector_u16 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_u16_to_i64((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_quarter_vector_u16_to_i64((cvectorization_ops_raw_quarter_vector_u16)cvectorization_ops_resize_half_vector_to_quarter_vector((cvectorization_ops_register_half_vector)a));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_vector_widening_lower_half_vector_i8_to_i32(cvectorization_ops_raw_half_vector_i8 rawA) {
+  const cvectorization_ops_raw_half_vector_i8 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_i8_to_i32((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_quarter_vector_i8_to_i32((cvectorization_ops_raw_quarter_vector_i8)cvectorization_ops_resize_half_vector_to_quarter_vector((cvectorization_ops_register_half_vector)a));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_lower_half_vector_i16_to_i64(cvectorization_ops_raw_half_vector_i16 rawA) {
+  const cvectorization_ops_raw_half_vector_i16 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_i16_to_i64((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_quarter_vector_i16_to_i64((cvectorization_ops_raw_quarter_vector_i16)cvectorization_ops_resize_half_vector_to_quarter_vector((cvectorization_ops_register_half_vector)a));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_lower_half_vector_f16_to_f64(cvectorization_ops_raw_half_vector_f16 rawA) {
+  const cvectorization_ops_raw_half_vector_f16 a = rawA;
+  return cvectorization_ops_vector_widening_quarter_vector_f16_to_f64((cvectorization_ops_raw_quarter_vector_f16)cvectorization_ops_resize_half_vector_to_quarter_vector((cvectorization_ops_register_half_vector)a));
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_vector_widening_lower_quarter_vector_u8_to_u64(cvectorization_ops_raw_quarter_vector_u8 rawA) {
+  const cvectorization_ops_raw_quarter_vector_u8 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_u8_to_u64((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_eighth_vector_u8_to_u64((cvectorization_ops_raw_eighth_vector_u8)cvectorization_ops_resize_quarter_vector_to_eighth_vector((cvectorization_ops_register_quarter_vector)a));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_lower_quarter_vector_u8_to_i64(cvectorization_ops_raw_quarter_vector_u8 rawA) {
+  const cvectorization_ops_raw_quarter_vector_u8 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_u8_to_i64((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_eighth_vector_u8_to_i64((cvectorization_ops_raw_eighth_vector_u8)cvectorization_ops_resize_quarter_vector_to_eighth_vector((cvectorization_ops_register_quarter_vector)a));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_lower_quarter_vector_i8_to_i64(cvectorization_ops_raw_quarter_vector_i8 rawA) {
+  const cvectorization_ops_raw_quarter_vector_i8 a = rawA;
+#if CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 4
+  return cvectorization_ops_x86_promote_i8_to_i64((cvectorization_ops_x86_block_i64)a);
+#else
+  return cvectorization_ops_vector_widening_eighth_vector_i8_to_i64((cvectorization_ops_raw_eighth_vector_i8)cvectorization_ops_resize_quarter_vector_to_eighth_vector((cvectorization_ops_register_quarter_vector)a));
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_vector_widening_half_vector_bf16_to_f32(cvectorization_ops_raw_half_vector_bf16 rawA) {
   const cvectorization_ops_raw_half_vector_bf16 a = rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32

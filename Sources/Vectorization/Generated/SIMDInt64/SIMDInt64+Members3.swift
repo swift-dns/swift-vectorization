@@ -1677,6 +1677,26 @@ extension SIMDInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func vector(wideningLower a: SIMDUInt16.HalfVector) -> Vector {
+        Vector(raw: cvectorization_ops_vector_widening_lower_half_vector_u16_to_i64(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func vector(wideningLower a: SIMDInt16.HalfVector) -> Vector {
+        Vector(raw: cvectorization_ops_vector_widening_lower_half_vector_i16_to_i64(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func vector(wideningLower a: SIMDUInt8.QuarterVector) -> Vector {
+        Vector(raw: cvectorization_ops_vector_widening_lower_quarter_vector_u8_to_i64(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func vector(wideningLower a: SIMDInt8.QuarterVector) -> Vector {
+        Vector(raw: cvectorization_ops_vector_widening_lower_quarter_vector_i8_to_i64(a.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func zippingLower(_ a: SIMDInt32.Vector, _ b: SIMDInt32.Vector) -> Vector {
         Vector(raw: cvectorization_ops_zipping_lower_i32_to_i64(a.raw, b.raw))
     }

@@ -31528,6 +31528,52 @@ let promoteNarrowOps: [Op] =
     [Shape.half, .quarter, .eighth].flatMap { promoteNarrowFamily($0, inRange: false) }
     + promoteNarrowFamily(.half, inRange: true)
 
+func promoteLowerNarrowAccepts(_ shape: Shape) -> (Element, Element) -> Bool {
+    { source, result in
+        (promotes(source, to: result) || (source.category == .float16 && result.category == .float))
+            && source.laneCount(of: shape) == 2 * result.laneCount
+    }
+}
+
+func promoteLowerNarrowFamily(_ shape: Shape) -> [Op] {
+    let lowerHalf = Shape.allCases.first { $0.fraction == 2 * (shape.fraction ?? 1) }!
+    return sourcedOps(accepting: promoteLowerNarrowAccepts(shape), includingHalfPrecision: true) {
+        source,
+        results in
+        let x86 = sourced(source) { source, result in
+            source.isHalfPrecision
+                ? nil : promoteX86(of: "a", inRange: false, from: source, to: result)
+        }
+        return Op(
+            "vector",
+            "PromoteLowerTo",
+            [.tag, .sourceNarrowVector(shape)],
+            .vector,
+            results,
+            section: .singleVectorPromotion,
+            vectorLabels: ["wideningLower"],
+            source: source,
+            targets: TargetBodies(avx2: x86, sse2: x86),
+            portable: sourced(source) { source, result in
+                let resized = resizedRegisterName(from: shape, to: lowerHalf, zeroExtending: false)
+                let operand =
+                    "(\(source.cRawVector(of: lowerHalf)))\(resized)((\(registerType(of: shape)))a)"
+                let promoted = float16ComposedCall(
+                    promoteNarrowOps + float16PromotionOpList,
+                    "PromoteTo",
+                    from: source,
+                    to: result,
+                    [operand],
+                    shape: lowerHalf
+                )
+                return "return \(promoted);"
+            }
+        )
+    }
+}
+
+let promoteLowerNarrowOps: [Op] = [Shape.half, .quarter].flatMap(promoteLowerNarrowFamily)
+
 func fixedPointDuplicates(from source: Element, to result: Element) -> String {
     let indices = laneIndices((0..<result.laneCount).flatMap { [$0, $0] })
     return ["a", "b"].map {
@@ -34636,12 +34682,13 @@ func float16ComposedCall(
     _ highwayName: String,
     from source: Element,
     to result: Element,
-    _ arguments: [String]
+    _ arguments: [String],
+    shape: Shape = .full
 ) -> String {
     guard
         let op = ops.first(where: {
             $0.highwayName == highwayName && $0.source?.suffix == source.suffix
-                && $0.applies.matches(result) && $0.sourceShape == .full
+                && $0.applies.matches(result) && $0.sourceShape == shape
         })
     else {
         fatalError("There is no \(highwayName) from \(source.swiftType) to \(result.swiftType)")
@@ -37215,7 +37262,8 @@ let float16ArithmeticOps: [Op] = float16ArithmeticIdentifiers.map { identifier i
 let ops =
     (basicOps + signAndComparisonOps + cryptoOps + maskOps + swizzleOps + compressOps
     + lookupSizes.map(lookupOp) + maskedOps + immediateOps + memoryOps + conversionOps
-    + widenArithmeticOps + narrowOps + convertFloat16Ops + bfloat16ConvertOps + float16ArithmeticOps)
+    + widenArithmeticOps + narrowOps + convertFloat16Ops + promoteLowerNarrowOps
+    + bfloat16ConvertOps + float16ArithmeticOps)
     .map(extendedToHalfPrecision).map(extendedToFloat)
 
 // A widening load reads lanes of a narrower element type and promotes each of them to the

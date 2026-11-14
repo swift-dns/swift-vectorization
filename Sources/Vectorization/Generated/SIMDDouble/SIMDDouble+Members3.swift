@@ -1468,6 +1468,15 @@ extension SIMDDouble {
 
     #endif
 
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func vector(wideningLower a: SIMDFloat16.HalfVector) -> Vector {
+        cvectorization_ops_vector_widening_lower_half_vector_f16_to_f64(a.raw)
+    }
+
+    #endif
+
     @export(implementation) @inline(always)
     public static func zippingLower(_ a: SIMDFloat.Vector, _ b: SIMDFloat.Vector) -> Vector {
         cvectorization_ops_zipping_lower_f32_to_f64(a, b)

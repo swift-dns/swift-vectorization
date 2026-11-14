@@ -24003,6 +24003,16 @@ hn::MulByPow2(fromPortF16(a), fromPortI16(b))
 hn::Combine(TagF16(), hn::DemoteTo(HalfTagF16(), hn::MulByPow2(hn::PromoteUpperTo(hn::Repartition<float, TagF16>(), fromPortF16(a)), hn::PromoteUpperTo(hn::RebindToSigned<hn::Repartition<float, TagF16>>(), fromPortI16(b)))), hn::DemoteTo(HalfTagF16(), hn::MulByPow2(hn::PromoteLowerTo(hn::Repartition<float, TagF16>(), fromPortF16(a)), hn::PromoteLowerTo(hn::RebindToSigned<hn::Repartition<float, TagF16>>(), fromPortI16(b)))))
 #endif
 ); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 vectorWideningLowerHalfU8ToU32(cvectorization_ops_raw_half_vector_u8 a) { return toPortU32(hn::PromoteLowerTo(TagU32(), halfFromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 vectorWideningLowerHalfU8ToI32(cvectorization_ops_raw_half_vector_u8 a) { return toPortI32(hn::PromoteLowerTo(TagI32(), halfFromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 vectorWideningLowerHalfU16ToU64(cvectorization_ops_raw_half_vector_u16 a) { return toPortU64(hn::PromoteLowerTo(TagU64(), halfFromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 vectorWideningLowerHalfU16ToI64(cvectorization_ops_raw_half_vector_u16 a) { return toPortI64(hn::PromoteLowerTo(TagI64(), halfFromPortU16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 vectorWideningLowerHalfI8ToI32(cvectorization_ops_raw_half_vector_i8 a) { return toPortI32(hn::PromoteLowerTo(TagI32(), halfFromPortI8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 vectorWideningLowerHalfI16ToI64(cvectorization_ops_raw_half_vector_i16 a) { return toPortI64(hn::PromoteLowerTo(TagI64(), halfFromPortI16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 vectorWideningLowerHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) { return toPortF64(hn::PromoteLowerTo(TagF64(), halfFromPortF16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 vectorWideningLowerQuarterU8ToU64(cvectorization_ops_raw_quarter_vector_u8 a) { return toPortU64(hn::PromoteLowerTo(TagU64(), quarterFromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 vectorWideningLowerQuarterU8ToI64(cvectorization_ops_raw_quarter_vector_u8 a) { return toPortI64(hn::PromoteLowerTo(TagI64(), quarterFromPortU8(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 vectorWideningLowerQuarterI8ToI64(cvectorization_ops_raw_quarter_vector_i8 a) { return toPortI64(hn::PromoteLowerTo(TagI64(), quarterFromPortI8(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorWideningHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) { return toPortF32(hn::PromoteTo(TagF32(), halfFromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorWideningLowerBF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(hn::PromoteLowerTo(TagF32(), fromPortBF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorWideningUpperBF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(hn::PromoteUpperTo(TagF32(), fromPortBF16(a))); }
@@ -30179,6 +30189,16 @@ HWY_INLINE cvectorization_ops_raw_vector_f16 vectorConvertingWhereI16ToF16(cvect
 HWY_INLINE cvectorization_ops_raw_vector_f32 sumsOf2F16ToF32(cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::sumsOf2F16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_u16 biasedExponentF16ToU16(cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::biasedExponentF16ToU16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 multiplyingByPowerOf2I16ToF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_i16 b) noexcept { return ::HighwayReference::multiplyingByPowerOf2I16ToF16(a, b); }
+HWY_INLINE cvectorization_ops_raw_vector_u32 vectorWideningLowerHalfU8ToU32(cvectorization_ops_raw_half_vector_u8 a) noexcept { return ::HighwayReference::vectorWideningLowerHalfU8ToU32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 vectorWideningLowerHalfU8ToI32(cvectorization_ops_raw_half_vector_u8 a) noexcept { return ::HighwayReference::vectorWideningLowerHalfU8ToI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 vectorWideningLowerHalfU16ToU64(cvectorization_ops_raw_half_vector_u16 a) noexcept { return ::HighwayReference::vectorWideningLowerHalfU16ToU64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 vectorWideningLowerHalfU16ToI64(cvectorization_ops_raw_half_vector_u16 a) noexcept { return ::HighwayReference::vectorWideningLowerHalfU16ToI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i32 vectorWideningLowerHalfI8ToI32(cvectorization_ops_raw_half_vector_i8 a) noexcept { return ::HighwayReference::vectorWideningLowerHalfI8ToI32(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 vectorWideningLowerHalfI16ToI64(cvectorization_ops_raw_half_vector_i16 a) noexcept { return ::HighwayReference::vectorWideningLowerHalfI16ToI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 vectorWideningLowerHalfF16ToF64(cvectorization_ops_raw_half_vector_f16 a) noexcept { return ::HighwayReference::vectorWideningLowerHalfF16ToF64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_u64 vectorWideningLowerQuarterU8ToU64(cvectorization_ops_raw_quarter_vector_u8 a) noexcept { return ::HighwayReference::vectorWideningLowerQuarterU8ToU64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 vectorWideningLowerQuarterU8ToI64(cvectorization_ops_raw_quarter_vector_u8 a) noexcept { return ::HighwayReference::vectorWideningLowerQuarterU8ToI64(a); }
+HWY_INLINE cvectorization_ops_raw_vector_i64 vectorWideningLowerQuarterI8ToI64(cvectorization_ops_raw_quarter_vector_i8 a) noexcept { return ::HighwayReference::vectorWideningLowerQuarterI8ToI64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorWideningHalfBF16ToF32(cvectorization_ops_raw_half_vector_bf16 a) noexcept { return ::HighwayReference::vectorWideningHalfBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorWideningLowerBF16ToF32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorWideningLowerBF16ToF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 vectorWideningUpperBF16ToF32(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::vectorWideningUpperBF16ToF32(a); }
