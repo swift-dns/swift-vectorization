@@ -74,8 +74,7 @@ jobs:
             release-tests: true
             sde-cpu: ""
             base: *ssse3
-          - &avx2
-            name: AVX2
+          - name: AVX2
             expected-target: AVX2
             runner: ubuntu-latest
             flags: "-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul -Xcc -D__MM_MALLOC_H"
@@ -91,7 +90,6 @@ jobs:
             debug-tests: false
             release-tests: true
             sde-cpu: ""
-            base: *avx2
           - &avx3
             name: AVX3
             expected-target: AVX3
