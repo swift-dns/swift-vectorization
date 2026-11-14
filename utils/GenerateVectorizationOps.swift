@@ -16138,6 +16138,7 @@ struct MaskedFamily {
     var sveArithmetic: SveMaskedArithmetic?
     var sveZeroedBuiltin: String?
     var selectsByPredicateOnSVE: Applies?
+    var selectsByBytesOnNEON = false
 }
 
 func maskedExpression(
@@ -16165,6 +16166,16 @@ func maskedSelecting(_ operation: String, merging: Bool, for element: Element) -
         [rawName("mask"), "(\(raw))\(operation)"]
         + (merging ? ["(\(raw))otherwise"] : [])
     return "return \(selecting)(\(operands.joined(separator: ", ")));"
+}
+
+func neonMaskedSelectingByBytes(_ operation: String, for element: Element) -> String {
+    let bytes = unsignedElement(bits: 8).at(width: element.width)
+    let selecting = cFunctionName("selectingOrZero", bytes)
+    let operands = [
+        "(\(bytes.cRawMask))\(rawName("mask"))",
+        "(\(bytes.cRawVector))\(operation)",
+    ]
+    return "return (\(element.cRawVector))\(selecting)(\(operands.joined(separator: ", ")));"
 }
 
 func sveMaskedComparison(of family: MaskedFamily, for element: Element) -> String? {
@@ -16454,6 +16465,11 @@ func maskedFamilyTargets(_ family: MaskedFamily, merging: Bool) -> TargetBodies<
     if let name = family.svePredicatedUnary {
         targets.sve2_128 = { element in sveMaskedUnary(name, merging: merging, for: element) }
     }
+    if family.selectsByBytesOnNEON && !merging {
+        targets.neon = { element in
+            neonMaskedSelectingByBytes(maskedExpression(of: family, for: element), for: element)
+        }
+    }
     if let arithmetic = family.sveArithmetic {
         targets.sve2_128 = { element in
             sveMaskedArithmetic(arithmetic, merging: merging, for: element)
@@ -16680,7 +16696,8 @@ let maskedFamilies: [MaskedFamily] = [
         applies: .float,
         zeroed: "MaskedSqrt",
         merged: "MaskedSqrtOr",
-        svePredicatedUnary: "sqrt"
+        svePredicatedUnary: "sqrt",
+        selectsByBytesOnNEON: true
     ),
     MaskedFamily(
         swiftName: "minimum",

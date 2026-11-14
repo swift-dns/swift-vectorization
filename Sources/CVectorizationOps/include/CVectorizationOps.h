@@ -124258,6 +124258,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
 #if CVECTORIZATION_OPS_NEON == 2
   const __SVBool_t active = __builtin_sve_svcmpne_n_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)rawMask, 0);
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsqrt_f32_z(active, (cvectorization_ops_sve_f32)a));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_f32)cvectorization_ops_selecting_or_zero_u8((cvectorization_ops_raw_mask_u8)rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_f32)cvectorization_ops_square_root_f32((cvectorization_ops_raw_vector_f32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)(unsigned short)__builtin_ia32_cvtd2mask512((cvectorization_ops_x86_i32)mask), (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_square_root_f32((cvectorization_ops_raw_vector_f32)a), (cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}));
 #else
@@ -136367,6 +136369,8 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
 #if CVECTORIZATION_OPS_NEON == 2
   const __SVBool_t active = __builtin_sve_svcmpne_n_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)rawMask, 0);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsqrt_f64_z(active, (cvectorization_ops_sve_f64)a));
+#elif CVECTORIZATION_OPS_NEON
+  return (cvectorization_ops_raw_vector_f64)cvectorization_ops_selecting_or_zero_u8((cvectorization_ops_raw_mask_u8)rawMask, (cvectorization_ops_raw_vector_u8)(cvectorization_ops_vector_f64)cvectorization_ops_square_root_f64((cvectorization_ops_raw_vector_f64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_selectpd_512((unsigned char)(unsigned char)__builtin_ia32_cvtq2mask512((cvectorization_ops_x86_i64)mask), (cvectorization_ops_x86_f64)(cvectorization_ops_vector_f64)cvectorization_ops_square_root_f64((cvectorization_ops_raw_vector_f64)a), (cvectorization_ops_x86_f64)(cvectorization_ops_x86_f64){0}));
 #else
