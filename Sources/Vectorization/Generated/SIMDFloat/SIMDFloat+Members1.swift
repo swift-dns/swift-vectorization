@@ -24,6 +24,16 @@ extension SIMDFloat {
     }
 
     @export(implementation) @inline(always)
+    public static func nan() -> Vector {
+        cvectorization_ops_nan_f32()
+    }
+
+    @export(implementation) @inline(always)
+    public static func infinity() -> Vector {
+        cvectorization_ops_infinity_f32()
+    }
+
+    @export(implementation) @inline(always)
     public static func unspecified() -> Vector {
         cvectorization_ops_unspecified_f32()
     }

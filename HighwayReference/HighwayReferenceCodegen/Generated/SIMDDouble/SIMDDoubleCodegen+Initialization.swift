@@ -64,6 +64,26 @@ public func highwaySignBitF64() -> SIMDDouble.Vector {
 }
 
 @inline(never)
+public func portNanF64() -> SIMDDouble.Vector {
+    SIMDDouble.nan()
+}
+
+@inline(never)
+public func highwayNanF64() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.nanF64()
+}
+
+@inline(never)
+public func portInfinityF64() -> SIMDDouble.Vector {
+    SIMDDouble.infinity()
+}
+
+@inline(never)
+public func highwayInfinityF64() -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.infinityF64()
+}
+
+@inline(never)
 public func portUnspecifiedF64() -> SIMDDouble.Vector {
     SIMDDouble.unspecified()
 }

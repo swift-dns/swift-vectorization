@@ -6,6 +6,11 @@ public import CVectorizationOps
 @available(SwiftStdlib 5.3, *)
 extension SIMDFloat16 {
     @export(implementation) @inline(always)
+    public static func interleavingLower(_ a: Vector, _ b: Vector) -> Vector {
+        cvectorization_ops_interleaving_lower_f16(a, b)
+    }
+
+    @export(implementation) @inline(always)
     public static func interleavingUpper(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_interleaving_upper_f16(a, b)
     }

@@ -32,6 +32,18 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func nan() {
+        let mismatches = Mismatches("nan")
+        mismatches.check(H.nan(), HighwayReference.nanF16(), "")
+        mismatches.record()
+    }
+
+    @Test func infinity() {
+        let mismatches = Mismatches("infinity")
+        mismatches.check(H.infinity(), HighwayReference.infinityF16(), "")
+        mismatches.record()
+    }
+
     @Test func unspecified() {
         let mismatches = Mismatches("unspecified")
         _ = H.unspecified()

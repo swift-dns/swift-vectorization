@@ -31,6 +31,18 @@ extension SIMDBFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func nan() {
+        let mismatches = Mismatches("nan")
+        mismatches.check(H.nan(), H.Vector(raw: HighwayReference.nanBF16()), "")
+        mismatches.record()
+    }
+
+    @Test func infinity() {
+        let mismatches = Mismatches("infinity")
+        mismatches.check(H.infinity(), H.Vector(raw: HighwayReference.infinityBF16()), "")
+        mismatches.record()
+    }
+
     @Test func unspecified() {
         let mismatches = Mismatches("unspecified")
         _ = H.unspecified()

@@ -12151,6 +12151,8 @@ HWY_INLINE void storeInterleaved2F32(cvectorization_ops_raw_vector_f32 a, cvecto
 HWY_INLINE void storeInterleaved3F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c, float* to) { hn::StoreInterleaved3(fromPortF32(a), fromPortF32(b), fromPortF32(c), TagF32(), to); }
 HWY_INLINE void storeInterleaved4F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c, cvectorization_ops_raw_vector_f32 d, float* to) { hn::StoreInterleaved4(fromPortF32(a), fromPortF32(b), fromPortF32(c), fromPortF32(d), TagF32(), to); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 signBitF32() { return toPortF32(hn::SignBit(TagF32())); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 nanF32() { return toPortF32(hn::NaN(TagF32())); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 infinityF32() { return toPortF32(hn::Inf(TagF32())); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 unspecifiedF32() { return toPortF32(hn::Undefined(TagF32())); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 zeroingNegativeF32(cvectorization_ops_raw_vector_f32 a) { return toPortF32(hn::ZeroIfNegative(fromPortF32(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 selectingIfNegativeF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::IfNegativeThenElse(fromPortF32(a), fromPortF32(b), fromPortF32(c))); }
@@ -13039,6 +13041,8 @@ HWY_INLINE void storeInterleaved2F64(cvectorization_ops_raw_vector_f64 a, cvecto
 HWY_INLINE void storeInterleaved3F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c, double* to) { hn::StoreInterleaved3(fromPortF64(a), fromPortF64(b), fromPortF64(c), TagF64(), to); }
 HWY_INLINE void storeInterleaved4F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c, cvectorization_ops_raw_vector_f64 d, double* to) { hn::StoreInterleaved4(fromPortF64(a), fromPortF64(b), fromPortF64(c), fromPortF64(d), TagF64(), to); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 signBitF64() { return toPortF64(hn::SignBit(TagF64())); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 nanF64() { return toPortF64(hn::NaN(TagF64())); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 infinityF64() { return toPortF64(hn::Inf(TagF64())); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 unspecifiedF64() { return toPortF64(hn::Undefined(TagF64())); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 zeroingNegativeF64(cvectorization_ops_raw_vector_f64 a) { return toPortF64(hn::ZeroIfNegative(fromPortF64(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 selectingIfNegativeF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) { return toPortF64(hn::IfNegativeThenElse(fromPortF64(a), fromPortF64(b), fromPortF64(c))); }
@@ -13866,6 +13870,8 @@ HWY_INLINE void storeInterleaved2F16(cvectorization_ops_raw_vector_f16 a, cvecto
 HWY_INLINE void storeInterleaved3F16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c, void* to) { hn::StoreInterleaved3(fromPortF16(a), fromPortF16(b), fromPortF16(c), TagF16(), reinterpret_cast<hwy::float16_t*>(to)); }
 HWY_INLINE void storeInterleaved4F16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c, cvectorization_ops_raw_vector_f16 d, void* to) { hn::StoreInterleaved4(fromPortF16(a), fromPortF16(b), fromPortF16(c), fromPortF16(d), TagF16(), reinterpret_cast<hwy::float16_t*>(to)); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 signBitF16() { return toPortF16(hn::SignBit(TagF16())); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 nanF16() { return toPortF16(hn::NaN(TagF16())); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 infinityF16() { return toPortF16(hn::Inf(TagF16())); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 unspecifiedF16() { return toPortF16(hn::Undefined(TagF16())); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 zeroingNegativeF16(cvectorization_ops_raw_vector_f16 a) { return toPortF16(hn::ZeroIfNegative(fromPortF16(a))); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 selectingIfNegativeF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c) { return toPortF16(hn::IfNegativeThenElse(fromPortF16(a), fromPortF16(b), fromPortF16(c))); }
@@ -15407,6 +15413,8 @@ HWY_INLINE void storeInterleaved2BF16(cvectorization_ops_raw_vector_bf16 a, cvec
 HWY_INLINE void storeInterleaved3BF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_bf16 c, void* to) { hn::StoreInterleaved3(fromPortBF16(a), fromPortBF16(b), fromPortBF16(c), TagBF16(), reinterpret_cast<hwy::bfloat16_t*>(to)); }
 HWY_INLINE void storeInterleaved4BF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_bf16 c, cvectorization_ops_raw_vector_bf16 d, void* to) { hn::StoreInterleaved4(fromPortBF16(a), fromPortBF16(b), fromPortBF16(c), fromPortBF16(d), TagBF16(), reinterpret_cast<hwy::bfloat16_t*>(to)); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 signBitBF16() { return toPortBF16(hn::SignBit(TagBF16())); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 nanBF16() { return toPortBF16(hn::NaN(TagBF16())); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 infinityBF16() { return toPortBF16(hn::Inf(TagBF16())); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 unspecifiedBF16() { return toPortBF16(hn::Undefined(TagBF16())); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 zeroingNegativeBF16(cvectorization_ops_raw_vector_bf16 a) { return toPortBF16(
 #if HWY_TARGET_IS_SVE && !HWY_SVE_HAVE_BF16_FEATURE
@@ -26370,6 +26378,8 @@ HWY_INLINE void storeInterleaved2F32(cvectorization_ops_raw_vector_f32 a, cvecto
 HWY_INLINE void storeInterleaved3F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c, float* to) noexcept { ::HighwayReference::storeInterleaved3F32(a, b, c, to); }
 HWY_INLINE void storeInterleaved4F32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c, cvectorization_ops_raw_vector_f32 d, float* to) noexcept { ::HighwayReference::storeInterleaved4F32(a, b, c, d, to); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 signBitF32() noexcept { return ::HighwayReference::signBitF32(); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 nanF32() noexcept { return ::HighwayReference::nanF32(); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 infinityF32() noexcept { return ::HighwayReference::infinityF32(); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 unspecifiedF32() noexcept { return ::HighwayReference::unspecifiedF32(); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 zeroingNegativeF32(cvectorization_ops_raw_vector_f32 a) noexcept { return ::HighwayReference::zeroingNegativeF32(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 selectingIfNegativeF32(cvectorization_ops_raw_vector_f32 a, cvectorization_ops_raw_vector_f32 b, cvectorization_ops_raw_vector_f32 c) noexcept { return ::HighwayReference::selectingIfNegativeF32(a, b, c); }
@@ -26660,6 +26670,8 @@ HWY_INLINE void storeInterleaved2F64(cvectorization_ops_raw_vector_f64 a, cvecto
 HWY_INLINE void storeInterleaved3F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c, double* to) noexcept { ::HighwayReference::storeInterleaved3F64(a, b, c, to); }
 HWY_INLINE void storeInterleaved4F64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c, cvectorization_ops_raw_vector_f64 d, double* to) noexcept { ::HighwayReference::storeInterleaved4F64(a, b, c, d, to); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 signBitF64() noexcept { return ::HighwayReference::signBitF64(); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 nanF64() noexcept { return ::HighwayReference::nanF64(); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 infinityF64() noexcept { return ::HighwayReference::infinityF64(); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 unspecifiedF64() noexcept { return ::HighwayReference::unspecifiedF64(); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 zeroingNegativeF64(cvectorization_ops_raw_vector_f64 a) noexcept { return ::HighwayReference::zeroingNegativeF64(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f64 selectingIfNegativeF64(cvectorization_ops_raw_vector_f64 a, cvectorization_ops_raw_vector_f64 b, cvectorization_ops_raw_vector_f64 c) noexcept { return ::HighwayReference::selectingIfNegativeF64(a, b, c); }
@@ -26901,6 +26913,8 @@ HWY_INLINE void storeInterleaved2F16(cvectorization_ops_raw_vector_f16 a, cvecto
 HWY_INLINE void storeInterleaved3F16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c, void* to) noexcept { ::HighwayReference::storeInterleaved3F16(a, b, c, to); }
 HWY_INLINE void storeInterleaved4F16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c, cvectorization_ops_raw_vector_f16 d, void* to) noexcept { ::HighwayReference::storeInterleaved4F16(a, b, c, d, to); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 signBitF16() noexcept { return ::HighwayReference::signBitF16(); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 nanF16() noexcept { return ::HighwayReference::nanF16(); }
+HWY_INLINE cvectorization_ops_raw_vector_f16 infinityF16() noexcept { return ::HighwayReference::infinityF16(); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 unspecifiedF16() noexcept { return ::HighwayReference::unspecifiedF16(); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 zeroingNegativeF16(cvectorization_ops_raw_vector_f16 a) noexcept { return ::HighwayReference::zeroingNegativeF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_f16 selectingIfNegativeF16(cvectorization_ops_raw_vector_f16 a, cvectorization_ops_raw_vector_f16 b, cvectorization_ops_raw_vector_f16 c) noexcept { return ::HighwayReference::selectingIfNegativeF16(a, b, c); }
@@ -27143,6 +27157,8 @@ HWY_INLINE void storeInterleaved2BF16(cvectorization_ops_raw_vector_bf16 a, cvec
 HWY_INLINE void storeInterleaved3BF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_bf16 c, void* to) noexcept { ::HighwayReference::storeInterleaved3BF16(a, b, c, to); }
 HWY_INLINE void storeInterleaved4BF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_bf16 c, cvectorization_ops_raw_vector_bf16 d, void* to) noexcept { ::HighwayReference::storeInterleaved4BF16(a, b, c, d, to); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 signBitBF16() noexcept { return ::HighwayReference::signBitBF16(); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 nanBF16() noexcept { return ::HighwayReference::nanBF16(); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 infinityBF16() noexcept { return ::HighwayReference::infinityBF16(); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 unspecifiedBF16() noexcept { return ::HighwayReference::unspecifiedBF16(); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 zeroingNegativeBF16(cvectorization_ops_raw_vector_bf16 a) noexcept { return ::HighwayReference::zeroingNegativeBF16(a); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 selectingIfNegativeBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_bf16 c) noexcept { return ::HighwayReference::selectingIfNegativeBF16(a, b, c); }

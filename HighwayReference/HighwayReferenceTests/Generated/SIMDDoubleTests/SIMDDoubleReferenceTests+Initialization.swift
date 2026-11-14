@@ -40,6 +40,18 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func nan() {
+        let mismatches = Mismatches("nan")
+        mismatches.check(H.nan(), HighwayReference.nanF64(), "")
+        mismatches.record()
+    }
+
+    @Test func infinity() {
+        let mismatches = Mismatches("infinity")
+        mismatches.check(H.infinity(), HighwayReference.infinityF64(), "")
+        mismatches.record()
+    }
+
     @Test func unspecified() {
         let mismatches = Mismatches("unspecified")
         _ = H.unspecified()

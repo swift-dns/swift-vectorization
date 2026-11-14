@@ -120443,6 +120443,32 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x80000000, 0x80000000, 0x80000000, 0x80000000}));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_nan_f32(void) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}));
+#else
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_infinity_f32(void) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000}));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000}));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000}));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000}));
+#else
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)((cvectorization_ops_vector_u32){0x7f800000, 0x7f800000, 0x7f800000, 0x7f800000}));
+#endif
+}
 #if CVECTORIZATION_OPS_NEON == 2
 __attribute__((__clang_arm_builtin_alias(__builtin_sve_svundef_f32))) __SVFloat32_t cvectorization_ops_sve_undefined_f32(void);
 #endif
@@ -132548,6 +132574,32 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x8000000000000000, 0x8000000000000000}));
 #endif
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_nan_f64(void) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff}));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff}));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff}));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff, 0x7fffffffffffffff}));
+#else
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7fffffffffffffff, 0x7fffffffffffffff}));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_infinity_f64(void) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000}));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000}));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000}));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000, 0x7ff0000000000000}));
+#else
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_vector_u64){0x7ff0000000000000, 0x7ff0000000000000}));
+#endif
+}
 #if CVECTORIZATION_OPS_NEON == 2
 __attribute__((__clang_arm_builtin_alias(__builtin_sve_svundef_f64))) __SVFloat64_t cvectorization_ops_sve_undefined_f64(void);
 #endif
@@ -139938,6 +139990,32 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_f16(cvector
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_sign_bit_f16(void) {
   return (cvectorization_ops_raw_vector_f16)cvectorization_ops_sign_bit_u16();
 }
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_nan_f16(void) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#else
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_infinity_f16(void) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00}));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00}));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00}));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00}));
+#else
+  return (cvectorization_ops_raw_vector_f16)((cvectorization_ops_vector_f16)((cvectorization_ops_vector_u16){0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00, 0x7c00}));
+#endif
+}
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_unspecified_f16(void) {
   return (cvectorization_ops_raw_vector_f16)cvectorization_ops_unspecified_u16();
 }
@@ -140769,6 +140847,32 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_bf16(cvecto
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_sign_bit_bf16(void) {
   return (cvectorization_ops_raw_vector_bf16)cvectorization_ops_sign_bit_u16();
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_nan_bf16(void) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#else
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff, 0x7fff}));
+#endif
+}
+CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_infinity_bf16(void) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80}));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80}));
+#elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80}));
+#elif CVECTORIZATION_OPS_X86 == 4
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80}));
+#else
+  return (cvectorization_ops_raw_vector_bf16)((cvectorization_ops_vector_bf16)((cvectorization_ops_vector_u16){0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80, 0x7f80}));
+#endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_bf16 cvectorization_ops_unspecified_bf16(void) {
   return (cvectorization_ops_raw_vector_bf16)cvectorization_ops_unspecified_u16();

@@ -19,6 +19,16 @@ extension SIMDBFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func nan() -> Vector {
+        Vector(raw: cvectorization_ops_nan_bf16())
+    }
+
+    @export(implementation) @inline(always)
+    public static func infinity() -> Vector {
+        Vector(raw: cvectorization_ops_infinity_bf16())
+    }
+
+    @export(implementation) @inline(always)
     public static func unspecified() -> Vector {
         Vector(raw: cvectorization_ops_unspecified_bf16())
     }

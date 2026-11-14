@@ -1613,10 +1613,5 @@ extension SIMDFloat16 {
         }
     }
 
-    @export(implementation) @inline(always)
-    public static func interleavingLower(_ a: Vector, _ b: Vector) -> Vector {
-        cvectorization_ops_interleaving_lower_f16(a, b)
-    }
-
 }
 #endif

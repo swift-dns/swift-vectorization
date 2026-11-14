@@ -752,6 +752,8 @@ public protocol SIMDFloatElement: SIMDElement {
     static func isFinite(_ a: Vector) -> Mask
     static func smallestOrNaN(_ a: Vector) -> Lane
     static func largestOrNaN(_ a: Vector) -> Lane
+    static func nan() -> Vector
+    static func infinity() -> Vector
     static func zeroingNegative(_ a: Vector) -> Vector
     static func selectingIfNegative(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
     static func selectingIfNegativeOrZero(_ a: Vector, _ b: Vector) -> Vector

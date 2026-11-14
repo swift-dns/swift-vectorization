@@ -45,6 +45,26 @@ public func highwaySignBitF16() -> SIMDFloat16.Vector {
 }
 
 @inline(never)
+public func portNanF16() -> SIMDFloat16.Vector {
+    SIMDFloat16.nan()
+}
+
+@inline(never)
+public func highwayNanF16() -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.nanF16()
+}
+
+@inline(never)
+public func portInfinityF16() -> SIMDFloat16.Vector {
+    SIMDFloat16.infinity()
+}
+
+@inline(never)
+public func highwayInfinityF16() -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.infinityF16()
+}
+
+@inline(never)
 public func portUnspecifiedF16() -> SIMDFloat16.Vector {
     SIMDFloat16.unspecified()
 }

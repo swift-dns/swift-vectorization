@@ -46,6 +46,26 @@ public func highwaySignBitBF16() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
+public func portNanBF16() -> SIMDBFloat16.Vector {
+    SIMDBFloat16.nan()
+}
+
+@inline(never)
+public func highwayNanBF16() -> SIMDBFloat16.Vector {
+    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.nanBF16())
+}
+
+@inline(never)
+public func portInfinityBF16() -> SIMDBFloat16.Vector {
+    SIMDBFloat16.infinity()
+}
+
+@inline(never)
+public func highwayInfinityBF16() -> SIMDBFloat16.Vector {
+    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.infinityBF16())
+}
+
+@inline(never)
 public func portUnspecifiedBF16() -> SIMDBFloat16.Vector {
     SIMDBFloat16.unspecified()
 }

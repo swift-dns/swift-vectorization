@@ -303,6 +303,7 @@ struct Applies {
     static let signed = Applies(categories: [.signedInteger], bits: nil)
     static let float = Applies(categories: [.float], bits: nil)
     static let signedOrFloat = Applies(categories: [.signedInteger, .float], bits: nil)
+    static let floatOrHalfPrecision = Applies(categories: [.float, .float16, .bfloat16], bits: nil)
 
     static func integer(bits: Set<Int>) -> Applies {
         Applies(categories: [.unsignedInteger, .signedInteger], bits: bits)
@@ -1544,10 +1545,26 @@ func x86Avx3RoundingShiftedRightBySame(for element: Element) -> String {
     return roundingShiftedRightBySame(unscaled: { _ in selected }, for: element)
 }
 
+func nanBits(of element: Element) -> UInt64 {
+    (UInt64(1) << UInt64(element.bits - 1)) - 1
+}
+
+func infinityBits(of element: Element) -> UInt64 {
+    (UInt64(1) << UInt64(element.bits - 1)) - (UInt64(1) << UInt64(mantissaBits(of: element)))
+}
+
 func scalarNaN(of element: Element) -> String {
-    let bits = (UInt64(1) << UInt64(element.bits - 1)) - 1
-    let literal = "(\(element.cUnsignedLane))0x\(String(bits, radix: 16))"
+    let literal = "(\(element.cUnsignedLane))0x\(String(nanBits(of: element), radix: 16))"
     return "__builtin_bit_cast(\(element.cType), \(literal))"
+}
+
+func repeatingBits(_ bits: UInt64, for element: Element) -> String {
+    let lanes = splat(
+        "0x\(String(bits, radix: 16))",
+        as: element.cUnsignedVector,
+        lanes: element.laneCount
+    )
+    return vectorResult(fromUnsignedBits(lanes, of: element), for: element)
 }
 
 func reducedExtremumOrNaN(_ name: String, isNaN: String, for element: Element) -> String {
@@ -12196,7 +12213,7 @@ func x86MultiplyingByFloorPowerOf2(for element: Element) -> String {
 
 func mantissaBits(of element: Element) -> Int {
     switch element.bits {
-    case 16: return 10
+    case 16: return element.category == .bfloat16 ? 7 : 10
     case 32: return 23
     default: return 52
     }
@@ -17350,6 +17367,19 @@ func extremum128Targets(minimum: Bool, upper: Bool) -> TargetBodies<Element> {
 let signAndComparisonOps: [Op] = [
     Op("signBit", "SignBit", [.tag], .vector, .all, section: .initialization) { element in
         vectorResult(fromUnsignedBits(signBitMask(for: element), of: element), for: element)
+    },
+    Op("nan", "NaN", [.tag], .vector, .floatOrHalfPrecision, section: .initialization) { element in
+        repeatingBits(nanBits(of: element), for: element)
+    },
+    Op(
+        "infinity",
+        "Inf",
+        [.tag],
+        .vector,
+        .floatOrHalfPrecision,
+        section: .initialization
+    ) { element in
+        repeatingBits(infinityBits(of: element), for: element)
     },
     Op(
         "unspecified",

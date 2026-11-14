@@ -38,6 +38,18 @@ extension SIMDBFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func nan() {
+        let mismatches = Mismatches("portNanBF16")
+        mismatches.check(portNanBF16(), highwayNanBF16(), "")
+        mismatches.record()
+    }
+
+    @Test func infinity() {
+        let mismatches = Mismatches("portInfinityBF16")
+        mismatches.check(portInfinityBF16(), highwayInfinityBF16(), "")
+        mismatches.record()
+    }
+
     @Test func unspecified() {
         let mismatches = Mismatches("portUnspecifiedBF16")
         _ = portUnspecifiedBF16()
