@@ -41672,7 +41672,8 @@ func swiftArgument(
 ) -> String {
     switch parameter {
     case .tag, .sourceTag, .narrowTag, .sourceNarrowTag: return ""
-    case .shiftAmount, .immediate: return "Int32(truncatingIfNeeded: \(binding.swiftName))"
+    case .shiftAmount: return "Int32(clamping: \(binding.swiftName))"
+    case .immediate: return "Int32(truncatingIfNeeded: \(binding.swiftName))"
     default: return rawArgument(binding.swiftName, parameter, for: element, source: source)
     }
 }

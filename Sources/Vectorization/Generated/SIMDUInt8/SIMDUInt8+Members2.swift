@@ -1080,11 +1080,7 @@ extension SIMDUInt8 {
     @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int, where mask: Mask) -> Vector {
         Vector(
-            raw: cvectorization_ops_shifted_left_where_u8(
-                mask.raw,
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
+            raw: cvectorization_ops_shifted_left_where_u8(mask.raw, a.raw, Int32(clamping: bits))
         )
     }
 
@@ -1100,7 +1096,7 @@ extension SIMDUInt8 {
                 otherwise.raw,
                 mask.raw,
                 a.raw,
-                Int32(truncatingIfNeeded: bits)
+                Int32(clamping: bits)
             )
         )
     }
@@ -1108,11 +1104,7 @@ extension SIMDUInt8 {
     @export(implementation) @inline(always)
     public static func shiftedRight(_ a: Vector, by bits: Int, where mask: Mask) -> Vector {
         Vector(
-            raw: cvectorization_ops_shifted_right_where_u8(
-                mask.raw,
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
+            raw: cvectorization_ops_shifted_right_where_u8(mask.raw, a.raw, Int32(clamping: bits))
         )
     }
 
@@ -1128,7 +1120,7 @@ extension SIMDUInt8 {
                 otherwise.raw,
                 mask.raw,
                 a.raw,
-                Int32(truncatingIfNeeded: bits)
+                Int32(clamping: bits)
             )
         )
     }
@@ -2127,6 +2119,11 @@ extension SIMDUInt8 {
     @export(implementation) @inline(always)
     public static func eighthVector(resizing a: SIMDInt8.HalfVector) -> EighthVector {
         EighthVector(raw: cvectorization_ops_eighth_vector_resizing_half_vector_i8_to_u8(a.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func vector(resizing a: SIMDInt8.QuarterVector) -> Vector {
+        Vector(raw: cvectorization_ops_vector_resizing_quarter_vector_i8_to_u8(a.raw))
     }
 
 }

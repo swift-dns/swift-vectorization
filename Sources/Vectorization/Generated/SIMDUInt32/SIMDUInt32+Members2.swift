@@ -1297,11 +1297,7 @@ extension SIMDUInt32 {
     @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int, where mask: Mask) -> Vector {
         Vector(
-            raw: cvectorization_ops_shifted_left_where_u32(
-                mask.raw,
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
+            raw: cvectorization_ops_shifted_left_where_u32(mask.raw, a.raw, Int32(clamping: bits))
         )
     }
 
@@ -1317,7 +1313,7 @@ extension SIMDUInt32 {
                 otherwise.raw,
                 mask.raw,
                 a.raw,
-                Int32(truncatingIfNeeded: bits)
+                Int32(clamping: bits)
             )
         )
     }
@@ -1325,11 +1321,7 @@ extension SIMDUInt32 {
     @export(implementation) @inline(always)
     public static func shiftedRight(_ a: Vector, by bits: Int, where mask: Mask) -> Vector {
         Vector(
-            raw: cvectorization_ops_shifted_right_where_u32(
-                mask.raw,
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
+            raw: cvectorization_ops_shifted_right_where_u32(mask.raw, a.raw, Int32(clamping: bits))
         )
     }
 
@@ -1345,7 +1337,7 @@ extension SIMDUInt32 {
                 otherwise.raw,
                 mask.raw,
                 a.raw,
-                Int32(truncatingIfNeeded: bits)
+                Int32(clamping: bits)
             )
         )
     }

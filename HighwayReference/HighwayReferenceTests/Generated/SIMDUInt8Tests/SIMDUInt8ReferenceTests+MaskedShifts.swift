@@ -364,11 +364,7 @@ extension SIMDUInt8ReferenceTests {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask),
                 H.Vector(
-                    raw: HighwayReference.shiftedLeftWhereU8(
-                        mask.raw,
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
             )
@@ -396,11 +392,7 @@ extension SIMDUInt8ReferenceTests {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask),
                 H.Vector(
-                    raw: HighwayReference.shiftedLeftWhereU8(
-                        mask.raw,
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
             )
@@ -422,11 +414,7 @@ extension SIMDUInt8ReferenceTests {
             mismatches.check(
                 H.shiftedLeft(a, by: bits, where: mask),
                 H.Vector(
-                    raw: HighwayReference.shiftedLeftWhereU8(
-                        mask.raw,
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.shiftedLeftWhereU8(mask.raw, a.raw, Int32(clamping: bits))
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
             )
@@ -454,7 +442,7 @@ extension SIMDUInt8ReferenceTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -489,7 +477,7 @@ extension SIMDUInt8ReferenceTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -518,7 +506,7 @@ extension SIMDUInt8ReferenceTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -544,7 +532,7 @@ extension SIMDUInt8ReferenceTests {
                     raw: HighwayReference.shiftedRightWhereU8(
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -576,7 +564,7 @@ extension SIMDUInt8ReferenceTests {
                     raw: HighwayReference.shiftedRightWhereU8(
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -602,7 +590,7 @@ extension SIMDUInt8ReferenceTests {
                     raw: HighwayReference.shiftedRightWhereU8(
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -631,7 +619,7 @@ extension SIMDUInt8ReferenceTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -666,7 +654,7 @@ extension SIMDUInt8ReferenceTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -695,7 +683,7 @@ extension SIMDUInt8ReferenceTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"

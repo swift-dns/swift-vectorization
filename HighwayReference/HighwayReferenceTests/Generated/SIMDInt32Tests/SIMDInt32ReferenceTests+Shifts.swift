@@ -13,9 +13,7 @@ extension SIMDInt32ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftI32(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.shiftedLeftI32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -35,9 +33,7 @@ extension SIMDInt32ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftI32(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.shiftedLeftI32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -51,9 +47,7 @@ extension SIMDInt32ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedRightI32(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.shiftedRightI32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -73,9 +67,7 @@ extension SIMDInt32ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedRightI32(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.shiftedRightI32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -216,10 +208,7 @@ extension SIMDInt32ReferenceTests {
             mismatches.check(
                 H.roundingShiftedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.roundingShiftedRightI32(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.roundingShiftedRightI32(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a)), bits: \(bits)"
             )
@@ -241,10 +230,7 @@ extension SIMDInt32ReferenceTests {
             mismatches.check(
                 H.roundingShiftedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.roundingShiftedRightI32(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.roundingShiftedRightI32(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a)), bits: \(bits)"
             )
@@ -343,9 +329,7 @@ extension SIMDInt32ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedLeftI32(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.rotatedLeftI32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -365,9 +349,7 @@ extension SIMDInt32ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedLeftI32(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.rotatedLeftI32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -381,9 +363,7 @@ extension SIMDInt32ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedRightI32(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.rotatedRightI32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -403,9 +383,7 @@ extension SIMDInt32ReferenceTests {
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedRightI32(a.raw, Int32(truncatingIfNeeded: bits))
-                ),
+                H.Vector(raw: HighwayReference.rotatedRightI32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a)), bits: \(bits)"
             )
         }

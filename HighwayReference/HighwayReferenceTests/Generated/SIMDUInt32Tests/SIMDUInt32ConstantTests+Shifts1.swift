@@ -14,10 +14,7 @@ extension SIMDUInt32ConstantTests {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.shiftedLeftTemplateU32(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.shiftedLeftTemplateU32(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )
@@ -161,10 +158,7 @@ extension SIMDUInt32ConstantTests {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.shiftedRightTemplateU32(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.shiftedRightTemplateU32(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )
@@ -645,7 +639,7 @@ extension SIMDUInt32ConstantTests {
                 H.Vector(
                     raw: HighwayReference.roundingShiftedRightTemplateU32(
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "a: \(describe(a))"
@@ -1012,10 +1006,7 @@ extension SIMDUInt32ConstantTests {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.rotatedLeftTemplateU32(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.rotatedLeftTemplateU32(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )

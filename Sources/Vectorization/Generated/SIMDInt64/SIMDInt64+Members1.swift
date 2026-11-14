@@ -385,12 +385,12 @@ extension SIMDInt64 {
 
     @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_shifted_left_i64(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_shifted_left_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
     public static func shiftedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_shifted_right_i64(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_shifted_right_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -410,12 +410,7 @@ extension SIMDInt64 {
 
     @export(implementation) @inline(always)
     public static func roundingShiftedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(
-            raw: cvectorization_ops_rounding_shifted_right_i64(
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
-        )
+        Vector(raw: cvectorization_ops_rounding_shifted_right_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -430,12 +425,12 @@ extension SIMDInt64 {
 
     @export(implementation) @inline(always)
     public static func rotatedLeft(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_rotated_left_i64(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_rotated_left_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
     public static func rotatedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_rotated_right_i64(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_rotated_right_i64(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)

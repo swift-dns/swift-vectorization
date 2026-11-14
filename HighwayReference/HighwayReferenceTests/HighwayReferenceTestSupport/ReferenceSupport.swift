@@ -644,7 +644,8 @@ package enum Inputs {
         guard !inContract else { return Array(0..<bits) }
         let candidates = [
             bits, bits + 1, 2 * bits, 31, 32, 33, 63, 64, 65, 127, 128, 255, 256, -1, -2, -bits,
-            Int(Int32.max), Int(Int32.min),
+            Int(Int32.max), Int(Int32.min), Int(Int32.max) &+ 1, Int(Int32.min) &- 1, Int.max,
+            Int.min,
         ]
         return candidates.reduce(into: []) { unique, amount in
             if (amount < 0 || amount >= bits) && !unique.contains(amount) {
@@ -662,7 +663,10 @@ package enum Inputs {
         let bits = V.Scalar.bitWidth
         func lane(_ amount: Int) -> V.Scalar { V.Scalar(truncatingIfNeeded: amount) }
         func inRange() -> V.Scalar { lane(Int(generator.next() % UInt64(bits))) }
-        let amounts = inContract ? Array(0..<bits) : shiftAmounts(bits: bits, inContract: false)
+        let amounts =
+            inContract
+            ? Array(0..<bits)
+            : shiftAmounts(bits: bits, inContract: false).filter { Int32(exactly: $0) != nil }
         let splats = amounts.map { V(repeating: lane($0)) }
         let rotations = amounts.indices.map { offset in
             V((0..<V.scalarCount).map { lane(amounts[($0 + offset) % amounts.count]) })

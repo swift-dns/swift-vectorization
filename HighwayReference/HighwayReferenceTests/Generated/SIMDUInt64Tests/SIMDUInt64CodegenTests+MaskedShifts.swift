@@ -327,8 +327,8 @@ extension SIMDUInt64CodegenTests {
             seed: 0xA2DE_DDEB_82E6_9D49
         ) {
             mismatches.check(
-                portShiftedLeftWhereU64(a, by: Int32(truncatingIfNeeded: bits), where: mask),
-                highwayShiftedLeftWhereU64(a, by: Int32(truncatingIfNeeded: bits), where: mask),
+                portShiftedLeftWhereU64(a, by: Int32(clamping: bits), where: mask),
+                highwayShiftedLeftWhereU64(a, by: Int32(clamping: bits), where: mask),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -341,11 +341,8 @@ extension SIMDUInt64CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 64, inContract: true)
         for (mask, bits) in everyPair(maskInputs, bitsInputs) {
             mismatches.check(
-                portShiftedLeftWhereU64ConstantA(by: Int32(truncatingIfNeeded: bits), where: mask),
-                highwayShiftedLeftWhereU64ConstantA(
-                    by: Int32(truncatingIfNeeded: bits),
-                    where: mask
-                ),
+                portShiftedLeftWhereU64ConstantA(by: Int32(clamping: bits), where: mask),
+                highwayShiftedLeftWhereU64ConstantA(by: Int32(clamping: bits), where: mask),
                 "mask: \(describe(mask)), bits: \(bits)"
             )
         }
@@ -382,13 +379,13 @@ extension SIMDUInt64CodegenTests {
             mismatches.check(
                 portShiftedLeftWhereOtherwiseU64(
                     a,
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask,
                     otherwise: otherwise
                 ),
                 highwayShiftedLeftWhereOtherwiseU64(
                     a,
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask,
                     otherwise: otherwise
                 ),
@@ -411,12 +408,12 @@ extension SIMDUInt64CodegenTests {
         ) {
             mismatches.check(
                 portShiftedLeftWhereOtherwiseU64ConstantA(
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask,
                     otherwise: otherwise
                 ),
                 highwayShiftedLeftWhereOtherwiseU64ConstantA(
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask,
                     otherwise: otherwise
                 ),
@@ -464,12 +461,12 @@ extension SIMDUInt64CodegenTests {
             mismatches.check(
                 portShiftedLeftWhereOtherwiseU64ConstantOtherwise(
                     a,
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask
                 ),
                 highwayShiftedLeftWhereOtherwiseU64ConstantOtherwise(
                     a,
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
@@ -490,8 +487,8 @@ extension SIMDUInt64CodegenTests {
             seed: 0x3EB9_7503_AA2E_220E
         ) {
             mismatches.check(
-                portShiftedRightWhereU64(a, by: Int32(truncatingIfNeeded: bits), where: mask),
-                highwayShiftedRightWhereU64(a, by: Int32(truncatingIfNeeded: bits), where: mask),
+                portShiftedRightWhereU64(a, by: Int32(clamping: bits), where: mask),
+                highwayShiftedRightWhereU64(a, by: Int32(clamping: bits), where: mask),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
             )
         }
@@ -504,11 +501,8 @@ extension SIMDUInt64CodegenTests {
         let bitsInputs = Inputs.shiftAmounts(bits: 64, inContract: true)
         for (mask, bits) in everyPair(maskInputs, bitsInputs) {
             mismatches.check(
-                portShiftedRightWhereU64ConstantA(by: Int32(truncatingIfNeeded: bits), where: mask),
-                highwayShiftedRightWhereU64ConstantA(
-                    by: Int32(truncatingIfNeeded: bits),
-                    where: mask
-                ),
+                portShiftedRightWhereU64ConstantA(by: Int32(clamping: bits), where: mask),
+                highwayShiftedRightWhereU64ConstantA(by: Int32(clamping: bits), where: mask),
                 "mask: \(describe(mask)), bits: \(bits)"
             )
         }
@@ -545,13 +539,13 @@ extension SIMDUInt64CodegenTests {
             mismatches.check(
                 portShiftedRightWhereOtherwiseU64(
                     a,
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask,
                     otherwise: otherwise
                 ),
                 highwayShiftedRightWhereOtherwiseU64(
                     a,
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask,
                     otherwise: otherwise
                 ),
@@ -574,12 +568,12 @@ extension SIMDUInt64CodegenTests {
         ) {
             mismatches.check(
                 portShiftedRightWhereOtherwiseU64ConstantA(
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask,
                     otherwise: otherwise
                 ),
                 highwayShiftedRightWhereOtherwiseU64ConstantA(
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask,
                     otherwise: otherwise
                 ),
@@ -627,12 +621,12 @@ extension SIMDUInt64CodegenTests {
             mismatches.check(
                 portShiftedRightWhereOtherwiseU64ConstantOtherwise(
                     a,
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask
                 ),
                 highwayShiftedRightWhereOtherwiseU64ConstantOtherwise(
                     a,
-                    by: Int32(truncatingIfNeeded: bits),
+                    by: Int32(clamping: bits),
                     where: mask
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
