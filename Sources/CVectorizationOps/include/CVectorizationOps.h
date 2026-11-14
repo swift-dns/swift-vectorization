@@ -1643,7 +1643,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_u8(cvectorization
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_u8(cvectorization_ops_vector_u8 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -21659,7 +21659,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_u16(cvectorizatio
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_u16(cvectorization_ops_vector_u16 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -35237,7 +35237,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_u32(cvectorizatio
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_u32(cvectorization_ops_vector_u32 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -47609,7 +47609,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_u64(cvectorizatio
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_u64(cvectorization_ops_vector_u64 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -61123,7 +61123,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_i8(cvectorization
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_i8(cvectorization_ops_vector_i8 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -78560,7 +78560,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_i16(cvectorizatio
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_i16(cvectorization_ops_vector_i16 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -92439,7 +92439,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_i32(cvectorizatio
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_i32(cvectorization_ops_vector_i32 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -105196,7 +105196,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_i64(cvectorizatio
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_i64(cvectorization_ops_vector_i64 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -118102,7 +118102,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_constant_lane_f32(cvectorizati
   const bool found = __builtin_reduce_or((cvectorization_ops_vector_u32)v == __builtin_bit_cast(uint32_t, lane)) != 0;
   return __builtin_constant_p(found) && found;
 }
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_f32(cvectorization_ops_vector_f32 v) {
   const bool splat = __builtin_reduce_and(((cvectorization_ops_vector_u32)v) == ((cvectorization_ops_vector_u32)v)[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -130645,7 +130645,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_constant_lane_f64(cvectorizati
   const bool found = __builtin_reduce_or((cvectorization_ops_vector_u64)v == __builtin_bit_cast(uint64_t, lane)) != 0;
   return __builtin_constant_p(found) && found;
 }
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_f64(cvectorization_ops_vector_f64 v) {
   const bool splat = __builtin_reduce_and(((cvectorization_ops_vector_u64)v) == ((cvectorization_ops_vector_u64)v)[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -142335,7 +142335,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_constant_lane_f16(cvectorizati
   return __builtin_constant_p(found) && found;
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_f16(cvectorization_ops_vector_f16 v) {
   const bool splat = __builtin_reduce_and(((cvectorization_ops_vector_u16)v) == ((cvectorization_ops_vector_u16)v)[0]) != 0;
   return __builtin_constant_p(splat) && splat;
@@ -144150,7 +144150,7 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_constant_bf16(cvectorizati
   return __builtin_constant_p(__builtin_reduce_or(v));
 }
 #endif
-#if CVECTORIZATION_OPS_NEON == 2
+#if CVECTORIZATION_OPS_SVE
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_sve_splat_bf16(cvectorization_ops_vector_bf16 v) {
   const bool splat = __builtin_reduce_and(v == v[0]) != 0;
   return __builtin_constant_p(splat) && splat;

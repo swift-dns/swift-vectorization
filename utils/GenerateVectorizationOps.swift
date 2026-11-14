@@ -2428,7 +2428,7 @@ func sveSplatFunction(for element: Element) -> String {
             return __builtin_constant_p(splat) && splat;
             """
     )
-    return "#if \(sve2_128Condition)\n\(function)#endif\n"
+    return "#if \(sveCondition)\n\(function)#endif\n"
 }
 
 func sveBinary(_ name: String, for element: Element) -> String {
