@@ -19,10 +19,37 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseNotMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseNotMask with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7359_367C_990A_82F4)
+        for mask in maskInputs {
+            mismatches.check(
+                H.bitwiseNot(mask),
+                H.Mask(raw: HighwayReference.bitwiseNotMaskF64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func bitwiseAndMask() {
         let mismatches = Mismatches("bitwiseAndMask")
         let aInputs = Inputs.masks(H.Mask.self, seed: 0xE6D2_C105_FB78_921F)
         let bInputs = Inputs.masks(H.Mask.self, seed: 0xE6D2_C005_FB78_906C)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseAnd(a, b),
+                H.Mask(raw: HighwayReference.bitwiseAndMaskF64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseAndMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseAndMask with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x06F0_CDE5_8C84_272C)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x06F0_CEE5_8C84_28DF)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAnd(a, b),
@@ -47,10 +74,38 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseAndNotMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseAndNotMask with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1E87_6CBA_FBE0_EA59)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1E87_6BBA_FBE0_E8A6)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseAndNot(a, b),
+                H.Mask(raw: HighwayReference.bitwiseAndNotMaskF64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func bitwiseOrMask() {
         let mismatches = Mismatches("bitwiseOrMask")
         let aInputs = Inputs.masks(H.Mask.self, seed: 0x6C5D_6C6A_7793_9989)
         let bInputs = Inputs.masks(H.Mask.self, seed: 0x6C5D_6B6A_7793_97D6)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseOr(a, b),
+                H.Mask(raw: HighwayReference.bitwiseOrMaskF64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseOrMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseOrMask with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x776A_D6E3_1C3B_A30E)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x776A_D7E3_1C3B_A4C1)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(a, b),
@@ -75,10 +130,38 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseXorMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseXorMask with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xBB5E_161E_0D94_3530)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xBB5E_171E_0D94_36E3)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseXor(a, b),
+                H.Mask(raw: HighwayReference.bitwiseXorMaskF64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func neitherTrue() {
         let mismatches = Mismatches("neitherTrue")
         let aInputs = Inputs.masks(H.Mask.self, seed: 0x751B_578C_6C68_CDD8)
         let bInputs = Inputs.masks(H.Mask.self, seed: 0x751B_588C_6C68_CF8B)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.neitherTrue(a, b),
+                H.Mask(raw: HighwayReference.neitherTrueF64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func neitherTrueNonCanonical() {
+        let mismatches = Mismatches("neitherTrue with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB14B_6359_8BD1_43D7)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB14B_6259_8BD1_4224)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.neitherTrue(a, b),
@@ -102,9 +185,35 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func onlyFirstTrueNonCanonical() {
+        let mismatches = Mismatches("onlyFirstTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF19D_9557_3FAE_BC48)
+        for mask in maskInputs {
+            mismatches.check(
+                H.onlyFirstTrue(mask),
+                H.Mask(raw: HighwayReference.onlyFirstTrueF64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func beforeFirstTrue() {
         let mismatches = Mismatches("beforeFirstTrue")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xED1C_3BD1_1359_B920)
+        for mask in maskInputs {
+            mismatches.check(
+                H.beforeFirstTrue(mask),
+                H.Mask(raw: HighwayReference.beforeFirstTrueF64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func beforeFirstTrueNonCanonical() {
+        let mismatches = Mismatches("beforeFirstTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xCCDE_9A14_EFD5_8C9F)
         for mask in maskInputs {
             mismatches.check(
                 H.beforeFirstTrue(mask),
@@ -128,9 +237,35 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func atOrBeforeFirstTrueNonCanonical() {
+        let mismatches = Mismatches("atOrBeforeFirstTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x44CA_7B68_990A_33A3)
+        for mask in maskInputs {
+            mismatches.check(
+                H.atOrBeforeFirstTrue(mask),
+                H.Mask(raw: HighwayReference.atOrBeforeFirstTrueF64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func atOrAfterFirstTrue() {
         let mismatches = Mismatches("atOrAfterFirstTrue")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3B93_8A29_D43E_00EF)
+        for mask in maskInputs {
+            mismatches.check(
+                H.atOrAfterFirstTrue(mask),
+                H.Mask(raw: HighwayReference.atOrAfterFirstTrueF64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func atOrAfterFirstTrueNonCanonical() {
+        let mismatches = Mismatches("atOrAfterFirstTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4E39_AC96_FAA4_A07C)
         for mask in maskInputs {
             mismatches.check(
                 H.atOrAfterFirstTrue(mask),

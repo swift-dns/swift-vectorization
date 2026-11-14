@@ -293,6 +293,30 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadWhereNonCanonical() {
+        let mismatches = Mismatches("loadWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xE53E_9FA6_EFB5_B08B)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xE53E_9EA6_EFB5_AED8
+        )
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.load(from: source.baseAddress!, where: mask),
+                    unsafe HighwayReference.loadWhereF64(mask.raw, source.baseAddress!)
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadWhereUncheckedSpan() {
         let mismatches = Mismatches("loadWhere unchecked span")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF2F3_E2B4_944E_7AAE)
@@ -378,6 +402,40 @@ extension SIMDDoubleReferenceTests {
                     unsafe HighwayReference.loadWhereOtherwiseF64(otherwise, mask.raw, source)
                 )
             }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("loadWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA48F_58E4_24E4_AC67)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA48F_57E4_24E4_AAB4)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xA48F_5AE4_24E4_AFCD
+        )
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0x5441_4E9F_5579_B4E1
+        ) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.load(from: source.baseAddress!, where: mask, otherwise: otherwise),
+                    unsafe HighwayReference.loadWhereOtherwiseF64(
+                        otherwise,
+                        mask.raw,
+                        source.baseAddress!
+                    )
+                )
+            }
             mismatches.check(
                 portResult,
                 referenceResult,

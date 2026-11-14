@@ -7,6 +7,283 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
+    private func checkShiftedRightWhereConstantBits(_ bits: Int) {
+        let mismatches = Mismatches("shiftedRightWhere with bits \(bits)")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3CC4_37C2_790E_F7F0)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3CC4_38C2_790E_F9A3)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.shiftedRight(a, by: bits, where: mask),
+                H.Vector(
+                    raw: HighwayReference.shiftedRightWhereTemplateI64(
+                        mask.raw,
+                        a.raw,
+                        Int32(truncatingIfNeeded: bits)
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightWhereConstantBits0() {
+        checkShiftedRightWhereConstantBits(0)
+    }
+
+    @Test func shiftedRightWhereConstantBits1() {
+        checkShiftedRightWhereConstantBits(1)
+    }
+
+    @Test func shiftedRightWhereConstantBits2() {
+        checkShiftedRightWhereConstantBits(2)
+    }
+
+    @Test func shiftedRightWhereConstantBits3() {
+        checkShiftedRightWhereConstantBits(3)
+    }
+
+    @Test func shiftedRightWhereConstantBits4() {
+        checkShiftedRightWhereConstantBits(4)
+    }
+
+    @Test func shiftedRightWhereConstantBits5() {
+        checkShiftedRightWhereConstantBits(5)
+    }
+
+    @Test func shiftedRightWhereConstantBits6() {
+        checkShiftedRightWhereConstantBits(6)
+    }
+
+    @Test func shiftedRightWhereConstantBits7() {
+        checkShiftedRightWhereConstantBits(7)
+    }
+
+    @Test func shiftedRightWhereConstantBits8() {
+        checkShiftedRightWhereConstantBits(8)
+    }
+
+    @Test func shiftedRightWhereConstantBits9() {
+        checkShiftedRightWhereConstantBits(9)
+    }
+
+    @Test func shiftedRightWhereConstantBits10() {
+        checkShiftedRightWhereConstantBits(10)
+    }
+
+    @Test func shiftedRightWhereConstantBits11() {
+        checkShiftedRightWhereConstantBits(11)
+    }
+
+    @Test func shiftedRightWhereConstantBits12() {
+        checkShiftedRightWhereConstantBits(12)
+    }
+
+    @Test func shiftedRightWhereConstantBits13() {
+        checkShiftedRightWhereConstantBits(13)
+    }
+
+    @Test func shiftedRightWhereConstantBits14() {
+        checkShiftedRightWhereConstantBits(14)
+    }
+
+    @Test func shiftedRightWhereConstantBits15() {
+        checkShiftedRightWhereConstantBits(15)
+    }
+
+    @Test func shiftedRightWhereConstantBits16() {
+        checkShiftedRightWhereConstantBits(16)
+    }
+
+    @Test func shiftedRightWhereConstantBits17() {
+        checkShiftedRightWhereConstantBits(17)
+    }
+
+    @Test func shiftedRightWhereConstantBits18() {
+        checkShiftedRightWhereConstantBits(18)
+    }
+
+    @Test func shiftedRightWhereConstantBits19() {
+        checkShiftedRightWhereConstantBits(19)
+    }
+
+    @Test func shiftedRightWhereConstantBits20() {
+        checkShiftedRightWhereConstantBits(20)
+    }
+
+    @Test func shiftedRightWhereConstantBits21() {
+        checkShiftedRightWhereConstantBits(21)
+    }
+
+    @Test func shiftedRightWhereConstantBits22() {
+        checkShiftedRightWhereConstantBits(22)
+    }
+
+    @Test func shiftedRightWhereConstantBits23() {
+        checkShiftedRightWhereConstantBits(23)
+    }
+
+    @Test func shiftedRightWhereConstantBits24() {
+        checkShiftedRightWhereConstantBits(24)
+    }
+
+    @Test func shiftedRightWhereConstantBits25() {
+        checkShiftedRightWhereConstantBits(25)
+    }
+
+    @Test func shiftedRightWhereConstantBits26() {
+        checkShiftedRightWhereConstantBits(26)
+    }
+
+    @Test func shiftedRightWhereConstantBits27() {
+        checkShiftedRightWhereConstantBits(27)
+    }
+
+    @Test func shiftedRightWhereConstantBits28() {
+        checkShiftedRightWhereConstantBits(28)
+    }
+
+    @Test func shiftedRightWhereConstantBits29() {
+        checkShiftedRightWhereConstantBits(29)
+    }
+
+    @Test func shiftedRightWhereConstantBits30() {
+        checkShiftedRightWhereConstantBits(30)
+    }
+
+    @Test func shiftedRightWhereConstantBits31() {
+        checkShiftedRightWhereConstantBits(31)
+    }
+
+    @Test func shiftedRightWhereConstantBits32() {
+        checkShiftedRightWhereConstantBits(32)
+    }
+
+    @Test func shiftedRightWhereConstantBits33() {
+        checkShiftedRightWhereConstantBits(33)
+    }
+
+    @Test func shiftedRightWhereConstantBits34() {
+        checkShiftedRightWhereConstantBits(34)
+    }
+
+    @Test func shiftedRightWhereConstantBits35() {
+        checkShiftedRightWhereConstantBits(35)
+    }
+
+    @Test func shiftedRightWhereConstantBits36() {
+        checkShiftedRightWhereConstantBits(36)
+    }
+
+    @Test func shiftedRightWhereConstantBits37() {
+        checkShiftedRightWhereConstantBits(37)
+    }
+
+    @Test func shiftedRightWhereConstantBits38() {
+        checkShiftedRightWhereConstantBits(38)
+    }
+
+    @Test func shiftedRightWhereConstantBits39() {
+        checkShiftedRightWhereConstantBits(39)
+    }
+
+    @Test func shiftedRightWhereConstantBits40() {
+        checkShiftedRightWhereConstantBits(40)
+    }
+
+    @Test func shiftedRightWhereConstantBits41() {
+        checkShiftedRightWhereConstantBits(41)
+    }
+
+    @Test func shiftedRightWhereConstantBits42() {
+        checkShiftedRightWhereConstantBits(42)
+    }
+
+    @Test func shiftedRightWhereConstantBits43() {
+        checkShiftedRightWhereConstantBits(43)
+    }
+
+    @Test func shiftedRightWhereConstantBits44() {
+        checkShiftedRightWhereConstantBits(44)
+    }
+
+    @Test func shiftedRightWhereConstantBits45() {
+        checkShiftedRightWhereConstantBits(45)
+    }
+
+    @Test func shiftedRightWhereConstantBits46() {
+        checkShiftedRightWhereConstantBits(46)
+    }
+
+    @Test func shiftedRightWhereConstantBits47() {
+        checkShiftedRightWhereConstantBits(47)
+    }
+
+    @Test func shiftedRightWhereConstantBits48() {
+        checkShiftedRightWhereConstantBits(48)
+    }
+
+    @Test func shiftedRightWhereConstantBits49() {
+        checkShiftedRightWhereConstantBits(49)
+    }
+
+    @Test func shiftedRightWhereConstantBits50() {
+        checkShiftedRightWhereConstantBits(50)
+    }
+
+    @Test func shiftedRightWhereConstantBits51() {
+        checkShiftedRightWhereConstantBits(51)
+    }
+
+    @Test func shiftedRightWhereConstantBits52() {
+        checkShiftedRightWhereConstantBits(52)
+    }
+
+    @Test func shiftedRightWhereConstantBits53() {
+        checkShiftedRightWhereConstantBits(53)
+    }
+
+    @Test func shiftedRightWhereConstantBits54() {
+        checkShiftedRightWhereConstantBits(54)
+    }
+
+    @Test func shiftedRightWhereConstantBits55() {
+        checkShiftedRightWhereConstantBits(55)
+    }
+
+    @Test func shiftedRightWhereConstantBits56() {
+        checkShiftedRightWhereConstantBits(56)
+    }
+
+    @Test func shiftedRightWhereConstantBits57() {
+        checkShiftedRightWhereConstantBits(57)
+    }
+
+    @Test func shiftedRightWhereConstantBits58() {
+        checkShiftedRightWhereConstantBits(58)
+    }
+
+    @Test func shiftedRightWhereConstantBits59() {
+        checkShiftedRightWhereConstantBits(59)
+    }
+
+    @Test func shiftedRightWhereConstantBits60() {
+        checkShiftedRightWhereConstantBits(60)
+    }
+
+    @Test func shiftedRightWhereConstantBits61() {
+        checkShiftedRightWhereConstantBits(61)
+    }
+
+    @Test func shiftedRightWhereConstantBits62() {
+        checkShiftedRightWhereConstantBits(62)
+    }
+
+    @Test func shiftedRightWhereConstantBits63() {
+        checkShiftedRightWhereConstantBits(63)
+    }
+
+    @inline(__always)
     private func checkShiftedRightWhereOtherwiseConstantBits(_ bits: Int) {
         let mismatches = Mismatches("shiftedRightWhereOtherwise with bits \(bits)")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8C57_BD36_D1FB_3704)
@@ -288,5 +565,116 @@ extension SIMDInt64ConstantTests {
 
     @Test func shiftedRightWhereOtherwiseConstantBits63() {
         checkShiftedRightWhereOtherwiseConstantBits(63)
+    }
+
+    @inline(__always)
+    private func checkShiftedRightWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+        let mismatches = Mismatches(
+            "shiftedRightWhereOtherwise with otherwise repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1AD4_300C_2887_9B37)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1AD4_310C_2887_9CEA)
+        let bitsInputs = Inputs.shiftAmounts(bits: 64, inContract: true)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            "repeating"
+        )
+        for (mask, a, bits) in mixedTriples(
+            maskInputs,
+            aInputs,
+            bitsInputs,
+            seed: 0x7E4F_A7CD_659A_5B38
+        ) {
+            mismatches.check(
+                H.shiftedRight(a, by: bits, where: mask, otherwise: H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.shiftedRightWhereOtherwiseI64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        Int32(truncatingIfNeeded: bits)
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat0() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(0)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat1() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(1)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat15() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(15)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat16() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(16)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat26() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(26)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat127() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(127)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat128() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(128)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat255() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(255)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat256() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(256)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat257() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(257)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat65280() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(65280)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat65281() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(65281)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplatMinus1() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(-1)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplatMinus16() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(-16)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplatMinus17() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(-17)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplatMinus128() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(-128)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplatMinus129() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(-129)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplatMax() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(H.Lane.max)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplatMin() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(H.Lane.min)
     }
 }

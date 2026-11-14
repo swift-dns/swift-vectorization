@@ -21,9 +21,7 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func lowerHalfOfMaskNonCanonical() {
         let mismatches = Mismatches("lowerHalfOfMask with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDBFloat16.Vector.self, seed: 0xDAFD_E61E_4383_5D4C).map {
-            SIMDBFloat16.mask(rebinding: SIMDUInt16.mask(from: SIMDUInt16.vector(bitPattern: $0)))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xDAFD_E61E_4383_5D4C)
         for mask in maskInputs {
             mismatches.check(
                 H.lowerHalf(mask),

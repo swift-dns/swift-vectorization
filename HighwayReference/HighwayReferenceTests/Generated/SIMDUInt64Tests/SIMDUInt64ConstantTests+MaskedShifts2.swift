@@ -289,4 +289,91 @@ extension SIMDUInt64ConstantTests {
     @Test func shiftedRightWhereOtherwiseConstantBits63() {
         checkShiftedRightWhereOtherwiseConstantBits(63)
     }
+
+    @inline(__always)
+    private func checkShiftedRightWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+        let mismatches = Mismatches(
+            "shiftedRightWhereOtherwise with otherwise repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x293B_2AAC_74CF_F3A3)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x293B_2BAC_74CF_F556)
+        let bitsInputs = Inputs.shiftAmounts(bits: 64, inContract: true)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for (mask, a, bits) in mixedTriples(
+            maskInputs,
+            aInputs,
+            bitsInputs,
+            seed: 0x5DF0_D822_C905_A72C
+        ) {
+            mismatches.check(
+                H.shiftedRight(a, by: bits, where: mask, otherwise: H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.shiftedRightWhereOtherwiseU64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        Int32(truncatingIfNeeded: bits)
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), bits: \(bits)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat0() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(0)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat1() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(1)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat15() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(15)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat16() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(16)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat26() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(26)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat127() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(127)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat128() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(128)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat255() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(255)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat256() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(256)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat257() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(257)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat65280() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(65280)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplat65281() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(65281)
+    }
+
+    @Test func shiftedRightWhereOtherwiseConstantSplatMax() {
+        checkShiftedRightWhereOtherwiseConstantOtherwise(H.Lane.max)
+    }
 }

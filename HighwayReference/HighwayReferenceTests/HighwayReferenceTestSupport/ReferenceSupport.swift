@@ -413,6 +413,43 @@ package enum Inputs {
         return [SIMDMask(repeating: false), SIMDMask(repeating: true)] + single + random
     }
 
+    package static func nonCanonicalMasks<M: ReferenceMask>(_ type: M.Type, seed: UInt64) -> [M] {
+        nonCanonicalMaskLanes(M.Storage.Scalar.self, count: M.Storage.scalarCount, seed: seed).map {
+            M(SIMDMask(M.Storage($0)))
+        }
+    }
+
+    package static func nonCanonicalMasks<M: ReferenceNarrowMask>(
+        _ type: M.Type,
+        seed: UInt64
+    ) -> [M] {
+        nonCanonicalMaskLanes(M.Lane.self, count: M.laneCount, seed: seed).flatMap { lanes in
+            [M.Lane(0), M.Lane(-1)].map { M(lanes: lanes, padding: $0) }
+        }
+    }
+
+    package static func nonCanonicalMaskLanes<Lane: FixedWidthInteger & SignedInteger>(
+        _ type: Lane.Type,
+        count: Int,
+        seed: UInt64
+    ) -> [[Lane]] {
+        var generator = SplitMix64(seed: seed)
+        let middle =
+            Lane(truncatingIfNeeded: UInt64.max >> (64 - Lane.bitWidth / 2)) << (Lane.bitWidth / 4)
+        let patterns: [Lane] = [0, -1, .min, 1, middle, .max]
+        let splats = patterns.map { Array(repeating: $0, count: count) }
+        let rotations = patterns.indices.map { offset in
+            (0..<count).map { patterns[($0 + offset) % patterns.count] }
+        }
+        let mixed = (0..<randomCount).map { _ in
+            (0..<count).map { _ in patterns[Int(generator.next() % UInt64(patterns.count))] }
+        }
+        let random = (0..<randomCount / 4).map { _ in
+            (0..<count).map { _ in Lane(truncatingIfNeeded: generator.next()) }
+        }
+        return splats + rotations + mixed + random
+    }
+
     package static func maskBits(lanes: Int, seed: UInt64) -> [UInt] {
         var generator = SplitMix64(seed: seed)
         let limit = UInt(1) << UInt(lanes)
@@ -763,10 +800,14 @@ package func poisoned<Indices: ReferenceVector, Mask: ReferenceMask>(
     with poison: Int
 ) -> Indices where Indices.Simd.Scalar: FixedWidthInteger {
     var lanes = indices.simd
-    for lane in 0..<Indices.Simd.scalarCount where !mask.simd[lane] {
+    for lane in 0..<Indices.Simd.scalarCount where mask.simd._storage[lane] == 0 {
         lanes[lane] = Indices.Simd.Scalar(truncatingIfNeeded: poison)
     }
     return Indices(lanes)
+}
+
+package func hasAllOnesLane<M: ReferenceMask>(_ mask: M) -> Bool {
+    (0..<M.Storage.scalarCount).contains { mask.simd._storage[$0] == -1 }
 }
 
 package func poisoned<Indices: ReferenceVector>(

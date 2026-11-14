@@ -191,10 +191,42 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func vectorConvertingWhereFromUInt64NonCanonical() {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromUInt64 with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xBA79_0E48_DAFA_82AF)
+        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xBA79_0D48_DAFA_80FC)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                HighwayReference.vectorConvertingWhereU64ToF64(mask.raw, a.raw),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func vectorConvertingWhereFromInt64() {
         let mismatches = Mismatches("vectorConvertingWhereFromInt64")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x61D8_3D35_75ED_DBA7)
         let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x61D8_3C35_75ED_D9F4)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                HighwayReference.vectorConvertingWhereI64ToF64(mask.raw, a.raw),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorConvertingWhereFromInt64NonCanonical() {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromInt64 with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x3FB8_AF13_F18C_27F4)
+        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x3FB8_B013_F18C_29A7)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.vector(converting: a, where: mask),
@@ -1764,41 +1796,6 @@ extension SIMDDoubleReferenceTests {
             let definedBytes =
                 SIMDFloat16.QuarterVector.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
             let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
-            let newBytes = HighwayReference.resizedBytesDefined(
-                definedBytes,
-                grownBytes,
-                MemoryLayout<SIMDFloat16.QuarterVector.Raw>.size
-            )
-            mismatches.check(
-                Array(bytes(of: port).prefix(definedBytes)),
-                Array(bytes(of: reference).prefix(definedBytes)),
-                "a: \(describe(a))"
-            )
-            mismatches.check(
-                Array(registerBytes(of: port).dropFirst(definedBytes).prefix(newBytes)),
-                Array(registerBytes(of: reference).dropFirst(definedBytes).prefix(newBytes)),
-                "a: \(describe(a))"
-            )
-        }
-        mismatches.record()
-    }
-    #endif
-
-    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-    @Test func halfVectorResizingFromQuarterFloat16() {
-        let mismatches = Mismatches("halfVectorResizingFromQuarterFloat16")
-        let aInputs = Inputs.conversions(
-            SIMDFloat16.QuarterVector.self,
-            seed: 0xFD05_A844_2AEE_65C3
-        ).map(poisoningUpperBytes)
-        for a in aInputs {
-            let port = H.halfVector(resizing: a)
-            let reference = H.HalfVector(
-                raw: HighwayReference.halfVectorResizingQuarterF16ToF64(a.raw)
-            )
-            let definedBytes =
-                SIMDFloat16.QuarterVector.laneCount * MemoryLayout<SIMDFloat16.Lane>.stride
-            let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(
                 definedBytes,
                 grownBytes,

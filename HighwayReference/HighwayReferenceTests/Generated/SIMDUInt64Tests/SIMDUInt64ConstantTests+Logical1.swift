@@ -1133,70 +1133,85 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkAllBitsSetConstantA(_ value: H.Lane) {
-        let mismatches = Mismatches("allBitsSet with a repeating \(hex(value))")
+    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+        let mismatches = Mismatches(
+            "bitwiseAndWhereOtherwise with otherwise repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE24A_8C37_3DF0_50BC)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE24A_8F37_3DF0_55D5)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE24A_8E37_3DF0_5422)
         mismatches.check(
             H.repeating(value),
             H.Vector(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
-        mismatches.check(
-            H.allBitsSet(H.repeating(value)),
-            HighwayReference.allBitsSetU64(H.repeating(value).raw),
-            ""
-        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x0E08_4457_BB57_ECC9)
+        {
+            mismatches.check(
+                H.bitwiseAnd(a, b, where: mask, otherwise: H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.bitwiseAndWhereOtherwiseU64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
         mismatches.record()
     }
 
-    @Test func allBitsSetConstantSplat0() {
-        checkAllBitsSetConstantA(0)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat0() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(0)
     }
 
-    @Test func allBitsSetConstantSplat1() {
-        checkAllBitsSetConstantA(1)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat1() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(1)
     }
 
-    @Test func allBitsSetConstantSplat15() {
-        checkAllBitsSetConstantA(15)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat15() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(15)
     }
 
-    @Test func allBitsSetConstantSplat16() {
-        checkAllBitsSetConstantA(16)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat16() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(16)
     }
 
-    @Test func allBitsSetConstantSplat26() {
-        checkAllBitsSetConstantA(26)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat26() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(26)
     }
 
-    @Test func allBitsSetConstantSplat127() {
-        checkAllBitsSetConstantA(127)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat127() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(127)
     }
 
-    @Test func allBitsSetConstantSplat128() {
-        checkAllBitsSetConstantA(128)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat128() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(128)
     }
 
-    @Test func allBitsSetConstantSplat255() {
-        checkAllBitsSetConstantA(255)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat255() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(255)
     }
 
-    @Test func allBitsSetConstantSplat256() {
-        checkAllBitsSetConstantA(256)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat256() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(256)
     }
 
-    @Test func allBitsSetConstantSplat257() {
-        checkAllBitsSetConstantA(257)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat257() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(257)
     }
 
-    @Test func allBitsSetConstantSplat65280() {
-        checkAllBitsSetConstantA(65280)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat65280() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(65280)
     }
 
-    @Test func allBitsSetConstantSplat65281() {
-        checkAllBitsSetConstantA(65281)
+    @Test func bitwiseAndWhereOtherwiseConstantSplat65281() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(65281)
     }
 
-    @Test func allBitsSetConstantSplatMax() {
-        checkAllBitsSetConstantA(H.Lane.max)
+    @Test func bitwiseAndWhereOtherwiseConstantSplatMax() {
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(H.Lane.max)
     }
 }

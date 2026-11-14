@@ -21,9 +21,7 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func lowerHalfOfMaskNonCanonical() {
         let mismatches = Mismatches("lowerHalfOfMask with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x6386_97EF_DDCC_B204).map {
-            SIMDUInt64.mask(from: $0)
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6386_97EF_DDCC_B204)
         for mask in maskInputs {
             mismatches.check(
                 H.lowerHalf(mask),
@@ -49,9 +47,7 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func upperHalfOfMaskNonCanonical() {
         let mismatches = Mismatches("upperHalfOfMask with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x44BB_74D6_D9F0_DB49).map {
-            SIMDUInt64.mask(from: $0)
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x44BB_74D6_D9F0_DB49)
         for mask in maskInputs {
             mismatches.check(
                 H.upperHalf(mask),
@@ -78,12 +74,8 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func combiningMasksNonCanonical() {
         let mismatches = Mismatches("combiningMasks with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x6412_E93C_242F_2DB8).map {
-            SIMDUInt64.lowerHalf(SIMDUInt64.mask(from: $0))
-        }
-        let bInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x6412_EA3C_242F_2F6B).map {
-            SIMDUInt64.lowerHalf(SIMDUInt64.mask(from: $0))
-        }
+        let aInputs = Inputs.nonCanonicalMasks(H.HalfMask.self, seed: 0x6412_E93C_242F_2DB8)
+        let bInputs = Inputs.nonCanonicalMasks(H.HalfMask.self, seed: 0x6412_EA3C_242F_2F6B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.combining(a, b),

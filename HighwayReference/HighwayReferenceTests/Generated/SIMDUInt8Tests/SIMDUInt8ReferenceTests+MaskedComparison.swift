@@ -22,12 +22,44 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func equalToWhereNonCanonical() {
+        let mismatches = Mismatches("equalToWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xEA38_5D0F_3517_4B3D)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEA38_5C0F_3517_498A)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEA38_5B0F_3517_47D7)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xA7E0_2830_B6D2_050F)
+        {
+            mismatches.check(
+                H.equalTo(a, b, where: mask),
+                H.Mask(raw: HighwayReference.equalToWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func notEqualToWhere() {
         let mismatches = Mismatches("notEqualToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2E33_B0A9_2433_23ED)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2E33_AFA9_2433_223A)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2E33_AEA9_2433_2087)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x8F48_52BF_A3E7_983F)
+        {
+            mismatches.check(
+                H.notEqualTo(a, b, where: mask),
+                H.Mask(raw: HighwayReference.notEqualToWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func notEqualToWhereNonCanonical() {
+        let mismatches = Mismatches("notEqualToWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x19F6_13A7_BBA0_550A)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x19F6_14A7_BBA0_56BD)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x19F6_11A7_BBA0_51A4)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x420F_46F5_95B3_D0CE)
         {
             mismatches.check(
                 H.notEqualTo(a, b, where: mask),
@@ -54,12 +86,44 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func lessThanWhereNonCanonical() {
+        let mismatches = Mismatches("lessThanWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA3FE_FE91_D264_524A)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA3FE_FF91_D264_53FD)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA3FE_FC91_D264_4EE4)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xEADE_B79E_5D2A_088E)
+        {
+            mismatches.check(
+                H.lessThan(a, b, where: mask),
+                H.Mask(raw: HighwayReference.lessThanWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func greaterThanWhere() {
         let mismatches = Mismatches("greaterThanWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x37CA_2729_96D3_934A)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x37CA_2829_96D3_94FD)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x37CA_2529_96D3_8FE4)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4AB1_206A_26B3_D38E)
+        {
+            mismatches.check(
+                H.greaterThan(a, b, where: mask),
+                H.Mask(raw: HighwayReference.greaterThanWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func greaterThanWhereNonCanonical() {
+        let mismatches = Mismatches("greaterThanWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x9BA8_14FB_9311_D2A1)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9BA8_13FB_9311_D0EE)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9BA8_12FB_9311_CF3B)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6EF6_99C0_3D82_111B)
         {
             mismatches.check(
                 H.greaterThan(a, b, where: mask),
@@ -86,12 +150,44 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func lessThanOrEqualToWhereNonCanonical() {
+        let mismatches = Mismatches("lessThanOrEqualToWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xC105_4BA9_48A8_6702)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC105_4CA9_48A8_68B5)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC105_49A9_48A8_639C)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6881_DE2D_CD53_B3C6)
+        {
+            mismatches.check(
+                H.lessThanOrEqualTo(a, b, where: mask),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func greaterThanOrEqualToWhere() {
         let mismatches = Mismatches("greaterThanOrEqualToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD4B5_7D90_C255_2DBC)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD4B5_7E90_C255_2F6F)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD4B5_7F90_C255_3122)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x98B1_8D0D_7E33_4C10)
+        {
+            mismatches.check(
+                H.greaterThanOrEqualTo(a, b, where: mask),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func greaterThanOrEqualToWhereNonCanonical() {
+        let mismatches = Mismatches("greaterThanOrEqualToWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x720F_5DD1_C0F2_0973)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x720F_5CD1_C0F2_07C0)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x720F_5FD1_C0F2_0CD9)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x26CE_ACC9_7FFF_AAB5)
         {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b, where: mask),

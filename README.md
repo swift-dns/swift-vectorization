@@ -113,6 +113,13 @@ SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and hi
 When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or a
 minimum or maximum on SVE, which payload comes out is up to the compiler, in highway as in the port.
 
+A mask made from a vector whose lanes are not all zeros or all ones, with `mask(from:)` or
+`Mask(raw:)`, behaves in every op as highway's `MaskFromVec` of the same vector does on the same
+target, which highway leaves to the target. On NEON, SSE2 through AVX2 and EMU128 each op reads the
+bits of the mask that highway's op reads, on the AVX-512 targets only the sign bit of each lane
+counts, and on SVE2_128 a lane is true when it is not zero, compared as a number for `SIMDFloat` and
+`SIMDDouble`, so that `-0.0` is false there.
+
 On the targets without a carry-less multiply instruction, SSE2, SSSE3, NEON_WITHOUT_AES, SVE2_128
 without SVE2-AES, and EMU128, highway's `CLMulLower` and `CLMulUpper` return a wrong upper 64 bits
 when both operands have one of the bit groups `0x1111111111111111 << k` (k = 0...3) fully set, as

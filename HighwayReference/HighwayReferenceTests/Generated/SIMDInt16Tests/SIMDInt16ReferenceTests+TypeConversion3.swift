@@ -727,4 +727,22 @@ extension SIMDInt16ReferenceTests {
         mismatches.record()
     }
     #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorConvertingWhereFromFloat16NonCanonical() {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromFloat16 with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA7CC_E343_8603_EF12)
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0xA7CC_E443_8603_F0C5)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                H.Vector(raw: HighwayReference.vectorConvertingWhereF16ToI16(mask.raw, a)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+    #endif
 }

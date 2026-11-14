@@ -682,4 +682,22 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
     #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorConvertingWhereFromFloat16NonCanonical() {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromFloat16 with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5972_3A1A_5D9D_EA96)
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x5972_3B1A_5D9D_EC49)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                H.Vector(raw: HighwayReference.vectorConvertingWhereF16ToU16(mask.raw, a)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+    #endif
 }

@@ -19,9 +19,35 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func vectorFromMaskNonCanonical() {
+        let mismatches = Mismatches("vectorFromMask with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6542_FFE7_651D_1BC0)
+        for mask in maskInputs {
+            mismatches.check(
+                H.vector(from: mask),
+                H.Vector(raw: HighwayReference.vectorFromMaskU64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func bitsOfMask() {
         let mismatches = Mismatches("bitsOfMask")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC59C_66BE_9504_9F71)
+        for mask in maskInputs {
+            mismatches.check(
+                H.bits(of: mask),
+                HighwayReference.bitsOfMaskU64(mask.raw),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitsOfMaskNonCanonical() {
+        let mismatches = Mismatches("bitsOfMask with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x3CF0_92A5_F918_1F36)
         for mask in maskInputs {
             mismatches.check(
                 H.bits(of: mask),
@@ -61,6 +87,25 @@ extension SIMDUInt64ReferenceTests {
             }
             let (referenceResult, referenceLanes) = unsafe withGuardedLanes(sentinel) {
                 destination in unsafe HighwayReference.storeMaskU64(mask.raw, destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
+            mismatches.check(portResult, referenceResult, "mask: \(describe(mask))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeMaskNonCanonical() {
+        let mismatches = Mismatches("storeMask with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF9E9_58BC_7131_ABEC)
+        let sentinel = Inputs.sentinel(UInt8.self, count: (H.laneCount + 7) / 8 + 4)
+        for mask in maskInputs {
+            var portLanes = sentinel
+            let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe H.storeMask(mask, to: destination.baseAddress!)
+            }
+            var referenceLanes = sentinel
+            let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe HighwayReference.storeMaskU64(mask.raw, destination.baseAddress!)
             }
             mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
             mismatches.check(portResult, referenceResult, "mask: \(describe(mask))")
@@ -123,9 +168,10 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func maskWideningFromHalfUInt32NonCanonical() {
         let mismatches = Mismatches("maskWideningFromHalfUInt32 with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0xE5F8_A9AE_850A_8686).map {
-            SIMDUInt32.halfMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDUInt32.HalfMask.self,
+            seed: 0xE5F8_A9AE_850A_8686
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -151,9 +197,10 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func maskWideningFromHalfInt32NonCanonical() {
         let mismatches = Mismatches("maskWideningFromHalfInt32 with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x2906_7569_74C4_25A1).map {
-            SIMDInt32.halfMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDInt32.HalfMask.self,
+            seed: 0x2906_7569_74C4_25A1
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -179,9 +226,10 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func maskWideningFromHalfFloatNonCanonical() {
         let mismatches = Mismatches("maskWideningFromHalfFloat with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x59D6_379E_D44D_B2BF).map {
-            SIMDFloat.halfMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDFloat.HalfMask.self,
+            seed: 0x59D6_379E_D44D_B2BF
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -209,9 +257,10 @@ extension SIMDUInt64ReferenceTests {
         let mismatches = Mismatches(
             "maskWideningFromQuarterUInt16 with masks from arbitrary vectors"
         )
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0xE267_52F4_B4E2_77C9).map {
-            SIMDUInt16.quarterMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDUInt16.QuarterMask.self,
+            seed: 0xE267_52F4_B4E2_77C9
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -239,9 +288,10 @@ extension SIMDUInt64ReferenceTests {
         let mismatches = Mismatches(
             "maskWideningFromQuarterInt16 with masks from arbitrary vectors"
         )
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0xDAA8_7CBB_6F09_DCC8).map {
-            SIMDInt16.quarterMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDInt16.QuarterMask.self,
+            seed: 0xDAA8_7CBB_6F09_DCC8
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -272,9 +322,10 @@ extension SIMDUInt64ReferenceTests {
         let mismatches = Mismatches(
             "maskWideningFromQuarterFloat16 with masks from arbitrary vectors"
         )
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x4A48_3A69_C3F1_A44B).map {
-            SIMDFloat16.quarterMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDFloat16.QuarterMask.self,
+            seed: 0x4A48_3A69_C3F1_A44B
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -303,9 +354,10 @@ extension SIMDUInt64ReferenceTests {
         let mismatches = Mismatches(
             "maskWideningFromQuarterBFloat16 with masks from arbitrary vectors"
         )
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x07C9_A7EE_E48A_04A5).map {
-            SIMDBFloat16.quarterMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDBFloat16.QuarterMask.self,
+            seed: 0x07C9_A7EE_E48A_04A5
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -331,9 +383,10 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func maskWideningFromEighthUInt8NonCanonical() {
         let mismatches = Mismatches("maskWideningFromEighthUInt8 with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0x3E78_027F_F9CA_BC4D).map {
-            SIMDUInt8.eighthMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDUInt8.EighthMask.self,
+            seed: 0x3E78_027F_F9CA_BC4D
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -359,9 +412,10 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func maskWideningFromEighthInt8NonCanonical() {
         let mismatches = Mismatches("maskWideningFromEighthInt8 with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDUInt64.Vector.self, seed: 0xDCDC_DF29_D643_B208).map {
-            SIMDInt8.eighthMask(narrowing: SIMDUInt64.mask(from: $0))
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMDInt8.EighthMask.self,
+            seed: 0xDCDC_DF29_D643_B208
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -387,9 +441,7 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func maskRebindingFromInt64NonCanonical() {
         let mismatches = Mismatches("mask rebinding from Int64 with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDInt64.Vector.self, seed: 0xB026_CBA2_C3E0_D65E).map {
-            SIMDInt64.mask(from: $0)
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(SIMDInt64.Mask.self, seed: 0xB026_CBA2_C3E0_D65E)
         for mask in maskInputs {
             mismatches.check(
                 H.mask(rebinding: mask),
@@ -415,9 +467,7 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func maskRebindingFromDoubleNonCanonical() {
         let mismatches = Mismatches("mask rebinding from Double with masks from arbitrary vectors")
-        let maskInputs = Inputs.vectors(SIMDDouble.Vector.self, seed: 0x655E_2542_BB16_D51E).map {
-            SIMDDouble.mask(from: $0)
-        }
+        let maskInputs = Inputs.nonCanonicalMasks(SIMDDouble.Mask.self, seed: 0x655E_2542_BB16_D51E)
         for mask in maskInputs {
             mismatches.check(
                 H.mask(rebinding: mask),

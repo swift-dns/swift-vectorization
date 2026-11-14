@@ -600,10 +600,42 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func vectorConvertingWhereFromUInt16NonCanonical() {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromUInt16 with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xE9C9_CFB4_EE51_F79F)
+        let aInputs = Inputs.conversions(SIMDUInt16.Vector.self, seed: 0xE9C9_CEB4_EE51_F5EC)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                HighwayReference.vectorConvertingWhereU16ToF16(mask.raw, a.raw),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func vectorConvertingWhereFromInt16() {
         let mismatches = Mismatches("vectorConvertingWhereFromInt16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1341_6ECC_C316_5B35)
         let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x1341_6DCC_C316_5982)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.vector(converting: a, where: mask),
+                HighwayReference.vectorConvertingWhereI16ToF16(mask.raw, a.raw),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorConvertingWhereFromInt16NonCanonical() {
+        let mismatches = Mismatches(
+            "vectorConvertingWhereFromInt16 with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0DCC_3B0D_B1E2_4572)
+        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0x0DCC_3C0D_B1E2_4725)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.vector(converting: a, where: mask),
