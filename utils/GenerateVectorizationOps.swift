@@ -25850,11 +25850,27 @@ func vectorLoadFirstOtherwise(
 }
 
 func x86Avx2LoadFirstOtherwise(for element: Element) -> String? {
-    guard element.width == 32, element.bits >= 32 else { return nil }
+    guard element.width == 32, element.bits >= 16 else { return nil }
     let lanes = element.laneCount / 2
     let fallback = portableLoadFirstOtherwise(for: element)
     let half = { (result: String, no: String, pointer: String, count: String) -> String in
         let loaded = "__builtin_memcpy(&\(result), \(pointer), sizeof \(result));"
+        guard lanes != 8 else {
+            return """
+                half_lanes \(result)Lanes = (half_lanes)\(no);
+                if (\(count) == 2) {
+                  unsigned int pair;
+                  __builtin_memcpy(&pair, \(pointer), sizeof pair);
+                  typedef unsigned int pair_lanes __attribute__((vector_size(16)));
+                  pair_lanes \(result)Pairs = (pair_lanes)\(result)Lanes;
+                  \(result)Pairs[0] = pair;
+                  \(result) = (half_vector)\(result)Pairs;
+                } else {
+                  __builtin_memcpy(&\(result)Lanes, \(pointer), \(count) * sizeof(\(result)Lanes[0]));
+                  \(result) = (half_vector)\(result)Lanes;
+                }
+                """
+        }
         guard lanes == 4 else {
             return """
                 if (\(count) >= 2) {
@@ -25889,7 +25905,7 @@ func x86Avx2LoadFirstOtherwise(for element: Element) -> String? {
     return """
         if (__builtin_constant_p(count) && count < \(2 * lanes)) {
           typedef \(element.cType) half_vector __attribute__((vector_size(16)));
-          \(lanes == 4 ? "typedef \(element.cType) pair_vector __attribute__((vector_size(8)));" : "")
+          \(lanes == 4 ? "typedef \(element.cType) pair_vector __attribute__((vector_size(8)));" : lanes == 8 ? "typedef unsigned short half_lanes __attribute__((vector_size(16)));" : "")
         const half_vector lowerOtherwise = __builtin_shufflevector(otherwise, otherwise, \(laneIndices(0..<lanes)));
         const half_vector upperOtherwise = __builtin_shufflevector(otherwise, otherwise, \(laneIndices(lanes..<2 * lanes)));
         half_vector lower;

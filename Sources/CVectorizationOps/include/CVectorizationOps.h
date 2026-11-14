@@ -33710,6 +33710,43 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_l
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_loaddquhi512_mask((const cvectorization_ops_x86_i16*)from, (cvectorization_ops_x86_i16)otherwise, (unsigned int)__builtin_ia32_bzhi_di(~0ull, (count < 32 ? count : 32))));
 #elif CVECTORIZATION_OPS_X86 == 4
+  if (__builtin_constant_p(count) && count < 16) {
+    typedef uint16_t half_vector __attribute__((vector_size(16)));
+    typedef unsigned short half_lanes __attribute__((vector_size(16)));
+  const half_vector lowerOtherwise = __builtin_shufflevector(otherwise, otherwise, 0, 1, 2, 3, 4, 5, 6, 7);
+  const half_vector upperOtherwise = __builtin_shufflevector(otherwise, otherwise, 8, 9, 10, 11, 12, 13, 14, 15);
+  half_vector lower;
+  half_vector upper = upperOtherwise;
+  if (count <= 8) {
+    half_lanes lowerLanes = (half_lanes)lowerOtherwise;
+    if (count == 2) {
+      unsigned int pair;
+      __builtin_memcpy(&pair, from, sizeof pair);
+      typedef unsigned int pair_lanes __attribute__((vector_size(16)));
+      pair_lanes lowerPairs = (pair_lanes)lowerLanes;
+      lowerPairs[0] = pair;
+      lower = (half_vector)lowerPairs;
+    } else {
+      __builtin_memcpy(&lowerLanes, from, count * sizeof(lowerLanes[0]));
+      lower = (half_vector)lowerLanes;
+    }
+  } else {
+    __builtin_memcpy(&lower, from, sizeof lower);
+    half_lanes upperLanes = (half_lanes)upperOtherwise;
+    if ((count - 8) == 2) {
+      unsigned int pair;
+      __builtin_memcpy(&pair, (from + 8), sizeof pair);
+      typedef unsigned int pair_lanes __attribute__((vector_size(16)));
+      pair_lanes upperPairs = (pair_lanes)upperLanes;
+      upperPairs[0] = pair;
+      upper = (half_vector)upperPairs;
+    } else {
+      __builtin_memcpy(&upperLanes, (from + 8), (count - 8) * sizeof(upperLanes[0]));
+      upper = (half_vector)upperLanes;
+    }
+  }
+  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  }
   const size_t size = (count < 16 ? count : 16) * sizeof(uint16_t);
   cvectorization_ops_vector_u16 v = otherwise;
   __builtin_memcpy(&v, from, size);
@@ -90791,6 +90828,43 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_l
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_loaddquhi512_mask((const cvectorization_ops_x86_i16*)from, (cvectorization_ops_x86_i16)otherwise, (unsigned int)__builtin_ia32_bzhi_di(~0ull, (count < 32 ? count : 32))));
 #elif CVECTORIZATION_OPS_X86 == 4
+  if (__builtin_constant_p(count) && count < 16) {
+    typedef int16_t half_vector __attribute__((vector_size(16)));
+    typedef unsigned short half_lanes __attribute__((vector_size(16)));
+  const half_vector lowerOtherwise = __builtin_shufflevector(otherwise, otherwise, 0, 1, 2, 3, 4, 5, 6, 7);
+  const half_vector upperOtherwise = __builtin_shufflevector(otherwise, otherwise, 8, 9, 10, 11, 12, 13, 14, 15);
+  half_vector lower;
+  half_vector upper = upperOtherwise;
+  if (count <= 8) {
+    half_lanes lowerLanes = (half_lanes)lowerOtherwise;
+    if (count == 2) {
+      unsigned int pair;
+      __builtin_memcpy(&pair, from, sizeof pair);
+      typedef unsigned int pair_lanes __attribute__((vector_size(16)));
+      pair_lanes lowerPairs = (pair_lanes)lowerLanes;
+      lowerPairs[0] = pair;
+      lower = (half_vector)lowerPairs;
+    } else {
+      __builtin_memcpy(&lowerLanes, from, count * sizeof(lowerLanes[0]));
+      lower = (half_vector)lowerLanes;
+    }
+  } else {
+    __builtin_memcpy(&lower, from, sizeof lower);
+    half_lanes upperLanes = (half_lanes)upperOtherwise;
+    if ((count - 8) == 2) {
+      unsigned int pair;
+      __builtin_memcpy(&pair, (from + 8), sizeof pair);
+      typedef unsigned int pair_lanes __attribute__((vector_size(16)));
+      pair_lanes upperPairs = (pair_lanes)upperLanes;
+      upperPairs[0] = pair;
+      upper = (half_vector)upperPairs;
+    } else {
+      __builtin_memcpy(&upperLanes, (from + 8), (count - 8) * sizeof(upperLanes[0]));
+      upper = (half_vector)upperLanes;
+    }
+  }
+  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  }
   const size_t size = (count < 16 ? count : 16) * sizeof(int16_t);
   cvectorization_ops_vector_i16 v = otherwise;
   __builtin_memcpy(&v, from, size);
