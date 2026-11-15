@@ -2983,7 +2983,9 @@ func sveLoadFirstWidening(from narrow: Element, to wide: Element) -> String? {
 }
 
 func sveWidening(from narrow: Element, to wide: Element) -> String? {
-    guard convertsFloatToInteger(from: narrow, to: wide) else { return nil }
+    guard narrow.category == .float || wide.category == .float else {
+        return sveExtendingLoad(sveAllLanes(of: wide), from: narrow, to: wide)
+    }
     return sveConvertingWidening(sveAllLanes(of: wide), from: narrow, to: wide)
 }
 
