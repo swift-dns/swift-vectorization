@@ -2854,19 +2854,24 @@ func sveExtendingLoad(_ active: String, from narrow: Element, to wide: Element) 
     return vectorResult(sveResult(load, for: wide), for: wide)
 }
 
-func sveLoadFirstConvertingWidening(from narrow: Element, to wide: Element) -> String {
-    let active = sveClampedLanes(for: wide)
+func sveConvertingWidening(_ active: String, from narrow: Element, to wide: Element) -> String {
     let words = unsignedElement(of: wide)
     let bits = unsignedElement(of: narrow)
     let load = sveBuiltin("ld1uw", [active, "(const \(bits.cType)*)from"], for: words)
     let loaded = "__builtin_sve_reinterpret_\(sveSuffix(of: narrow))_u64(\(load))"
     let name = "svcvt_\(sveSuffix(of: wide))_\(sveSuffix(of: narrow))_x"
     let converted = "__builtin_sve_\(name)(\(sveAllLanes(of: wide)), \(loaded))"
+    return vectorResult(sveResult(converted, for: wide), for: wide)
+}
+
+func sveLoadFirstConvertingWidening(from narrow: Element, to wide: Element) -> String {
+    let converted = sveConvertingWidening(sveClampedLanes(for: wide), from: narrow, to: wide)
+    guard wide.width == 16 else { return converted }
     return """
         if (__builtin_constant_p(count)) {
         \(indented(neonLoadFirstWidening(from: narrow, to: wide)))
         }
-        \(vectorResult(sveResult(converted, for: wide), for: wide))
+        \(converted)
         """
 }
 
@@ -2875,6 +2880,11 @@ func sveLoadFirstWidening(from narrow: Element, to wide: Element) -> String? {
         return sveExtendingLoad(sveClampedLanes(for: wide), from: narrow, to: wide)
     }
     return sveLoadFirstConvertingWidening(from: narrow, to: wide)
+}
+
+func sveWidening(from narrow: Element, to wide: Element) -> String? {
+    guard convertsFloatToInteger(from: narrow, to: wide) else { return nil }
+    return sveConvertingWidening(sveAllLanes(of: wide), from: narrow, to: wide)
 }
 
 func sveLoadFirst(for element: Element, spanned: Bool = false) -> String {
@@ -38746,6 +38756,7 @@ let wideningOps: [WideningOp] = [
         takesCount: false,
         targets: TargetBodies(
             neon: { pair in neonWidening(from: pair.narrow, to: pair.wide) },
+            sve: { pair in sveWidening(from: pair.narrow, to: pair.wide) },
             avx3: { pair in x86Avx3Widening(from: pair.narrow, to: pair.wide) },
             avx2: { pair in x86Widening(takesCount: false, from: pair.narrow, to: pair.wide) },
             sse2: { pair in x86Widening(takesCount: false, from: pair.narrow, to: pair.wide) }
@@ -38759,6 +38770,7 @@ let wideningOps: [WideningOp] = [
         targets: TargetBodies(
             neon: { pair in neonLoadFirstWidening(from: pair.narrow, to: pair.wide) },
             sve2_128: { pair in sveLoadFirstWidening(from: pair.narrow, to: pair.wide) },
+            sve: { pair in sveLoadFirstWidening(from: pair.narrow, to: pair.wide) },
             avx3: { pair in x86Avx3LoadFirstWidening(from: pair.narrow, to: pair.wide) },
             avx2: { pair in x86Widening(takesCount: true, from: pair.narrow, to: pair.wide) },
             sse2: { pair in x86Widening(takesCount: true, from: pair.narrow, to: pair.wide) }
