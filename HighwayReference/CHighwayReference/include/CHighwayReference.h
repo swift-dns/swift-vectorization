@@ -15869,7 +15869,13 @@ HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedBF16(cvectorization_ops_
 HWY_INLINE cvectorization_ops_raw_vector_bf16 compressedNotBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask) { return toPortBF16(hn::CompressNot(fromPortBF16(a), maskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 expandedBF16(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_mask_bf16 mask) { return toPortBF16(hn::Expand(fromPortBF16(a), maskFromPortBF16(mask))); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 repeatingWhereBF16(cvectorization_ops_raw_mask_bf16 mask, uint16_t value) { return toPortBF16(hn::MaskedSet(TagBF16(), maskFromPortBF16(mask), hwy::BitCastScalar<hwy::bfloat16_t>(value))); }
-HWY_INLINE cvectorization_ops_raw_vector_bf16 repeatingWhereOtherwiseBF16(cvectorization_ops_raw_vector_bf16 otherwise, cvectorization_ops_raw_mask_bf16 mask, uint16_t value) { return toPortBF16(hn::MaskedSetOr(fromPortBF16(otherwise), maskFromPortBF16(mask), hwy::BitCastScalar<hwy::bfloat16_t>(value))); }
+HWY_INLINE cvectorization_ops_raw_vector_bf16 repeatingWhereOtherwiseBF16(cvectorization_ops_raw_vector_bf16 otherwise, cvectorization_ops_raw_mask_bf16 mask, uint16_t value) { return toPortBF16(
+#if HWY_TARGET_IS_SVE && !HWY_SVE_HAVE_BF16_FEATURE
+hn::BitCast(TagBF16(), hn::MaskedSetOr(hn::BitCast(hn::RebindToUnsigned<TagBF16>(), fromPortBF16(otherwise)), hn::RebindMask(hn::RebindToUnsigned<TagBF16>(), maskFromPortBF16(mask)), hwy::BitCastScalar<uint16_t>(hwy::BitCastScalar<hwy::bfloat16_t>(value))))
+#else
+hn::MaskedSetOr(fromPortBF16(otherwise), maskFromPortBF16(mask), hwy::BitCastScalar<hwy::bfloat16_t>(value))
+#endif
+); }
 HWY_INLINE cvectorization_ops_raw_vector_bf16 shiftedLeftLanesBF16(cvectorization_ops_raw_vector_bf16 a, int lanes) {
   switch (lanes) {
   case 0: return toPortBF16(hn::ShiftLeftLanes<0>(TagBF16(), fromPortBF16(a)));

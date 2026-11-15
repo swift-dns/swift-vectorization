@@ -17024,6 +17024,19 @@ func maskedInequality(
     return "~(\(element.cMask))\(call)"
 }
 
+func bfloat16MaskedSetOrReference(for element: Element, _ arguments: [String]) -> String {
+    let direct = "hn::MaskedSetOr(\(arguments.joined(separator: ", ")))"
+    guard element.category == .bfloat16 else { return direct }
+    let tag = "hn::RebindToUnsigned<\(element.tag)>()"
+    let bits = "hwy::BitCastScalar<\(unsignedElement(of: element).hwyType)>(\(arguments[2]))"
+    let operands = [
+        "hn::BitCast(\(tag), \(arguments[0]))", "hn::RebindMask(\(tag), \(arguments[1]))", bits,
+    ]
+    let masked = "hn::MaskedSetOr(\(operands.joined(separator: ", ")))"
+    let emulated = "hn::BitCast(\(element.tag)(), \(masked))"
+    return "\n#if \(bfloat16EmulatedOnSveCondition)\n\(emulated)\n#else\n\(direct)\n#endif\n"
+}
+
 func maskedRepeatingOp(merging: Bool) -> Op {
     let operation = { (element: Element) in repeatingVector("value", of: element) }
     var targets = maskedTargets(operation, merging: merging)
@@ -17035,7 +17048,8 @@ func maskedRepeatingOp(merging: Bool) -> Op {
         .vector,
         .all,
         section: .initialization,
-        targets: targets
+        targets: targets,
+        referenceCall: merging ? bfloat16MaskedSetOrReference : nil
     ) { element in
         maskedSelecting(operation(element), merging: merging, for: element)
     }
@@ -36340,6 +36354,8 @@ let signedHalfPrecisionDelegations: Set<String> = [
     "zeroingIfNegative",
 ]
 
+let signedWideSveHalfPrecisionDelegations: Set<String> = ["lookup8", "lookup16"]
+
 func halfPrecisionNativeVector(for element: Element) -> String {
     vectorTypedef("native_vector", lane: "_Float16", bits: element.bits, lanes: element.laneCount)
 }
@@ -43480,9 +43496,9 @@ func halfPrecisionTuple(_ name: String, count: Int, to element: Element) -> Stri
     return "(\(element.cTuple(count))){\(members.joined(separator: ", "))}"
 }
 
-func halfPrecisionDelegate(of op: Op, for element: Element) -> Element {
+func halfPrecisionDelegate(of op: Op, for element: Element, signed: Bool = false) -> Element {
     let delegate =
-        signedHalfPrecisionDelegations.contains(op.identifier)
+        signed || signedHalfPrecisionDelegations.contains(op.identifier)
         ? signedElement(of: element) : unsignedElement(of: element)
     return delegate.at(width: element.width)
 }
@@ -43491,10 +43507,11 @@ func halfPrecisionCall(
     of op: Op,
     for element: Element,
     readingMasks: Bool = false,
+    signed: Bool = false,
     callee: (Element) -> String,
     declaration: (Binding) -> String
 ) -> String {
-    let delegate = halfPrecisionDelegate(of: op, for: element)
+    let delegate = halfPrecisionDelegate(of: op, for: element, signed: signed)
     let arguments = zip(
         zip(bindings(of: op, for: element), bindings(of: op, for: delegate)),
         op.parameters
@@ -43589,12 +43606,14 @@ func halfPrecisionDelegating(
     _ op: Op,
     for element: Element,
     readingMasks: Bool = false,
-    spanned: Bool = false
+    spanned: Bool = false,
+    signed: Bool = false
 ) -> String {
     halfPrecisionCall(
         of: op,
         for: element,
         readingMasks: readingMasks,
+        signed: signed,
         callee: {
             spanned ? cFunctionName(op.identifier + "Span", $0) : cFunctionName(of: op, for: $0)
         },
@@ -43614,6 +43633,14 @@ func halfPrecisionDelegation(
                 && halfPrecisionBodies[op.identifier] == nil)
     else { return nil }
     let delegation = halfPrecisionDelegating(op, for: element, spanned: spanned)
+    if signedWideSveHalfPrecisionDelegations.contains(op.identifier) {
+        let signed = halfPrecisionDelegating(op, for: element, spanned: spanned, signed: true)
+        return cBody(
+            TargetBodies(sve: { _ in signed }),
+            for: element,
+            portable: { _ in delegation }
+        )
+    }
     guard takesFloat16Mask(op, for: element) else { return delegation }
     let reading = halfPrecisionDelegating(op, for: element, readingMasks: true, spanned: spanned)
     return cBody(

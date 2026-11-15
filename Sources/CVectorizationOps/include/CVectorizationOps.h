@@ -135189,10 +135189,22 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_e
 #endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_lookup8_f16(const void* from, cvectorization_ops_raw_vector_i16 rawIndices) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f16)cvectorization_ops_lookup8_i16((const int16_t*)from, rawIndices);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f16)cvectorization_ops_lookup8_i16((const int16_t*)from, rawIndices);
+#else
   return (cvectorization_ops_raw_vector_f16)cvectorization_ops_lookup8_u16((const uint16_t*)from, (cvectorization_ops_raw_vector_u16)rawIndices);
+#endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_lookup16_f16(const void* from, cvectorization_ops_raw_vector_i16 rawIndices) {
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_f16)cvectorization_ops_lookup16_i16((const int16_t*)from, rawIndices);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_f16)cvectorization_ops_lookup16_i16((const int16_t*)from, rawIndices);
+#else
   return (cvectorization_ops_raw_vector_f16)cvectorization_ops_lookup16_u16((const uint16_t*)from, (cvectorization_ops_raw_vector_u16)rawIndices);
+#endif
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f16 cvectorization_ops_repeating_where_f16(cvectorization_ops_raw_mask_f16 rawMask, uint16_t value) {
 #if CVECTORIZATION_OPS_NEON == 2
