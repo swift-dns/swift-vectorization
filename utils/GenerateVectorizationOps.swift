@@ -13274,22 +13274,27 @@ struct LookupSize {
     let lanes: Int
     let applies: Applies
     var capabilityApplies: Applies?
+    let scalableBits: [Int]
 }
 
 let lookupSizes = [
     LookupSize(
         lanes: 8,
         applies: .allAndFloat16(bits: [8, 16, 32, 64]),
-        capabilityApplies: .allAndHalfPrecision(bits: [8, 16, 32, 64])
+        capabilityApplies: .allAndHalfPrecision(bits: [8, 16, 32, 64]),
+        scalableBits: [16, 32]
     ),
     LookupSize(
         lanes: 16,
         applies: .allAndFloat16(bits: [8, 16, 32, 64]),
-        capabilityApplies: .allAndHalfPrecision(bits: [8, 16, 32, 64])
+        capabilityApplies: .allAndHalfPrecision(bits: [8, 16, 32, 64]),
+        scalableBits: [16]
     ),
-    LookupSize(lanes: 32, applies: .integer(bits: [8])),
-    LookupSize(lanes: 64, applies: .integer(bits: [8])),
+    LookupSize(lanes: 32, applies: .integer(bits: [8]), scalableBits: [8]),
+    LookupSize(lanes: 64, applies: .integer(bits: [8]), scalableBits: []),
 ]
+
+let scalableSveCondition = "HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2"
 
 enum LaneCapability {
     case lookup(LookupSize)
@@ -13342,7 +13347,13 @@ enum LaneCapability {
         let lanes = "sizeof(\(element.cVector)) / sizeof(\(element.cType))"
         switch self {
         case .lookup(let size):
-            let enough = "return \(lanes) >= \(size.lanes / 2);"
+            let enough = """
+                #if \(scalableSveCondition)
+                return \(size.scalableBits.contains(element.bits));
+                #else
+                return \(lanes) >= \(size.lanes / 2);
+                #endif
+                """
             guard size.lanes == 64 else { return enough }
             return """
                 #if \(neonCondition) == \(ArmLevel.neon.neonLevel)

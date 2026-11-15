@@ -1588,19 +1588,35 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_eighth_mask_u8 cvectorization_o
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u8(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u8(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup32_u8(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 16;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup64_u8(void) {
 #if CVECTORIZATION_OPS_NEON == 1
   return true;
 #else
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_u8) / sizeof(uint8_t) >= 32;
+#endif
 #endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_u8(void) {
@@ -21300,10 +21316,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_u16 cvectorization
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u16(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_u16) / sizeof(uint16_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u16(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_u16) / sizeof(uint16_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_u16(void) {
   return sizeof(cvectorization_ops_vector_u16) / sizeof(uint16_t) >= 4;
@@ -34521,10 +34545,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_u32 cvectorization_op
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u32(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_u32) / sizeof(uint32_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u32(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_u32) / sizeof(uint32_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_u32(void) {
   return sizeof(cvectorization_ops_vector_u32) / sizeof(uint32_t) >= 4;
@@ -46582,10 +46614,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_u64 cvectorization_op
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_u64(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_u64) / sizeof(uint64_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_u64(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_u64) / sizeof(uint64_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_u64(void) {
   return sizeof(cvectorization_ops_vector_u64) / sizeof(uint64_t) >= 4;
@@ -59812,19 +59852,35 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_eighth_mask_i8 cvectorization_o
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i8(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i8(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup32_i8(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 16;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup64_i8(void) {
 #if CVECTORIZATION_OPS_NEON == 1
   return true;
 #else
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_i8) / sizeof(int8_t) >= 32;
+#endif
 #endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_i8(void) {
@@ -76904,10 +76960,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_i16 cvectorization
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i16(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_i16) / sizeof(int16_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i16(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_i16) / sizeof(int16_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_i16(void) {
   return sizeof(cvectorization_ops_vector_i16) / sizeof(int16_t) >= 4;
@@ -90448,10 +90512,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_i32 cvectorization_op
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i32(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_i32) / sizeof(int32_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i32(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_i32) / sizeof(int32_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_i32(void) {
   return sizeof(cvectorization_ops_vector_i32) / sizeof(int32_t) >= 4;
@@ -102926,10 +102998,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_i64 cvectorization_op
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_i64(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_i64) / sizeof(int64_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_i64(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_i64) / sizeof(int64_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_i64(void) {
   return sizeof(cvectorization_ops_vector_i64) / sizeof(int64_t) >= 4;
@@ -115567,10 +115647,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_f32 cvectorization_op
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_f32(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_f32) / sizeof(float) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_f32(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_f32) / sizeof(float) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_f32(void) {
   return sizeof(cvectorization_ops_vector_f32) / sizeof(float) >= 4;
@@ -127895,10 +127983,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_half_mask_f64 cvectorization_op
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_f64(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_f64) / sizeof(double) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_f64(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return false;
+#else
   return sizeof(cvectorization_ops_vector_f64) / sizeof(double) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_f64(void) {
   return sizeof(cvectorization_ops_vector_f64) / sizeof(double) >= 4;
@@ -139377,10 +139473,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_f16 cvectorization
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_f16(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_f16) / sizeof(__fp16) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_f16(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_f16) / sizeof(__fp16) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_f16(void) {
   return sizeof(cvectorization_ops_vector_f16) / sizeof(__fp16) >= 4;
@@ -141212,10 +141316,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_quarter_mask_bf16 cvectorizatio
 }
 #endif
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup8_bf16(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_bf16) / sizeof(uint16_t) >= 4;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_lookup16_bf16(void) {
+#if HWY_STATIC_TARGET == HWY_SVE || HWY_STATIC_TARGET == HWY_SVE2
+  return true;
+#else
   return sizeof(cvectorization_ops_vector_bf16) / sizeof(uint16_t) >= 8;
+#endif
 }
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_can_reverse4_bf16(void) {
   return sizeof(cvectorization_ops_vector_bf16) / sizeof(uint16_t) >= 4;
