@@ -7470,27 +7470,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_u8(const uin
   cvectorization_ops_block_u8* const v0 = (cvectorization_ops_block_u8*)rawV0;
   cvectorization_ops_block_u8* const v1 = (cvectorization_ops_block_u8*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint8_t buf0[32] __attribute__((aligned(32)));
-  uint8_t buf1[32] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  const cvectorization_ops_vector_u8 out0 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u8 out1 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
+  const __clang_svuint8x2_t loaded = __builtin_sve_svld2_u8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_u8 r0 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget2_u8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u8 r1 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget2_u8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint8_t buf0[64] __attribute__((aligned(64)));
-  uint8_t buf1[64] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 64; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  const cvectorization_ops_vector_u8 out0 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u8 out1 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
+  const __clang_svuint8x2_t loaded = __builtin_sve_svld2_u8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_u8 r0 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget2_u8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u8 r1 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget2_u8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t wide_vector __attribute__((vector_size(32)));
   wide_vector all;
@@ -7557,35 +7547,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_u8(const uin
   cvectorization_ops_block_u8* const v1 = (cvectorization_ops_block_u8*)rawV1;
   cvectorization_ops_block_u8* const v2 = (cvectorization_ops_block_u8*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint8_t buf0[32] __attribute__((aligned(32)));
-  uint8_t buf1[32] __attribute__((aligned(32)));
-  uint8_t buf2[32] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  const cvectorization_ops_vector_u8 out0 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u8 out1 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_u8 out2 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
+  const __clang_svuint8x3_t loaded = __builtin_sve_svld3_u8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_u8 r0 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget3_u8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u8 r1 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget3_u8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u8 r2 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget3_u8(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint8_t buf0[64] __attribute__((aligned(64)));
-  uint8_t buf1[64] __attribute__((aligned(64)));
-  uint8_t buf2[64] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 64; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  const cvectorization_ops_vector_u8 out0 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u8 out1 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_u8 out2 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
+  const __clang_svuint8x3_t loaded = __builtin_sve_svld3_u8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_u8 r0 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget3_u8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u8 r1 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget3_u8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u8 r2 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget3_u8(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t wide_vector __attribute__((vector_size(48)));
   wide_vector all;
@@ -7838,43 +7814,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_u8(const uin
   cvectorization_ops_block_u8* const v2 = (cvectorization_ops_block_u8*)rawV2;
   cvectorization_ops_block_u8* const v3 = (cvectorization_ops_block_u8*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint8_t buf0[32] __attribute__((aligned(32)));
-  uint8_t buf1[32] __attribute__((aligned(32)));
-  uint8_t buf2[32] __attribute__((aligned(32)));
-  uint8_t buf3[32] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  const cvectorization_ops_vector_u8 out0 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u8 out1 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_u8 out2 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
-  const cvectorization_ops_vector_u8 out3 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf3);
-  __builtin_memcpy(v3, &out3, sizeof out3);
+  const __clang_svuint8x4_t loaded = __builtin_sve_svld4_u8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_u8 r0 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget4_u8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u8 r1 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget4_u8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u8 r2 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget4_u8(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_u8 r3 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget4_u8(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint8_t buf0[64] __attribute__((aligned(64)));
-  uint8_t buf1[64] __attribute__((aligned(64)));
-  uint8_t buf2[64] __attribute__((aligned(64)));
-  uint8_t buf3[64] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 64; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  const cvectorization_ops_vector_u8 out0 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u8 out1 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_u8 out2 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
-  const cvectorization_ops_vector_u8 out3 = (cvectorization_ops_vector_u8)cvectorization_ops_load_aligned_u8(buf3);
-  __builtin_memcpy(v3, &out3, sizeof out3);
+  const __clang_svuint8x4_t loaded = __builtin_sve_svld4_u8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_u8 r0 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget4_u8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u8 r1 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget4_u8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u8 r2 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget4_u8(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_u8 r3 = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svget4_u8(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -8010,17 +7968,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_u8(cvectori
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_u8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate2_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_u8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate2_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector(a, b, 0, 16, 1, 17, 2, 18, 3, 19, 4, 20, 5, 21, 6, 22, 7, 23, 8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31);
@@ -8075,19 +8025,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_u8(cvectori
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
   const cvectorization_ops_vector_u8 c = (cvectorization_ops_vector_u8)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_u8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate3_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)c));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_u8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate3_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)c));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t pair_vector __attribute__((vector_size(32)));
   typedef uint8_t wide_vector __attribute__((vector_size(48)));
@@ -8345,21 +8285,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u8(cvectori
   const cvectorization_ops_vector_u8 c = (cvectorization_ops_vector_u8)rawC;
   const cvectorization_ops_vector_u8 d = (cvectorization_ops_vector_u8)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_u8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate4_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)c, (cvectorization_ops_sve_u8)d));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_u8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate4_u8((cvectorization_ops_sve_u8)a, (cvectorization_ops_sve_u8)b, (cvectorization_ops_sve_u8)c, (cvectorization_ops_sve_u8)d));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t pair_vector __attribute__((vector_size(32)));
   typedef uint8_t wide_vector __attribute__((vector_size(64)));
@@ -24716,27 +24644,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_u16(const ui
   cvectorization_ops_block_u16* const v0 = (cvectorization_ops_block_u16*)rawV0;
   cvectorization_ops_block_u16* const v1 = (cvectorization_ops_block_u16*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint16_t buf0[16] __attribute__((aligned(32)));
-  uint16_t buf1[16] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  const cvectorization_ops_vector_u16 out0 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u16 out1 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
+  const __clang_svuint16x2_t loaded = __builtin_sve_svld2_u16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_u16 r0 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget2_u16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u16 r1 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget2_u16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint16_t buf0[32] __attribute__((aligned(64)));
-  uint16_t buf1[32] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  const cvectorization_ops_vector_u16 out0 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u16 out1 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
+  const __clang_svuint16x2_t loaded = __builtin_sve_svld2_u16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_u16 r0 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget2_u16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u16 r1 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget2_u16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t wide_vector __attribute__((vector_size(32)));
   wide_vector all;
@@ -24823,35 +24741,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_u16(const ui
   cvectorization_ops_block_u16* const v1 = (cvectorization_ops_block_u16*)rawV1;
   cvectorization_ops_block_u16* const v2 = (cvectorization_ops_block_u16*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint16_t buf0[16] __attribute__((aligned(32)));
-  uint16_t buf1[16] __attribute__((aligned(32)));
-  uint16_t buf2[16] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  const cvectorization_ops_vector_u16 out0 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u16 out1 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_u16 out2 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
+  const __clang_svuint16x3_t loaded = __builtin_sve_svld3_u16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_u16 r0 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget3_u16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u16 r1 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget3_u16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u16 r2 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget3_u16(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint16_t buf0[32] __attribute__((aligned(64)));
-  uint16_t buf1[32] __attribute__((aligned(64)));
-  uint16_t buf2[32] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  const cvectorization_ops_vector_u16 out0 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u16 out1 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_u16 out2 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
+  const __clang_svuint16x3_t loaded = __builtin_sve_svld3_u16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_u16 r0 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget3_u16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u16 r1 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget3_u16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u16 r2 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget3_u16(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t wide_vector __attribute__((vector_size(48)));
   wide_vector all;
@@ -25102,43 +25006,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_u16(const ui
   cvectorization_ops_block_u16* const v2 = (cvectorization_ops_block_u16*)rawV2;
   cvectorization_ops_block_u16* const v3 = (cvectorization_ops_block_u16*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint16_t buf0[16] __attribute__((aligned(32)));
-  uint16_t buf1[16] __attribute__((aligned(32)));
-  uint16_t buf2[16] __attribute__((aligned(32)));
-  uint16_t buf3[16] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  const cvectorization_ops_vector_u16 out0 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u16 out1 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_u16 out2 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
-  const cvectorization_ops_vector_u16 out3 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf3);
-  __builtin_memcpy(v3, &out3, sizeof out3);
+  const __clang_svuint16x4_t loaded = __builtin_sve_svld4_u16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_u16 r0 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget4_u16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u16 r1 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget4_u16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u16 r2 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget4_u16(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_u16 r3 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget4_u16(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint16_t buf0[32] __attribute__((aligned(64)));
-  uint16_t buf1[32] __attribute__((aligned(64)));
-  uint16_t buf2[32] __attribute__((aligned(64)));
-  uint16_t buf3[32] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  const cvectorization_ops_vector_u16 out0 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_u16 out1 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_u16 out2 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
-  const cvectorization_ops_vector_u16 out3 = (cvectorization_ops_vector_u16)cvectorization_ops_load_aligned_u16(buf3);
-  __builtin_memcpy(v3, &out3, sizeof out3);
+  const __clang_svuint16x4_t loaded = __builtin_sve_svld4_u16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_u16 r0 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget4_u16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u16 r1 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget4_u16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u16 r2 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget4_u16(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_u16 r3 = (cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svget4_u16(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -25262,17 +25148,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_u16(cvector
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_u16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate2_u16((cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_u16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate2_u16((cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector(a, b, 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15);
@@ -25318,19 +25196,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_u16(cvector
   const cvectorization_ops_vector_u16 b = (cvectorization_ops_vector_u16)rawB;
   const cvectorization_ops_vector_u16 c = (cvectorization_ops_vector_u16)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_u16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate3_u16((cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)c));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_u16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate3_u16((cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)c));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t pair_vector __attribute__((vector_size(32)));
   typedef uint16_t wide_vector __attribute__((vector_size(48)));
@@ -25555,21 +25423,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u16(cvector
   const cvectorization_ops_vector_u16 c = (cvectorization_ops_vector_u16)rawC;
   const cvectorization_ops_vector_u16 d = (cvectorization_ops_vector_u16)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_u16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate4_u16((cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)c, (cvectorization_ops_sve_u16)d));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_u16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate4_u16((cvectorization_ops_sve_u16)a, (cvectorization_ops_sve_u16)b, (cvectorization_ops_sve_u16)c, (cvectorization_ops_sve_u16)d));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t pair_vector __attribute__((vector_size(32)));
   typedef uint16_t wide_vector __attribute__((vector_size(64)));
@@ -37164,23 +37020,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_u32(const ui
   cvectorization_ops_block_u32* const v0 = (cvectorization_ops_block_u32*)rawV0;
   cvectorization_ops_block_u32* const v1 = (cvectorization_ops_block_u32*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint32_t buf0[8] __attribute__((aligned(32)));
-  uint32_t buf1[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svuint32x2_t loaded = __builtin_sve_svld2_u32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_u32 r0 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget2_u32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u32 r1 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget2_u32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint32_t buf0[16] __attribute__((aligned(64)));
-  uint32_t buf1[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svuint32x2_t loaded = __builtin_sve_svld2_u32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_u32 r0 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget2_u32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u32 r1 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget2_u32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_i64 vA, vB;
   __builtin_memcpy(&vA, from + 0, sizeof vA);
@@ -37223,29 +37073,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_u32(const ui
   cvectorization_ops_block_u32* const v1 = (cvectorization_ops_block_u32*)rawV1;
   cvectorization_ops_block_u32* const v2 = (cvectorization_ops_block_u32*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint32_t buf0[8] __attribute__((aligned(32)));
-  uint32_t buf1[8] __attribute__((aligned(32)));
-  uint32_t buf2[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svuint32x3_t loaded = __builtin_sve_svld3_u32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_u32 r0 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget3_u32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u32 r1 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget3_u32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u32 r2 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget3_u32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint32_t buf0[16] __attribute__((aligned(64)));
-  uint32_t buf1[16] __attribute__((aligned(64)));
-  uint32_t buf2[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svuint32x3_t loaded = __builtin_sve_svld3_u32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_u32 r0 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget3_u32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u32 r1 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget3_u32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u32 r2 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget3_u32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(48)));
   wide_vector all;
@@ -37351,35 +37193,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_u32(const ui
   cvectorization_ops_block_u32* const v2 = (cvectorization_ops_block_u32*)rawV2;
   cvectorization_ops_block_u32* const v3 = (cvectorization_ops_block_u32*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint32_t buf0[8] __attribute__((aligned(32)));
-  uint32_t buf1[8] __attribute__((aligned(32)));
-  uint32_t buf2[8] __attribute__((aligned(32)));
-  uint32_t buf3[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svuint32x4_t loaded = __builtin_sve_svld4_u32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_u32 r0 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget4_u32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u32 r1 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget4_u32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u32 r2 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget4_u32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_u32 r3 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget4_u32(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint32_t buf0[16] __attribute__((aligned(64)));
-  uint32_t buf1[16] __attribute__((aligned(64)));
-  uint32_t buf2[16] __attribute__((aligned(64)));
-  uint32_t buf3[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svuint32x4_t loaded = __builtin_sve_svld4_u32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_u32 r0 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget4_u32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u32 r1 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget4_u32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u32 r2 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget4_u32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_u32 r3 = (cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svget4_u32(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -37487,17 +37319,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_u32(cvector
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_u32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate2_u32((cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_u32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate2_u32((cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector(a, b, 0, 4, 1, 5, 2, 6, 3, 7);
@@ -37543,19 +37367,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_u32(cvector
   const cvectorization_ops_vector_u32 b = (cvectorization_ops_vector_u32)rawB;
   const cvectorization_ops_vector_u32 c = (cvectorization_ops_vector_u32)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_u32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate3_u32((cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)c));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_u32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate3_u32((cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)c));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t pair_vector __attribute__((vector_size(32)));
   typedef uint32_t wide_vector __attribute__((vector_size(48)));
@@ -37633,21 +37447,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u32(cvector
   const cvectorization_ops_vector_u32 c = (cvectorization_ops_vector_u32)rawC;
   const cvectorization_ops_vector_u32 d = (cvectorization_ops_vector_u32)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_u32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate4_u32((cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)c, (cvectorization_ops_sve_u32)d));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_u32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate4_u32((cvectorization_ops_sve_u32)a, (cvectorization_ops_sve_u32)b, (cvectorization_ops_sve_u32)c, (cvectorization_ops_sve_u32)d));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t pair_vector __attribute__((vector_size(32)));
   typedef uint32_t wide_vector __attribute__((vector_size(64)));
@@ -49502,23 +49304,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_u64(const ui
   cvectorization_ops_block_u64* const v0 = (cvectorization_ops_block_u64*)rawV0;
   cvectorization_ops_block_u64* const v1 = (cvectorization_ops_block_u64*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t buf0[4] __attribute__((aligned(32)));
-  uint64_t buf1[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svuint64x2_t loaded = __builtin_sve_svld2_u64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_u64 r0 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget2_u64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u64 r1 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget2_u64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t buf0[8] __attribute__((aligned(64)));
-  uint64_t buf1[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svuint64x2_t loaded = __builtin_sve_svld2_u64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_u64 r0 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget2_u64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u64 r1 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget2_u64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_i64 vA, vB;
   __builtin_memcpy(&vA, from + 0, sizeof vA);
@@ -49561,29 +49357,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_u64(const ui
   cvectorization_ops_block_u64* const v1 = (cvectorization_ops_block_u64*)rawV1;
   cvectorization_ops_block_u64* const v2 = (cvectorization_ops_block_u64*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t buf0[4] __attribute__((aligned(32)));
-  uint64_t buf1[4] __attribute__((aligned(32)));
-  uint64_t buf2[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svuint64x3_t loaded = __builtin_sve_svld3_u64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_u64 r0 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget3_u64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u64 r1 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget3_u64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u64 r2 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget3_u64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t buf0[8] __attribute__((aligned(64)));
-  uint64_t buf1[8] __attribute__((aligned(64)));
-  uint64_t buf2[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svuint64x3_t loaded = __builtin_sve_svld3_u64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_u64 r0 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget3_u64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u64 r1 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget3_u64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u64 r2 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget3_u64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_i64 v3210, v7654, vba98;
   __builtin_memcpy(&v3210, from + 0, sizeof v3210);
@@ -49675,35 +49463,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_u64(const ui
   cvectorization_ops_block_u64* const v2 = (cvectorization_ops_block_u64*)rawV2;
   cvectorization_ops_block_u64* const v3 = (cvectorization_ops_block_u64*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t buf0[4] __attribute__((aligned(32)));
-  uint64_t buf1[4] __attribute__((aligned(32)));
-  uint64_t buf2[4] __attribute__((aligned(32)));
-  uint64_t buf3[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svuint64x4_t loaded = __builtin_sve_svld4_u64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_u64 r0 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget4_u64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u64 r1 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget4_u64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u64 r2 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget4_u64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_u64 r3 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget4_u64(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t buf0[8] __attribute__((aligned(64)));
-  uint64_t buf1[8] __attribute__((aligned(64)));
-  uint64_t buf2[8] __attribute__((aligned(64)));
-  uint64_t buf3[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svuint64x4_t loaded = __builtin_sve_svld4_u64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_u64 r0 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget4_u64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_u64 r1 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget4_u64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_u64 r2 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget4_u64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_u64 r3 = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svget4_u64(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -49799,55 +49577,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_u64(cvector
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const uint64_t a0 = a[0];
-  const uint64_t b0 = b[0];
-  const uint64_t a1 = a[1];
-  const uint64_t b1 = b[1];
-  const uint64_t a2 = a[2];
-  const uint64_t b2 = b[2];
-  const uint64_t a3 = a[3];
-  const uint64_t b3 = b[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = a3;
-  *to++ = b3;
+  __builtin_sve_svst2_u64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate2_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const uint64_t a0 = a[0];
-  const uint64_t b0 = b[0];
-  const uint64_t a1 = a[1];
-  const uint64_t b1 = b[1];
-  const uint64_t a2 = a[2];
-  const uint64_t b2 = b[2];
-  const uint64_t a3 = a[3];
-  const uint64_t b3 = b[3];
-  const uint64_t a4 = a[4];
-  const uint64_t b4 = b[4];
-  const uint64_t a5 = a[5];
-  const uint64_t b5 = b[5];
-  const uint64_t a6 = a[6];
-  const uint64_t b6 = b[6];
-  const uint64_t a7 = a[7];
-  const uint64_t b7 = b[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = a7;
-  *to++ = b7;
+  __builtin_sve_svst2_u64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate2_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector(a, b, 0, 2, 1, 3);
@@ -49884,79 +49616,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_u64(cvector
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
   const cvectorization_ops_vector_u64 c = (cvectorization_ops_vector_u64)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const uint64_t a0 = a[0];
-  const uint64_t b0 = b[0];
-  const uint64_t c0 = c[0];
-  const uint64_t a1 = a[1];
-  const uint64_t b1 = b[1];
-  const uint64_t c1 = c[1];
-  const uint64_t a2 = a[2];
-  const uint64_t b2 = b[2];
-  const uint64_t c2 = c[2];
-  const uint64_t a3 = a[3];
-  const uint64_t b3 = b[3];
-  const uint64_t c3 = c[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
+  __builtin_sve_svst3_u64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate3_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(c) ? __builtin_sve_svdup_n_u64(c[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)c)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const uint64_t a0 = a[0];
-  const uint64_t b0 = b[0];
-  const uint64_t c0 = c[0];
-  const uint64_t a1 = a[1];
-  const uint64_t b1 = b[1];
-  const uint64_t c1 = c[1];
-  const uint64_t a2 = a[2];
-  const uint64_t b2 = b[2];
-  const uint64_t c2 = c[2];
-  const uint64_t a3 = a[3];
-  const uint64_t b3 = b[3];
-  const uint64_t c3 = c[3];
-  const uint64_t a4 = a[4];
-  const uint64_t b4 = b[4];
-  const uint64_t c4 = c[4];
-  const uint64_t a5 = a[5];
-  const uint64_t b5 = b[5];
-  const uint64_t c5 = c[5];
-  const uint64_t a6 = a[6];
-  const uint64_t b6 = b[6];
-  const uint64_t c6 = c[6];
-  const uint64_t a7 = a[7];
-  const uint64_t b7 = b[7];
-  const uint64_t c7 = c[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = c4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = c5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = c6;
-  *to++ = a7;
-  *to++ = b7;
-  *to++ = c7;
+  __builtin_sve_svst3_u64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate3_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(c) ? __builtin_sve_svdup_n_u64(c[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)c)));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t pair_vector __attribute__((vector_size(32)));
   typedef uint64_t wide_vector __attribute__((vector_size(48)));
@@ -50022,103 +49684,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_u64(cvector
   const cvectorization_ops_vector_u64 c = (cvectorization_ops_vector_u64)rawC;
   const cvectorization_ops_vector_u64 d = (cvectorization_ops_vector_u64)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const uint64_t a0 = a[0];
-  const uint64_t b0 = b[0];
-  const uint64_t c0 = c[0];
-  const uint64_t d0 = d[0];
-  const uint64_t a1 = a[1];
-  const uint64_t b1 = b[1];
-  const uint64_t c1 = c[1];
-  const uint64_t d1 = d[1];
-  const uint64_t a2 = a[2];
-  const uint64_t b2 = b[2];
-  const uint64_t c2 = c[2];
-  const uint64_t d2 = d[2];
-  const uint64_t a3 = a[3];
-  const uint64_t b3 = b[3];
-  const uint64_t c3 = c[3];
-  const uint64_t d3 = d[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = d0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = d1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = d2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = d3;
+  __builtin_sve_svst4_u64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate4_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(c) ? __builtin_sve_svdup_n_u64(c[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)c), (cvectorization_ops_sve_splat_u64(d) ? __builtin_sve_svdup_n_u64(d[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)d)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const uint64_t a0 = a[0];
-  const uint64_t b0 = b[0];
-  const uint64_t c0 = c[0];
-  const uint64_t d0 = d[0];
-  const uint64_t a1 = a[1];
-  const uint64_t b1 = b[1];
-  const uint64_t c1 = c[1];
-  const uint64_t d1 = d[1];
-  const uint64_t a2 = a[2];
-  const uint64_t b2 = b[2];
-  const uint64_t c2 = c[2];
-  const uint64_t d2 = d[2];
-  const uint64_t a3 = a[3];
-  const uint64_t b3 = b[3];
-  const uint64_t c3 = c[3];
-  const uint64_t d3 = d[3];
-  const uint64_t a4 = a[4];
-  const uint64_t b4 = b[4];
-  const uint64_t c4 = c[4];
-  const uint64_t d4 = d[4];
-  const uint64_t a5 = a[5];
-  const uint64_t b5 = b[5];
-  const uint64_t c5 = c[5];
-  const uint64_t d5 = d[5];
-  const uint64_t a6 = a[6];
-  const uint64_t b6 = b[6];
-  const uint64_t c6 = c[6];
-  const uint64_t d6 = d[6];
-  const uint64_t a7 = a[7];
-  const uint64_t b7 = b[7];
-  const uint64_t c7 = c[7];
-  const uint64_t d7 = d[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = d0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = d1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = d2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = d3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = c4;
-  *to++ = d4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = c5;
-  *to++ = d5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = c6;
-  *to++ = d6;
-  *to++ = a7;
-  *to++ = b7;
-  *to++ = c7;
-  *to++ = d7;
+  __builtin_sve_svst4_u64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate4_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(c) ? __builtin_sve_svdup_n_u64(c[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)c), (cvectorization_ops_sve_splat_u64(d) ? __builtin_sve_svdup_n_u64(d[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)d)));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t pair_vector __attribute__((vector_size(32)));
   typedef uint64_t wide_vector __attribute__((vector_size(64)));
@@ -64521,27 +64089,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_i8(const int
   cvectorization_ops_block_i8* const v0 = (cvectorization_ops_block_i8*)rawV0;
   cvectorization_ops_block_i8* const v1 = (cvectorization_ops_block_i8*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t buf0[32] __attribute__((aligned(32)));
-  int8_t buf1[32] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  const cvectorization_ops_vector_i8 out0 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i8 out1 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
+  const __clang_svint8x2_t loaded = __builtin_sve_svld2_s8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_i8 r0 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget2_s8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i8 r1 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget2_s8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t buf0[64] __attribute__((aligned(64)));
-  int8_t buf1[64] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 64; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  const cvectorization_ops_vector_i8 out0 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i8 out1 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
+  const __clang_svint8x2_t loaded = __builtin_sve_svld2_s8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_i8 r0 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget2_s8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i8 r1 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget2_s8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t wide_vector __attribute__((vector_size(32)));
   wide_vector all;
@@ -64608,35 +64166,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_i8(const int
   cvectorization_ops_block_i8* const v1 = (cvectorization_ops_block_i8*)rawV1;
   cvectorization_ops_block_i8* const v2 = (cvectorization_ops_block_i8*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t buf0[32] __attribute__((aligned(32)));
-  int8_t buf1[32] __attribute__((aligned(32)));
-  int8_t buf2[32] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  const cvectorization_ops_vector_i8 out0 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i8 out1 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_i8 out2 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
+  const __clang_svint8x3_t loaded = __builtin_sve_svld3_s8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_i8 r0 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget3_s8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i8 r1 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget3_s8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i8 r2 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget3_s8(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t buf0[64] __attribute__((aligned(64)));
-  int8_t buf1[64] __attribute__((aligned(64)));
-  int8_t buf2[64] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 64; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  const cvectorization_ops_vector_i8 out0 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i8 out1 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_i8 out2 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
+  const __clang_svint8x3_t loaded = __builtin_sve_svld3_s8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_i8 r0 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget3_s8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i8 r1 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget3_s8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i8 r2 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget3_s8(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t wide_vector __attribute__((vector_size(48)));
   wide_vector all;
@@ -64889,43 +64433,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_i8(const int
   cvectorization_ops_block_i8* const v2 = (cvectorization_ops_block_i8*)rawV2;
   cvectorization_ops_block_i8* const v3 = (cvectorization_ops_block_i8*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t buf0[32] __attribute__((aligned(32)));
-  int8_t buf1[32] __attribute__((aligned(32)));
-  int8_t buf2[32] __attribute__((aligned(32)));
-  int8_t buf3[32] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  const cvectorization_ops_vector_i8 out0 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i8 out1 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_i8 out2 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
-  const cvectorization_ops_vector_i8 out3 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf3);
-  __builtin_memcpy(v3, &out3, sizeof out3);
+  const __clang_svint8x4_t loaded = __builtin_sve_svld4_s8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_i8 r0 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget4_s8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i8 r1 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget4_s8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i8 r2 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget4_s8(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_i8 r3 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget4_s8(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t buf0[64] __attribute__((aligned(64)));
-  int8_t buf1[64] __attribute__((aligned(64)));
-  int8_t buf2[64] __attribute__((aligned(64)));
-  int8_t buf3[64] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 64; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  const cvectorization_ops_vector_i8 out0 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i8 out1 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_i8 out2 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
-  const cvectorization_ops_vector_i8 out3 = (cvectorization_ops_vector_i8)cvectorization_ops_load_aligned_i8(buf3);
-  __builtin_memcpy(v3, &out3, sizeof out3);
+  const __clang_svint8x4_t loaded = __builtin_sve_svld4_s8(__builtin_sve_svptrue_pat_b8(31), from);
+  const cvectorization_ops_vector_i8 r0 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget4_s8(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i8 r1 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget4_s8(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i8 r2 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget4_s8(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_i8 r3 = (cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svget4_s8(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -65061,17 +64587,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_i8(cvectori
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_s8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate2_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_s8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate2_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)b, 0, 16, 1, 17, 2, 18, 3, 19, 4, 20, 5, 21, 6, 22, 7, 23, 8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31);
@@ -65126,19 +64644,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_i8(cvectori
   const cvectorization_ops_vector_i8 b = (cvectorization_ops_vector_i8)rawB;
   const cvectorization_ops_vector_i8 c = (cvectorization_ops_vector_i8)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_s8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate3_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)c));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_s8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate3_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)c));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t pair_vector __attribute__((vector_size(32)));
   typedef uint8_t wide_vector __attribute__((vector_size(48)));
@@ -65396,21 +64904,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i8(cvectori
   const cvectorization_ops_vector_i8 c = (cvectorization_ops_vector_i8)rawC;
   const cvectorization_ops_vector_i8 d = (cvectorization_ops_vector_i8)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_s8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate4_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)c, (cvectorization_ops_sve_i8)d));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 64; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_s8(__builtin_sve_svptrue_pat_b8(31), to, __builtin_sve_svcreate4_s8((cvectorization_ops_sve_i8)a, (cvectorization_ops_sve_i8)b, (cvectorization_ops_sve_i8)c, (cvectorization_ops_sve_i8)d));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint8_t pair_vector __attribute__((vector_size(32)));
   typedef uint8_t wide_vector __attribute__((vector_size(64)));
@@ -79130,27 +78626,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_i16(const in
   cvectorization_ops_block_i16* const v0 = (cvectorization_ops_block_i16*)rawV0;
   cvectorization_ops_block_i16* const v1 = (cvectorization_ops_block_i16*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t buf0[16] __attribute__((aligned(32)));
-  int16_t buf1[16] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  const cvectorization_ops_vector_i16 out0 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i16 out1 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
+  const __clang_svint16x2_t loaded = __builtin_sve_svld2_s16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_i16 r0 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget2_s16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i16 r1 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget2_s16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t buf0[32] __attribute__((aligned(64)));
-  int16_t buf1[32] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  const cvectorization_ops_vector_i16 out0 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i16 out1 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
+  const __clang_svint16x2_t loaded = __builtin_sve_svld2_s16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_i16 r0 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget2_s16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i16 r1 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget2_s16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t wide_vector __attribute__((vector_size(32)));
   wide_vector all;
@@ -79237,35 +78723,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_i16(const in
   cvectorization_ops_block_i16* const v1 = (cvectorization_ops_block_i16*)rawV1;
   cvectorization_ops_block_i16* const v2 = (cvectorization_ops_block_i16*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t buf0[16] __attribute__((aligned(32)));
-  int16_t buf1[16] __attribute__((aligned(32)));
-  int16_t buf2[16] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  const cvectorization_ops_vector_i16 out0 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i16 out1 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_i16 out2 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
+  const __clang_svint16x3_t loaded = __builtin_sve_svld3_s16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_i16 r0 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget3_s16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i16 r1 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget3_s16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i16 r2 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget3_s16(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t buf0[32] __attribute__((aligned(64)));
-  int16_t buf1[32] __attribute__((aligned(64)));
-  int16_t buf2[32] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  const cvectorization_ops_vector_i16 out0 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i16 out1 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_i16 out2 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
+  const __clang_svint16x3_t loaded = __builtin_sve_svld3_s16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_i16 r0 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget3_s16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i16 r1 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget3_s16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i16 r2 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget3_s16(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t wide_vector __attribute__((vector_size(48)));
   wide_vector all;
@@ -79516,43 +78988,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_i16(const in
   cvectorization_ops_block_i16* const v2 = (cvectorization_ops_block_i16*)rawV2;
   cvectorization_ops_block_i16* const v3 = (cvectorization_ops_block_i16*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t buf0[16] __attribute__((aligned(32)));
-  int16_t buf1[16] __attribute__((aligned(32)));
-  int16_t buf2[16] __attribute__((aligned(32)));
-  int16_t buf3[16] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  const cvectorization_ops_vector_i16 out0 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i16 out1 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_i16 out2 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
-  const cvectorization_ops_vector_i16 out3 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf3);
-  __builtin_memcpy(v3, &out3, sizeof out3);
+  const __clang_svint16x4_t loaded = __builtin_sve_svld4_s16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_i16 r0 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget4_s16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i16 r1 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget4_s16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i16 r2 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget4_s16(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_i16 r3 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget4_s16(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t buf0[32] __attribute__((aligned(64)));
-  int16_t buf1[32] __attribute__((aligned(64)));
-  int16_t buf2[32] __attribute__((aligned(64)));
-  int16_t buf3[32] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 32; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  const cvectorization_ops_vector_i16 out0 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf0);
-  __builtin_memcpy(v0, &out0, sizeof out0);
-  const cvectorization_ops_vector_i16 out1 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf1);
-  __builtin_memcpy(v1, &out1, sizeof out1);
-  const cvectorization_ops_vector_i16 out2 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf2);
-  __builtin_memcpy(v2, &out2, sizeof out2);
-  const cvectorization_ops_vector_i16 out3 = (cvectorization_ops_vector_i16)cvectorization_ops_load_aligned_i16(buf3);
-  __builtin_memcpy(v3, &out3, sizeof out3);
+  const __clang_svint16x4_t loaded = __builtin_sve_svld4_s16(__builtin_sve_svptrue_pat_b16(31), from);
+  const cvectorization_ops_vector_i16 r0 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget4_s16(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i16 r1 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget4_s16(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i16 r2 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget4_s16(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_i16 r3 = (cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svget4_s16(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -79676,17 +79130,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_i16(cvector
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_s16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate2_s16((cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_s16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate2_s16((cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector((cvectorization_ops_vector_u16)a, (cvectorization_ops_vector_u16)b, 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15);
@@ -79732,19 +79178,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_i16(cvector
   const cvectorization_ops_vector_i16 b = (cvectorization_ops_vector_i16)rawB;
   const cvectorization_ops_vector_i16 c = (cvectorization_ops_vector_i16)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_s16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate3_s16((cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)c));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_s16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate3_s16((cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)c));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t pair_vector __attribute__((vector_size(32)));
   typedef uint16_t wide_vector __attribute__((vector_size(48)));
@@ -79969,21 +79405,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i16(cvector
   const cvectorization_ops_vector_i16 c = (cvectorization_ops_vector_i16)rawC;
   const cvectorization_ops_vector_i16 d = (cvectorization_ops_vector_i16)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_s16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate4_s16((cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)c, (cvectorization_ops_sve_i16)d));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 32; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_s16(__builtin_sve_svptrue_pat_b16(31), to, __builtin_sve_svcreate4_s16((cvectorization_ops_sve_i16)a, (cvectorization_ops_sve_i16)b, (cvectorization_ops_sve_i16)c, (cvectorization_ops_sve_i16)d));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint16_t pair_vector __attribute__((vector_size(32)));
   typedef uint16_t wide_vector __attribute__((vector_size(64)));
@@ -91894,23 +91318,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_i32(const in
   cvectorization_ops_block_i32* const v0 = (cvectorization_ops_block_i32*)rawV0;
   cvectorization_ops_block_i32* const v1 = (cvectorization_ops_block_i32*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t buf0[8] __attribute__((aligned(32)));
-  int32_t buf1[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svint32x2_t loaded = __builtin_sve_svld2_s32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_i32 r0 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget2_s32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i32 r1 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget2_s32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t buf0[16] __attribute__((aligned(64)));
-  int32_t buf1[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svint32x2_t loaded = __builtin_sve_svld2_s32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_i32 r0 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget2_s32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i32 r1 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget2_s32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_i64 vA, vB;
   __builtin_memcpy(&vA, from + 0, sizeof vA);
@@ -91953,29 +91371,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_i32(const in
   cvectorization_ops_block_i32* const v1 = (cvectorization_ops_block_i32*)rawV1;
   cvectorization_ops_block_i32* const v2 = (cvectorization_ops_block_i32*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t buf0[8] __attribute__((aligned(32)));
-  int32_t buf1[8] __attribute__((aligned(32)));
-  int32_t buf2[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svint32x3_t loaded = __builtin_sve_svld3_s32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_i32 r0 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget3_s32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i32 r1 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget3_s32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i32 r2 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget3_s32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t buf0[16] __attribute__((aligned(64)));
-  int32_t buf1[16] __attribute__((aligned(64)));
-  int32_t buf2[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svint32x3_t loaded = __builtin_sve_svld3_s32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_i32 r0 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget3_s32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i32 r1 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget3_s32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i32 r2 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget3_s32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(48)));
   wide_vector all;
@@ -92081,35 +91491,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_i32(const in
   cvectorization_ops_block_i32* const v2 = (cvectorization_ops_block_i32*)rawV2;
   cvectorization_ops_block_i32* const v3 = (cvectorization_ops_block_i32*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t buf0[8] __attribute__((aligned(32)));
-  int32_t buf1[8] __attribute__((aligned(32)));
-  int32_t buf2[8] __attribute__((aligned(32)));
-  int32_t buf3[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svint32x4_t loaded = __builtin_sve_svld4_s32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_i32 r0 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget4_s32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i32 r1 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget4_s32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i32 r2 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget4_s32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_i32 r3 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget4_s32(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t buf0[16] __attribute__((aligned(64)));
-  int32_t buf1[16] __attribute__((aligned(64)));
-  int32_t buf2[16] __attribute__((aligned(64)));
-  int32_t buf3[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svint32x4_t loaded = __builtin_sve_svld4_s32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_i32 r0 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget4_s32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i32 r1 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget4_s32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i32 r2 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget4_s32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_i32 r3 = (cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svget4_s32(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -92217,17 +91617,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_i32(cvector
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_s32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate2_s32((cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_s32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate2_s32((cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector((cvectorization_ops_vector_u32)a, (cvectorization_ops_vector_u32)b, 0, 4, 1, 5, 2, 6, 3, 7);
@@ -92273,19 +91665,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_i32(cvector
   const cvectorization_ops_vector_i32 b = (cvectorization_ops_vector_i32)rawB;
   const cvectorization_ops_vector_i32 c = (cvectorization_ops_vector_i32)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_s32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate3_s32((cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)c));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_s32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate3_s32((cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)c));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t pair_vector __attribute__((vector_size(32)));
   typedef uint32_t wide_vector __attribute__((vector_size(48)));
@@ -92363,21 +91745,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i32(cvector
   const cvectorization_ops_vector_i32 c = (cvectorization_ops_vector_i32)rawC;
   const cvectorization_ops_vector_i32 d = (cvectorization_ops_vector_i32)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_s32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate4_s32((cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)c, (cvectorization_ops_sve_i32)d));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_s32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate4_s32((cvectorization_ops_sve_i32)a, (cvectorization_ops_sve_i32)b, (cvectorization_ops_sve_i32)c, (cvectorization_ops_sve_i32)d));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t pair_vector __attribute__((vector_size(32)));
   typedef uint32_t wide_vector __attribute__((vector_size(64)));
@@ -104587,23 +103957,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_i64(const in
   cvectorization_ops_block_i64* const v0 = (cvectorization_ops_block_i64*)rawV0;
   cvectorization_ops_block_i64* const v1 = (cvectorization_ops_block_i64*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t buf0[4] __attribute__((aligned(32)));
-  int64_t buf1[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svint64x2_t loaded = __builtin_sve_svld2_s64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_i64 r0 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget2_s64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i64 r1 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget2_s64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t buf0[8] __attribute__((aligned(64)));
-  int64_t buf1[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svint64x2_t loaded = __builtin_sve_svld2_s64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_i64 r0 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget2_s64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i64 r1 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget2_s64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_i64 vA, vB;
   __builtin_memcpy(&vA, from + 0, sizeof vA);
@@ -104646,29 +104010,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_i64(const in
   cvectorization_ops_block_i64* const v1 = (cvectorization_ops_block_i64*)rawV1;
   cvectorization_ops_block_i64* const v2 = (cvectorization_ops_block_i64*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t buf0[4] __attribute__((aligned(32)));
-  int64_t buf1[4] __attribute__((aligned(32)));
-  int64_t buf2[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svint64x3_t loaded = __builtin_sve_svld3_s64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_i64 r0 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget3_s64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i64 r1 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget3_s64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i64 r2 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget3_s64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t buf0[8] __attribute__((aligned(64)));
-  int64_t buf1[8] __attribute__((aligned(64)));
-  int64_t buf2[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svint64x3_t loaded = __builtin_sve_svld3_s64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_i64 r0 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget3_s64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i64 r1 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget3_s64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i64 r2 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget3_s64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_i64 v3210, v7654, vba98;
   __builtin_memcpy(&v3210, from + 0, sizeof v3210);
@@ -104760,35 +104116,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_i64(const in
   cvectorization_ops_block_i64* const v2 = (cvectorization_ops_block_i64*)rawV2;
   cvectorization_ops_block_i64* const v3 = (cvectorization_ops_block_i64*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t buf0[4] __attribute__((aligned(32)));
-  int64_t buf1[4] __attribute__((aligned(32)));
-  int64_t buf2[4] __attribute__((aligned(32)));
-  int64_t buf3[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svint64x4_t loaded = __builtin_sve_svld4_s64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_i64 r0 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget4_s64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i64 r1 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget4_s64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i64 r2 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget4_s64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_i64 r3 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget4_s64(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t buf0[8] __attribute__((aligned(64)));
-  int64_t buf1[8] __attribute__((aligned(64)));
-  int64_t buf2[8] __attribute__((aligned(64)));
-  int64_t buf3[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svint64x4_t loaded = __builtin_sve_svld4_s64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_i64 r0 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget4_s64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_i64 r1 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget4_s64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_i64 r2 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget4_s64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_i64 r3 = (cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svget4_s64(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -104884,55 +104230,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_i64(cvector
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const int64_t a0 = a[0];
-  const int64_t b0 = b[0];
-  const int64_t a1 = a[1];
-  const int64_t b1 = b[1];
-  const int64_t a2 = a[2];
-  const int64_t b2 = b[2];
-  const int64_t a3 = a[3];
-  const int64_t b3 = b[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = a3;
-  *to++ = b3;
+  __builtin_sve_svst2_s64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate2_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const int64_t a0 = a[0];
-  const int64_t b0 = b[0];
-  const int64_t a1 = a[1];
-  const int64_t b1 = b[1];
-  const int64_t a2 = a[2];
-  const int64_t b2 = b[2];
-  const int64_t a3 = a[3];
-  const int64_t b3 = b[3];
-  const int64_t a4 = a[4];
-  const int64_t b4 = b[4];
-  const int64_t a5 = a[5];
-  const int64_t b5 = b[5];
-  const int64_t a6 = a[6];
-  const int64_t b6 = b[6];
-  const int64_t a7 = a[7];
-  const int64_t b7 = b[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = a7;
-  *to++ = b7;
+  __builtin_sve_svst2_s64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate2_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b)));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector((cvectorization_ops_vector_u64)a, (cvectorization_ops_vector_u64)b, 0, 2, 1, 3);
@@ -104969,79 +104269,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_i64(cvector
   const cvectorization_ops_vector_i64 b = (cvectorization_ops_vector_i64)rawB;
   const cvectorization_ops_vector_i64 c = (cvectorization_ops_vector_i64)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const int64_t a0 = a[0];
-  const int64_t b0 = b[0];
-  const int64_t c0 = c[0];
-  const int64_t a1 = a[1];
-  const int64_t b1 = b[1];
-  const int64_t c1 = c[1];
-  const int64_t a2 = a[2];
-  const int64_t b2 = b[2];
-  const int64_t c2 = c[2];
-  const int64_t a3 = a[3];
-  const int64_t b3 = b[3];
-  const int64_t c3 = c[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
+  __builtin_sve_svst3_s64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate3_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), (cvectorization_ops_sve_splat_i64(c) ? __builtin_sve_svdup_n_s64(c[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)c)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const int64_t a0 = a[0];
-  const int64_t b0 = b[0];
-  const int64_t c0 = c[0];
-  const int64_t a1 = a[1];
-  const int64_t b1 = b[1];
-  const int64_t c1 = c[1];
-  const int64_t a2 = a[2];
-  const int64_t b2 = b[2];
-  const int64_t c2 = c[2];
-  const int64_t a3 = a[3];
-  const int64_t b3 = b[3];
-  const int64_t c3 = c[3];
-  const int64_t a4 = a[4];
-  const int64_t b4 = b[4];
-  const int64_t c4 = c[4];
-  const int64_t a5 = a[5];
-  const int64_t b5 = b[5];
-  const int64_t c5 = c[5];
-  const int64_t a6 = a[6];
-  const int64_t b6 = b[6];
-  const int64_t c6 = c[6];
-  const int64_t a7 = a[7];
-  const int64_t b7 = b[7];
-  const int64_t c7 = c[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = c4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = c5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = c6;
-  *to++ = a7;
-  *to++ = b7;
-  *to++ = c7;
+  __builtin_sve_svst3_s64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate3_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), (cvectorization_ops_sve_splat_i64(c) ? __builtin_sve_svdup_n_s64(c[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)c)));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t pair_vector __attribute__((vector_size(32)));
   typedef uint64_t wide_vector __attribute__((vector_size(48)));
@@ -105107,103 +104337,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_i64(cvector
   const cvectorization_ops_vector_i64 c = (cvectorization_ops_vector_i64)rawC;
   const cvectorization_ops_vector_i64 d = (cvectorization_ops_vector_i64)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const int64_t a0 = a[0];
-  const int64_t b0 = b[0];
-  const int64_t c0 = c[0];
-  const int64_t d0 = d[0];
-  const int64_t a1 = a[1];
-  const int64_t b1 = b[1];
-  const int64_t c1 = c[1];
-  const int64_t d1 = d[1];
-  const int64_t a2 = a[2];
-  const int64_t b2 = b[2];
-  const int64_t c2 = c[2];
-  const int64_t d2 = d[2];
-  const int64_t a3 = a[3];
-  const int64_t b3 = b[3];
-  const int64_t c3 = c[3];
-  const int64_t d3 = d[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = d0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = d1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = d2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = d3;
+  __builtin_sve_svst4_s64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate4_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), (cvectorization_ops_sve_splat_i64(c) ? __builtin_sve_svdup_n_s64(c[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)c), (cvectorization_ops_sve_splat_i64(d) ? __builtin_sve_svdup_n_s64(d[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)d)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const int64_t a0 = a[0];
-  const int64_t b0 = b[0];
-  const int64_t c0 = c[0];
-  const int64_t d0 = d[0];
-  const int64_t a1 = a[1];
-  const int64_t b1 = b[1];
-  const int64_t c1 = c[1];
-  const int64_t d1 = d[1];
-  const int64_t a2 = a[2];
-  const int64_t b2 = b[2];
-  const int64_t c2 = c[2];
-  const int64_t d2 = d[2];
-  const int64_t a3 = a[3];
-  const int64_t b3 = b[3];
-  const int64_t c3 = c[3];
-  const int64_t d3 = d[3];
-  const int64_t a4 = a[4];
-  const int64_t b4 = b[4];
-  const int64_t c4 = c[4];
-  const int64_t d4 = d[4];
-  const int64_t a5 = a[5];
-  const int64_t b5 = b[5];
-  const int64_t c5 = c[5];
-  const int64_t d5 = d[5];
-  const int64_t a6 = a[6];
-  const int64_t b6 = b[6];
-  const int64_t c6 = c[6];
-  const int64_t d6 = d[6];
-  const int64_t a7 = a[7];
-  const int64_t b7 = b[7];
-  const int64_t c7 = c[7];
-  const int64_t d7 = d[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = d0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = d1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = d2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = d3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = c4;
-  *to++ = d4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = c5;
-  *to++ = d5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = c6;
-  *to++ = d6;
-  *to++ = a7;
-  *to++ = b7;
-  *to++ = c7;
-  *to++ = d7;
+  __builtin_sve_svst4_s64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate4_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), (cvectorization_ops_sve_splat_i64(c) ? __builtin_sve_svdup_n_s64(c[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)c), (cvectorization_ops_sve_splat_i64(d) ? __builtin_sve_svdup_n_s64(d[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)d)));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t pair_vector __attribute__((vector_size(32)));
   typedef uint64_t wide_vector __attribute__((vector_size(64)));
@@ -116859,23 +115995,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_f32(const fl
   cvectorization_ops_block_f32* const v0 = (cvectorization_ops_block_f32*)rawV0;
   cvectorization_ops_block_f32* const v1 = (cvectorization_ops_block_f32*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  float buf0[8] __attribute__((aligned(32)));
-  float buf1[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svfloat32x2_t loaded = __builtin_sve_svld2_f32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_f32 r0 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget2_f32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f32 r1 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget2_f32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  float buf0[16] __attribute__((aligned(64)));
-  float buf1[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svfloat32x2_t loaded = __builtin_sve_svld2_f32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_f32 r0 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget2_f32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f32 r1 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget2_f32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_f32 vA, vB;
   __builtin_memcpy(&vA, from + 0, sizeof vA);
@@ -116918,29 +116048,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_f32(const fl
   cvectorization_ops_block_f32* const v1 = (cvectorization_ops_block_f32*)rawV1;
   cvectorization_ops_block_f32* const v2 = (cvectorization_ops_block_f32*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  float buf0[8] __attribute__((aligned(32)));
-  float buf1[8] __attribute__((aligned(32)));
-  float buf2[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svfloat32x3_t loaded = __builtin_sve_svld3_f32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_f32 r0 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget3_f32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f32 r1 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget3_f32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_f32 r2 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget3_f32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  float buf0[16] __attribute__((aligned(64)));
-  float buf1[16] __attribute__((aligned(64)));
-  float buf2[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svfloat32x3_t loaded = __builtin_sve_svld3_f32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_f32 r0 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget3_f32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f32 r1 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget3_f32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_f32 r2 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget3_f32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(48)));
   wide_vector all;
@@ -117046,35 +116168,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_f32(const fl
   cvectorization_ops_block_f32* const v2 = (cvectorization_ops_block_f32*)rawV2;
   cvectorization_ops_block_f32* const v3 = (cvectorization_ops_block_f32*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  float buf0[8] __attribute__((aligned(32)));
-  float buf1[8] __attribute__((aligned(32)));
-  float buf2[8] __attribute__((aligned(32)));
-  float buf3[8] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svfloat32x4_t loaded = __builtin_sve_svld4_f32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_f32 r0 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget4_f32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f32 r1 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget4_f32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_f32 r2 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget4_f32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_f32 r3 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget4_f32(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  float buf0[16] __attribute__((aligned(64)));
-  float buf1[16] __attribute__((aligned(64)));
-  float buf2[16] __attribute__((aligned(64)));
-  float buf3[16] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 16; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svfloat32x4_t loaded = __builtin_sve_svld4_f32(__builtin_sve_svptrue_pat_b32(31), from);
+  const cvectorization_ops_vector_f32 r0 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget4_f32(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f32 r1 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget4_f32(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_f32 r2 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget4_f32(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_f32 r3 = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svget4_f32(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -117182,17 +116294,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_f32(cvector
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
   const cvectorization_ops_vector_f32 b = (cvectorization_ops_vector_f32)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_f32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate2_f32((cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-  }
+  __builtin_sve_svst2_f32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate2_f32((cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector((cvectorization_ops_vector_u32)a, (cvectorization_ops_vector_u32)b, 0, 4, 1, 5, 2, 6, 3, 7);
@@ -117237,19 +116341,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_f32(cvector
   const cvectorization_ops_vector_f32 b = (cvectorization_ops_vector_f32)rawB;
   const cvectorization_ops_vector_f32 c = (cvectorization_ops_vector_f32)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_f32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate3_f32((cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)c));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-  }
+  __builtin_sve_svst3_f32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate3_f32((cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)c));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t pair_vector __attribute__((vector_size(32)));
   typedef uint32_t wide_vector __attribute__((vector_size(48)));
@@ -117327,21 +116421,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_f32(cvector
   const cvectorization_ops_vector_f32 c = (cvectorization_ops_vector_f32)rawC;
   const cvectorization_ops_vector_f32 d = (cvectorization_ops_vector_f32)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 8; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_f32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate4_f32((cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)c, (cvectorization_ops_sve_f32)d));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-#pragma clang loop unroll(full)
-  for (size_t i = 0; i < 16; ++i) {
-    *to++ = a[i];
-    *to++ = b[i];
-    *to++ = c[i];
-    *to++ = d[i];
-  }
+  __builtin_sve_svst4_f32(__builtin_sve_svptrue_pat_b32(31), to, __builtin_sve_svcreate4_f32((cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b, (cvectorization_ops_sve_f32)c, (cvectorization_ops_sve_f32)d));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint32_t pair_vector __attribute__((vector_size(32)));
   typedef uint32_t wide_vector __attribute__((vector_size(64)));
@@ -128581,23 +127663,17 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved2_f64(const do
   cvectorization_ops_block_f64* const v0 = (cvectorization_ops_block_f64*)rawV0;
   cvectorization_ops_block_f64* const v1 = (cvectorization_ops_block_f64*)rawV1;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  double buf0[4] __attribute__((aligned(32)));
-  double buf1[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svfloat64x2_t loaded = __builtin_sve_svld2_f64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_f64 r0 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget2_f64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f64 r1 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget2_f64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  double buf0[8] __attribute__((aligned(64)));
-  double buf1[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
+  const __clang_svfloat64x2_t loaded = __builtin_sve_svld2_f64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_f64 r0 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget2_f64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f64 r1 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget2_f64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_f64 vA, vB;
   __builtin_memcpy(&vA, from + 0, sizeof vA);
@@ -128640,29 +127716,21 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved3_f64(const do
   cvectorization_ops_block_f64* const v1 = (cvectorization_ops_block_f64*)rawV1;
   cvectorization_ops_block_f64* const v2 = (cvectorization_ops_block_f64*)rawV2;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  double buf0[4] __attribute__((aligned(32)));
-  double buf1[4] __attribute__((aligned(32)));
-  double buf2[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svfloat64x3_t loaded = __builtin_sve_svld3_f64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_f64 r0 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget3_f64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f64 r1 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget3_f64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_f64 r2 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget3_f64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  double buf0[8] __attribute__((aligned(64)));
-  double buf1[8] __attribute__((aligned(64)));
-  double buf2[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
+  const __clang_svfloat64x3_t loaded = __builtin_sve_svld3_f64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_f64 r0 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget3_f64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f64 r1 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget3_f64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_f64 r2 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget3_f64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_x86_f64 v3210, v7654, vba98;
   __builtin_memcpy(&v3210, from + 0, sizeof v3210);
@@ -128754,35 +127822,25 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_load_interleaved4_f64(const do
   cvectorization_ops_block_f64* const v2 = (cvectorization_ops_block_f64*)rawV2;
   cvectorization_ops_block_f64* const v3 = (cvectorization_ops_block_f64*)rawV3;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  double buf0[4] __attribute__((aligned(32)));
-  double buf1[4] __attribute__((aligned(32)));
-  double buf2[4] __attribute__((aligned(32)));
-  double buf3[4] __attribute__((aligned(32)));
-  for (size_t i = 0; i < 4; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svfloat64x4_t loaded = __builtin_sve_svld4_f64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_f64 r0 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget4_f64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f64 r1 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget4_f64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_f64 r2 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget4_f64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_f64 r3 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget4_f64(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  double buf0[8] __attribute__((aligned(64)));
-  double buf1[8] __attribute__((aligned(64)));
-  double buf2[8] __attribute__((aligned(64)));
-  double buf3[8] __attribute__((aligned(64)));
-  for (size_t i = 0; i < 8; ++i) {
-    buf0[i] = *from++;
-    buf1[i] = *from++;
-    buf2[i] = *from++;
-    buf3[i] = *from++;
-  }
-  __builtin_memcpy(v0, &buf0, sizeof buf0);
-  __builtin_memcpy(v1, &buf1, sizeof buf1);
-  __builtin_memcpy(v2, &buf2, sizeof buf2);
-  __builtin_memcpy(v3, &buf3, sizeof buf3);
+  const __clang_svfloat64x4_t loaded = __builtin_sve_svld4_f64(__builtin_sve_svptrue_pat_b64(31), from);
+  const cvectorization_ops_vector_f64 r0 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget4_f64(loaded, 0);
+  __builtin_memcpy(v0, &r0, sizeof r0);
+  const cvectorization_ops_vector_f64 r1 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget4_f64(loaded, 1);
+  __builtin_memcpy(v1, &r1, sizeof r1);
+  const cvectorization_ops_vector_f64 r2 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget4_f64(loaded, 2);
+  __builtin_memcpy(v2, &r2, sizeof r2);
+  const cvectorization_ops_vector_f64 r3 = (cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svget4_f64(loaded, 3);
+  __builtin_memcpy(v3, &r3, sizeof r3);
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t wide_vector __attribute__((vector_size(64)));
   wide_vector all;
@@ -128878,55 +127936,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved2_f64(cvector
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
   const cvectorization_ops_vector_f64 b = (cvectorization_ops_vector_f64)rawB;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const double a0 = a[0];
-  const double b0 = b[0];
-  const double a1 = a[1];
-  const double b1 = b[1];
-  const double a2 = a[2];
-  const double b2 = b[2];
-  const double a3 = a[3];
-  const double b3 = b[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = a3;
-  *to++ = b3;
+  __builtin_sve_svst2_f64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate2_f64((cvectorization_ops_sve_f64)a, (cvectorization_ops_sve_f64)b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const double a0 = a[0];
-  const double b0 = b[0];
-  const double a1 = a[1];
-  const double b1 = b[1];
-  const double a2 = a[2];
-  const double b2 = b[2];
-  const double a3 = a[3];
-  const double b3 = b[3];
-  const double a4 = a[4];
-  const double b4 = b[4];
-  const double a5 = a[5];
-  const double b5 = b[5];
-  const double a6 = a[6];
-  const double b6 = b[6];
-  const double a7 = a[7];
-  const double b7 = b[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = a7;
-  *to++ = b7;
+  __builtin_sve_svst2_f64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate2_f64((cvectorization_ops_sve_f64)a, (cvectorization_ops_sve_f64)b));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t wide_vector __attribute__((vector_size(32)));
   const wide_vector all = __builtin_shufflevector((cvectorization_ops_vector_u64)a, (cvectorization_ops_vector_u64)b, 0, 2, 1, 3);
@@ -128963,79 +127975,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved3_f64(cvector
   const cvectorization_ops_vector_f64 b = (cvectorization_ops_vector_f64)rawB;
   const cvectorization_ops_vector_f64 c = (cvectorization_ops_vector_f64)rawC;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const double a0 = a[0];
-  const double b0 = b[0];
-  const double c0 = c[0];
-  const double a1 = a[1];
-  const double b1 = b[1];
-  const double c1 = c[1];
-  const double a2 = a[2];
-  const double b2 = b[2];
-  const double c2 = c[2];
-  const double a3 = a[3];
-  const double b3 = b[3];
-  const double c3 = c[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
+  __builtin_sve_svst3_f64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate3_f64((cvectorization_ops_sve_f64)a, (cvectorization_ops_sve_f64)b, (cvectorization_ops_sve_f64)c));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const double a0 = a[0];
-  const double b0 = b[0];
-  const double c0 = c[0];
-  const double a1 = a[1];
-  const double b1 = b[1];
-  const double c1 = c[1];
-  const double a2 = a[2];
-  const double b2 = b[2];
-  const double c2 = c[2];
-  const double a3 = a[3];
-  const double b3 = b[3];
-  const double c3 = c[3];
-  const double a4 = a[4];
-  const double b4 = b[4];
-  const double c4 = c[4];
-  const double a5 = a[5];
-  const double b5 = b[5];
-  const double c5 = c[5];
-  const double a6 = a[6];
-  const double b6 = b[6];
-  const double c6 = c[6];
-  const double a7 = a[7];
-  const double b7 = b[7];
-  const double c7 = c[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = c4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = c5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = c6;
-  *to++ = a7;
-  *to++ = b7;
-  *to++ = c7;
+  __builtin_sve_svst3_f64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate3_f64((cvectorization_ops_sve_f64)a, (cvectorization_ops_sve_f64)b, (cvectorization_ops_sve_f64)c));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t pair_vector __attribute__((vector_size(32)));
   typedef uint64_t wide_vector __attribute__((vector_size(48)));
@@ -129101,103 +128043,9 @@ CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_interleaved4_f64(cvector
   const cvectorization_ops_vector_f64 c = (cvectorization_ops_vector_f64)rawC;
   const cvectorization_ops_vector_f64 d = (cvectorization_ops_vector_f64)rawD;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const double a0 = a[0];
-  const double b0 = b[0];
-  const double c0 = c[0];
-  const double d0 = d[0];
-  const double a1 = a[1];
-  const double b1 = b[1];
-  const double c1 = c[1];
-  const double d1 = d[1];
-  const double a2 = a[2];
-  const double b2 = b[2];
-  const double c2 = c[2];
-  const double d2 = d[2];
-  const double a3 = a[3];
-  const double b3 = b[3];
-  const double c3 = c[3];
-  const double d3 = d[3];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = d0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = d1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = d2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = d3;
+  __builtin_sve_svst4_f64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate4_f64((cvectorization_ops_sve_f64)a, (cvectorization_ops_sve_f64)b, (cvectorization_ops_sve_f64)c, (cvectorization_ops_sve_f64)d));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const double a0 = a[0];
-  const double b0 = b[0];
-  const double c0 = c[0];
-  const double d0 = d[0];
-  const double a1 = a[1];
-  const double b1 = b[1];
-  const double c1 = c[1];
-  const double d1 = d[1];
-  const double a2 = a[2];
-  const double b2 = b[2];
-  const double c2 = c[2];
-  const double d2 = d[2];
-  const double a3 = a[3];
-  const double b3 = b[3];
-  const double c3 = c[3];
-  const double d3 = d[3];
-  const double a4 = a[4];
-  const double b4 = b[4];
-  const double c4 = c[4];
-  const double d4 = d[4];
-  const double a5 = a[5];
-  const double b5 = b[5];
-  const double c5 = c[5];
-  const double d5 = d[5];
-  const double a6 = a[6];
-  const double b6 = b[6];
-  const double c6 = c[6];
-  const double d6 = d[6];
-  const double a7 = a[7];
-  const double b7 = b[7];
-  const double c7 = c[7];
-  const double d7 = d[7];
-  *to++ = a0;
-  *to++ = b0;
-  *to++ = c0;
-  *to++ = d0;
-  *to++ = a1;
-  *to++ = b1;
-  *to++ = c1;
-  *to++ = d1;
-  *to++ = a2;
-  *to++ = b2;
-  *to++ = c2;
-  *to++ = d2;
-  *to++ = a3;
-  *to++ = b3;
-  *to++ = c3;
-  *to++ = d3;
-  *to++ = a4;
-  *to++ = b4;
-  *to++ = c4;
-  *to++ = d4;
-  *to++ = a5;
-  *to++ = b5;
-  *to++ = c5;
-  *to++ = d5;
-  *to++ = a6;
-  *to++ = b6;
-  *to++ = c6;
-  *to++ = d6;
-  *to++ = a7;
-  *to++ = b7;
-  *to++ = c7;
-  *to++ = d7;
+  __builtin_sve_svst4_f64(__builtin_sve_svptrue_pat_b64(31), to, __builtin_sve_svcreate4_f64((cvectorization_ops_sve_f64)a, (cvectorization_ops_sve_f64)b, (cvectorization_ops_sve_f64)c, (cvectorization_ops_sve_f64)d));
 #elif CVECTORIZATION_OPS_NEON
   typedef uint64_t pair_vector __attribute__((vector_size(32)));
   typedef uint64_t wide_vector __attribute__((vector_size(64)));

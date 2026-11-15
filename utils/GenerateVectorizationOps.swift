@@ -16306,6 +16306,7 @@ let basicOps: [Op] = [
         span: .vectors(2),
         targets: TargetBodies(
             neon: { element in shuffleLoadInterleaved(channels: 2, for: element) },
+            sve: { element in sveLoadedInterleaved(channels: 2, for: element) },
             avx3dl: { element in x86Avx3LoadInterleaved2Body(level: .avx3dl, for: element) },
             avx3: { element in x86Avx3LoadInterleaved2Body(level: .avx3, for: element) },
             avx2: { element in x86Avx2LoadInterleaved2(for: element) },
@@ -16334,6 +16335,7 @@ let basicOps: [Op] = [
         span: .vectors(3),
         targets: TargetBodies(
             neon: { element in shuffleLoadInterleaved(channels: 3, for: element) },
+            sve: { element in sveLoadedInterleaved(channels: 3, for: element) },
             avx3: { element in x86Avx3LoadInterleaved3Body(for: element) },
             avx2: { element in x86Avx2LoadInterleaved3(for: element) },
             sse4: { element in
@@ -16382,6 +16384,7 @@ let basicOps: [Op] = [
         span: .vectors(4),
         targets: TargetBodies(
             neon: { element in shuffleLoadInterleaved(channels: 4, for: element) },
+            sve: { element in sveLoadedInterleaved(channels: 4, for: element) },
             avx3: { element in x86Avx3LoadInterleaved4(for: element) },
             avx2: { element in
                 x86Avx2LoadInterleaved(
@@ -16411,6 +16414,7 @@ let basicOps: [Op] = [
         span: .vectors(2),
         targets: TargetBodies(
             neon: { element in shuffleStoreInterleaved(channels: 2, for: element) },
+            sve: { element in sveStoredInterleaved(channels: 2, for: element) },
             avx3dl: { element in x86Avx3StoreInterleaved2Body(level: .avx3dl, for: element) },
             avx3: { element in x86Avx3StoreInterleaved2Body(level: .avx3, for: element) },
             avx2: { element in x86Avx2StoreInterleaved2(for: element) },
@@ -16435,6 +16439,7 @@ let basicOps: [Op] = [
         span: .vectors(3),
         targets: TargetBodies(
             neon: { element in shuffleStoreInterleaved(channels: 3, for: element) },
+            sve: { element in sveStoredInterleaved(channels: 3, for: element) },
             avx3: { element in x86Avx3StoreInterleaved3Body(for: element) },
             avx2: { element in x86Avx2StoreInterleaved3(for: element) },
             sse4: { element in
@@ -16472,6 +16477,7 @@ let basicOps: [Op] = [
         span: .vectors(4),
         targets: TargetBodies(
             neon: { element in shuffleStoreInterleaved(channels: 4, for: element) },
+            sve: { element in sveStoredInterleaved(channels: 4, for: element) },
             avx3: { element in x86Avx3StoreInterleaved4Body(for: element) },
             avx2: { element in x86Avx2StoreInterleaved4(for: element) },
             sse2: { element in
@@ -26612,6 +26618,40 @@ func sveSafeCopy(for element: Element) -> String {
     let active = sveActiveLanes("count", for: element)
     let loaded = sveBuiltin("ld1", [active, "from"], for: element)
     return "\(sveBuiltin("st1", [active, "to", loaded], for: element));"
+}
+
+func sveTupleType(_ count: Int, of element: Element) -> String {
+    let lane =
+        switch element.category {
+        case .unsignedInteger: "uint\(element.bits)"
+        case .signedInteger: "int\(element.bits)"
+        case .float, .float16: "float\(element.bits)"
+        case .bfloat16: "bfloat16"
+        }
+    return "__clang_sv\(lane)x\(count)_t"
+}
+
+func sveLoadedInterleaved(channels: Int, for element: Element) -> String {
+    let loaded = sveBuiltin("ld\(channels)", [sveAllLanes(of: element), "from"], for: element)
+    let splits = (0..<channels).map { channel in
+        let part = sveBuiltin("get\(channels)", ["loaded", "\(channel)"], for: element)
+        return """
+            const \(element.cVector) r\(channel) = \(sveResult(part, for: element));
+            \(outVectorStore(channel))
+            """
+    }
+    return """
+        const \(sveTupleType(channels, of: element)) loaded = \(loaded);
+        \(splits.joined(separator: "\n"))
+        """
+}
+
+func sveStoredInterleaved(channels: Int, for element: Element) -> String {
+    let operands = ["a", "b", "c", "d"].prefix(channels).map {
+        sveOperand($0, for: element, splat: true)
+    }
+    let tuple = sveBuiltin("create\(channels)", Array(operands), for: element)
+    return "\(sveBuiltin("st\(channels)", [sveAllLanes(of: element), "to", tuple], for: element));"
 }
 
 func sveLoadedUpperHalf(for element: Element) -> String {
