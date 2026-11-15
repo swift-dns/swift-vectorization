@@ -24100,12 +24100,80 @@ func sveBlockShift(
                 }
             return (amount: count, body: sveBlockResult(shifted, unit: unit, for: element))
         }
-        let active = sveActiveLanes("\(amount) & \(limit - 1)", for: view)
-        let inactive = "__builtin_sve_svnot_b_z(\(sveAllLanes(of: view)), \(active))"
+        let inactive = sveInactiveLanes("\(amount) & \(limit - 1)", for: view)
         let slid = sveBuiltin("splice", [inactive, operand, zero], for: view)
         return """
             \(constantSwitch(on: amount, cases))
             \(sveBlockResult(slid, unit: unit, for: element))
+            """
+    }
+}
+
+func sveUnsignedBlockView(unit: Int, for element: Element) -> Element {
+    unsignedElement(bits: unit == 1 ? 8 : element.bits).at(width: element.width)
+}
+
+func sveFirstLanesPerBlock(_ count: String, for view: Element) -> String {
+    let positions = sveBuiltin("dupq_n", (0..<view.blockLaneCount).map(String.init), for: view)
+    return sveBuiltin(
+        "cmplt_n",
+        [sveAllLanes(of: view), positions, "(\(view.cType))(\(count))"],
+        for: view
+    )
+}
+
+func sveViewResult(_ call: String, view: Element, for element: Element) -> String {
+    vectorResult("(\(element.cVector))\(sveResult(call, for: view))", for: element)
+}
+
+func sveInactiveLanes(_ count: String, for view: Element) -> String {
+    "__builtin_sve_svnot_b_z(\(sveAllLanes(of: view)), \(sveActiveLanes(count, for: view)))"
+}
+
+func svePerBlockShift(
+    _ direction: BlockShift,
+    amount: String,
+    unit: Int,
+    for element: Element
+) -> String {
+    let view = sveUnsignedBlockView(unit: unit, for: element)
+    let operand = sveOperand("a", for: view)
+    let zero = sveBuiltin("dup_n", ["0"], for: view)
+    switch direction {
+    case .left:
+        let slid = sveBuiltin(
+            "splice",
+            [sveActiveLanes(amount, for: view), zero, operand],
+            for: view
+        )
+        let shifted = sveBuiltin(
+            "sel",
+            [sveFirstLanesPerBlock(amount, for: view), zero, slid],
+            for: view
+        )
+        return sveViewResult(shifted, view: view, for: element)
+    case .right:
+        let limit = view.blockLaneCount
+        func kept(_ slid: String, below count: String) -> String {
+            let shifted = sveBuiltin(
+                "sel",
+                [sveFirstLanesPerBlock(count, for: view), slid, zero],
+                for: view
+            )
+            return sveViewResult(shifted, view: view, for: element)
+        }
+        let cases = (0...limit).map { count in
+            let slid = sveBuiltin("ext", [operand, operand, String(count)], for: view)
+            return (amount: count, body: kept(slid, below: String(limit - count)))
+        }
+        let slid = sveBuiltin(
+            "splice",
+            [sveInactiveLanes(amount, for: view), operand, zero],
+            for: view
+        )
+        return """
+            \(constantSwitch(on: amount, cases))
+            \(kept(slid, below: "\(limit) - \(amount)"))
             """
     }
 }
@@ -24174,6 +24242,7 @@ func blockShiftTargets(
     return TargetBodies(
         neon: { neonBlockShift(direction, amount: amount, unit: unit($0), for: $0) },
         sve2_128: { sveBlockShift(direction, amount: amount, unit: unit($0), for: $0) },
+        sve: { svePerBlockShift(direction, amount: amount, unit: unit($0), for: $0) },
         avx3dl: {
             x86BlockShift(direction, amount: amount, unit: unit($0), level: .avx3dl, for: $0)
         },
@@ -24233,12 +24302,58 @@ func sveBlockCombine(amount: String, unit: Int, for element: Element) -> String 
         let combined = sveBuiltin("ext", [low, high, String(count)], for: view)
         return (amount: count, body: sveBlockResult(combined, unit: unit, for: element))
     }
-    let inactive =
-        "__builtin_sve_svnot_b_z(\(sveAllLanes(of: view)), \(sveActiveLanes(amount, for: view)))"
-    let slid = sveBuiltin("splice", [inactive, low, high], for: view)
+    let slid = sveBuiltin("splice", [sveInactiveLanes(amount, for: view), low, high], for: view)
     return """
         \(constantSwitch(on: amount, cases))
         \(sveBlockResult(slid, unit: unit, for: element))
+        """
+}
+
+func svePerBlockCombine(amount: String, unit: Int, for element: Element) -> String {
+    let bytes = sveUnsignedBlockView(unit: 1, for: element)
+    let (high, low) = (sveOperand("a", for: bytes), sveOperand("b", for: bytes))
+    func combined(_ lowered: String, keeping kept: String) -> String {
+        let raised = sveBuiltin(
+            "splice",
+            [sveActiveLanes(kept, for: bytes), high, high],
+            for: bytes
+        )
+        let selected = sveBuiltin(
+            "sel",
+            [sveFirstLanesPerBlock(kept, for: bytes), lowered, raised],
+            for: bytes
+        )
+        return sveViewResult(selected, view: bytes, for: element)
+    }
+    let cases = combineCases(unit: unit) { count in
+        combined(
+            sveBuiltin("ext", [low, low, String(count)], for: bytes),
+            keeping: String(16 - count)
+        )
+    }
+    let byteCount = blockByteCount(amount, unit: unit)
+    let rotated = sveBuiltin(
+        "splice",
+        [sveInactiveLanes(byteCount, for: bytes), low, low],
+        for: bytes
+    )
+    return """
+        \(constantSwitch(on: amount, cases))
+        \(combined(rotated, keeping: "16 - \(byteCount)"))
+        """
+}
+
+func sveSlideDownCombine(for element: Element) -> String {
+    let view = sveUnsignedBlockView(unit: element.bits / 8, for: element)
+    let (high, low) = (sveOperand("a", for: view), sveOperand("b", for: view))
+    let cases = (1..<element.laneCount).map { count in
+        let combined = sveBuiltin("ext", [low, high, String(count)], for: view)
+        return (amount: count, body: sveViewResult(combined, view: view, for: element))
+    }
+    let slid = sveBuiltin("splice", [sveInactiveLanes("lanes", for: view), low, high], for: view)
+    return """
+        \(constantSwitch(on: "lanes", cases))
+        \(sveViewResult(slid, view: view, for: element))
         """
 }
 
@@ -24284,6 +24399,7 @@ func blockCombineTargets(amount: String, bytewise: Bool) -> TargetBodies<Element
     return TargetBodies(
         neon: { neonBlockCombine(amount: amount, unit: unit($0), for: $0) },
         sve2_128: { sveBlockCombine(amount: amount, unit: unit($0), for: $0) },
+        sve: { svePerBlockCombine(amount: amount, unit: unit($0), for: $0) },
         avx3dl: { x86BlockCombine(amount: amount, unit: unit($0), level: .avx3dl, for: $0) },
         avx3: { x86BlockCombine(amount: amount, unit: unit($0), level: .avx3, for: $0) },
         avx2: { x86BlockCombine(amount: amount, unit: unit($0), level: .avx2, for: $0) },
@@ -24773,6 +24889,7 @@ func x86Avx2SlideDownCombine(for element: Element) -> String {
 func combinedSlideDownTargets() -> TargetBodies<Element> {
     TargetBodies(
         sve2_128: { sveBlockCombine(amount: "lanes", unit: $0.bits / 8, for: $0) },
+        sve: { sveSlideDownCombine(for: $0) },
         avx2: { x86Avx2SlideDownCombine(for: $0) },
         ssse3: { x86SlideDownCombine(level: .ssse3, for: $0) },
         sse2: { x86SlideDownCombine(level: .sse2, for: $0) }
