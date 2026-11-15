@@ -12,6 +12,9 @@ NEON SumAboveSpanU16
 NEON SumAboveSpanU32
 NEON SumAboveSpanU64
 NEON SumAboveSpanU8
+NEON GatherFirstOtherwiseF32ConstantCountTwo
+NEON GatherFirstOtherwiseI32ConstantCountTwo
+NEON GatherFirstOtherwiseU32ConstantCountTwo
 SSE2 DividingI16
 SSE2 DividingU8
 SSE2 MultiplyingHighU64
