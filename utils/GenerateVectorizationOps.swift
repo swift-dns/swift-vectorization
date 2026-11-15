@@ -17576,6 +17576,21 @@ func sveExtremum128(minimum: Bool, upper: Bool, for element: Element) -> String 
             """
     }
     let equal = sveBuiltin("cmpeq", [all] + operands, for: element)
+    guard element.width != 32 else {
+        let type = sveType(of: element)
+        let ones = sveBuiltin("dup_n", ["(\(element.cType))-1"], for: element)
+        let zeros = sveBuiltin("dup_n", ["0"], for: element)
+        let lanes = sveBuiltin("sel", [less, ones, zeros], for: element)
+        let lower = sveBuiltin("trn1", ["lessLanes", "lessLanes"], for: element)
+        let high = sveBuiltin("sel", ["equal", lower, "lessLanes"], for: element)
+        return """
+            const __SVBool_t equal = \(equal);
+            const \(type) lessLanes = \(lanes);
+            const \(type) high = \(high);
+            const \(element.cVector) mask = \(sveResult(sveBuiltin("trn2", ["high", "high"], for: element), for: element));
+            \(vectorResult("(mask & a) | (~mask & b)", for: element))
+            """
+    }
     return """
         const __SVBool_t equal = \(equal);
         const __SVBool_t less = \(less);
@@ -17730,6 +17745,7 @@ func lessThan128Targets(upper: Bool) -> TargetBodies<Element> {
 func extremum128Targets(minimum: Bool, upper: Bool) -> TargetBodies<Element> {
     TargetBodies(
         sve2_128: { element in sveExtremum128(minimum: minimum, upper: upper, for: element) },
+        sve: { element in sveExtremum128(minimum: minimum, upper: upper, for: element) },
         avx3: { element in
             x86Extremum128(minimum: minimum, upper: upper, level: .avx3, for: element)
         },

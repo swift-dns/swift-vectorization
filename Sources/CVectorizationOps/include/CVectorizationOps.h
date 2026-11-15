@@ -51408,19 +51408,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_m
   const __SVBool_t high = __builtin_sve_svsel_b(equal, __builtin_sve_svtrn1_b64(less, less), less);
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(high, high), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_mask_u64 equal = (cvectorization_ops_mask_u64)(a == b);
-  const cvectorization_ops_mask_u64 lessLanes = (cvectorization_ops_mask_u64)(a < b);
-  const cvectorization_ops_mask_u64 lowLess = __builtin_shufflevector(lessLanes, lessLanes, 0, 0, 2, 2);
-  const cvectorization_ops_mask_u64 high = (equal & lowLess) | (~equal & lessLanes);
-  const cvectorization_ops_mask_u64 less = __builtin_shufflevector(high, high, 1, 1, 3, 3);
-  return (cvectorization_ops_raw_vector_u64)(b ^ ((cvectorization_ops_vector_u64)less & (a ^ b)));
+  const __SVBool_t equal = __builtin_sve_svcmpeq_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b));
+  const __SVUint64_t lessLanes = __builtin_sve_svsel_u64(__builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)), __builtin_sve_svdup_n_u64((uint64_t)-1), __builtin_sve_svdup_n_u64(0));
+  const __SVUint64_t high = __builtin_sve_svsel_u64(equal, __builtin_sve_svtrn1_u64(lessLanes, lessLanes), lessLanes);
+  const cvectorization_ops_vector_u64 mask = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svtrn2_u64(high, high);
+  return (cvectorization_ops_raw_vector_u64)((mask & a) | (~mask & b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_mask_u64 equal = (cvectorization_ops_mask_u64)(a == b);
-  const cvectorization_ops_mask_u64 lessLanes = (cvectorization_ops_mask_u64)(a < b);
-  const cvectorization_ops_mask_u64 lowLess = __builtin_shufflevector(lessLanes, lessLanes, 0, 0, 2, 2, 4, 4, 6, 6);
-  const cvectorization_ops_mask_u64 high = (equal & lowLess) | (~equal & lessLanes);
-  const cvectorization_ops_mask_u64 less = __builtin_shufflevector(high, high, 1, 1, 3, 3, 5, 5, 7, 7);
-  return (cvectorization_ops_raw_vector_u64)(b ^ ((cvectorization_ops_vector_u64)less & (a ^ b)));
+  const __SVBool_t equal = __builtin_sve_svcmpeq_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b));
+  const __SVBool_t less = __builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b));
+  const __SVBool_t high = __builtin_sve_svsel_b(equal, __builtin_sve_svtrn1_b64(less, less), less);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(high, high), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const unsigned char equalBits = (unsigned char)__builtin_ia32_cmpq512_mask((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)b, (int)0, (unsigned char)-1);
   const unsigned char lessBits = (unsigned char)__builtin_ia32_ucmpq512_mask((cvectorization_ops_x86_i64)b, (cvectorization_ops_x86_i64)a, (int)6, (unsigned char)-1);
@@ -51482,19 +51479,16 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_m
   const __SVBool_t high = __builtin_sve_svsel_b(equal, __builtin_sve_svtrn1_b64(less, less), less);
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(high, high), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_mask_u64 equal = (cvectorization_ops_mask_u64)(b == a);
-  const cvectorization_ops_mask_u64 lessLanes = (cvectorization_ops_mask_u64)(b < a);
-  const cvectorization_ops_mask_u64 lowLess = __builtin_shufflevector(lessLanes, lessLanes, 0, 0, 2, 2);
-  const cvectorization_ops_mask_u64 high = (equal & lowLess) | (~equal & lessLanes);
-  const cvectorization_ops_mask_u64 less = __builtin_shufflevector(high, high, 1, 1, 3, 3);
-  return (cvectorization_ops_raw_vector_u64)(b ^ ((cvectorization_ops_vector_u64)less & (a ^ b)));
+  const __SVBool_t equal = __builtin_sve_svcmpeq_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
+  const __SVUint64_t lessLanes = __builtin_sve_svsel_u64(__builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)), __builtin_sve_svdup_n_u64((uint64_t)-1), __builtin_sve_svdup_n_u64(0));
+  const __SVUint64_t high = __builtin_sve_svsel_u64(equal, __builtin_sve_svtrn1_u64(lessLanes, lessLanes), lessLanes);
+  const cvectorization_ops_vector_u64 mask = (cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svtrn2_u64(high, high);
+  return (cvectorization_ops_raw_vector_u64)((mask & a) | (~mask & b));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_mask_u64 equal = (cvectorization_ops_mask_u64)(b == a);
-  const cvectorization_ops_mask_u64 lessLanes = (cvectorization_ops_mask_u64)(b < a);
-  const cvectorization_ops_mask_u64 lowLess = __builtin_shufflevector(lessLanes, lessLanes, 0, 0, 2, 2, 4, 4, 6, 6);
-  const cvectorization_ops_mask_u64 high = (equal & lowLess) | (~equal & lessLanes);
-  const cvectorization_ops_mask_u64 less = __builtin_shufflevector(high, high, 1, 1, 3, 3, 5, 5, 7, 7);
-  return (cvectorization_ops_raw_vector_u64)(b ^ ((cvectorization_ops_vector_u64)less & (a ^ b)));
+  const __SVBool_t equal = __builtin_sve_svcmpeq_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
+  const __SVBool_t less = __builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
+  const __SVBool_t high = __builtin_sve_svsel_b(equal, __builtin_sve_svtrn1_b64(less, less), less);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(high, high), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const unsigned char equalBits = (unsigned char)__builtin_ia32_cmpq512_mask((cvectorization_ops_x86_i64)b, (cvectorization_ops_x86_i64)a, (int)0, (unsigned char)-1);
   const unsigned char lessBits = (unsigned char)__builtin_ia32_ucmpq512_mask((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)b, (int)6, (unsigned char)-1);
@@ -51554,11 +51548,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_m
   const __SVBool_t less = __builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b));
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(less, less), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_mask_u64 less = __builtin_shufflevector((cvectorization_ops_mask_u64)(a < b), (cvectorization_ops_mask_u64)(a < b), 1, 1, 3, 3);
-  return (cvectorization_ops_raw_vector_u64)(b ^ ((cvectorization_ops_vector_u64)less & (a ^ b)));
+  const __SVBool_t less = __builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(less, less), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_mask_u64 less = __builtin_shufflevector((cvectorization_ops_mask_u64)(a < b), (cvectorization_ops_mask_u64)(a < b), 1, 1, 3, 3, 5, 5, 7, 7);
-  return (cvectorization_ops_raw_vector_u64)(b ^ ((cvectorization_ops_vector_u64)less & (a ^ b)));
+  const __SVBool_t less = __builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(less, less), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const unsigned char lessBits = (unsigned char)__builtin_ia32_ucmpq512_mask((cvectorization_ops_x86_i64)b, (cvectorization_ops_x86_i64)a, (int)6, (unsigned char)-1);
   const cvectorization_ops_mask_u64 lessLanes = (cvectorization_ops_mask_u64)__builtin_ia32_cvtmask2q512((unsigned char)lessBits);
@@ -51601,11 +51595,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_m
   const __SVBool_t less = __builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(less, less), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_mask_u64 less = __builtin_shufflevector((cvectorization_ops_mask_u64)(b < a), (cvectorization_ops_mask_u64)(b < a), 1, 1, 3, 3);
-  return (cvectorization_ops_raw_vector_u64)(b ^ ((cvectorization_ops_vector_u64)less & (a ^ b)));
+  const __SVBool_t less = __builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(less, less), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_mask_u64 less = __builtin_shufflevector((cvectorization_ops_mask_u64)(b < a), (cvectorization_ops_mask_u64)(b < a), 1, 1, 3, 3, 5, 5, 7, 7);
-  return (cvectorization_ops_raw_vector_u64)(b ^ ((cvectorization_ops_vector_u64)less & (a ^ b)));
+  const __SVBool_t less = __builtin_sve_svcmplt_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svtrn2_b64(less, less), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const unsigned char lessBits = (unsigned char)__builtin_ia32_ucmpq512_mask((cvectorization_ops_x86_i64)a, (cvectorization_ops_x86_i64)b, (int)6, (unsigned char)-1);
   const cvectorization_ops_mask_u64 lessLanes = (cvectorization_ops_mask_u64)__builtin_ia32_cvtmask2q512((unsigned char)lessBits);
