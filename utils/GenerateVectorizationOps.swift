@@ -24638,6 +24638,107 @@ func sveBroadcast(for element: Element) -> String {
         """
 }
 
+let sveHasFloat64MatrixCondition = "defined(__ARM_FEATURE_SVE_MATMUL_FP64)"
+
+func sveLaneView(of element: Element) -> Element {
+    sveUnsignedBlockView(unit: element.bits / 8, for: element)
+}
+
+func sveBlockLaneIndices(_ instruction: String, plus offset: String, for view: Element) -> String {
+    let all = sveAllLanes(of: view)
+    let positions = sveBuiltin(
+        "\(instruction)_n",
+        [all, sveBuiltin("index", ["0", "1"], for: view), "\(view.blockLaneCount - 1)"],
+        for: view,
+        predication: "x"
+    )
+    return sveBuiltin(
+        "add_n",
+        [all, positions, "(\(view.cType))(\(offset))"],
+        for: view,
+        predication: "x"
+    )
+}
+
+func sveBroadcastInBlocks(for element: Element) -> String {
+    let view = sveLaneView(of: element)
+    let indices = sveBlockLaneIndices("bic", plus: "lane", for: view)
+    let lookup = sveBuiltin("tbl", [sveOperand("a", for: view), indices], for: view)
+    return sveViewResult(lookup, view: view, for: element)
+}
+
+func sveBroadcastLane(for element: Element) -> String {
+    let view = sveLaneView(of: element)
+    let broadcast = sveBuiltin(
+        "dup_lane",
+        [sveOperand("a", for: view), "(\(view.cType))lane"],
+        for: view
+    )
+    return sveViewResult(broadcast, view: view, for: element)
+}
+
+func sveBroadcastBlock(for element: Element) -> String {
+    let view = sveLaneView(of: element)
+    let operand = sveOperand("a", for: view)
+    let indices = sveBlockLaneIndices("and", plus: "block * \(view.blockLaneCount)", for: view)
+    let lookup = sveBuiltin("tbl", [operand, indices], for: view)
+    guard element.width == 32 else { return sveViewResult(lookup, view: view, for: element) }
+    let lower = "__builtin_sve_svptrue_pat_b\(view.bits)(\(svePattern(lanes: view.laneCount / 2)))"
+    let upper = "__builtin_sve_svnot_b_z(\(sveAllLanes(of: unsignedElement(bits: 8))), \(lower))"
+    let concatenated = { (pairs: [String]) in
+        constantSwitch(
+            on: "block",
+            pairs.enumerated().map { block, call in
+                (amount: block, body: sveViewResult(call, view: view, for: element))
+            }
+        )
+    }
+    let blocks = concatenated(
+        ["uzp1q", "uzp2q"].map { sveBuiltin($0, [operand, operand], for: view) }
+    )
+    let lowerUpper = sveBuiltin("splice", [upper, operand, operand], for: view)
+    let spliced = concatenated([
+        sveBuiltin("splice", [lower, operand, operand], for: view),
+        sveBuiltin("sel", [upper, operand, lowerUpper], for: view),
+    ])
+    return """
+        #if \(sveHasFloat64MatrixCondition)
+        \(blocks)
+        #else
+        \(spliced)
+        #endif
+        \(sveViewResult(lookup, view: view, for: element))
+        """
+}
+
+func sveSlideBlocks(_ direction: SlideDirection, for element: Element) -> String {
+    let view = sveLaneView(of: element)
+    let operand = sveOperand("a", for: view)
+    let zero = sveBuiltin("dup_n", ["0"], for: view)
+    let lanes = "blocks * \(view.blockLaneCount)"
+    switch direction {
+    case .up:
+        let slid = sveBuiltin(
+            "splice",
+            [sveActiveLanes(lanes, for: view), zero, operand],
+            for: view
+        )
+        return sveViewResult(slid, view: view, for: element)
+    case .down:
+        let lookup = sveBuiltin(
+            "tbl",
+            [operand, sveBuiltin("index", ["(\(view.cType))(\(lanes))", "1"], for: view)],
+            for: view
+        )
+        let kept = sveActiveLanes("\(view.laneCount) - \(lanes)", for: view)
+        return sveViewResult(
+            sveBuiltin("sel", [kept, lookup, zero], for: view),
+            view: view,
+            for: element
+        )
+    }
+}
+
 func x86Broadcast(for element: Element) -> String {
     let cases = broadcastCases(count: element.blockLaneCount, for: element)
     let size = element.bits / 8
@@ -25030,6 +25131,7 @@ let shuffleOps: [Op] = [
         targets: TargetBodies(
             neon: { neonBroadcast(for: $0) },
             sve2_128: { sveBroadcast(for: $0) },
+            sve: { sveBroadcastInBlocks(for: $0) },
             avx3dl: { x86Broadcast(for: $0) },
             avx3: { x86Broadcast(for: $0) },
             avx2: { x86Broadcast(for: $0) },
@@ -25050,6 +25152,7 @@ let shuffleOps: [Op] = [
         targets: TargetBodies(
             neon: { neonBroadcast(for: $0) },
             sve2_128: { sveBroadcast(for: $0) },
+            sve: { sveBroadcastLane(for: $0) },
             ssse3: { x86Broadcast(for: $0) }
         )
     ) { element in
@@ -25063,7 +25166,8 @@ let shuffleOps: [Op] = [
         .all,
         section: .otherFixedPatternAcrossBlocks,
         immediates: [broadcastVectorBlock],
-        identifier: "broadcastingBlock"
+        identifier: "broadcastingBlock",
+        targets: TargetBodies(sve: { sveBroadcastBlock(for: $0) })
     ) { element in
         portableBroadcastBlock(for: element)
     },
@@ -25074,7 +25178,8 @@ let shuffleOps: [Op] = [
         .vector,
         .all,
         section: .slideAcrossBlocks,
-        immediates: [slidBlockCount]
+        immediates: [slidBlockCount],
+        targets: TargetBodies(sve: { sveSlideBlocks(.up, for: $0) })
     ) { element in
         portableSlideBlocks(.up, for: element)
     },
@@ -25085,7 +25190,8 @@ let shuffleOps: [Op] = [
         .vector,
         .all,
         section: .slideAcrossBlocks,
-        immediates: [slidBlockCount]
+        immediates: [slidBlockCount],
+        targets: TargetBodies(sve: { sveSlideBlocks(.down, for: $0) })
     ) { element in
         portableSlideBlocks(.down, for: element)
     },
