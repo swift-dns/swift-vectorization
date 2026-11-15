@@ -65,6 +65,8 @@ returns under static dispatch, and `Vector.SIMDType` is as wide as the target's 
 | -------- | ------------------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------- |
 | arm64    | NEON, NEON_WITHOUT_AES, NEON_BF16    | 16    | The baseline: NEON on Apple platforms, elsewhere NEON_WITHOUT_AES unless `-march` enables AES.                              |
 | arm64    | SVE2_128                             | 16    | With `-Xcc -march=armv9-a+bf16+i8mm -Xcc -msve-vector-bits=128`.                                                            |
+| arm64    | SVE_256                              | 32    | With `-Xcc -march=armv8.4-a+sve+bf16+i8mm -Xcc -msve-vector-bits=256`, such as AWS Graviton3.                               |
+| arm64    | SVE, SVE2                            | 64    | With `-Xcc -msve-vector-bits=512` and `-Xcc -march=armv8.2-a+sve` (SVE) or `-Xcc -march=armv9-a+bf16+i8mm` (SVE2).          |
 | x86_64   | SSE2, SSSE3, SSE4                    | 16    | SSE2 is the baseline, SSSE3 on Apple platforms and Android. SSE4 needs `-Xcc -march=x86-64-v2 -Xcc -maes -Xcc -mpclmul`.    |
 | x86_64   | AVX2                                 | 32    | With `-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul`, or a CPU such as `-Xcc -march=skylake`.                              |
 | x86_64   | AVX3, AVX3_DL, AVX3_ZEN4, AVX3_SPR   | 64    | With AVX-512 flags, such as `-Xcc -march=skylake-avx512` or `-Xcc -march=icelake-server`.                                   |
@@ -75,10 +77,17 @@ and SVE2_128 needs BF16 and I8MM, without which the build fails with an error th
 A build for which highway would pick a target the port does not support, such as SVE sized at run
 time, AVX10_2 or WASM_EMU256, fails with an error that names the flag to use instead.
 
-Swift's own code generation does not see `-msve-vector-bits`, so SVE2_128 builds should also pass
-`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=128` and
-`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=128`. Without them the ops are still right,
-but some of them spend extra instructions on vector lengths the build cannot have.
+Today's Swift toolchains carry clang 21, for which highway marks its SVE, SVE_256 and SVE2 targets
+broken (it lifts that from clang 22), so those builds also need
+`-Xcc -DHWY_BROKEN_SVE=0 -Xcc -DHWY_BROKEN_SVE2=0`. Vector lengths of 1024 and 2048 bits fail with
+an error, because Swift has no SIMD type of 128 or 256 lanes. A build for one SVE vector length is
+only right on CPUs with that length, so `SIMDTarget.isSupported` is false on any other.
+
+Swift's own code generation does not see `-msve-vector-bits`, so SVE builds should also pass
+`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=N` and
+`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=N` with the same N, such as 128 for SVE2_128.
+Without them the ops are still right, but some of them spend extra instructions on vector lengths
+the build cannot have.
 
 Highway can also pick the target at run time with dynamic dispatch. Swift cannot compile one function
 for several CPU levels, so the port matches highway's static dispatch only.
@@ -109,6 +118,8 @@ Every op reproduces what highway does on the same target, down to NaN payloads a
 out-of-range inputs, so the ops behave like highway's. `HighwayReference/` holds a copy of highway
 and generated tests that compare every op with highway's, lane for lane, on NEON, NEON_WITHOUT_AES,
 SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and highway's EMU128.
+No CI runner has the wide SVE targets: their ops were compared with highway's under QEMU, outside
+these tests.
 
 When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or a
 minimum or maximum on SVE, which payload comes out is up to the compiler, in highway as in the port.
