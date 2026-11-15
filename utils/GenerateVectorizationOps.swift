@@ -2343,7 +2343,7 @@ func sveConstantFunction(for element: Element) -> String {
         parameters: ["\(element.cVector) v"],
         body: "return __builtin_constant_p(__builtin_reduce_or(\(bits)));"
     )
-    return "#if \(sve2_128Condition)\n\(function)#endif\n"
+    return "#if \(sveCondition)\n\(function)#endif\n"
 }
 
 func sveReduction(_ name: String, for element: Element) -> String? {
@@ -2711,7 +2711,8 @@ func sveConstantNumbersFunction(for element: Element) -> String {
             return __builtin_constant_p(found) && !found;
             """
     )
-    return "#if \(sve2_128Condition)\n\(function)#endif\n"
+    let condition = element.category == .float16 ? sve2_128Condition : sveCondition
+    return "#if \(condition)\n\(function)#endif\n"
 }
 
 func constantLaneFunction(for element: Element) -> String {
@@ -2742,14 +2743,27 @@ func sveConstantBarrier(
         (name: "first", source: "a", lanes: blocked.first),
         (name: "second", source: "b", lanes: blocked.second),
     ].filter { !$0.lanes.isEmpty }
-    let declarations = hidden.map { "\(element.cVector) \($0.name) = \($0.source);" }
-    let registers = hidden.map { "\"+w\"(\($0.name))" }
+    let wide = element.width > 16
+    func register(_ name: String) -> String { "hidden\(uppercasedFirst(name))" }
+    let declarations = hidden.map { lane in
+        guard wide else { return "\(element.cVector) \(lane.name) = \(lane.source);" }
+        let source = sveOperand(lane.source, for: element)
+        return "\(sveType(of: element)) \(register(lane.name)) = \(source);"
+    }
+    let registers = hidden.map { "\"+w\"(\(wide ? register($0.name) : $0.name))" }
+    let restorations: [String] =
+        wide
+        ? hidden.map { lane in
+            let restored = sveResult(register(lane.name), for: element)
+            return "const \(element.cVector) \(lane.name) = \(restored);"
+        } : []
     let first = blocked.first.isEmpty ? "a" : "first"
     let second = blocked.second.isEmpty ? "b" : "second"
+    let hiding =
+        declarations + ["__asm__(\"\" : \(registers.joined(separator: ", ")));"] + restorations
     return """
         if (!\(numbers) && (\(conditions.joined(separator: " || ")))) {
-          \(declarations.joined(separator: "\n  "))
-          __asm__("" : \(registers.joined(separator: ", ")));
+          \(hiding.joined(separator: "\n  "))
           \(operation(first, second))
         }
         \(operation("a", "b"))
@@ -2819,6 +2833,19 @@ func sveExtremum(_ name: String, blocking lane: SveBlockedLane, for element: Ele
     }
     guard element.bits == 64 else { return nil }
     return sveBinary(name, for: element)
+}
+
+func sveWideExtremum(
+    _ name: String,
+    blocking lane: SveBlockedLane,
+    for element: Element
+) -> String? {
+    guard element.category == .float else { return sveExtremum(name, blocking: lane, for: element) }
+    return sveConstantBarrier(blocking: .both([.notANumber, lane]), for: element) {
+        let operands = [sveAllLanes(of: element)] + [$0, $1].map { sveOperand($0, for: element) }
+        let combined = sveBuiltin("\(name)nm", operands, for: element, predication: "x")
+        return vectorResult(sveResult(combined, for: element), for: element)
+    }
 }
 
 func sveMultiplyAdding(
@@ -5458,7 +5485,7 @@ func x86Dividing(level: X86Level, for element: Element) -> String {
     }
 }
 
-func sveDividing(for element: Element) -> String {
+func sveDividing(secondGeneration: Bool = true, for element: Element) -> String {
     guard element.bits < 32 else {
         let operands = [sveAllLanes(of: element)] + ["a", "b"].map { sveOperand($0, for: element) }
         let divided = sveBuiltin("div", operands, for: element, predication: "x")
@@ -5469,9 +5496,12 @@ func sveDividing(for element: Element) -> String {
     let sixteen = resizedElement(of: element, bits: 16)
     let word = resizedElement(of: element, bits: 32)
     var statements: [String] = []
+    let widenings =
+        secondGeneration
+        ? [("Even", "movlb"), ("Odd", "movlt")] : [("Lower", "unpklo"), ("Upper", "unpkhi")]
     func widened(_ name: String, of source: String, through steps: [Element]) -> [String] {
         guard let wide = steps.first else { return [name] }
-        return [("Even", "movlb"), ("Odd", "movlt")].flatMap { half, instruction in
+        return widenings.flatMap { half, instruction in
             let child = "\(name)\(half)"
             let call = sveBuiltin(instruction, [source], for: wide)
             statements.append("const \(sveType(of: wide)) \(child) = \(call);")
@@ -5482,22 +5512,36 @@ func sveDividing(for element: Element) -> String {
     let leaves = ["a", "b"].map { widened($0, of: sveOperand($0, for: element), through: steps) }
     var quotients: [String] = []
     for (first, second) in zip(leaves[0], leaves[1]) {
-        let operands = [sveAllLanes(of: word), first, second]
+        let all = sveAllLanes(of: word)
         let quotient = "quotient\(first.dropFirst())"
-        let divided = sveBuiltin("div", operands, for: word, predication: "x")
+        var divided = sveBuiltin("div", [all, first, second], for: word, predication: "x")
+        if !secondGeneration && element.category == .signedInteger {
+            let limits = [
+                ("max_n", lowestValue(of: element)), ("min_n", highestValue(of: element)),
+            ]
+            for (name, limit) in limits {
+                divided = sveBuiltin(name, [all, divided, limit], for: word, predication: "x")
+            }
+        }
         statements.append("const \(sveType(of: word)) \(quotient) = \(divided);")
         quotients.append(quotient)
     }
     func narrowed(_ low: String, _ high: String, from wide: Element) -> String {
-        sveBuiltin("qxtnt", [sveBuiltin("qxtnb", [low], for: wide), high], for: wide)
+        guard !secondGeneration else {
+            return sveBuiltin("qxtnt", [sveBuiltin("qxtnb", [low], for: wide), high], for: wide)
+        }
+        let narrow = resizedElement(of: wide, bits: wide.bits / 2)
+        let operands = [low, high].map { sveReinterpreted($0, from: wide, to: narrow) }
+        return sveBuiltin("uzp1", operands, for: narrow)
     }
     var result = narrowed(quotients[0], quotients[1], from: word)
     if element.bits == 8 {
-        for (name, pair) in [("Even", 0), ("Odd", 2)] {
+        let (first, second) = (widenings[0].0, widenings[1].0)
+        for (name, pair) in [(first, 0), (second, 2)] {
             let halves = narrowed(quotients[pair], quotients[pair + 1], from: word)
             statements.append("const \(sveType(of: sixteen)) quotients\(name) = \(halves);")
         }
-        result = narrowed("quotientsEven", "quotientsOdd", from: sixteen)
+        result = narrowed("quotients\(first)", "quotients\(second)", from: sixteen)
     }
     return (statements + [vectorResult(sveResult(result, for: element), for: element)])
         .joined(separator: "\n")
@@ -11822,14 +11866,16 @@ func integerNegatedMultiplySubtracting(for element: Element) -> String {
 let x86DisablesFmaCondition = "defined(HWY_DISABLE_BMI2_FMA)"
 
 func fusedMultiplicationTargets(_ form: FusedMultiplication) -> TargetBodies<Element> {
-    TargetBodies(
+    func sve(_ element: Element) -> String? {
+        element.category == .float
+            ? sveMultiplyAdding(form.sve, for: element) : form.sveInteger(element)
+    }
+    return TargetBodies(
         neon: { element in
             element.category == .float ? vectorResult(form.neon, for: element) : nil
         },
-        sve2_128: { element in
-            element.category == .float
-                ? sveMultiplyAdding(form.sve, for: element) : form.sveInteger(element)
-        },
+        sve2_128: sve,
+        sve: sve,
         avx3: { element in
             element.category == .float ? vectorResult(form.fused, for: element) : nil
         },
@@ -11949,6 +11995,10 @@ func multiplyAlternatingTargets(negatingAll: Bool) -> TargetBodies<Element> {
         },
         sve2_128Splat: { element in
             sveConstantMultiplyAlternating(negatingAll: negatingAll, for: element)
+        },
+        sve: { element in
+            sveMultiplyAlternatingStatements(negatingAll: negatingAll, for: element)?
+                .joined(separator: "\n")
         },
         avx3: { element in
             x86MultiplyAlternating(level: .avx3, negatingAll: negatingAll, for: element)
@@ -12167,6 +12217,12 @@ func x86NearestRounded(of operand: String, for element: Element) -> String {
         const \(element.cMask) exact = (\(element.cMask))(__builtin_elementwise_abs(\(operand)) < limit);
         \(vectorResult(bitSelect("exact", "signed_rounded", operand, of: element), for: element))
         """
+}
+
+func sveMultiplyingRounded(for element: Element) -> String? {
+    sveConstantBarrier(blocking: .multiplying, for: element) {
+        vectorRounded(.nearestEven, of: "\($0) * \($1)", for: element)
+    }
 }
 
 func x86MultiplyingRounded(for element: Element) -> String {
@@ -13016,17 +13072,19 @@ func complexMultiplyingTargets(conjugating: Bool, adding: Bool) -> TargetBodies<
                 for: element
             ) : nil
     }
+    func sve(_ element: Element) -> String? {
+        element.category == .float
+            ? sveComplexMultiplying(conjugating: conjugating, adding: adding, for: element)
+            : twoProductComplexMultiplyingBody(
+                conjugating: conjugating,
+                adding: adding,
+                for: element
+            )
+    }
     return TargetBodies(
         neon: fused,
-        sve2_128: { element in
-            element.category == .float
-                ? sveComplexMultiplying(conjugating: conjugating, adding: adding, for: element)
-                : twoProductComplexMultiplyingBody(
-                    conjugating: conjugating,
-                    adding: adding,
-                    for: element
-                )
-        },
+        sve2_128: sve,
+        sve: sve,
         avx3dl: { element in
             element.bits == 8
                 ? twoProductComplexMultiplyingBody(
@@ -13086,7 +13144,9 @@ func sveReversedPairs(of operand: String, for element: Element) -> String {
     let lanes = unsignedElement(bits: element.bits)
     guard element.bits < 64 else {
         let view = sveSplatOperand("((\(lanes.cVector))\(operand))", for: lanes)
-        return sveBuiltin("ext", [view, view, "1"], for: lanes)
+        let rotated = sveBuiltin("ext", [view, view, "1"], for: lanes)
+        guard element.width > 16 else { return rotated }
+        return sveBuiltin("trn1", [rotated, view], for: lanes)
     }
     let (name, wide) = [8: ("revb", 16), 16: ("revh", 32), 32: ("revw", 64)][element.bits]!
     let wider = unsignedElement(bits: wide)
@@ -13125,10 +13185,9 @@ func sveAddingSubtracting(for element: Element) -> String {
         """
 }
 
-func sveConstantMultiplyAlternating(negatingAll: Bool, for element: Element) -> String? {
+func sveMultiplyAlternatingStatements(negatingAll: Bool, for element: Element) -> [String]? {
     guard element.category == .float, let minusZero = sveBlockedLiteral(.minusZero, for: element)
     else { return nil }
-    let constant = cFunctionName("sveConstant", element)
     let negation = sveBuiltin(
         "neg",
         [sveAllLanes(of: element), sveOperand("c", for: element)],
@@ -13142,11 +13201,16 @@ func sveConstantMultiplyAlternating(negatingAll: Bool, for element: Element) -> 
         for: element
     )
     let negated = "const \(element.cVector) negated = \(sveResult(negation, for: element));"
-    let statements =
-        (negatingAll ? [negated] : []) + [
-            reversed, "const \(element.cVector) addend = \(sveResult(sum, for: element));",
-            sveMultiplyAdding(adding: "addend", for: element),
-        ]
+    return (negatingAll ? [negated] : []) + [
+        reversed, "const \(element.cVector) addend = \(sveResult(sum, for: element));",
+        sveMultiplyAdding(adding: "addend", for: element),
+    ]
+}
+
+func sveConstantMultiplyAlternating(negatingAll: Bool, for element: Element) -> String? {
+    guard let statements = sveMultiplyAlternatingStatements(negatingAll: negatingAll, for: element)
+    else { return nil }
+    let constant = cFunctionName("sveConstant", element)
     return """
         if (\(constant)(a) || \(constant)(b)) {
           \(statements.joined(separator: "\n  "))
@@ -13993,7 +14057,11 @@ let basicOps: [Op] = [
             sve2_128: { element in
                 sveConstantArithmetic("+", blocking: .adding, for: element)
             },
-            sve2_128Splat: { element in sveSplatBinary("add", .arithmetic, for: element) }
+            sve2_128Splat: { element in sveSplatBinary("add", .arithmetic, for: element) },
+            sve: { element in
+                sveConstantArithmetic("+", blocking: .adding, for: element)
+            },
+            sveSplat: { element in sveSplatBinary("add", .arithmetic, for: element) }
         )
     ) { element in
         binaryArithmetic("+", for: element)
@@ -14010,6 +14078,12 @@ let basicOps: [Op] = [
                 sveConstantArithmetic("-", blocking: .subtracting, for: element)
             },
             sve2_128Splat: { element in
+                sveSplatBinary("sub", .arithmetic, commutative: false, for: element)
+            },
+            sve: { element in
+                sveConstantArithmetic("-", blocking: .subtracting, for: element)
+            },
+            sveSplat: { element in
                 sveSplatBinary("sub", .arithmetic, commutative: false, for: element)
             }
         )
@@ -14028,6 +14102,10 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in floatAddingSubtracting(for: element) },
             sve2_128: { element in sveAddingSubtracting(for: element) },
+            sve: { element in
+                element.category == .float ? sveAddingSubtracting(for: element) : nil
+            },
+            sve2: { element in sveAddingSubtracting(for: element) },
             avx3: { element in floatAddingSubtracting(for: element) },
             avx2: { element in x86AddingSubtracting(for: element) },
             ssse3: { element in x86AddingSubtracting(for: element) },
@@ -14052,6 +14130,12 @@ let basicOps: [Op] = [
                     : sveConstantArithmetic("*", blocking: .multiplying, for: element)
             },
             sve2_128Splat: { element in sveSplatBinary("mul", .signed, for: element) },
+            sve: { element in
+                isInteger64(element)
+                    ? sveBinary("mul", for: element)
+                    : sveConstantArithmetic("*", blocking: .multiplying, for: element)
+            },
+            sveSplat: { element in sveSplatBinary("mul", .signed, for: element) },
             avx3dl: { element in element.bits == 8 ? x86HalvesMultiplying(for: element) : nil },
             avx2: { element in isInteger64(element) ? x86Multiplying64(for: element) : nil },
             sse4: { element in
@@ -14083,6 +14167,13 @@ let basicOps: [Op] = [
                 guard element.category == .float else { return sveDividing(for: element) }
                 return sveConstantArithmetic("/", blocking: .dividing, for: element)
             },
+            sve: { element in
+                guard element.category == .float else {
+                    return sveDividing(secondGeneration: false, for: element)
+                }
+                return sveConstantArithmetic("/", blocking: .dividing, for: element)
+            },
+            sve2: { element in element.category == .float ? nil : sveDividing(for: element) },
             avx3: { element in
                 element.category == .float
                     ? vectorResult("a / b", for: element) : x86Dividing(level: .avx3, for: element)
@@ -14121,6 +14212,10 @@ let basicOps: [Op] = [
             sve2_128Splat: { element in
                 sveSplatBinary("min", sveExtremumImmediate(for: element), for: element)
             },
+            sve: { element in sveWideExtremum("min", blocking: .minusInfinity, for: element) },
+            sveSplat: { element in
+                sveSplatBinary("min", sveExtremumImmediate(for: element), for: element)
+            },
             avx3: { element in x86MinMax(.minimum, level: .avx3, for: element) },
             avx2: { element in x86MinMax(.minimum, level: .avx2, for: element) },
             sse4: { element in x86MinMax(.minimum, level: .sse4, for: element) },
@@ -14141,6 +14236,10 @@ let basicOps: [Op] = [
             neon: { element in neonExtremum("max", for: element) },
             sve2_128: { element in sveExtremum("max", blocking: .infinity, for: element) },
             sve2_128Splat: { element in
+                sveSplatBinary("max", sveExtremumImmediate(for: element), for: element)
+            },
+            sve: { element in sveWideExtremum("max", blocking: .infinity, for: element) },
+            sveSplat: { element in
                 sveSplatBinary("max", sveExtremumImmediate(for: element), for: element)
             },
             avx3: { element in x86MinMax(.maximum, level: .avx3, for: element) },
@@ -14175,7 +14274,9 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonAbsoluteDifference(for: element) },
             sve2_128: { element in sveAbsoluteDifference(for: element) },
-            sve2_128Splat: { element in sveConstantNaNAbsoluteDifference(for: element) }
+            sve2_128Splat: { element in sveConstantNaNAbsoluteDifference(for: element) },
+            sve: { element in sveAbsoluteDifference(for: element) },
+            sveSplat: { element in sveConstantNaNAbsoluteDifference(for: element) }
         )
     ) { element in
         portableAbsoluteDifference(for: element)
@@ -14196,6 +14297,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonSaturatingNegated(for: element) },
             sve2_128: { element in sveSaturatingUnary("qneg", for: element) },
+            sve2: { element in sveSaturatingUnary("qneg", for: element) },
             avx3: { element in x86SaturatingNegated(level: .avx3, for: element) },
             avx2: { element in x86SaturatingNegated(level: .avx2, for: element) },
             sse4: { element in x86SaturatingNegated(level: .sse4, for: element) }
@@ -14228,6 +14330,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonSaturatingMagnitude(for: element) },
             sve2_128: { element in sveSaturatingUnary("qabs", for: element) },
+            sve2: { element in sveSaturatingUnary("qabs", for: element) },
             avx3: { element in x86SaturatingMagnitude(level: .avx3, for: element) },
             avx2: { element in x86SaturatingMagnitude(level: .avx2, for: element) },
             sse4: { element in x86SaturatingMagnitude(level: .sse4, for: element) },
@@ -14247,6 +14350,7 @@ let basicOps: [Op] = [
         vectorLabels: ["_", "from"],
         targets: TargetBodies(
             sve2_128: { element in sveCopyingSign(for: element) },
+            sve2: { element in sveCopyingSign(for: element) },
             avx3: { element in x86Avx3CopyingSign(toMagnitude: false, for: element) }
         )
     ) { element in
@@ -14262,6 +14366,7 @@ let basicOps: [Op] = [
         vectorLabels: ["_", "from"],
         targets: TargetBodies(
             sve2_128: { element in sveCopyingSign(for: element) },
+            sve2: { element in sveCopyingSign(for: element) },
             avx3: { element in x86Avx3CopyingSign(toMagnitude: true, for: element) }
         )
     ) { element in
@@ -14280,6 +14385,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonApproximate("vrsqrteq_v", for: element) },
             sve2_128: { element in sveApproximate("rsqrte", for: element) },
+            sve: { element in sveApproximate("rsqrte", for: element) },
             avx3: { element in x86Approximate("rsqrt", for: element) },
             avx2: { element in
                 guard element.bits == 64 else { return x86Approximate("rsqrt", for: element) }
@@ -14310,6 +14416,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonApproximate("vrecpeq_v", for: element) },
             sve2_128: { element in sveApproximate("recpe", for: element) },
+            sve: { element in sveApproximate("recpe", for: element) },
             avx3: { element in x86Approximate("rcp", for: element) },
             avx2: { element in x86Approximate("rcp", for: element) },
             sse2: { element in x86Approximate("rcp", for: element) }
@@ -14326,6 +14433,7 @@ let basicOps: [Op] = [
         section: .arithmetic,
         targets: TargetBodies(
             sve2_128: { element in sveExponent(for: element) },
+            sve2: { element in sveExponent(for: element) },
             avx3: { element in x86FloatPart("getexp", for: element) }
         )
     ) { element in
@@ -14358,6 +14466,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in fusedMultiplyAdding(for: element) },
             sve2_128: { element in sveMultiplyAdding(for: element) },
+            sve: { element in sveMultiplyAdding(for: element) },
             avx3: { element in fusedMultiplyAdding(for: element) },
             avx2: { element in
                 guard element.category == .float else { return nil }
@@ -14531,6 +14640,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonMultiplyingFixedPoint15(for: element) },
             sve2_128: { element in sveMultiplyingFixedPoint15(for: element) },
+            sve2: { element in sveMultiplyingFixedPoint15(for: element) },
             avx3: { element in x86MultiplyingFixedPoint15(level: .avx3, for: element) },
             avx2: { element in x86MultiplyingFixedPoint15(level: .avx2, for: element) },
             ssse3: { element in x86MultiplyingFixedPoint15(level: .ssse3, for: element) },
@@ -14550,11 +14660,8 @@ let basicOps: [Op] = [
         filtersUnorderedNaNs: true,
         targets: TargetBodies(
             neon: { element in vectorRounded(.nearestEven, of: "a * b", for: element) },
-            sve2_128: { element in
-                sveConstantBarrier(blocking: .multiplying, for: element) {
-                    vectorRounded(.nearestEven, of: "\($0) * \($1)", for: element)
-                }
-            },
+            sve2_128: { element in sveMultiplyingRounded(for: element) },
+            sve: { element in sveMultiplyingRounded(for: element) },
             avx3: { element in vectorRounded(.nearestEven, of: "a * b", for: element) },
             avx2: { element in vectorRounded(.nearestEven, of: "a * b", for: element) },
             sse4: { element in vectorRounded(.nearestEven, of: "a * b", for: element) },
@@ -14617,6 +14724,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in multiplyingByFloorPowerOf2(.neon, for: element) },
             sve2_128: { element in multiplyingByFloorPowerOf2(.sve, for: element) },
+            sve: { element in multiplyingByFloorPowerOf2(.sve, for: element) },
             avx3: { element in x86MultiplyingByFloorPowerOf2(for: element) },
             avx2: { element in multiplyingByFloorPowerOf2(.vector, for: element) },
             sse4: { element in
@@ -14667,6 +14775,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in element.bits < 64 ? neonRoundedAverage(for: element) : nil },
             sve2_128: { element in isInteger64(element) ? sveBinary("rhadd", for: element) : nil },
+            sve2: { element in isInteger64(element) ? sveBinary("rhadd", for: element) : nil },
             avx3: { element in x86RoundedAverage(level: .avx3, for: element) },
             avx2: { element in x86RoundedAverage(level: .avx2, for: element) },
             sse2: { element in x86RoundedAverage(level: .sse2, for: element) }
@@ -15304,6 +15413,7 @@ let basicOps: [Op] = [
         filtersUnorderedNaNs: true,
         targets: TargetBodies(
             sve2_128: { element in svePredicatedBinary("addp", predication: "m", for: element) },
+            sve2: { element in svePredicatedBinary("addp", predication: "m", for: element) },
             avx2: { element in x86Pairwise(subtracting: false, for: element) },
             sse2: { element in x86Pairwise(subtracting: false, for: element) },
             emu128: { element in emulatedPairwise(subtracting: false, for: element) }
@@ -15324,6 +15434,7 @@ let basicOps: [Op] = [
                     ? nil : emulatedPairwiseBlocks(subtracting: true, for: element)
             },
             sve2_128: { element in svePairwiseSubtracting(for: element) },
+            sve: { element in svePairwiseSubtracting(for: element) },
             avx2: { element in x86Pairwise(subtracting: true, for: element) },
             sse2: { element in x86Pairwise(subtracting: true, for: element) },
             emu128: { element in emulatedPairwise(subtracting: true, for: element) }
@@ -15340,6 +15451,7 @@ let basicOps: [Op] = [
         section: .multiply,
         targets: TargetBodies(
             sve2_128: { element in svePredicatedBinary("mulh", for: element) },
+            sve: { element in svePredicatedBinary("mulh", for: element) },
             avx3: { element in x86MultiplyingHigh(level: .avx3, for: element) },
             avx2: { element in x86MultiplyingHigh(level: .avx2, for: element) },
             sse4: { element in x86MultiplyingHigh(level: .sse4, for: element) },
@@ -15409,6 +15521,7 @@ let basicOps: [Op] = [
                     ?? neonMagnitudeExtremum("minimum", for: element)
             },
             sve2_128: { element in sveConstantMagnitudeExtremum("minimum", for: element) },
+            sve: { element in sveConstantMagnitudeExtremum("minimum", for: element) },
             avx3: { element in floatMagnitudeExtremum("minimum", for: element) },
             avx2: { element in floatMagnitudeExtremum("minimum", for: element) },
             sse2: { element in floatMagnitudeExtremum("minimum", for: element) },
@@ -15437,6 +15550,7 @@ let basicOps: [Op] = [
                     ?? neonMagnitudeExtremum("maximum", for: element)
             },
             sve2_128: { element in sveConstantMagnitudeExtremum("maximum", for: element) },
+            sve: { element in sveConstantMagnitudeExtremum("maximum", for: element) },
             avx3: { element in floatMagnitudeExtremum("maximum", for: element) },
             avx2: { element in floatMagnitudeExtremum("maximum", for: element) },
             sse2: { element in floatMagnitudeExtremum("maximum", for: element) },
@@ -15588,6 +15702,7 @@ let basicOps: [Op] = [
         section: .multiply,
         targets: TargetBodies(
             sve2_128: { element in sveMultiplyAddingLow52Bits(for: element) },
+            sve: { element in sveMultiplyAddingLow52Bits(for: element) },
             avx3dl: { element in x86MultiplyAdding52Bits(high: false, for: element) }
         )
     ) { element in
@@ -15603,6 +15718,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in multiplyAddingHigh52BitsHalves(flippingSigns: false, for: element) },
             sve2_128: { element in sveMultiplyAddingHigh52Bits(for: element) },
+            sve: { element in sveMultiplyAddingHigh52Bits(for: element) },
             avx3dl: { element in x86MultiplyAdding52Bits(high: true, for: element) },
             avx3: { element in multiplyAddingHigh52BitsHalves(flippingSigns: false, for: element) },
             avx2: { element in multiplyAddingHigh52BitsHalves(flippingSigns: true, for: element) },
@@ -17645,18 +17761,20 @@ func x86Saturated(subtracting: Bool, level: X86Level, for element: Element) -> S
 }
 
 func saturatedTargets(subtracting: Bool) -> TargetBodies<Element> {
-    TargetBodies(
+    func splat(_ element: Element) -> String? {
+        sveSplatBinary(
+            subtracting ? "qsub" : "qadd",
+            .arithmetic,
+            commutative: !subtracting,
+            splattingFirst: !subtracting || element.bits == 64,
+            predicated: false,
+            for: element
+        )
+    }
+    return TargetBodies(
         neon: subtracting ? { element in neonSaturatingSubtraction(for: element) } : nil,
-        sve2_128Splat: { element in
-            sveSplatBinary(
-                subtracting ? "qsub" : "qadd",
-                .arithmetic,
-                commutative: !subtracting,
-                splattingFirst: !subtracting || element.bits == 64,
-                predicated: false,
-                for: element
-            )
-        },
+        sve2_128Splat: splat,
+        sveSplat: splat,
         avx3: { element in x86Saturated(subtracting: subtracting, level: .avx3, for: element) },
         avx2: { element in x86Saturated(subtracting: subtracting, level: .avx2, for: element) },
         sse4: { element in x86Saturated(subtracting: subtracting, level: .sse4, for: element) },
