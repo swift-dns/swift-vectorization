@@ -21027,6 +21027,29 @@ func x86Avx2InterleavedWhole(upper: Bool, for element: Element) -> String? {
     )
 }
 
+func x86WordsReplacingLane(for element: Element) -> String? {
+    guard element.category == .float, element.bits == 64 else { return nil }
+    let words = unsignedElement(bits: 32)
+    let unsigned = unsignedElement(of: element)
+    let positions = compoundLiteral(
+        "words_vector",
+        (0..<element.laneCount).flatMap { ["\($0)", "0"] }
+    )
+    let target = splat("(\(unsigned.cType))index", as: unsigned.cVector, lanes: element.laneCount)
+    let i64 = x86Vector("i64")
+    let swapped = "__builtin_shufflevector(equal, equal, 1, 0, 3, 2)"
+    let value = "(\(i64))\(repeatingVector("value", of: element))"
+    let selected = "((\(i64))a ^ (mask & ((\(i64))a ^ \(value))))"
+    return """
+        \(vectorTypedef("words_vector", of: words, lanes: 2 * element.laneCount))
+        const words_vector positions = \(positions);
+        const words_vector target = (words_vector)\(target);
+        const words_vector equal = (words_vector)(positions == target);
+        const \(i64) mask = (\(i64))(equal & \(swapped));
+        \(vectorResult("(\(element.cVector))\(selected)", for: element))
+        """
+}
+
 func x86ReplacingLane(level: X86Level, for element: Element) -> String {
     let unsigned = unsignedElement(of: element)
     let positions = iota(as: unsigned.cVector, lanes: element.laneCount)
@@ -23721,7 +23744,10 @@ let swizzleOps: [Op] =
                 avx3: { x86Avx3ReplacingLane(for: $0) },
                 avx2: { x86ReplacingLane(level: .avx2, for: $0) },
                 sse4: { x86ReplacingLane(level: .sse4, for: $0) },
-                ssse3: { x86ReplacingLaneBytes(level: .ssse3, for: $0) },
+                ssse3: { element in
+                    x86ReplacingLaneBytes(level: .ssse3, for: element)
+                        ?? x86WordsReplacingLane(for: element)
+                },
                 sse2: { element in
                     x86ReplacingLaneBytes(level: .sse2, for: element)
                         ?? x86ReplacingLane(level: .sse2, for: element)

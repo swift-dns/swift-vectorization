@@ -133155,7 +133155,14 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_r
   const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1};
   const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_blendvpd((cvectorization_ops_x86_f64)a, (cvectorization_ops_x86_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value), (cvectorization_ops_x86_f64)(positions == target)));
-#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+#elif CVECTORIZATION_OPS_X86 == 2
+  typedef uint32_t words_vector __attribute__((vector_size(16)));
+  const words_vector positions = (words_vector){0, 0, 1, 0};
+  const words_vector target = (words_vector)(cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
+  const words_vector equal = (words_vector)(positions == target);
+  const cvectorization_ops_x86_i64 mask = (cvectorization_ops_x86_i64)(equal & __builtin_shufflevector(equal, equal, 1, 0, 3, 2));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)((cvectorization_ops_x86_i64)a ^ (mask & ((cvectorization_ops_x86_i64)a ^ (cvectorization_ops_x86_i64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value)))));
+#elif CVECTORIZATION_OPS_X86 == 1
   const cvectorization_ops_vector_u64 positions = (cvectorization_ops_vector_u64){0, 1};
   const cvectorization_ops_vector_u64 target = (cvectorization_ops_vector_u64){(uint64_t)index, (uint64_t)index};
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(((cvectorization_ops_vector_u64)(positions == target) & (cvectorization_ops_vector_u64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value)) | (~(cvectorization_ops_vector_u64)(positions == target) & (cvectorization_ops_vector_u64)a)));
