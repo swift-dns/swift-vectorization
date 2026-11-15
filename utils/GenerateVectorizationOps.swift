@@ -20461,11 +20461,14 @@ func sveExpandedLoad(otherwise: Bool, for element: Element) -> String? {
 
 func sveCompressed(not: Bool, for element: Element) -> String? {
     if element.bits <= 16 { return sveCompressedNarrow(not: not, for: element) }
-    if element.bits == 64 {
+    if element.bits == 64 && element.width == 16 {
         return """
             \(sveSplicedPairs(not: not, for: element))
             \(vectorResult(sveResult("spliced", for: element), for: element))
             """
+    }
+    if element.bits == 64 && element.width == 32 {
+        return sveCompressedQuads(not: not, for: element)
     }
     let all = sveAllLanes(of: element)
     let nonzero = svePredicate(of: "mask", for: element)
@@ -23400,6 +23403,70 @@ func partitioned(isPartition: Bool, for element: Element) -> String {
     return "return \(sliding)(\(compressed), \(rejected), \(count));"
 }
 
+func sveCompressTableName(_ name: String, not: Bool, for element: Element) -> String {
+    "cvectorization_ops_sve_compress\(not ? "_not" : "")_\(name)_\(element.cSuffix)"
+}
+
+func sveCompressTable(named name: String, _ rows: [Int]) -> String {
+    cFunction(
+        returns: "const uint64_t*",
+        name: name,
+        parameters: [],
+        body: """
+            static const uint64_t table[\(rows.count)] __attribute__((aligned(16))) = {\(rows.map(String.init).joined(separator: ", "))};
+            return table;
+            """
+    )
+}
+
+func sveCompressHelpers(not: Bool, for element: Element) -> String? {
+    guard element.bits == 64, element.width == 32 else { return nil }
+    let rows = compressTableRows(lanes: 4, not: not) { [$0] }
+    return sveCompressTable(named: sveCompressTableName("table_64x4", not: not, for: element), rows)
+}
+
+func sveCompressBlocksHelpers(for element: Element) -> String? {
+    guard element.width == 32 else { return nil }
+    let rows = compressTableRows(lanes: 2, not: true) { [2 * $0, 2 * $0 + 1] }
+    return sveCompressTable(
+        named: sveCompressTableName("blocks_table_64x4", not: true, for: element),
+        rows
+    )
+}
+
+func sveTableIndicesLookup(_ table: String, at offset: String, for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let indices = sveBuiltin(
+        "ld1",
+        [sveAllLanes(of: element), "\(table)() + (\(offset))"],
+        for: unsigned
+    )
+    let lookup = sveBuiltin("tbl", [sveOperand("a", for: element), indices], for: element)
+    return vectorResult(sveResult(lookup, for: element), for: element)
+}
+
+func sveCompressedQuads(not: Bool, for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let bits = sveBuiltin(
+        "lsl",
+        [
+            sveAllLanes(of: element), sveBuiltin("dup_n", ["1"], for: unsigned),
+            sveBuiltin("index", ["2", "1"], for: unsigned),
+        ],
+        for: unsigned,
+        predication: "x"
+    )
+    let sum = sveBuiltin("addv", [svePredicate(of: "mask", for: element), bits], for: unsigned)
+    let table = sveCompressTableName("table_64x4", not: not, for: element)
+    return sveTableIndicesLookup(table, at: "\(sum) & \(4 * 15)", for: element)
+}
+
+func sveCompressedBlocksNot(for element: Element) -> String? {
+    guard element.width == 32 else { return nil }
+    let table = sveCompressTableName("blocks_table_64x4", not: true, for: element)
+    return sveTableIndicesLookup(table, at: "(mask[0] ? 4 : 0) + (mask[2] ? 8 : 0)", for: element)
+}
+
 let compressOps: [Op] = [
     Op(
         "compressed",
@@ -23413,6 +23480,7 @@ let compressOps: [Op] = [
         targets: TargetBodies(
             neon: { neonCompressed(not: false, for: $0) },
             sve2_128: { sveCompressed(not: false, for: $0) },
+            sve: { sveCompressed(not: false, for: $0) },
             avx3dl: { x86Avx3Compressed(not: false, level: .avx3dl, for: $0) },
             avx3: { x86Avx3Compressed(not: false, level: .avx3, for: $0) },
             avx2: { x86Avx2Compressed(not: false, for: $0) },
@@ -23421,6 +23489,7 @@ let compressOps: [Op] = [
         ),
         helpers: TargetBodies(
             neon: { neonCompressHelpers(not: false, for: $0) },
+            sve: { sveCompressHelpers(not: false, for: $0) },
             avx3: { x86Avx3CompressHelpers(not: false, for: $0) },
             avx2: { x86Avx2CompressHelpers(not: false, for: $0) },
             sse2: { x86CompressHelpers(not: false, for: $0) }
@@ -23440,6 +23509,7 @@ let compressOps: [Op] = [
         targets: TargetBodies(
             neon: { neonCompressed(not: true, for: $0) },
             sve2_128: { sveCompressed(not: true, for: $0) },
+            sve: { sveCompressed(not: true, for: $0) },
             avx3dl: { x86Avx3Compressed(not: true, level: .avx3dl, for: $0) },
             avx3: { x86Avx3Compressed(not: true, level: .avx3, for: $0) },
             avx2: { x86Avx2Compressed(not: true, for: $0) },
@@ -23448,6 +23518,7 @@ let compressOps: [Op] = [
         ),
         helpers: TargetBodies(
             neon: { neonCompressHelpers(not: true, for: $0) },
+            sve: { sveCompressHelpers(not: true, for: $0) },
             avx3: { x86Avx3CompressHelpers(not: true, for: $0) },
             avx2: { x86Avx2CompressHelpers(not: true, for: $0) },
             sse2: { x86CompressHelpers(not: true, for: $0) }
@@ -23463,7 +23534,9 @@ let compressOps: [Op] = [
         .unsigned(bits: [64]),
         section: .compress,
         definedLanes: .falseLanes,
-        identifier: "compressedBlocksNot"
+        identifier: "compressedBlocksNot",
+        targets: TargetBodies(sve: { sveCompressedBlocksNot(for: $0) }),
+        helpers: TargetBodies(sve: { sveCompressBlocksHelpers(for: $0) })
     ) { element in
         element.width == 16
             ? vectorResult("a", for: element)
@@ -23488,6 +23561,7 @@ let compressOps: [Op] = [
                 default: neonPartitionedBytes(for: $0)
                 }
             },
+            sve: { partitioned(isPartition: $0.bits == 64 && $0.width == 32, for: $0) },
             avx3dl: { partitioned(isPartition: $0.bits == 64, for: $0) },
             avx3: { x86Avx3Partitioned(for: $0) },
             avx2: { partitioned(isPartition: $0.bits != 8, for: $0) },
