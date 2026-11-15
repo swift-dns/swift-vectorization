@@ -27048,6 +27048,16 @@ func x86GatherTargets(
             )
         }
     }
+    let sve = { (element: Element) in
+        sveGathering(
+            index: index,
+            offsets: offsets,
+            selecting: selecting,
+            otherwise: otherwise,
+            firstLanes: firstLanes,
+            for: element
+        )
+    }
     return TargetBodies(
         neon: { element in
             guard firstLanes, element.bits == 32 else { return nil }
@@ -27058,16 +27068,8 @@ func x86GatherTargets(
                 for: element
             )
         },
-        sve2_128: { element in
-            sveGathering(
-                index: index,
-                offsets: offsets,
-                selecting: selecting,
-                otherwise: otherwise,
-                firstLanes: firstLanes,
-                for: element
-            )
-        },
+        sve2_128: sve,
+        sve: sve,
         avx3: body(avx3: true),
         avx2: body(avx3: false),
         sse4: { element in
@@ -27088,17 +27090,19 @@ func x86Avx3ScatterTargets(
     selecting: Bool = false,
     firstLanes: Bool = false
 ) -> TargetBodies<Element> {
-    TargetBodies(
+    let sve = { (element: Element) in
+        sveScattering(
+            index: offsets ? "byteOffsets" : "indices",
+            offsets: offsets,
+            selecting: selecting,
+            firstLanes: firstLanes,
+            for: element
+        )
+    }
+    return TargetBodies(
         neon: { element in firstLanes ? hoistedScatteredFirst(for: element) : nil },
-        sve2_128: { element in
-            sveScattering(
-                index: offsets ? "byteOffsets" : "indices",
-                offsets: offsets,
-                selecting: selecting,
-                firstLanes: firstLanes,
-                for: element
-            )
-        },
+        sve2_128: sve,
+        sve: sve,
         avx3: { element in
             let index = offsets ? "byteOffsets" : "indices"
             var active: String?
