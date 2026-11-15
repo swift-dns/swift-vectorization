@@ -21283,9 +21283,27 @@ func emulatedPairwiseBlocks(subtracting: Bool, for element: Element) -> String? 
     return vectorResult(signed ? "(\(element.cVector))\(pairs)" : pairs, for: element)
 }
 
+func svePairwiseBlocks(subtracting: Bool, for element: Element) -> String {
+    let name = cFunctionName(subtracting ? "pairwiseSubtracting" : "pairwiseAdding", element)
+    let pairwise = "\(name)(\(rawName("a")), \(rawName("b")))"
+    guard element.bits < 64 else { return "return \(pairwise);" }
+    let view = unsignedElement(of: element)
+    let quads = unsignedElement(bits: 64)
+    let operand = sveOperand("pairwise", for: view)
+    let halves = ["uzp1", "uzp2"].map {
+        sveReinterpreted(sveBuiltin($0, [operand, operand], for: view), from: view, to: quads)
+    }
+    let interleaved = sveBuiltin("zip1", halves, for: quads)
+    return """
+        const \(element.cVector) pairwise = (\(element.cVector))\(pairwise);
+        \(sveViewResult(sveReinterpreted(interleaved, from: quads, to: view), view: view, for: element))
+        """
+}
+
 func pairwiseBlocksTargets(subtracting: Bool) -> TargetBodies<Element> {
     TargetBodies(
         sve2_128Splat: { sveSplatPairwise(subtracting: subtracting, for: $0) },
+        sve: { svePairwiseBlocks(subtracting: subtracting, for: $0) },
         avx3: { x86PairwiseBlocks(subtracting: subtracting, level: .avx3, for: $0) },
         avx2: { x86PairwiseBlocks(subtracting: subtracting, level: .avx2, for: $0) },
         sse4: { x86PairwiseBlocks(subtracting: subtracting, level: .sse4, for: $0) },
@@ -23791,9 +23809,7 @@ func tupleOps(count: Int) -> [Op] {
             .tuple(count),
             .all,
             section: .tuples,
-            targets: TargetBodies(sve2_128: { element in
-                tupleCreation(count, for: element) { sveSplatMember($0, for: element) }
-            }),
+            targets: TargetBodies(sve2_128: splatCreation, sve: splatCreation),
             referenceCall: tupleCreationReference(count)
         ) { element in
             tupleCreation(count, for: element)
@@ -25635,6 +25651,7 @@ func truncatingStoreOp(to narrow: Element) -> Op {
         targets: TargetBodies(
             neon: { element in lowestLanesTruncatedStore(to: narrow, for: element) },
             sve2_128: { element in sveTruncatedStore(to: narrow, for: element) },
+            sve: { element in sveTruncatedStore(to: narrow, for: element) },
             ssse3: { element in truncatedStore(to: narrow, for: element) },
             sse2: { element in x86Sse2TruncatedStore(to: narrow, for: element) }
         ),
