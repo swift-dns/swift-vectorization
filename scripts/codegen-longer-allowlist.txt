@@ -105,6 +105,7 @@ SSE4 SelectBelowSpanU32
 SSE4 SumAboveSpanU64
 SSE4 SelectBelowSpanU64
 SSE4 SelectBelowSpanU8
+SSE4 RemainderWhereOtherwiseU32ConstantA
 AVX2 SelectBelowSpanF64
 AVX2 SelectBelowSpanF32
 AVX2 ClampAboveSpanI16
