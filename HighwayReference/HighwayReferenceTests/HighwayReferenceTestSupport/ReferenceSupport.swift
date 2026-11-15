@@ -929,8 +929,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 @inlinable
 package func hasNaNs<V: SIMD>(negating operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
-    HighwayReference.hasNativeFusedMultiplyAdd()
-        && operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
+    operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
 }
 
 @inlinable
