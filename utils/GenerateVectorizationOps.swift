@@ -32133,6 +32133,21 @@ func promoteNarrowSve(from source: Element, shape: Shape, to result: Element) ->
         """
 }
 
+func promoteNarrowSveConverting(from source: Element, to result: Element) -> String? {
+    guard source.category == .float || result.category == .float else { return nil }
+    let duplicated = laneIndices(promotedLanes(to: result).flatMap { [$0, $0] })
+    let converted = sveBuiltin(
+        "cvt_\(sveSuffix(of: result))",
+        [sveAllLanes(of: source), sveOperand("zipped", for: source)],
+        for: source,
+        predication: "x"
+    )
+    return """
+        const \(source.cVector) zipped = __builtin_shufflevector(a, a, \(duplicated));
+        \(vectorResult(sveResult(converted, for: result), for: result))
+        """
+}
+
 func promoteNarrowZeroed(from source: Element, shape: Shape) -> String {
     let register = partialRegisterLanes(of: shape, for: source, arm: false)
     let kept = source.laneCount(of: shape)
@@ -32177,6 +32192,9 @@ func promoteNarrowFamily(_ shape: Shape, inRange: Bool) -> [Op] {
                 },
                 sve2_128: sourced(source) { source, result in
                     promoteNarrowSve(from: source, shape: shape, to: result)
+                },
+                sve: sourced(source) { source, result in
+                    promoteNarrowSveConverting(from: source, to: result)
                 },
                 avx3: sourced(source) { source, result in
                     promoteAvx3(
@@ -32496,11 +32514,12 @@ func demoteSingleSve(
     _ operand: String,
     _ shape: Shape,
     from source: Element,
-    to result: Element
+    to result: Element,
+    narrowsSaturating: Bool
 ) -> String {
     var narrowed = operand
     var element = source
-    if demoteSingleSveClamps(from: source, to: result) {
+    if !narrowsSaturating || demoteSingleSveClamps(from: source, to: result) {
         (narrowed, element) = demoteSingleSveClamped(operand, from: source, to: result)
     } else {
         let route = demoteSingleRoute(from: source, to: result)
@@ -32529,14 +32548,24 @@ func demoteSingleSveBody(
     _ shift: DemoteShift?,
     _ shape: Shape,
     from source: Element,
-    to result: Element
+    to result: Element,
+    narrowsSaturating: Bool = true
 ) -> String {
     let operand = sveSplatOperand("a", for: source)
-    guard let shift else { return demoteSingleSve(operand, shape, from: source, to: result) }
+    func demoted(_ operand: String) -> String {
+        demoteSingleSve(
+            operand,
+            shape,
+            from: source,
+            to: result,
+            narrowsSaturating: narrowsSaturating
+        )
+    }
+    guard let shift else { return demoted(operand) }
     let shifted = demoteSveShifted(operand, shift, for: source)
     return """
         const \(sveType(of: source)) shifted = \(shifted);
-        \(demoteSingleSve("shifted", shape, from: source, to: result))
+        \(demoted("shifted"))
         """
 }
 
@@ -33042,13 +33071,18 @@ func demoteSingleTargets(
             )
         }
     }
+    let saturating = sourced(source) { source, result in
+        demoteSingleSveBody(shift, shape, from: source, to: result)
+    }
     return TargetBodies(
         neon: sourced(source) { source, result in
             demoteSingleNeonBody(shift, shape, from: source, to: result)
         },
-        sve2_128: sourced(source) { source, result in
-            demoteSingleSveBody(shift, shape, from: source, to: result)
+        sve2_128: saturating,
+        sve: sourced(source) { source, result in
+            demoteSingleSveBody(shift, shape, from: source, to: result, narrowsSaturating: false)
         },
+        sve2: saturating,
         avx3: x86(.avx3),
         avx2: x86(.avx2),
         sse4: x86(.sse4),
@@ -33456,6 +33490,9 @@ func demoteFloatOp(
                 sve2_128: sourced(source) { source, result in
                     source.category == .float ? nil : demoteSveConverting(from: source, to: result)
                 },
+                sve: sourced(source) { source, result in
+                    demoteSveConverting(conversion, from: source, to: result)
+                },
                 avx3: x86(.avx3),
                 avx2: x86(.avx2),
                 sse4: x86(.sse4),
@@ -33653,10 +33690,19 @@ func demoteSveUnzipped(
     return statements.joined(separator: "\n")
 }
 
-func demoteSveConverting(from source: Element, to result: Element) -> String {
+func demoteSveConverting(
+    _ conversion: FloatToIntConversion = .saturating,
+    from source: Element,
+    to result: Element
+) -> String {
+    let operand = sveSplatOperand("a", for: source)
+    let rounded =
+        conversion == .nearestEven
+        ? sveBuiltin("rintn", [sveAllLanes(of: source), operand], for: source, predication: "x")
+        : operand
     let converted = sveBuiltin(
-        "cvt_f32",
-        [sveAllLanes(of: result), sveSplatOperand("a", for: source)],
+        "cvt_\(sveSuffix(of: result))",
+        [sveAllLanes(of: result), rounded],
         for: source,
         predication: "x"
     )
@@ -33675,6 +33721,17 @@ let demoteFloatTruncatingOps = [Shape.half, .quarter, .eighth].flatMap { shape i
         ) -> (Element) -> String? {
             sourced(source) { source, result in gathering(source, result, shape) }
         }
+        let unzipped = sourced(source) { source, result in
+            demoteSveUnzipped(
+                through: Array(
+                    repeating: result,
+                    count: (source.bits / result.bits).trailingZeroBitCount
+                ),
+                shape: shape,
+                from: source,
+                to: result
+            )
+        }
         return Op(
             shape.conversion("vector"),
             "TruncateTo",
@@ -33688,17 +33745,8 @@ let demoteFloatTruncatingOps = [Shape.half, .quarter, .eighth].flatMap { shape i
                 neon: sourced(source) { source, result in
                     demoteTruncatedNeon(from: source, to: result, shape: shape)
                 },
-                sve2_128: sourced(source) { source, result in
-                    demoteSveUnzipped(
-                        through: Array(
-                            repeating: result,
-                            count: (source.bits / result.bits).trailingZeroBitCount
-                        ),
-                        shape: shape,
-                        from: source,
-                        to: result
-                    )
-                },
+                sve2_128: unzipped,
+                sve: unzipped,
                 avx2: x86(demoteTruncatedAvx2),
                 ssse3: x86(demoteTruncatedShuffled),
                 sse2: x86(demoteTruncatedSse2)
@@ -33739,6 +33787,14 @@ let demoteFloatU8FromU32Ops = sourcedOps(accepting: convertsU8FromU32) { source,
     let neon = sourced(source) { source, result in
         demoteTruncatedNeon(from: source, to: result, shape: .quarter)
     }
+    let unzipped = sourced(source) { source, result in
+        demoteSveUnzipped(
+            through: [unsignedElement(bits: 16).at(width: result.width), result],
+            shape: .quarter,
+            from: source,
+            to: result
+        )
+    }
     return Op(
         "quarterVector",
         "U8FromU32",
@@ -33750,14 +33806,8 @@ let demoteFloatU8FromU32Ops = sourcedOps(accepting: convertsU8FromU32) { source,
         source: source,
         targets: TargetBodies(
             neon: neon,
-            sve2_128: sourced(source) { source, result in
-                demoteSveUnzipped(
-                    through: [unsignedElement(bits: 16).at(width: result.width), result],
-                    shape: .quarter,
-                    from: source,
-                    to: result
-                )
-            },
+            sve2_128: unzipped,
+            sve: unzipped,
             avx3: truncating(arm: false),
             avx2: { result in
                 let lookup = [
@@ -33952,6 +34002,30 @@ func x86DemotedMask(
     )
 }
 
+func sveDemotedMask(from source: Element, to result: Element, shape: Shape) -> String {
+    let signedSource = signedElement(of: source).at(width: source.width)
+    let signedResult = signedElement(of: result).at(width: result.width)
+    let route = demoteSingleRoute(from: signedSource, to: signedResult)
+    var statements = [
+        "const \(sveType(of: signedSource)) narrowed0 = \(sveOperand("mask", for: signedSource));"
+    ]
+    for (index, (previous, stage)) in zip(route, route.dropFirst()).enumerated() {
+        let operand = sveReinterpreted("narrowed\(index)", from: previous, to: stage)
+        let narrowed = sveBuiltin("uzp1", [operand, operand], for: stage)
+        statements.append("const \(sveType(of: stage)) narrowed\(index + 1) = \(narrowed);")
+    }
+    let narrowed = sveResult("narrowed\(route.count - 1)", for: signedResult)
+    let padded = narrowedResult(
+        narrowed,
+        lanes: result.laneCount,
+        shape,
+        arm: true,
+        isMask: true,
+        for: result
+    )
+    return (statements + [padded]).joined(separator: "\n")
+}
+
 func portableDemotedMask(from source: Element, to result: Element, shape: Shape) -> String {
     saturatedMaskDemotion(
         { demoteSinglePortable("a", shape, from: $0, to: $1, isMask: true) },
@@ -34063,6 +34137,9 @@ let narrowMaskDemotionOps: [Op] = Shape.allCases.filter { $0 != .full && $0.hasM
             targets: TargetBodies(
                 neon: sourced(source) { source, result in
                     neonDemotedMask(from: source, to: result, shape: shape)
+                },
+                sve: sourced(source) { source, result in
+                    sveDemotedMask(from: source, to: result, shape: shape)
                 },
                 avx3: sourced(source) { source, result in
                     demotedMask(from: source, to: result, shape: shape)
