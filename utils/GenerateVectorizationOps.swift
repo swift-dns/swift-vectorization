@@ -19701,11 +19701,15 @@ func sveLowerHalfOfMask(for element: Element) -> String? {
 }
 
 func sveVectorLanes(for element: Element) -> String {
-    "__builtin_sve_svptrue_pat_b\(element.bits)(\(svePattern(lanes: element.laneCount)))"
+    guard element.width == 16 else { return sveAllLanes(of: element) }
+    return "__builtin_sve_svptrue_pat_b\(element.bits)(\(svePattern(lanes: element.laneCount)))"
 }
 
 func sveFirstTrueSet(_ kind: FirstTrueSet, for element: Element) -> String? {
-    guard kind == .onlyFirst || element.bits < 64 || element.category == .float else { return nil }
+    guard
+        kind == .onlyFirst || element.bits < 64 || element.category == .float
+            || element.width > 16
+    else { return nil }
     let all = sveAllLanes(of: unsignedElement(bits: 8))
     let selected: String
     switch kind {
@@ -19742,7 +19746,7 @@ func sveKnownLastTrue(for element: Element) -> String {
 }
 
 func sveLastTrue(for element: Element) -> String? {
-    guard element.category == .float else { return nil }
+    guard element.category == .float || element.width > 16 else { return nil }
     let unsigned = unsignedElement(of: element)
     let indices = sveBuiltin("index", ["0", "1"], for: unsigned)
     let present = "__builtin_sve_svand_b_z(lanes, lanes, active)"
@@ -19794,6 +19798,46 @@ func sveSelectingByVector(for element: Element) -> String {
     )
 }
 
+func sveMaskFromVector(for element: Element) -> String {
+    maskResult("(\(element.cMask))(a != (\(element.cVector)){0})", for: element)
+}
+
+func sveRepeatingBlockMask(for element: Element) -> String? {
+    guard element.width > 16 else { return nil }
+    let unsigned = unsignedElement(of: element)
+    let bytes = unsignedElement(bits: 8)
+    let replicated: String
+    if element.bits == 8 {
+        let pairs = unsignedElement(bits: 16)
+        let halves = sveResult(sveBuiltin("dup_n", ["(uint16_t)bits"], for: pairs), for: pairs)
+        let indices = sveBuiltin(
+            "lsr_n",
+            [sveAllLanes(of: bytes), sveBuiltin("index", ["0", "1"], for: bytes), "3"],
+            for: bytes,
+            predication: "x"
+        )
+        replicated = sveBuiltin(
+            "tbl",
+            [sveOperand("(\(halves))", for: bytes), indices],
+            for: bytes
+        )
+    } else {
+        let set = sveResult(sveBuiltin("dup_n", ["(uint8_t)bits"], for: bytes), for: bytes)
+        replicated = sveOperand("(\(set))", for: unsigned)
+    }
+    let laneBits = (0..<element.blockLaneCount).map { "\(1 << ($0 % 8))" }
+    let tested = sveBuiltin(
+        "and",
+        [sveAllLanes(of: unsigned), replicated, sveBuiltin("dupq_n", laneBits, for: unsigned)],
+        for: unsigned,
+        predication: "x"
+    )
+    return sveMaskVector(
+        sveBuiltin("cmpne_n", [sveAllLanes(of: unsigned), tested, "0"], for: unsigned),
+        for: element
+    )
+}
+
 let maskOps: [Op] = [
     Op(
         "mask",
@@ -19805,9 +19849,8 @@ let maskOps: [Op] = [
         vectorLabels: ["from"],
         identifier: "maskFromVector",
         targets: TargetBodies(
-            sve2_128: { element in
-                maskResult("(\(element.cMask))(a != (\(element.cVector)){0})", for: element)
-            },
+            sve2_128: { element in sveMaskFromVector(for: element) },
+            sve: { element in sveMaskFromVector(for: element) },
             avx3: { element in
                 maskResult(
                     x86Avx3MaskVector(x86Avx3MaskBits("a", for: element), for: element),
@@ -19844,6 +19887,7 @@ let maskOps: [Op] = [
         section: .createMask,
         targets: TargetBodies(
             neon: { element in vectorRepeatingBlockMask(broadcasting: .quadwords, for: element) },
+            sve: { element in sveRepeatingBlockMask(for: element) },
             avx3: { element in x86Avx3RepeatingBlockMask(for: element) },
             avx2: { element in vectorRepeatingBlockMask(for: element) },
             sse2: { element in vectorRepeatingBlockMask(for: element) }
@@ -19978,6 +20022,7 @@ let maskOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonTrueLane(.last, known: false, for: element) },
             sve2_128: { element in sveLastTrue(for: element) },
+            sve: { element in sveLastTrue(for: element) },
             avx3: { element in x86TrueLane(.last, known: false, for: element) },
             avx2: { element in x86TrueLane(.last, known: false, for: element) },
             sse2: { element in x86TrueLane(.last, known: false, for: element) }
@@ -19996,6 +20041,7 @@ let maskOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonTrueLane(.first, known: true, for: element) },
             sve2_128: { element in sveKnownFirstTrue(for: element) },
+            sve: { element in sveKnownFirstTrue(for: element) },
             avx3: { element in x86TrueLane(.first, known: true, for: element) },
             avx2: { element in x86TrueLane(.first, known: true, for: element) },
             sse2: { element in x86TrueLane(.first, known: true, for: element) }
@@ -20014,6 +20060,7 @@ let maskOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonTrueLane(.last, known: true, for: element) },
             sve2_128: { element in sveKnownLastTrue(for: element) },
+            sve: { element in sveKnownLastTrue(for: element) },
             avx3: { element in x86TrueLane(.last, known: true, for: element) },
             avx2: { element in x86TrueLane(.last, known: true, for: element) },
             sse2: { element in x86TrueLane(.last, known: true, for: element) }
@@ -20031,6 +20078,7 @@ let maskOps: [Op] = [
         identifier: "selectingByVector",
         targets: TargetBodies(
             sve2_128: { element in sveSelectingByVector(for: element) },
+            sve2: { element in sveSelectingByVector(for: element) },
             avx3: { element in x86Avx3Ternary(0xCA, for: element) },
             avx2: { element in
                 vectorResult(x86Selecting("a", "b", "c", for: element), for: element)
@@ -20160,6 +20208,7 @@ let maskOps: [Op] = [
         targets: TargetBodies(
             neon: { element in vectorFirstTrueSet(.onlyFirst, isX86: false, for: element) },
             sve2_128: { element in sveFirstTrueSet(.onlyFirst, for: element) },
+            sve: { element in sveFirstTrueSet(.onlyFirst, for: element) },
             avx3: { element in x86Avx3FirstTrueSet(.onlyFirst, for: element) },
             avx2: { element in vectorFirstTrueSet(.onlyFirst, isX86: true, for: element) },
             sse2: { element in vectorFirstTrueSet(.onlyFirst, isX86: true, for: element) }
@@ -20177,6 +20226,7 @@ let maskOps: [Op] = [
         targets: TargetBodies(
             neon: { element in vectorFirstTrueSet(.beforeFirst, isX86: false, for: element) },
             sve2_128: { element in sveFirstTrueSet(.beforeFirst, for: element) },
+            sve: { element in sveFirstTrueSet(.beforeFirst, for: element) },
             avx3: { element in x86Avx3FirstTrueSet(.beforeFirst, for: element) },
             avx2: { element in vectorFirstTrueSet(.beforeFirst, isX86: true, for: element) },
             sse2: { element in vectorFirstTrueSet(.beforeFirst, isX86: true, for: element) }
@@ -20194,6 +20244,7 @@ let maskOps: [Op] = [
         targets: TargetBodies(
             neon: { element in vectorFirstTrueSet(.atOrBeforeFirst, isX86: false, for: element) },
             sve2_128: { element in sveFirstTrueSet(.atOrBeforeFirst, for: element) },
+            sve: { element in sveFirstTrueSet(.atOrBeforeFirst, for: element) },
             avx3: { element in x86Avx3FirstTrueSet(.atOrBeforeFirst, for: element) },
             avx2: { element in vectorFirstTrueSet(.atOrBeforeFirst, isX86: true, for: element) },
             sse2: { element in vectorFirstTrueSet(.atOrBeforeFirst, isX86: true, for: element) }
@@ -20211,6 +20262,7 @@ let maskOps: [Op] = [
         targets: TargetBodies(
             neon: { element in vectorFirstTrueSet(.atOrAfterFirst, isX86: false, for: element) },
             sve2_128: { element in sveFirstTrueSet(.atOrAfterFirst, for: element) },
+            sve: { element in sveFirstTrueSet(.atOrAfterFirst, for: element) },
             avx3: { element in x86Avx3FirstTrueSet(.atOrAfterFirst, for: element) },
             avx2: { element in vectorFirstTrueSet(.atOrAfterFirst, isX86: true, for: element) },
             sse2: { element in vectorFirstTrueSet(.atOrAfterFirst, isX86: true, for: element) }
@@ -35419,14 +35471,17 @@ func float16ConcatenatedDelegation(parity: Int, for element: Element) -> String 
     )
 }
 
+func halfPrecisionMaskFromVector(for element: Element) -> String {
+    """
+    \(halfPrecisionNativeVector(for: element))
+    \(maskResult("(\(element.cMask))((native_vector)a != (native_vector){0})", for: element))
+    """
+}
+
 let halfPrecisionTargetBodies: [String: TargetBodies<Element>] = [
     "maskFromVector": TargetBodies(
-        sve2_128: { element in
-            """
-            \(halfPrecisionNativeVector(for: element))
-            \(maskResult("(\(element.cMask))((native_vector)a != (native_vector){0})", for: element))
-            """
-        }
+        sve2_128: { element in halfPrecisionMaskFromVector(for: element) },
+        sve: { element in halfPrecisionMaskFromVector(for: element) }
     ),
     "concatenatingOdd": TargetBodies(
         sse2: { x86ConcatenatedParity(parity: 1, level: .sse2, for: $0) }
