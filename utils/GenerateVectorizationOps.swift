@@ -37449,6 +37449,17 @@ func halfPrecisionSumsOf4(from source: Element, to result: Element) -> String {
     return "return \(float16ComposedCall(sumsOps, "SumsOf2", from: single, to: result, [pairs]));"
 }
 
+func bfloat16SumsOfReference(factor: Int, _ arguments: [String]) -> String {
+    let single = floatElement(bits: 32).tag
+    let promoted = ["PromoteEvenTo", "PromoteOddTo"].map {
+        "hn::\($0)(\(single)(), \(arguments[0]))"
+    }
+    let pairs = "hn::Add(\(promoted.joined(separator: ", ")))"
+    let composed = factor == 2 ? pairs : "hn::SumsOf2(\(pairs))"
+    let direct = "hn::SumsOf\(factor)(\(arguments[0]))"
+    return "\n#if \(bfloat16EmulatedOnSveCondition)\n\(composed)\n#else\n\(direct)\n#endif\n"
+}
+
 func halfPrecisionSumsOps(from category: Category) -> [Op] {
     [(2, UnorderedNaNs.adjacentLanes), (4, .adjacentQuads)].flatMap { factor, unorderedNaNs in
         sourcedOps(
@@ -37469,6 +37480,8 @@ func halfPrecisionSumsOps(from category: Category) -> [Op] {
                 filtersUnorderedNaNs: true,
                 vectorLabels: ["_"],
                 source: source,
+                referenceCall: category == .bfloat16
+                    ? { _, arguments in bfloat16SumsOfReference(factor: factor, arguments) } : nil,
                 portable: sourced(source) { source, result in
                     factor == 2
                         ? halfPrecisionSumsOf2(from: source, to: result)

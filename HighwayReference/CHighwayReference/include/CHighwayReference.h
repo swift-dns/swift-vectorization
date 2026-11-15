@@ -25538,8 +25538,20 @@ HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAccumulatingInAnyOrderBF16T
 }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingEvenBF16ToF32(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::MulEvenAdd(TagF32(), fromPortBF16(a), fromPortBF16(b), fromPortF32(c))); }
 HWY_INLINE cvectorization_ops_raw_vector_f32 multiplyAddingOddBF16ToF32(cvectorization_ops_raw_vector_bf16 a, cvectorization_ops_raw_vector_bf16 b, cvectorization_ops_raw_vector_f32 c) { return toPortF32(hn::MulOddAdd(TagF32(), fromPortBF16(a), fromPortBF16(b), fromPortF32(c))); }
-HWY_INLINE cvectorization_ops_raw_vector_f32 sumsOf2BF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(hn::SumsOf2(fromPortBF16(a))); }
-HWY_INLINE cvectorization_ops_raw_vector_f64 sumsOf4BF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(hn::SumsOf4(fromPortBF16(a))); }
+HWY_INLINE cvectorization_ops_raw_vector_f32 sumsOf2BF16ToF32(cvectorization_ops_raw_vector_bf16 a) { return toPortF32(
+#if HWY_TARGET_IS_SVE && !HWY_SVE_HAVE_BF16_FEATURE
+hn::Add(hn::PromoteEvenTo(TagF32(), fromPortBF16(a)), hn::PromoteOddTo(TagF32(), fromPortBF16(a)))
+#else
+hn::SumsOf2(fromPortBF16(a))
+#endif
+); }
+HWY_INLINE cvectorization_ops_raw_vector_f64 sumsOf4BF16ToF64(cvectorization_ops_raw_vector_bf16 a) { return toPortF64(
+#if HWY_TARGET_IS_SVE && !HWY_SVE_HAVE_BF16_FEATURE
+hn::SumsOf2(hn::Add(hn::PromoteEvenTo(TagF32(), fromPortBF16(a)), hn::PromoteOddTo(TagF32(), fromPortBF16(a))))
+#else
+hn::SumsOf4(fromPortBF16(a))
+#endif
+); }
 /// Swift calls a C++ function that might throw as an `invoke` with a landing pad, which makes
 /// LLVM schedule the code around the call differently from the code around the port's C
 /// functions. The codegen comparison calls these `noexcept` forwarders instead, which the
