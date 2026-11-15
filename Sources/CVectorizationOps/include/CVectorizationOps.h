@@ -18999,13 +18999,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_sh
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_load_repeating_block_u8(const uint8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_u8 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svld1rq_u8(__builtin_sve_svptrue_pat_b8(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_u8 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svld1rq_u8(__builtin_sve_svptrue_pat_b8(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_u8 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -19093,17 +19089,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lo
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_loading_upper_half_u8(const uint8_t* from, cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(16));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsplice_u8(lower, (cvectorization_ops_sve_u8)a, __builtin_sve_svld1_u8(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(32));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsplice_u8(lower, (cvectorization_ops_sve_u8)a, __builtin_sve_svld1_u8(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint8_t half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
@@ -20042,6 +20032,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_lo
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_u8(cvectorization_ops_raw_vector_u8 rawA, uint8_t* to) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_u8(__builtin_sve_svptrue_pat_b8(31), to, (cvectorization_ops_sve_u8)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_u8(__builtin_sve_svptrue_pat_b8(31), to, (cvectorization_ops_sve_u8)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_u8(__builtin_sve_svptrue_pat_b8(31), to, (cvectorization_ops_sve_u8)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -32077,13 +32071,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_s
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_load_repeating_block_u16(const uint16_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_u16 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svld1rq_u16(__builtin_sve_svptrue_pat_b16(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_u16 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svld1rq_u16(__builtin_sve_svptrue_pat_b16(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_u16 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -32208,17 +32198,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_loading_upper_half_u16(const uint16_t* from, cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(8));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsplice_u16(lower, (cvectorization_ops_sve_u16)a, __builtin_sve_svld1_u16(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(16));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsplice_u16(lower, (cvectorization_ops_sve_u16)a, __builtin_sve_svld1_u16(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint16_t half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -32908,6 +32892,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_u16(cvectorization_ops_raw_vector_u16 rawA, uint16_t* to) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_u16(__builtin_sve_svptrue_pat_b16(31), to, (cvectorization_ops_sve_u16)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_u16(__builtin_sve_svptrue_pat_b16(31), to, (cvectorization_ops_sve_u16)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_u16(__builtin_sve_svptrue_pat_b16(31), to, (cvectorization_ops_sve_u16)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -43531,13 +43519,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_s
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_load_repeating_block_u32(const uint32_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_u32 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 0, 1, 2, 3));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svld1rq_u32(__builtin_sve_svptrue_pat_b32(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_u32 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svld1rq_u32(__builtin_sve_svptrue_pat_b32(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_u32 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -43729,17 +43713,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_loading_upper_half_u32(const uint32_t* from, cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(4));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsplice_u32(lower, (cvectorization_ops_sve_u32)a, __builtin_sve_svld1_u32(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(8));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsplice_u32(lower, (cvectorization_ops_sve_u32)a, __builtin_sve_svld1_u32(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -44755,6 +44733,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_u32(cvectorization_ops_raw_vector_u32 rawA, uint32_t* to) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_u32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_u32)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_u32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_u32)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_u32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_u32)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -56566,13 +56548,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_s
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_load_repeating_block_u64(const uint64_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_u64 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(block, block, 0, 1, 0, 1));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svld1rq_u64(__builtin_sve_svptrue_pat_b64(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_u64 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(block, block, 0, 1, 0, 1, 0, 1, 0, 1));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svld1rq_u64(__builtin_sve_svptrue_pat_b64(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_u64 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -56695,17 +56673,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_loading_upper_half_u64(const uint64_t* from, cvectorization_ops_raw_vector_u64 rawA) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint64_t half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(2));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsplice_u64(lower, (cvectorization_ops_sve_u64)a, __builtin_sve_svld1_u64(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint64_t half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(4));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsplice_u64(lower, (cvectorization_ops_sve_u64)a, __builtin_sve_svld1_u64(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint64_t half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
@@ -57579,6 +57551,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_u64(cvectorization_ops_raw_vector_u64 rawA, uint64_t* to) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_u64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_u64)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_u64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_u64)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_u64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_u64)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -73552,13 +73528,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_sh
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_load_repeating_block_i8(const int8_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_i8 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svld1rq_s8(__builtin_sve_svptrue_pat_b8(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_i8 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svld1rq_s8(__builtin_sve_svptrue_pat_b8(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_i8 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -73646,17 +73618,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lo
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_loading_upper_half_i8(const int8_t* from, cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(16));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsplice_s8(lower, (cvectorization_ops_sve_i8)a, __builtin_sve_svld1_s8(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int8_t half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(32));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsplice_s8(lower, (cvectorization_ops_sve_i8)a, __builtin_sve_svld1_s8(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int8_t half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
@@ -74595,6 +74561,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_lo
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_i8(cvectorization_ops_raw_vector_i8 rawA, int8_t* to) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_s8(__builtin_sve_svptrue_pat_b8(31), to, (cvectorization_ops_sve_i8)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_s8(__builtin_sve_svptrue_pat_b8(31), to, (cvectorization_ops_sve_i8)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_s8(__builtin_sve_svptrue_pat_b8(31), to, (cvectorization_ops_sve_i8)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -86823,13 +86793,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_s
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_load_repeating_block_i16(const int16_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_i16 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svld1rq_s16(__builtin_sve_svptrue_pat_b16(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_i16 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svld1rq_s16(__builtin_sve_svptrue_pat_b16(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_i16 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -86954,17 +86920,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_loading_upper_half_i16(const int16_t* from, cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(8));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsplice_s16(lower, (cvectorization_ops_sve_i16)a, __builtin_sve_svld1_s16(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int16_t half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsplice_s16(lower, (cvectorization_ops_sve_i16)a, __builtin_sve_svld1_s16(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int16_t half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -87654,6 +87614,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_i16(cvectorization_ops_raw_vector_i16 rawA, int16_t* to) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_s16(__builtin_sve_svptrue_pat_b16(31), to, (cvectorization_ops_sve_i16)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_s16(__builtin_sve_svptrue_pat_b16(31), to, (cvectorization_ops_sve_i16)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_s16(__builtin_sve_svptrue_pat_b16(31), to, (cvectorization_ops_sve_i16)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -98589,13 +98553,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_s
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_load_repeating_block_i32(const int32_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_i32 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 0, 1, 2, 3));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svld1rq_s32(__builtin_sve_svptrue_pat_b32(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_i32 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svld1rq_s32(__builtin_sve_svptrue_pat_b32(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_i32 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -98787,17 +98747,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_loading_upper_half_i32(const int32_t* from, cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(4));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsplice_s32(lower, (cvectorization_ops_sve_i32)a, __builtin_sve_svld1_s32(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(8));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsplice_s32(lower, (cvectorization_ops_sve_i32)a, __builtin_sve_svld1_s32(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int32_t half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -99813,6 +99767,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_i32(cvectorization_ops_raw_vector_i32 rawA, int32_t* to) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_s32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_i32)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_s32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_i32)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_s32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_i32)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -111111,13 +111069,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_s
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_load_repeating_block_i64(const int64_t* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_i64 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(block, block, 0, 1, 0, 1));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svld1rq_s64(__builtin_sve_svptrue_pat_b64(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_i64 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(block, block, 0, 1, 0, 1, 0, 1, 0, 1));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svld1rq_s64(__builtin_sve_svptrue_pat_b64(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_i64 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -111240,17 +111194,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_loading_upper_half_i64(const int64_t* from, cvectorization_ops_raw_vector_i64 rawA) {
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int64_t half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(2));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsplice_s64(lower, (cvectorization_ops_sve_i64)a, __builtin_sve_svld1_s64(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int64_t half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(4));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsplice_s64(lower, (cvectorization_ops_sve_i64)a, __builtin_sve_svld1_s64(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int64_t half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
@@ -112124,6 +112072,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_i64(cvectorization_ops_raw_vector_i64 rawA, int64_t* to) {
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_s64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_i64)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_s64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_i64)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_s64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_i64)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -123422,13 +123374,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_s
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_load_repeating_block_f32(const float* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_f32 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 0, 1, 2, 3));
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svld1rq_f32(__builtin_sve_svptrue_pat_b32(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_f32 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(block, block, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3));
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svld1rq_f32(__builtin_sve_svptrue_pat_b32(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_f32 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -123643,17 +123591,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_loading_upper_half_f32(const float* from, cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(4));
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsplice_f32(lower, (cvectorization_ops_sve_f32)a, __builtin_sve_svld1_f32(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(8));
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsplice_f32(lower, (cvectorization_ops_sve_f32)a, __builtin_sve_svld1_f32(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef float half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -124650,6 +124592,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_f32(cvectorization_ops_raw_vector_f32 rawA, float* to) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_f32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_f32)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_f32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_f32)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_f32(__builtin_sve_svptrue_pat_b32(31), to, (cvectorization_ops_sve_f32)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);
@@ -134853,13 +134799,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_s
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_load_repeating_block_f64(const double* from) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_block_f64 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(block, block, 0, 1, 0, 1));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svld1rq_f64(__builtin_sve_svptrue_pat_b64(31), from));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_block_f64 block;
-  __builtin_memcpy(&block, from, sizeof block);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(block, block, 0, 1, 0, 1, 0, 1, 0, 1));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svld1rq_f64(__builtin_sve_svptrue_pat_b64(31), from));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   cvectorization_ops_block_f64 block;
   __builtin_memcpy(&block, from, sizeof block);
@@ -134982,17 +134924,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_loading_upper_half_f64(const double* from, cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef double half_vector __attribute__((vector_size(16)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(2));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsplice_f64(lower, (cvectorization_ops_sve_f64)a, __builtin_sve_svld1_f64(lower, from)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef double half_vector __attribute__((vector_size(32)));
-  const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  half_vector upper;
-  __builtin_memcpy(&upper, from, sizeof upper);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVBool_t lower = __builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(4));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsplice_f64(lower, (cvectorization_ops_sve_f64)a, __builtin_sve_svld1_f64(lower, from)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef double half_vector __attribute__((vector_size(32)));
   const half_vector lower = __builtin_shufflevector(a, a, 0, 1, 2, 3);
@@ -135875,6 +135811,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_l
 CVECTORIZATION_OPS_INLINE void cvectorization_ops_store_streaming_f64(cvectorization_ops_raw_vector_f64 rawA, double* to) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  __builtin_sve_svstnt1_f64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_f64)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  __builtin_sve_svstnt1_f64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_f64)a);
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   __builtin_sve_svstnt1_f64(__builtin_sve_svptrue_pat_b64(31), to, (cvectorization_ops_sve_f64)a);
 #elif CVECTORIZATION_OPS_NEON
   __builtin_prefetch(to, 1, 0);

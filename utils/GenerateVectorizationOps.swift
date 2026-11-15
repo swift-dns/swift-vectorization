@@ -26555,6 +26555,11 @@ func sveMemory(_ pointer: String, isConst: Bool = false, for element: Element) -
     return "(\(isConst ? "const " : "")\(element.cType)*)\(pointer)"
 }
 
+func sveRepeatedBlockLoad(for element: Element) -> String {
+    let loaded = sveBuiltin("ld1rq", [sveAllLanes(of: element), "from"], for: element)
+    return vectorResult(sveResult(loaded, for: element), for: element)
+}
+
 func sveMaskedLoad(otherwise: Bool, for element: Element) -> String {
     let predicate = svePredicate(of: "mask", for: element)
     let loaded = sveBuiltin(
@@ -26607,6 +26612,20 @@ func sveSafeCopy(for element: Element) -> String {
     let active = sveActiveLanes("count", for: element)
     let loaded = sveBuiltin("ld1", [active, "from"], for: element)
     return "\(sveBuiltin("st1", [active, "to", loaded], for: element));"
+}
+
+func sveLoadedUpperHalf(for element: Element) -> String {
+    let lower = sveActiveLanes("\(element.laneCount / 2)", for: element)
+    let upper = sveBuiltin("ld1", ["lower", "from"], for: element)
+    let joined = sveBuiltin(
+        "splice",
+        ["lower", sveOperand("a", for: element), upper],
+        for: element
+    )
+    return """
+        const __SVBool_t lower = \(lower);
+        \(vectorResult(sveResult(joined, for: element), for: element))
+        """
 }
 
 func x86Avx3MaskedLoad(otherwise: Bool, for element: Element) -> String {
@@ -27399,7 +27418,8 @@ let memoryOps: [Op] =
             .vector,
             .all,
             section: .load,
-            span: .block
+            span: .block,
+            targets: TargetBodies(sve: { element in sveRepeatedBlockLoad(for: element) })
         ) { element in
             repeatedBlockLoad(for: element)
         },
@@ -27473,6 +27493,7 @@ let memoryOps: [Op] =
             .all,
             section: .load,
             span: .halfVector,
+            targets: TargetBodies(sve: { element in sveLoadedUpperHalf(for: element) }),
             swiftOrdering: [1, 0]
         ) { element in
             loadedUpperHalf(for: element)
@@ -27767,6 +27788,7 @@ let memoryOps: [Op] =
             targets: TargetBodies(
                 neon: { _ in "__builtin_prefetch(to, 1, 0);\n\(storedVector(to: "to"))" },
                 sve2_128: { element in sveStreamed(for: element) },
+                sve: { element in sveStreamed(for: element) },
                 avx3: { element in x86Streamed(for: element) },
                 avx2: { element in x86Streamed(for: element) },
                 sse2: { element in x86Streamed(for: element) }
