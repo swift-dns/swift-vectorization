@@ -33265,11 +33265,15 @@ func reorderMulFloatRearranging(
     """
 }
 
-func reorderMulSveRearranging(keepingFirstIf condition: String, for element: Element) -> String {
+func reorderMulSveRearranging(
+    keepingFirstIf condition: String,
+    floatSum: (Element) -> String?,
+    for element: Element
+) -> String {
     guard element.category != .float else {
         return reorderMulFloatRearranging(
             keepingFirstIf: condition,
-            otherwise: svePredicatedBinary("add", for: element),
+            otherwise: floatSum(element),
             for: element
         )
     }
@@ -33308,11 +33312,18 @@ let reorderMulRearrangingOp = Op(
                 """
         },
         sve2_128: { element in
-            reorderMulSveRearranging(keepingFirstIf: reorderMulSveKeepsFirstCondition, for: element)
+            reorderMulSveRearranging(
+                keepingFirstIf: reorderMulSveKeepsFirstCondition,
+                floatSum: { svePredicatedBinary("add", for: $0) },
+                for: element
+            )
         },
         sve: { element in
             reorderMulSveRearranging(
                 keepingFirstIf: reorderMulWideSveKeepsFirstCondition,
+                floatSum: {
+                    sveConstantArithmetic("+", blocking: .both([.minusZero, .notANumber]), for: $0)
+                },
                 for: element
             )
         },

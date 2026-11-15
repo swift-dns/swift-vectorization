@@ -122205,13 +122205,29 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_r
 #if (HWY_COMPILER_CLANG >= 1700 || HWY_COMPILER_GCC_ACTUAL >= 1400) && defined(__ARM_FEATURE_SVE_BF16)
   return (cvectorization_ops_raw_vector_f32)(a);
 #else
-  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svadd_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b));
+  if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_lane_f32(a, -0.0f) || cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_lane_f32(b, -0.0f) || cvectorization_ops_constant_nan_f32(b))) {
+    __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
+    __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
+    __asm__("" : "+w"(hiddenFirst), "+w"(hiddenSecond));
+    const cvectorization_ops_vector_f32 first = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)hiddenFirst;
+    const cvectorization_ops_vector_f32 second = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)hiddenSecond;
+    return (cvectorization_ops_raw_vector_f32)(first + second);
+  }
+  return (cvectorization_ops_raw_vector_f32)(a + b);
 #endif
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
 #if (HWY_COMPILER_CLANG >= 1700 || HWY_COMPILER_GCC_ACTUAL >= 1400) && defined(__ARM_FEATURE_SVE_BF16)
   return (cvectorization_ops_raw_vector_f32)(a);
 #else
-  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svadd_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a, (cvectorization_ops_sve_f32)b));
+  if (!cvectorization_ops_sve_constant_numbers_f32(a, b) && (cvectorization_ops_constant_lane_f32(a, -0.0f) || cvectorization_ops_constant_nan_f32(a) || cvectorization_ops_constant_lane_f32(b, -0.0f) || cvectorization_ops_constant_nan_f32(b))) {
+    __SVFloat32_t hiddenFirst = (cvectorization_ops_sve_f32)a;
+    __SVFloat32_t hiddenSecond = (cvectorization_ops_sve_f32)b;
+    __asm__("" : "+w"(hiddenFirst), "+w"(hiddenSecond));
+    const cvectorization_ops_vector_f32 first = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)hiddenFirst;
+    const cvectorization_ops_vector_f32 second = (cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)hiddenSecond;
+    return (cvectorization_ops_raw_vector_f32)(first + second);
+  }
+  return (cvectorization_ops_raw_vector_f32)(a + b);
 #endif
 #elif CVECTORIZATION_OPS_NEON
 #if HWY_STATIC_TARGET == HWY_NEON_BF16 || (defined(__ARM_FEATURE_BF16_VECTOR_ARITHMETIC) && (HWY_COMPILER_GCC_ACTUAL >= 1000 || HWY_COMPILER_CLANG >= 1100))
