@@ -16318,7 +16318,7 @@ struct MaskedFamily {
     var svePredicatedUnary: String?
     var followsHighwayOrderOnSSE2 = false
     var sveArithmetic: SveMaskedArithmetic?
-    var sveZeroedBuiltin: String?
+    var sveZeroedBuiltin: (neon: String, sve: String)?
     var selectsByPredicateOnSVE: Applies?
     var selectsByBytesOnNEON = false
 }
@@ -16399,6 +16399,19 @@ func sveMergingDividing(for element: Element) -> String {
         predication: "m"
     )
     return sveMergingSelecting(divided, for: element)
+}
+
+func sveZeroedBinary(_ name: String, _ operands: [String], for element: Element) -> String {
+    let combined = sveBuiltin(
+        name,
+        ["active"] + operands.map { sveOperand($0, for: element) },
+        for: element,
+        predication: "z"
+    )
+    return """
+        const __SVBool_t active = \(svePredicate(of: "mask", for: element));
+        \(vectorResult(sveResult(combined, for: element), for: element))
+        """
 }
 
 func x86Avx3Zeros(for element: Element) -> String {
@@ -16663,28 +16676,41 @@ func maskedFamilyTargets(_ family: MaskedFamily, merging: Bool) -> TargetBodies<
         }
     }
     if let arithmetic = family.sveArithmetic {
-        targets.sve2_128 = { element in
+        let masked = { (element: Element) in
             sveMaskedArithmetic(arithmetic, merging: merging, for: element)
         }
+        targets.sve2_128 = masked
+        targets.sve = masked
     }
     if let builtin = family.sveZeroedBuiltin, !merging {
+        let blocked = SveBlockedLanes.both([.notANumber, .minusInfinity])
         targets.sve2_128 = { element in
             guard element.category == .float else { return nil }
             let code = neonTypeCode(of: element)
-            let blocked = SveBlockedLanes.both([.notANumber, .minusInfinity])
             return sveConstantBarrier(blocking: blocked, for: element) {
-                let operation = neonBuiltin(builtin, [$0, $1], code: code, for: element)
+                let operation = neonBuiltin(builtin.neon, [$0, $1], code: code, for: element)
                 return maskedSelecting(operation, merging: false, for: element)
+            }
+        }
+        targets.sve = { element in
+            guard element.category == .float else { return nil }
+            return sveConstantBarrier(blocking: blocked, for: element) {
+                sveZeroedBinary(builtin.sve, [$0, $1], for: element)
             }
         }
     }
     guard merging else { return targets }
     if let selected = family.selectsByPredicateOnSVE {
-        let sve = targets.sve2_128
-        targets.sve2_128 = { element in
-            guard selected.matches(element) else { return sve?(element) }
-            return sveMergingSelecting(maskedExpression(of: family, for: element), for: element)
+        func selecting(
+            _ inherited: ((Element) -> String?)?
+        ) -> (Element) -> String? {
+            { element in
+                guard selected.matches(element) else { return inherited?(element) }
+                return sveMergingSelecting(maskedExpression(of: family, for: element), for: element)
+            }
         }
+        targets.sve2_128 = selecting(targets.sve2_128)
+        targets.sve = selecting(targets.sve)
     }
     if family.divides {
         let plain = { (element: Element) -> String? in
@@ -16874,7 +16900,7 @@ func maskedReductionOp(
         section: .maskedReductions,
         unorderedNaNs: unorderedNaNs,
         filtersUnorderedNaNs: filtersUnorderedNaNs,
-        targets: TargetBodies(sve2_128: sve)
+        targets: TargetBodies(sve2_128: sve, sve: sve)
     ) { element in
         maskedReduction(swiftName, identity: identity?(element), for: element)
     }
@@ -16912,7 +16938,7 @@ let maskedFamilies: [MaskedFamily] = [
         unorderedNaNs: .perLane,
         filtersUnorderedNaNs: true,
         outOfLineOnSVE: .float,
-        sveZeroedBuiltin: "vmaxq_v",
+        sveZeroedBuiltin: (neon: "vmaxq_v", sve: "max"),
         selectsByPredicateOnSVE: .integer(bits: [64])
     ),
     MaskedFamily(
