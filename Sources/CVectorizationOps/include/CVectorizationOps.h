@@ -12721,11 +12721,17 @@ CVECTORIZATION_OPS_INLINE uint8_t cvectorization_ops_lane_u8(cvectorization_ops_
   }
   return __builtin_sve_svlasta_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_u8 vector; uint8_t lanes[32]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_u8 vector; uint8_t lanes[32]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_u8 vector; uint8_t lanes[64]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_u8 vector; uint8_t lanes[64]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_u8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 16) && index < 16) {
     return (__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))[index];
@@ -12742,13 +12748,9 @@ CVECTORIZATION_OPS_INLINE uint8_t cvectorization_ops_lane_u8(cvectorization_ops_
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_replacing_lane_u8(cvectorization_ops_raw_vector_u8 rawA, size_t index, uint8_t value) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_u8 vector; uint8_t lanes[32]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u8)(storage.vector);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpeq_n_s8(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_s8(0, 1), (int8_t)index), __builtin_sve_svdup_n_u8(value), (cvectorization_ops_sve_u8)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_u8 vector; uint8_t lanes[64]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u8)(storage.vector);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svsel_u8(__builtin_sve_svcmpeq_n_s8(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_s8(0, 1), (int8_t)index), __builtin_sve_svdup_n_u8(value), (cvectorization_ops_sve_u8)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_ia32_selectb_512((unsigned long long)((uint64_t)1 << index), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_u8)cvectorization_ops_repeating_u8(value), (cvectorization_ops_x86_i8)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -13034,7 +13036,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_pa
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_bit_reversed_u8(cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
-#if CVECTORIZATION_OPS_X86 == 5
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svrbit_u8_x(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svrbit_u8_x(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)a));
+#elif CVECTORIZATION_OPS_X86 == 5
   typedef uint16_t wide_vector __attribute__((vector_size(64)));
   cvectorization_ops_vector_u8 reversed = (cvectorization_ops_vector_u8)a;
   {
@@ -27273,11 +27279,17 @@ CVECTORIZATION_OPS_INLINE uint16_t cvectorization_ops_lane_u16(cvectorization_op
   }
   return __builtin_sve_svlasta_u16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_u16 vector; uint16_t lanes[16]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_u16 vector; uint16_t lanes[16]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_u16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_u16 vector; uint16_t lanes[32]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_u16 vector; uint16_t lanes[32]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_u16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 8) && index < 8) {
     return (__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7))[index];
@@ -27294,13 +27306,9 @@ CVECTORIZATION_OPS_INLINE uint16_t cvectorization_ops_lane_u16(cvectorization_op
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_replacing_lane_u16(cvectorization_ops_raw_vector_u16 rawA, size_t index, uint16_t value) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_u16 vector; uint16_t lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u16)(storage.vector);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpeq_n_s16(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svindex_s16(0, 1), (int16_t)index), __builtin_sve_svdup_n_u16(value), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_u16 vector; uint16_t lanes[32]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u16)(storage.vector);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svsel_u16(__builtin_sve_svcmpeq_n_s16(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svindex_s16(0, 1), (int16_t)index), __builtin_sve_svdup_n_u16(value), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_ia32_selectw_512((unsigned int)((uint64_t)1 << index), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value), (cvectorization_ops_x86_i16)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -27531,9 +27539,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_p
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_byte_swapped_u16(cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svrevb_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 39, 38, 41, 40, 43, 42, 45, 44, 47, 46, 49, 48, 51, 50, 53, 52, 55, 54, 57, 56, 59, 58, 61, 60, 63, 62));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svrevb_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 39, 38, 41, 40, 43, 42, 45, 44, 47, 46, 49, 48, 51, 50, 53, 52, 55, 54, 57, 56, 59, 58, 61, 60, 63, 62));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -27550,11 +27558,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_b
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_bit_reversed_u16(cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 reversed = (cvectorization_ops_vector_u16)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svrbit_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 reversed = (cvectorization_ops_vector_u16)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 39, 38, 41, 40, 43, 42, 45, 44, 47, 46, 49, 48, 51, 50, 53, 52, 55, 54, 57, 56, 59, 58, 61, 60, 63, 62));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svrbit_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_X86 == 6
   const cvectorization_ops_vector_u16 reversed = (cvectorization_ops_vector_u16)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 39, 38, 41, 40, 43, 42, 45, 44, 47, 46, 49, 48, 51, 50, 53, 52, 55, 54, 57, 56, 59, 58, 61, 60, 63, 62));
@@ -39401,11 +39407,17 @@ CVECTORIZATION_OPS_INLINE uint32_t cvectorization_ops_lane_u32(cvectorization_op
   }
   return __builtin_sve_svlasta_u32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_u32 vector; uint32_t lanes[8]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_u32 vector; uint32_t lanes[8]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_u32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_u32 vector; uint32_t lanes[16]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_u32 vector; uint32_t lanes[16]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_u32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 4) && index < 4) {
     return (__builtin_shufflevector(a, a, 0, 1, 2, 3))[index];
@@ -39422,13 +39434,9 @@ CVECTORIZATION_OPS_INLINE uint32_t cvectorization_ops_lane_u32(cvectorization_op
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_replacing_lane_u32(cvectorization_ops_raw_vector_u32 rawA, size_t index, uint32_t value) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_u32 vector; uint32_t lanes[8]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u32)(storage.vector);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpeq_n_s32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_s32(0, 1), (int32_t)index), __builtin_sve_svdup_n_u32(value), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_u32 vector; uint32_t lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u32)(storage.vector);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svsel_u32(__builtin_sve_svcmpeq_n_s32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_s32(0, 1), (int32_t)index), __builtin_sve_svdup_n_u32(value), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_selectd_512((unsigned short)((uint64_t)1 << index), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_u32)cvectorization_ops_repeating_u32(value), (cvectorization_ops_x86_i32)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -39596,9 +39604,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_p
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_byte_swapped_u32(cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svrevb_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28, 35, 34, 33, 32, 39, 38, 37, 36, 43, 42, 41, 40, 47, 46, 45, 44, 51, 50, 49, 48, 55, 54, 53, 52, 59, 58, 57, 56, 63, 62, 61, 60));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svrevb_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28, 35, 34, 33, 32, 39, 38, 37, 36, 43, 42, 41, 40, 47, 46, 45, 44, 51, 50, 49, 48, 55, 54, 53, 52, 59, 58, 57, 56, 63, 62, 61, 60));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -39616,11 +39624,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_b
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_bit_reversed_u32(cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 reversed = (cvectorization_ops_vector_u32)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svrbit_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 reversed = (cvectorization_ops_vector_u32)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28, 35, 34, 33, 32, 39, 38, 37, 36, 43, 42, 41, 40, 47, 46, 45, 44, 51, 50, 49, 48, 55, 54, 53, 52, 59, 58, 57, 56, 63, 62, 61, 60));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svrbit_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_X86 == 6
   const cvectorization_ops_vector_u32 reversed = (cvectorization_ops_vector_u32)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28, 35, 34, 33, 32, 39, 38, 37, 36, 43, 42, 41, 40, 47, 46, 45, 44, 51, 50, 49, 48, 55, 54, 53, 52, 59, 58, 57, 56, 63, 62, 61, 60));
@@ -52728,11 +52734,17 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_lane_u64(cvectorization_op
   }
   return __builtin_sve_svlasta_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_u64 vector; uint64_t lanes[4]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_u64 vector; uint64_t lanes[4]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_u64 vector; uint64_t lanes[8]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_u64 vector; uint64_t lanes[8]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_u64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 2) && index < 2) {
     return (__builtin_shufflevector(a, a, 0, 1))[index];
@@ -52749,13 +52761,9 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_lane_u64(cvectorization_op
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_replacing_lane_u64(cvectorization_ops_raw_vector_u64 rawA, size_t index, uint64_t value) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_u64 vector; uint64_t lanes[4]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u64)(storage.vector);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpeq_n_s64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svindex_s64(0, 1), (int64_t)index), __builtin_sve_svdup_n_u64(value), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_u64 vector; uint64_t lanes[8]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_u64)(storage.vector);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svsel_u64(__builtin_sve_svcmpeq_n_s64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svindex_s64(0, 1), (int64_t)index), __builtin_sve_svdup_n_u64(value), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_ia32_selectq_512((unsigned char)((uint64_t)1 << index), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u64)cvectorization_ops_repeating_u64(value), (cvectorization_ops_x86_i64)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -52909,9 +52917,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_p
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_byte_swapped_u64(cvectorization_ops_raw_vector_u64 rawA) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svrevb_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24, 39, 38, 37, 36, 35, 34, 33, 32, 47, 46, 45, 44, 43, 42, 41, 40, 55, 54, 53, 52, 51, 50, 49, 48, 63, 62, 61, 60, 59, 58, 57, 56));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svrevb_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24, 39, 38, 37, 36, 35, 34, 33, 32, 47, 46, 45, 44, 43, 42, 41, 40, 55, 54, 53, 52, 51, 50, 49, 48, 63, 62, 61, 60, 59, 58, 57, 56));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -52931,11 +52939,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_b
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_bit_reversed_u64(cvectorization_ops_raw_vector_u64 rawA) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 reversed = (cvectorization_ops_vector_u64)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svrbit_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 reversed = (cvectorization_ops_vector_u64)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24, 39, 38, 37, 36, 35, 34, 33, 32, 47, 46, 45, 44, 43, 42, 41, 40, 55, 54, 53, 52, 51, 50, 49, 48, 63, 62, 61, 60, 59, 58, 57, 56));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svrbit_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_X86 == 6
   const cvectorization_ops_vector_u64 reversed = (cvectorization_ops_vector_u64)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24, 39, 38, 37, 36, 35, 34, 33, 32, 47, 46, 45, 44, 43, 42, 41, 40, 55, 54, 53, 52, 51, 50, 49, 48, 63, 62, 61, 60, 59, 58, 57, 56));
@@ -68212,11 +68218,17 @@ CVECTORIZATION_OPS_INLINE int8_t cvectorization_ops_lane_i8(cvectorization_ops_r
   }
   return __builtin_sve_svlasta_s8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_i8 vector; int8_t lanes[32]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_i8 vector; int8_t lanes[32]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_s8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_i8 vector; int8_t lanes[64]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_i8 vector; int8_t lanes[64]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_s8(__builtin_sve_svwhilelt_b8_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 16) && index < 16) {
     return (__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))[index];
@@ -68233,13 +68245,9 @@ CVECTORIZATION_OPS_INLINE int8_t cvectorization_ops_lane_i8(cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_replacing_lane_i8(cvectorization_ops_raw_vector_i8 rawA, size_t index, int8_t value) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_i8 vector; int8_t lanes[32]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i8)(storage.vector);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(__builtin_sve_svcmpeq_n_s8(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_s8(0, 1), (int8_t)index), __builtin_sve_svdup_n_s8(value), (cvectorization_ops_sve_i8)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_i8 vector; int8_t lanes[64]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i8)(storage.vector);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svsel_s8(__builtin_sve_svcmpeq_n_s8(__builtin_sve_svptrue_pat_b8(31), __builtin_sve_svindex_s8(0, 1), (int8_t)index), __builtin_sve_svdup_n_s8(value), (cvectorization_ops_sve_i8)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_ia32_selectb_512((unsigned long long)((uint64_t)1 << index), (cvectorization_ops_x86_i8)(cvectorization_ops_vector_i8)cvectorization_ops_repeating_i8(value), (cvectorization_ops_x86_i8)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -68520,7 +68528,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_pa
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_bit_reversed_i8(cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
-#if CVECTORIZATION_OPS_X86 == 5
+#if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svrbit_u8_x(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)a));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svrbit_u8_x(__builtin_sve_svptrue_pat_b8(31), (cvectorization_ops_sve_u8)a));
+#elif CVECTORIZATION_OPS_X86 == 5
   typedef uint16_t wide_vector __attribute__((vector_size(64)));
   cvectorization_ops_vector_u8 reversed = (cvectorization_ops_vector_u8)a;
   {
@@ -82931,11 +82943,17 @@ CVECTORIZATION_OPS_INLINE int16_t cvectorization_ops_lane_i16(cvectorization_ops
   }
   return __builtin_sve_svlasta_s16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_i16 vector; int16_t lanes[16]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_i16 vector; int16_t lanes[16]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_s16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_i16 vector; int16_t lanes[32]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_i16 vector; int16_t lanes[32]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_s16(__builtin_sve_svwhilelt_b16_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 8) && index < 8) {
     return (__builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7))[index];
@@ -82952,13 +82970,9 @@ CVECTORIZATION_OPS_INLINE int16_t cvectorization_ops_lane_i16(cvectorization_ops
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_replacing_lane_i16(cvectorization_ops_raw_vector_i16 rawA, size_t index, int16_t value) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_i16 vector; int16_t lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i16)(storage.vector);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(__builtin_sve_svcmpeq_n_s16(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svindex_s16(0, 1), (int16_t)index), __builtin_sve_svdup_n_s16(value), (cvectorization_ops_sve_i16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_i16 vector; int16_t lanes[32]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i16)(storage.vector);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svsel_s16(__builtin_sve_svcmpeq_n_s16(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svindex_s16(0, 1), (int16_t)index), __builtin_sve_svdup_n_s16(value), (cvectorization_ops_sve_i16)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_ia32_selectw_512((unsigned int)((uint64_t)1 << index), (cvectorization_ops_x86_i16)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value), (cvectorization_ops_x86_i16)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -83184,9 +83198,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_p
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_byte_swapped_i16(cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svrevb_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 39, 38, 41, 40, 43, 42, 45, 44, 47, 46, 49, 48, 51, 50, 53, 52, 55, 54, 57, 56, 59, 58, 61, 60, 63, 62));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svrevb_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 39, 38, 41, 40, 43, 42, 45, 44, 47, 46, 49, 48, 51, 50, 53, 52, 55, 54, 57, 56, 59, 58, 61, 60, 63, 62));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -83203,11 +83217,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_b
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_bit_reversed_i16(cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 reversed = (cvectorization_ops_vector_i16)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svrbit_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 reversed = (cvectorization_ops_vector_i16)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 39, 38, 41, 40, 43, 42, 45, 44, 47, 46, 49, 48, 51, 50, 53, 52, 55, 54, 57, 56, 59, 58, 61, 60, 63, 62));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svrbit_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_u16)a));
 #elif CVECTORIZATION_OPS_X86 == 6
   const cvectorization_ops_vector_i16 reversed = (cvectorization_ops_vector_i16)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16, 19, 18, 21, 20, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 39, 38, 41, 40, 43, 42, 45, 44, 47, 46, 49, 48, 51, 50, 53, 52, 55, 54, 57, 56, 59, 58, 61, 60, 63, 62));
@@ -95374,11 +95386,17 @@ CVECTORIZATION_OPS_INLINE int32_t cvectorization_ops_lane_i32(cvectorization_ops
   }
   return __builtin_sve_svlasta_s32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_i32 vector; int32_t lanes[8]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_i32 vector; int32_t lanes[8]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_s32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_i32 vector; int32_t lanes[16]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_i32 vector; int32_t lanes[16]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_s32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 4) && index < 4) {
     return (__builtin_shufflevector(a, a, 0, 1, 2, 3))[index];
@@ -95395,13 +95413,9 @@ CVECTORIZATION_OPS_INLINE int32_t cvectorization_ops_lane_i32(cvectorization_ops
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_replacing_lane_i32(cvectorization_ops_raw_vector_i32 rawA, size_t index, int32_t value) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_i32 vector; int32_t lanes[8]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i32)(storage.vector);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(__builtin_sve_svcmpeq_n_s32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_s32(0, 1), (int32_t)index), __builtin_sve_svdup_n_s32(value), (cvectorization_ops_sve_i32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_i32 vector; int32_t lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i32)(storage.vector);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svsel_s32(__builtin_sve_svcmpeq_n_s32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_s32(0, 1), (int32_t)index), __builtin_sve_svdup_n_s32(value), (cvectorization_ops_sve_i32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_selectd_512((unsigned short)((uint64_t)1 << index), (cvectorization_ops_x86_i32)(cvectorization_ops_vector_i32)cvectorization_ops_repeating_i32(value), (cvectorization_ops_x86_i32)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -95569,9 +95583,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_p
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_byte_swapped_i32(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svrevb_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28, 35, 34, 33, 32, 39, 38, 37, 36, 43, 42, 41, 40, 47, 46, 45, 44, 51, 50, 49, 48, 55, 54, 53, 52, 59, 58, 57, 56, 63, 62, 61, 60));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svrevb_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28, 35, 34, 33, 32, 39, 38, 37, 36, 43, 42, 41, 40, 47, 46, 45, 44, 51, 50, 49, 48, 55, 54, 53, 52, 59, 58, 57, 56, 63, 62, 61, 60));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -95589,11 +95603,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_b
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_bit_reversed_i32(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 reversed = (cvectorization_ops_vector_i32)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svrbit_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 reversed = (cvectorization_ops_vector_i32)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28, 35, 34, 33, 32, 39, 38, 37, 36, 43, 42, 41, 40, 47, 46, 45, 44, 51, 50, 49, 48, 55, 54, 53, 52, 59, 58, 57, 56, 63, 62, 61, 60));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svrbit_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)a));
 #elif CVECTORIZATION_OPS_X86 == 6
   const cvectorization_ops_vector_i32 reversed = (cvectorization_ops_vector_i32)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12, 19, 18, 17, 16, 23, 22, 21, 20, 27, 26, 25, 24, 31, 30, 29, 28, 35, 34, 33, 32, 39, 38, 37, 36, 43, 42, 41, 40, 47, 46, 45, 44, 51, 50, 49, 48, 55, 54, 53, 52, 59, 58, 57, 56, 63, 62, 61, 60));
@@ -108152,11 +108164,17 @@ CVECTORIZATION_OPS_INLINE int64_t cvectorization_ops_lane_i64(cvectorization_ops
   }
   return __builtin_sve_svlasta_s64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_i64 vector; int64_t lanes[4]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_i64 vector; int64_t lanes[4]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_s64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_i64 vector; int64_t lanes[8]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_i64 vector; int64_t lanes[8]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_s64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 2) && index < 2) {
     return (__builtin_shufflevector(a, a, 0, 1))[index];
@@ -108173,13 +108191,9 @@ CVECTORIZATION_OPS_INLINE int64_t cvectorization_ops_lane_i64(cvectorization_ops
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_replacing_lane_i64(cvectorization_ops_raw_vector_i64 rawA, size_t index, int64_t value) {
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_i64 vector; int64_t lanes[4]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i64)(storage.vector);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsel_s64(__builtin_sve_svcmpeq_n_s64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svindex_s64(0, 1), (int64_t)index), __builtin_sve_svdup_n_s64(value), (cvectorization_ops_sve_i64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_i64 vector; int64_t lanes[8]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_i64)(storage.vector);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svsel_s64(__builtin_sve_svcmpeq_n_s64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svindex_s64(0, 1), (int64_t)index), __builtin_sve_svdup_n_s64(value), (cvectorization_ops_sve_i64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_ia32_selectq_512((unsigned char)((uint64_t)1 << index), (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i64)cvectorization_ops_repeating_i64(value), (cvectorization_ops_x86_i64)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -108333,9 +108347,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_p
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_byte_swapped_i64(cvectorization_ops_raw_vector_i64 rawA) {
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svrevb_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24, 39, 38, 37, 36, 35, 34, 33, 32, 47, 46, 45, 44, 43, 42, 41, 40, 55, 54, 53, 52, 51, 50, 49, 48, 63, 62, 61, 60, 59, 58, 57, 56));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svrevb_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_shufflevector((cvectorization_ops_vector_u8)a, (cvectorization_ops_vector_u8)a, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24, 39, 38, 37, 36, 35, 34, 33, 32, 47, 46, 45, 44, 43, 42, 41, 40, 55, 54, 53, 52, 51, 50, 49, 48, 63, 62, 61, 60, 59, 58, 57, 56));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -108355,11 +108369,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_b
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_bit_reversed_i64(cvectorization_ops_raw_vector_i64 rawA) {
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 reversed = (cvectorization_ops_vector_i64)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svrbit_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 reversed = (cvectorization_ops_vector_i64)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
-  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24, 39, 38, 37, 36, 35, 34, 33, 32, 47, 46, 45, 44, 43, 42, 41, 40, 55, 54, 53, 52, 51, 50, 49, 48, 63, 62, 61, 60, 59, 58, 57, 56));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svrbit_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a));
 #elif CVECTORIZATION_OPS_X86 == 6
   const cvectorization_ops_vector_i64 reversed = (cvectorization_ops_vector_i64)__builtin_elementwise_bitreverse((cvectorization_ops_vector_u8)a);
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_shufflevector((cvectorization_ops_vector_u8)reversed, (cvectorization_ops_vector_u8)reversed, 7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8, 23, 22, 21, 20, 19, 18, 17, 16, 31, 30, 29, 28, 27, 26, 25, 24, 39, 38, 37, 36, 35, 34, 33, 32, 47, 46, 45, 44, 43, 42, 41, 40, 55, 54, 53, 52, 51, 50, 49, 48, 63, 62, 61, 60, 59, 58, 57, 56));
@@ -120972,11 +120984,17 @@ CVECTORIZATION_OPS_INLINE float cvectorization_ops_lane_f32(cvectorization_ops_r
   }
   return __builtin_sve_svlasta_f32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_f32 vector; float lanes[8]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_f32 vector; float lanes[8]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_f32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_f32 vector; float lanes[16]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_f32 vector; float lanes[16]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_f32(__builtin_sve_svwhilelt_b32_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 4) && index < 4) {
     return (__builtin_shufflevector(a, a, 0, 1, 2, 3))[index];
@@ -120993,13 +121011,9 @@ CVECTORIZATION_OPS_INLINE float cvectorization_ops_lane_f32(cvectorization_ops_r
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_replacing_lane_f32(cvectorization_ops_raw_vector_f32 rawA, size_t index, float value) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_f32 vector; float lanes[8]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_f32)(storage.vector);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(__builtin_sve_svcmpeq_n_s32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_s32(0, 1), (int32_t)index), __builtin_sve_svdup_n_f32(value), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_f32 vector; float lanes[16]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_f32)(storage.vector);
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)(cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svsel_f32(__builtin_sve_svcmpeq_n_s32(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svindex_s32(0, 1), (int32_t)index), __builtin_sve_svdup_n_f32(value), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_selectps_512((unsigned short)((uint64_t)1 << index), (cvectorization_ops_x86_f32)(cvectorization_ops_vector_f32)cvectorization_ops_repeating_f32(value), (cvectorization_ops_x86_f32)a));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -132963,11 +132977,17 @@ CVECTORIZATION_OPS_INLINE double cvectorization_ops_lane_f64(cvectorization_ops_
   }
   return __builtin_sve_svlasta_f64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_f64(a) ? __builtin_sve_svdup_n_f64(a[0]) : (__SVFloat64_t)(cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_f64 vector; double lanes[4]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_f64 vector; double lanes[4]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_f64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_f64(a) ? __builtin_sve_svdup_n_f64(a[0]) : (__SVFloat64_t)(cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_f64 vector; double lanes[8]; } storage = {a};
-  return storage.lanes[index];
+  if (__builtin_constant_p(index)) {
+    union { cvectorization_ops_vector_f64 vector; double lanes[8]; } storage = {a};
+    return storage.lanes[index];
+  }
+  return __builtin_sve_svlasta_f64(__builtin_sve_svwhilelt_b64_u32(0, (uint32_t)(index)), (cvectorization_ops_sve_splat_f64(a) ? __builtin_sve_svdup_n_f64(a[0]) : (__SVFloat64_t)(cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   if (__builtin_constant_p(index < 2) && index < 2) {
     return (__builtin_shufflevector(a, a, 0, 1))[index];
@@ -132984,13 +133004,9 @@ CVECTORIZATION_OPS_INLINE double cvectorization_ops_lane_f64(cvectorization_ops_
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_replacing_lane_f64(cvectorization_ops_raw_vector_f64 rawA, size_t index, double value) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  union { cvectorization_ops_vector_f64 vector; double lanes[4]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_f64)(storage.vector);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(__builtin_sve_svcmpeq_n_s64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svindex_s64(0, 1), (int64_t)index), __builtin_sve_svdup_n_f64(value), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  union { cvectorization_ops_vector_f64 vector; double lanes[8]; } storage = {a};
-  storage.lanes[index] = value;
-  return (cvectorization_ops_raw_vector_f64)(storage.vector);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svsel_f64(__builtin_sve_svcmpeq_n_s64(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svindex_s64(0, 1), (int64_t)index), __builtin_sve_svdup_n_f64(value), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)__builtin_ia32_selectpd_512((unsigned char)((uint64_t)1 << index), (cvectorization_ops_x86_f64)(cvectorization_ops_vector_f64)cvectorization_ops_repeating_f64(value), (cvectorization_ops_x86_f64)a));
 #elif CVECTORIZATION_OPS_X86 == 4

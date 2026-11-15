@@ -20829,6 +20829,25 @@ func portableReplacingLane(for element: Element) -> String {
     """
 }
 
+func sveReplacingLane(for element: Element) -> String {
+    let signed = signedElement(of: element)
+    let view = element.isHalfPrecision ? unsignedElement(of: element) : element
+    let selected = sveBuiltin(
+        "cmpeq_n",
+        [
+            sveAllLanes(of: signed), sveBuiltin("index", ["0", "1"], for: signed),
+            "(\(signed.cType))index",
+        ],
+        for: signed
+    )
+    let replaced = sveBuiltin(
+        "sel",
+        [selected, sveBuiltin("dup_n", ["value"], for: view), sveOperand("a", for: view)],
+        for: view
+    )
+    return sveViewResult(replaced, view: view, for: element)
+}
+
 func x86ReplacingLaneBytes(level: X86Level, for element: Element) -> String? {
     guard element.width == 16, element.bits == 8 else { return nil }
     let positions = iota(as: element.cVector, lanes: element.laneCount)
@@ -21084,6 +21103,17 @@ func portableBitReversed(for element: Element) -> String {
         const \(element.cVector) reversed = (\(element.cVector))__builtin_elementwise_bitreverse((\(bytes))a);
         \(vectorResult(byteSwapped("reversed", for: element), for: element))
         """
+}
+
+func sveReversedWithinLanes(_ instruction: String, for element: Element) -> String {
+    let view = unsignedElement(of: element)
+    let reversed = sveBuiltin(
+        instruction,
+        [sveAllLanes(of: view), sveOperand("a", for: view)],
+        for: view,
+        predication: "x"
+    )
+    return sveViewResult(reversed, view: view, for: element)
 }
 
 func neonConcatenatedHalves(upper: Bool, for element: Element) -> String {
@@ -23614,6 +23644,7 @@ let swizzleOps: [Op] =
             section: .gettingSettingLanes,
             targets: TargetBodies(
                 sve2_128: { sveLane(for: $0) },
+                sve: { sveLane(for: $0) },
                 avx3: { x86Avx3Lane(for: $0) }
             )
         ) { element in
@@ -23630,6 +23661,7 @@ let swizzleOps: [Op] =
             .all,
             section: .gettingSettingLanes,
             targets: TargetBodies(
+                sve: { sveReplacingLane(for: $0) },
                 avx3: { x86Avx3ReplacingLane(for: $0) },
                 avx2: { x86ReplacingLane(level: .avx2, for: $0) },
                 sse4: { x86ReplacingLane(level: .sse4, for: $0) },
@@ -23708,6 +23740,7 @@ let swizzleOps: [Op] =
             .integer(bits: [16, 32, 64]),
             section: .reverse,
             targets: TargetBodies(
+                sve: { element in sveReversedWithinLanes("revb", for: element) },
                 ssse3: { element in vectorResult(byteSwapped("a", for: element), for: element) },
                 sse2: { element in x86ByteSwapped(for: element) }
             )
@@ -23722,6 +23755,7 @@ let swizzleOps: [Op] =
             .integer,
             section: .reverse,
             targets: TargetBodies(
+                sve: { element in sveReversedWithinLanes("rbit", for: element) },
                 avx3dl: { element in portableBitReversed(for: element) },
                 avx3: { element in x86BitReversed(for: element) },
                 ssse3: { element in portableBitReversed(for: element) },
@@ -23746,6 +23780,9 @@ let swizzleOps: [Op] =
 
 func tupleOps(count: Int) -> [Op] {
     let vectors = Array(repeating: Parameter.vector, count: count)
+    let splatCreation = { (element: Element) -> String? in
+        tupleCreation(count, for: element) { sveSplatMember($0, for: element) }
+    }
     return [
         Op(
             "create\(count)",
