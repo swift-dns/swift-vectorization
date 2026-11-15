@@ -17700,6 +17700,7 @@ func negativeSelectTargets(
 ) -> TargetBodies<Element> {
     TargetBodies(
         sve2_128Splat: sveSplat,
+        sveSplat: sveSplat,
         avx3: { element in x86NegativeSelect(yes, no, level: .avx3, for: element) },
         avx2: { element in x86NegativeSelect(yes, no, level: .avx2, for: element) },
         sse4: { element in x86NegativeSelect(yes, no, level: .sse4, for: element) },
@@ -17772,8 +17773,14 @@ let signAndComparisonOps: [Op] = [
         .all,
         section: .initialization,
         unspecifiedResult: true,
-        targets: TargetBodies(sve2_128: { element in sveUndefined(for: element) }),
-        helpers: TargetBodies(sve2_128: { element in sveUndefinedDeclaration(for: element) })
+        targets: TargetBodies(
+            sve2_128: { element in sveUndefined(for: element) },
+            sve: { element in sveUndefined(for: element) }
+        ),
+        helpers: TargetBodies(
+            sve2_128: { element in sveUndefinedDeclaration(for: element) },
+            sve: { element in sveUndefinedDeclaration(for: element) }
+        )
     ) { element in
         let zero = compoundLiteral(element.cVector, ["0"])
         return vectorResult("__builtin_nondeterministic_value(\(zero))", for: element)
@@ -17852,6 +17859,7 @@ let signAndComparisonOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             sve2_128Splat: { element in sveNegatingSplat(for: element) },
+            sveSplat: { element in sveNegatingSplat(for: element) },
             avx3: { element in x86NegatingIfNegative(level: .avx3, for: element) },
             avx2: { element in x86NegatingIfNegative(level: .avx2, for: element) },
             sse4: { element in x86NegatingIfNegative(level: .sse4, for: element) },
@@ -17909,6 +17917,7 @@ let signAndComparisonOps: [Op] = [
         section: .comparisons,
         targets: TargetBodies(
             neon: { element in bitTest(allBits: false, for: element) },
+            sve: { element in bitTest(allBits: false, for: element) },
             avx3: { element in bitTest(allBits: false, for: element) }
         )
     ) { element in
