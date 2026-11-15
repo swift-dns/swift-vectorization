@@ -18889,6 +18889,7 @@ func carrylessMultiplyingEmulatedLanes(for element: Element) -> String {
 }
 
 func aesRoundOp(_ round: AesRound) -> Op {
+    let sve: (Element) -> String = { sveAesRound(round, for: $0) }
     let blockwise: (Element) -> String = { x86AesRound(round, for: $0) }
     return Op(
         round.swiftName,
@@ -18900,7 +18901,8 @@ func aesRoundOp(_ round: AesRound) -> Op {
         vectorLabels: ["_", "roundKey"],
         targets: TargetBodies(
             neon: { neonAesRound(round, for: $0) },
-            sve2_128: { sveAesRound(round, for: $0) },
+            sve2_128: sve,
+            sve: sve,
             avx3dl: { x86Avx3DlAesRound(round, for: $0) },
             avx3: blockwise,
             avx2: blockwise,
@@ -18922,6 +18924,7 @@ func carrylessMultiplyingOp(
     upper: Bool,
     helpers: TargetBodies<Element> = TargetBodies()
 ) -> Op {
+    let sve: (Element) -> String = { sveCarrylessMultiplying(upper: upper, for: $0) }
     let blockwise: (Element) -> String = { x86CarrylessMultiplying(upper: upper, for: $0) }
     return Op(
         swiftName,
@@ -18932,7 +18935,8 @@ func carrylessMultiplyingOp(
         section: .crypto,
         targets: TargetBodies(
             neon: { neonCarrylessMultiplying(upper: upper, for: $0) },
-            sve2_128: { sveCarrylessMultiplying(upper: upper, for: $0) },
+            sve2_128: sve,
+            sve: sve,
             avx3dl: { x86Avx3DlCarrylessMultiplying(upper: upper, for: $0) },
             avx3: blockwise,
             avx2: blockwise,
@@ -18990,9 +18994,11 @@ let carrylessMultiplyingHelpers: TargetBodies<Element> = {
         [carrylessWideProduct(for: element), blockProduct(element), emulated(element)]
             .joined(separator: "\n")
     }
-    helpers.sve2_128 = { element in
+    let sve: (Element) -> String = { element in
         [sveBlockProduct(element), emulated(element)].joined(separator: "\n")
     }
+    helpers.sve2_128 = sve
+    helpers.sve = sve
     let emulatedLanes = emulatedFunction(
         carrylessMultiplyingEmulatedName,
         vectors: 2,
@@ -19022,6 +19028,7 @@ let cryptoOps: [Op] =
             targets: TargetBodies(
                 neon: { neonAesInverseMixColumns(for: $0) },
                 sve2_128: { sveAesInverseMixColumns(for: $0) },
+                sve: { sveAesInverseMixColumns(for: $0) },
                 avx3dl: { x86Avx3DlAesInverseMixColumns(for: $0) },
                 avx3: { x86AesInverseMixColumns(for: $0) },
                 avx2: { x86AesInverseMixColumns(for: $0) },
@@ -19045,6 +19052,7 @@ let cryptoOps: [Op] =
             targets: TargetBodies(
                 neon: { neonAesKeyGenerationAssist(for: $0) },
                 sve2_128: { sveAesKeyGenerationAssist(for: $0) },
+                sve: { sveAesKeyGenerationAssist(for: $0) },
                 avx3dl: { x86Avx3DlAesKeyGenerationAssist(for: $0) },
                 avx3: { x86AesKeyGenerationAssist(for: $0) },
                 avx2: { x86AesKeyGenerationAssist(for: $0) },

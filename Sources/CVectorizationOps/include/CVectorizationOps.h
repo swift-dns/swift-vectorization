@@ -8611,6 +8611,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ae
 #else
   return cvectorization_ops_aes_round_emulated_u8(rawA, rawB);
 #endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesmc_u8(__builtin_sve_svaese_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0))) ^ b);
+#else
+  return cvectorization_ops_aes_round_emulated_u8(rawA, rawB);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesmc_u8(__builtin_sve_svaese_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0))) ^ b);
+#else
+  return cvectorization_ops_aes_round_emulated_u8(rawA, rawB);
+#endif
 #elif CVECTORIZATION_OPS_NEON
 #if HWY_STATIC_TARGET != HWY_NEON_WITHOUT_AES
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vaesmcq_u8((cvectorization_ops_neon_i8)(cvectorization_ops_vector_u8)__builtin_neon_vaeseq_u8((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)(cvectorization_ops_vector_u8){0}, 48), 48) ^ b);
@@ -8891,6 +8903,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ae
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
   const cvectorization_ops_vector_u8 b = (cvectorization_ops_vector_u8)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaese_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0)) ^ b);
+#else
+  return cvectorization_ops_aes_last_round_emulated_u8(rawA, rawB);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaese_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0)) ^ b);
+#else
+  return cvectorization_ops_aes_last_round_emulated_u8(rawA, rawB);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
 #if defined(__ARM_FEATURE_SVE2_AES)
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaese_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0)) ^ b);
 #else
@@ -9319,6 +9343,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ae
 #else
   return cvectorization_ops_aes_round_inverse_emulated_u8(rawA, rawB);
 #endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesimc_u8(__builtin_sve_svaesd_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0))) ^ b);
+#else
+  return cvectorization_ops_aes_round_inverse_emulated_u8(rawA, rawB);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesimc_u8(__builtin_sve_svaesd_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0))) ^ b);
+#else
+  return cvectorization_ops_aes_round_inverse_emulated_u8(rawA, rawB);
+#endif
 #elif CVECTORIZATION_OPS_NEON
 #if HWY_STATIC_TARGET != HWY_NEON_WITHOUT_AES
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vaesimcq_u8((cvectorization_ops_neon_i8)(cvectorization_ops_vector_u8)__builtin_neon_vaesdq_u8((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)(cvectorization_ops_vector_u8){0}, 48), 48) ^ b);
@@ -9622,6 +9658,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ae
 #else
   return cvectorization_ops_aes_last_round_inverse_emulated_u8(rawA, rawB);
 #endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesd_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0)) ^ b);
+#else
+  return cvectorization_ops_aes_last_round_inverse_emulated_u8(rawA, rawB);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesd_u8((cvectorization_ops_sve_u8)a, __builtin_sve_svdup_n_u8(0)) ^ b);
+#else
+  return cvectorization_ops_aes_last_round_inverse_emulated_u8(rawA, rawB);
+#endif
 #elif CVECTORIZATION_OPS_NEON
 #if HWY_STATIC_TARGET != HWY_NEON_WITHOUT_AES
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)__builtin_neon_vaesdq_u8((cvectorization_ops_neon_i8)a, (cvectorization_ops_neon_i8)(cvectorization_ops_vector_u8){0}, 48) ^ b);
@@ -9823,6 +9871,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ae
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_aes_inverse_mix_columns_u8(cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesimc_u8((cvectorization_ops_sve_u8)a));
+#else
+  return cvectorization_ops_aes_inverse_mix_columns_emulated_u8(rawA);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesimc_u8((cvectorization_ops_sve_u8)a));
+#else
+  return cvectorization_ops_aes_inverse_mix_columns_emulated_u8(rawA);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
 #if defined(__ARM_FEATURE_SVE2_AES)
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaesimc_u8((cvectorization_ops_sve_u8)a));
 #else
@@ -10968,6 +11028,28 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ae
   const cvectorization_ops_vector_u8 rotatedWord = (cvectorization_ops_vector_u8){0x00, 0x0D, 0x0A, 0x07, 0x01, 0x0E, 0x0B, 0x04, 0x08, 0x05, 0x02, 0x0F, 0x09, 0x06, 0x03, 0x0C};
   const cvectorization_ops_vector_u8 mask = (cvectorization_ops_vector_u8){0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0};
   const cvectorization_ops_vector_u8 duplicated = (cvectorization_ops_vector_u8)__builtin_shufflevector((words)a, (words)a, 1, 1, 3, 3);
+  const cvectorization_ops_vector_u8 substituted = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaese_u8((cvectorization_ops_sve_u8)duplicated, __builtin_sve_svdup_n_u8(0)) ^ mask;
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_bytes_u8((cvectorization_ops_raw_vector_u8)(substituted), (cvectorization_ops_raw_vector_u8)(rotatedWord)));
+#else
+  return cvectorization_ops_aes_key_generation_assist_emulated_u8(rawA, roundConstant);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+#if defined(__ARM_FEATURE_SVE2_AES)
+  typedef uint32_t words __attribute__((vector_size(32)));
+  const cvectorization_ops_vector_u8 rotatedWord = (cvectorization_ops_vector_u8){0x00, 0x0D, 0x0A, 0x07, 0x01, 0x0E, 0x0B, 0x04, 0x08, 0x05, 0x02, 0x0F, 0x09, 0x06, 0x03, 0x0C, 0x00, 0x0D, 0x0A, 0x07, 0x01, 0x0E, 0x0B, 0x04, 0x08, 0x05, 0x02, 0x0F, 0x09, 0x06, 0x03, 0x0C};
+  const cvectorization_ops_vector_u8 mask = (cvectorization_ops_vector_u8){0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0};
+  const cvectorization_ops_vector_u8 duplicated = (cvectorization_ops_vector_u8)__builtin_shufflevector((words)a, (words)a, 1, 1, 3, 3, 5, 5, 7, 7);
+  const cvectorization_ops_vector_u8 substituted = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaese_u8((cvectorization_ops_sve_u8)duplicated, __builtin_sve_svdup_n_u8(0)) ^ mask;
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_bytes_u8((cvectorization_ops_raw_vector_u8)(substituted), (cvectorization_ops_raw_vector_u8)(rotatedWord)));
+#else
+  return cvectorization_ops_aes_key_generation_assist_emulated_u8(rawA, roundConstant);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+#if defined(__ARM_FEATURE_SVE2_AES)
+  typedef uint32_t words __attribute__((vector_size(64)));
+  const cvectorization_ops_vector_u8 rotatedWord = (cvectorization_ops_vector_u8){0x00, 0x0D, 0x0A, 0x07, 0x01, 0x0E, 0x0B, 0x04, 0x08, 0x05, 0x02, 0x0F, 0x09, 0x06, 0x03, 0x0C, 0x00, 0x0D, 0x0A, 0x07, 0x01, 0x0E, 0x0B, 0x04, 0x08, 0x05, 0x02, 0x0F, 0x09, 0x06, 0x03, 0x0C, 0x00, 0x0D, 0x0A, 0x07, 0x01, 0x0E, 0x0B, 0x04, 0x08, 0x05, 0x02, 0x0F, 0x09, 0x06, 0x03, 0x0C, 0x00, 0x0D, 0x0A, 0x07, 0x01, 0x0E, 0x0B, 0x04, 0x08, 0x05, 0x02, 0x0F, 0x09, 0x06, 0x03, 0x0C};
+  const cvectorization_ops_vector_u8 mask = (cvectorization_ops_vector_u8){0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0, 0, roundConstant, 0, 0, 0, 0, 0, 0};
+  const cvectorization_ops_vector_u8 duplicated = (cvectorization_ops_vector_u8)__builtin_shufflevector((words)a, (words)a, 1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13, 15, 15);
   const cvectorization_ops_vector_u8 substituted = (cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svaese_u8((cvectorization_ops_sve_u8)duplicated, __builtin_sve_svdup_n_u8(0)) ^ mask;
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)cvectorization_ops_table_lookup_bytes_u8((cvectorization_ops_raw_vector_u8)(substituted), (cvectorization_ops_raw_vector_u8)(rotatedWord)));
 #else
@@ -51667,32 +51749,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_c
 }
 
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_carryless_wide_product_u64(uint64_t a, uint64_t b, uint64_t* high) {
-#if defined(__SIZEOF_INT128__)
-  const unsigned __int128 product = (unsigned __int128)a * (unsigned __int128)b;
-  *high = (uint64_t)(product >> 64);
-  return (uint64_t)product;
-#else
-  const uint64_t loLo = (a & 0xffffffff) * (b & 0xffffffff);
-  const uint64_t hiLo = (a >> 32) * (b & 0xffffffff);
-  const uint64_t loHi = (a & 0xffffffff) * (b >> 32);
-  const uint64_t hiHi = (a >> 32) * (b >> 32);
-  const uint64_t carry = (loLo >> 32) + (hiLo & 0xffffffff) + loHi;
-  *high = (hiLo >> 32) + (carry >> 32) + hiHi;
-  return a * b;
-#endif
-}
-
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_carryless_block_product_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB, size_t lane) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-  cvectorization_ops_vector_u64 product;
-  uint64_t high;
-  product[0] = cvectorization_ops_carryless_wide_product_u64(a[0 + lane], b[0 + lane], &high);
-  product[1] = high;
-  product[2] = cvectorization_ops_carryless_wide_product_u64(a[2 + lane], b[2 + lane], &high);
-  product[3] = high;
-  return (cvectorization_ops_raw_vector_u64)(product);
+  const cvectorization_ops_sve_u64 low = (cvectorization_ops_sve_u64)__builtin_sve_svmul_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b);
+  const cvectorization_ops_sve_u64 high = (cvectorization_ops_sve_u64)__builtin_sve_svmulh_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b);
+  return (cvectorization_ops_raw_vector_u64)(lane ? (cvectorization_ops_sve_u64)__builtin_sve_svtrn2_u64(low, high) : (cvectorization_ops_sve_u64)__builtin_sve_svtrn1_u64(low, high));
 }
 
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_carryless_multiplying_emulated_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB, size_t lane) {
@@ -51718,36 +51780,12 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_c
 }
 
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_carryless_wide_product_u64(uint64_t a, uint64_t b, uint64_t* high) {
-#if defined(__SIZEOF_INT128__)
-  const unsigned __int128 product = (unsigned __int128)a * (unsigned __int128)b;
-  *high = (uint64_t)(product >> 64);
-  return (uint64_t)product;
-#else
-  const uint64_t loLo = (a & 0xffffffff) * (b & 0xffffffff);
-  const uint64_t hiLo = (a >> 32) * (b & 0xffffffff);
-  const uint64_t loHi = (a & 0xffffffff) * (b >> 32);
-  const uint64_t hiHi = (a >> 32) * (b >> 32);
-  const uint64_t carry = (loLo >> 32) + (hiLo & 0xffffffff) + loHi;
-  *high = (hiLo >> 32) + (carry >> 32) + hiHi;
-  return a * b;
-#endif
-}
-
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_carryless_block_product_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB, size_t lane) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
-  cvectorization_ops_vector_u64 product;
-  uint64_t high;
-  product[0] = cvectorization_ops_carryless_wide_product_u64(a[0 + lane], b[0 + lane], &high);
-  product[1] = high;
-  product[2] = cvectorization_ops_carryless_wide_product_u64(a[2 + lane], b[2 + lane], &high);
-  product[3] = high;
-  product[4] = cvectorization_ops_carryless_wide_product_u64(a[4 + lane], b[4 + lane], &high);
-  product[5] = high;
-  product[6] = cvectorization_ops_carryless_wide_product_u64(a[6 + lane], b[6 + lane], &high);
-  product[7] = high;
-  return (cvectorization_ops_raw_vector_u64)(product);
+  const cvectorization_ops_sve_u64 low = (cvectorization_ops_sve_u64)__builtin_sve_svmul_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b);
+  const cvectorization_ops_sve_u64 high = (cvectorization_ops_sve_u64)__builtin_sve_svmulh_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b);
+  return (cvectorization_ops_raw_vector_u64)(lane ? (cvectorization_ops_sve_u64)__builtin_sve_svtrn2_u64(low, high) : (cvectorization_ops_sve_u64)__builtin_sve_svtrn1_u64(low, high));
 }
 
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_carryless_multiplying_emulated_u64(cvectorization_ops_raw_vector_u64 rawA, cvectorization_ops_raw_vector_u64 rawB, size_t lane) {
@@ -52012,6 +52050,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_c
 #else
   return cvectorization_ops_carryless_multiplying_emulated_u64(rawA, rawB, 0);
 #endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svpmullb_pair_u64((cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#else
+  return cvectorization_ops_carryless_multiplying_emulated_u64(rawA, rawB, 0);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svpmullb_pair_u64((cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#else
+  return cvectorization_ops_carryless_multiplying_emulated_u64(rawA, rawB, 0);
+#endif
 #elif CVECTORIZATION_OPS_NEON
 #if HWY_STATIC_TARGET != HWY_NEON_WITHOUT_AES
   return (cvectorization_ops_raw_vector_u64)(__builtin_neon_vmull_p64(a[0], b[0]));
@@ -52057,6 +52107,18 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_c
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
   const cvectorization_ops_vector_u64 b = (cvectorization_ops_vector_u64)rawB;
 #if CVECTORIZATION_OPS_NEON == 2
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svpmullt_pair_u64((cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#else
+  return cvectorization_ops_carryless_multiplying_emulated_u64(rawA, rawB, 1);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+#if defined(__ARM_FEATURE_SVE2_AES)
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svpmullt_pair_u64((cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
+#else
+  return cvectorization_ops_carryless_multiplying_emulated_u64(rawA, rawB, 1);
+#endif
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
 #if defined(__ARM_FEATURE_SVE2_AES)
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svpmullt_pair_u64((cvectorization_ops_sve_u64)a, (cvectorization_ops_sve_u64)b));
 #else
