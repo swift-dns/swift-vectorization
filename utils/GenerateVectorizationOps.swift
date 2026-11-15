@@ -33289,13 +33289,12 @@ let reorderMulRearrangingOp = Op(
     "RearrangeToOddPlusEven",
     [.vector, .vector],
     .vector,
-    .all(bits: [32]).including([floatElement(bits: 64)]),
+    .all(bits: [32]),
     section: .multiply,
     unorderedNaNs: .perLane,
     targets: TargetBodies(
         neon: { element in
             if element.category == .float {
-                guard element.bits == 32 else { return nil }
                 return reorderMulFloatRearranging(
                     keepingFirstIf: reorderMulNeonKeepsFirstCondition,
                     for: element
