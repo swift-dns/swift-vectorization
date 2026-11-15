@@ -13829,7 +13829,10 @@ let basicOps: [Op] = [
         .vector,
         .all,
         section: .initialization,
-        targets: TargetBodies(sve2_128: { element in sveIota(for: element) })
+        targets: TargetBodies(
+            sve2_128: { element in sveIota(for: element) },
+            sve: { element in sveIota(for: element) }
+        )
     ) { element in
         let lanes = element.laneCount
         switch element.category {
@@ -13900,12 +13903,14 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonLoadFirst(for: element) },
             sve2_128: { element in sveLoadFirst(for: element) },
+            sve: { element in sveLoadFirst(for: element) },
             avx3: { element in x86Avx3LoadFirst(for: element) },
             avx2: { element in x86LoadFirstWide(for: element) },
             sse2: { element in x86LoadFirst(lanes: element.laneCount, for: element) }
         ),
         spanTargets: TargetBodies(
-            sve2_128: { element in sveLoadFirst(for: element, spanned: true) }
+            sve2_128: { element in sveLoadFirst(for: element, spanned: true) },
+            sve: { element in sveLoadFirst(for: element, spanned: true) }
         ),
         helpers: TargetBodies(
             avx2: { element in x86LoadFirstHelpers(for: element) },
@@ -13962,6 +13967,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonStoreFirst(for: element) },
             sve2_128: { element in sveStoreFirst(for: element) },
+            sve: { element in sveStoreFirst(for: element) },
             avx3: { element in x86Avx3StoreFirst(for: element) },
             avx2: { element in x86StoreFirstMasked(for: element) },
             sse2: { element in x86StoreFirst(for: element) }
@@ -15250,6 +15256,7 @@ let basicOps: [Op] = [
         section: .floatingPointClassification,
         targets: TargetBodies(
             sve2_128: { element in sveIsFinite(for: element) },
+            sve: { element in sveIsFinite(for: element) },
             avx3: { element in
                 maskResult(x86Avx3Classified(0x99, inverted: true, for: element), for: element)
             }
@@ -15616,6 +15623,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in signedFirstLanes(for: element) },
             sve2_128: { element in sveFirstLanes(for: element) },
+            sve: { element in sveFirstLanes(for: element) },
             avx3: { element in x86Avx3FirstLanes(for: element) },
             avx2: { element in signedFirstLanes(for: element) },
             sse4: { element in signedFirstLanes(for: element) },
@@ -15667,6 +15675,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { _ in "\(neonNibbles)\nreturn nibbles == 0;" },
             sve2_128: { element in sveAllFalse(for: element) },
+            sve: { element in sveAllFalse(for: element) },
             avx3: { element in "return \(x86MaskBits(for: element)) == 0;" },
             avx2: { element in "return \(x86MaskBits(for: element)) == 0;" },
             sse2: { element in "return \(x86MaskBits(for: element)) == 0;" }
@@ -15999,6 +16008,7 @@ let basicOps: [Op] = [
         constantArgument: ConstantArgument(name: "a", vector: true),
         targets: TargetBodies(
             sve2_128: { element in sveReversed(for: element) },
+            sve: { element in sveReversed(for: element) },
             ssse3: { element in element.bits == 8 ? portableReverse(for: element) : nil },
             sse2: { element in x86ReversedBytes(for: element) }
         )
