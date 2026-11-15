@@ -27239,6 +27239,7 @@ func compressedStoreTargets(blended: Bool) -> TargetBodies<Element> {
     return TargetBodies(
         neon: { element in neonCompressedStore(blended: blended, for: element) },
         sve2_128: { element in sveCompressedStore(blended: blended, for: element) },
+        sve: { element in sveCompressedStore(blended: blended, for: element) },
         avx3dl: { element in x86Avx3CompressStoreUnlessSlow(blended: blended, for: element) },
         avx3: { element in
             guard x86Avx3IsNative(.avx3, for: element) else {
@@ -27259,6 +27260,7 @@ func compressedBitsTargets() -> TargetBodies<Element> {
             element.bits == 64
                 ? neonCompressedBits(for: element) : registeredCompressedBits(for: element)
         },
+        sve: { element in registeredCompressedBits(for: element) },
         avx3dl: { element in registeredCompressedBits(for: element) },
         avx3: { element in registeredCompressedBits(for: element) },
         avx2: { element in x86Avx2CompressedBits(for: element) },
@@ -27271,6 +27273,7 @@ func compressedBitsStoreTargets() -> TargetBodies<Element> {
     TargetBodies(
         neon: { element in neonCompressedBitsStore(for: element) },
         sve2_128: { element in registeredCompressedBitsStore(for: element) },
+        sve: { element in registeredCompressedBitsStore(for: element) },
         avx3dl: { element in registeredCompressedBitsStore(for: element) },
         avx3: { element in registeredCompressedBitsStore(for: element) },
         avx2: { element in x86Avx2CompressedBitsStore(for: element) },
@@ -27409,14 +27412,17 @@ func sveCompressedPartitionStore(for element: Element) -> String {
 }
 
 func sveCompressedStore(blended: Bool, for element: Element) -> String {
-    if !blended && element.bits == 64 { return sveCompressedPartitionStore(for: element) }
+    if !blended && element.bits == 64 && element.width == 16 {
+        return sveCompressedPartitionStore(for: element)
+    }
+    let compacts = element.bits == 32 || (element.bits == 64 && (blended || element.width != 32))
     let active = svePredicate(of: "mask", for: element)
     let compacted =
-        if element.bits >= 32 {
+        if compacts {
             """
             const \(sveType(of: element)) compacted = \(sveBuiltin("compact", ["active", sveOperand("a", for: element)], for: element));
             """
-        } else if blended && element.bits == 8 {
+        } else if blended && element.bits == 8 && element.width == 16 {
             neonCompressedScoped(not: false, into: "compacted", for: element)
         } else {
             """
@@ -27428,12 +27434,12 @@ func sveCompressedStore(blended: Bool, for element: Element) -> String {
         [
             blended ? sveActiveLanes("count", for: element) : sveAllLanes(of: element),
             sveMemory("to", for: element),
-            element.bits >= 32 ? "compacted" : sveOperand("compacted", for: element),
+            compacts ? "compacted" : sveOperand("compacted", for: element),
         ],
         for: element
     )
     let count = "__builtin_sve_svcntp_b\(element.bits)(active, active)"
-    let isCountedFirst = blended || element.bits >= 32
+    let isCountedFirst = blended || compacts
     return """
         const __SVBool_t active = \(active);
         \(compacted)
