@@ -465,6 +465,62 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
+    private func checkSumsOf2FromInt8ConstantA(_ value: SIMDInt8.Lane) {
+        let mismatches = Mismatches("sumsOf2FromInt8 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDInt8.repeating(value),
+            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf2(SIMDInt8.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf2I8ToI16(SIMDInt8.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat0() {
+        checkSumsOf2FromInt8ConstantA(0)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat1() {
+        checkSumsOf2FromInt8ConstantA(1)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat15() {
+        checkSumsOf2FromInt8ConstantA(15)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat16() {
+        checkSumsOf2FromInt8ConstantA(16)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat26() {
+        checkSumsOf2FromInt8ConstantA(26)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplat127() {
+        checkSumsOf2FromInt8ConstantA(127)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplatMinus1() {
+        checkSumsOf2FromInt8ConstantA(-1)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplatMinus16() {
+        checkSumsOf2FromInt8ConstantA(-16)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplatMinus17() {
+        checkSumsOf2FromInt8ConstantA(-17)
+    }
+
+    @Test func sumsOf2FromInt8ConstantSplatMinus128() {
+        checkSumsOf2FromInt8ConstantA(-128)
+    }
+
+    @inline(__always)
     private func checkSumsOfAdjacentQuadAbsoluteDifferencesFromInt8ConstantImmediates(
         _ aOffset: Int,
         _ bOffset: Int

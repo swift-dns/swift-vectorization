@@ -408,4 +408,338 @@ extension SIMDInt64ConstantTests {
         checkPairwiseSubtractingConstantA(H.Lane.min)
         checkPairwiseSubtractingConstantB(H.Lane.min)
     }
+
+    @inline(__always)
+    private func checkSumsOf2FromInt32ConstantA(_ value: SIMDInt32.Lane) {
+        let mismatches = Mismatches("sumsOf2FromInt32 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDInt32.repeating(value),
+            SIMDInt32.Vector(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf2(SIMDInt32.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf2I32ToI64(SIMDInt32.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat0() {
+        checkSumsOf2FromInt32ConstantA(0)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat1() {
+        checkSumsOf2FromInt32ConstantA(1)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat15() {
+        checkSumsOf2FromInt32ConstantA(15)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat16() {
+        checkSumsOf2FromInt32ConstantA(16)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat26() {
+        checkSumsOf2FromInt32ConstantA(26)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat127() {
+        checkSumsOf2FromInt32ConstantA(127)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat128() {
+        checkSumsOf2FromInt32ConstantA(128)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat255() {
+        checkSumsOf2FromInt32ConstantA(255)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat256() {
+        checkSumsOf2FromInt32ConstantA(256)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat257() {
+        checkSumsOf2FromInt32ConstantA(257)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat65280() {
+        checkSumsOf2FromInt32ConstantA(65280)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplat65281() {
+        checkSumsOf2FromInt32ConstantA(65281)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplatMinus1() {
+        checkSumsOf2FromInt32ConstantA(-1)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplatMinus16() {
+        checkSumsOf2FromInt32ConstantA(-16)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplatMinus17() {
+        checkSumsOf2FromInt32ConstantA(-17)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplatMinus128() {
+        checkSumsOf2FromInt32ConstantA(-128)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplatMinus129() {
+        checkSumsOf2FromInt32ConstantA(-129)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplatMax() {
+        checkSumsOf2FromInt32ConstantA(SIMDInt32.Lane.max)
+    }
+
+    @Test func sumsOf2FromInt32ConstantSplatMin() {
+        checkSumsOf2FromInt32ConstantA(SIMDInt32.Lane.min)
+    }
+
+    @inline(__always)
+    private func checkSumsOf4FromInt16ConstantA(_ value: SIMDInt16.Lane) {
+        let mismatches = Mismatches("sumsOf4FromInt16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDInt16.repeating(value),
+            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf4(SIMDInt16.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf4I16ToI64(SIMDInt16.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat0() {
+        checkSumsOf4FromInt16ConstantA(0)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat1() {
+        checkSumsOf4FromInt16ConstantA(1)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat15() {
+        checkSumsOf4FromInt16ConstantA(15)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat16() {
+        checkSumsOf4FromInt16ConstantA(16)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat26() {
+        checkSumsOf4FromInt16ConstantA(26)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat127() {
+        checkSumsOf4FromInt16ConstantA(127)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat128() {
+        checkSumsOf4FromInt16ConstantA(128)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat255() {
+        checkSumsOf4FromInt16ConstantA(255)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat256() {
+        checkSumsOf4FromInt16ConstantA(256)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplat257() {
+        checkSumsOf4FromInt16ConstantA(257)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplatMinus1() {
+        checkSumsOf4FromInt16ConstantA(-1)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplatMinus16() {
+        checkSumsOf4FromInt16ConstantA(-16)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplatMinus17() {
+        checkSumsOf4FromInt16ConstantA(-17)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplatMinus128() {
+        checkSumsOf4FromInt16ConstantA(-128)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplatMinus129() {
+        checkSumsOf4FromInt16ConstantA(-129)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplatMax() {
+        checkSumsOf4FromInt16ConstantA(SIMDInt16.Lane.max)
+    }
+
+    @Test func sumsOf4FromInt16ConstantSplatMin() {
+        checkSumsOf4FromInt16ConstantA(SIMDInt16.Lane.min)
+    }
+
+    @inline(__always)
+    private func checkSumsOf8FromInt8ConstantA(_ value: SIMDInt8.Lane) {
+        let mismatches = Mismatches("sumsOf8FromInt8 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDInt8.repeating(value),
+            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf8(SIMDInt8.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf8I8ToI64(SIMDInt8.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplat0() {
+        checkSumsOf8FromInt8ConstantA(0)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplat1() {
+        checkSumsOf8FromInt8ConstantA(1)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplat15() {
+        checkSumsOf8FromInt8ConstantA(15)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplat16() {
+        checkSumsOf8FromInt8ConstantA(16)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplat26() {
+        checkSumsOf8FromInt8ConstantA(26)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplat127() {
+        checkSumsOf8FromInt8ConstantA(127)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplatMinus1() {
+        checkSumsOf8FromInt8ConstantA(-1)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplatMinus16() {
+        checkSumsOf8FromInt8ConstantA(-16)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplatMinus17() {
+        checkSumsOf8FromInt8ConstantA(-17)
+    }
+
+    @Test func sumsOf8FromInt8ConstantSplatMinus128() {
+        checkSumsOf8FromInt8ConstantA(-128)
+    }
+
+    @inline(__always)
+    private func checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+        let mismatches = Mismatches(
+            "sumsOf8AbsoluteDifferencesFromInt8 with a repeating \(hex(value))"
+        )
+        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x1C8A_6B2E_83CA_DD0F)
+        mismatches.check(
+            SIMDInt8.repeating(value),
+            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.sumsOf8AbsoluteDifferences(SIMDInt8.repeating(value), b),
+                H.Vector(
+                    raw: HighwayReference.sumsOf8AbsoluteDifferencesI8ToI64(
+                        SIMDInt8.repeating(value).raw,
+                        b.raw
+                    )
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(_ value: SIMDInt8.Lane) {
+        let mismatches = Mismatches(
+            "sumsOf8AbsoluteDifferencesFromInt8 with b repeating \(hex(value))"
+        )
+        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x2445_A12E_87E8_19B1)
+        mismatches.check(
+            SIMDInt8.repeating(value),
+            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.sumsOf8AbsoluteDifferences(a, SIMDInt8.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.sumsOf8AbsoluteDifferencesI8ToI64(
+                        a.raw,
+                        SIMDInt8.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplat0() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(0)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(0)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplat1() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(1)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(1)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplat15() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(15)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(15)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplat16() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(16)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(16)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplat26() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(26)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(26)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplat127() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(127)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(127)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplatMinus1() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(-1)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(-1)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplatMinus16() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(-16)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(-16)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplatMinus17() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(-17)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(-17)
+    }
+
+    @Test func sumsOf8AbsoluteDifferencesFromInt8ConstantSplatMinus128() {
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(-128)
+        checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(-128)
+    }
 }

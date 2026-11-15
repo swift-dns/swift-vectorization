@@ -644,4 +644,144 @@ extension SIMDInt32ConstantTests {
     @Test func saturatingSubtractingConstantSplatMin() {
         checkSaturatingSubtractingConstantB(H.Lane.min)
     }
+
+    @inline(__always)
+    private func checkSumsOf2FromInt16ConstantA(_ value: SIMDInt16.Lane) {
+        let mismatches = Mismatches("sumsOf2FromInt16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDInt16.repeating(value),
+            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf2(SIMDInt16.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf2I16ToI32(SIMDInt16.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat0() {
+        checkSumsOf2FromInt16ConstantA(0)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat1() {
+        checkSumsOf2FromInt16ConstantA(1)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat15() {
+        checkSumsOf2FromInt16ConstantA(15)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat16() {
+        checkSumsOf2FromInt16ConstantA(16)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat26() {
+        checkSumsOf2FromInt16ConstantA(26)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat127() {
+        checkSumsOf2FromInt16ConstantA(127)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat128() {
+        checkSumsOf2FromInt16ConstantA(128)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat255() {
+        checkSumsOf2FromInt16ConstantA(255)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat256() {
+        checkSumsOf2FromInt16ConstantA(256)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat257() {
+        checkSumsOf2FromInt16ConstantA(257)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus1() {
+        checkSumsOf2FromInt16ConstantA(-1)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus16() {
+        checkSumsOf2FromInt16ConstantA(-16)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus17() {
+        checkSumsOf2FromInt16ConstantA(-17)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus128() {
+        checkSumsOf2FromInt16ConstantA(-128)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus129() {
+        checkSumsOf2FromInt16ConstantA(-129)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMax() {
+        checkSumsOf2FromInt16ConstantA(SIMDInt16.Lane.max)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMin() {
+        checkSumsOf2FromInt16ConstantA(SIMDInt16.Lane.min)
+    }
+
+    @inline(__always)
+    private func checkSumsOf4FromInt8ConstantA(_ value: SIMDInt8.Lane) {
+        let mismatches = Mismatches("sumsOf4FromInt8 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDInt8.repeating(value),
+            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf4(SIMDInt8.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf4I8ToI32(SIMDInt8.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat0() {
+        checkSumsOf4FromInt8ConstantA(0)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat1() {
+        checkSumsOf4FromInt8ConstantA(1)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat15() {
+        checkSumsOf4FromInt8ConstantA(15)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat16() {
+        checkSumsOf4FromInt8ConstantA(16)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat26() {
+        checkSumsOf4FromInt8ConstantA(26)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat127() {
+        checkSumsOf4FromInt8ConstantA(127)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplatMinus1() {
+        checkSumsOf4FromInt8ConstantA(-1)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplatMinus16() {
+        checkSumsOf4FromInt8ConstantA(-16)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplatMinus17() {
+        checkSumsOf4FromInt8ConstantA(-17)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplatMinus128() {
+        checkSumsOf4FromInt8ConstantA(-128)
+    }
 }

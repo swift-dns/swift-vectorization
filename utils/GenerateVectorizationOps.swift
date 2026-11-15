@@ -30606,6 +30606,25 @@ func sumsX86QuadSum(_ differences: String, _ element: Element) -> String {
     )
 }
 
+func sumsSveQuadSum(_ differences: String, _ element: Element) -> String {
+    let bytes = unsignedElement(of: element).at(width: element.width)
+    let quads = unsignedElement(bits: 32).at(width: element.width)
+    let zero = sveBuiltin("dup_n", ["0"], for: quads)
+    let sums = sveBuiltin("dot_n", [zero, sveOperand(differences, for: bytes), "1"], for: quads)
+    return sveResult(sums, for: quads)
+}
+
+func sumsSvePairs(_ operand: String, _ source: Element, _ result: Element) -> String {
+    let zero = sveBuiltin("dup_n", ["0"], for: result)
+    let pairs = sveBuiltin(
+        "adalp",
+        [sveAllLanes(of: result), zero, sveOperand(operand, for: source)],
+        for: result,
+        predication: "x"
+    )
+    return sveResult(pairs, for: result)
+}
+
 func sumsShuffledQuadSums(
     operands: SumsOperands,
     quadSum: SumsQuadSum,
@@ -30679,6 +30698,98 @@ func sumsNeonOfEightAbsoluteDifferences(from source: Element, to result: Element
     return vectorResult(
         sumsNeonWidened(differences, as: unsignedElement(of: source), to: result),
         for: result
+    )
+}
+
+func sumsSveOfTwo(sve2: Bool, from source: Element, to result: Element) -> String {
+    let all = sveAllLanes(of: result)
+    if source.category == .float {
+        let converted = { (lanes: String) in
+            sveBuiltin(
+                "cvt_\(sveSuffix(of: result))",
+                [sveAllLanes(of: source), lanes],
+                for: source,
+                predication: "x"
+            )
+        }
+        let lanes = [converted("v"), converted(sveBuiltin("trn2", ["v", "v"], for: source))]
+        let sum = sveBuiltin("add", [all] + lanes, for: result, predication: "x")
+        return """
+            const \(sveType(of: source)) v = \(sveSplatOperand("a", for: source));
+            \(vectorResult(sveResult(sum, for: result), for: result))
+            """
+    }
+    guard !sve2 else {
+        let zero = sveBuiltin("dup_n", ["0"], for: result)
+        let operand = sveSplatOperand("a", for: source)
+        let sum = sveBuiltin("adalp", [all, zero, operand], for: result, predication: "x")
+        return vectorResult(sveResult(sum, for: result), for: result)
+    }
+    let lanes = [0, 1].map { promoteEvenOddSveLanes("v", parity: $0, from: source, to: result) }
+    let sum = sveBuiltin("add", [all] + lanes, for: result, predication: "x")
+    let operand = sveReinterpreted(sveSplatOperand("a", for: source), from: source, to: result)
+    return """
+        const \(sveType(of: result)) v = \(operand);
+        \(vectorResult(sveResult(sum, for: result), for: result))
+        """
+}
+
+func sumsSveOfFour(from source: Element, to result: Element) -> String {
+    let zero = sveBuiltin("dup_n", ["0"], for: result)
+    let sum = sveBuiltin("dot_n", [zero, sveSplatOperand("a", for: source), "1"], for: result)
+    return vectorResult(sveResult(sum, for: result), for: result)
+}
+
+func sumsSveOfEight(
+    _ bytes: String,
+    sve2: Bool,
+    from source: Element,
+    to result: Element
+) -> String {
+    let words = resizedElement(of: source, bits: 32)
+    let lanes = resizedElement(of: source, bits: 64)
+    let all = sveAllLanes(of: lanes)
+    let sums = sveBuiltin(
+        "dot_n",
+        [sveBuiltin("dup_n", ["0"], for: words), bytes, "1"],
+        for: words
+    )
+    let declaration: String
+    let sum: String
+    if sve2 {
+        declaration = "const \(sveType(of: words)) sums = \(sums);"
+        let zero = sveBuiltin("dup_n", ["0"], for: lanes)
+        sum = sveBuiltin("adalp", [all, zero, "sums"], for: lanes, predication: "x")
+    } else {
+        declaration =
+            "const \(sveType(of: lanes)) sums = \(sveReinterpreted(sums, from: words, to: lanes));"
+        let shift = source.category == .signedInteger ? "asr_n" : "lsr_n"
+        let high = sveBuiltin(shift, [all, "sums", "32"], for: lanes, predication: "x")
+        let low = sveBuiltin("extw", [all, "sums"], for: lanes, predication: "x")
+        sum = sveBuiltin("add", [all, high, low], for: lanes, predication: "x")
+    }
+    let reinterpreted = sveReinterpreted(sum, from: lanes, to: result)
+    return "\(declaration)\n\(vectorResult(sveResult(reinterpreted, for: result), for: result))"
+}
+
+func sumsSveOfEightAbsoluteDifferences(
+    sve2: Bool,
+    from source: Element,
+    to result: Element
+) -> String {
+    let bytes = unsignedElement(of: source).at(width: source.width)
+    let operands = ["a", "b"].map { sveSplatOperand($0, for: source) }
+    let differences = sveBuiltin(
+        "abd",
+        [sveAllLanes(of: source)] + operands,
+        for: source,
+        predication: "x"
+    )
+    return sumsSveOfEight(
+        sveReinterpreted(differences, from: source, to: bytes),
+        sve2: sve2,
+        from: bytes,
+        to: result
     )
 }
 
@@ -30826,16 +30937,40 @@ func sumsBitwisePairs(_ operand: String, _ source: Element, _ result: Element) -
 func sumsOfTargets(factor: Int, from source: Element) -> TargetBodies<Element> {
     let widening = sourced(source) { source, result in sumsNeonWidening(from: source, to: result) }
     let sse4 = sourced(source) { source, result in sumsX86Sse4Chained(from: source, to: result) }
+    func sve(_ sve2: Bool) -> (Element) -> String {
+        sourced(source) { source, result in
+            switch factor {
+            case 2: return sumsSveOfTwo(sve2: sve2, from: source, to: result)
+            case 4: return sumsSveOfFour(from: source, to: result)
+            default:
+                let bytes = sveSplatOperand("a", for: source)
+                return sumsSveOfEight(bytes, sve2: sve2, from: source, to: result)
+            }
+        }
+    }
     guard factor == 8 else {
         let avx3 = sourced(source) { source, result -> String? in
             factor == 4
                 ? sumsX86Avx3OfFour(from: source, to: result)
                 : sumsX86Avx3OfTwoFloats(from: source, to: result)
         }
-        return TargetBodies(sve2_128: widening, avx3: avx3, sse4: sse4)
+        return TargetBodies(
+            sve2_128: widening,
+            sve: sve(false),
+            sve2: sve(true),
+            avx3: avx3,
+            sse4: sse4
+        )
     }
     let x86 = sourced(source) { source, result in sumsX86OfEight(from: source, to: result) }
-    return TargetBodies(neon: widening, avx3: x86, avx2: x86, sse2: x86)
+    return TargetBodies(
+        neon: widening,
+        sve: sve(false),
+        sve2: sve(true),
+        avx3: x86,
+        avx2: x86,
+        sse2: x86
+    )
 }
 
 func sumsOfOps(_ swiftName: String, _ highwayName: String, bits: Set<Int>, factor: Int) -> [Op] {
@@ -30877,6 +31012,12 @@ let sumsOfAbsoluteDifferencesOps = sourcedOps(
         targets: TargetBodies(
             neon: sourced(source) { source, result in
                 sumsNeonOfEightAbsoluteDifferences(from: source, to: result)
+            },
+            sve: sourced(source) { source, result in
+                sumsSveOfEightAbsoluteDifferences(sve2: false, from: source, to: result)
+            },
+            sve2: sourced(source) { source, result in
+                sumsSveOfEightAbsoluteDifferences(sve2: true, from: source, to: result)
             },
             avx3: x86,
             avx2: x86,
@@ -30940,6 +31081,8 @@ let sumsAdjacentQuadOps = sourcedOps(accepting: sumsAccepts(bits: [8], factor: 2
         source: source,
         targets: TargetBodies(
             neon: vectors(biasing: false, pairs: sumsNeonPairs),
+            sve: vectors(biasing: false, pairs: sumsBitwisePairs),
+            sve2: vectors(biasing: false, pairs: sumsSvePairs),
             avx3: sumsAdjacentQuadTarget(from: source, biasing: true) {
                 aOffset,
                 bOffset,
@@ -30991,6 +31134,7 @@ let sumsShuffledQuadOps = sourcedOps(accepting: sumsAccepts(bits: [8], factor: 2
         source: source,
         targets: TargetBodies(
             neon: vectors(biasing: false),
+            sve: vectors(biasing: false),
             avx3: sumsShuffledQuadTarget(from: source, biasing: true) { tuple, operands, result in
                 sumsX86Avx3ShuffledQuad(tuple: tuple, operands: operands, to: result)
             },
@@ -31000,6 +31144,7 @@ let sumsShuffledQuadOps = sourcedOps(accepting: sumsAccepts(bits: [8], factor: 2
         ),
         helpers: TargetBodies(
             neon: sums(biasing: false, quadSum: sumsNeonQuadSum),
+            sve: sums(biasing: false, quadSum: sumsSveQuadSum),
             avx2: sums(biasing: false, quadSum: sumsX86QuadSum),
             sse4: sums(biasing: false, quadSum: sumsX86QuadSum),
             sse2: sums(biasing: true, quadSum: sumsX86QuadSum)
@@ -31210,6 +31355,9 @@ let mulBitsPowerOf2Ops = sourcedOps(accepting: mulBitsPowerOf2Accepts) { source,
             sve2_128: sourced(source) { source, result in
                 mulBitsPowerOf2Sve(from: source, to: result)
             },
+            sve: sourced(source) { source, result in
+                mulBitsPowerOf2Sve(from: source, to: result)
+            },
             avx3: { result in mulBitsPowerOf2X86Avx3(to: result) },
             avx2: { result in mulBitsPowerOf2(.halves, to: result) },
             sse4: { result in mulBitsPowerOf2(.halves, to: result) },
@@ -31295,8 +31443,25 @@ func mulBitsMultiplyingNeon(odd: Bool, from source: Element, to result: Element)
         """
 }
 
-func mulBitsMultiplyingSve(odd: Bool, from source: Element, to result: Element) -> String {
+func mulBitsMultiplyingSve(
+    odd: Bool,
+    sve2: Bool = true,
+    from source: Element,
+    to result: Element
+) -> String {
     let operands = ["a", "b"].map { sveSplatOperand($0, for: source) }
+    guard sve2 else {
+        let products = ["mul", "mulh"].map {
+            sveBuiltin($0, [sveAllLanes(of: source)] + operands, for: source, predication: "x")
+        }
+        let interleaved = sveBuiltin(odd ? "trn2" : "trn1", ["low", "high"], for: source)
+        let product = sveReinterpreted(interleaved, from: source, to: result)
+        return """
+            const \(sveType(of: source)) low = \(products[0]);
+            const \(sveType(of: source)) high = \(products[1]);
+            \(vectorResult(sveResult(product, for: result), for: result))
+            """
+    }
     let product = sveBuiltin(odd ? "mullt" : "mullb", operands, for: result)
     return vectorResult(sveResult(product, for: result), for: result)
 }
@@ -31416,6 +31581,12 @@ func mulBitsMultiplyingOps(
                     mulBitsMultiplyingNeon(odd: odd, from: source, to: result)
                 },
                 sve2_128: sourced(source) { source, result in
+                    mulBitsMultiplyingSve(odd: odd, from: source, to: result)
+                },
+                sve: sourced(source) { source, result in
+                    mulBitsMultiplyingSve(odd: odd, sve2: false, from: source, to: result)
+                },
+                sve2: sourced(source) { source, result in
                     mulBitsMultiplyingSve(odd: odd, from: source, to: result)
                 },
                 avx3: x86(.avx3),
@@ -31549,6 +31720,7 @@ func mulBitsMultiplying64Op(
         section: .multiply,
         targets: TargetBodies(
             sve2_128: { element in mulBitsWideProduct64Sve(odd: odd, for: element) },
+            sve: { element in mulBitsWideProduct64Sve(odd: odd, for: element) },
             avx3: { element in mulBitsWideProduct64X86(odd: odd, for: element) },
             avx2: { element in mulBitsWideProduct64X86(odd: odd, for: element) }
         )
@@ -31613,6 +31785,7 @@ func mulBitsByteVectors(for element: Element) -> (bytes: Element, words: Element
 enum MulBitsByteLookup {
     case neon
     case sve
+    case wideSve(sve2: Bool)
     case x86
 
     func lookup(_ table: String, _ indices: String, for element: Element) -> String {
@@ -31622,8 +31795,29 @@ enum MulBitsByteLookup {
         case .sve:
             let operands = [table, indices].map { sveOperand($0, for: bytes) }
             return sveResult(sveBuiltin("tbl", operands, for: bytes), for: bytes)
+        case .wideSve:
+            let all = sveAllLanes(of: bytes)
+            let iota = sveBuiltin("index", ["0", "1"], for: bytes)
+            let blocks = sveBuiltin("and_n", [all, iota, "0xF0"], for: bytes, predication: "x")
+            let offsets = sveBuiltin(
+                "add",
+                [all, sveOperand(indices, for: bytes), blocks],
+                for: bytes,
+                predication: "x"
+            )
+            let operands = [sveOperand(table, for: bytes), offsets]
+            return sveResult(sveBuiltin("tbl", operands, for: bytes), for: bytes)
         case .x86: return x86TableLookup(table, indices, for: bytes)
         }
+    }
+
+    func summedBytes(_ bytes: String, for element: Element) -> String {
+        guard case .wideSve(let sve2) = self else {
+            return vectorResult(sumsOfBytes(bytes, for: element), for: element)
+        }
+        let byteLanes = unsignedElement(bits: 8).at(width: element.width)
+        let operand = sveOperand(bytes, for: byteLanes)
+        return sumsSveOfEight(operand, sve2: sve2, from: byteLanes, to: element)
     }
 
     func sumsOfBytes(_ bytes: String, for element: Element) -> String {
@@ -31641,7 +31835,7 @@ enum MulBitsByteLookup {
                 )
             }
             return summed
-        case .sve:
+        case .sve, .wideSve:
             let byteLanes = unsignedElement(bits: 8).at(width: element.width)
             let words = unsignedElement(bits: 32).at(width: element.width)
             let sums = sveBuiltin(
@@ -31799,7 +31993,7 @@ func mulBitsBitShuffledLookup(
         const \(bytes.cVector) tableBytes = \(target.lookup("looked", "byteIndices", for: element));
         \(rotation)
         const \(lanes.cVector) extracted = (\(lanes.cVector))rotated & \(selectedBits);
-        \(vectorResult(target.sumsOfBytes("extracted", for: element), for: element))
+        \(target.summedBytes("extracted", for: element))
         """
 }
 
@@ -31861,6 +32055,7 @@ let mulBitsMultiRotatedRightOps = mulBitsByteIndexedOps(
     targets: TargetBodies(
         neon: { element in mulBitsMultiRotatedRightLookup(.neon, for: element) },
         sve2_128: { element in mulBitsMultiRotatedRightLookup(.sve, for: element) },
+        sve: { element in mulBitsMultiRotatedRightLookup(.wideSve(sve2: false), for: element) },
         avx3dl: { element in mulBitsMultiRotatedRightX86Multishift(for: element) },
         avx3: { element in mulBitsMultiRotatedRightLookup(.x86, for: element) },
         avx2: { element in mulBitsMultiRotatedRightLookup(.x86, for: element) },
@@ -31878,6 +32073,8 @@ let mulBitsBitShuffledOps = mulBitsByteIndexedOps(
     targets: TargetBodies(
         neon: { element in mulBitsBitShuffledLookup(.neon, for: element) },
         sve2_128: { element in mulBitsBitShuffledLookup(.sve, for: element) },
+        sve: { element in mulBitsBitShuffledLookup(.wideSve(sve2: false), for: element) },
+        sve2: { element in mulBitsBitShuffledLookup(.wideSve(sve2: true), for: element) },
         avx3dl: { element in mulBitsBitShuffledX86Shuffling(for: element) },
         avx3: { element in mulBitsBitShuffledLookup(.x86, avx3: true, for: element) },
         avx2: { element in mulBitsBitShuffledLookup(.x86, for: element) },
@@ -31976,13 +32173,48 @@ func widenMulPairwiseNeon(
     )
 }
 
+func widenMulSveLanes(
+    _ operands: [String],
+    parity: Int,
+    from source: Element,
+    to result: Element
+) -> [String] {
+    operands.map {
+        let operand = sveReinterpreted($0, from: source, to: result)
+        return promoteEvenOddSveLanes(operand, parity: parity, from: source, to: result)
+    }
+}
+
+func widenMulSveMultiplyAdding(
+    _ operands: [String],
+    parity: Int,
+    onto addend: String,
+    from source: Element,
+    to result: Element
+) -> String {
+    let lanes = widenMulSveLanes(operands, parity: parity, from: source, to: result)
+    return sveBuiltin(
+        "mad",
+        [sveAllLanes(of: result), lanes[1], lanes[0], addend],
+        for: result,
+        predication: "x"
+    )
+}
+
 func widenMulPairwiseSveCall(
     _ first: String,
     _ second: String,
+    sve2: Bool = true,
     from source: Element,
     to result: Element
 ) -> String {
     let operands = [first, second].map { sveSplatOperand($0, for: source) }
+    guard sve2 else {
+        let lanes = widenMulSveLanes(operands, parity: 0, from: source, to: result)
+        let all = sveAllLanes(of: result)
+        let even = sveBuiltin("mul", [all] + lanes, for: result, predication: "x")
+        return widenMulSveMultiplyAdding(operands, parity: 1, onto: even, from: source, to: result)
+    }
     let even = sveBuiltin("mullb", operands, for: result)
     return sveBuiltin("mlalt", [even] + operands, for: result)
 }
@@ -31990,10 +32222,12 @@ func widenMulPairwiseSveCall(
 func widenMulPairwiseSve(
     _ first: String,
     _ second: String,
+    sve2: Bool = true,
     from source: Element,
     to result: Element
 ) -> String {
-    sveResult(widenMulPairwiseSveCall(first, second, from: source, to: result), for: result)
+    let call = widenMulPairwiseSveCall(first, second, sve2: sve2, from: source, to: result)
+    return sveResult(call, for: result)
 }
 
 func widenMulPairwiseX86(
@@ -32052,6 +32286,12 @@ func widenMulPairwiseTargets(masked: Bool, from source: Element) -> TargetBodies
     return TargetBodies(
         neon: body { _, result in widenMulPairwiseNeon("a", "b", to: result) },
         sve2_128: body { source, result in
+            ("", widenMulPairwiseSve("a", "b", from: source, to: result))
+        },
+        sve: body { source, result in
+            ("", widenMulPairwiseSve("a", "b", sve2: false, from: source, to: result))
+        },
+        sve2: body { source, result in
             ("", widenMulPairwiseSve("a", "b", from: source, to: result))
         },
         avx3: x86(.avx3, nativeMask: true),
@@ -32177,7 +32417,11 @@ func widenMulAccumulatingTail(
     return (statements.joined(separator: "\n"), selected)
 }
 
-func widenMulAccumulatingSve(from source: Element, to result: Element) -> String {
+func widenMulAccumulatingSve(
+    sve2: Bool = true,
+    from source: Element,
+    to result: Element
+) -> String {
     let (type, all) = (sveType(of: result), sveAllLanes(of: result))
     let lowest = sveBuiltin("dup_n", [lowestValue(of: result)], for: result)
     let overflowing = sveBuiltin("cmpeq", [all, "product", lowest], for: result)
@@ -32199,7 +32443,7 @@ func widenMulAccumulatingSve(from source: Element, to result: Element) -> String
         for: result
     )
     return """
-        const \(type) product = \(widenMulPairwiseSveCall("a", "b", from: source, to: result));
+        const \(type) product = \(widenMulPairwiseSveCall("a", "b", sve2: sve2, from: source, to: result));
         const \(type) overflow = \(sveBuiltin("sel", [overflowing, ones, zeros], for: result));
         const \(type) sum = \(sveSplatOperand("c", for: result));
         \(vectorResult(sveResult(saturated, for: result), for: result))
@@ -32256,6 +32500,12 @@ let widenMulAccumulatingOps = sourcedOps(accepting: widenMulAccumulatingAccepts)
                 )
             },
             sve2_128: sourced(source) { source, result in
+                widenMulAccumulatingSve(from: source, to: result)
+            },
+            sve: sourced(source) { source, result in
+                widenMulAccumulatingSve(sve2: false, from: source, to: result)
+            },
+            sve2: sourced(source) { source, result in
                 widenMulAccumulatingSve(from: source, to: result)
             },
             avx3dl: x86(.avx3dl),
@@ -32575,6 +32825,7 @@ func widenMulQuadTargets(mixed: Bool, from source: Element) -> TargetBodies<Elem
     return TargetBodies(
         neon: body { widenMulQuadNeon(from: $0, to: $1, mixed: mixed) },
         sve2_128: body { widenMulQuadSve(from: $0, to: $1, mixed: mixed) },
+        sve: body { widenMulQuadSve(from: $0, to: $1, mixed: mixed) },
         avx3dl: x86(.avx3dl),
         avx3: x86(.avx3),
         avx2: x86(.avx2),
@@ -32688,14 +32939,29 @@ func reorderMulNeonAccumulating(to result: Element) -> String {
         """
 }
 
-func reorderMulSveAccumulating(from source: Element, to result: Element) -> String {
+func reorderMulSveAccumulating(
+    sve2: Bool = true,
+    from source: Element,
+    to result: Element
+) -> String {
     let (a, b) = (sveSplatOperand("a", for: source), sveSplatOperand("b", for: source))
-    func accumulated(_ instruction: String, onto accumulator: String) -> String {
+    func accumulated(parity: Int, onto accumulator: String) -> String {
+        guard sve2 else {
+            let sum = widenMulSveMultiplyAdding(
+                [a, b],
+                parity: parity,
+                onto: accumulator,
+                from: source,
+                to: result
+            )
+            return sveResult(sum, for: result)
+        }
         let operands = [accumulator, a, b]
+        let instruction = parity == 1 ? "mlalt" : "mlalb"
         return sveResult(sveBuiltin(instruction, operands, for: result), for: result)
     }
-    let odd = accumulated("mlalt", onto: sveOperand("accumulated", for: result))
-    let even = accumulated("mlalb", onto: sveSplatOperand("c", for: result))
+    let odd = accumulated(parity: 1, onto: sveOperand("accumulated", for: result))
+    let even = accumulated(parity: 0, onto: sveSplatOperand("c", for: result))
     return """
         \(reorderMulLoadedOutVector(named: "accumulated", for: result))
         const \(result.cVector) odd = \(odd);
@@ -32813,6 +33079,12 @@ let reorderMulReorderingOps = sourcedOps(accepting: reorderMulReorderAccepts) { 
             sve2_128: sourced(source) { source, result in
                 reorderMulSveAccumulating(from: source, to: result)
             },
+            sve: sourced(source) { source, result in
+                reorderMulSveAccumulating(sve2: false, from: source, to: result)
+            },
+            sve2: sourced(source) { source, result in
+                reorderMulSveAccumulating(from: source, to: result)
+            },
             avx3dl: x86(.avx3dl),
             avx3: x86(.avx3),
             avx2: x86(.avx2),
@@ -32864,20 +33136,41 @@ let reorderMulNeonKeepsFirstCondition =
 let reorderMulSveKeepsFirstCondition =
     "HWY_COMPILER_CLANG >= 1700 || HWY_COMPILER_GCC_ACTUAL >= 1400"
 
+let reorderMulWideSveKeepsFirstCondition =
+    "(\(reorderMulSveKeepsFirstCondition)) && defined(__ARM_FEATURE_SVE_BF16)"
+
 let x86Bfloat16EnabledCondition =
     "defined(HWY_AVX3_ENABLE_AVX512BF16) ? HWY_AVX3_ENABLE_AVX512BF16 : !defined(HWY_AVX3_DISABLE_AVX512BF16) && !HWY_COMPILER_CLANGCL"
 
 let reorderMulAvx3KeepsFirstCondition =
     "(HWY_STATIC_TARGET & (HWY_AVX3_SPR | HWY_AVX3_ZEN4)) && (\(x86Bfloat16EnabledCondition))"
 
-func reorderMulFloatRearranging(keepingFirstIf condition: String, for element: Element) -> String {
+func reorderMulFloatRearranging(
+    keepingFirstIf condition: String,
+    otherwise sum: String? = nil,
+    for element: Element
+) -> String {
     """
     #if \(condition)
     \(vectorResult("a", for: element))
     #else
-    \(binaryArithmetic("+", for: element))
+    \(sum ?? binaryArithmetic("+", for: element))
     #endif
     """
+}
+
+func reorderMulSveRearranging(keepingFirstIf condition: String, for element: Element) -> String {
+    guard element.category != .float else {
+        return reorderMulFloatRearranging(
+            keepingFirstIf: condition,
+            otherwise: svePredicatedBinary("add", for: element),
+            for: element
+        )
+    }
+    return [
+        sveSplatBinary("add", .arithmetic, for: element),
+        binaryArithmetic("+", for: element),
+    ].compactMap { $0 }.joined(separator: "\n")
 }
 
 func reorderMulX86Rearranging(for element: Element) -> String {
@@ -32910,16 +33203,13 @@ let reorderMulRearrangingOp = Op(
                 """
         },
         sve2_128: { element in
-            guard element.category != .float else {
-                return reorderMulFloatRearranging(
-                    keepingFirstIf: reorderMulSveKeepsFirstCondition,
-                    for: element
-                )
-            }
-            return [
-                sveSplatBinary("add", .arithmetic, for: element),
-                binaryArithmetic("+", for: element),
-            ].compactMap { $0 }.joined(separator: "\n")
+            reorderMulSveRearranging(keepingFirstIf: reorderMulSveKeepsFirstCondition, for: element)
+        },
+        sve: { element in
+            reorderMulSveRearranging(
+                keepingFirstIf: reorderMulWideSveKeepsFirstCondition,
+                for: element
+            )
         },
         avx3dl: { element in
             element.category == .float
