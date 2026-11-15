@@ -14,10 +14,7 @@ extension SIMDUInt16ConstantTests {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.shiftedLeftTemplateU16(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.shiftedLeftTemplateU16(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )
@@ -97,10 +94,7 @@ extension SIMDUInt16ConstantTests {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.shiftedRightTemplateU16(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.shiftedRightTemplateU16(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )
@@ -547,7 +541,7 @@ extension SIMDUInt16ConstantTests {
                 H.Vector(
                     raw: HighwayReference.roundingShiftedRightTemplateU16(
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "a: \(describe(a))"
@@ -870,10 +864,7 @@ extension SIMDUInt16ConstantTests {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.rotatedLeftTemplateU16(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.rotatedLeftTemplateU16(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )
@@ -953,10 +944,7 @@ extension SIMDUInt16ConstantTests {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.rotatedRightTemplateU16(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.rotatedRightTemplateU16(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )

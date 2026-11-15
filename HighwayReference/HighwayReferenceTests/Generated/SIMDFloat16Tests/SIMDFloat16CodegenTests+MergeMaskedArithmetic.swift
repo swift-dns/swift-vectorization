@@ -868,7 +868,7 @@ extension SIMDFloat16CodegenTests {
             bInputs,
             cInputs,
             seed: 0x8D40_4594_1A42_8101
-        ) where !hasNaNs(in: b) {
+        ) where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF16ConstantA(
                     b,
@@ -900,7 +900,7 @@ extension SIMDFloat16CodegenTests {
             aInputs,
             cInputs,
             seed: 0xFE7C_6FE6_C99C_AFC2
-        ) where !hasNaNs(in: a) {
+        ) where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF16ConstantB(
                     a,
@@ -932,7 +932,7 @@ extension SIMDFloat16CodegenTests {
             aInputs,
             bInputs,
             seed: 0xC42E_2CCB_8629_F9CB
-        ) where !hasNaNs(in: a, b) {
+        ) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF16ConstantC(
                     a,
@@ -1027,7 +1027,7 @@ extension SIMDFloat16CodegenTests {
             bInputs,
             cInputs,
             seed: 0x9136_0225_4835_FD56
-        ) where !hasNaNs(in: b) {
+        ) where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplySubtractingWhereOtherwiseF16ConstantA(
                     b,
@@ -1059,7 +1059,7 @@ extension SIMDFloat16CodegenTests {
             aInputs,
             cInputs,
             seed: 0xCEE6_868A_E2F6_7CF5
-        ) where !hasNaNs(in: a) {
+        ) where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplySubtractingWhereOtherwiseF16ConstantB(
                     a,
@@ -1091,7 +1091,7 @@ extension SIMDFloat16CodegenTests {
             aInputs,
             bInputs,
             seed: 0x9258_DCD0_6530_B104
-        ) where !hasNaNs(in: a, b) {
+        ) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplySubtractingWhereOtherwiseF16ConstantC(
                     a,

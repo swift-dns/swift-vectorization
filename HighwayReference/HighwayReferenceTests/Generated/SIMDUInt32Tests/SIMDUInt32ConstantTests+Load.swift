@@ -509,4 +509,496 @@ extension SIMDUInt32ConstantTests {
     @Test func loadFirstOtherwiseConstantCount4294967312BeforeGuardPage() {
         checkLoadFirstOtherwiseConstantCountBeforeGuardPage(4_294_967_312)
     }
+
+    @inline(__always)
+    private func checkLoadFirstWideningFromUInt8ConstantCount(_ count: Int) {
+        let mismatches = Mismatches("loadFirstWidening from UInt8 with count \(count)")
+        let fromInputs = Inputs.buffers(UInt8.self, count: H.laneCount, seed: 0xC1AC_5901_CA61_4879)
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU8ToU32(source.baseAddress!, count)
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount0() {
+        checkLoadFirstWideningFromUInt8ConstantCount(0)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount1() {
+        checkLoadFirstWideningFromUInt8ConstantCount(1)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount2() {
+        checkLoadFirstWideningFromUInt8ConstantCount(2)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount3() {
+        checkLoadFirstWideningFromUInt8ConstantCount(3)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount4() {
+        checkLoadFirstWideningFromUInt8ConstantCount(4)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount5() {
+        checkLoadFirstWideningFromUInt8ConstantCount(5)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount6() {
+        checkLoadFirstWideningFromUInt8ConstantCount(6)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount7() {
+        checkLoadFirstWideningFromUInt8ConstantCount(7)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount8() {
+        checkLoadFirstWideningFromUInt8ConstantCount(8)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount9() {
+        checkLoadFirstWideningFromUInt8ConstantCount(9)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount10() {
+        checkLoadFirstWideningFromUInt8ConstantCount(10)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount11() {
+        checkLoadFirstWideningFromUInt8ConstantCount(11)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount12() {
+        checkLoadFirstWideningFromUInt8ConstantCount(12)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount13() {
+        checkLoadFirstWideningFromUInt8ConstantCount(13)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount14() {
+        checkLoadFirstWideningFromUInt8ConstantCount(14)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount15() {
+        checkLoadFirstWideningFromUInt8ConstantCount(15)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount16() {
+        checkLoadFirstWideningFromUInt8ConstantCount(16)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount17() {
+        checkLoadFirstWideningFromUInt8ConstantCount(17)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount32() {
+        checkLoadFirstWideningFromUInt8ConstantCount(32)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount1000() {
+        checkLoadFirstWideningFromUInt8ConstantCount(1000)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount4294967296() {
+        checkLoadFirstWideningFromUInt8ConstantCount(4_294_967_296)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount4294967297() {
+        checkLoadFirstWideningFromUInt8ConstantCount(4_294_967_297)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount4294967300() {
+        checkLoadFirstWideningFromUInt8ConstantCount(4_294_967_300)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount4294967304() {
+        checkLoadFirstWideningFromUInt8ConstantCount(4_294_967_304)
+    }
+
+    @Test func loadFirstWideningFromUInt8ConstantCount4294967312() {
+        checkLoadFirstWideningFromUInt8ConstantCount(4_294_967_312)
+    }
+
+    @inline(__always)
+    private func checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(_ count: Int) {
+        let mismatches = Mismatches(
+            "loadFirstWidening from UInt8 with count \(count) before a guard page"
+        )
+        let fromInputs = Inputs.buffers(UInt8.self, count: H.laneCount, seed: 0x50E3_4A29_FB93_3326)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
+                source in
+                (
+                    unsafe H.loadFirstWidening(from: source, count: count),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU8ToU32(
+                            source,
+                            min(count, H.laneCount)
+                        )
+                    )
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount0() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(0)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount1() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(1)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount2() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(2)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount3() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(3)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount4() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(4)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount5() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(5)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount6() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(6)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount7() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(7)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount8() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(8)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount9() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(9)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount10() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(10)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount11() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(11)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount12() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(12)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount13() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(13)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount14() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(14)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount15() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(15)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount16() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(16)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount17() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(17)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount32() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(32)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount1000() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(1000)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount4294967296() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(4_294_967_296)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount4294967297() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(4_294_967_297)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount4294967300() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(4_294_967_300)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount4294967304() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(4_294_967_304)
+    }
+
+    @Test func loadFirstWideningFromUInt8BeforeGuardPageConstantCount4294967312() {
+        checkLoadFirstWideningFromUInt8BeforeGuardPageConstantCount(4_294_967_312)
+    }
+
+    @inline(__always)
+    private func checkLoadFirstWideningFromUInt16ConstantCount(_ count: Int) {
+        let mismatches = Mismatches("loadFirstWidening from UInt16 with count \(count)")
+        let fromInputs = Inputs.buffers(
+            UInt16.self,
+            count: H.laneCount,
+            seed: 0x3728_9351_D052_D75E
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU16ToU32(source.baseAddress!, count)
+                    )
+                )
+            }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount0() {
+        checkLoadFirstWideningFromUInt16ConstantCount(0)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount1() {
+        checkLoadFirstWideningFromUInt16ConstantCount(1)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount2() {
+        checkLoadFirstWideningFromUInt16ConstantCount(2)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount3() {
+        checkLoadFirstWideningFromUInt16ConstantCount(3)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount4() {
+        checkLoadFirstWideningFromUInt16ConstantCount(4)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount5() {
+        checkLoadFirstWideningFromUInt16ConstantCount(5)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount6() {
+        checkLoadFirstWideningFromUInt16ConstantCount(6)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount7() {
+        checkLoadFirstWideningFromUInt16ConstantCount(7)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount8() {
+        checkLoadFirstWideningFromUInt16ConstantCount(8)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount9() {
+        checkLoadFirstWideningFromUInt16ConstantCount(9)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount10() {
+        checkLoadFirstWideningFromUInt16ConstantCount(10)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount11() {
+        checkLoadFirstWideningFromUInt16ConstantCount(11)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount12() {
+        checkLoadFirstWideningFromUInt16ConstantCount(12)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount13() {
+        checkLoadFirstWideningFromUInt16ConstantCount(13)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount14() {
+        checkLoadFirstWideningFromUInt16ConstantCount(14)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount15() {
+        checkLoadFirstWideningFromUInt16ConstantCount(15)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount16() {
+        checkLoadFirstWideningFromUInt16ConstantCount(16)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount17() {
+        checkLoadFirstWideningFromUInt16ConstantCount(17)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount32() {
+        checkLoadFirstWideningFromUInt16ConstantCount(32)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount1000() {
+        checkLoadFirstWideningFromUInt16ConstantCount(1000)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount4294967296() {
+        checkLoadFirstWideningFromUInt16ConstantCount(4_294_967_296)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount4294967297() {
+        checkLoadFirstWideningFromUInt16ConstantCount(4_294_967_297)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount4294967300() {
+        checkLoadFirstWideningFromUInt16ConstantCount(4_294_967_300)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount4294967304() {
+        checkLoadFirstWideningFromUInt16ConstantCount(4_294_967_304)
+    }
+
+    @Test func loadFirstWideningFromUInt16ConstantCount4294967312() {
+        checkLoadFirstWideningFromUInt16ConstantCount(4_294_967_312)
+    }
+
+    @inline(__always)
+    private func checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(_ count: Int) {
+        let mismatches = Mismatches(
+            "loadFirstWidening from UInt16 with count \(count) before a guard page"
+        )
+        let fromInputs = Inputs.buffers(
+            UInt16.self,
+            count: H.laneCount,
+            seed: 0x6638_0864_D9CA_14C3
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
+                source in
+                (
+                    unsafe H.loadFirstWidening(from: source, count: count),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadFirstWideningU16ToU32(
+                            source,
+                            min(count, H.laneCount)
+                        )
+                    )
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount0() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(0)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount1() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(1)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount2() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(2)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount3() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(3)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount4() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(4)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount5() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(5)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount6() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(6)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount7() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(7)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount8() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(8)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount9() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(9)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount10() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(10)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount11() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(11)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount12() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(12)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount13() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(13)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount14() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(14)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount15() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(15)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount16() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(16)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount17() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(17)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount32() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(32)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount1000() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(1000)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount4294967296() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(4_294_967_296)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount4294967297() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(4_294_967_297)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount4294967300() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(4_294_967_300)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount4294967304() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(4_294_967_304)
+    }
+
+    @Test func loadFirstWideningFromUInt16BeforeGuardPageConstantCount4294967312() {
+        checkLoadFirstWideningFromUInt16BeforeGuardPageConstantCount(4_294_967_312)
+    }
 }

@@ -20,6 +20,24 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func halfVectorConvertingFromFloatResized() {
+        let mismatches = Mismatches(
+            "halfVectorConvertingFromFloat resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.float16Demotions(SIMDFloat.Vector.self, seed: 0x0806_D08C_20E4_18AD)
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 2),
+                    H.vector(resizing: H.halfVector(converting: a))
+                ),
+                HighwayReference.resizedHalfVectorConvertingF32ToF16(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func quarterVectorConvertingFromDouble() {
         let mismatches = Mismatches("quarterVectorConvertingFromDouble")
         let aInputs = Inputs.float16Demotions(SIMDDouble.Vector.self, seed: 0x8367_8996_8330_2329)
@@ -27,6 +45,24 @@ extension SIMDFloat16ReferenceTests {
             mismatches.check(
                 H.quarterVector(converting: a),
                 H.QuarterVector(raw: HighwayReference.quarterVectorConvertingF64ToF16(a)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func quarterVectorConvertingFromDoubleResized() {
+        let mismatches = Mismatches(
+            "quarterVectorConvertingFromDouble resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.float16Demotions(SIMDDouble.Vector.self, seed: 0xECBF_370D_28D5_7B85)
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 4),
+                    H.vector(resizing: H.quarterVector(converting: a))
+                ),
+                HighwayReference.resizedQuarterVectorConvertingF64ToF16(a),
                 "a: \(describe(a))"
             )
         }

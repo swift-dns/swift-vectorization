@@ -325,12 +325,12 @@ extension SIMDUInt8 {
 
     @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_shifted_left_u8(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_shifted_left_u8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
     public static func shiftedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_shifted_right_u8(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_shifted_right_u8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -350,12 +350,7 @@ extension SIMDUInt8 {
 
     @export(implementation) @inline(always)
     public static func roundingShiftedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(
-            raw: cvectorization_ops_rounding_shifted_right_u8(
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
-        )
+        Vector(raw: cvectorization_ops_rounding_shifted_right_u8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -370,12 +365,12 @@ extension SIMDUInt8 {
 
     @export(implementation) @inline(always)
     public static func rotatedLeft(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_rotated_left_u8(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_rotated_left_u8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
     public static func rotatedRight(_ a: Vector, by bits: Int) -> Vector {
-        Vector(raw: cvectorization_ops_rotated_right_u8(a.raw, Int32(truncatingIfNeeded: bits)))
+        Vector(raw: cvectorization_ops_rotated_right_u8(a.raw, Int32(clamping: bits)))
     }
 
     @export(implementation) @inline(always)
@@ -654,6 +649,11 @@ extension SIMDUInt8 {
     #endif
 
     @export(implementation) @inline(always)
+    public static func mask(narrowing a: SIMDBFloat16.Mask, _ b: SIMDBFloat16.Mask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_narrowing_bf16_to_u8(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
     public static func halfMask(narrowing mask: SIMDUInt16.Mask) -> HalfMask {
         HalfMask(raw: cvectorization_ops_half_mask_narrowing_u16_to_u8(mask.raw))
     }
@@ -671,6 +671,11 @@ extension SIMDUInt8 {
     }
 
     #endif
+
+    @export(implementation) @inline(always)
+    public static func halfMask(narrowing mask: SIMDBFloat16.Mask) -> HalfMask {
+        HalfMask(raw: cvectorization_ops_half_mask_narrowing_bf16_to_u8(mask.raw))
+    }
 
     @export(implementation) @inline(always)
     public static func quarterMask(narrowing mask: SIMDUInt32.Mask) -> QuarterMask {
@@ -2086,6 +2091,40 @@ extension SIMDUInt8 {
     @export(implementation) @inline(always)
     public static func pairwiseSubtractingBlocks(_ a: Vector, _ b: Vector) -> Vector {
         Vector(raw: cvectorization_ops_pairwise_subtracting_blocks_u8(a.raw, b.raw))
+    }
+
+    @export(implementation) @inline(always)
+    public static func broadcastingInBlocks(_ a: Vector, lane: Int) -> Vector {
+        precondition(lane >= 0 && lane <= 15, "Lane is negative or not in a block")
+        return unsafe broadcastingInBlocks(a, laneUnchecked: lane)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func broadcastingInBlocks(_ a: Vector, laneUnchecked lane: Int) -> Vector {
+        assert(lane >= 0 && lane <= 15, "Lane is negative or not in a block")
+        return Vector(
+            raw: cvectorization_ops_broadcasting_in_blocks_u8(
+                a.raw,
+                Int32(truncatingIfNeeded: lane)
+            )
+        )
+    }
+
+    @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector {
+        precondition(
+            bytes >= 0 && bytes <= 16,
+            "Byte count is negative or more than a block has bytes"
+        )
+        return unsafe shiftedLeftBytes(a, byUnchecked: bytes)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector {
+        assert(bytes >= 0 && bytes <= 16, "Byte count is negative or more than a block has bytes")
+        return Vector(
+            raw: cvectorization_ops_shifted_left_bytes_u8(a.raw, Int32(truncatingIfNeeded: bytes))
+        )
     }
 
 }

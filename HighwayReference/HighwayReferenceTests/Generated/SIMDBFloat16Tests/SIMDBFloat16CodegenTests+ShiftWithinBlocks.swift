@@ -30,6 +30,46 @@ extension SIMDBFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func combinedShiftedRightBytesConstantA() {
+        let mismatches = Mismatches("portCombinedShiftedRightBytesBF16ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCECD_F9FE_FC80_9343)
+        for b in bInputs {
+            mismatches.check(
+                portCombinedShiftedRightBytesBF16ConstantA(b),
+                highwayCombinedShiftedRightBytesBF16ConstantA(b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesConstantB() {
+        let mismatches = Mismatches("portCombinedShiftedRightBytesBF16ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD7CF_AFFF_01B3_6C05)
+        for a in aInputs {
+            mismatches.check(
+                portCombinedShiftedRightBytesBF16ConstantB(a),
+                highwayCombinedShiftedRightBytesBF16ConstantB(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesConstantBytes() {
+        let mismatches = Mismatches("portCombinedShiftedRightBytesBF16ConstantBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCBE5_8BF0_A4DB_E488)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCBE5_8CF0_A4DB_E63B)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portCombinedShiftedRightBytesBF16ConstantBytes(a, b),
+                highwayCombinedShiftedRightBytesBF16ConstantBytes(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func combinedShiftedRightLanesConstantA() {
         let mismatches = Mismatches("portCombinedShiftedRightLanesBF16ConstantA")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1BFA_5082_1C80_CB6B)

@@ -21,6 +21,18 @@ struct SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func canLookup8() {
+        let mismatches = Mismatches("canLookup8")
+        mismatches.check(H.canLookup8, HighwayReference.canLookup8I8(), "")
+        mismatches.record()
+    }
+
+    @Test func canLookup16() {
+        let mismatches = Mismatches("canLookup16")
+        mismatches.check(H.canLookup16, HighwayReference.canLookup16I8(), "")
+        mismatches.record()
+    }
+
     @Test func canLookup32() {
         let mismatches = Mismatches("canLookup32")
         mismatches.check(H.canLookup32, HighwayReference.canLookup32I8(), "")

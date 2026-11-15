@@ -414,4 +414,374 @@ extension SIMDInt32ConstantTests {
         checkDividingConstantA(H.Lane.min)
         checkDividingConstantB(H.Lane.min)
     }
+
+    @inline(__always)
+    private func checkSaturatingAddingConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5A72_9D57_407A_EB78)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.saturatingAdding(H.repeating(value), b),
+                H.Vector(raw: HighwayReference.saturatingAddingI32(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSaturatingAddingConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingAdding with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7578_2357_5014_1FAA)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.saturatingAdding(a, H.repeating(value)),
+                H.Vector(raw: HighwayReference.saturatingAddingI32(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantSplat0() {
+        checkSaturatingAddingConstantA(0)
+        checkSaturatingAddingConstantB(0)
+    }
+
+    @Test func saturatingAddingConstantSplat1() {
+        checkSaturatingAddingConstantA(1)
+        checkSaturatingAddingConstantB(1)
+    }
+
+    @Test func saturatingAddingConstantSplat15() {
+        checkSaturatingAddingConstantA(15)
+        checkSaturatingAddingConstantB(15)
+    }
+
+    @Test func saturatingAddingConstantSplat16() {
+        checkSaturatingAddingConstantA(16)
+        checkSaturatingAddingConstantB(16)
+    }
+
+    @Test func saturatingAddingConstantSplat26() {
+        checkSaturatingAddingConstantA(26)
+        checkSaturatingAddingConstantB(26)
+    }
+
+    @Test func saturatingAddingConstantSplat127() {
+        checkSaturatingAddingConstantA(127)
+        checkSaturatingAddingConstantB(127)
+    }
+
+    @Test func saturatingAddingConstantSplat128() {
+        checkSaturatingAddingConstantA(128)
+        checkSaturatingAddingConstantB(128)
+    }
+
+    @Test func saturatingAddingConstantSplat255() {
+        checkSaturatingAddingConstantA(255)
+        checkSaturatingAddingConstantB(255)
+    }
+
+    @Test func saturatingAddingConstantSplat256() {
+        checkSaturatingAddingConstantA(256)
+        checkSaturatingAddingConstantB(256)
+    }
+
+    @Test func saturatingAddingConstantSplat257() {
+        checkSaturatingAddingConstantA(257)
+        checkSaturatingAddingConstantB(257)
+    }
+
+    @Test func saturatingAddingConstantSplat65280() {
+        checkSaturatingAddingConstantA(65280)
+        checkSaturatingAddingConstantB(65280)
+    }
+
+    @Test func saturatingAddingConstantSplat65281() {
+        checkSaturatingAddingConstantA(65281)
+        checkSaturatingAddingConstantB(65281)
+    }
+
+    @Test func saturatingAddingConstantSplatMinus1() {
+        checkSaturatingAddingConstantA(-1)
+        checkSaturatingAddingConstantB(-1)
+    }
+
+    @Test func saturatingAddingConstantSplatMinus16() {
+        checkSaturatingAddingConstantA(-16)
+        checkSaturatingAddingConstantB(-16)
+    }
+
+    @Test func saturatingAddingConstantSplatMinus17() {
+        checkSaturatingAddingConstantA(-17)
+        checkSaturatingAddingConstantB(-17)
+    }
+
+    @Test func saturatingAddingConstantSplatMinus128() {
+        checkSaturatingAddingConstantA(-128)
+        checkSaturatingAddingConstantB(-128)
+    }
+
+    @Test func saturatingAddingConstantSplatMinus129() {
+        checkSaturatingAddingConstantA(-129)
+        checkSaturatingAddingConstantB(-129)
+    }
+
+    @Test func saturatingAddingConstantSplatMax() {
+        checkSaturatingAddingConstantA(H.Lane.max)
+        checkSaturatingAddingConstantB(H.Lane.max)
+    }
+
+    @Test func saturatingAddingConstantSplatMin() {
+        checkSaturatingAddingConstantA(H.Lane.min)
+        checkSaturatingAddingConstantB(H.Lane.min)
+    }
+
+    @inline(__always)
+    private func checkSaturatingSubtractingConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD539_59A8_2673_AD29)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.saturatingSubtracting(a, H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.saturatingSubtractingI32(a.raw, H.repeating(value).raw)
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantSplat0() {
+        checkSaturatingSubtractingConstantB(0)
+    }
+
+    @Test func saturatingSubtractingConstantSplat1() {
+        checkSaturatingSubtractingConstantB(1)
+    }
+
+    @Test func saturatingSubtractingConstantSplat15() {
+        checkSaturatingSubtractingConstantB(15)
+    }
+
+    @Test func saturatingSubtractingConstantSplat16() {
+        checkSaturatingSubtractingConstantB(16)
+    }
+
+    @Test func saturatingSubtractingConstantSplat26() {
+        checkSaturatingSubtractingConstantB(26)
+    }
+
+    @Test func saturatingSubtractingConstantSplat127() {
+        checkSaturatingSubtractingConstantB(127)
+    }
+
+    @Test func saturatingSubtractingConstantSplat128() {
+        checkSaturatingSubtractingConstantB(128)
+    }
+
+    @Test func saturatingSubtractingConstantSplat255() {
+        checkSaturatingSubtractingConstantB(255)
+    }
+
+    @Test func saturatingSubtractingConstantSplat256() {
+        checkSaturatingSubtractingConstantB(256)
+    }
+
+    @Test func saturatingSubtractingConstantSplat257() {
+        checkSaturatingSubtractingConstantB(257)
+    }
+
+    @Test func saturatingSubtractingConstantSplat65280() {
+        checkSaturatingSubtractingConstantB(65280)
+    }
+
+    @Test func saturatingSubtractingConstantSplat65281() {
+        checkSaturatingSubtractingConstantB(65281)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMinus1() {
+        checkSaturatingSubtractingConstantB(-1)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMinus16() {
+        checkSaturatingSubtractingConstantB(-16)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMinus17() {
+        checkSaturatingSubtractingConstantB(-17)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMinus128() {
+        checkSaturatingSubtractingConstantB(-128)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMinus129() {
+        checkSaturatingSubtractingConstantB(-129)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMax() {
+        checkSaturatingSubtractingConstantB(H.Lane.max)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMin() {
+        checkSaturatingSubtractingConstantB(H.Lane.min)
+    }
+
+    @inline(__always)
+    private func checkSumsOf2FromInt16ConstantA(_ value: SIMDInt16.Lane) {
+        let mismatches = Mismatches("sumsOf2FromInt16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDInt16.repeating(value),
+            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf2(SIMDInt16.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf2I16ToI32(SIMDInt16.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat0() {
+        checkSumsOf2FromInt16ConstantA(0)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat1() {
+        checkSumsOf2FromInt16ConstantA(1)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat15() {
+        checkSumsOf2FromInt16ConstantA(15)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat16() {
+        checkSumsOf2FromInt16ConstantA(16)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat26() {
+        checkSumsOf2FromInt16ConstantA(26)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat127() {
+        checkSumsOf2FromInt16ConstantA(127)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat128() {
+        checkSumsOf2FromInt16ConstantA(128)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat255() {
+        checkSumsOf2FromInt16ConstantA(255)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat256() {
+        checkSumsOf2FromInt16ConstantA(256)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplat257() {
+        checkSumsOf2FromInt16ConstantA(257)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus1() {
+        checkSumsOf2FromInt16ConstantA(-1)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus16() {
+        checkSumsOf2FromInt16ConstantA(-16)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus17() {
+        checkSumsOf2FromInt16ConstantA(-17)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus128() {
+        checkSumsOf2FromInt16ConstantA(-128)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMinus129() {
+        checkSumsOf2FromInt16ConstantA(-129)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMax() {
+        checkSumsOf2FromInt16ConstantA(SIMDInt16.Lane.max)
+    }
+
+    @Test func sumsOf2FromInt16ConstantSplatMin() {
+        checkSumsOf2FromInt16ConstantA(SIMDInt16.Lane.min)
+    }
+
+    @inline(__always)
+    private func checkSumsOf4FromInt8ConstantA(_ value: SIMDInt8.Lane) {
+        let mismatches = Mismatches("sumsOf4FromInt8 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDInt8.repeating(value),
+            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf4(SIMDInt8.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf4I8ToI32(SIMDInt8.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat0() {
+        checkSumsOf4FromInt8ConstantA(0)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat1() {
+        checkSumsOf4FromInt8ConstantA(1)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat15() {
+        checkSumsOf4FromInt8ConstantA(15)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat16() {
+        checkSumsOf4FromInt8ConstantA(16)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat26() {
+        checkSumsOf4FromInt8ConstantA(26)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplat127() {
+        checkSumsOf4FromInt8ConstantA(127)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplatMinus1() {
+        checkSumsOf4FromInt8ConstantA(-1)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplatMinus16() {
+        checkSumsOf4FromInt8ConstantA(-16)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplatMinus17() {
+        checkSumsOf4FromInt8ConstantA(-17)
+    }
+
+    @Test func sumsOf4FromInt8ConstantSplatMinus128() {
+        checkSumsOf4FromInt8ConstantA(-128)
+    }
 }

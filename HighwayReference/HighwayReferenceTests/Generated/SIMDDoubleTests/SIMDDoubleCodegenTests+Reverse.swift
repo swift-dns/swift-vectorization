@@ -22,6 +22,21 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func byteSwapped() {
+        let mismatches = Mismatches("portByteSwappedF64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x18B2_A407_40CB_7D45)
+        for a in aInputs {
+            mismatches.check(portByteSwappedF64(a), highwayByteSwappedF64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func byteSwappedConstantA() {
+        let mismatches = Mismatches("portByteSwappedF64ConstantA")
+        mismatches.check(portByteSwappedF64ConstantA(), highwayByteSwappedF64ConstantA(), "")
+        mismatches.record()
+    }
+
     @Test func reversedBlocks() {
         let mismatches = Mismatches("portReversedBlocksF64")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5C8B_BA60_C36E_4DA3)

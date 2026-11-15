@@ -342,4 +342,20 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
     #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func vectorWideningLowerFromHalfFloat16() {
+        let mismatches = Mismatches("portVectorWideningLowerHalfF16ToF64")
+        let aInputs = Inputs.conversions(SIMDFloat16.HalfVector.self, seed: 0xB409_89A5_F802_4A7C)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorWideningLowerHalfF16ToF64(wideningLower: a),
+                highwayVectorWideningLowerHalfF16ToF64(wideningLower: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+    #endif
 }

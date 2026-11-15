@@ -8,6 +8,209 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
+    private func checkTableLookupBytesConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("tableLookupBytes with a repeating \(hex(value))")
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            perByte: true,
+            count: 16,
+            seed: 0x11D5_D170_B48C_CB4F,
+            inContract: true
+        )
+        mismatches.check(
+            H.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                H.tableLookupBytes(H.repeating(value), at: indices),
+                HighwayReference.tableLookupBytesF16(H.repeating(value), indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesConstantSplatZero() {
+        checkTableLookupBytesConstantA(0.0)
+    }
+
+    @Test func tableLookupBytesConstantSplatNegativeZero() {
+        checkTableLookupBytesConstantA(-0.0)
+    }
+
+    @Test func tableLookupBytesConstantSplatOne() {
+        checkTableLookupBytesConstantA(1.0)
+    }
+
+    @Test func tableLookupBytesConstantSplatMinusOne() {
+        checkTableLookupBytesConstantA(-1.0)
+    }
+
+    @Test func tableLookupBytesConstantSplatTwo() {
+        checkTableLookupBytesConstantA(2.0)
+    }
+
+    @Test func tableLookupBytesConstantSplatHalf() {
+        checkTableLookupBytesConstantA(0.5)
+    }
+
+    @Test func tableLookupBytesConstantSplatFour() {
+        checkTableLookupBytesConstantA(4.0)
+    }
+
+    @Test func tableLookupBytesConstantSplatQuarter() {
+        checkTableLookupBytesConstantA(0.25)
+    }
+
+    @Test func tableLookupBytesConstantSplatOnePointFive() {
+        checkTableLookupBytesConstantA(1.5)
+    }
+
+    @Test func tableLookupBytesConstantSplatMinusTwoPointFive() {
+        checkTableLookupBytesConstantA(-2.5)
+    }
+
+    @Test func tableLookupBytesConstantSplatInfinity() {
+        checkTableLookupBytesConstantA(.infinity)
+    }
+
+    @Test func tableLookupBytesConstantSplatMinusInfinity() {
+        checkTableLookupBytesConstantA(-.infinity)
+    }
+
+    @Test func tableLookupBytesConstantSplatNaN() {
+        checkTableLookupBytesConstantA(.nan)
+    }
+
+    @Test func tableLookupBytesConstantSplatMinusNaN() {
+        checkTableLookupBytesConstantA(-.nan)
+    }
+
+    @Test func tableLookupBytesConstantSplatPayloadNaN() {
+        checkTableLookupBytesConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func tableLookupBytesConstantSplatSignalingNaN() {
+        checkTableLookupBytesConstantA(.signalingNaN)
+    }
+
+    @Test func tableLookupBytesConstantSplatMinusSignalingNaN() {
+        checkTableLookupBytesConstantA(-.signalingNaN)
+    }
+
+    @Test func tableLookupBytesConstantSplatLeastNonzero() {
+        checkTableLookupBytesConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func tableLookupBytesConstantSplatGreatest() {
+        checkTableLookupBytesConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkTableLookupBytesOrZeroConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("tableLookupBytesOrZero with a repeating \(hex(value))")
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0x1267_B333_F0AB_6DEE,
+            inContract: true
+        )
+        mismatches.check(
+            H.repeating(value),
+            HighwayReference.repeatingF16(value.bitPattern),
+            "repeating"
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                H.tableLookupBytesOrZero(H.repeating(value), at: indices),
+                HighwayReference.tableLookupBytesOrZeroF16(H.repeating(value), indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatZero() {
+        checkTableLookupBytesOrZeroConstantA(0.0)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatNegativeZero() {
+        checkTableLookupBytesOrZeroConstantA(-0.0)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatOne() {
+        checkTableLookupBytesOrZeroConstantA(1.0)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatMinusOne() {
+        checkTableLookupBytesOrZeroConstantA(-1.0)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatTwo() {
+        checkTableLookupBytesOrZeroConstantA(2.0)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatHalf() {
+        checkTableLookupBytesOrZeroConstantA(0.5)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatFour() {
+        checkTableLookupBytesOrZeroConstantA(4.0)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatQuarter() {
+        checkTableLookupBytesOrZeroConstantA(0.25)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatOnePointFive() {
+        checkTableLookupBytesOrZeroConstantA(1.5)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatMinusTwoPointFive() {
+        checkTableLookupBytesOrZeroConstantA(-2.5)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatInfinity() {
+        checkTableLookupBytesOrZeroConstantA(.infinity)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatMinusInfinity() {
+        checkTableLookupBytesOrZeroConstantA(-.infinity)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatNaN() {
+        checkTableLookupBytesOrZeroConstantA(.nan)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatMinusNaN() {
+        checkTableLookupBytesOrZeroConstantA(-.nan)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatPayloadNaN() {
+        checkTableLookupBytesOrZeroConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatSignalingNaN() {
+        checkTableLookupBytesOrZeroConstantA(.signalingNaN)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatMinusSignalingNaN() {
+        checkTableLookupBytesOrZeroConstantA(-.signalingNaN)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatLeastNonzero() {
+        checkTableLookupBytesOrZeroConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func tableLookupBytesOrZeroConstantSplatGreatest() {
+        checkTableLookupBytesOrZeroConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkBroadcastingInBlocksConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("broadcastingInBlocks with a repeating \(hex(value))")
         let laneInputs = Array(0...7)

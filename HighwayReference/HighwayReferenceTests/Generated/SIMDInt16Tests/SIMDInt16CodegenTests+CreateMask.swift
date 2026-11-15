@@ -26,6 +26,36 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func firstLanesConstantCountTwo() {
+        let mismatches = Mismatches("portFirstLanesI16ConstantCountTwo")
+        mismatches.check(
+            portFirstLanesI16ConstantCountTwo(),
+            highwayFirstLanesI16ConstantCountTwo(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountLaneCount() {
+        let mismatches = Mismatches("portFirstLanesI16ConstantCountLaneCount")
+        mismatches.check(
+            portFirstLanesI16ConstantCountLaneCount(),
+            highwayFirstLanesI16ConstantCountLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portFirstLanesI16ConstantCountTwiceLaneCount")
+        mismatches.check(
+            portFirstLanesI16ConstantCountTwiceLaneCount(),
+            highwayFirstLanesI16ConstantCountTwiceLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
     @Test func maskFromVector() {
         let mismatches = Mismatches("portMaskFromVectorI16")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEB12_ADEA_3862_C2EC)

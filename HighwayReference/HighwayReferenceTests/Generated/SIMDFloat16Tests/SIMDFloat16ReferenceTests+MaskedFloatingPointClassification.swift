@@ -20,5 +20,19 @@ extension SIMDFloat16ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func isNaNWhereNonCanonical() {
+        let mismatches = Mismatches("isNaNWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4890_BFE8_E391_F0AF)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4890_BEE8_E391_EEFC)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.isNaN(a, where: mask),
+                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }
 #endif

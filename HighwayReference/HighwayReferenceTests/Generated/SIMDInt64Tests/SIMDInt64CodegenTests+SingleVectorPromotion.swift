@@ -486,4 +486,60 @@ extension SIMDInt64CodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func vectorWideningLowerFromHalfUInt16() {
+        let mismatches = Mismatches("portVectorWideningLowerHalfU16ToI64")
+        let aInputs = Inputs.conversions(SIMDUInt16.HalfVector.self, seed: 0x263F_13C7_AC60_B58F)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorWideningLowerHalfU16ToI64(wideningLower: a),
+                highwayVectorWideningLowerHalfU16ToI64(wideningLower: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromHalfInt16() {
+        let mismatches = Mismatches("portVectorWideningLowerHalfI16ToI64")
+        let aInputs = Inputs.conversions(SIMDInt16.HalfVector.self, seed: 0x60A7_0741_B8AB_10EC)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorWideningLowerHalfI16ToI64(wideningLower: a),
+                highwayVectorWideningLowerHalfI16ToI64(wideningLower: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromQuarterUInt8() {
+        let mismatches = Mismatches("portVectorWideningLowerQuarterU8ToI64")
+        let aInputs = Inputs.conversions(SIMDUInt8.QuarterVector.self, seed: 0x38E8_534A_887B_CB71)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorWideningLowerQuarterU8ToI64(wideningLower: a),
+                highwayVectorWideningLowerQuarterU8ToI64(wideningLower: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromQuarterInt8() {
+        let mismatches = Mismatches("portVectorWideningLowerQuarterI8ToI64")
+        let aInputs = Inputs.conversions(SIMDInt8.QuarterVector.self, seed: 0x49E9_9E04_5658_C512)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorWideningLowerQuarterI8ToI64(wideningLower: a),
+                highwayVectorWideningLowerQuarterI8ToI64(wideningLower: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

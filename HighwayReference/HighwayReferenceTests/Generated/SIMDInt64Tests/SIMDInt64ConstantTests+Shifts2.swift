@@ -227,7 +227,7 @@ extension SIMDInt64ConstantTests {
                 H.Vector(
                     raw: HighwayReference.roundingShiftedRightTemplateI64(
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "a: \(describe(a))"
@@ -507,7 +507,7 @@ extension SIMDInt64ConstantTests {
                 H.Vector(
                     raw: HighwayReference.roundingShiftedRightI64(
                         H.repeating(value).raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "bits: \(bits)"

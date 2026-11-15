@@ -437,6 +437,98 @@ public func highwayRemainderI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vec
 }
 
 @inline(never)
+public func portSaturatingAddingI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.saturatingAdding(a, b)
+}
+
+@inline(never)
+public func highwaySaturatingAddingI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(raw: HighwayReference.Nothrow.saturatingAddingI64(a.raw, b.raw))
+}
+
+@inline(never)
+public func portSaturatingAddingI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.saturatingAdding(SIMDInt64.repeating(26), b)
+}
+
+@inline(never)
+public func highwaySaturatingAddingI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(
+        raw: HighwayReference.Nothrow.saturatingAddingI64(
+            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            b.raw
+        )
+    )
+}
+
+@inline(never)
+public func portSaturatingAddingI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.saturatingAdding(a, SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwaySaturatingAddingI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(
+        raw: HighwayReference.Nothrow.saturatingAddingI64(
+            a.raw,
+            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portSaturatingSubtractingI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.saturatingSubtracting(a, b)
+}
+
+@inline(never)
+public func highwaySaturatingSubtractingI64(
+    _ a: SIMDInt64.Vector,
+    _ b: SIMDInt64.Vector
+) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(raw: HighwayReference.Nothrow.saturatingSubtractingI64(a.raw, b.raw))
+}
+
+@inline(never)
+public func portSaturatingSubtractingI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.saturatingSubtracting(SIMDInt64.repeating(26), b)
+}
+
+@inline(never)
+public func highwaySaturatingSubtractingI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(
+        raw: HighwayReference.Nothrow.saturatingSubtractingI64(
+            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            b.raw
+        )
+    )
+}
+
+@inline(never)
+public func portSaturatingSubtractingI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.saturatingSubtracting(a, SIMDInt64.repeating(26))
+}
+
+@inline(never)
+public func highwaySaturatingSubtractingI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
+    SIMDInt64.Vector(
+        raw: HighwayReference.Nothrow.saturatingSubtractingI64(
+            a.raw,
+            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portRoundedAverageI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Vector
 {
     SIMDInt64.roundedAverage(a, b)

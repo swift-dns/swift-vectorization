@@ -24,6 +24,16 @@ extension SIMDFloat {
     }
 
     @export(implementation) @inline(always)
+    public static func nan() -> Vector {
+        cvectorization_ops_nan_f32()
+    }
+
+    @export(implementation) @inline(always)
+    public static func infinity() -> Vector {
+        cvectorization_ops_infinity_f32()
+    }
+
+    @export(implementation) @inline(always)
     public static func unspecified() -> Vector {
         cvectorization_ops_unspecified_f32()
     }
@@ -149,6 +159,11 @@ extension SIMDFloat {
     }
 
     @export(implementation) @inline(always)
+    public static func mantissa(_ a: Vector) -> Vector {
+        cvectorization_ops_mantissa_f32(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func pairwiseAdding(_ a: Vector, _ b: Vector) -> Vector {
         cvectorization_ops_pairwise_adding_f32(a, b)
     }
@@ -166,6 +181,11 @@ extension SIMDFloat {
     }
 
     #endif
+
+    @export(implementation) @inline(always)
+    public static func sumsOf2(_ a: SIMDBFloat16.Vector) -> Vector {
+        cvectorization_ops_sums_of2_bf16_to_f32(a.raw)
+    }
 
     @export(implementation) @inline(always)
     public static func minimum(_ a: Vector, _ b: Vector) -> Vector {
@@ -666,6 +686,11 @@ extension SIMDFloat {
     }
 
     #endif
+
+    @export(implementation) @inline(always)
+    public static func mask(widening mask: SIMDBFloat16.HalfMask) -> Mask {
+        Mask(raw: cvectorization_ops_mask_widening_half_vector_bf16_to_f32(mask.raw))
+    }
 
     @export(implementation) @inline(always)
     public static func mask(widening mask: SIMDUInt8.QuarterMask) -> Mask {
@@ -1471,6 +1496,46 @@ extension SIMDFloat {
                 buffer.baseAddress.unsafelyUnwrapped + initializedCount
             )
             initializedCount &+= 16 / MemoryLayout<Lane>.stride
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func loadInterleaved2(
+        from: UnsafePointer<Lane>,
+        _ v0: inout Vector,
+        _ v1: inout Vector
+    ) {
+        unsafe cvectorization_ops_load_interleaved2_f32(from, &v0, &v1)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func loadInterleaved2(
+        from span: Span<Lane>,
+        _ v0: inout Vector,
+        _ v1: inout Vector
+    ) {
+        precondition(
+            span.count >= 2 * laneCount,
+            "Span has fewer elements than 2 vectors have lanes"
+        )
+        unsafe loadInterleaved2(fromUnchecked: span, &v0, &v1)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func loadInterleaved2(
+        fromUnchecked span: Span<Lane>,
+        _ v0: inout Vector,
+        _ v1: inout Vector
+    ) {
+        assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
+        span.withUnsafeBufferPointer {
+            unsafe cvectorization_ops_load_interleaved2_f32(
+                $0.baseAddress.unsafelyUnwrapped,
+                &v0,
+                &v1
+            )
         }
     }
 

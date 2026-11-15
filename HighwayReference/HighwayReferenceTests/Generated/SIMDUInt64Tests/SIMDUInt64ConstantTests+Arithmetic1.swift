@@ -534,6 +534,216 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
+    private func checkSaturatingAddingConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x843C_3878_521F_A041)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.saturatingAdding(H.repeating(value), b),
+                H.Vector(raw: HighwayReference.saturatingAddingU64(H.repeating(value).raw, b.raw)),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSaturatingAddingConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingAdding with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6AE9_B278_43F8_008F)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.saturatingAdding(a, H.repeating(value)),
+                H.Vector(raw: HighwayReference.saturatingAddingU64(a.raw, H.repeating(value).raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantSplat0() {
+        checkSaturatingAddingConstantA(0)
+        checkSaturatingAddingConstantB(0)
+    }
+
+    @Test func saturatingAddingConstantSplat1() {
+        checkSaturatingAddingConstantA(1)
+        checkSaturatingAddingConstantB(1)
+    }
+
+    @Test func saturatingAddingConstantSplat15() {
+        checkSaturatingAddingConstantA(15)
+        checkSaturatingAddingConstantB(15)
+    }
+
+    @Test func saturatingAddingConstantSplat16() {
+        checkSaturatingAddingConstantA(16)
+        checkSaturatingAddingConstantB(16)
+    }
+
+    @Test func saturatingAddingConstantSplat26() {
+        checkSaturatingAddingConstantA(26)
+        checkSaturatingAddingConstantB(26)
+    }
+
+    @Test func saturatingAddingConstantSplat127() {
+        checkSaturatingAddingConstantA(127)
+        checkSaturatingAddingConstantB(127)
+    }
+
+    @Test func saturatingAddingConstantSplat128() {
+        checkSaturatingAddingConstantA(128)
+        checkSaturatingAddingConstantB(128)
+    }
+
+    @Test func saturatingAddingConstantSplat255() {
+        checkSaturatingAddingConstantA(255)
+        checkSaturatingAddingConstantB(255)
+    }
+
+    @Test func saturatingAddingConstantSplat256() {
+        checkSaturatingAddingConstantA(256)
+        checkSaturatingAddingConstantB(256)
+    }
+
+    @Test func saturatingAddingConstantSplat257() {
+        checkSaturatingAddingConstantA(257)
+        checkSaturatingAddingConstantB(257)
+    }
+
+    @Test func saturatingAddingConstantSplat65280() {
+        checkSaturatingAddingConstantA(65280)
+        checkSaturatingAddingConstantB(65280)
+    }
+
+    @Test func saturatingAddingConstantSplat65281() {
+        checkSaturatingAddingConstantA(65281)
+        checkSaturatingAddingConstantB(65281)
+    }
+
+    @Test func saturatingAddingConstantSplatMax() {
+        checkSaturatingAddingConstantA(H.Lane.max)
+        checkSaturatingAddingConstantB(H.Lane.max)
+    }
+
+    @inline(__always)
+    private func checkSaturatingSubtractingConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingSubtracting with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3728_CDEB_BDE6_A19C)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for b in bInputs {
+            mismatches.check(
+                H.saturatingSubtracting(H.repeating(value), b),
+                H.Vector(
+                    raw: HighwayReference.saturatingSubtractingU64(H.repeating(value).raw, b.raw)
+                ),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkSaturatingSubtractingConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("saturatingSubtracting with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x507B_53EB_CC0E_414E)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.saturatingSubtracting(a, H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.saturatingSubtractingU64(a.raw, H.repeating(value).raw)
+                ),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantSplat0() {
+        checkSaturatingSubtractingConstantA(0)
+        checkSaturatingSubtractingConstantB(0)
+    }
+
+    @Test func saturatingSubtractingConstantSplat1() {
+        checkSaturatingSubtractingConstantA(1)
+        checkSaturatingSubtractingConstantB(1)
+    }
+
+    @Test func saturatingSubtractingConstantSplat15() {
+        checkSaturatingSubtractingConstantA(15)
+        checkSaturatingSubtractingConstantB(15)
+    }
+
+    @Test func saturatingSubtractingConstantSplat16() {
+        checkSaturatingSubtractingConstantA(16)
+        checkSaturatingSubtractingConstantB(16)
+    }
+
+    @Test func saturatingSubtractingConstantSplat26() {
+        checkSaturatingSubtractingConstantA(26)
+        checkSaturatingSubtractingConstantB(26)
+    }
+
+    @Test func saturatingSubtractingConstantSplat127() {
+        checkSaturatingSubtractingConstantA(127)
+        checkSaturatingSubtractingConstantB(127)
+    }
+
+    @Test func saturatingSubtractingConstantSplat128() {
+        checkSaturatingSubtractingConstantA(128)
+        checkSaturatingSubtractingConstantB(128)
+    }
+
+    @Test func saturatingSubtractingConstantSplat255() {
+        checkSaturatingSubtractingConstantA(255)
+        checkSaturatingSubtractingConstantB(255)
+    }
+
+    @Test func saturatingSubtractingConstantSplat256() {
+        checkSaturatingSubtractingConstantA(256)
+        checkSaturatingSubtractingConstantB(256)
+    }
+
+    @Test func saturatingSubtractingConstantSplat257() {
+        checkSaturatingSubtractingConstantA(257)
+        checkSaturatingSubtractingConstantB(257)
+    }
+
+    @Test func saturatingSubtractingConstantSplat65280() {
+        checkSaturatingSubtractingConstantA(65280)
+        checkSaturatingSubtractingConstantB(65280)
+    }
+
+    @Test func saturatingSubtractingConstantSplat65281() {
+        checkSaturatingSubtractingConstantA(65281)
+        checkSaturatingSubtractingConstantB(65281)
+    }
+
+    @Test func saturatingSubtractingConstantSplatMax() {
+        checkSaturatingSubtractingConstantA(H.Lane.max)
+        checkSaturatingSubtractingConstantB(H.Lane.max)
+    }
+
+    @inline(__always)
     private func checkRoundedAverageConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("roundedAverage with a repeating \(hex(value))")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2365_5562_5A8B_4D70)
@@ -847,94 +1057,138 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBiasedExponentFromDoubleConstantA(_ value: SIMDDouble.Lane) {
-        let mismatches = Mismatches("biasedExponentFromDouble with a repeating \(hex(value))")
+    private func checkSumsOf2FromUInt32ConstantA(_ value: SIMDUInt32.Lane) {
+        let mismatches = Mismatches("sumsOf2FromUInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMDUInt32.repeating(value),
+            SIMDUInt32.Vector(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         mismatches.check(
-            H.biasedExponent(SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.biasedExponentF64ToU64(SIMDDouble.repeating(value))),
+            H.sumsOf2(SIMDUInt32.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf2U32ToU64(SIMDUInt32.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatZero() {
-        checkBiasedExponentFromDoubleConstantA(0.0)
+    @Test func sumsOf2FromUInt32ConstantSplat0() {
+        checkSumsOf2FromUInt32ConstantA(0)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatNegativeZero() {
-        checkBiasedExponentFromDoubleConstantA(-0.0)
+    @Test func sumsOf2FromUInt32ConstantSplat1() {
+        checkSumsOf2FromUInt32ConstantA(1)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatOne() {
-        checkBiasedExponentFromDoubleConstantA(1.0)
+    @Test func sumsOf2FromUInt32ConstantSplat15() {
+        checkSumsOf2FromUInt32ConstantA(15)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatMinusOne() {
-        checkBiasedExponentFromDoubleConstantA(-1.0)
+    @Test func sumsOf2FromUInt32ConstantSplat16() {
+        checkSumsOf2FromUInt32ConstantA(16)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatTwo() {
-        checkBiasedExponentFromDoubleConstantA(2.0)
+    @Test func sumsOf2FromUInt32ConstantSplat26() {
+        checkSumsOf2FromUInt32ConstantA(26)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatHalf() {
-        checkBiasedExponentFromDoubleConstantA(0.5)
+    @Test func sumsOf2FromUInt32ConstantSplat127() {
+        checkSumsOf2FromUInt32ConstantA(127)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatFour() {
-        checkBiasedExponentFromDoubleConstantA(4.0)
+    @Test func sumsOf2FromUInt32ConstantSplat128() {
+        checkSumsOf2FromUInt32ConstantA(128)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatQuarter() {
-        checkBiasedExponentFromDoubleConstantA(0.25)
+    @Test func sumsOf2FromUInt32ConstantSplat255() {
+        checkSumsOf2FromUInt32ConstantA(255)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatOnePointFive() {
-        checkBiasedExponentFromDoubleConstantA(1.5)
+    @Test func sumsOf2FromUInt32ConstantSplat256() {
+        checkSumsOf2FromUInt32ConstantA(256)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatMinusTwoPointFive() {
-        checkBiasedExponentFromDoubleConstantA(-2.5)
+    @Test func sumsOf2FromUInt32ConstantSplat257() {
+        checkSumsOf2FromUInt32ConstantA(257)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatInfinity() {
-        checkBiasedExponentFromDoubleConstantA(.infinity)
+    @Test func sumsOf2FromUInt32ConstantSplat65280() {
+        checkSumsOf2FromUInt32ConstantA(65280)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatMinusInfinity() {
-        checkBiasedExponentFromDoubleConstantA(-.infinity)
+    @Test func sumsOf2FromUInt32ConstantSplat65281() {
+        checkSumsOf2FromUInt32ConstantA(65281)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatNaN() {
-        checkBiasedExponentFromDoubleConstantA(.nan)
+    @Test func sumsOf2FromUInt32ConstantSplatMax() {
+        checkSumsOf2FromUInt32ConstantA(SIMDUInt32.Lane.max)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatMinusNaN() {
-        checkBiasedExponentFromDoubleConstantA(-.nan)
+    @inline(__always)
+    private func checkSumsOf4FromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+        let mismatches = Mismatches("sumsOf4FromUInt16 with a repeating \(hex(value))")
+        mismatches.check(
+            SIMDUInt16.repeating(value),
+            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sumsOf4(SIMDUInt16.repeating(value)),
+            H.Vector(raw: HighwayReference.sumsOf4U16ToU64(SIMDUInt16.repeating(value).raw)),
+            ""
+        )
+        mismatches.record()
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatPayloadNaN() {
-        checkBiasedExponentFromDoubleConstantA(SIMDDouble.Lane(nan: 1, signaling: false))
+    @Test func sumsOf4FromUInt16ConstantSplat0() {
+        checkSumsOf4FromUInt16ConstantA(0)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatSignalingNaN() {
-        checkBiasedExponentFromDoubleConstantA(.signalingNaN)
+    @Test func sumsOf4FromUInt16ConstantSplat1() {
+        checkSumsOf4FromUInt16ConstantA(1)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatMinusSignalingNaN() {
-        checkBiasedExponentFromDoubleConstantA(-.signalingNaN)
+    @Test func sumsOf4FromUInt16ConstantSplat15() {
+        checkSumsOf4FromUInt16ConstantA(15)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatLeastNonzero() {
-        checkBiasedExponentFromDoubleConstantA(.leastNonzeroMagnitude)
+    @Test func sumsOf4FromUInt16ConstantSplat16() {
+        checkSumsOf4FromUInt16ConstantA(16)
     }
 
-    @Test func biasedExponentFromDoubleConstantSplatGreatest() {
-        checkBiasedExponentFromDoubleConstantA(.greatestFiniteMagnitude)
+    @Test func sumsOf4FromUInt16ConstantSplat26() {
+        checkSumsOf4FromUInt16ConstantA(26)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat127() {
+        checkSumsOf4FromUInt16ConstantA(127)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat128() {
+        checkSumsOf4FromUInt16ConstantA(128)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat255() {
+        checkSumsOf4FromUInt16ConstantA(255)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat256() {
+        checkSumsOf4FromUInt16ConstantA(256)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat257() {
+        checkSumsOf4FromUInt16ConstantA(257)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat65280() {
+        checkSumsOf4FromUInt16ConstantA(65280)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplat65281() {
+        checkSumsOf4FromUInt16ConstantA(65281)
+    }
+
+    @Test func sumsOf4FromUInt16ConstantSplatMax() {
+        checkSumsOf4FromUInt16ConstantA(SIMDUInt16.Lane.max)
     }
 }

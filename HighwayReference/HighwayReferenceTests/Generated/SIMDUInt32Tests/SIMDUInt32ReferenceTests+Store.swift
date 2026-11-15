@@ -262,6 +262,58 @@ extension SIMDUInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test(
+        .disabled(
+            if: SIMDTarget.memoryOpsMightFault,
+            "The lanes the mask leaves out can fault on this target"
+        )
+    )
+    func storeWhereMaskedOffPastGuardPage() {
+        let mismatches = Mismatches(
+            "storeWhere with the lanes the mask leaves out past a guard page"
+        )
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDFCE_A672_F7CC_CCDD)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDFCE_A572_F7CC_CB2A)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (_, portLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(lanesThroughLastTrue(of: mask)))
+            ) { destination in unsafe H.store(a, to: destination, where: mask) }
+            let (_, referenceLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(lanesThroughLastTrue(of: mask)))
+            ) { destination in unsafe HighwayReference.storeWhereU32(a.raw, mask.raw, destination) }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeWhereNonCanonical() {
+        let mismatches = Mismatches("storeWhere with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x210C_8E48_00E7_E942)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x210C_8F48_00E7_EAF5)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe H.store(a, to: destination.baseAddress!, where: mask)
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe HighwayReference.storeWhereU32(a.raw, mask.raw, destination.baseAddress!)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeWhereUncheckedSpan() {
         let mismatches = Mismatches("storeWhere unchecked span")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5983_D98E_72A2_0D05)

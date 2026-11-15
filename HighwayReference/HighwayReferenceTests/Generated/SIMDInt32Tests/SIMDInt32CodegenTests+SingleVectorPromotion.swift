@@ -246,4 +246,33 @@ extension SIMDInt32CodegenTests {
         }
         mismatches.record()
     }
+
+    @Test func vectorWideningLowerFromHalfUInt8() {
+        let mismatches = Mismatches("portVectorWideningLowerHalfU8ToI32")
+        let aInputs = Inputs.conversions(SIMDUInt8.HalfVector.self, seed: 0x2428_03CB_7296_0C2F)
+            .map(poisoningUpperBytes)
+        for a in aInputs {
+            mismatches.check(
+                portVectorWideningLowerHalfU8ToI32(wideningLower: a),
+                highwayVectorWideningLowerHalfU8ToI32(wideningLower: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func vectorWideningLowerFromHalfInt8() {
+        let mismatches = Mismatches("portVectorWideningLowerHalfI8ToI32")
+        let aInputs = Inputs.conversions(SIMDInt8.HalfVector.self, seed: 0x9037_C29E_FB16_BC74).map(
+            poisoningUpperBytes
+        )
+        for a in aInputs {
+            mismatches.check(
+                portVectorWideningLowerHalfI8ToI32(wideningLower: a),
+                highwayVectorWideningLowerHalfI8ToI32(wideningLower: a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

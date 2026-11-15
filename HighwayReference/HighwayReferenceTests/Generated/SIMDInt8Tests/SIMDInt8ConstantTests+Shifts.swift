@@ -13,12 +13,7 @@ extension SIMDInt8ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftTemplateI8(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
-                ),
+                H.Vector(raw: HighwayReference.shiftedLeftTemplateI8(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a))"
             )
         }
@@ -65,10 +60,7 @@ extension SIMDInt8ConstantTests {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.shiftedRightTemplateI8(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.shiftedRightTemplateI8(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )
@@ -417,7 +409,7 @@ extension SIMDInt8ConstantTests {
                 H.Vector(
                     raw: HighwayReference.roundingShiftedRightTemplateI8(
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "a: \(describe(a))"
@@ -663,12 +655,7 @@ extension SIMDInt8ConstantTests {
         for a in aInputs {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedLeftTemplateI8(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
-                ),
+                H.Vector(raw: HighwayReference.rotatedLeftTemplateI8(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a))"
             )
         }
@@ -715,10 +702,7 @@ extension SIMDInt8ConstantTests {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.rotatedRightTemplateI8(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.rotatedRightTemplateI8(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )

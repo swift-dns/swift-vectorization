@@ -40,6 +40,18 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func nan() {
+        let mismatches = Mismatches("nan")
+        mismatches.check(H.nan(), HighwayReference.nanF64(), "")
+        mismatches.record()
+    }
+
+    @Test func infinity() {
+        let mismatches = Mismatches("infinity")
+        mismatches.check(H.infinity(), HighwayReference.infinityF64(), "")
+        mismatches.record()
+    }
+
     @Test func unspecified() {
         let mismatches = Mismatches("unspecified")
         _ = H.unspecified()
@@ -61,6 +73,20 @@ extension SIMDDoubleReferenceTests {
         mismatches.record()
     }
 
+    @Test func repeatingWhereNonCanonical() {
+        let mismatches = Mismatches("repeatingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1808_9D4F_E201_749C)
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x1808_9E4F_E201_764F)
+        for (mask, value) in everyPair(maskInputs, valueInputs) {
+            mismatches.check(
+                H.repeating(value, where: mask),
+                HighwayReference.repeatingWhereF64(mask.raw, value),
+                "mask: \(describe(mask)), value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func repeatingWhereOtherwise() {
         let mismatches = Mismatches("repeatingWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8064_58F9_2830_3BCD)
@@ -71,6 +97,26 @@ extension SIMDDoubleReferenceTests {
             maskInputs,
             valueInputs,
             seed: 0x5B36_F9BA_F4D0_249F
+        ) {
+            mismatches.check(
+                H.repeating(value, where: mask, otherwise: otherwise),
+                HighwayReference.repeatingWhereOtherwiseF64(otherwise, mask.raw, value),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func repeatingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("repeatingWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5500_F132_EBBC_F06A)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5500_F232_EBBC_F21D)
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x5500_EF32_EBBC_ED04)
+        for (otherwise, mask, value) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            valueInputs,
+            seed: 0x63B3_3451_BD90_FFAE
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),

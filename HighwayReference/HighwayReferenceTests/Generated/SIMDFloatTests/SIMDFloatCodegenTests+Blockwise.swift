@@ -7,6 +7,112 @@ import Testing
 import Vectorization
 
 extension SIMDFloatCodegenTests {
+    @Test func tableLookupBytes() {
+        let mismatches = Mismatches("portTableLookupBytesF32")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4C02_EFFC_79F9_2153)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            perByte: true,
+            count: 16,
+            seed: 0x4C02_EEFC_79F9_1FA0,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTableLookupBytesF32(a, atUnchecked: indices),
+                highwayTableLookupBytesF32(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesConstantA() {
+        let mismatches = Mismatches("portTableLookupBytesF32ConstantA")
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            perByte: true,
+            count: 16,
+            seed: 0xDB10_5039_3DA8_46CF,
+            inContract: true
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                portTableLookupBytesF32ConstantA(atUnchecked: indices),
+                highwayTableLookupBytesF32ConstantA(atUnchecked: indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesConstantIndices() {
+        let mismatches = Mismatches("portTableLookupBytesF32ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBDA7_C4C2_1AEC_7912)
+        for a in aInputs {
+            mismatches.check(
+                portTableLookupBytesF32ConstantIndices(a),
+                highwayTableLookupBytesF32ConstantIndices(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZero() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroF32")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF3AE_D6BD_8DE9_AE18)
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0xF3AE_D7BD_8DE9_AFCB,
+            inContract: true
+        )
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            mismatches.check(
+                portTableLookupBytesOrZeroF32(a, atUnchecked: indices),
+                highwayTableLookupBytesOrZeroF32(a, atUnchecked: indices),
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantA() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroF32ConstantA")
+        let indicesInputs = Inputs.tableIndices(
+            H.Vector.self,
+            offset: 128,
+            perByte: true,
+            count: 144,
+            seed: 0x00D0_AB1A_7CCE_ED6E,
+            inContract: true
+        )
+        for indices in indicesInputs {
+            mismatches.check(
+                portTableLookupBytesOrZeroF32ConstantA(atUnchecked: indices),
+                highwayTableLookupBytesOrZeroF32ConstantA(atUnchecked: indices),
+                "indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func tableLookupBytesOrZeroConstantIndices() {
+        let mismatches = Mismatches("portTableLookupBytesOrZeroF32ConstantIndices")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB46B_6F91_0CA4_5457)
+        for a in aInputs {
+            mismatches.check(
+                portTableLookupBytesOrZeroF32ConstantIndices(a),
+                highwayTableLookupBytesOrZeroF32ConstantIndices(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func pairwiseAddingBlocks() {
         let mismatches = Mismatches("portPairwiseAddingBlocksF32")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE04E_CD38_1B7C_15DD)

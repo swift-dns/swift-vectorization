@@ -18,7 +18,7 @@ extension SIMDUInt8ConstantTests {
                     raw: HighwayReference.shiftedLeftWhereTemplateU8(
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
@@ -78,7 +78,7 @@ extension SIMDUInt8ConstantTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
@@ -131,7 +131,7 @@ extension SIMDUInt8ConstantTests {
                     raw: HighwayReference.shiftedRightWhereTemplateU8(
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
@@ -191,7 +191,7 @@ extension SIMDUInt8ConstantTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"

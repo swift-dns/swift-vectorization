@@ -336,6 +336,86 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func saturatingAdding() {
+        let mismatches = Mismatches("portSaturatingAddingU32")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF1DE_9D7B_5E1B_FF96)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF1DE_9E7B_5E1C_0149)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portSaturatingAddingU32(a, b),
+                highwaySaturatingAddingU32(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantA() {
+        let mismatches = Mismatches("portSaturatingAddingU32ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA1EB_F5FB_AA2F_2544)
+        for b in bInputs {
+            mismatches.check(
+                portSaturatingAddingU32ConstantA(b),
+                highwaySaturatingAddingU32ConstantA(b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingAddingConstantB() {
+        let mismatches = Mismatches("portSaturatingAddingU32ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBBAB_5BFB_B8B3_6076)
+        for a in aInputs {
+            mismatches.check(
+                portSaturatingAddingU32ConstantB(a),
+                highwaySaturatingAddingU32ConstantB(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtracting() {
+        let mismatches = Mismatches("portSaturatingSubtractingU32")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x293A_FD75_F411_01C7)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x293A_FC75_F411_0014)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portSaturatingSubtractingU32(a, b),
+                highwaySaturatingSubtractingU32(a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantA() {
+        let mismatches = Mismatches("portSaturatingSubtractingU32ConstantA")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8141_CC02_0355_BC53)
+        for b in bInputs {
+            mismatches.check(
+                portSaturatingSubtractingU32ConstantA(b),
+                highwaySaturatingSubtractingU32ConstantA(b),
+                "b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingConstantB() {
+        let mismatches = Mismatches("portSaturatingSubtractingU32ConstantB")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8A43_8202_0888_9515)
+        for a in aInputs {
+            mismatches.check(
+                portSaturatingSubtractingU32ConstantB(a),
+                highwaySaturatingSubtractingU32ConstantB(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func roundedAverage() {
         let mismatches = Mismatches("portRoundedAverageU32")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2D66_8C03_2391_1121)

@@ -22,6 +22,22 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func selectingNonCanonical() {
+        let mismatches = Mismatches("selecting with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB87E_4DDF_8AF5_A5CD)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB87E_4CDF_8AF5_A41A)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB87E_4BDF_8AF5_A267)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6C68_3C25_7C9F_B29F)
+        {
+            mismatches.check(
+                H.selecting(mask, a, b),
+                H.Vector(raw: HighwayReference.selectingU64(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func selectingOrZero() {
         let mismatches = Mismatches("selectingOrZero")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDF62_0BA1_B4E9_564D)
@@ -36,10 +52,38 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func selectingOrZeroNonCanonical() {
+        let mismatches = Mismatches("selectingOrZero with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA258_B6C9_0884_42EA)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA258_B7C9_0884_449D)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.selectingOrZero(mask, a),
+                H.Vector(raw: HighwayReference.selectingOrZeroU64(mask.raw, a.raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func zeroingSelected() {
         let mismatches = Mismatches("zeroingSelected")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC5B1_442C_BFA1_1C11)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC5B1_432C_BFA1_1A5E)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.zeroingSelected(mask, a),
+                H.Vector(raw: HighwayReference.zeroingSelectedU64(mask.raw, a.raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func zeroingSelectedNonCanonical() {
+        let mismatches = Mismatches("zeroingSelected with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8BBA_8C8A_8853_1B56)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8BBA_8D8A_8853_1D09)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.zeroingSelected(mask, a),

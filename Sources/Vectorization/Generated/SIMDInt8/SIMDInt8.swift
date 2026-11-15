@@ -197,6 +197,12 @@ public enum SIMDInt8: SIMDElement, SIMDIntegerElement, SendableMetatype {
     public static var blockCount: Int { Int(cvectorization_ops_block_count_i8()) }
 
     @export(implementation) @inline(always)
+    public static var canLookup8: Bool { cvectorization_ops_can_lookup8_i8() }
+
+    @export(implementation) @inline(always)
+    public static var canLookup16: Bool { cvectorization_ops_can_lookup16_i8() }
+
+    @export(implementation) @inline(always)
     public static var canLookup32: Bool { cvectorization_ops_can_lookup32_i8() }
 
     @export(implementation) @inline(always)

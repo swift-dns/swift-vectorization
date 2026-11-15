@@ -65,6 +65,20 @@ extension SIMDInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func repeatingWhereNonCanonical() {
+        let mismatches = Mismatches("repeatingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x14A6_FFAC_0A09_FECC)
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x14A7_00AC_0A0A_007F)
+        for (mask, value) in everyPair(maskInputs, valueInputs) {
+            mismatches.check(
+                H.repeating(value, where: mask),
+                H.Vector(raw: HighwayReference.repeatingWhereI16(mask.raw, value)),
+                "mask: \(describe(mask)), value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func repeatingWhereOtherwise() {
         let mismatches = Mismatches("repeatingWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF97F_3E0D_66C7_885D)
@@ -75,6 +89,28 @@ extension SIMDInt16ReferenceTests {
             maskInputs,
             valueInputs,
             seed: 0x9371_77D0_005A_462F
+        ) {
+            mismatches.check(
+                H.repeating(value, where: mask, otherwise: otherwise),
+                H.Vector(
+                    raw: HighwayReference.repeatingWhereOtherwiseI16(otherwise.raw, mask.raw, value)
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func repeatingWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("repeatingWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x6358_ACC4_6C36_C7BA)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6358_ADC4_6C36_C96D)
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x6358_AAC4_6C36_C454)
+        for (otherwise, mask, value) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            valueInputs,
+            seed: 0xCFDA_347C_46CC_A67E
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),

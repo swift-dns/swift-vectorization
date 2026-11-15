@@ -181,12 +181,44 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseAndWhereNonCanonical() {
+        let mismatches = Mismatches("bitwiseAndWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4617_4C96_3C69_041A)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4617_4D96_3C69_05CD)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4617_4A96_3C69_00B4)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x19E7_92B6_7ED1_155E)
+        {
+            mismatches.check(
+                H.bitwiseAnd(a, b, where: mask),
+                H.Vector(raw: HighwayReference.bitwiseAndWhereU64(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func bitwiseOrWhere() {
         let mismatches = Mismatches("bitwiseOrWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4FC2_1D53_841A_00E1)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4FC2_1C53_8419_FF2E)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4FC2_1B53_8419_FD7B)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6647_22CC_5A67_CEDB)
+        {
+            mismatches.check(
+                H.bitwiseOr(a, b, where: mask),
+                H.Vector(raw: HighwayReference.bitwiseOrWhereU64(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseOrWhereNonCanonical() {
+        let mismatches = Mismatches("bitwiseOrWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x18A0_0F8A_A5AB_D6E6)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x18A0_108A_A5AB_D899)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x18A0_0D8A_A5AB_D380)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xD83C_EB0C_E926_3F62)
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask),
@@ -213,6 +245,22 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseXorWhereNonCanonical() {
+        let mismatches = Mismatches("bitwiseXorWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF539_E4B0_35AA_26AA)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF539_E5B0_35AA_285D)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF539_E2B0_35AA_2344)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x81B4_2D85_0917_AE6E)
+        {
+            mismatches.check(
+                H.bitwiseXor(a, b, where: mask),
+                H.Vector(raw: HighwayReference.bitwiseXorWhereU64(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func bitwiseAndWhereOtherwise() {
         let mismatches = Mismatches("bitwiseAndWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x85F8_5985_CFFE_EC0F)
@@ -225,6 +273,35 @@ extension SIMDUInt64ReferenceTests {
             aInputs,
             bInputs,
             seed: 0xB6D8_B9EA_694C_F969
+        ) {
+            mismatches.check(
+                H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
+                H.Vector(
+                    raw: HighwayReference.bitwiseAndWhereOtherwiseU64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseAndWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("bitwiseAndWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x2A9A_2818_A949_FC9C)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2A9A_2918_A949_FE4F)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2A9A_2A18_A94A_0002)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2A9A_2B18_A94A_01B5)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0xD30A_8753_28AB_7170
         ) {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: otherwise),
@@ -271,6 +348,35 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseOrWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("bitwiseOrWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xC2E7_DFFD_6080_EE98)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xC2E7_E0FD_6080_F04B)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC2E7_E1FD_6080_F1FE)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC2E7_E2FD_6080_F3B1)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x330E_8604_C3C1_CAD4
+        ) {
+            mismatches.check(
+                H.bitwiseOr(a, b, where: mask, otherwise: otherwise),
+                H.Vector(
+                    raw: HighwayReference.bitwiseOrWhereOtherwiseU64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func bitwiseXorWhereOtherwise() {
         let mismatches = Mismatches("bitwiseXorWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x714A_2B5A_4725_9E3F)
@@ -283,6 +389,35 @@ extension SIMDUInt64ReferenceTests {
             aInputs,
             bInputs,
             seed: 0xBDC2_B4F8_1DB3_7FD9
+        ) {
+            mismatches.check(
+                H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
+                H.Vector(
+                    raw: HighwayReference.bitwiseXorWhereOtherwiseU64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseXorWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("bitwiseXorWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x79A8_34E7_F539_A9CC)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x79A8_35E7_F539_AB7F)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x79A8_36E7_F539_AD32)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x79A8_37E7_F539_AEE5)
+        for (otherwise, mask, a, b) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            aInputs,
+            bInputs,
+            seed: 0x9331_06DA_626C_DCA0
         ) {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: otherwise),
@@ -382,6 +517,20 @@ extension SIMDUInt64ReferenceTests {
         let mismatches = Mismatches("leadingZeroBitCountWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7728_EE62_B5B3_0D15)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7728_ED62_B5B3_0B62)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.leadingZeroBitCount(a, where: mask),
+                H.Vector(raw: HighwayReference.leadingZeroBitCountWhereU64(mask.raw, a.raw)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func leadingZeroBitCountWhereNonCanonical() {
+        let mismatches = Mismatches("leadingZeroBitCountWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2743_3471_FDDD_35D2)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2743_3571_FDDD_3785)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.leadingZeroBitCount(a, where: mask),

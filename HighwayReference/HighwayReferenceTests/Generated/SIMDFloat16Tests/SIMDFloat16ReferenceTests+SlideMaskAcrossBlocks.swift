@@ -35,6 +35,20 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func slideMaskUpLanesNonCanonical() {
+        let mismatches = Mismatches("slideMaskUpLanes with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xBC11_43E4_6683_78F8)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        for (mask, lanes) in everyPair(maskInputs, lanesInputs) {
+            mismatches.check(
+                H.slideUpLanes(mask, by: lanes),
+                H.Mask(raw: HighwayReference.slideMaskUpLanesF16(mask.raw, lanes)),
+                "mask: \(describe(mask)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func slideMaskDownLanes() {
         let mismatches = Mismatches("slideMaskDownLanes")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3FF4_C825_600A_DBE8)
@@ -63,6 +77,20 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func slideMaskDownLanesNonCanonical() {
+        let mismatches = Mismatches("slideMaskDownLanes with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x9F4E_C832_9EA2_7B67)
+        let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
+        for (mask, lanes) in everyPair(maskInputs, lanesInputs) {
+            mismatches.check(
+                H.slideDownLanes(mask, by: lanes),
+                H.Mask(raw: HighwayReference.slideMaskDownLanesF16(mask.raw, lanes)),
+                "mask: \(describe(mask)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func slideMask1Up() {
         let mismatches = Mismatches("slideMask1Up")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9F45_6BBD_B95F_4929)
@@ -76,9 +104,35 @@ extension SIMDFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func slideMask1UpNonCanonical() {
+        let mismatches = Mismatches("slideMask1Up with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA73F_919C_66B7_03AE)
+        for mask in maskInputs {
+            mismatches.check(
+                H.slide1Up(mask),
+                H.Mask(raw: HighwayReference.slideMask1UpF16(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func slideMask1Down() {
         let mismatches = Mismatches("slideMask1Down")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDCAA_85EB_5839_5AD8)
+        for mask in maskInputs {
+            mismatches.check(
+                H.slide1Down(mask),
+                H.Mask(raw: HighwayReference.slideMask1DownF16(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func slideMask1DownNonCanonical() {
+        let mismatches = Mismatches("slideMask1Down with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4E37_69F3_ABDA_C0D7)
         for mask in maskInputs {
             mismatches.check(
                 H.slide1Down(mask),

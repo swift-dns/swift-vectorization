@@ -162,6 +162,68 @@ public func highwayIndicesI8ConstantVector() -> SIMDInt8.Vector {
 }
 
 @inline(never)
+public func portLookup8I8(
+    at indices: SIMDInt8.Indices,
+    from: UnsafePointer<SIMDInt8.Lane>
+) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.lookup8(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup8I8(
+    at indices: SIMDInt8.Vector,
+    from: UnsafePointer<Int8>
+) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.lookup8I8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup8I8ConstantIndices(from: UnsafePointer<SIMDInt8.Lane>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.lookup8(at: SIMDInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup8I8ConstantIndices(from: UnsafePointer<Int8>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup8I8(
+            from,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(1)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portLookup16I8(
+    at indices: SIMDInt8.Indices,
+    from: UnsafePointer<SIMDInt8.Lane>
+) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.lookup16(at: indices, from: from)
+}
+
+@inline(never)
+public func highwayLookup16I8(
+    at indices: SIMDInt8.Vector,
+    from: UnsafePointer<Int8>
+) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(raw: HighwayReference.Nothrow.lookup16I8(from, indices.raw))
+}
+
+@inline(never)
+public func portLookup16I8ConstantIndices(from: UnsafePointer<SIMDInt8.Lane>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.lookup16(at: SIMDInt8.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup16I8ConstantIndices(from: UnsafePointer<Int8>) -> SIMDInt8.Vector {
+    unsafe SIMDInt8.Vector(
+        raw: HighwayReference.Nothrow.lookup16I8(
+            from,
+            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(1)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portLookup32I8(
     at indices: SIMDInt8.Indices,
     from: UnsafePointer<SIMDInt8.Lane>

@@ -6,6 +6,62 @@ import Testing
 import Vectorization
 
 extension SIMDDoubleReferenceTests {
+    @Test func shiftedLeftBytes() {
+        let mismatches = Mismatches("shiftedLeftBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAC8A_6BD1_DB14_7E38)
+        let bytesInputs = Array(0...16)
+        for (a, bytes) in everyPair(aInputs, bytesInputs) {
+            mismatches.check(
+                H.shiftedLeftBytes(a, by: bytes),
+                HighwayReference.shiftedLeftBytesF64(a, Int32(truncatingIfNeeded: bytes)),
+                "a: \(describe(a)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedLeftBytesUnchecked() {
+        let mismatches = Mismatches("shiftedLeftBytes unchecked")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8B1B_C39A_D04F_1B5E)
+        let bytesInputs = Array(0...16)
+        for (a, bytes) in everyPair(aInputs, bytesInputs) {
+            mismatches.check(
+                unsafe H.shiftedLeftBytes(a, byUnchecked: bytes),
+                HighwayReference.shiftedLeftBytesF64(a, Int32(truncatingIfNeeded: bytes)),
+                "a: \(describe(a)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightBytes() {
+        let mismatches = Mismatches("shiftedRightBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1EDD_901A_CCFE_808F)
+        let bytesInputs = Array(0...16)
+        for (a, bytes) in everyPair(aInputs, bytesInputs) {
+            mismatches.check(
+                H.shiftedRightBytes(a, by: bytes),
+                HighwayReference.shiftedRightBytesF64(a, Int32(truncatingIfNeeded: bytes)),
+                "a: \(describe(a)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightBytesUnchecked() {
+        let mismatches = Mismatches("shiftedRightBytes unchecked")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB5C5_F7A9_038F_2133)
+        let bytesInputs = Array(0...16)
+        for (a, bytes) in everyPair(aInputs, bytesInputs) {
+            mismatches.check(
+                unsafe H.shiftedRightBytes(a, byUnchecked: bytes),
+                HighwayReference.shiftedRightBytesF64(a, Int32(truncatingIfNeeded: bytes)),
+                "a: \(describe(a)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func shiftedLeftLanes() {
         let mismatches = Mismatches("shiftedLeftLanes")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8B6E_28BE_CC1F_C888)
@@ -57,6 +113,54 @@ extension SIMDDoubleReferenceTests {
                 unsafe H.shiftedRightLanes(a, byUnchecked: lanes),
                 HighwayReference.shiftedRightLanesF64(a, Int32(truncatingIfNeeded: lanes)),
                 "a: \(describe(a)), lanes: \(lanes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytes() {
+        let mismatches = Mismatches("combinedShiftedRightBytes")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2FA3_FD54_BD40_957E)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2FA3_FE54_BD40_9731)
+        let bytesInputs = Array(1...15)
+        for (a, b, bytes) in mixedTriples(
+            aInputs,
+            bInputs,
+            bytesInputs,
+            seed: 0x6C76_700C_E9BB_921A
+        ) {
+            mismatches.check(
+                H.combinedShiftedRightBytes(a, b, by: bytes),
+                HighwayReference.combinedShiftedRightBytesF64(
+                    a,
+                    b,
+                    Int32(truncatingIfNeeded: bytes)
+                ),
+                "a: \(describe(a)), b: \(describe(b)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesUnchecked() {
+        let mismatches = Mismatches("combinedShiftedRightBytes unchecked")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9A87_1C83_A433_DDB8)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9A87_1D83_A433_DF6B)
+        let bytesInputs = Array(1...15)
+        for (a, b, bytes) in mixedTriples(
+            aInputs,
+            bInputs,
+            bytesInputs,
+            seed: 0x3BB7_CBAC_9E8B_C6F4
+        ) {
+            mismatches.check(
+                unsafe H.combinedShiftedRightBytes(a, b, byUnchecked: bytes),
+                HighwayReference.combinedShiftedRightBytesF64(
+                    a,
+                    b,
+                    Int32(truncatingIfNeeded: bytes)
+                ),
+                "a: \(describe(a)), b: \(describe(b)), bytes: \(bytes)"
             )
         }
         mismatches.record()

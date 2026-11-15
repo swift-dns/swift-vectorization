@@ -85,7 +85,7 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches("portNegatedMultiplyAddingF32ConstantA")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC5DE_F578_5FF1_03FB)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0xC5DE_F678_5FF1_05AE)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(in: b) {
+        for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplyAddingF32ConstantA(b, c),
                 highwayNegatedMultiplyAddingF32ConstantA(b, c),
@@ -99,7 +99,7 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches("portNegatedMultiplyAddingF32ConstantB")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCE74_2B78_64C7_E45D)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0xCE74_2978_64C7_E0F7)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(in: a) {
+        for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplyAddingF32ConstantB(a, c),
                 highwayNegatedMultiplyAddingF32ConstantB(a, c),
@@ -113,7 +113,7 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches("portNegatedMultiplyAddingF32ConstantC")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD62F_C278_68E5_C5D2)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD62F_C378_68E5_C785)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(in: a, b) {
+        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplyAddingF32ConstantC(a, b),
                 highwayNegatedMultiplyAddingF32ConstantC(a, b),
@@ -243,7 +243,7 @@ extension SIMDFloatCodegenTests {
             let mismatches = Mismatches("portNegatedMultiplySubtractingF32ConstantA")
             let bInputs = Inputs.vectors(H.Vector.self, seed: 0x176D_600E_049B_7612)
             let cInputs = Inputs.vectors(H.Vector.self, seed: 0x176D_5F0E_049B_745F)
-            for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(in: b) {
+            for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(negating: b) {
                 mismatches.check(
                     portNegatedMultiplySubtractingF32ConstantA(b, c),
                     highwayNegatedMultiplySubtractingF32ConstantA(b, c),
@@ -266,7 +266,7 @@ extension SIMDFloatCodegenTests {
             let mismatches = Mismatches("portNegatedMultiplySubtractingF32ConstantB")
             let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E6B_AA0D_FF68_9D50)
             let cInputs = Inputs.vectors(H.Vector.self, seed: 0x0E6B_AC0D_FF68_A0B6)
-            for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(in: a) {
+            for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(negating: a) {
                 mismatches.check(
                     portNegatedMultiplySubtractingF32ConstantB(a, c),
                     highwayNegatedMultiplySubtractingF32ConstantB(a, c),
@@ -285,7 +285,7 @@ extension SIMDFloatCodegenTests {
         let mismatches = Mismatches("portNegatedMultiplySubtractingF32ConstantC")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x05D6_930D_FA91_F19B)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x05D6_920D_FA91_EFE8)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(in: a, b) {
+        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplySubtractingF32ConstantC(a, b),
                 highwayNegatedMultiplySubtractingF32ConstantC(a, b),

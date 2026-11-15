@@ -65,6 +65,8 @@ returns under static dispatch, and `Vector.SIMDType` is as wide as the target's 
 | -------- | ------------------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------- |
 | arm64    | NEON, NEON_WITHOUT_AES, NEON_BF16    | 16    | The baseline: NEON on Apple platforms, elsewhere NEON_WITHOUT_AES unless `-march` enables AES.                              |
 | arm64    | SVE2_128                             | 16    | With `-Xcc -march=armv9-a+bf16+i8mm -Xcc -msve-vector-bits=128`.                                                            |
+| arm64    | SVE_256                              | 32    | With `-Xcc -march=armv8.4-a+sve+bf16+i8mm -Xcc -msve-vector-bits=256`, such as AWS Graviton3.                               |
+| arm64    | SVE, SVE2                            | 64    | With `-Xcc -msve-vector-bits=512` and `-Xcc -march=armv8.2-a+sve` (SVE) or `-Xcc -march=armv9-a+bf16+i8mm` (SVE2).          |
 | x86_64   | SSE2, SSSE3, SSE4                    | 16    | SSE2 is the baseline, SSSE3 on Apple platforms and Android. SSE4 needs `-Xcc -march=x86-64-v2 -Xcc -maes -Xcc -mpclmul`.    |
 | x86_64   | AVX2                                 | 32    | With `-Xcc -march=x86-64-v3 -Xcc -maes -Xcc -mpclmul`, or a CPU such as `-Xcc -march=skylake`.                              |
 | x86_64   | AVX3, AVX3_DL, AVX3_ZEN4, AVX3_SPR   | 64    | With AVX-512 flags, such as `-Xcc -march=skylake-avx512` or `-Xcc -march=icelake-server`.                                   |
@@ -75,10 +77,17 @@ and SVE2_128 needs BF16 and I8MM, without which the build fails with an error th
 A build for which highway would pick a target the port does not support, such as SVE sized at run
 time, AVX10_2 or WASM_EMU256, fails with an error that names the flag to use instead.
 
-Swift's own code generation does not see `-msve-vector-bits`, so SVE2_128 builds should also pass
-`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=128` and
-`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=128`. Without them the ops are still right,
-but some of them spend extra instructions on vector lengths the build cannot have.
+Today's Swift toolchains carry clang 21, for which highway marks its SVE, SVE_256 and SVE2 targets
+broken (it lifts that from clang 22), so those builds also need
+`-Xcc -DHWY_BROKEN_SVE=0 -Xcc -DHWY_BROKEN_SVE2=0`. Vector lengths of 1024 and 2048 bits fail with
+an error, because Swift has no SIMD type of 128 or 256 lanes. A build for one SVE vector length is
+only right on CPUs with that length, so `SIMDTarget.isSupported` is false on any other.
+
+Swift's own code generation does not see `-msve-vector-bits`, so SVE builds should also pass
+`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-min=N` and
+`-Xswiftc -Xllvm -Xswiftc -aarch64-sve-vector-bits-max=N` with the same N, such as 128 for SVE2_128.
+Without them the ops are still right, but some of them spend extra instructions on vector lengths
+the build cannot have.
 
 Highway can also pick the target at run time with dynamic dispatch. Swift cannot compile one function
 for several CPU levels, so the port matches highway's static dispatch only.
@@ -97,10 +106,11 @@ on the portable C targets, whose ops follow highway's EMU128, they take EMU128's
 
 `SIMDTarget.target` is the target the ops were compiled for, as a `SIMDTargetSet`, which has
 highway's bit and name for each of highway's targets. `SIMDTarget.supportedTargets` is highway's
-`SupportedTargets()`: it mirrors highway's detection on x86 and arm, and where highway has none, as
-on other architectures, it reports the compiled baseline. `SIMDTarget.isSupported` is whether it
-contains `SIMDTarget.target`. Like highway's, the detection reports what the CPU advertises, so
-under Rosetta, which advertises no AVX, an AVX2 build reports itself unsupported although it runs.
+`SupportedTargets()`: it mirrors highway's detection on x86 and arm, and on other architectures,
+where highway also detects the CPU's targets, it reports the compiled baseline.
+`SIMDTarget.isSupported` is whether it contains `SIMDTarget.target`. Like highway's, the detection
+reports what the CPU advertises, so under Rosetta, which advertises no AVX, an AVX2 build reports
+itself unsupported although it runs.
 
 ## How it relates to highway
 
@@ -108,15 +118,33 @@ Every op reproduces what highway does on the same target, down to NaN payloads a
 out-of-range inputs, so the ops behave like highway's. `HighwayReference/` holds a copy of highway
 and generated tests that compare every op with highway's, lane for lane, on NEON, NEON_WITHOUT_AES,
 SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and highway's EMU128.
+No CI runner has the wide SVE targets: their ops were compared with highway's under QEMU, outside
+these tests.
 
 When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or a
 minimum or maximum on SVE, which payload comes out is up to the compiler, in highway as in the port.
+
+A mask made from a vector whose lanes are not all zeros or all ones, with `mask(from:)` or
+`Mask(raw:)`, behaves in every op as highway's `MaskFromVec` of the same vector does on the same
+target, which highway leaves to the target. On NEON, SSE2 through AVX2 and EMU128 each op reads the
+bits of the mask that highway's op reads, on the AVX-512 targets only the sign bit of each lane
+counts, and on SVE2_128 a lane is true when it is not zero, compared as a number for `SIMDFloat`,
+`SIMDDouble` and `SIMDFloat16`, so that `-0.0` is false there.
 
 On the targets without a carry-less multiply instruction, SSE2, SSSE3, NEON_WITHOUT_AES, SVE2_128
 without SVE2-AES, and EMU128, highway's `CLMulLower` and `CLMulUpper` return a wrong upper 64 bits
 when both operands have one of the bit groups `0x1111111111111111 << k` (k = 0...3) fully set, as
 `~0` does. So do the port's `carrylessMultiplyingLower` and `carrylessMultiplyingUpper` on those
 targets and in the portable C of WASM, PPC8, Z14 and so on.
+
+Highway's `MaskedMax`, the maximum that zeroes the lanes its mask leaves out, is `svmax_z` on
+SVE2_128, so a selected lane is NaN where either operand is NaN, while `Max` and `MaskedMaxOr`
+there, like `MaskedMax` on NEON, return the other operand where one is a quiet NaN. So does the
+port's `maximum(_:_:where:)` on float lanes.
+
+Highway's `AllBits0` compares `Float` and `Double` lanes with zero, so a vector of `-0.0` counts as
+all clear, except on the AVX-512 targets, AVX3, AVX3_DL, AVX3_ZEN4 and AVX3_SPR, where it tests the
+bits. So does the port's `allBitsClear`.
 
 Lanes that highway leaves as uninitialized memory, such as the tail of an 8-bit `Compress` on x86,
 are not compared.

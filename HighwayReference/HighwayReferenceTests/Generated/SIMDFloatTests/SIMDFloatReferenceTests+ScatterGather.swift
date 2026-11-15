@@ -309,6 +309,156 @@ extension SIMDFloatReferenceTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstOtherwise() {
+        let mismatches = Mismatches("gatherFirstOtherwise")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x1C25_1213_A1F7_8C79)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x1C25_1113_A1F7_8AC6
+        )
+        let indicesInputs = Inputs.tableIndices(
+            SIMDInt32.Vector.self,
+            count: H.laneCount,
+            seed: 0x1C25_1013_A1F7_8913,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, indices, count) in mixedQuadruples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0x9D3B_F8BF_EEC9_CA33
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.gather(
+                        from: source.baseAddress!,
+                        indices: indices,
+                        count: count,
+                        otherwise: otherwise
+                    ),
+                    unsafe HighwayReference.gatherFirstOtherwiseF32(
+                        otherwise,
+                        source.baseAddress!,
+                        indices.raw,
+                        count
+                    )
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseBeforeGuardPage() {
+        let mismatches = Mismatches("gatherFirstOtherwise before a guard page")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x543B_D9F5_BDEB_E4B6)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x543B_DAF5_BDEB_E669
+        )
+        let indicesInputs = Inputs.tableIndices(
+            SIMDInt32.Vector.self,
+            count: H.laneCount,
+            seed: 0x543B_D7F5_BDEB_E150,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, indices, count) in mixedQuadruples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0x7964_E59D_B476_2CB2
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.gather(
+                        from: source,
+                        indices: indices,
+                        count: count,
+                        otherwise: otherwise
+                    ),
+                    unsafe HighwayReference.gatherFirstOtherwiseF32(
+                        otherwise,
+                        source,
+                        indices.raw,
+                        count
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseUncheckedSpan() {
+        let mismatches = Mismatches("gatherFirstOtherwise unchecked span")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x33FD_A03C_A033_3D71)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x33FD_9F3C_A033_3BBE
+        )
+        let indicesInputs = Inputs.tableIndices(
+            SIMDInt32.Vector.self,
+            count: H.laneCount,
+            seed: 0x33FD_9E3C_A033_3A0B,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, indices, count) in mixedQuadruples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0xF13B_B95A_4D5C_4E2B
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    ({
+                        let span = unsafe Span(_unsafeElements: source)
+                        return unsafe H.gather(
+                            fromUnchecked: span,
+                            indices: indices,
+                            count: count,
+                            otherwise: otherwise
+                        )
+                    })(),
+                    ({
+                        let span = unsafe Span(_unsafeElements: source)
+                        return H.gather(
+                            from: span,
+                            indices: indices,
+                            count: count,
+                            otherwise: otherwise
+                        )
+                    })()
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherWhere() {
         let mismatches = Mismatches("gatherWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6D5D_0765_0ACA_3EBA)
@@ -376,6 +526,46 @@ extension SIMDFloatReferenceTests {
                     unsafe HighwayReference.gatherWhereF32(mask.raw, source, indices.raw)
                 )
             }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherWhereNonCanonical() {
+        let mismatches = Mismatches("gatherWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0A3B_7937_ACB8_3E51)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x0A3B_7837_ACB8_3C9E
+        )
+        let indicesInputs = Inputs.tableIndices(
+            SIMDInt32.Vector.self,
+            count: H.laneCount,
+            seed: 0x0A3B_7737_ACB8_3AEB,
+            inContract: true
+        )
+        for (mask, from, indices) in mixedTriples(
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0x5244_BD89_16E3_E18B
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.gather(from: source.baseAddress!, indices: indices, where: mask),
+                    unsafe HighwayReference.gatherWhereF32(
+                        mask.raw,
+                        source.baseAddress!,
+                        indices.raw
+                    )
+                )
+            }
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -514,6 +704,54 @@ extension SIMDFloatReferenceTests {
                     )
                 )
             }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherWhereOtherwiseNonCanonical() {
+        let mismatches = Mismatches("gatherWhereOtherwise with masks from arbitrary vectors")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x3A5D_EBD7_3118_5179)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x3A5D_EAD7_3118_4FC6)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x3A5D_E9D7_3118_4E13
+        )
+        let indicesInputs = Inputs.tableIndices(
+            SIMDInt32.Vector.self,
+            count: H.laneCount,
+            seed: 0x3A5D_E8D7_3118_4C60,
+            inContract: true
+        )
+        for (otherwise, mask, from, indices) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0xF0BE_4BD2_D9FC_4133
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.gather(
+                        from: source.baseAddress!,
+                        indices: indices,
+                        where: mask,
+                        otherwise: otherwise
+                    ),
+                    unsafe HighwayReference.gatherWhereOtherwiseF32(
+                        otherwise,
+                        mask.raw,
+                        source.baseAddress!,
+                        indices.raw
+                    )
+                )
+            }
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -934,6 +1172,46 @@ extension SIMDFloatReferenceTests {
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe HighwayReference.scatterWhereF32(a, mask.raw, destination, indices.raw)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func scatterWhereNonCanonical() {
+        let mismatches = Mismatches("scatterWhere with masks from arbitrary vectors")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x01B4_E4C2_4697_F5E4)
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x01B4_E5C2_4697_F797)
+        let indicesInputs = Inputs.tableIndices(
+            SIMDInt32.Vector.self,
+            count: H.laneCount,
+            seed: 0x01B4_E6C2_4697_F94A,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        for (a, mask, indices) in mixedTriples(
+            aInputs,
+            maskInputs,
+            indicesInputs,
+            seed: 0xB75F_3B18_6844_4198
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            var portLanes = sentinel
+            portLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe H.scatter(a, to: destination.baseAddress!, indices: indices, where: mask)
+            }
+            var referenceLanes = sentinel
+            referenceLanes.withUnsafeMutableBufferPointer { destination in
+                unsafe HighwayReference.scatterWhereF32(
+                    a,
+                    mask.raw,
+                    destination.baseAddress!,
+                    indices.raw
+                )
             }
             mismatches.check(
                 portLanes,

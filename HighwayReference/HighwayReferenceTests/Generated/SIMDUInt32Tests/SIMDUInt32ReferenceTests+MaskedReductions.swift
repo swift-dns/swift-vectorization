@@ -20,6 +20,20 @@ extension SIMDUInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func sumWhereNonCanonical() {
+        let mismatches = Mismatches("sumWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA3C1_0A7A_AA00_305C)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA3C1_0B7A_AA00_320F)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.sum(a, where: mask),
+                HighwayReference.sumWhereU32(mask.raw, a.raw),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func smallestWhere() {
         let mismatches = Mismatches("smallestWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA6CE_1299_8330_DBAD)
@@ -34,10 +48,38 @@ extension SIMDUInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func smallestWhereNonCanonical() {
+        let mismatches = Mismatches("smallestWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x12C7_AF60_162D_EECA)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x12C7_B060_162D_F07D)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.smallest(a, where: mask),
+                HighwayReference.smallestWhereU32(mask.raw, a.raw),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func largestWhere() {
         let mismatches = Mismatches("largestWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x88DB_9C4D_3EC4_5386)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x88DB_9D4D_3EC4_5539)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.largest(a, where: mask),
+                HighwayReference.largestWhereU32(mask.raw, a.raw),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func largestWhereNonCanonical() {
+        let mismatches = Mismatches("largestWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2B09_7F63_8684_75B5)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2B09_7E63_8684_7402)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),

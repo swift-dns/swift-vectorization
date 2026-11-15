@@ -346,6 +346,98 @@ public func highwayRemainderU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.V
 }
 
 @inline(never)
+public func portSaturatingAddingU64(
+    _ a: SIMDUInt64.Vector,
+    _ b: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.saturatingAdding(a, b)
+}
+
+@inline(never)
+public func highwaySaturatingAddingU64(
+    _ a: SIMDUInt64.Vector,
+    _ b: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.saturatingAddingU64(a.raw, b.raw))
+}
+
+@inline(never)
+public func portSaturatingAddingU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.saturatingAdding(SIMDUInt64.repeating(26), b)
+}
+
+@inline(never)
+public func highwaySaturatingAddingU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.saturatingAddingU64(
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            b.raw
+        )
+    )
+}
+
+@inline(never)
+public func portSaturatingAddingU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.saturatingAdding(a, SIMDUInt64.repeating(26))
+}
+
+@inline(never)
+public func highwaySaturatingAddingU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.saturatingAddingU64(
+            a.raw,
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portSaturatingSubtractingU64(
+    _ a: SIMDUInt64.Vector,
+    _ b: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.saturatingSubtracting(a, b)
+}
+
+@inline(never)
+public func highwaySaturatingSubtractingU64(
+    _ a: SIMDUInt64.Vector,
+    _ b: SIMDUInt64.Vector
+) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(raw: HighwayReference.Nothrow.saturatingSubtractingU64(a.raw, b.raw))
+}
+
+@inline(never)
+public func portSaturatingSubtractingU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.saturatingSubtracting(SIMDUInt64.repeating(26), b)
+}
+
+@inline(never)
+public func highwaySaturatingSubtractingU64ConstantA(_ b: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.saturatingSubtractingU64(
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw,
+            b.raw
+        )
+    )
+}
+
+@inline(never)
+public func portSaturatingSubtractingU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.saturatingSubtracting(a, SIMDUInt64.repeating(26))
+}
+
+@inline(never)
+public func highwaySaturatingSubtractingU64ConstantB(_ a: SIMDUInt64.Vector) -> SIMDUInt64.Vector {
+    SIMDUInt64.Vector(
+        raw: HighwayReference.Nothrow.saturatingSubtractingU64(
+            a.raw,
+            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+        )
+    )
+}
+
+@inline(never)
 public func portRoundedAverageU64(
     _ a: SIMDUInt64.Vector,
     _ b: SIMDUInt64.Vector

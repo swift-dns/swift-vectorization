@@ -381,6 +381,21 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func mantissa() {
+        let mismatches = Mismatches("portMantissaF64")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA38D_B48C_7891_5783)
+        for a in aInputs {
+            mismatches.check(portMantissaF64(a), highwayMantissaF64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func mantissaConstantA() {
+        let mismatches = Mismatches("portMantissaF64ConstantA")
+        mismatches.check(portMantissaF64ConstantA(), highwayMantissaF64ConstantA(), "")
+        mismatches.record()
+    }
+
     @Test func pairwiseAdding() {
         let mismatches = Mismatches("portPairwiseAddingF64")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5082_052D_DEC2_6AFA)
@@ -473,6 +488,44 @@ extension SIMDDoubleCodegenTests {
     @Test func sumsOf2FromFloatConstantA() {
         let mismatches = Mismatches("portSumsOf2F32ToF64ConstantA")
         mismatches.check(portSumsOf2F32ToF64ConstantA(), highwaySumsOf2F32ToF64ConstantA(), "")
+        mismatches.record()
+    }
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf4FromFloat16() {
+        let mismatches = Mismatches("portSumsOf4F16ToF64")
+        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x432A_0DBC_573C_A8BF)
+        for a in aInputs where !hasUnorderedNaNs(adjacentQuadsOf: a) {
+            mismatches.check(portSumsOf4F16ToF64(a), highwaySumsOf4F16ToF64(a), "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+    #endif
+
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @Test func sumsOf4FromFloat16ConstantA() {
+        let mismatches = Mismatches("portSumsOf4F16ToF64ConstantA")
+        mismatches.check(portSumsOf4F16ToF64ConstantA(), highwaySumsOf4F16ToF64ConstantA(), "")
+        mismatches.record()
+    }
+    #endif
+
+    @Test func sumsOf4FromBFloat16() {
+        let mismatches = Mismatches("portSumsOf4BF16ToF64")
+        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x0CB5_3CFE_15C0_C827)
+        for a in aInputs where !hasUnorderedNaNs(adjacentQuadsOf: a) {
+            mismatches.check(
+                portSumsOf4BF16ToF64(a),
+                highwaySumsOf4BF16ToF64(a),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func sumsOf4FromBFloat16ConstantA() {
+        let mismatches = Mismatches("portSumsOf4BF16ToF64ConstantA")
+        mismatches.check(portSumsOf4BF16ToF64ConstantA(), highwaySumsOf4BF16ToF64ConstantA(), "")
         mismatches.record()
     }
 }

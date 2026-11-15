@@ -16,6 +16,12 @@ public protocol SIMDElement {
     /// How many 16-byte blocks a `Vector` holds on the target this was compiled for.
     static var blockCount: Int { get }
 
+    /// Whether a `Vector` holds enough lanes for `lookup8` on the target this was compiled for.
+    static var canLookup8: Bool { get }
+
+    /// Whether a `Vector` holds enough lanes for `lookup16` on the target this was compiled for.
+    static var canLookup16: Bool { get }
+
     /// Whether a `Vector` holds enough lanes for `reversed4` on the target this was compiled for.
     static var canReverse4: Bool { get }
 
@@ -147,6 +153,10 @@ public protocol SIMDElement {
     static func slide1Up(_ a: Vector, fillingWith fill: Lane) -> Vector
     static func slide1Down(_ a: Vector) -> Vector
     static func slide1Down(_ a: Vector, fillingWith fill: Lane) -> Vector
+    static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector
+    @unsafe static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector
+    static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector
+    @unsafe static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector
     static func tableLookupLanes(_ a: Vector, at indices: Indices) -> Vector
     @unsafe static func tableLookupLanes(_ a: Vector, atUnchecked indices: Indices) -> Vector
     static func twoTablesLookupLanes(_ a: Vector, _ b: Vector, at indices: Indices) -> Vector
@@ -427,6 +437,16 @@ public protocol SIMDElement {
     static func compressedNot(_ a: Vector, where mask: Mask) -> Vector
     static func partitioned(_ a: Vector, where mask: Mask) -> Vector
     static func expanded(_ a: Vector, where mask: Mask) -> Vector
+    static func lookup8(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func lookup8(at indices: Indices, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func lookup8(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
+    static func lookup16(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    static func lookup16(at indices: Indices, from span: Span<Lane>) -> Vector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func lookup16(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
     static func minimum(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
     static func maximum(_ a: Vector, _ b: Vector, where mask: Mask) -> Vector
     static func maximum(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
@@ -509,10 +529,20 @@ public protocol SIMDElement {
     static func sum(_ a: Vector, where mask: Mask) -> Lane
     static func smallest(_ a: Vector, where mask: Mask) -> Lane
     static func largest(_ a: Vector, where mask: Mask) -> Lane
+    static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector
+    @unsafe static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
+    static func shiftedRightBytes(_ a: Vector, by bytes: Int) -> Vector
+    @unsafe static func shiftedRightBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
     static func shiftedLeftLanes(_ a: Vector, by lanes: Int) -> Vector
     @unsafe static func shiftedLeftLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector
     static func shiftedRightLanes(_ a: Vector, by lanes: Int) -> Vector
     @unsafe static func shiftedRightLanes(_ a: Vector, byUnchecked lanes: Int) -> Vector
+    static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
+    @unsafe static func combinedShiftedRightBytes(
+        _ a: Vector,
+        _ b: Vector,
+        byUnchecked bytes: Int
+    ) -> Vector
     static func combinedShiftedRightLanes(_ a: Vector, _ b: Vector, by lanes: Int) -> Vector
     @unsafe static func combinedShiftedRightLanes(
         _ a: Vector,
@@ -665,6 +695,8 @@ public protocol SIMDElement {
 /// The ops that only the integer element types have.
 public protocol SIMDIntegerElement: SIMDElement {
     static func remainder(_ a: Vector, _ b: Vector) -> Vector
+    static func saturatingAdding(_ a: Vector, _ b: Vector) -> Vector
+    static func saturatingSubtracting(_ a: Vector, _ b: Vector) -> Vector
     static func roundedAverage(_ a: Vector, _ b: Vector) -> Vector
     static func bitwiseNot(_ a: Vector) -> Vector
     static func shiftedLeft(_ a: Vector, by bits: Int) -> Vector
@@ -681,10 +713,6 @@ public protocol SIMDIntegerElement: SIMDElement {
     static func leadingZeroBitCount(_ a: Vector) -> Vector
     static func trailingZeroBitCount(_ a: Vector) -> Vector
     static func highestSetBitIndex(_ a: Vector) -> Vector
-    static func tableLookupBytes(_ a: Vector, at indices: Vector) -> Vector
-    @unsafe static func tableLookupBytes(_ a: Vector, atUnchecked indices: Vector) -> Vector
-    static func tableLookupBytesOrZero(_ a: Vector, at indices: Vector) -> Vector
-    @unsafe static func tableLookupBytesOrZero(_ a: Vector, atUnchecked indices: Vector) -> Vector
     static func testingBit(_ a: Vector, _ b: Vector) -> Mask
     static func bitReversed(_ a: Vector) -> Vector
     static func remainder(_ a: Vector, _ b: Vector, where mask: Mask, otherwise: Vector) -> Vector
@@ -703,16 +731,6 @@ public protocol SIMDIntegerElement: SIMDElement {
         otherwise: Vector
     ) -> Vector
     static func leadingZeroBitCount(_ a: Vector, where mask: Mask) -> Vector
-    static func shiftedLeftBytes(_ a: Vector, by bytes: Int) -> Vector
-    @unsafe static func shiftedLeftBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
-    static func shiftedRightBytes(_ a: Vector, by bytes: Int) -> Vector
-    @unsafe static func shiftedRightBytes(_ a: Vector, byUnchecked bytes: Int) -> Vector
-    static func combinedShiftedRightBytes(_ a: Vector, _ b: Vector, by bytes: Int) -> Vector
-    @unsafe static func combinedShiftedRightBytes(
-        _ a: Vector,
-        _ b: Vector,
-        byUnchecked bytes: Int
-    ) -> Vector
     static func shiftedLeft(_ a: Vector, by bits: Int, where mask: Mask) -> Vector
     static func shiftedLeft(
         _ a: Vector,
@@ -752,22 +770,15 @@ public protocol SIMDFloatElement: SIMDElement {
     static func isFinite(_ a: Vector) -> Mask
     static func smallestOrNaN(_ a: Vector) -> Lane
     static func largestOrNaN(_ a: Vector) -> Lane
+    static func nan() -> Vector
+    static func infinity() -> Vector
     static func zeroingNegative(_ a: Vector) -> Vector
     static func selectingIfNegative(_ a: Vector, _ b: Vector, _ c: Vector) -> Vector
     static func selectingIfNegativeOrZero(_ a: Vector, _ b: Vector) -> Vector
     static func zeroingIfNegative(_ a: Vector, _ b: Vector) -> Vector
     static func negatingIfNegative(_ a: Vector, _ b: Vector) -> Vector
     static func isNegative(_ a: Vector) -> Mask
-    static func lookup8(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
-    @available(SwiftStdlib 5.1, *)
-    static func lookup8(at indices: Indices, from span: Span<Lane>) -> Vector
-    @available(SwiftStdlib 5.1, *)
-    @unsafe static func lookup8(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
-    static func lookup16(at indices: Indices, from: UnsafePointer<Lane>) -> Vector
-    @available(SwiftStdlib 5.1, *)
-    static func lookup16(at indices: Indices, from span: Span<Lane>) -> Vector
-    @available(SwiftStdlib 5.1, *)
-    @unsafe static func lookup16(at indices: Indices, fromUnchecked span: Span<Lane>) -> Vector
+    static func byteSwapped(_ a: Vector) -> Vector
     static func squareRoot(_ a: Vector, where mask: Mask) -> Vector
     static func squareRoot(_ a: Vector, where mask: Mask, otherwise: Vector) -> Vector
     static func approximateReciprocal(_ a: Vector, where mask: Mask) -> Vector

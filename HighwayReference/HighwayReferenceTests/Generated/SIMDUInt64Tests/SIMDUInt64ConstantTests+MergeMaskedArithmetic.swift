@@ -7,6 +7,348 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
+    private func checkMinimumWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+        let mismatches = Mismatches("minimumWhereOtherwise with otherwise repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5CAD_5DCE_0237_62EE)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5CAD_5CCE_0237_613B)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5CAD_5BCE_0237_5F88)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xBECA_8A6E_A7C3_571B)
+        {
+            mismatches.check(
+                H.minimum(a, b, where: mask, otherwise: H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.minimumWhereOtherwiseU64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat0() {
+        checkMinimumWhereOtherwiseConstantOtherwise(0)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat1() {
+        checkMinimumWhereOtherwiseConstantOtherwise(1)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat15() {
+        checkMinimumWhereOtherwiseConstantOtherwise(15)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat16() {
+        checkMinimumWhereOtherwiseConstantOtherwise(16)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat26() {
+        checkMinimumWhereOtherwiseConstantOtherwise(26)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat127() {
+        checkMinimumWhereOtherwiseConstantOtherwise(127)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat128() {
+        checkMinimumWhereOtherwiseConstantOtherwise(128)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat255() {
+        checkMinimumWhereOtherwiseConstantOtherwise(255)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat256() {
+        checkMinimumWhereOtherwiseConstantOtherwise(256)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat257() {
+        checkMinimumWhereOtherwiseConstantOtherwise(257)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat65280() {
+        checkMinimumWhereOtherwiseConstantOtherwise(65280)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplat65281() {
+        checkMinimumWhereOtherwiseConstantOtherwise(65281)
+    }
+
+    @Test func minimumWhereOtherwiseConstantSplatMax() {
+        checkMinimumWhereOtherwiseConstantOtherwise(H.Lane.max)
+    }
+
+    @inline(__always)
+    private func checkMaximumWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+        let mismatches = Mismatches("maximumWhereOtherwise with otherwise repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE442_9441_064A_C824)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE442_9741_064A_CD3D)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE442_9641_064A_CB8A)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x7B8F_487A_B6F1_AB51)
+        {
+            mismatches.check(
+                H.maximum(a, b, where: mask, otherwise: H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.maximumWhereOtherwiseU64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat0() {
+        checkMaximumWhereOtherwiseConstantOtherwise(0)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat1() {
+        checkMaximumWhereOtherwiseConstantOtherwise(1)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat15() {
+        checkMaximumWhereOtherwiseConstantOtherwise(15)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat16() {
+        checkMaximumWhereOtherwiseConstantOtherwise(16)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat26() {
+        checkMaximumWhereOtherwiseConstantOtherwise(26)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat127() {
+        checkMaximumWhereOtherwiseConstantOtherwise(127)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat128() {
+        checkMaximumWhereOtherwiseConstantOtherwise(128)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat255() {
+        checkMaximumWhereOtherwiseConstantOtherwise(255)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat256() {
+        checkMaximumWhereOtherwiseConstantOtherwise(256)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat257() {
+        checkMaximumWhereOtherwiseConstantOtherwise(257)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat65280() {
+        checkMaximumWhereOtherwiseConstantOtherwise(65280)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplat65281() {
+        checkMaximumWhereOtherwiseConstantOtherwise(65281)
+    }
+
+    @Test func maximumWhereOtherwiseConstantSplatMax() {
+        checkMaximumWhereOtherwiseConstantOtherwise(H.Lane.max)
+    }
+
+    @inline(__always)
+    private func checkDividingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+        let mismatches = Mismatches("dividingWhereOtherwise with otherwise repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5F01_EB72_5B98_005A)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5F01_EA72_5B97_FEA7)
+        let bInputs =
+            Inputs.vectors(H.Vector.self, seed: 0x5F01_E972_5B97_FCF4)
+            + Inputs.vectors(H.Vector.self, seed: 0x9C50_E4D2_ABFD_5BB3).enumerated().map {
+                index,
+                vector in
+                H.Vector(
+                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
+                )
+            }
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x941E_DE93_1A8D_C15F)
+        {
+            mismatches.check(
+                H.dividing(a, b, where: mask, otherwise: H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.dividingWhereOtherwiseU64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat0() {
+        checkDividingWhereOtherwiseConstantOtherwise(0)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat1() {
+        checkDividingWhereOtherwiseConstantOtherwise(1)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat15() {
+        checkDividingWhereOtherwiseConstantOtherwise(15)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat16() {
+        checkDividingWhereOtherwiseConstantOtherwise(16)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat26() {
+        checkDividingWhereOtherwiseConstantOtherwise(26)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat127() {
+        checkDividingWhereOtherwiseConstantOtherwise(127)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat128() {
+        checkDividingWhereOtherwiseConstantOtherwise(128)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat255() {
+        checkDividingWhereOtherwiseConstantOtherwise(255)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat256() {
+        checkDividingWhereOtherwiseConstantOtherwise(256)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat257() {
+        checkDividingWhereOtherwiseConstantOtherwise(257)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat65280() {
+        checkDividingWhereOtherwiseConstantOtherwise(65280)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplat65281() {
+        checkDividingWhereOtherwiseConstantOtherwise(65281)
+    }
+
+    @Test func dividingWhereOtherwiseConstantSplatMax() {
+        checkDividingWhereOtherwiseConstantOtherwise(H.Lane.max)
+    }
+
+    @inline(__always)
+    private func checkRemainderWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+        let mismatches = Mismatches(
+            "remainderWhereOtherwise with otherwise repeating \(hex(value))"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x61E1_DA16_0D9C_404F)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x61E1_DB16_0D9C_4202)
+        let bInputs =
+            Inputs.vectors(H.Vector.self, seed: 0x61E1_DC16_0D9C_43B5)
+            + Inputs.vectors(H.Vector.self, seed: 0x6AA8_59C5_8313_501E).enumerated().map {
+                index,
+                vector in
+                H.Vector(
+                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
+                )
+            }
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6EF3_7614_8138_4770)
+        {
+            mismatches.check(
+                H.remainder(a, b, where: mask, otherwise: H.repeating(value)),
+                H.Vector(
+                    raw: HighwayReference.remainderWhereOtherwiseU64(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat0() {
+        checkRemainderWhereOtherwiseConstantOtherwise(0)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat1() {
+        checkRemainderWhereOtherwiseConstantOtherwise(1)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat15() {
+        checkRemainderWhereOtherwiseConstantOtherwise(15)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat16() {
+        checkRemainderWhereOtherwiseConstantOtherwise(16)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat26() {
+        checkRemainderWhereOtherwiseConstantOtherwise(26)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat127() {
+        checkRemainderWhereOtherwiseConstantOtherwise(127)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat128() {
+        checkRemainderWhereOtherwiseConstantOtherwise(128)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat255() {
+        checkRemainderWhereOtherwiseConstantOtherwise(255)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat256() {
+        checkRemainderWhereOtherwiseConstantOtherwise(256)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat257() {
+        checkRemainderWhereOtherwiseConstantOtherwise(257)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat65280() {
+        checkRemainderWhereOtherwiseConstantOtherwise(65280)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplat65281() {
+        checkRemainderWhereOtherwiseConstantOtherwise(65281)
+    }
+
+    @Test func remainderWhereOtherwiseConstantSplatMax() {
+        checkRemainderWhereOtherwiseConstantOtherwise(H.Lane.max)
+    }
+
+    @inline(__always)
     private func checkMultiplySubtractingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
         let mismatches = Mismatches(
             "multiplySubtractingWhereOtherwise with otherwise repeating \(hex(value))"

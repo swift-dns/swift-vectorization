@@ -19,10 +19,37 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseNotMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseNotMask with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xFD65_BFCF_12EA_30DB)
+        for mask in maskInputs {
+            mismatches.check(
+                H.bitwiseNot(mask),
+                H.Mask(raw: HighwayReference.bitwiseNotMaskU64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func bitwiseAndMask() {
         let mismatches = Mismatches("bitwiseAndMask")
         let aInputs = Inputs.masks(H.Mask.self, seed: 0x0990_6769_98A9_7E68)
         let bInputs = Inputs.masks(H.Mask.self, seed: 0x0990_6869_98A9_801B)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseAnd(a, b),
+                H.Mask(raw: HighwayReference.bitwiseAndMaskU64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseAndMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseAndMask with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xCB59_3788_3ADC_D5E7)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xCB59_3688_3ADC_D434)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseAnd(a, b),
@@ -47,10 +74,38 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseAndNotMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseAndNotMask with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x252C_840E_2379_7CA8)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x252C_850E_2379_7E5B)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseAndNot(a, b),
+                H.Mask(raw: HighwayReference.bitwiseAndNotMaskU64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func bitwiseOrMask() {
         let mismatches = Mismatches("bitwiseOrMask")
         let aInputs = Inputs.masks(H.Mask.self, seed: 0xA5CE_82FC_DD99_4904)
         let bInputs = Inputs.masks(H.Mask.self, seed: 0xA5CE_83FC_DD99_4AB7)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseOr(a, b),
+                H.Mask(raw: HighwayReference.bitwiseOrMaskU64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func bitwiseOrMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseOrMask with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5CDC_BBFF_E616_BC7B)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5CDC_BAFF_E616_BAC8)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(a, b),
@@ -75,10 +130,38 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func bitwiseXorMaskNonCanonical() {
+        let mismatches = Mismatches("bitwiseXorMask with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xFE57_66BD_4365_00B7)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xFE57_65BD_4364_FF04)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.bitwiseXor(a, b),
+                H.Mask(raw: HighwayReference.bitwiseXorMaskU64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func neitherTrue() {
         let mismatches = Mismatches("neitherTrue")
         let aInputs = Inputs.masks(H.Mask.self, seed: 0x0F08_CC8F_8CD5_8935)
         let bInputs = Inputs.masks(H.Mask.self, seed: 0x0F08_CB8F_8CD5_8782)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.neitherTrue(a, b),
+                H.Mask(raw: HighwayReference.neitherTrueU64(a.raw, b.raw)),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func neitherTrueNonCanonical() {
+        let mismatches = Mismatches("neitherTrue with masks from arbitrary vectors")
+        let aInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA2D8_F8E0_0521_1372)
+        let bInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA2D8_F9E0_0521_1525)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.neitherTrue(a, b),
@@ -102,9 +185,35 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func onlyFirstTrueNonCanonical() {
+        let mismatches = Mismatches("onlyFirstTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4AB1_CFD2_6FD6_EF09)
+        for mask in maskInputs {
+            mismatches.check(
+                H.onlyFirstTrue(mask),
+                H.Mask(raw: HighwayReference.onlyFirstTrueU64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func beforeFirstTrue() {
         let mismatches = Mismatches("beforeFirstTrue")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6C4B_445C_B9C9_6E25)
+        for mask in maskInputs {
+            mismatches.check(
+                H.beforeFirstTrue(mask),
+                H.Mask(raw: HighwayReference.beforeFirstTrueU64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func beforeFirstTrueNonCanonical() {
+        let mismatches = Mismatches("beforeFirstTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4BC0_3735_CD8E_AF22)
         for mask in maskInputs {
             mismatches.check(
                 H.beforeFirstTrue(mask),
@@ -128,6 +237,19 @@ extension SIMDUInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func atOrBeforeFirstTrueNonCanonical() {
+        let mismatches = Mismatches("atOrBeforeFirstTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8011_482B_7C08_960A)
+        for mask in maskInputs {
+            mismatches.check(
+                H.atOrBeforeFirstTrue(mask),
+                H.Mask(raw: HighwayReference.atOrBeforeFirstTrueU64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func atOrAfterFirstTrue() {
         let mismatches = Mismatches("atOrAfterFirstTrue")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8050_901D_E4ED_03F0)
@@ -139,5 +261,174 @@ extension SIMDUInt64ReferenceTests {
             )
         }
         mismatches.record()
+    }
+
+    @Test func atOrAfterFirstTrueNonCanonical() {
+        let mismatches = Mismatches("atOrAfterFirstTrue with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6A04_3F4D_AABA_73AF)
+        for mask in maskInputs {
+            mismatches.check(
+                H.atOrAfterFirstTrue(mask),
+                H.Mask(raw: HighwayReference.atOrAfterFirstTrueU64(mask.raw)),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func onlyFirstTrueOfBitwiseNotMask() {
+        withKnownIssue(
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its SetOnlyFirst breaks after the first true byte, so it returns no true lane where the first true lane is not lane 0, while the port builds a canonical predicate in each op and returns the documented result"
+        ) {
+            let mismatches = Mismatches("onlyFirstTrue of bitwiseNotMask")
+            let maskInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xDB3A_911B_4451_B9BB)
+            for mask in maskInputs {
+                mismatches.check(
+                    H.onlyFirstTrue(H.bitwiseNot(mask)),
+                    H.Mask(raw: HighwayReference.onlyFirstTrueOfBitwiseNotMaskU64(mask.raw)),
+                    "mask: \(describe(mask))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            SIMDTarget.targetName.hasPrefix("SVE")
+        }
+    }
+
+    @Test func onlyFirstTrueOfNeitherTrue() {
+        withKnownIssue(
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its SetOnlyFirst breaks after the first true byte, so it returns no true lane where the first true lane is not lane 0, while the port builds a canonical predicate in each op and returns the documented result"
+        ) {
+            let mismatches = Mismatches("onlyFirstTrue of neitherTrue")
+            let aInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xF091_2D11_CAB2_5ED4)
+            let bInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xF091_2E11_CAB2_6087)
+            for (a, b) in everyPair(aInputs, bInputs) {
+                mismatches.check(
+                    H.onlyFirstTrue(H.neitherTrue(a, b)),
+                    H.Mask(raw: HighwayReference.onlyFirstTrueOfNeitherTrueU64(a.raw, b.raw)),
+                    "a: \(describe(a)), b: \(describe(b))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            SIMDTarget.targetName.hasPrefix("SVE")
+        }
+    }
+
+    @Test func beforeFirstTrueOfBitwiseNotMask() {
+        withKnownIssue(
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its SetBeforeFirst breaks before the first true byte, so it returns only lane 0 where the first true lane is above lane 1 or no lane is true, while the port builds a canonical predicate in each op and returns the documented result"
+        ) {
+            let mismatches = Mismatches("beforeFirstTrue of bitwiseNotMask")
+            let maskInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x056B_3D33_428B_F5C0)
+            for mask in maskInputs {
+                mismatches.check(
+                    H.beforeFirstTrue(H.bitwiseNot(mask)),
+                    H.Mask(raw: HighwayReference.beforeFirstTrueOfBitwiseNotMaskU64(mask.raw)),
+                    "mask: \(describe(mask))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            SIMDTarget.targetName.hasPrefix("SVE")
+        }
+    }
+
+    @Test func beforeFirstTrueOfNeitherTrue() {
+        withKnownIssue(
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its SetBeforeFirst breaks before the first true byte, so it returns only lane 0 where the first true lane is above lane 1 or no lane is true, while the port builds a canonical predicate in each op and returns the documented result"
+        ) {
+            let mismatches = Mismatches("beforeFirstTrue of neitherTrue")
+            let aInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x6F66_969A_7B95_7DD9)
+            let bInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x6F66_959A_7B95_7C26)
+            for (a, b) in everyPair(aInputs, bInputs) {
+                mismatches.check(
+                    H.beforeFirstTrue(H.neitherTrue(a, b)),
+                    H.Mask(raw: HighwayReference.beforeFirstTrueOfNeitherTrueU64(a.raw, b.raw)),
+                    "a: \(describe(a)), b: \(describe(b))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            SIMDTarget.targetName.hasPrefix("SVE")
+        }
+    }
+
+    @Test func atOrBeforeFirstTrueOfBitwiseNotMask() {
+        withKnownIssue(
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its SetAtOrBeforeFirst breaks after the first true byte, so it returns only lane 0 where the first true lane is not lane 0 or no lane is true, while the port builds a canonical predicate in each op and returns the documented result"
+        ) {
+            let mismatches = Mismatches("atOrBeforeFirstTrue of bitwiseNotMask")
+            let maskInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xF5ED_7CDB_0942_E278)
+            for mask in maskInputs {
+                mismatches.check(
+                    H.atOrBeforeFirstTrue(H.bitwiseNot(mask)),
+                    H.Mask(raw: HighwayReference.atOrBeforeFirstTrueOfBitwiseNotMaskU64(mask.raw)),
+                    "mask: \(describe(mask))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            SIMDTarget.targetName.hasPrefix("SVE")
+        }
+    }
+
+    @Test func atOrBeforeFirstTrueOfNeitherTrue() {
+        withKnownIssue(
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its SetAtOrBeforeFirst breaks after the first true byte, so it returns only lane 0 where the first true lane is not lane 0 or no lane is true, while the port builds a canonical predicate in each op and returns the documented result"
+        ) {
+            let mismatches = Mismatches("atOrBeforeFirstTrue of neitherTrue")
+            let aInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xC9B4_D165_3DC0_E531)
+            let bInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0xC9B4_D065_3DC0_E37E)
+            for (a, b) in everyPair(aInputs, bInputs) {
+                mismatches.check(
+                    H.atOrBeforeFirstTrue(H.neitherTrue(a, b)),
+                    H.Mask(raw: HighwayReference.atOrBeforeFirstTrueOfNeitherTrueU64(a.raw, b.raw)),
+                    "a: \(describe(a)), b: \(describe(b))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            SIMDTarget.targetName.hasPrefix("SVE")
+        }
+    }
+
+    @Test func atOrAfterFirstTrueOfBitwiseNotMask() {
+        withKnownIssue(
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its SetAtOrAfterFirst negates SetBeforeFirst, which breaks before the first true byte, so it returns every lane but lane 0 where the first true lane is above lane 1 or no lane is true, while the port builds a canonical predicate in each op and returns the documented result"
+        ) {
+            let mismatches = Mismatches("atOrAfterFirstTrue of bitwiseNotMask")
+            let maskInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x17D5_0DEC_5201_0745)
+            for mask in maskInputs {
+                mismatches.check(
+                    H.atOrAfterFirstTrue(H.bitwiseNot(mask)),
+                    H.Mask(raw: HighwayReference.atOrAfterFirstTrueOfBitwiseNotMaskU64(mask.raw)),
+                    "mask: \(describe(mask))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            SIMDTarget.targetName.hasPrefix("SVE")
+        }
+    }
+
+    @Test func atOrAfterFirstTrueOfNeitherTrue() {
+        withKnownIssue(
+            "Highway's SVE Not and ExclusiveNeither also set the predicate bits of the upper bytes of a lane wider than 8 bits, which SVE ignores, and its SetAtOrAfterFirst negates SetBeforeFirst, which breaks before the first true byte, so it returns every lane but lane 0 where the first true lane is above lane 1 or no lane is true, while the port builds a canonical predicate in each op and returns the documented result"
+        ) {
+            let mismatches = Mismatches("atOrAfterFirstTrue of neitherTrue")
+            let aInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x182F_D538_53F7_2A7A)
+            let bInputs = Inputs.masksAndComplements(H.Mask.self, seed: 0x182F_D638_53F7_2C2D)
+            for (a, b) in everyPair(aInputs, bInputs) {
+                mismatches.check(
+                    H.atOrAfterFirstTrue(H.neitherTrue(a, b)),
+                    H.Mask(raw: HighwayReference.atOrAfterFirstTrueOfNeitherTrueU64(a.raw, b.raw)),
+                    "a: \(describe(a)), b: \(describe(b))"
+                )
+            }
+            mismatches.record()
+        } when: {
+            SIMDTarget.targetName.hasPrefix("SVE")
+        }
     }
 }

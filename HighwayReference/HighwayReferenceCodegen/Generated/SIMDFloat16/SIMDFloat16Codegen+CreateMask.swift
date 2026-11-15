@@ -45,6 +45,40 @@ public func highwayFirstLanesF16ConstantCount() -> SIMDFloat16.Mask {
 }
 
 @inline(never)
+public func portFirstLanesF16ConstantCountTwo() -> SIMDFloat16.Mask {
+    SIMDFloat16.firstLanes(count: 2)
+}
+
+@inline(never)
+public func highwayFirstLanesF16ConstantCountTwo() -> SIMDFloat16.Mask {
+    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.firstLanesF16(2))
+}
+
+@inline(never)
+public func portFirstLanesF16ConstantCountLaneCount() -> SIMDFloat16.Mask {
+    SIMDFloat16.firstLanes(count: SIMDFloat16.laneCount)
+}
+
+@inline(never)
+public func highwayFirstLanesF16ConstantCountLaneCount() -> SIMDFloat16.Mask {
+    SIMDFloat16.Mask(
+        raw: HighwayReference.Nothrow.firstLanesF16(HighwayReference.Nothrow.laneCountF16())
+    )
+}
+
+@inline(never)
+public func portFirstLanesF16ConstantCountTwiceLaneCount() -> SIMDFloat16.Mask {
+    SIMDFloat16.firstLanes(count: 2 * SIMDFloat16.laneCount)
+}
+
+@inline(never)
+public func highwayFirstLanesF16ConstantCountTwiceLaneCount() -> SIMDFloat16.Mask {
+    SIMDFloat16.Mask(
+        raw: HighwayReference.Nothrow.firstLanesF16(2 * HighwayReference.Nothrow.laneCountF16())
+    )
+}
+
+@inline(never)
 public func portMaskFromVectorF16(from a: SIMDFloat16.Vector) -> SIMDFloat16.Mask {
     SIMDFloat16.mask(from: a)
 }

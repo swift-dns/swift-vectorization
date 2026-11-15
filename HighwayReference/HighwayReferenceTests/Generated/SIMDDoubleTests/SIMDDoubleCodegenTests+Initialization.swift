@@ -53,6 +53,18 @@ extension SIMDDoubleCodegenTests {
         mismatches.record()
     }
 
+    @Test func nan() {
+        let mismatches = Mismatches("portNanF64")
+        mismatches.check(portNanF64(), highwayNanF64(), "")
+        mismatches.record()
+    }
+
+    @Test func infinity() {
+        let mismatches = Mismatches("portInfinityF64")
+        mismatches.check(portInfinityF64(), highwayInfinityF64(), "")
+        mismatches.record()
+    }
+
     @Test func unspecified() {
         let mismatches = Mismatches("portUnspecifiedF64")
         _ = portUnspecifiedF64()

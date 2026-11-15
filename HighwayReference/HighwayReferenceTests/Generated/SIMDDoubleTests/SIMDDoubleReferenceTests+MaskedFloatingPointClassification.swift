@@ -19,4 +19,18 @@ extension SIMDDoubleReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func isNaNWhereNonCanonical() {
+        let mismatches = Mismatches("isNaNWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4C18_805B_3DF2_24F0)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4C18_815B_3DF2_26A3)
+        for (mask, a) in everyPair(maskInputs, aInputs) {
+            mismatches.check(
+                H.isNaN(a, where: mask),
+                H.Mask(raw: HighwayReference.isNaNWhereF64(mask.raw, a)),
+                "mask: \(describe(mask)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

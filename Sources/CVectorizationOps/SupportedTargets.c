@@ -452,3 +452,13 @@ int64_t cvectorization_ops_supported_targets(void) {
 #endif
   return bits;
 }
+
+bool cvectorization_ops_vector_length_matches(void) {
+#if HWY_STATIC_TARGET & (HWY_SVE | HWY_SVE2)
+  uint64_t sve_vec_len;
+  __asm__("cntb %0" : "=r"(sve_vec_len)::);
+  return sve_vec_len == CVECTORIZATION_OPS_VECTOR_BYTES;
+#else
+  return true;
+#endif
+}

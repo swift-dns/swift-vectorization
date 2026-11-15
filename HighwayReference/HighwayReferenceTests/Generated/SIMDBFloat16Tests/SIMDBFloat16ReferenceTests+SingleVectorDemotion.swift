@@ -18,4 +18,22 @@ extension SIMDBFloat16ReferenceTests {
         }
         mismatches.record()
     }
+
+    @Test func halfVectorConvertingFromFloatResized() {
+        let mismatches = Mismatches(
+            "halfVectorConvertingFromFloat resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0xEF12_12CC_B9A3_BF0D)
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 2),
+                    H.vector(resizing: H.halfVector(converting: a))
+                ),
+                H.Vector(raw: HighwayReference.resizedHalfVectorConvertingF32ToBF16(a)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
 }

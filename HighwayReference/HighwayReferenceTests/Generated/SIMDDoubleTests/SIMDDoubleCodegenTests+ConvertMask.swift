@@ -149,6 +149,19 @@ extension SIMDDoubleCodegenTests {
     }
     #endif
 
+    @Test func maskWideningFromQuarterBFloat16() {
+        let mismatches = Mismatches("portMaskWideningQuarterBF16ToF64")
+        let maskInputs = Inputs.masks(SIMDBFloat16.QuarterMask.self, seed: 0xEF43_622D_4133_49C3)
+        for mask in maskInputs {
+            mismatches.check(
+                portMaskWideningQuarterBF16ToF64(widening: mask),
+                highwayMaskWideningQuarterBF16ToF64(widening: mask),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func maskWideningFromEighthUInt8() {
         let mismatches = Mismatches("portMaskWideningEighthU8ToF64")
         let maskInputs = Inputs.masks(SIMDUInt8.EighthMask.self, seed: 0xEC47_551C_3610_3A2B)

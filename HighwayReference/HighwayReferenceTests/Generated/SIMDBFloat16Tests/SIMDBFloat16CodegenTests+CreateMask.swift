@@ -30,6 +30,36 @@ extension SIMDBFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func firstLanesConstantCountTwo() {
+        let mismatches = Mismatches("portFirstLanesBF16ConstantCountTwo")
+        mismatches.check(
+            portFirstLanesBF16ConstantCountTwo(),
+            highwayFirstLanesBF16ConstantCountTwo(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountLaneCount() {
+        let mismatches = Mismatches("portFirstLanesBF16ConstantCountLaneCount")
+        mismatches.check(
+            portFirstLanesBF16ConstantCountLaneCount(),
+            highwayFirstLanesBF16ConstantCountLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
+    @Test func firstLanesConstantCountTwiceLaneCount() {
+        let mismatches = Mismatches("portFirstLanesBF16ConstantCountTwiceLaneCount")
+        mismatches.check(
+            portFirstLanesBF16ConstantCountTwiceLaneCount(),
+            highwayFirstLanesBF16ConstantCountTwiceLaneCount(),
+            ""
+        )
+        mismatches.record()
+    }
+
     @Test func repeatingMask() {
         let mismatches = Mismatches("portRepeatingMaskBF16")
         let valueInputs = [false, true]

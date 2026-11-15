@@ -113,6 +113,179 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
+    private func checkGatherFirstOtherwiseConstantOtherwise(_ value: H.Lane) {
+        let mismatches = Mismatches("gatherFirstOtherwise with otherwise repeating \(hex(value))")
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x8434_8EDF_7427_30DF
+        )
+        let indicesInputs = Inputs.tableIndices(
+            SIMDInt64.Vector.self,
+            count: H.laneCount,
+            seed: 0x8434_8FDF_7427_3292,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        for (from, indices, count) in mixedTriples(
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0x8595_B717_F577_2580
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.gather(
+                        from: source.baseAddress!,
+                        indices: indices,
+                        count: count,
+                        otherwise: H.repeating(value)
+                    ),
+                    unsafe HighwayReference.gatherFirstOtherwiseF64(
+                        H.repeating(value),
+                        source.baseAddress!,
+                        indices.raw,
+                        count
+                    )
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatZero() {
+        checkGatherFirstOtherwiseConstantOtherwise(0.0)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatNegativeZero() {
+        checkGatherFirstOtherwiseConstantOtherwise(-0.0)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatOne() {
+        checkGatherFirstOtherwiseConstantOtherwise(1.0)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatMinusOne() {
+        checkGatherFirstOtherwiseConstantOtherwise(-1.0)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatTwo() {
+        checkGatherFirstOtherwiseConstantOtherwise(2.0)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatHalf() {
+        checkGatherFirstOtherwiseConstantOtherwise(0.5)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatFour() {
+        checkGatherFirstOtherwiseConstantOtherwise(4.0)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatQuarter() {
+        checkGatherFirstOtherwiseConstantOtherwise(0.25)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatOnePointFive() {
+        checkGatherFirstOtherwiseConstantOtherwise(1.5)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatMinusTwoPointFive() {
+        checkGatherFirstOtherwiseConstantOtherwise(-2.5)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatInfinity() {
+        checkGatherFirstOtherwiseConstantOtherwise(.infinity)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatMinusInfinity() {
+        checkGatherFirstOtherwiseConstantOtherwise(-.infinity)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatNaN() {
+        checkGatherFirstOtherwiseConstantOtherwise(.nan)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatMinusNaN() {
+        checkGatherFirstOtherwiseConstantOtherwise(-.nan)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatPayloadNaN() {
+        checkGatherFirstOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatSignalingNaN() {
+        checkGatherFirstOtherwiseConstantOtherwise(.signalingNaN)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatMinusSignalingNaN() {
+        checkGatherFirstOtherwiseConstantOtherwise(-.signalingNaN)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatLeastNonzero() {
+        checkGatherFirstOtherwiseConstantOtherwise(.leastNonzeroMagnitude)
+    }
+
+    @Test func gatherFirstOtherwiseConstantSplatGreatest() {
+        checkGatherFirstOtherwiseConstantOtherwise(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkGatherFirstOtherwiseConstantIndices(_ value: Int64) {
+        let mismatches = Mismatches("gatherFirstOtherwise with indices repeating \(hex(value))")
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x1CF8_FBEF_240F_BF73)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x1CF8_FAEF_240F_BDC0
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, count) in mixedTriples(
+            otherwiseInputs,
+            fromInputs,
+            countInputs,
+            seed: 0x40F3_72F0_4732_7CB5
+        ) {
+            let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
+                (
+                    unsafe H.gather(
+                        from: source.baseAddress!,
+                        indices: SIMDInt64.repeating(value),
+                        count: count,
+                        otherwise: otherwise
+                    ),
+                    unsafe HighwayReference.gatherFirstOtherwiseF64(
+                        otherwise,
+                        source.baseAddress!,
+                        SIMDInt64.repeating(value).raw,
+                        count
+                    )
+                )
+            }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseConstantIndicesSplat0() {
+        checkGatherFirstOtherwiseConstantIndices(0)
+    }
+
+    @Test func gatherFirstOtherwiseConstantIndicesSplat1() {
+        checkGatherFirstOtherwiseConstantIndices(1)
+    }
+
+    @inline(__always)
     private func checkGatherWhereConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("gatherWhere with indices repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x194D_C2C2_70A3_DC40)

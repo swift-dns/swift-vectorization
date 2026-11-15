@@ -113,6 +113,20 @@ extension SIMDUInt8CodegenTests {
     }
     #endif
 
+    @Test func maskNarrowingFromBFloat16() {
+        let mismatches = Mismatches("portMaskNarrowingBF16ToU8")
+        let aInputs = Inputs.masks(SIMDBFloat16.Mask.self, seed: 0xF9BB_3EE5_9817_7736)
+        let bInputs = Inputs.masks(SIMDBFloat16.Mask.self, seed: 0xF9BB_3FE5_9817_78E9)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                portMaskNarrowingBF16ToU8(narrowing: a, b),
+                highwayMaskNarrowingBF16ToU8(narrowing: a, b),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func halfMaskNarrowingFromUInt16() {
         let mismatches = Mismatches("portHalfMaskNarrowingU16ToU8")
         let maskInputs = Inputs.masks(SIMDUInt16.Mask.self, seed: 0x68CB_B904_6315_63B5)
@@ -153,6 +167,19 @@ extension SIMDUInt8CodegenTests {
         mismatches.record()
     }
     #endif
+
+    @Test func halfMaskNarrowingFromBFloat16() {
+        let mismatches = Mismatches("portHalfMaskNarrowingBF16ToU8")
+        let maskInputs = Inputs.masks(SIMDBFloat16.Mask.self, seed: 0x92A9_0CD0_31D5_0449)
+        for mask in maskInputs {
+            mismatches.check(
+                portHalfMaskNarrowingBF16ToU8(narrowing: mask),
+                highwayHalfMaskNarrowingBF16ToU8(narrowing: mask),
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
 
     @Test func quarterMaskNarrowingFromUInt32() {
         let mismatches = Mismatches("portQuarterMaskNarrowingU32ToU8")

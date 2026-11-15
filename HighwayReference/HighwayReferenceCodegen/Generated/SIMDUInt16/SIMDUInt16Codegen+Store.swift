@@ -325,6 +325,62 @@ public func highwayStoreFirstU16ConstantCount(
 }
 
 @inline(never)
+public func portStoreFirstU16ConstantCountTwo(
+    _ a: SIMDUInt16.Vector,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.storeFirst(a, to: to, count: 2)
+}
+
+@inline(never)
+public func highwayStoreFirstU16ConstantCountTwo(
+    _ a: SIMDUInt16.Vector,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstU16(a.raw, to, 2)
+}
+
+@inline(never)
+public func portStoreFirstU16ConstantCountLaneCount(
+    _ a: SIMDUInt16.Vector,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.storeFirst(a, to: to, count: SIMDUInt16.laneCount)
+}
+
+@inline(never)
+public func highwayStoreFirstU16ConstantCountLaneCount(
+    _ a: SIMDUInt16.Vector,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstU16(
+        a.raw,
+        to,
+        HighwayReference.Nothrow.laneCountU16()
+    )
+}
+
+@inline(never)
+public func portStoreFirstU16ConstantCountTwiceLaneCount(
+    _ a: SIMDUInt16.Vector,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.storeFirst(a, to: to, count: 2 * SIMDUInt16.laneCount)
+}
+
+@inline(never)
+public func highwayStoreFirstU16ConstantCountTwiceLaneCount(
+    _ a: SIMDUInt16.Vector,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.storeFirstU16(
+        a.raw,
+        to,
+        2 * HighwayReference.Nothrow.laneCountU16()
+    )
+}
+
+@inline(never)
 public func portStoreWhereU16(
     _ a: SIMDUInt16.Vector,
     to: UnsafeMutablePointer<SIMDUInt16.Lane>,
@@ -405,6 +461,62 @@ public func highwayStoreRepeatingU16ConstantCount(_ value: UInt16, to: UnsafeMut
 }
 
 @inline(never)
+public func portStoreRepeatingU16ConstantCountTwo(
+    _ value: SIMDUInt16.Lane,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.storeRepeating(value, count: 2, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingU16ConstantCountTwo(
+    _ value: UInt16,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.storeRepeatingU16(2, value, to)
+}
+
+@inline(never)
+public func portStoreRepeatingU16ConstantCountLaneCount(
+    _ value: SIMDUInt16.Lane,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.storeRepeating(value, count: SIMDUInt16.laneCount, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingU16ConstantCountLaneCount(
+    _ value: UInt16,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.storeRepeatingU16(
+        HighwayReference.Nothrow.laneCountU16(),
+        value,
+        to
+    )
+}
+
+@inline(never)
+public func portStoreRepeatingU16ConstantCountTwiceLaneCount(
+    _ value: SIMDUInt16.Lane,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.storeRepeating(value, count: 2 * SIMDUInt16.laneCount, to: to)
+}
+
+@inline(never)
+public func highwayStoreRepeatingU16ConstantCountTwiceLaneCount(
+    _ value: UInt16,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.storeRepeatingU16(
+        2 * HighwayReference.Nothrow.laneCountU16(),
+        value,
+        to
+    )
+}
+
+@inline(never)
 public func portCopyU16(
     count: Int,
     from: UnsafePointer<SIMDUInt16.Lane>,
@@ -436,6 +548,54 @@ public func highwayCopyU16ConstantCount(
     to: UnsafeMutablePointer<UInt16>
 ) {
     unsafe HighwayReference.Nothrow.copyU16(1, from, to)
+}
+
+@inline(never)
+public func portCopyU16ConstantCountTwo(
+    from: UnsafePointer<SIMDUInt16.Lane>,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.copy(count: 2, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyU16ConstantCountTwo(
+    from: UnsafePointer<UInt16>,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.copyU16(2, from, to)
+}
+
+@inline(never)
+public func portCopyU16ConstantCountLaneCount(
+    from: UnsafePointer<SIMDUInt16.Lane>,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.copy(count: SIMDUInt16.laneCount, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyU16ConstantCountLaneCount(
+    from: UnsafePointer<UInt16>,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.copyU16(HighwayReference.Nothrow.laneCountU16(), from, to)
+}
+
+@inline(never)
+public func portCopyU16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<SIMDUInt16.Lane>,
+    to: UnsafeMutablePointer<SIMDUInt16.Lane>
+) {
+    unsafe SIMDUInt16.copy(count: 2 * SIMDUInt16.laneCount, from: from, to: to)
+}
+
+@inline(never)
+public func highwayCopyU16ConstantCountTwiceLaneCount(
+    from: UnsafePointer<UInt16>,
+    to: UnsafeMutablePointer<UInt16>
+) {
+    unsafe HighwayReference.Nothrow.copyU16(2 * HighwayReference.Nothrow.laneCountU16(), from, to)
 }
 
 @inline(never)

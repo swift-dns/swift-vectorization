@@ -27,6 +27,28 @@ public func highwayReversedF16ConstantA() -> SIMDFloat16.Vector {
 }
 
 @inline(never)
+public func portByteSwappedF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+    SIMDFloat16.byteSwapped(a)
+}
+
+@inline(never)
+public func highwayByteSwappedF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.byteSwappedF16(a)
+}
+
+@inline(never)
+public func portByteSwappedF16ConstantA() -> SIMDFloat16.Vector {
+    SIMDFloat16.byteSwapped(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+}
+
+@inline(never)
+public func highwayByteSwappedF16ConstantA() -> SIMDFloat16.Vector {
+    HighwayReference.Nothrow.byteSwappedF16(
+        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    )
+}
+
+@inline(never)
 public func portReversedBlocksF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
     SIMDFloat16.reversedBlocks(a)
 }

@@ -131,6 +131,22 @@ public func highwayMaskNarrowingF16ToI8(
 #endif
 
 @inline(never)
+public func portMaskNarrowingBF16ToI8(
+    narrowing a: SIMDBFloat16.Mask,
+    _ b: SIMDBFloat16.Mask
+) -> SIMDInt8.Mask {
+    SIMDInt8.mask(narrowing: a, b)
+}
+
+@inline(never)
+public func highwayMaskNarrowingBF16ToI8(
+    narrowing a: SIMDBFloat16.Mask,
+    _ b: SIMDBFloat16.Mask
+) -> SIMDInt8.Mask {
+    SIMDInt8.Mask(raw: HighwayReference.Nothrow.maskNarrowingBF16ToI8(a.raw, b.raw))
+}
+
+@inline(never)
 public func portHalfMaskNarrowingU16ToI8(narrowing mask: SIMDUInt16.Mask) -> SIMDInt8.HalfMask {
     SIMDInt8.halfMask(narrowing: mask)
 }
@@ -163,6 +179,17 @@ public func highwayHalfMaskNarrowingF16ToI8(narrowing mask: SIMDFloat16.Mask) ->
     SIMDInt8.HalfMask(raw: HighwayReference.Nothrow.halfMaskNarrowingF16ToI8(mask.raw))
 }
 #endif
+
+@inline(never)
+public func portHalfMaskNarrowingBF16ToI8(narrowing mask: SIMDBFloat16.Mask) -> SIMDInt8.HalfMask {
+    SIMDInt8.halfMask(narrowing: mask)
+}
+
+@inline(never)
+public func highwayHalfMaskNarrowingBF16ToI8(narrowing mask: SIMDBFloat16.Mask) -> SIMDInt8.HalfMask
+{
+    SIMDInt8.HalfMask(raw: HighwayReference.Nothrow.halfMaskNarrowingBF16ToI8(mask.raw))
+}
 
 @inline(never)
 public func portQuarterMaskNarrowingU32ToI8(narrowing mask: SIMDUInt32.Mask) -> SIMDInt8.QuarterMask

@@ -7,6 +7,194 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
+    private func checkShiftedLeftBytesConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("shiftedLeftBytes with a repeating \(hex(value))")
+        let bytesInputs = Array(0...16)
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        for bytes in bytesInputs {
+            mismatches.check(
+                H.shiftedLeftBytes(H.repeating(value), by: bytes),
+                HighwayReference.shiftedLeftBytesF64(
+                    H.repeating(value),
+                    Int32(truncatingIfNeeded: bytes)
+                ),
+                "bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedLeftBytesConstantSplatZero() {
+        checkShiftedLeftBytesConstantA(0.0)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatNegativeZero() {
+        checkShiftedLeftBytesConstantA(-0.0)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatOne() {
+        checkShiftedLeftBytesConstantA(1.0)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinusOne() {
+        checkShiftedLeftBytesConstantA(-1.0)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatTwo() {
+        checkShiftedLeftBytesConstantA(2.0)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatHalf() {
+        checkShiftedLeftBytesConstantA(0.5)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatFour() {
+        checkShiftedLeftBytesConstantA(4.0)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatQuarter() {
+        checkShiftedLeftBytesConstantA(0.25)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatOnePointFive() {
+        checkShiftedLeftBytesConstantA(1.5)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinusTwoPointFive() {
+        checkShiftedLeftBytesConstantA(-2.5)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatInfinity() {
+        checkShiftedLeftBytesConstantA(.infinity)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinusInfinity() {
+        checkShiftedLeftBytesConstantA(-.infinity)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatNaN() {
+        checkShiftedLeftBytesConstantA(.nan)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinusNaN() {
+        checkShiftedLeftBytesConstantA(-.nan)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatPayloadNaN() {
+        checkShiftedLeftBytesConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func shiftedLeftBytesConstantSplatSignalingNaN() {
+        checkShiftedLeftBytesConstantA(.signalingNaN)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatMinusSignalingNaN() {
+        checkShiftedLeftBytesConstantA(-.signalingNaN)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatLeastNonzero() {
+        checkShiftedLeftBytesConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func shiftedLeftBytesConstantSplatGreatest() {
+        checkShiftedLeftBytesConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkShiftedRightBytesConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("shiftedRightBytes with a repeating \(hex(value))")
+        let bytesInputs = Array(0...16)
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        for bytes in bytesInputs {
+            mismatches.check(
+                H.shiftedRightBytes(H.repeating(value), by: bytes),
+                HighwayReference.shiftedRightBytesF64(
+                    H.repeating(value),
+                    Int32(truncatingIfNeeded: bytes)
+                ),
+                "bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func shiftedRightBytesConstantSplatZero() {
+        checkShiftedRightBytesConstantA(0.0)
+    }
+
+    @Test func shiftedRightBytesConstantSplatNegativeZero() {
+        checkShiftedRightBytesConstantA(-0.0)
+    }
+
+    @Test func shiftedRightBytesConstantSplatOne() {
+        checkShiftedRightBytesConstantA(1.0)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinusOne() {
+        checkShiftedRightBytesConstantA(-1.0)
+    }
+
+    @Test func shiftedRightBytesConstantSplatTwo() {
+        checkShiftedRightBytesConstantA(2.0)
+    }
+
+    @Test func shiftedRightBytesConstantSplatHalf() {
+        checkShiftedRightBytesConstantA(0.5)
+    }
+
+    @Test func shiftedRightBytesConstantSplatFour() {
+        checkShiftedRightBytesConstantA(4.0)
+    }
+
+    @Test func shiftedRightBytesConstantSplatQuarter() {
+        checkShiftedRightBytesConstantA(0.25)
+    }
+
+    @Test func shiftedRightBytesConstantSplatOnePointFive() {
+        checkShiftedRightBytesConstantA(1.5)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinusTwoPointFive() {
+        checkShiftedRightBytesConstantA(-2.5)
+    }
+
+    @Test func shiftedRightBytesConstantSplatInfinity() {
+        checkShiftedRightBytesConstantA(.infinity)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinusInfinity() {
+        checkShiftedRightBytesConstantA(-.infinity)
+    }
+
+    @Test func shiftedRightBytesConstantSplatNaN() {
+        checkShiftedRightBytesConstantA(.nan)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinusNaN() {
+        checkShiftedRightBytesConstantA(-.nan)
+    }
+
+    @Test func shiftedRightBytesConstantSplatPayloadNaN() {
+        checkShiftedRightBytesConstantA(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func shiftedRightBytesConstantSplatSignalingNaN() {
+        checkShiftedRightBytesConstantA(.signalingNaN)
+    }
+
+    @Test func shiftedRightBytesConstantSplatMinusSignalingNaN() {
+        checkShiftedRightBytesConstantA(-.signalingNaN)
+    }
+
+    @Test func shiftedRightBytesConstantSplatLeastNonzero() {
+        checkShiftedRightBytesConstantA(.leastNonzeroMagnitude)
+    }
+
+    @Test func shiftedRightBytesConstantSplatGreatest() {
+        checkShiftedRightBytesConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
     private func checkShiftedLeftLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedLeftLanes with lanes \(lanes)")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2EE4_159A_3400_3F09)
@@ -296,6 +484,141 @@ extension SIMDDoubleConstantTests {
 
     @Test func shiftedRightLanesConstantSplatGreatest() {
         checkShiftedRightLanesConstantA(.greatestFiniteMagnitude)
+    }
+
+    @inline(__always)
+    private func checkCombinedShiftedRightBytesConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("combinedShiftedRightBytes with a repeating \(hex(value))")
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7B27_5561_FAEE_6474)
+        let bytesInputs = Array(1...15)
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        for (b, bytes) in everyPair(bInputs, bytesInputs) {
+            mismatches.check(
+                H.combinedShiftedRightBytes(H.repeating(value), b, by: bytes),
+                HighwayReference.combinedShiftedRightBytesF64(
+                    H.repeating(value),
+                    b,
+                    Int32(truncatingIfNeeded: bytes)
+                ),
+                "b: \(describe(b)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @inline(__always)
+    private func checkCombinedShiftedRightBytesConstantB(_ value: H.Lane) {
+        let mismatches = Mismatches("combinedShiftedRightBytes with b repeating \(hex(value))")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x940C_BB62_08B8_FBE6)
+        let bytesInputs = Array(1...15)
+        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        for (a, bytes) in everyPair(aInputs, bytesInputs) {
+            mismatches.check(
+                H.combinedShiftedRightBytes(a, H.repeating(value), by: bytes),
+                HighwayReference.combinedShiftedRightBytesF64(
+                    a,
+                    H.repeating(value),
+                    Int32(truncatingIfNeeded: bytes)
+                ),
+                "a: \(describe(a)), bytes: \(bytes)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatZero() {
+        checkCombinedShiftedRightBytesConstantA(0.0)
+        checkCombinedShiftedRightBytesConstantB(0.0)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatNegativeZero() {
+        checkCombinedShiftedRightBytesConstantA(-0.0)
+        checkCombinedShiftedRightBytesConstantB(-0.0)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatOne() {
+        checkCombinedShiftedRightBytesConstantA(1.0)
+        checkCombinedShiftedRightBytesConstantB(1.0)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinusOne() {
+        checkCombinedShiftedRightBytesConstantA(-1.0)
+        checkCombinedShiftedRightBytesConstantB(-1.0)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatTwo() {
+        checkCombinedShiftedRightBytesConstantA(2.0)
+        checkCombinedShiftedRightBytesConstantB(2.0)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatHalf() {
+        checkCombinedShiftedRightBytesConstantA(0.5)
+        checkCombinedShiftedRightBytesConstantB(0.5)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatFour() {
+        checkCombinedShiftedRightBytesConstantA(4.0)
+        checkCombinedShiftedRightBytesConstantB(4.0)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatQuarter() {
+        checkCombinedShiftedRightBytesConstantA(0.25)
+        checkCombinedShiftedRightBytesConstantB(0.25)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatOnePointFive() {
+        checkCombinedShiftedRightBytesConstantA(1.5)
+        checkCombinedShiftedRightBytesConstantB(1.5)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinusTwoPointFive() {
+        checkCombinedShiftedRightBytesConstantA(-2.5)
+        checkCombinedShiftedRightBytesConstantB(-2.5)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatInfinity() {
+        checkCombinedShiftedRightBytesConstantA(.infinity)
+        checkCombinedShiftedRightBytesConstantB(.infinity)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinusInfinity() {
+        checkCombinedShiftedRightBytesConstantA(-.infinity)
+        checkCombinedShiftedRightBytesConstantB(-.infinity)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatNaN() {
+        checkCombinedShiftedRightBytesConstantA(.nan)
+        checkCombinedShiftedRightBytesConstantB(.nan)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinusNaN() {
+        checkCombinedShiftedRightBytesConstantA(-.nan)
+        checkCombinedShiftedRightBytesConstantB(-.nan)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatPayloadNaN() {
+        checkCombinedShiftedRightBytesConstantA(H.Lane(nan: 1, signaling: false))
+        checkCombinedShiftedRightBytesConstantB(H.Lane(nan: 1, signaling: false))
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatSignalingNaN() {
+        checkCombinedShiftedRightBytesConstantA(.signalingNaN)
+        checkCombinedShiftedRightBytesConstantB(.signalingNaN)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatMinusSignalingNaN() {
+        checkCombinedShiftedRightBytesConstantA(-.signalingNaN)
+        checkCombinedShiftedRightBytesConstantB(-.signalingNaN)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatLeastNonzero() {
+        checkCombinedShiftedRightBytesConstantA(.leastNonzeroMagnitude)
+        checkCombinedShiftedRightBytesConstantB(.leastNonzeroMagnitude)
+    }
+
+    @Test func combinedShiftedRightBytesConstantSplatGreatest() {
+        checkCombinedShiftedRightBytesConstantA(.greatestFiniteMagnitude)
+        checkCombinedShiftedRightBytesConstantB(.greatestFiniteMagnitude)
     }
 
     @inline(__always)

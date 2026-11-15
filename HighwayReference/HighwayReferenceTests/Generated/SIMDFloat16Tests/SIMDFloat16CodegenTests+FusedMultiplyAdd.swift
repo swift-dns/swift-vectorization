@@ -86,7 +86,7 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portNegatedMultiplyAddingF16ConstantA")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7B40_78A4_5884_E341)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7B40_75A4_5884_DE28)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(in: b) {
+        for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplyAddingF16ConstantA(b, c),
                 highwayNegatedMultiplyAddingF16ConstantA(b, c),
@@ -100,7 +100,7 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portNegatedMultiplyAddingF16ConstantB")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x61ED_F2A4_4A5D_438F)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x61ED_F4A4_4A5D_46F5)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(in: a) {
+        for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplyAddingF16ConstantB(a, c),
                 highwayNegatedMultiplyAddingF16ConstantB(a, c),
@@ -114,7 +114,7 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portNegatedMultiplyAddingF16ConstantC")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x69A9_29A4_4E7A_81E4)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x69A9_2AA4_4E7A_8397)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(in: a, b) {
+        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplyAddingF16ConstantC(a, b),
                 highwayNegatedMultiplyAddingF16ConstantC(a, b),
@@ -202,7 +202,7 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portNegatedMultiplySubtractingF16ConstantA")
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2E1B_428E_D1CD_8A9C)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2E1B_458E_D1CD_8FB5)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(in: b) {
+        for (b, c) in everyPair(bInputs, cInputs) where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplySubtractingF16ConstantA(b, c),
                 highwayNegatedMultiplySubtractingF16ConstantA(b, c),
@@ -216,7 +216,7 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portNegatedMultiplySubtractingF16ConstantB")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x476D_C88E_DFF5_2A4E)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x476D_C68E_DFF5_26E8)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(in: a) {
+        for (a, c) in everyPair(aInputs, cInputs) where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplySubtractingF16ConstantB(a, c),
                 highwayNegatedMultiplySubtractingF16ConstantB(a, c),
@@ -230,7 +230,7 @@ extension SIMDFloat16CodegenTests {
         let mismatches = Mismatches("portNegatedMultiplySubtractingF16ConstantC")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3E6B_918E_DAC1_7659)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3E6B_908E_DAC1_74A6)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(in: a, b) {
+        for (a, b) in everyPair(aInputs, bInputs) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplySubtractingF16ConstantC(a, b),
                 highwayNegatedMultiplySubtractingF16ConstantC(a, b),

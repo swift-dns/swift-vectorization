@@ -18,7 +18,7 @@ extension SIMDInt32ConstantTests {
                     raw: HighwayReference.shiftedLeftWhereTemplateI32(
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
@@ -174,7 +174,7 @@ extension SIMDInt32ConstantTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
@@ -323,7 +323,7 @@ extension SIMDInt32ConstantTests {
                     raw: HighwayReference.shiftedRightWhereTemplateI32(
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
@@ -479,7 +479,7 @@ extension SIMDInt32ConstantTests {
                         otherwise.raw,
                         mask.raw,
                         a.raw,
-                        Int32(truncatingIfNeeded: bits)
+                        Int32(clamping: bits)
                     )
                 ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"

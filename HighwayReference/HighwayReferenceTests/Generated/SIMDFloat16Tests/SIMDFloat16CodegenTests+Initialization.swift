@@ -39,6 +39,18 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func nan() {
+        let mismatches = Mismatches("portNanF16")
+        mismatches.check(portNanF16(), highwayNanF16(), "")
+        mismatches.record()
+    }
+
+    @Test func infinity() {
+        let mismatches = Mismatches("portInfinityF16")
+        mismatches.check(portInfinityF16(), highwayInfinityF16(), "")
+        mismatches.record()
+    }
+
     @Test func unspecified() {
         let mismatches = Mismatches("portUnspecifiedF16")
         _ = portUnspecifiedF16()

@@ -4,6 +4,105 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
+public func portTableLookupBytesF64(
+    _ a: SIMDDouble.Vector,
+    atUnchecked indices: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.tableLookupBytes(a, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupBytesF64(
+    _ a: SIMDDouble.Vector,
+    atUnchecked indices: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.tableLookupBytesF64(a, indices)
+}
+
+@inline(never)
+public func portTableLookupBytesF64ConstantA(
+    atUnchecked indices: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.tableLookupBytes(SIMDDouble.repeating(1.5), atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupBytesF64ConstantA(
+    atUnchecked indices: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.tableLookupBytesF64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        indices
+    )
+}
+
+@inline(never)
+public func portTableLookupBytesF64ConstantIndices(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.tableLookupBytes(a, atUnchecked: SIMDDouble.repeating(Double(bitPattern: 3)))
+}
+
+@inline(never)
+public func highwayTableLookupBytesF64ConstantIndices(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.tableLookupBytesF64(
+        a,
+        HighwayReference.Nothrow.repeatingF64(Double(bitPattern: 3))
+    )
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroF64(
+    _ a: SIMDDouble.Vector,
+    atUnchecked indices: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.tableLookupBytesOrZero(a, atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroF64(
+    _ a: SIMDDouble.Vector,
+    atUnchecked indices: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.tableLookupBytesOrZeroF64(a, indices)
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroF64ConstantA(
+    atUnchecked indices: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.tableLookupBytesOrZero(SIMDDouble.repeating(1.5), atUnchecked: indices)
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroF64ConstantA(
+    atUnchecked indices: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.tableLookupBytesOrZeroF64(
+        HighwayReference.Nothrow.repeatingF64(1.5),
+        indices
+    )
+}
+
+@inline(never)
+public func portTableLookupBytesOrZeroF64ConstantIndices(
+    _ a: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    unsafe SIMDDouble.tableLookupBytesOrZero(
+        a,
+        atUnchecked: SIMDDouble.repeating(Double(bitPattern: 3))
+    )
+}
+
+@inline(never)
+public func highwayTableLookupBytesOrZeroF64ConstantIndices(
+    _ a: SIMDDouble.Vector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.tableLookupBytesOrZeroF64(
+        a,
+        HighwayReference.Nothrow.repeatingF64(Double(bitPattern: 3))
+    )
+}
+
+@inline(never)
 public func portPairwiseAddingBlocksF64(
     _ a: SIMDDouble.Vector,
     _ b: SIMDDouble.Vector

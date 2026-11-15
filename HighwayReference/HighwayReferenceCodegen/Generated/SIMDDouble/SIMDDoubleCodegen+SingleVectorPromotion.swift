@@ -333,3 +333,21 @@ public func highwayVectorWideningQuarterF16ToF64(
     HighwayReference.Nothrow.vectorWideningQuarterF16ToF64(a.raw)
 }
 #endif
+
+#if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portVectorWideningLowerHalfF16ToF64(
+    wideningLower a: SIMDFloat16.HalfVector
+) -> SIMDDouble.Vector {
+    SIMDDouble.vector(wideningLower: a)
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwayVectorWideningLowerHalfF16ToF64(
+    wideningLower a: SIMDFloat16.HalfVector
+) -> SIMDDouble.Vector {
+    HighwayReference.Nothrow.vectorWideningLowerHalfF16ToF64(a.raw)
+}
+#endif

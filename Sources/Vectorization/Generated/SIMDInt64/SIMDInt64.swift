@@ -128,6 +128,13 @@ public enum SIMDInt64: SIMDElement, SIMDIntegerElement, SendableMetatype {
     @export(implementation) @inline(always)
     public static var canReverse8: Bool { cvectorization_ops_can_reverse8_i64() }
 
+    @export(implementation) @inline(always)
+    package static func indexLimit(count: Int, stride: Int) -> Int {
+        guard count > 0 else { return 0 }
+        let lanes = Swift.min(UInt64(count), (1 << 63) / UInt64(stride) + 1)
+        return Int(truncatingIfNeeded: Swift.min((lanes - 1) * UInt64(stride) + 1, 1 << 63))
+    }
+
 }
 
 @available(*, unavailable)

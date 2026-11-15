@@ -22,12 +22,44 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func maximumWhereNonCanonical() {
+        let mismatches = Mismatches("maximumWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2915_2142_7C11_F8D8)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2915_2242_7C11_FA8B)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2915_2342_7C11_FC3E)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x2492_C4B3_31EA_1F94)
+        {
+            mismatches.check(
+                H.maximum(a, b, where: mask),
+                H.Vector(raw: HighwayReference.maximumWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func addingWhere() {
         let mismatches = Mismatches("addingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x53DA_C9F3_FF32_7660)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x53DA_CAF3_FF32_7813)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x53DA_CBF3_FF32_79C6)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x2626_0F83_F52F_A35C)
+        {
+            mismatches.check(
+                H.adding(a, b, where: mask),
+                H.Vector(raw: HighwayReference.addingWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func addingWhereNonCanonical() {
+        let mismatches = Mismatches("addingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xE011_B0E4_EE22_88DF)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE011_AFE4_EE22_872C)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE011_B2E4_EE22_8C45)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x0B67_950A_0652_AB79)
         {
             mismatches.check(
                 H.adding(a, b, where: mask),
@@ -54,12 +86,44 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func subtractingWhereNonCanonical() {
+        let mismatches = Mismatches("subtractingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xAE6E_F630_E5EB_0316)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAE6E_F730_E5EB_04C9)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAE6E_F430_E5EA_FFB0)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x1FFB_5E63_8A03_2B12)
+        {
+            mismatches.check(
+                H.subtracting(a, b, where: mask),
+                H.Vector(raw: HighwayReference.subtractingWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplyingWhere() {
         let mismatches = Mismatches("multiplyingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x75BF_B12A_7E2F_4CF5)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x75BF_B02A_7E2F_4B42)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x75BF_AF2A_7E2F_498F)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x679D_E241_08A2_A227)
+        {
+            mismatches.check(
+                H.multiplying(a, b, where: mask),
+                H.Vector(raw: HighwayReference.multiplyingWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplyingWhereNonCanonical() {
+        let mismatches = Mismatches("multiplyingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB54B_55E8_CBF1_CA32)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB54B_56E8_CBF1_CBE5)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB54B_53E8_CBF1_C6CC)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x0B59_6335_F491_79F6)
         {
             mismatches.check(
                 H.multiplying(a, b, where: mask),
@@ -94,6 +158,30 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func dividingWhereNonCanonical() {
+        let mismatches = Mismatches("dividingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xEAB0_8182_55DF_0A22)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEAB0_8282_55DF_0BD5)
+        let bInputs =
+            Inputs.vectors(H.Vector.self, seed: 0xEAB0_7F82_55DF_06BC)
+            + Inputs.vectors(H.Vector.self, seed: 0x6E65_5A3A_CB2A_D9FB).enumerated().map {
+                index,
+                vector in
+                H.Vector(
+                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
+                )
+            }
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xC60F_BAAC_E8AC_9B66)
+        {
+            mismatches.check(
+                H.dividing(a, b, where: mask),
+                H.Vector(raw: HighwayReference.dividingWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func saturatingAddingWhere() {
         let mismatches = Mismatches("saturatingAddingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB88B_1E4C_AA6A_A3EA)
@@ -110,12 +198,46 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func saturatingAddingWhereNonCanonical() {
+        let mismatches = Mismatches("saturatingAddingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xF613_A727_C67D_88C1)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF613_A627_C67D_870E)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF613_A527_C67D_855B)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xD9A6_E3A4_91E1_773B)
+        {
+            mismatches.check(
+                H.saturatingAdding(a, b, where: mask),
+                H.Vector(raw: HighwayReference.saturatingAddingWhereU8(mask.raw, a.raw, b.raw)),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func saturatingSubtractingWhere() {
         let mismatches = Mismatches("saturatingSubtractingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2C70_7D49_88A1_394F)
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2C70_7C49_88A1_379C)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2C70_7F49_88A1_3CB5)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xB439_0D53_B4DF_BC29)
+        {
+            mismatches.check(
+                H.saturatingSubtracting(a, b, where: mask),
+                H.Vector(
+                    raw: HighwayReference.saturatingSubtractingWhereU8(mask.raw, a.raw, b.raw)
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingSubtractingWhereNonCanonical() {
+        let mismatches = Mismatches("saturatingSubtractingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7561_1C04_538A_5FDC)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7561_1D04_538A_618F)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7561_1E04_538A_6342)
+        for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x3CEF_CE87_A826_C630)
         {
             mismatches.check(
                 H.saturatingSubtracting(a, b, where: mask),
@@ -152,6 +274,30 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func multiplyAddingWhereNonCanonical() {
+        let mismatches = Mismatches("multiplyAddingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1A61_C80D_D70B_E8BF)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A61_C70D_D70B_E70C)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1A61_CA0D_D70B_EC25)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x1A61_C90D_D70B_EA72)
+        for (mask, a, b, c) in mixedQuadruples(
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0x7301_B32B_64CD_B359
+        ) {
+            mismatches.check(
+                H.multiplyAdding(a, b, c, where: mask),
+                H.Vector(
+                    raw: HighwayReference.multiplyAddingWhereU8(mask.raw, a.raw, b.raw, c.raw)
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func multiplySubtractingWhere() {
         let mismatches = Mismatches("multiplySubtractingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFDC8_0808_254C_BCB1)
@@ -164,6 +310,30 @@ extension SIMDUInt8ReferenceTests {
             bInputs,
             cInputs,
             seed: 0x2154_8026_0CC1_0EEB
+        ) {
+            mismatches.check(
+                H.multiplySubtracting(a, b, c, where: mask),
+                H.Vector(
+                    raw: HighwayReference.multiplySubtractingWhereU8(mask.raw, a.raw, b.raw, c.raw)
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func multiplySubtractingWhereNonCanonical() {
+        let mismatches = Mismatches("multiplySubtractingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB09A_0D40_26AA_A776)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB09A_0E40_26AA_A929)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB09A_0B40_26AA_A410)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xB09A_0C40_26AA_A5C3)
+        for (mask, a, b, c) in mixedQuadruples(
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0xAA8F_B2DF_6CCA_9FF2
         ) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask),
@@ -205,6 +375,35 @@ extension SIMDUInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func negatedMultiplyAddingWhereNonCanonical() {
+        let mismatches = Mismatches("negatedMultiplyAddingWhere with masks from arbitrary vectors")
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4D76_93D1_5D74_1887)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4D76_92D1_5D74_16D4)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4D76_95D1_5D74_1BED)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4D76_94D1_5D74_1A3A)
+        for (mask, a, b, c) in mixedQuadruples(
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0x4AEF_C11E_F958_E681
+        ) {
+            mismatches.check(
+                H.negatedMultiplyAdding(a, b, c, where: mask),
+                H.Vector(
+                    raw: HighwayReference.negatedMultiplyAddingWhereU8(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func negatedMultiplySubtractingWhere() {
         let mismatches = Mismatches("negatedMultiplySubtractingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA0DA_666C_237B_3D29)
@@ -217,6 +416,37 @@ extension SIMDUInt8ReferenceTests {
             bInputs,
             cInputs,
             seed: 0x688A_0825_FA71_C663
+        ) {
+            mismatches.check(
+                H.negatedMultiplySubtracting(a, b, c, where: mask),
+                H.Vector(
+                    raw: HighwayReference.negatedMultiplySubtractingWhereU8(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
+                "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func negatedMultiplySubtractingWhereNonCanonical() {
+        let mismatches = Mismatches(
+            "negatedMultiplySubtractingWhere with masks from arbitrary vectors"
+        )
+        let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xDB12_C1B0_396A_B7AE)
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDB12_C2B0_396A_B961)
+        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDB12_BFB0_396A_B448)
+        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDB12_C0B0_396A_B5FB)
+        for (mask, a, b, c) in mixedQuadruples(
+            maskInputs,
+            aInputs,
+            bInputs,
+            cInputs,
+            seed: 0xC39F_F745_A13D_330A
         ) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask),

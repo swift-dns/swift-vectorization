@@ -7,6 +7,103 @@ extension SIMDFloat {
     public static func scatter(
         _ a: Vector,
         to: UnsafeMutablePointer<Lane>,
+        byteOffsets: SIMDInt32.Vector
+    ) {
+        unsafe cvectorization_ops_scatter_byte_offsets_f32(a, to, byteOffsets.raw)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        to span: inout MutableSpan<Lane>,
+        byteOffsets: SIMDInt32.Vector
+    ) {
+        precondition(
+            cvectorization_ops_indices_within_i32(
+                byteOffsets.raw,
+                0,
+                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
+            ),
+            "Byte offset is negative or leaves no room for a lane in the span"
+        )
+        unsafe scatter(a, toUnchecked: &span, byteOffsets: byteOffsets)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        toUnchecked span: inout MutableSpan<Lane>,
+        byteOffsets: SIMDInt32.Vector
+    ) {
+        assert(
+            cvectorization_ops_indices_within_i32(
+                byteOffsets.raw,
+                0,
+                SIMDInt32.indexLimit(count: span.count, stride: MemoryLayout<Lane>.stride)
+            ),
+            "Byte offset is negative or leaves no room for a lane in the span"
+        )
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_scatter_byte_offsets_f32(a, $0.baseAddress, byteOffsets.raw)
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        to: UnsafeMutablePointer<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int
+    ) {
+        unsafe cvectorization_ops_scatter_first_f32(a, to, indices.raw, count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        to span: inout MutableSpan<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int
+    ) {
+        precondition(
+            cvectorization_ops_indices_within_where_f32(
+                indices.raw,
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        unsafe scatter(a, toUnchecked: &span, indices: indices, count: count)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        toUnchecked span: inout MutableSpan<Lane>,
+        indices: SIMDInt32.Vector,
+        count: Int
+    ) {
+        assert(
+            cvectorization_ops_indices_within_where_f32(
+                indices.raw,
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
+                firstLanes(count: count).raw
+            ),
+            "Index is negative or past the end of the span, for a lane in use"
+        )
+        span.withUnsafeMutableBufferPointer {
+            unsafe cvectorization_ops_scatter_first_f32(a, $0.baseAddress, indices.raw, count)
+        }
+    }
+
+    @export(implementation) @inline(always)
+    public static func scatter(
+        _ a: Vector,
+        to: UnsafeMutablePointer<Lane>,
         indices: SIMDInt32.Vector,
         where mask: Mask
     ) {
@@ -24,7 +121,7 @@ extension SIMDFloat {
         precondition(
             cvectorization_ops_indices_within_where_f32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -43,7 +140,7 @@ extension SIMDFloat {
         assert(
             cvectorization_ops_indices_within_where_f32(
                 indices.raw,
-                Swift.min(span.count, 1 << 31),
+                SIMDInt32.indexLimit(count: span.count, stride: 1),
                 mask.raw
             ),
             "Index is negative or past the end of the span, for a lane in use"
@@ -1392,4 +1489,12 @@ extension SIMDFloat {
         cvectorization_ops_vector_widening_odd_bf16_to_f32(a.raw)
     }
 
+    #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+    @available(SwiftStdlib 5.3, *)
+    @export(implementation) @inline(always)
+    public static func zippingLower(_ a: SIMDFloat16.Vector, _ b: SIMDFloat16.Vector) -> Vector {
+        cvectorization_ops_zipping_lower_f16_to_f32(a, b)
+    }
+
+    #endif
 }

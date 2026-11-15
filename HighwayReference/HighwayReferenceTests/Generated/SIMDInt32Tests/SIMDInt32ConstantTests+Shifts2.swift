@@ -14,10 +14,7 @@ extension SIMDInt32ConstantTests {
             mismatches.check(
                 H.rotatedRight(a, by: bits),
                 H.Vector(
-                    raw: HighwayReference.rotatedRightTemplateI32(
-                        a.raw,
-                        Int32(truncatingIfNeeded: bits)
-                    )
+                    raw: HighwayReference.rotatedRightTemplateI32(a.raw, Int32(clamping: bits))
                 ),
                 "a: \(describe(a))"
             )

@@ -23,6 +23,28 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func halfVectorClampingFromUInt16Resized() {
+        let mismatches = Mismatches(
+            "halfVectorClampingFromUInt16 resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.integerDemotions(
+            SIMDUInt16.Vector.self,
+            to: H.Lane.self,
+            seed: 0x58CE_8474_9386_0408
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 2),
+                    H.vector(resizing: H.halfVector(clamping: a))
+                ),
+                H.Vector(raw: HighwayReference.resizedHalfVectorClampingU16ToI8(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func halfVectorClampingFromInt16() {
         let mismatches = Mismatches("halfVectorClampingFromInt16")
         let aInputs = Inputs.integerDemotions(
@@ -34,6 +56,28 @@ extension SIMDInt8ReferenceTests {
             mismatches.check(
                 H.halfVector(clamping: a),
                 H.HalfVector(raw: HighwayReference.halfVectorClampingI16ToI8(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func halfVectorClampingFromInt16Resized() {
+        let mismatches = Mismatches(
+            "halfVectorClampingFromInt16 resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.integerDemotions(
+            SIMDInt16.Vector.self,
+            to: H.Lane.self,
+            seed: 0x12F9_7596_A153_10DF
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 2),
+                    H.vector(resizing: H.halfVector(clamping: a))
+                ),
+                H.Vector(raw: HighwayReference.resizedHalfVectorClampingI16ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -241,6 +285,28 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func quarterVectorClampingFromUInt32Resized() {
+        let mismatches = Mismatches(
+            "quarterVectorClampingFromUInt32 resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.integerDemotions(
+            SIMDUInt32.Vector.self,
+            to: H.Lane.self,
+            seed: 0x9D1A_7AAB_DEEE_11C3
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 4),
+                    H.vector(resizing: H.quarterVector(clamping: a))
+                ),
+                H.Vector(raw: HighwayReference.resizedQuarterVectorClampingU32ToI8(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func quarterVectorClampingFromInt32() {
         let mismatches = Mismatches("quarterVectorClampingFromInt32")
         let aInputs = Inputs.integerDemotions(
@@ -252,6 +318,28 @@ extension SIMDInt8ReferenceTests {
             mismatches.check(
                 H.quarterVector(clamping: a),
                 H.QuarterVector(raw: HighwayReference.quarterVectorClampingI32ToI8(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func quarterVectorClampingFromInt32Resized() {
+        let mismatches = Mismatches(
+            "quarterVectorClampingFromInt32 resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.integerDemotions(
+            SIMDInt32.Vector.self,
+            to: H.Lane.self,
+            seed: 0x3C3F_F5DB_6D82_6E12
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 4),
+                    H.vector(resizing: H.quarterVector(clamping: a))
+                ),
+                H.Vector(raw: HighwayReference.resizedQuarterVectorClampingI32ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -463,6 +551,28 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func eighthVectorClampingFromUInt64Resized() {
+        let mismatches = Mismatches(
+            "eighthVectorClampingFromUInt64 resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.integerDemotions(
+            SIMDUInt64.Vector.self,
+            to: H.Lane.self,
+            seed: 0x1883_C140_EAF5_826F
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 8),
+                    H.vector(resizing: H.eighthVector(clamping: a))
+                ),
+                H.Vector(raw: HighwayReference.resizedEighthVectorClampingU64ToI8(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func eighthVectorClampingFromInt64() {
         let mismatches = Mismatches("eighthVectorClampingFromInt64")
         let aInputs = Inputs.integerDemotions(
@@ -474,6 +584,28 @@ extension SIMDInt8ReferenceTests {
             mismatches.check(
                 H.eighthVector(clamping: a),
                 H.EighthVector(raw: HighwayReference.eighthVectorClampingI64ToI8(a.raw)),
+                "a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func eighthVectorClampingFromInt64Resized() {
+        let mismatches = Mismatches(
+            "eighthVectorClampingFromInt64 resized with its unspecified lanes zeroed"
+        )
+        let aInputs = Inputs.integerDemotions(
+            SIMDInt64.Vector.self,
+            to: H.Lane.self,
+            seed: 0xA7AB_8AA9_4176_DEEC
+        )
+        for a in aInputs {
+            mismatches.check(
+                H.selectingOrZero(
+                    H.firstLanes(count: H.laneCount / 8),
+                    H.vector(resizing: H.eighthVector(clamping: a))
+                ),
+                H.Vector(raw: HighwayReference.resizedEighthVectorClampingI64ToI8(a.raw)),
                 "a: \(describe(a))"
             )
         }

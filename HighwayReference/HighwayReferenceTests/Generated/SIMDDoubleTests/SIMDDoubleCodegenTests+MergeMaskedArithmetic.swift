@@ -908,7 +908,7 @@ extension SIMDDoubleCodegenTests {
             bInputs,
             cInputs,
             seed: 0xAA8F_1DAE_52AD_5CCC
-        ) where !hasNaNs(in: b) {
+        ) where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF64ConstantA(
                     b,
@@ -940,7 +940,7 @@ extension SIMDDoubleCodegenTests {
             aInputs,
             cInputs,
             seed: 0xC852_D105_CD99_BCF7
-        ) where !hasNaNs(in: a) {
+        ) where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF64ConstantB(
                     a,
@@ -972,7 +972,7 @@ extension SIMDDoubleCodegenTests {
             aInputs,
             bInputs,
             seed: 0xB486_3EF2_3E21_061E
-        ) where !hasNaNs(in: a, b) {
+        ) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereOtherwiseF64ConstantC(
                     a,
@@ -1080,7 +1080,7 @@ extension SIMDDoubleCodegenTests {
                 bInputs,
                 cInputs,
                 seed: 0x396B_630C_7294_6AE5
-            ) where !hasNaNs(in: b) {
+            ) where !hasNaNs(negating: b) {
                 mismatches.check(
                     portNegatedMultiplySubtractingWhereOtherwiseF64ConstantA(
                         b,
@@ -1121,7 +1121,7 @@ extension SIMDDoubleCodegenTests {
                 aInputs,
                 cInputs,
                 seed: 0x266C_4937_6F7A_0146
-            ) where !hasNaNs(in: a) {
+            ) where !hasNaNs(negating: a) {
                 mismatches.check(
                     portNegatedMultiplySubtractingWhereOtherwiseF64ConstantB(
                         a,
@@ -1158,7 +1158,7 @@ extension SIMDDoubleCodegenTests {
             aInputs,
             bInputs,
             seed: 0x67FE_9A63_D4C5_EC9F
-        ) where !hasNaNs(in: a, b) {
+        ) where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplySubtractingWhereOtherwiseF64ConstantC(
                     a,

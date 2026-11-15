@@ -727,10 +727,10 @@ extension SIMDInt16 {
                 cvectorization_ops_indices_within_i16(
                     unsafe cvectorization_ops_load_indices_i16($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return unsafe loadIndices(fromUnchecked: span)
     }
@@ -744,10 +744,10 @@ extension SIMDInt16 {
                 cvectorization_ops_indices_within_i16(
                     unsafe cvectorization_ops_load_indices_i16($0.baseAddress.unsafelyUnwrapped),
                     0,
-                    laneCount
+                    2 * laneCount
                 )
             },
-            "Lane index is negative or at least as many as a vector has lanes"
+            "Lane index is negative or at least twice as many as a vector has lanes"
         )
         return span.withUnsafeBufferPointer {
             Indices(
@@ -1343,11 +1343,7 @@ extension SIMDInt16 {
     @export(implementation) @inline(always)
     public static func shiftedLeft(_ a: Vector, by bits: Int, where mask: Mask) -> Vector {
         Vector(
-            raw: cvectorization_ops_shifted_left_where_i16(
-                mask.raw,
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
+            raw: cvectorization_ops_shifted_left_where_i16(mask.raw, a.raw, Int32(clamping: bits))
         )
     }
 
@@ -1363,7 +1359,7 @@ extension SIMDInt16 {
                 otherwise.raw,
                 mask.raw,
                 a.raw,
-                Int32(truncatingIfNeeded: bits)
+                Int32(clamping: bits)
             )
         )
     }
@@ -1371,11 +1367,7 @@ extension SIMDInt16 {
     @export(implementation) @inline(always)
     public static func shiftedRight(_ a: Vector, by bits: Int, where mask: Mask) -> Vector {
         Vector(
-            raw: cvectorization_ops_shifted_right_where_i16(
-                mask.raw,
-                a.raw,
-                Int32(truncatingIfNeeded: bits)
-            )
+            raw: cvectorization_ops_shifted_right_where_i16(mask.raw, a.raw, Int32(clamping: bits))
         )
     }
 
@@ -1391,7 +1383,7 @@ extension SIMDInt16 {
                 otherwise.raw,
                 mask.raw,
                 a.raw,
-                Int32(truncatingIfNeeded: bits)
+                Int32(clamping: bits)
             )
         )
     }

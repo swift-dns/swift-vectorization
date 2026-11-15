@@ -423,7 +423,7 @@ extension SIMDFloat16CodegenTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF5B0_323B_1688_7325)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF5B0_313B_1688_7172)
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0x41A1_1750_5FF5_8059)
-        where !hasNaNs(in: b) {
+        where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereF16ConstantA(b, c, where: mask),
                 highwayNegatedMultiplyAddingWhereF16ConstantA(b, c, where: mask),
@@ -439,7 +439,7 @@ extension SIMDFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0F02_B63B_24B0_0F71)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x0F02_B43B_24B0_0C0B)
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0x1838_1505_72B9_5BDA)
-        where !hasNaNs(in: a) {
+        where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereF16ConstantB(a, c, where: mask),
                 highwayNegatedMultiplyAddingWhereF16ConstantB(a, c, where: mask),
@@ -455,7 +455,7 @@ extension SIMDFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0600_FD3B_1F7D_3196)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0600_FC3B_1F7D_2FE3)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4620_9751_8807_4D03)
-        where !hasNaNs(in: a, b) {
+        where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplyAddingWhereF16ConstantC(a, b, where: mask),
                 highwayNegatedMultiplyAddingWhereF16ConstantC(a, b, where: mask),
@@ -493,7 +493,7 @@ extension SIMDFloat16CodegenTests {
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7936_81D0_5DAA_2FC2)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7936_82D0_5DAA_3175)
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0xBB68_117C_573D_8FB0)
-        where !hasNaNs(in: b) {
+        where !hasNaNs(negating: b) {
             mismatches.check(
                 portNegatedMultiplySubtractingWhereF16ConstantA(b, c, where: mask),
                 highwayNegatedMultiplySubtractingWhereF16ConstantA(b, c, where: mask),
@@ -509,7 +509,7 @@ extension SIMDFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x80F1_B5D0_61C7_68FE)
         let cInputs = Inputs.vectors(H.Vector.self, seed: 0x80F1_B3D0_61C7_6598)
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0xD09A_EEE6_D2E2_88EB)
-        where !hasNaNs(in: a) {
+        where !hasNaNs(negating: a) {
             mismatches.check(
                 portNegatedMultiplySubtractingWhereF16ConstantB(a, c, where: mask),
                 highwayNegatedMultiplySubtractingWhereF16ConstantB(a, c, where: mask),
@@ -525,7 +525,7 @@ extension SIMDFloat16CodegenTests {
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8986_CED0_669E_1819)
         let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8986_CBD0_669E_1300)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xFCC2_F9B8_92ED_F9E2)
-        where !hasNaNs(in: a, b) {
+        where !hasNaNs(negating: a, b) {
             mismatches.check(
                 portNegatedMultiplySubtractingWhereF16ConstantC(a, b, where: mask),
                 highwayNegatedMultiplySubtractingWhereF16ConstantC(a, b, where: mask),

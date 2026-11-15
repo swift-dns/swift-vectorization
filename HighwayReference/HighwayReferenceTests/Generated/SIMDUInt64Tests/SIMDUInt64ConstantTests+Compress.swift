@@ -7,6 +7,161 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
+    private func checkCompressedConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("compressed with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA2C1_4DB9_86DB_E8D3)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for mask in maskInputs {
+            let port = H.compressed(H.repeating(value), where: mask)
+            let reference = H.Vector(
+                raw: HighwayReference.compressedU64(H.repeating(value).raw, mask.raw)
+            )
+            let checkedLanes =
+                HighwayReference.compressTailIsDeterministicU64() ? H.laneCount : H.trueCount(mask)
+            mismatches.check(
+                (0..<checkedLanes).map { port.simd[$0] },
+                (0..<checkedLanes).map { reference.simd[$0] },
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func compressedConstantSplat0() {
+        checkCompressedConstantA(0)
+    }
+
+    @Test func compressedConstantSplat1() {
+        checkCompressedConstantA(1)
+    }
+
+    @Test func compressedConstantSplat15() {
+        checkCompressedConstantA(15)
+    }
+
+    @Test func compressedConstantSplat16() {
+        checkCompressedConstantA(16)
+    }
+
+    @Test func compressedConstantSplat26() {
+        checkCompressedConstantA(26)
+    }
+
+    @Test func compressedConstantSplat127() {
+        checkCompressedConstantA(127)
+    }
+
+    @Test func compressedConstantSplat128() {
+        checkCompressedConstantA(128)
+    }
+
+    @Test func compressedConstantSplat255() {
+        checkCompressedConstantA(255)
+    }
+
+    @Test func compressedConstantSplat256() {
+        checkCompressedConstantA(256)
+    }
+
+    @Test func compressedConstantSplat257() {
+        checkCompressedConstantA(257)
+    }
+
+    @Test func compressedConstantSplat65280() {
+        checkCompressedConstantA(65280)
+    }
+
+    @Test func compressedConstantSplat65281() {
+        checkCompressedConstantA(65281)
+    }
+
+    @Test func compressedConstantSplatMax() {
+        checkCompressedConstantA(H.Lane.max)
+    }
+
+    @inline(__always)
+    private func checkCompressedNotConstantA(_ value: H.Lane) {
+        let mismatches = Mismatches("compressedNot with a repeating \(hex(value))")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE66E_05A1_9831_E3DC)
+        mismatches.check(
+            H.repeating(value),
+            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            "repeating"
+        )
+        for mask in maskInputs {
+            let port = H.compressedNot(H.repeating(value), where: mask)
+            let reference = H.Vector(
+                raw: HighwayReference.compressedNotU64(H.repeating(value).raw, mask.raw)
+            )
+            let checkedLanes =
+                HighwayReference.compressTailIsDeterministicU64()
+                ? H.laneCount : H.laneCount - H.trueCount(mask)
+            mismatches.check(
+                (0..<checkedLanes).map { port.simd[$0] },
+                (0..<checkedLanes).map { reference.simd[$0] },
+                "mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func compressedNotConstantSplat0() {
+        checkCompressedNotConstantA(0)
+    }
+
+    @Test func compressedNotConstantSplat1() {
+        checkCompressedNotConstantA(1)
+    }
+
+    @Test func compressedNotConstantSplat15() {
+        checkCompressedNotConstantA(15)
+    }
+
+    @Test func compressedNotConstantSplat16() {
+        checkCompressedNotConstantA(16)
+    }
+
+    @Test func compressedNotConstantSplat26() {
+        checkCompressedNotConstantA(26)
+    }
+
+    @Test func compressedNotConstantSplat127() {
+        checkCompressedNotConstantA(127)
+    }
+
+    @Test func compressedNotConstantSplat128() {
+        checkCompressedNotConstantA(128)
+    }
+
+    @Test func compressedNotConstantSplat255() {
+        checkCompressedNotConstantA(255)
+    }
+
+    @Test func compressedNotConstantSplat256() {
+        checkCompressedNotConstantA(256)
+    }
+
+    @Test func compressedNotConstantSplat257() {
+        checkCompressedNotConstantA(257)
+    }
+
+    @Test func compressedNotConstantSplat65280() {
+        checkCompressedNotConstantA(65280)
+    }
+
+    @Test func compressedNotConstantSplat65281() {
+        checkCompressedNotConstantA(65281)
+    }
+
+    @Test func compressedNotConstantSplatMax() {
+        checkCompressedNotConstantA(H.Lane.max)
+    }
+
+    @inline(__always)
     private func checkStoreCompressedConstantA(_ value: H.Lane) {
         let mismatches = Mismatches("storeCompressed with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE801_3567_F64A_D472)
