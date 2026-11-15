@@ -301,6 +301,40 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test(
+        .disabled(
+            if: SIMDTarget.memoryOpsMightFault,
+            "The lanes the mask leaves out can fault on this target"
+        )
+    )
+    func loadWhereMaskedOffPastGuardPage() {
+        let mismatches = Mismatches(
+            "loadWhere with the lanes the mask leaves out past a guard page"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9C6A_1DFF_3F95_26B3)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0x9C6A_1CFF_3F95_2500
+        )
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(lanesThroughLastTrue(of: mask)))
+            ) { source in
+                (
+                    unsafe H.load(from: source, where: mask),
+                    unsafe H.Vector(raw: HighwayReference.loadWhereI8(mask.raw, source))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadWhereNonCanonical() {
         let mismatches = Mismatches("loadWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xD696_5CA8_A309_1C74)
@@ -409,6 +443,48 @@ extension SIMDInt8ReferenceTests {
             seed: 0xC683_3424_77C6_59B6
         ) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.load(from: source, where: mask, otherwise: otherwise),
+                    unsafe H.Vector(
+                        raw: HighwayReference.loadWhereOtherwiseI8(otherwise.raw, mask.raw, source)
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(
+        .disabled(
+            if: SIMDTarget.memoryOpsMightFault,
+            "The lanes the mask leaves out can fault on this target"
+        )
+    )
+    func loadWhereOtherwiseMaskedOffPastGuardPage() {
+        let mismatches = Mismatches(
+            "loadWhereOtherwise with the lanes the mask leaves out past a guard page"
+        )
+        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xDC9B_0CA6_62CD_717D)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDC9B_0BA6_62CD_6FCA)
+        let fromInputs = Inputs.buffers(
+            H.Lane.self,
+            count: H.laneCount,
+            seed: 0xDC9B_0AA6_62CD_6E17
+        )
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0x1FFD_8E15_632B_95CF
+        ) {
+            let (portResult, referenceResult) = unsafe withGuardedLanes(
+                Array(from.prefix(lanesThroughLastTrue(of: mask)))
+            ) { source in
                 (
                     unsafe H.load(from: source, where: mask, otherwise: otherwise),
                     unsafe H.Vector(

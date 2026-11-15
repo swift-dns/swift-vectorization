@@ -826,6 +826,11 @@ package func poisoned<Indices: ReferenceVector>(
     return Indices(lanes)
 }
 
+package func lanesThroughLastTrue<Mask: ReferenceMask>(of mask: Mask) -> Int {
+    let lanes = mask.simd
+    return (0..<lanes.scalarCount).last { lanes[$0] }.map { $0 + 1 } ?? 0
+}
+
 package func compressedLaneCount(bits: [UInt8], lanes: Int, tailIsDeterministic: Bool) -> Int {
     tailIsDeterministic
         ? lanes : (0..<lanes).filter { bits[$0 / 8] >> UInt8($0 % 8) & 1 == 1 }.count

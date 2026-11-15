@@ -850,6 +850,7 @@ struct Op {
     let appendsToOutputSpan: Bool
     let clampsSpanCount: Bool
     let leavesLanesUnspecified: Bool
+    let mightFaultOnMaskedOffLanes: Bool
     let referenceCall: ((Element, [String]) -> String)?
     let portable: (Element) -> String
 
@@ -889,6 +890,7 @@ struct Op {
         appendsToOutputSpan: Bool = true,
         clampsSpanCount: Bool = false,
         leavesLanesUnspecified: Bool = false,
+        mightFaultOnMaskedOffLanes: Bool = false,
         referenceCall: ((Element, [String]) -> String)? = nil,
         portable: @escaping (Element) -> String
     ) {
@@ -930,6 +932,7 @@ struct Op {
         self.appendsToOutputSpan = appendsToOutputSpan
         self.clampsSpanCount = clampsSpanCount
         self.leavesLanesUnspecified = leavesLanesUnspecified
+        self.mightFaultOnMaskedOffLanes = mightFaultOnMaskedOffLanes
         self.referenceCall = referenceCall
         self.portable = portable
     }
@@ -27410,9 +27413,11 @@ let memoryOps: [Op] =
             span: .vectors(1),
             targets: TargetBodies(
                 sve2_128: { element in sveMaskedLoad(otherwise: false, for: element) },
+                sve: { element in sveMaskedLoad(otherwise: false, for: element) },
                 avx3: { element in x86Avx3MaskedLoad(otherwise: false, for: element) },
                 avx2: { element in x86Avx2MaskedAccess(store: false, for: element) }
-            )
+            ),
+            mightFaultOnMaskedOffLanes: true
         ) { element in
             maskedLoad(otherwise: false, for: element)
         },
@@ -27426,10 +27431,12 @@ let memoryOps: [Op] =
             span: .vectors(1),
             targets: TargetBodies(
                 sve2_128: { element in sveMaskedLoad(otherwise: true, for: element) },
+                sve: { element in sveMaskedLoad(otherwise: true, for: element) },
                 avx3: { element in x86Avx3MaskedLoad(otherwise: true, for: element) },
                 avx2: { element in x86BlendedMaskedLoad(for: element) },
                 sse4: { element in x86BlendedMaskedLoad(for: element) }
-            )
+            ),
+            mightFaultOnMaskedOffLanes: true
         ) { element in
             maskedLoad(otherwise: true, for: element)
         },
@@ -27444,6 +27451,7 @@ let memoryOps: [Op] =
             targets: TargetBodies(
                 neon: { element in vectorLoadFirstOtherwise(wrapping: true, for: element) },
                 sve2_128: { element in sveLoadFirstOtherwise(for: element) },
+                sve: { element in sveLoadFirstOtherwise(for: element) },
                 avx3: { element in x86Avx3LoadFirstOtherwise(for: element) },
                 avx2: { element in x86Avx2LoadFirstOtherwise(for: element) },
                 sse4: { element in vectorLoadFirstOtherwise(style: .wide, for: element) },
@@ -27480,11 +27488,13 @@ let memoryOps: [Op] =
             targets: TargetBodies(
                 neon: { element in vectorBlendedStore(for: element) },
                 sve2_128: { element in sveBlendedStore(for: element) },
+                sve: { element in sveBlendedStore(for: element) },
                 avx3: { element in x86Avx3BlendedStore(for: element) },
                 avx2: { element in x86Avx2MaskedAccess(store: true, for: element) },
                 sse2: { element in scalarMaskedStore(for: element) }
             ),
-            appendsToOutputSpan: false
+            appendsToOutputSpan: false,
+            mightFaultOnMaskedOffLanes: true
         ) { element in
             maskedLaneStore(for: element)
         },
@@ -27498,6 +27508,7 @@ let memoryOps: [Op] =
             span: .first,
             targets: TargetBodies(
                 sve2_128: { element in sveSafeFill(for: element) },
+                sve: { element in sveSafeFill(for: element) },
                 avx3: { element in x86Avx3SafeFill(for: element) }
             ),
             swiftOrdering: [1, 0, 2],
@@ -27516,6 +27527,7 @@ let memoryOps: [Op] =
             span: .first,
             targets: TargetBodies(
                 sve2_128: { element in sveSafeCopy(for: element) },
+                sve: { element in sveSafeCopy(for: element) },
                 avx3: { element in x86Avx3SafeCopy(for: element) }
             ),
             appendsToOutputSpan: false,
@@ -45207,6 +45219,10 @@ let assertionsDisabling: Disabling = (
     "assertionsAreEnabled", "Assertions abort the test run on these indices"
 )
 
+let maskedOffLanesDisabling: Disabling = (
+    "SIMDTarget.memoryOpsMightFault", "The lanes the mask leaves out can fault on this target"
+)
+
 func outOfContractDisabling(of op: Op) -> [Disabling] {
     if op.requiresTrueLane {
         return [assertionsDisabling]
@@ -45467,10 +45483,13 @@ func referenceStatements(
     for element: Element,
     inputs: [ReferenceInput],
     guarded: Bool,
+    maskedOff: Bool = false,
     count: String = "count",
     alternative: CodegenAlternative? = nil,
     calls: (port: String, reference: String)
 ) -> (declarations: [String], statements: String) {
+    let extent: SpanExtent? = maskedOff ? .first : op.span
+    let guardedCount = maskedOff ? "lanesThroughLastTrue(of: mask)" : count
     let description = referenceDescription(of: inputs)
     let aligned = isAligned(op)
     let isStore = op.parameters.contains(where: \.isMutablePointer)
@@ -45484,9 +45503,10 @@ func referenceStatements(
         )
         statements = referenceCopyStatements(
             of: source,
-            sourceLanes: guarded ? guardedLanes(of: source, extent: op.span, count: count) : nil,
+            sourceLanes: guarded
+                ? guardedLanes(of: source, extent: extent, count: guardedCount) : nil,
             destinationLanes: guarded
-                ? guardedLanes(of: "sentinel", extent: op.span, count: count) : nil,
+                ? guardedLanes(of: "sentinel", extent: extent, count: guardedCount) : nil,
             returnsResult: op.returns != .void,
             port: calls.port,
             reference: paddedReferenceCall(calls.reference, of: op, source: source),
@@ -45502,7 +45522,7 @@ func referenceStatements(
                 aligned: aligned,
                 alignedTo: alignmentLanes(of: op),
                 guardedLanes: guarded
-                    ? guardedLanes(of: source, extent: op.span, count: count) : nil,
+                    ? guardedLanes(of: source, extent: extent, count: guardedCount) : nil,
                 comparison: op.leavesLanesUnspecified
                     ? compressedPrefixComparison(of: source, for: element, description: description)
                     : nil,
@@ -45515,7 +45535,7 @@ func referenceStatements(
                 count: outVectors,
                 for: element,
                 guardedLanes: guarded
-                    ? guardedLanes(of: source, extent: op.span, count: count) : nil,
+                    ? guardedLanes(of: source, extent: extent, count: guardedCount) : nil,
                 port: calls.port,
                 reference: calls.reference,
                 inputs: inputs
@@ -45533,7 +45553,7 @@ func referenceStatements(
         statements = referenceStoreStatements(
             aligned: aligned,
             guardedLanes: guarded
-                ? guardedLanes(of: "sentinel", extent: op.span, count: count) : nil,
+                ? guardedLanes(of: "sentinel", extent: extent, count: guardedCount) : nil,
             returnsResult: op.returns != .void,
             port: calls.port,
             reference: calls.reference,
@@ -45620,11 +45640,17 @@ func referenceTest(
     inContract: Bool,
     checked: Bool = true,
     guarded: Bool = false,
+    maskedOff: Bool = false,
     nonCanonical: Bool = false
 ) -> String {
     let (test, label) =
         if guarded {
             ("\(op.testIdentifier)BeforeGuardPage", "\(op.testIdentifier) before a guard page")
+        } else if maskedOff {
+            (
+                "\(op.testIdentifier)MaskedOffPastGuardPage",
+                "\(op.testIdentifier) with the lanes the mask leaves out past a guard page"
+            )
         } else if nonCanonical {
             (
                 "\(op.testIdentifier)NonCanonical",
@@ -45637,27 +45663,29 @@ func referenceTest(
         } else {
             ("\(op.testIdentifier)Unchecked", "\(op.testIdentifier) unchecked")
         }
+    let isGuarded = guarded || maskedOff
     let inputs = referenceInputs(
         of: op,
         for: element,
         test: test,
         inContract: inContract,
-        guarded: guarded,
+        guarded: isGuarded,
         nonCanonical: nonCanonical
     )
     let calls = referenceCalls(
         of: op,
         for: element,
-        pointer: referencePointer(of: op, guarded: guarded),
+        pointer: referencePointer(of: op, guarded: isGuarded),
         referencePointer: paddedPointer(of: op),
-        destination: referenceDestination(of: op, guarded: guarded),
+        destination: referenceDestination(of: op, guarded: isGuarded),
         checked: checked
     )
     let (declarations, statements) = referenceStatements(
         of: op,
         for: element,
         inputs: inputs,
-        guarded: guarded,
+        guarded: isGuarded,
+        maskedOff: maskedOff,
         calls: calls
     )
 
@@ -45668,7 +45696,8 @@ func referenceTest(
         inputs: inputs,
         declarations: declarations,
         disabling: laneCapabilityDisabling(of: op, for: element)
-            + (inContract ? [] : outOfContractDisabling(of: op)),
+            + (inContract ? [] : outOfContractDisabling(of: op))
+            + (maskedOff ? [maskedOffLanesDisabling] : []),
         loopCondition: referenceLoopCondition(of: op, for: element, inputs: inputs),
         statements: statements
     )
@@ -45907,6 +45936,9 @@ func referenceTests(of op: Op, for element: Element) -> [String] {
     }
     if op.span != nil {
         tests.append(referenceTest(of: op, for: element, inContract: true, guarded: true))
+    }
+    if op.mightFaultOnMaskedOffLanes {
+        tests.append(referenceTest(of: op, for: element, inContract: true, maskedOff: true))
     }
     if op.takesMask {
         tests.append(referenceTest(of: op, for: element, inContract: true, nonCanonical: true))

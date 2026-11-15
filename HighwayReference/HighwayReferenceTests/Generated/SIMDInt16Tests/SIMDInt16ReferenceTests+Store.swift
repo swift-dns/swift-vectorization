@@ -262,6 +262,35 @@ extension SIMDInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test(
+        .disabled(
+            if: SIMDTarget.memoryOpsMightFault,
+            "The lanes the mask leaves out can fault on this target"
+        )
+    )
+    func storeWhereMaskedOffPastGuardPage() {
+        let mismatches = Mismatches(
+            "storeWhere with the lanes the mask leaves out past a guard page"
+        )
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x988D_EF56_8F5C_C643)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x988D_EE56_8F5C_C490)
+        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (_, portLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(lanesThroughLastTrue(of: mask)))
+            ) { destination in unsafe H.store(a, to: destination, where: mask) }
+            let (_, referenceLanes) = unsafe withGuardedLanes(
+                Array(sentinel.prefix(lanesThroughLastTrue(of: mask)))
+            ) { destination in unsafe HighwayReference.storeWhereI16(a.raw, mask.raw, destination) }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeWhereNonCanonical() {
         let mismatches = Mismatches("storeWhere with masks from arbitrary vectors")
         let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDA5D_E1D0_E602_7D64)
