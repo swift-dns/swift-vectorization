@@ -27330,7 +27330,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_r
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
   const cvectorization_ops_vector_u16 positions = (cvectorization_ops_vector_u16){0, 1, 2, 3, 4, 5, 6, 7};
   const cvectorization_ops_vector_u16 target = (cvectorization_ops_vector_u16){(uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index};
-  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
+  if (__builtin_constant_p(index)) {
+    return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
+  }
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(((cvectorization_ops_x86_i64)(positions != target) & (cvectorization_ops_x86_i64)a) | ((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_u16)cvectorization_ops_repeating_u16(value))));
 #else
   union { cvectorization_ops_vector_u16 vector; uint16_t lanes[8]; } storage = {a};
   storage.lanes[index] = value;
@@ -83048,7 +83051,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_r
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
   const cvectorization_ops_vector_u16 positions = (cvectorization_ops_vector_u16){0, 1, 2, 3, 4, 5, 6, 7};
   const cvectorization_ops_vector_u16 target = (cvectorization_ops_vector_u16){(uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index, (uint16_t)index};
-  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
+  if (__builtin_constant_p(index)) {
+    return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value)) | (~(cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)a)));
+  }
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(((cvectorization_ops_x86_i64)(positions != target) & (cvectorization_ops_x86_i64)a) | ((cvectorization_ops_x86_i64)(positions == target) & (cvectorization_ops_x86_i64)(cvectorization_ops_vector_i16)cvectorization_ops_repeating_i16(value))));
 #else
   union { cvectorization_ops_vector_i16 vector; int16_t lanes[8]; } storage = {a};
   storage.lanes[index] = value;

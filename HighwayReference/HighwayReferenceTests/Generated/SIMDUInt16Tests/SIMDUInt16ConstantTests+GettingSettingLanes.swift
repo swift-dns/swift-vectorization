@@ -218,4 +218,147 @@ extension SIMDUInt16ConstantTests {
     @Test func laneConstantSplatMax() {
         checkLaneConstantA(H.Lane.max)
     }
+
+    @inline(__always)
+    private func checkReplacingLaneConstantIndex(_ index: Int) {
+        let mismatches = Mismatches("replacingLane with index \(index)")
+        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x473C_01F9_55AF_30B8)
+        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x473C_03F9_55AF_341E)
+        for (a, value) in everyPair(aInputs, valueInputs) {
+            mismatches.check(
+                H.replacingLane(a, at: index, with: value),
+                H.Vector(raw: HighwayReference.replacingLaneU16(a.raw, index, value)),
+                "a: \(describe(a)), value: \(hex(value))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test(.enabled(if: 0 < H.laneCount)) func replacingLaneConstantIndex0() {
+        checkReplacingLaneConstantIndex(0)
+    }
+
+    @Test(.enabled(if: 1 < H.laneCount)) func replacingLaneConstantIndex1() {
+        checkReplacingLaneConstantIndex(1)
+    }
+
+    @Test(.enabled(if: 2 < H.laneCount)) func replacingLaneConstantIndex2() {
+        checkReplacingLaneConstantIndex(2)
+    }
+
+    @Test(.enabled(if: 3 < H.laneCount)) func replacingLaneConstantIndex3() {
+        checkReplacingLaneConstantIndex(3)
+    }
+
+    @Test(.enabled(if: 4 < H.laneCount)) func replacingLaneConstantIndex4() {
+        checkReplacingLaneConstantIndex(4)
+    }
+
+    @Test(.enabled(if: 5 < H.laneCount)) func replacingLaneConstantIndex5() {
+        checkReplacingLaneConstantIndex(5)
+    }
+
+    @Test(.enabled(if: 6 < H.laneCount)) func replacingLaneConstantIndex6() {
+        checkReplacingLaneConstantIndex(6)
+    }
+
+    @Test(.enabled(if: 7 < H.laneCount)) func replacingLaneConstantIndex7() {
+        checkReplacingLaneConstantIndex(7)
+    }
+
+    @Test(.enabled(if: 8 < H.laneCount)) func replacingLaneConstantIndex8() {
+        checkReplacingLaneConstantIndex(8)
+    }
+
+    @Test(.enabled(if: 9 < H.laneCount)) func replacingLaneConstantIndex9() {
+        checkReplacingLaneConstantIndex(9)
+    }
+
+    @Test(.enabled(if: 10 < H.laneCount)) func replacingLaneConstantIndex10() {
+        checkReplacingLaneConstantIndex(10)
+    }
+
+    @Test(.enabled(if: 11 < H.laneCount)) func replacingLaneConstantIndex11() {
+        checkReplacingLaneConstantIndex(11)
+    }
+
+    @Test(.enabled(if: 12 < H.laneCount)) func replacingLaneConstantIndex12() {
+        checkReplacingLaneConstantIndex(12)
+    }
+
+    @Test(.enabled(if: 13 < H.laneCount)) func replacingLaneConstantIndex13() {
+        checkReplacingLaneConstantIndex(13)
+    }
+
+    @Test(.enabled(if: 14 < H.laneCount)) func replacingLaneConstantIndex14() {
+        checkReplacingLaneConstantIndex(14)
+    }
+
+    @Test(.enabled(if: 15 < H.laneCount)) func replacingLaneConstantIndex15() {
+        checkReplacingLaneConstantIndex(15)
+    }
+
+    @Test(.enabled(if: 16 < H.laneCount)) func replacingLaneConstantIndex16() {
+        checkReplacingLaneConstantIndex(16)
+    }
+
+    @Test(.enabled(if: 17 < H.laneCount)) func replacingLaneConstantIndex17() {
+        checkReplacingLaneConstantIndex(17)
+    }
+
+    @Test(.enabled(if: 18 < H.laneCount)) func replacingLaneConstantIndex18() {
+        checkReplacingLaneConstantIndex(18)
+    }
+
+    @Test(.enabled(if: 19 < H.laneCount)) func replacingLaneConstantIndex19() {
+        checkReplacingLaneConstantIndex(19)
+    }
+
+    @Test(.enabled(if: 20 < H.laneCount)) func replacingLaneConstantIndex20() {
+        checkReplacingLaneConstantIndex(20)
+    }
+
+    @Test(.enabled(if: 21 < H.laneCount)) func replacingLaneConstantIndex21() {
+        checkReplacingLaneConstantIndex(21)
+    }
+
+    @Test(.enabled(if: 22 < H.laneCount)) func replacingLaneConstantIndex22() {
+        checkReplacingLaneConstantIndex(22)
+    }
+
+    @Test(.enabled(if: 23 < H.laneCount)) func replacingLaneConstantIndex23() {
+        checkReplacingLaneConstantIndex(23)
+    }
+
+    @Test(.enabled(if: 24 < H.laneCount)) func replacingLaneConstantIndex24() {
+        checkReplacingLaneConstantIndex(24)
+    }
+
+    @Test(.enabled(if: 25 < H.laneCount)) func replacingLaneConstantIndex25() {
+        checkReplacingLaneConstantIndex(25)
+    }
+
+    @Test(.enabled(if: 26 < H.laneCount)) func replacingLaneConstantIndex26() {
+        checkReplacingLaneConstantIndex(26)
+    }
+
+    @Test(.enabled(if: 27 < H.laneCount)) func replacingLaneConstantIndex27() {
+        checkReplacingLaneConstantIndex(27)
+    }
+
+    @Test(.enabled(if: 28 < H.laneCount)) func replacingLaneConstantIndex28() {
+        checkReplacingLaneConstantIndex(28)
+    }
+
+    @Test(.enabled(if: 29 < H.laneCount)) func replacingLaneConstantIndex29() {
+        checkReplacingLaneConstantIndex(29)
+    }
+
+    @Test(.enabled(if: 30 < H.laneCount)) func replacingLaneConstantIndex30() {
+        checkReplacingLaneConstantIndex(30)
+    }
+
+    @Test(.enabled(if: 31 < H.laneCount)) func replacingLaneConstantIndex31() {
+        checkReplacingLaneConstantIndex(31)
+    }
 }

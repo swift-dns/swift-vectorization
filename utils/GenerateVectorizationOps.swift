@@ -7902,12 +7902,22 @@ func x86Avx3Selecting(
     x86Avx3Select(x86Avx3MaskBits(mask, for: element), yes, no, for: element)
 }
 
-func x86BitSelect(_ mask: String, _ yes: String, _ no: String, for element: Element) -> String {
+func x86BitSelect(
+    _ mask: String,
+    _ yes: String,
+    _ no: String,
+    unselected: String? = nil,
+    for element: Element
+) -> String {
     guard element.category != .float else { return bitSelect(mask, yes, no, of: element) }
     let i64 = x86Vector("i64")
     let chosen = "(\(i64))\(mask) & (\(i64))\(yes)"
-    let rest = "~(\(i64))\(mask) & (\(i64))\(no)"
-    return "(\(element.cVector))((\(chosen)) | (\(rest)))"
+    guard let unselected else {
+        let rest = "~(\(i64))\(mask) & (\(i64))\(no)"
+        return "(\(element.cVector))((\(chosen)) | (\(rest)))"
+    }
+    let rest = "(\(i64))\(unselected) & (\(i64))\(no)"
+    return "(\(element.cVector))((\(rest)) | (\(chosen)))"
 }
 
 func x86Immediate(_ value: Int) -> String {
@@ -21026,10 +21036,29 @@ func x86ReplacingLane(level: X86Level, for element: Element) -> String {
         level >= .sse4
         ? x86Selecting("(positions == target)", value, "a", for: element)
         : x86BitSelect("(positions == target)", value, "a", for: element)
-    return """
+    let declarations = """
         const \(unsigned.cVector) positions = \(positions);
         const \(unsigned.cVector) target = \(target);
-        \(vectorResult(selected, for: element))
+        """
+    guard level < .sse4, element.bits == 16 else {
+        return """
+            \(declarations)
+            \(vectorResult(selected, for: element))
+            """
+    }
+    let reordered = x86BitSelect(
+        "(positions == target)",
+        value,
+        "a",
+        unselected: "(positions != target)",
+        for: element
+    )
+    return """
+        \(declarations)
+        if (__builtin_constant_p(index)) {
+        \(indented(vectorResult(selected, for: element)))
+        }
+        \(vectorResult(reordered, for: element))
         """
 }
 
