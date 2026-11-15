@@ -60464,7 +60464,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_di
   const wide_vector quotient2 = (wide_vector)__builtin_ia32_cvttps2dq256((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(a, a, 8, 9, 10, 11, 24, 25, 26, 27), float_vector) / __builtin_convertvector(__builtin_shufflevector(b, b, 8, 9, 10, 11, 24, 25, 26, 27), float_vector)));
   const wide_vector quotient3 = (wide_vector)__builtin_ia32_cvttps2dq256((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(a, a, 12, 13, 14, 15, 28, 29, 30, 31), float_vector) / __builtin_convertvector(__builtin_shufflevector(b, b, 12, 13, 14, 15, 28, 29, 30, 31), float_vector)));
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_x86_i8)__builtin_ia32_packsswb256((cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)__builtin_ia32_packssdw256((cvectorization_ops_x86_i32)quotient0, (cvectorization_ops_x86_i32)quotient1), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)__builtin_ia32_packssdw256((cvectorization_ops_x86_i32)quotient2, (cvectorization_ops_x86_i32)quotient3)));
-#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+#elif CVECTORIZATION_OPS_X86 == 3
   typedef float float_vector __attribute__((vector_size(16)));
   typedef int32_t wide_vector __attribute__((vector_size(16)));
   typedef int16_t half_vector __attribute__((vector_size(16)));
@@ -60472,6 +60472,19 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_di
   const half_vector highA = __builtin_convertvector(__builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15), half_vector);
   const half_vector lowB = __builtin_convertvector(__builtin_shufflevector(b, b, 0, 1, 2, 3, 4, 5, 6, 7), half_vector);
   const half_vector highB = __builtin_convertvector(__builtin_shufflevector(b, b, 8, 9, 10, 11, 12, 13, 14, 15), half_vector);
+  const wide_vector quotient0 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(lowA, lowA, 0, 1, 2, 3), float_vector) / __builtin_convertvector(__builtin_shufflevector(lowB, lowB, 0, 1, 2, 3), float_vector)));
+  const wide_vector quotient1 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(lowA, lowA, 4, 5, 6, 7), float_vector) / __builtin_convertvector(__builtin_shufflevector(lowB, lowB, 4, 5, 6, 7), float_vector)));
+  const wide_vector quotient2 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(highA, highA, 0, 1, 2, 3), float_vector) / __builtin_convertvector(__builtin_shufflevector(highB, highB, 0, 1, 2, 3), float_vector)));
+  const wide_vector quotient3 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(highA, highA, 4, 5, 6, 7), float_vector) / __builtin_convertvector(__builtin_shufflevector(highB, highB, 4, 5, 6, 7), float_vector)));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_i32)quotient0, (cvectorization_ops_x86_i32)quotient1), (cvectorization_ops_x86_i16)(cvectorization_ops_x86_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_i32)quotient2, (cvectorization_ops_x86_i32)quotient3)));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  typedef float float_vector __attribute__((vector_size(16)));
+  typedef int32_t wide_vector __attribute__((vector_size(16)));
+  typedef int16_t half_vector __attribute__((vector_size(16)));
+  const half_vector lowA = (half_vector)__builtin_shufflevector(a, a, 0, 16, 1, 17, 2, 18, 3, 19, 4, 20, 5, 21, 6, 22, 7, 23) >> 8;
+  const half_vector highA = (half_vector)__builtin_shufflevector(a, a, 8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31) >> 8;
+  const half_vector lowB = (half_vector)__builtin_shufflevector(b, b, 0, 16, 1, 17, 2, 18, 3, 19, 4, 20, 5, 21, 6, 22, 7, 23) >> 8;
+  const half_vector highB = (half_vector)__builtin_shufflevector(b, b, 8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31) >> 8;
   const wide_vector quotient0 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(lowA, lowA, 0, 1, 2, 3), float_vector) / __builtin_convertvector(__builtin_shufflevector(lowB, lowB, 0, 1, 2, 3), float_vector)));
   const wide_vector quotient1 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(lowA, lowA, 4, 5, 6, 7), float_vector) / __builtin_convertvector(__builtin_shufflevector(lowB, lowB, 4, 5, 6, 7), float_vector)));
   const wide_vector quotient2 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(highA, highA, 0, 1, 2, 3), float_vector) / __builtin_convertvector(__builtin_shufflevector(highB, highB, 0, 1, 2, 3), float_vector)));
@@ -60990,7 +61003,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_re
   const half_vector highQuotients = (half_vector)(cvectorization_ops_x86_i16)__builtin_shufflevector((cvectorization_ops_x86_i64)(cvectorization_ops_x86_i16)__builtin_ia32_packssdw256((cvectorization_ops_x86_i32)highQuotient0, (cvectorization_ops_x86_i32)highQuotient1), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i16)__builtin_ia32_packssdw256((cvectorization_ops_x86_i32)highQuotient0, (cvectorization_ops_x86_i32)highQuotient1), 0, 2, 1, 3);
   const half_vector highRemainder = (half_vector)((half_unsigned_vector)highA - (half_unsigned_vector)highQuotients * (half_unsigned_vector)highB);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_x86_i8)__builtin_shufflevector((cvectorization_ops_x86_i64)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb256((cvectorization_ops_x86_i16)lowRemainder, (cvectorization_ops_x86_i16)highRemainder), (cvectorization_ops_x86_i64)(cvectorization_ops_x86_i8)__builtin_ia32_packsswb256((cvectorization_ops_x86_i16)lowRemainder, (cvectorization_ops_x86_i16)highRemainder), 0, 2, 1, 3));
-#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+#elif CVECTORIZATION_OPS_X86 == 3
   typedef float float_vector __attribute__((vector_size(16)));
   typedef int32_t wide_vector __attribute__((vector_size(16)));
   typedef int16_t half_vector __attribute__((vector_size(16)));
@@ -60998,6 +61011,22 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_re
   const half_vector highA = __builtin_convertvector(__builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15), half_vector);
   const half_vector lowB = __builtin_convertvector(__builtin_shufflevector(b, b, 0, 1, 2, 3, 4, 5, 6, 7), half_vector);
   const half_vector highB = __builtin_convertvector(__builtin_shufflevector(b, b, 8, 9, 10, 11, 12, 13, 14, 15), half_vector);
+  const wide_vector quotient0 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(lowA, lowA, 0, 1, 2, 3), float_vector) / __builtin_convertvector(__builtin_shufflevector(lowB, lowB, 0, 1, 2, 3), float_vector)));
+  const wide_vector quotient1 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(lowA, lowA, 4, 5, 6, 7), float_vector) / __builtin_convertvector(__builtin_shufflevector(lowB, lowB, 4, 5, 6, 7), float_vector)));
+  const wide_vector quotient2 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(highA, highA, 0, 1, 2, 3), float_vector) / __builtin_convertvector(__builtin_shufflevector(highB, highB, 0, 1, 2, 3), float_vector)));
+  const wide_vector quotient3 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(highA, highA, 4, 5, 6, 7), float_vector) / __builtin_convertvector(__builtin_shufflevector(highB, highB, 4, 5, 6, 7), float_vector)));
+  typedef uint16_t half_unsigned_vector __attribute__((vector_size(16)));
+  const half_vector lowRemainder = (half_vector)((half_unsigned_vector)lowA - (half_unsigned_vector)(cvectorization_ops_x86_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_i32)quotient0, (cvectorization_ops_x86_i32)quotient1) * (half_unsigned_vector)lowB);
+  const half_vector highRemainder = (half_vector)((half_unsigned_vector)highA - (half_unsigned_vector)(cvectorization_ops_x86_i16)__builtin_ia32_packssdw128((cvectorization_ops_x86_i32)quotient2, (cvectorization_ops_x86_i32)quotient3) * (half_unsigned_vector)highB);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_x86_i8)__builtin_ia32_packsswb128((cvectorization_ops_x86_i16)lowRemainder, (cvectorization_ops_x86_i16)highRemainder));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 2
+  typedef float float_vector __attribute__((vector_size(16)));
+  typedef int32_t wide_vector __attribute__((vector_size(16)));
+  typedef int16_t half_vector __attribute__((vector_size(16)));
+  const half_vector lowA = (half_vector)__builtin_shufflevector(a, a, 0, 16, 1, 17, 2, 18, 3, 19, 4, 20, 5, 21, 6, 22, 7, 23) >> 8;
+  const half_vector highA = (half_vector)__builtin_shufflevector(a, a, 8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31) >> 8;
+  const half_vector lowB = (half_vector)__builtin_shufflevector(b, b, 0, 16, 1, 17, 2, 18, 3, 19, 4, 20, 5, 21, 6, 22, 7, 23) >> 8;
+  const half_vector highB = (half_vector)__builtin_shufflevector(b, b, 8, 24, 9, 25, 10, 26, 11, 27, 12, 28, 13, 29, 14, 30, 15, 31) >> 8;
   const wide_vector quotient0 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(lowA, lowA, 0, 1, 2, 3), float_vector) / __builtin_convertvector(__builtin_shufflevector(lowB, lowB, 0, 1, 2, 3), float_vector)));
   const wide_vector quotient1 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(lowA, lowA, 4, 5, 6, 7), float_vector) / __builtin_convertvector(__builtin_shufflevector(lowB, lowB, 4, 5, 6, 7), float_vector)));
   const wide_vector quotient2 = (wide_vector)__builtin_ia32_cvttps2dq((cvectorization_ops_x86_f32)(__builtin_convertvector(__builtin_shufflevector(highA, highA, 0, 1, 2, 3), float_vector) / __builtin_convertvector(__builtin_shufflevector(highB, highB, 0, 1, 2, 3), float_vector)));

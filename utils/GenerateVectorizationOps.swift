@@ -4875,6 +4875,11 @@ func x86Packing(
     return "(\(x86Vector(result)))\(call)"
 }
 
+func x86SignExtendedBytes(_ operand: String, at lanes: [Int]) -> String {
+    let unpacked = laneIndices(lanes.flatMap { [$0, 16 + $0] })
+    return "(half_vector)__builtin_shufflevector(\(operand), \(operand), \(unpacked)) >> 8"
+}
+
 func x86PartsDividing(level: X86Level, for element: Element, remainder: Bool = false) -> String {
     let parts = 32 / element.bits
     let blocks = element.width / 16
@@ -4891,12 +4896,15 @@ func x86PartsDividing(level: X86Level, for element: Element, remainder: Bool = f
     if usesHalves {
         let half = resizedElement(of: element, bits: 16)
         statements.append(vectorTypedef("half_vector", of: half, lanes: blocks * 8))
+        let shiftsSigns = isSigned && blocks == 1 && level < .sse4
         for (name, operand) in [("A", "a"), ("B", "b")] {
             for (position, half) in ["low", "high"].enumerated() {
                 let lanes = blockwise(start: position * 8, count: 8, perBlock: 16)
-                statements.append(
-                    "const half_vector \(half)\(name) = \(convertedLanes(operand, at: lanes, to: "half_vector"));"
-                )
+                let converted =
+                    shiftsSigns
+                    ? x86SignExtendedBytes(operand, at: lanes)
+                    : convertedLanes(operand, at: lanes, to: "half_vector")
+                statements.append("const half_vector \(half)\(name) = \(converted);")
             }
         }
     }
@@ -14333,6 +14341,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             avx3: { element in x86Remainder(level: .avx3, for: element) },
             avx2: { element in x86Remainder(level: .avx2, for: element) },
+            sse4: { element in x86Remainder(level: .sse4, for: element) },
             sse2: { element in x86Remainder(level: .sse2, for: element) }
         )
     ) { element in
