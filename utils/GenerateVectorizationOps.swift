@@ -2371,11 +2371,57 @@ func sveTableLookupBytes(for element: Element) -> String {
     return vectorResult("(\(element.cVector))\(sveResult(lookup, for: bytes))", for: element)
 }
 
+func sveBlockTableLookupBytes(zeroing: Bool, for element: Element) -> String {
+    let bytes = unsignedElement(bits: 8)
+    let all = sveAllLanes(of: bytes)
+    let iota = sveBuiltin("index", ["0", "1"], for: bytes)
+    let offsets = sveBuiltin("bic_n", [all, iota, "15"], for: bytes, predication: "x")
+    let indices = sveBuiltin(
+        "add",
+        [all, sveOperand("indices", for: bytes), offsets],
+        for: bytes,
+        predication: "x"
+    )
+    var lookup = sveBuiltin("tbl", [sveOperand("a", for: bytes), indices], for: bytes)
+    if zeroing {
+        let signed = signedElement(of: bytes)
+        let negative = sveBuiltin(
+            "cmplt_n",
+            [all, sveOperand("indices", for: signed), "0"],
+            for: signed
+        )
+        let zero = sveBuiltin("dup_n", ["0"], for: bytes)
+        lookup = sveBuiltin("sel", [negative, zero, lookup], for: bytes)
+    }
+    return vectorResult("(\(element.cVector))\(sveResult(lookup, for: bytes))", for: element)
+}
+
 func sveTwoTablesLookupLanes(for element: Element) -> String {
     let operands = [sveOperand("a", for: element), sveOperand("b", for: element)]
     let tables = sveBuiltin("create2", operands, for: element)
     let lookup = sveBuiltin("tbl2", [tables, sveLaneIndices(for: element)], for: element)
     return vectorResult(sveResult(lookup, for: element), for: element)
+}
+
+func sveTwoTablesLookupLanesByHalves(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element)
+    let all = sveAllLanes(of: unsigned)
+    let indices = sveLaneIndices(for: element)
+    let wrapped = sveBuiltin(
+        "and_n",
+        [all, indices, "\(element.laneCount - 1)"],
+        for: unsigned,
+        predication: "x"
+    )
+    let first = sveBuiltin("cmpeq", [all, indices, "wrapped"], for: unsigned)
+    let lookups = ["a", "b"].map {
+        sveBuiltin("tbl", [sveOperand($0, for: element), "wrapped"], for: element)
+    }
+    let selected = sveBuiltin("sel", [first] + lookups, for: element)
+    return """
+        const \(sveType(of: unsigned)) wrapped = \(wrapped);
+        \(vectorResult(sveResult(selected, for: element), for: element))
+        """
 }
 
 func sveComparisonSplat(_ name: String, mirrored: String, for element: Element) -> String? {
@@ -6144,6 +6190,7 @@ func tableLookupBytesTargets(zeroing: Bool) -> TargetBodies<Element> {
             vectorResult(neonTableLookup("a", "indices", for: element), for: element)
         },
         sve2_128: zeroing ? { element in sveTableLookupBytes(for: element) } : nil,
+        sve: { element in sveBlockTableLookupBytes(zeroing: zeroing, for: element) },
         avx3: lookup,
         avx2: lookup,
         ssse3: lookup,
@@ -13287,6 +13334,8 @@ struct LookupSize {
     let scalableBits: [Int]
 }
 
+let sveScalableBytes = 64
+
 let lookupSizes = [
     LookupSize(
         lanes: 8,
@@ -13599,6 +13648,51 @@ func neonLookup64(for element: Element) -> String {
     return "\(tables.joined(separator: "\n"))\n\(vectorResult(lookup, for: element))"
 }
 
+func sveScalableLookup(lanes: Int, for element: Element) -> String {
+    let half = lanes / 2
+    let index = laneIndexElement(of: element)
+    let unsigned = unsignedElement(of: element)
+    let all = sveAllLanes(of: element)
+    let first = "__builtin_sve_svptrue_pat_b\(element.bits)(\(svePattern(lanes: half)))"
+    let upper = sveBuiltin(
+        "cmpge_n",
+        [all, sveOperand("indices", for: index), "\(half)"],
+        for: index
+    )
+    let statements =
+        [("low", "from"), ("high", "from + \(half)")].map { name, pointer in
+            let loaded = sveBuiltin("ld1", [first, pointer], for: element)
+            return "const \(sveVector(element.cSuffix)) \(name) = \(loaded);"
+        } + ["const __SVBool_t upper = \(upper);"]
+    let indices = sveOperand("indices", for: unsigned)
+    guard element.bits > 8 else {
+        let lowered = sveBuiltin(
+            "sub_n",
+            [all, indices, "\(half)"],
+            for: unsigned,
+            predication: "x"
+        )
+        let lookups = [("high", lowered), ("low", indices)].map { table, offsets in
+            sveBuiltin("tbl", [table, offsets], for: element)
+        }
+        let selected = sveBuiltin("sel", ["upper"] + lookups, for: element)
+        return (statements + [vectorResult(sveResult(selected, for: element), for: element)])
+            .joined(separator: "\n")
+    }
+    let shifted = sveBuiltin(
+        "add_n",
+        ["upper", indices, "\(element.laneCount - half)"],
+        for: unsigned,
+        predication: "m"
+    )
+    let operands =
+        ["low", "high"].map { "(\(element.cRawVector))(\(element.cVector))\($0)" }
+        + ["(\(index.cRawVector))\(sveResult(shifted, for: unsigned))"]
+    let function = cFunctionName("twoTablesLookupLanes", element)
+    let call = "\(function)(\(operands.joined(separator: ", ")))"
+    return (statements + ["return \(call);"]).joined(separator: "\n")
+}
+
 func lookupOp(_ size: LookupSize) -> Op {
     let lanes = size.lanes
     func aligned(_ element: Element) -> String {
@@ -13618,6 +13712,10 @@ func lookupOp(_ size: LookupSize) -> Op {
             neon: { element in lanes == 64 ? neonLookup64(for: element) : nil },
             sve2_128: { element in
                 lanes == 64 ? lookupBody(lanes: lanes, aligned: false, for: element) : nil
+            },
+            sve: { element in
+                element.width == sveScalableBytes
+                    ? sveScalableLookup(lanes: lanes, for: element) : nil
             },
             avx3: aligned,
             avx2: aligned,
@@ -15945,6 +16043,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonTableLookupLanes(for: element) },
             sve2_128: { element in sveTableLookupLanes(for: element) },
+            sve: { element in sveTableLookupLanes(for: element) },
             avx3dl: { element in x86TableLookupLanes(level: .avx3dl, for: element) },
             avx3: { element in x86TableLookupLanes(level: .avx3, for: element) },
             avx2: { element in x86TableLookupLanes(level: .avx2, for: element) },
@@ -15966,6 +16065,8 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonTwoTablesLookupLanes(for: element) },
             sve2_128: { element in sveTwoTablesLookupLanes(for: element) },
+            sve: { element in sveTwoTablesLookupLanesByHalves(for: element) },
+            sve2: { element in sveTwoTablesLookupLanes(for: element) },
             avx3dl: { element in x86TwoTablesLookupLanes(level: .avx3dl, for: element) },
             avx3: { element in x86TwoTablesLookupLanes(level: .avx3, for: element) },
             avx2: { element in x86TwoTablesLookupLanes(level: .avx2, for: element) },
