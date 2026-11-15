@@ -2106,6 +2106,15 @@ func sveShift(
     return vectorResult(sveResult(shifted, for: element), for: element)
 }
 
+func sveBroadcastingSignBit(for element: Element) -> String {
+    sveShift(
+        "asr",
+        by: "\(element.bits - 1)",
+        of: sveSplatOperand("a", for: element),
+        for: element
+    )
+}
+
 func sveShiftByLanes(_ instruction: String, for element: Element) -> String {
     let unsigned = unsignedElement(of: element)
     let arguments = [
@@ -2507,6 +2516,16 @@ func sveBinary(_ name: String, for element: Element) -> String {
     let plain = vectorResult(sveResult(combined, for: element), for: element)
     let bodies = [sveSplatBinary(name, nil, for: element), plain].compactMap { $0 }
     return bodies.joined(separator: "\n")
+}
+
+func sveAllBitsSet(for element: Element) -> String {
+    let unsigned = unsignedElement(of: element).at(width: element.width)
+    return sveAllLanesEqual(
+        "a",
+        to: "(\(unsigned.cUnsignedLane))~0",
+        splat: element.category != .float,
+        for: unsigned
+    )
 }
 
 func sveAndXor(for element: Element) -> String? {
@@ -7508,6 +7527,21 @@ func sveReversedBits(for element: Element) -> String {
 
 func sveBitCount(_ counted: String, for element: Element) -> String {
     vectorResult(sveResult(counted, for: element), for: element)
+}
+
+func sveLeadingZeroCountResult(for element: Element) -> String {
+    let counted = sveLeadingZeroCount(sveOperand("a", for: element, splat: true), for: element)
+    return sveBitCount(counted, for: element)
+}
+
+func svePopulationCount(for element: Element) -> String {
+    let counted = sveBuiltin(
+        "cnt",
+        [sveAllLanes(of: element), sveOperand("a", for: element, splat: true)],
+        for: element,
+        predication: "x"
+    )
+    return sveBitCount(counted, for: element)
 }
 
 func sveTrailingZeroCount(for element: Element) -> String {
@@ -14644,7 +14678,9 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             sve2_128: { element in sveWideBitwise("bitwiseAnd", ["a", "b"], for: element) },
-            sve2_128Splat: { element in sveBitwiseSplat("and", for: element) }
+            sve2_128Splat: { element in sveBitwiseSplat("and", for: element) },
+            sve: { element in sveWideBitwise("bitwiseAnd", ["a", "b"], for: element) },
+            sveSplat: { element in sveBitwiseSplat("and", for: element) }
         )
     ) { element in
         bitwise(for: element) { bits in "\(bits("a")) & \(bits("b"))" }
@@ -14658,7 +14694,9 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             sve2_128: { element in sveWideBitwise("bitwiseOr", ["a", "b"], for: element) },
-            sve2_128Splat: { element in sveBitwiseSplat("orr", for: element) }
+            sve2_128Splat: { element in sveBitwiseSplat("orr", for: element) },
+            sve: { element in sveWideBitwise("bitwiseOr", ["a", "b"], for: element) },
+            sveSplat: { element in sveBitwiseSplat("orr", for: element) }
         )
     ) { element in
         bitwise(for: element) { bits in "\(bits("a")) | \(bits("b"))" }
@@ -14672,7 +14710,9 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             sve2_128: { element in sveWideBitwise("bitwiseXor", ["a", "b"], for: element) },
-            sve2_128Splat: { element in sveBitwiseSplat("eor", for: element) }
+            sve2_128Splat: { element in sveBitwiseSplat("eor", for: element) },
+            sve: { element in sveWideBitwise("bitwiseXor", ["a", "b"], for: element) },
+            sveSplat: { element in sveBitwiseSplat("eor", for: element) }
         )
     ) { element in
         bitwise(for: element) { bits in "\(bits("a")) ^ \(bits("b"))" }
@@ -14692,6 +14732,10 @@ let basicOps: [Op] = [
             sve2_128: { element in sveWideBitwise("bitwiseAndNot", ["a", "b"], for: element) },
             sve2_128Splat: { element in
                 sveBitwiseSplat("bic", operands: ("b", "a"), commutative: false, for: element)
+            },
+            sve: { element in sveWideBitwise("bitwiseAndNot", ["a", "b"], for: element) },
+            sveSplat: { element in
+                sveBitwiseSplat("bic", operands: ("b", "a"), commutative: false, for: element)
             }
         )
     ) { element in
@@ -14706,6 +14750,10 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             sve2_128: { element in
+                sveWideBitwise("bitwiseAndXor", ["a", "b", "c"], for: element)
+                    ?? sveAndXor(for: element)
+            },
+            sve: { element in
                 sveWideBitwise("bitwiseAndXor", ["a", "b", "c"], for: element)
                     ?? sveAndXor(for: element)
             },
@@ -14734,6 +14782,10 @@ let basicOps: [Op] = [
                 sveWideBitwise("bitwiseXor3", ["a", "b", "c"], for: element)
                     ?? sveTernaryBitwise("eor3", for: element)
             },
+            sve2: { element in
+                sveWideBitwise("bitwiseXor3", ["a", "b", "c"], for: element)
+                    ?? sveTernaryBitwise("eor3", for: element)
+            },
             avx3: { element in x86Avx3Ternary(0x96, for: element) }
         )
     ) { element in
@@ -14752,6 +14804,10 @@ let basicOps: [Op] = [
                 sveWideBitwise("bitwiseOr3", ["a", "b", "c"], for: element)
                     ?? sveNestedBitwise("orr", "orr", for: element)
             },
+            sve: { element in
+                sveWideBitwise("bitwiseOr3", ["a", "b", "c"], for: element)
+                    ?? sveNestedBitwise("orr", "orr", for: element)
+            },
             avx3: { element in x86Avx3Ternary(0xFE, for: element) }
         )
     ) { element in
@@ -14766,6 +14822,10 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             sve2_128: { element in
+                sveWideBitwise("bitwiseOrAnd", ["a", "b", "c"], for: element)
+                    ?? sveNestedBitwise("orr", "and", for: element)
+            },
+            sve: { element in
                 sveWideBitwise("bitwiseOrAnd", ["a", "b", "c"], for: element)
                     ?? sveNestedBitwise("orr", "and", for: element)
             },
@@ -14794,6 +14854,10 @@ let basicOps: [Op] = [
                 sveWideBitwise("bitwiseXorAndNot", ["a", "b", "c"], for: element)
                     ?? sveTernaryBitwise("bcax", ["a", "c", "b"], for: element)
             },
+            sve2: { element in
+                sveWideBitwise("bitwiseXorAndNot", ["a", "b", "c"], for: element)
+                    ?? sveTernaryBitwise("bcax", ["a", "c", "b"], for: element)
+            },
             avx3: { element in x86Avx3Ternary(0xD2, for: element) }
         )
     ) { element in
@@ -14808,6 +14872,10 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             sve2_128: { element in
+                sveWideBitwise("bitwiseSelecting", ["a", "b", "c"], for: element)
+                    ?? sveTernaryBitwise("bsl", ["b", "c", "a"], for: element)
+            },
+            sve2: { element in
                 sveWideBitwise("bitwiseSelecting", ["a", "b", "c"], for: element)
                     ?? sveTernaryBitwise("bsl", ["b", "c", "a"], for: element)
             },
@@ -14826,14 +14894,8 @@ let basicOps: [Op] = [
         .signed,
         section: .logical,
         targets: TargetBodies(
-            sve2_128: { element in
-                sveShift(
-                    "asr",
-                    by: "\(element.bits - 1)",
-                    of: sveSplatOperand("a", for: element),
-                    for: element
-                )
-            },
+            sve2_128: { element in sveBroadcastingSignBit(for: element) },
+            sve: { element in sveBroadcastingSignBit(for: element) },
             avx3dl: { element in element.bits == 8 ? x86Avx3GaloisSignBit(for: element) : nil }
         )
     ) { element in
@@ -14851,6 +14913,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonShift(negated: false, for: element) },
             sve2_128: { element in sveShift("lsl", for: element) },
+            sve: { element in sveShift("lsl", for: element) },
             avx3: { element in x86ShiftedLeft(for: element) },
             avx2: { element in x86ShiftedLeft(for: element) },
             sse2: { element in x86ShiftedLeft(for: element) }
@@ -14869,6 +14932,9 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonShift(negated: true, for: element) },
             sve2_128: { element in
+                sveShift(element.category == .signedInteger ? "asr" : "lsr", for: element)
+            },
+            sve: { element in
                 sveShift(element.category == .signedInteger ? "asr" : "lsr", for: element)
             },
             avx3: { element in x86ShiftedRight(level: .avx3, for: element) },
@@ -14896,6 +14962,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonShiftByLanes(negated: false, for: element) },
             sve2_128: { element in sveShiftByLanes("lsl", for: element) },
+            sve: { element in sveShiftByLanes("lsl", for: element) },
             avx3dl: { element in
                 element.bits == 8
                     ? x86Avx3DlShiftedLeftBytes(for: element)
@@ -14923,6 +14990,9 @@ let basicOps: [Op] = [
             sve2_128: { element in
                 sveShiftByLanes(element.category == .signedInteger ? "asr" : "lsr", for: element)
             },
+            sve: { element in
+                sveShiftByLanes(element.category == .signedInteger ? "asr" : "lsr", for: element)
+            },
             avx3dl: { element in x86ShiftedRightByLanes(level: .avx3dl, for: element) },
             avx3: { element in x86ShiftedRightByLanes(level: .avx3, for: element) },
             avx2: { element in x86ShiftedRightByLanes(level: .avx2, for: element) },
@@ -14947,6 +15017,7 @@ let basicOps: [Op] = [
                 neonShiftByLanes(negated: true, instruction: "vrshlq_v", for: element)
             },
             sve2_128: { element in sveRoundingShiftByLanes(for: element) },
+            sve2: { element in sveRoundingShiftByLanes(for: element) },
             avx2: { element in x86Avx2RoundingShiftedRightByLanes(for: element) },
             sse4: { element in portableRoundingShiftedRightByLanes(for: element) },
             sse2: { element in
@@ -14973,6 +15044,7 @@ let basicOps: [Op] = [
                 neonShift(negated: true, instruction: "vrshlq_v", for: element)
             },
             sve2_128: { element in sveRoundingShiftBySame(for: element) },
+            sve2: { element in sveRoundingShiftBySame(for: element) },
             avx3: { element in x86Avx3RoundingShiftedRightBySame(for: element) },
             emu128: { element in emulatedRoundingShiftedRightBySame(for: element) }
         )
@@ -14988,6 +15060,7 @@ let basicOps: [Op] = [
         section: .shifts,
         targets: TargetBodies(
             sve2_128: { element in sveRotatedByLanes(left: true, for: element) },
+            sve: { element in sveRotatedByLanes(left: true, for: element) },
             avx3dl: { element in x86Avx3RotatedByLanes(left: true, level: .avx3dl, for: element) },
             avx3: { element in x86Avx3RotatedByLanes(left: true, level: .avx3, for: element) },
             emu128: { element in emulatedRotatedByLanes(left: true, for: element) }
@@ -15004,6 +15077,7 @@ let basicOps: [Op] = [
         section: .shifts,
         targets: TargetBodies(
             sve2_128: { element in sveRotatedByLanes(left: false, for: element) },
+            sve: { element in sveRotatedByLanes(left: false, for: element) },
             avx3dl: { element in x86Avx3RotatedByLanes(left: false, level: .avx3dl, for: element) },
             avx3: { element in x86Avx3RotatedByLanes(left: false, level: .avx3, for: element) },
             emu128: { element in emulatedRotatedByLanes(left: false, for: element) }
@@ -15021,6 +15095,7 @@ let basicOps: [Op] = [
         template: shiftTemplate(.rotateLeft),
         targets: TargetBodies(
             sve2_128: { element in sveRotatedBySame(left: true, for: element) },
+            sve: { element in sveRotatedBySame(left: true, for: element) },
             avx3dl: { element in x86Avx3RotatedBySame(left: true, level: .avx3dl, for: element) },
             avx3: { element in x86Avx3RotatedBySame(left: true, level: .avx3, for: element) },
             emu128: { element in emulatedRotatedBySame(left: true, for: element) }
@@ -15038,6 +15113,7 @@ let basicOps: [Op] = [
         template: shiftTemplate(.rotateRight),
         targets: TargetBodies(
             sve2_128: { element in sveRotatedBySame(left: false, for: element) },
+            sve: { element in sveRotatedBySame(left: false, for: element) },
             avx3dl: { element in x86Avx3RotatedBySame(left: false, level: .avx3dl, for: element) },
             avx3: { element in x86Avx3RotatedBySame(left: false, level: .avx3, for: element) },
             emu128: { element in emulatedRotatedBySame(left: false, for: element) }
@@ -15061,6 +15137,9 @@ let basicOps: [Op] = [
         section: .comparisons,
         targets: TargetBodies(
             sve2_128Splat: { element in
+                sveComparisonSplat("cmplt", mirrored: "cmpgt", for: element)
+            },
+            sveSplat: { element in
                 sveComparisonSplat("cmplt", mirrored: "cmpgt", for: element)
             },
             avx3: { element in
@@ -15095,6 +15174,9 @@ let basicOps: [Op] = [
         section: .comparisons,
         targets: TargetBodies(
             sve2_128Splat: { element in
+                sveComparisonSplat("cmpgt", mirrored: "cmplt", for: element)
+            },
+            sveSplat: { element in
                 sveComparisonSplat("cmpgt", mirrored: "cmplt", for: element)
             },
             avx2: { element in
@@ -15379,6 +15461,9 @@ let basicOps: [Op] = [
             sve2_128Splat: { element in
                 sveBitwiseSplat("and", operands: ("mask", "a"), splattingFirst: false, for: element)
             },
+            sveSplat: { element in
+                sveBitwiseSplat("and", operands: ("mask", "a"), splattingFirst: false, for: element)
+            },
             avx3: { element in x86Avx3ZeroMasked("a", for: element) }
         )
     ) { element in
@@ -15603,15 +15688,8 @@ let basicOps: [Op] = [
         .all,
         section: .logical,
         targets: TargetBodies(
-            sve2_128: { element in
-                let unsigned = unsignedElement(of: element)
-                return sveAllLanesEqual(
-                    "a",
-                    to: "(\(unsigned.cUnsignedLane))~0",
-                    splat: element.category != .float,
-                    for: unsigned
-                )
-            },
+            sve2_128: { element in sveAllBitsSet(for: element) },
+            sve: { element in sveAllBitsSet(for: element) },
             avx3: { element in x86Avx3AllBitsSet(for: element) },
             emu128: { element in emulatedAllBitsReduction(setting: true, for: element) }
         )
@@ -15627,6 +15705,7 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             sve2_128: { element in sveAllLanesEqual("a", to: "0", splat: true, for: element) },
+            sve: { element in sveAllLanesEqual("a", to: "0", splat: true, for: element) },
             avx3: { element in x86Avx3AllBitsClear(for: element) },
             emu128: { element in emulatedAllBitsReduction(setting: false, for: element) }
         )
@@ -15642,17 +15721,8 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             neon: { element in neonPopulationCount(for: element) },
-            sve2_128: { element in
-                sveBitCount(
-                    sveBuiltin(
-                        "cnt",
-                        [sveAllLanes(of: element), sveOperand("a", for: element, splat: true)],
-                        for: element,
-                        predication: "x"
-                    ),
-                    for: element
-                )
-            },
+            sve2_128: { element in svePopulationCount(for: element) },
+            sve: { element in svePopulationCount(for: element) },
             avx3dl: { element in portablePopulationCount(for: element) },
             avx3: { element in x86PopulationCount(level: .avx3, for: element) },
             avx2: { element in x86PopulationCount(level: .avx2, for: element) },
@@ -15672,12 +15742,8 @@ let basicOps: [Op] = [
         section: .logical,
         targets: TargetBodies(
             neon: { element in neonLeadingZeroCountResult(for: element) },
-            sve2_128: { element in
-                sveBitCount(
-                    sveLeadingZeroCount(sveOperand("a", for: element, splat: true), for: element),
-                    for: element
-                )
-            },
+            sve2_128: { element in sveLeadingZeroCountResult(for: element) },
+            sve: { element in sveLeadingZeroCountResult(for: element) },
             avx3dl: { element in x86Avx3BitScan(.leadingZeros, level: .avx3dl, for: element) },
             avx3: { element in x86Avx3BitScan(.leadingZeros, level: .avx3, for: element) },
             avx2: { element in x86BiasedBitScan(.leadingZeros, level: .avx2, for: element) },
@@ -15698,6 +15764,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonTrailingZeroCount(for: element) },
             sve2_128: { element in sveTrailingZeroCount(for: element) },
+            sve: { element in sveTrailingZeroCount(for: element) },
             avx3dl: { element in x86Avx3BitScan(.trailingZeros, level: .avx3dl, for: element) },
             avx3: { element in x86Avx3BitScan(.trailingZeros, level: .avx3, for: element) },
             avx2: { element in x86BiasedBitScan(.trailingZeros, level: .avx2, for: element) },
@@ -15718,6 +15785,7 @@ let basicOps: [Op] = [
         targets: TargetBodies(
             neon: { element in neonHighestSetBitIndex(for: element) },
             sve2_128: { element in sveHighestSetBitIndex(for: element) },
+            sve: { element in sveHighestSetBitIndex(for: element) },
             avx3dl: { element in x86Avx3BitScan(.highestSetBit, level: .avx3dl, for: element) },
             avx3: { element in x86Avx3BitScan(.highestSetBit, level: .avx3, for: element) },
             avx2: { element in x86BiasedBitScan(.highestSetBit, level: .avx2, for: element) },
