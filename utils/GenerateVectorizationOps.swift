@@ -28550,6 +28550,22 @@ func zipInterleaved(upper: Bool, from source: Element, to result: Element) -> St
     )
 }
 
+func zipBytesInterleaved(upper: Bool, from source: Element, to result: Element) -> String? {
+    guard source.category == .float16 else { return nil }
+    let indices = unpackIndices(
+        lanes: source.blockLaneCount,
+        upper: upper,
+        blocks: source.width / 16
+    ).flatMap { [2 * $0, 2 * $0 + 1] }
+    let bytes = vectorTypedef("bytes_vector", of: unsignedElement(bits: 8), lanes: source.width)
+    let shuffled =
+        "__builtin_shufflevector((bytes_vector)a, (bytes_vector)b, \(laneIndices(indices)))"
+    return """
+        \(bytes)
+        \(vectorResult(shuffled, for: result))
+        """
+}
+
 func zipSveInterleaved(_ name: String, from source: Element, to result: Element) -> String {
     let operands = ["a", "b"].map { sveSplatOperand($0, for: source) }
     return vectorResult(
@@ -28576,6 +28592,9 @@ func zipOp(
             targets: TargetBodies(
                 sve2_128: sourced(source) { source, result in
                     zipSveInterleaved(upper ? "zip2" : "zip1", from: source, to: result)
+                },
+                sse2: sourced(source) { source, result in
+                    zipBytesInterleaved(upper: upper, from: source, to: result)
                 }
             ),
             portable: sourced(source) { source, result in

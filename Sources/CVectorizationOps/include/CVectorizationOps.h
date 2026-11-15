@@ -146048,6 +146048,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_z
   return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
 #elif CVECTORIZATION_OPS_X86 == 4
   return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 2, 18, 3, 19, 8, 24, 9, 25, 10, 26, 11, 27));
+#elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
+  typedef uint8_t bytes_vector __attribute__((vector_size(16)));
+  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector((bytes_vector)a, (bytes_vector)b, 0, 1, 16, 17, 2, 3, 18, 19, 4, 5, 20, 21, 6, 7, 22, 23));
 #else
   return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 8, 1, 9, 2, 10, 3, 11));
 #endif
