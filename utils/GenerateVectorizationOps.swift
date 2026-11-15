@@ -20695,6 +20695,92 @@ func sveShuffled(
     return view == nil ? result : "\(vectorTypedef(of: lanes))\n\(result)"
 }
 
+func sveViewedResult(_ call: String, viewing view: Element, for element: Element) -> String {
+    vectorResult("(\(element.cVector))\(sveResult(call, for: view))", for: element)
+}
+
+func sveInterleavedBlockHalves(upper: Bool, for element: Element) -> String {
+    guard element.bits < 64 else {
+        return sveShuffled(upper ? "trn2" : "trn1", "a", "b", for: element)
+    }
+    let pairs = unsignedElement(bits: 64)
+    let lanes = unsignedElement(of: element)
+    let halves = ["a", "b"].map { operand in
+        let gathered = sveBuiltin(
+            upper ? "uzp2" : "uzp1",
+            [sveOperand(operand, for: pairs), sveOperand(operand, for: pairs)],
+            for: pairs
+        )
+        return "const \(pairs.cVector) \(operand)Halves = \(sveResult(gathered, for: pairs));"
+    }
+    let zipped = sveBuiltin(
+        "zip1",
+        ["aHalves", "bHalves"].map { sveOperand($0, for: lanes) },
+        for: lanes
+    )
+    return """
+        \(halves.joined(separator: "\n"))
+        \(sveViewedResult(zipped, viewing: lanes, for: element))
+        """
+}
+
+func sveConcatenatedHalves(upper: Bool, for element: Element) -> String {
+    let lanes = unsignedElement(of: element)
+    let (high, low) = (sveOperand("a", for: lanes), sveOperand("b", for: lanes))
+    let pattern = svePattern(lanes: element.laneCount / 2)
+    let lower = "__builtin_sve_svptrue_pat_b\(lanes.bits)(\(pattern))"
+    let spliced: String
+    if upper {
+        let all = sveAllLanes(of: unsignedElement(bits: 8))
+        let lowUpper = sveBuiltin("splice", ["upper", low, low], for: lanes)
+        let selected = sveBuiltin("sel", ["upper", high, "lowUpper"], for: lanes)
+        spliced = """
+            const __SVBool_t upper = __builtin_sve_svnot_b_z(\(all), \(lower));
+            const \(sveVector(lanes.cSuffix)) lowUpper = \(lowUpper);
+            \(sveViewedResult(selected, viewing: lanes, for: element))
+            """
+    } else {
+        let joined = sveBuiltin("splice", [lower, low, high], for: lanes)
+        spliced = sveViewedResult(joined, viewing: lanes, for: element)
+    }
+    guard element.width == 32 else { return spliced }
+    let blocks = sveBuiltin(upper ? "uzp2q" : "uzp1q", [low, high], for: lanes)
+    return """
+        #if defined(__ARM_FEATURE_SVE_MATMUL_FP64)
+        \(sveViewedResult(blocks, viewing: lanes, for: element))
+        #else
+        \(spliced)
+        #endif
+        """
+}
+
+func sveReversedGroups(_ group: Int, for element: Element) -> String? {
+    guard element.width > 16, element.laneCount >= group else { return nil }
+    let lanes = unsignedElement(of: element)
+    if element.laneCount == group {
+        let reversed = sveBuiltin("rev", [sveOperand("a", for: lanes)], for: lanes)
+        return sveViewedResult(reversed, viewing: lanes, for: element)
+    }
+    if element.bits * group <= 64 {
+        let groups = unsignedElement(bits: element.bits * group)
+        let reversed = sveBuiltin(
+            ["revb", "revh", "revw"][element.bits.trailingZeroBitCount - 3],
+            [sveAllLanes(of: groups), sveOperand("a", for: groups)],
+            for: groups,
+            predication: "x"
+        )
+        return sveViewedResult(reversed, viewing: groups, for: element)
+    }
+    let indices = sveBuiltin(
+        "eor_n",
+        [sveAllLanes(of: lanes), sveBuiltin("index", ["0", "1"], for: lanes), "\(group - 1)"],
+        for: lanes,
+        predication: "x"
+    )
+    let lookup = sveBuiltin("tbl", [sveOperand("a", for: lanes), indices], for: lanes)
+    return sveViewedResult(lookup, viewing: lanes, for: element)
+}
+
 func sveSplatCondition(of operands: [String], for element: Element) -> String {
     operands.map { sveSplatCondition($0, nil, for: element) }.joined(separator: " || ")
 }
@@ -21578,7 +21664,10 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.tag, .vector, .vector],
         applies: .all,
         section: .interleave,
-        targets: TargetBodies(sve2_128: { element in sveShuffled("zip1", "a", "b", for: element) })
+        targets: TargetBodies(
+            sve2_128: { element in sveShuffled("zip1", "a", "b", for: element) },
+            sve: { element in sveInterleavedBlockHalves(upper: false, for: element) }
+        )
     ) { element in
         unpackIndices(lanes: element.blockLaneCount, upper: false, blocks: element.width / 16)
     },
@@ -21588,7 +21677,10 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.tag, .vector, .vector],
         applies: .all,
         section: .interleave,
-        targets: TargetBodies(sve2_128: { element in sveShuffled("zip2", "a", "b", for: element) })
+        targets: TargetBodies(
+            sve2_128: { element in sveShuffled("zip2", "a", "b", for: element) },
+            sve: { element in sveInterleavedBlockHalves(upper: true, for: element) }
+        )
     ) { element in
         unpackIndices(lanes: element.blockLaneCount, upper: true, blocks: element.width / 16)
     },
@@ -21600,6 +21692,7 @@ let fixedPermutations: [FixedPermutation] = [
         section: .interleave,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("trn1", "a", "b", for: element) },
+            sve: { element in sveShuffled("trn1", "a", "b", for: element) },
             avx3dl: { element in
                 element.bits == 8
                     ? shuffled("a", "b", interleavedLanes(parity: 0, for: element), for: element)
@@ -21622,6 +21715,7 @@ let fixedPermutations: [FixedPermutation] = [
         section: .interleave,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("trn2", "a", "b", for: element) },
+            sve: { element in sveShuffled("trn2", "a", "b", for: element) },
             avx3dl: { element in
                 element.bits == 8
                     ? shuffled("a", "b", interleavedLanes(parity: 1, for: element), for: element)
@@ -21657,7 +21751,10 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.vector],
         applies: .all,
         section: .otherFixedPatternPermutationsWithinBlocks,
-        targets: TargetBodies(sve2_128: { element in sveShuffled("trn1", "a", "a", for: element) }),
+        targets: TargetBodies(
+            sve2_128: { element in sveShuffled("trn1", "a", "a", for: element) },
+            sve: { element in sveShuffled("trn1", "a", "a", for: element) }
+        ),
         sse2Only: { element in x86DuplicatedBytes(even: true, for: element) },
         indices: { element in
             (0..<element.laneCount).map { $0 & ~1 }
@@ -21669,7 +21766,10 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.vector],
         applies: .all,
         section: .otherFixedPatternPermutationsWithinBlocks,
-        targets: TargetBodies(sve2_128: { element in sveShuffled("trn2", "a", "a", for: element) }),
+        targets: TargetBodies(
+            sve2_128: { element in sveShuffled("trn2", "a", "a", for: element) },
+            sve: { element in sveShuffled("trn2", "a", "a", for: element) }
+        ),
         sse2Only: { element in x86DuplicatedBytes(even: false, for: element) },
         indices: { element in
             (0..<element.laneCount).map { $0 | 1 }
@@ -21745,7 +21845,8 @@ let fixedPermutations: [FixedPermutation] = [
                     viewing: isInteger64(element) ? nil : unsignedElement(bits: 64),
                     for: element
                 )
-            }
+            },
+            sve: { element in sveConcatenatedHalves(upper: false, for: element) }
         ),
         lowerFirst: true
     ) { element in
@@ -21767,7 +21868,8 @@ let fixedPermutations: [FixedPermutation] = [
                     viewing: isInteger64(element) ? nil : unsignedElement(bits: 64),
                     for: element
                 )
-            }
+            },
+            sve: { element in sveConcatenatedHalves(upper: true, for: element) }
         ),
         lowerFirst: true
     ) { element in
@@ -21779,7 +21881,10 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.tag, .vector, .vector],
         applies: .all,
         section: .combine,
-        targets: TargetBodies(sve2_128Splat: { element in sveSplatExtended(for: element) }),
+        targets: TargetBodies(
+            sve2_128Splat: { element in sveSplatExtended(for: element) },
+            sveSplat: { element in sveSplatExtended(for: element) }
+        ),
         sse2Only: { element in x86ConcatenatedLowerUpper(for: element) },
         lowerFirst: true,
         indices: { element in
@@ -21794,6 +21899,7 @@ let fixedPermutations: [FixedPermutation] = [
         section: .combine,
         targets: TargetBodies(
             sve2_128Splat: { element in sveSplatSelectedLower(for: element) },
+            sveSplat: { element in sveSplatSelectedLower(for: element) },
             sse4: { element in x86ConcatenatedUpperLower(level: .sse4, for: element) },
             ssse3: { element in x86ConcatenatedUpperLower(level: .ssse3, for: element) },
             sse2: { element in x86ConcatenatedUpperLower(level: .sse2, for: element) }
@@ -21810,6 +21916,7 @@ let fixedPermutations: [FixedPermutation] = [
         section: .combine,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("uzp2", "b", "a", for: element) },
+            sve: { element in sveShuffled("uzp2", "b", "a", for: element) },
             avx3dl: { element in
                 x86Avx3ConcatenatedParity(parity: 1, level: .avx3dl, for: element)
             },
@@ -21831,6 +21938,7 @@ let fixedPermutations: [FixedPermutation] = [
         section: .combine,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("uzp1", "b", "a", for: element) },
+            sve: { element in sveShuffled("uzp1", "b", "a", for: element) },
             avx3dl: { element in
                 x86Avx3ConcatenatedParity(parity: 0, level: .avx3dl, for: element)
             },
@@ -21852,6 +21960,7 @@ let fixedPermutations: [FixedPermutation] = [
         section: .combine,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("zip1", "a", "b", for: element) },
+            sve: { element in sveShuffled("zip1", "a", "b", for: element) },
             avx3dl: { element in
                 x86Avx3InterleavedWholeBytes(upper: false, level: .avx3dl, for: element)
             },
@@ -21875,6 +21984,7 @@ let fixedPermutations: [FixedPermutation] = [
         section: .combine,
         targets: TargetBodies(
             sve2_128: { element in sveShuffled("zip2", "a", "b", for: element) },
+            sve: { element in sveShuffled("zip2", "a", "b", for: element) },
             avx3dl: { element in
                 x86Avx3InterleavedWholeBytes(upper: true, level: .avx3dl, for: element)
             },
@@ -21919,6 +22029,7 @@ let fixedPermutations: [FixedPermutation] = [
         section: .reverse,
         targets: TargetBodies(
             sve2_128: { element in element.bits == 32 ? sveReversed(for: element) : nil },
+            sve: { element in sveReversedGroups(4, for: element) },
             avx3: { element in x86Avx3ReversedGroups(4, for: element) }
         ),
         helpers: TargetBodies(avx3: { element in x86Avx3ReverseHelpers(4, for: element) }),
@@ -21934,7 +22045,10 @@ let fixedPermutations: [FixedPermutation] = [
         parameters: [.tag, .vector],
         applies: .all,
         section: .reverse,
-        targets: TargetBodies(avx3: { element in x86Avx3ReversedGroups(8, for: element) }),
+        targets: TargetBodies(
+            sve: { element in sveReversedGroups(8, for: element) },
+            avx3: { element in x86Avx3ReversedGroups(8, for: element) }
+        ),
         helpers: TargetBodies(avx3: { element in x86Avx3ReverseHelpers(8, for: element) }),
         sse2Only: { element in x86ReversedGroups(8, for: element) },
         laneCapability: .reversal(lanes: 8),
