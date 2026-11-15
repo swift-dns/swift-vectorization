@@ -27956,6 +27956,10 @@ enum FloatToIntConversion {
         case .down: return "m"
         }
     }
+
+    var sveRounding: String? {
+        neonRounding.isEmpty ? nil : "rint\(neonRounding)"
+    }
 }
 
 func floatToIntPairs(_ source: Element, _ result: Element) -> Bool {
@@ -28060,6 +28064,27 @@ func floatToIntNeon(_ conversion: FloatToIntConversion, to result: Element) -> S
     let operand = "(\(neonVector("i8")))a"
     let code = neonTypeCode(of: result)
     return "const \(result.cVector) converted = (\(result.cVector))\(builtin)(\(operand), \(code));"
+}
+
+func floatToIntSve(
+    _ conversion: FloatToIntConversion,
+    masked: Bool,
+    from source: Element,
+    to result: Element
+) -> String {
+    let all = sveAllLanes(of: source)
+    let operand = sveOperand("a", for: source)
+    let rounded =
+        conversion.sveRounding.map {
+            sveBuiltin($0, [all, operand], for: source, predication: "x")
+        } ?? operand
+    let converted = sveBuiltin(
+        "cvt_\(sveSuffix(of: result))",
+        [masked ? svePredicate(of: "mask", for: result) : all, rounded],
+        for: source,
+        predication: masked ? "z" : "x"
+    )
+    return vectorResult(sveResult(converted, for: result), for: result)
 }
 
 func floatToIntReturning(masked: Bool, avx3: Bool = false, for result: Element) -> String {
@@ -28469,6 +28494,9 @@ func floatToIntOps(
                     let converted = floatToIntNeon(conversion, to: result)
                     return "\(converted)\n\(floatToIntReturning(masked: masked, for: result))"
                 },
+                sve: sourced(source) { source, result in
+                    floatToIntSve(conversion, masked: masked, from: source, to: result)
+                },
                 avx3: x86(.avx3),
                 avx2: x86(.avx2),
                 sse4: x86(.sse4),
@@ -28611,6 +28639,18 @@ func promoteLowerUpperSve(
     )
 }
 
+func promoteLowerUpperSveConverting(
+    _ half: PromoteLowerUpperHalf,
+    from source: Element,
+    to result: Element
+) -> String {
+    promoteSveConverting(
+        selecting: { sveBuiltin(half == .lower ? "zip1" : "zip2", [$0, $0], for: source) },
+        from: source,
+        to: result
+    )
+}
+
 func promoteLowerUpperX86Block(_ half: PromoteLowerUpperHalf, from source: Element) -> String {
     let indices = promoteLowerUpperIndices(half, of: source)
     guard source.width == 16 else {
@@ -28733,6 +28773,10 @@ func promoteLowerUpperFamily(_ half: PromoteLowerUpperHalf, inRange: Bool) -> [O
                 },
                 sve2_128: { result in
                     promoteLowerUpperSve(half, from: source.at(width: result.width), to: result)
+                },
+                sve: sourced(source) { source, result in
+                    promoteLowerUpperSve(half, from: source, to: result)
+                        ?? promoteLowerUpperSveConverting(half, from: source, to: result)
                 },
                 avx3: sourced(source) { source, result in
                     promoteAvx3(
@@ -28976,6 +29020,30 @@ func promoteEvenOddX86Avx3(
     return "\(gathered)\n\(vectorResult(truncated, for: result))"
 }
 
+func promoteEvenOddSveLanes(
+    _ operand: String,
+    parity: Int,
+    from source: Element,
+    to extended: Element
+) -> String {
+    guard parity == 1 else {
+        let letter = ["b", "h", "w"][source.bits.trailingZeroBitCount - 3]
+        return sveBuiltin(
+            "ext\(letter)",
+            [sveAllLanes(of: extended), operand],
+            for: extended,
+            predication: "x"
+        )
+    }
+    let shift = source.category == .signedInteger ? "asr" : "lsr"
+    return sveBuiltin(
+        "\(shift)_n",
+        [sveAllLanes(of: extended), operand, "\(source.bits)"],
+        for: extended,
+        predication: "x"
+    )
+}
+
 func promoteEvenOddSveIntegers(parity: Int, from source: Element, to result: Element) -> String {
     let extended =
         source.category == .signedInteger
@@ -28985,34 +29053,18 @@ func promoteEvenOddSveIntegers(parity: Int, from source: Element, to result: Ele
         from: source,
         to: extended
     )
-    let call: String
-    if parity == 0 {
-        let letter = ["b", "h", "w"][source.bits.trailingZeroBitCount - 3]
-        call = sveBuiltin(
-            "ext\(letter)",
-            [sveAllLanes(of: extended), operand],
-            for: extended,
-            predication: "x"
-        )
-    } else {
-        let shift = source.category == .signedInteger ? "asr" : "lsr"
-        call = sveBuiltin(
-            "\(shift)_n",
-            [sveAllLanes(of: extended), operand, "\(source.bits)"],
-            for: extended,
-            predication: "x"
-        )
-    }
+    let call = promoteEvenOddSveLanes(operand, parity: parity, from: source, to: extended)
     return vectorResult("(\(result.cVector))\(sveResult(call, for: extended))", for: result)
 }
 
-func promoteEvenOddSveConverting(parity: Int, from source: Element, to result: Element) -> String {
+func promoteSveConverting(
+    selecting selected: (String) -> String,
+    from source: Element,
+    to result: Element
+) -> String {
     let converted = sveBuiltin(
         "cvt_\(sveSuffix(of: result))",
-        [
-            sveAllLanes(of: source),
-            parity == 0 ? "v" : sveBuiltin("trn2", ["v", "v"], for: source),
-        ],
+        [sveAllLanes(of: source), selected("v")],
         for: source,
         predication: "x"
     )
@@ -29020,6 +29072,14 @@ func promoteEvenOddSveConverting(parity: Int, from source: Element, to result: E
         const \(sveType(of: source)) v = \(sveSplatOperand("a", for: source));
         \(vectorResult(sveResult(converted, for: result), for: result))
         """
+}
+
+func promoteEvenOddSveConverting(parity: Int, from source: Element, to result: Element) -> String {
+    promoteSveConverting(
+        selecting: { parity == 0 ? $0 : sveBuiltin("trn2", [$0, $0], for: source) },
+        from: source,
+        to: result
+    )
 }
 
 func promoteEvenOddSve(parity: Int, from source: Element, to result: Element) -> String? {
@@ -29103,6 +29163,10 @@ func promoteEvenOddFamily(
                 },
                 sve2_128: sourced(source) { source, result -> String? in
                     promoteEvenOddSve(parity: parity, from: source, to: result)
+                },
+                sve: sourced(source) { source, result in
+                    promoteEvenOddSve(parity: parity, from: source, to: result)
+                        ?? promoteEvenOddSveConverting(parity: parity, from: source, to: result)
                 },
                 avx3: x86(.avx3),
                 avx2: x86(.avx2),
@@ -29202,6 +29266,21 @@ func zipSveInterleaved(_ name: String, from source: Element, to result: Element)
     )
 }
 
+func zipSveBlockHalves(upper: Bool, from source: Element, to result: Element) -> String {
+    let words = unsignedElement(bits: 64).at(width: source.width)
+    let declarations = ["a", "b"].map { name in
+        let operand = sveReinterpreted(sveSplatOperand(name, for: source), from: source, to: words)
+        return "const \(sveType(of: words)) \(name)Words = \(operand);"
+    }
+    let concatenation = upper ? "uzp2" : "uzp1"
+    let halves = ["aWords", "bWords"].map { name in
+        let blocks = sveBuiltin(concatenation, [name, name], for: words)
+        return sveReinterpreted(blocks, from: words, to: source)
+    }
+    let interleaved = sveResult(sveBuiltin("zip1", halves, for: source), for: source)
+    return (declarations + [vectorResult(interleaved, for: result)]).joined(separator: "\n")
+}
+
 func zipOp(
     _ swiftName: String,
     _ highwayName: String,
@@ -29220,6 +29299,9 @@ func zipOp(
             targets: TargetBodies(
                 sve2_128: sourced(source) { source, result in
                     zipSveInterleaved(upper ? "zip2" : "zip1", from: source, to: result)
+                },
+                sve: sourced(source) { source, result in
+                    zipSveBlockHalves(upper: upper, from: source, to: result)
                 },
                 sse2: sourced(source) { source, result in
                     zipBytesInterleaved(upper: upper, from: source, to: result)
@@ -29486,21 +29568,35 @@ func demoteNeonBody(
     return "\(constantSwitch(on: "bits", cases))\n\(unfused)"
 }
 
+func demoteSveSaturated(_ operand: String, from source: Element, to result: Element) -> String {
+    let all = sveAllLanes(of: source)
+    var clamped = operand
+    var compared = source
+    if source.category == .signedInteger {
+        let lowest = result.category == .signedInteger ? lowestValue(of: result) : "0"
+        clamped = sveBuiltin("max_n", [all, clamped, lowest], for: source, predication: "x")
+        if result.category == .unsignedInteger {
+            compared = unsignedElement(of: source)
+            clamped = sveReinterpreted(clamped, from: source, to: compared)
+        }
+    }
+    let arguments = [all, clamped, highestValue(of: result)]
+    let saturated = sveBuiltin("min_n", arguments, for: compared, predication: "x")
+    return sveReinterpreted(saturated, from: compared, to: result)
+}
+
 func demoteSveKernel(
     _ first: String,
     _ second: String,
     ordered: Bool,
+    sve2: Bool = true,
     from source: Element,
     to result: Element
 ) -> DemoteKernel {
     let operands = [first, second]
     let combined: String
-    if demoteUnsignedToSigned(from: source, to: result) {
-        let narrowed = operands.map { operand in
-            let arguments = [sveAllLanes(of: source), operand, highestValue(of: result)]
-            let clamped = sveBuiltin("min_n", arguments, for: source, predication: "x")
-            return sveReinterpreted(clamped, from: source, to: result)
-        }
+    if !sve2 || demoteUnsignedToSigned(from: source, to: result) {
+        let narrowed = operands.map { demoteSveSaturated($0, from: source, to: result) }
         combined = sveBuiltin(ordered ? "uzp1" : "trn1", narrowed, for: result)
     } else {
         let isSignedToUnsigned = demoteSignedToUnsigned(from: source, to: result)
@@ -29522,20 +29618,22 @@ func demoteSveShifted(_ operand: String, _ shift: DemoteShift, for source: Eleme
 func demoteSveBody(
     _ shift: DemoteShift?,
     ordered: Bool,
+    sve2: Bool = true,
     from source: Element,
     to result: Element
 ) -> String {
     let operands = ["a", "b"].map { sveSplatOperand($0, for: source) }
-    guard let shift else {
-        return demoteSveKernel(operands[0], operands[1], ordered: ordered, from: source, to: result)
-            .body(for: result)
+    func demoted(_ first: String, _ second: String) -> DemoteKernel {
+        demoteSveKernel(first, second, ordered: ordered, sve2: sve2, from: source, to: result)
     }
-    let kernel = demoteSveKernel("shiftedA", "shiftedB", ordered: ordered, from: source, to: result)
+    guard let shift else {
+        return demoted(operands[0], operands[1]).body(for: result)
+    }
     return DemoteKernel(
         statements: zip(["shiftedA", "shiftedB"], operands).map { name, operand in
             "const \(sveType(of: source)) \(name) = \(demoteSveShifted(operand, shift, for: source));"
         },
-        value: kernel.value
+        value: demoted("shiftedA", "shiftedB").value
     ).body(for: result)
 }
 
@@ -30047,6 +30145,12 @@ func demoteTargets(
         sve2_128: sourced(source) { source, result in
             demoteSveBody(shift, ordered: ordered, from: source, to: result)
         },
+        sve: sourced(source) { source, result in
+            demoteSveBody(shift, ordered: ordered, sve2: false, from: source, to: result)
+        },
+        sve2: sourced(source) { source, result in
+            demoteSveBody(shift, ordered: ordered, from: source, to: result)
+        },
         avx3: x86(.avx3),
         avx2: x86(.avx2),
         sse4: x86(.sse4),
@@ -30115,6 +30219,9 @@ let demoteTruncatingOps = sourcedOps(accepting: demoteUnsignedIntegers) { source
     let shuffled = sourced(source) { source, result in
         demoteEvenLanes("a", "b", lane: result.cType, from: source).body(for: result)
     }
+    let truncated = sourced(source) { source, result in
+        demoteSveTruncated(from: source, to: result)
+    }
     return Op(
         "vector",
         "OrderedTruncate2To",
@@ -30126,9 +30233,8 @@ let demoteTruncatingOps = sourcedOps(accepting: demoteUnsignedIntegers) { source
         source: source,
         targets: TargetBodies(
             neon: shuffled,
-            sve2_128: sourced(source) { source, result in
-                demoteSveTruncated(from: source, to: result)
-            },
+            sve2_128: truncated,
+            sve: truncated,
             avx3dl: x86(.avx3dl),
             avx3: x86(.avx3),
             avx2: x86(.avx2),
@@ -30181,6 +30287,7 @@ let demoteMasksOps = sourcedOps(
         targets: TargetBodies(
             neon: saturated,
             sve2_128: shuffled,
+            sve: shuffled,
             avx3: x86(.avx3),
             avx2: x86(.avx2),
             sse4: x86(.sse4),

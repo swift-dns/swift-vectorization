@@ -140556,19 +140556,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_vector_converting_f32_to_u32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_u32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, value) >> 23) < 159 ? (uint32_t)value : (__builtin_signbit(value) ? 0 : UINT32_MAX);
-  }
-  return (cvectorization_ops_raw_vector_u32)(converted);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svcvt_u32_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_u32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, value) >> 23) < 159 ? (uint32_t)value : (__builtin_signbit(value) ? 0 : UINT32_MAX);
-  }
-  return (cvectorization_ops_raw_vector_u32)(converted);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svcvt_u32_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 converted = (cvectorization_ops_vector_u32)__builtin_neon_vcvtq_u32_v((cvectorization_ops_neon_i8)a, 50);
   return (cvectorization_ops_raw_vector_u32)(converted);
@@ -140620,19 +140610,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_vector_converting_f32_to_i32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : (__builtin_signbit(value) ? INT32_MIN : INT32_MAX);
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : (__builtin_signbit(value) ? INT32_MIN : INT32_MAX);
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i32 converted = (cvectorization_ops_vector_i32)__builtin_neon_vcvtq_s32_v((cvectorization_ops_neon_i8)a, 34);
   return (cvectorization_ops_raw_vector_i32)(converted);
@@ -140668,19 +140648,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_vector_converting_f64_to_u64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_u64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, value) >> 52) < 1087 ? (uint64_t)value : (__builtin_signbit(value) ? 0 : UINT64_MAX);
-  }
-  return (cvectorization_ops_raw_vector_u64)(converted);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_u64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, value) >> 52) < 1087 ? (uint64_t)value : (__builtin_signbit(value) ? 0 : UINT64_MAX);
-  }
-  return (cvectorization_ops_raw_vector_u64)(converted);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 converted = (cvectorization_ops_vector_u64)__builtin_neon_vcvtq_u64_v((cvectorization_ops_neon_i8)a, 51);
   return (cvectorization_ops_raw_vector_u64)(converted);
@@ -140763,19 +140733,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_converting_f64_to_i64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : (__builtin_signbit(value) ? INT64_MIN : INT64_MAX);
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : (__builtin_signbit(value) ? INT64_MIN : INT64_MAX);
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i64 converted = (cvectorization_ops_vector_i64)__builtin_neon_vcvtq_s64_v((cvectorization_ops_neon_i8)a, 35);
   return (cvectorization_ops_raw_vector_i64)(converted);
@@ -140824,19 +140784,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_vector_converting_in_range_f32_to_u32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_u32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, value) >> 23) < 159 ? (uint32_t)value : 0;
-  }
-  return (cvectorization_ops_raw_vector_u32)(converted);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svcvt_u32_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_u32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, value) >> 23) < 159 ? (uint32_t)value : 0;
-  }
-  return (cvectorization_ops_raw_vector_u32)(converted);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svcvt_u32_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 converted = (cvectorization_ops_vector_u32)__builtin_neon_vcvtq_u32_v((cvectorization_ops_neon_i8)a, 50);
   return (cvectorization_ops_raw_vector_u32)(converted);
@@ -140877,19 +140827,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_vector_converting_in_range_f32_to_i32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : INT32_MIN;
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : INT32_MIN;
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i32 converted = (cvectorization_ops_vector_i32)__builtin_neon_vcvtq_s32_v((cvectorization_ops_neon_i8)a, 34);
   return (cvectorization_ops_raw_vector_i32)(converted);
@@ -140914,19 +140854,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_vector_converting_in_range_f64_to_u64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_u64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, value) >> 52) < 1087 ? (uint64_t)value : 0;
-  }
-  return (cvectorization_ops_raw_vector_u64)(converted);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_u64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, value) >> 52) < 1087 ? (uint64_t)value : 0;
-  }
-  return (cvectorization_ops_raw_vector_u64)(converted);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 converted = (cvectorization_ops_vector_u64)__builtin_neon_vcvtq_u64_v((cvectorization_ops_neon_i8)a, 51);
   return (cvectorization_ops_raw_vector_u64)(converted);
@@ -140973,19 +140903,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_converting_in_range_f64_to_i64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : INT64_MIN;
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : INT64_MIN;
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i64 converted = (cvectorization_ops_vector_i64)__builtin_neon_vcvtq_s64_v((cvectorization_ops_neon_i8)a, 35);
   return (cvectorization_ops_raw_vector_i64)(converted);
@@ -141025,19 +140945,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const cvectorization_ops_mask_u32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u32, cvectorization_ops_read_mask_u32, rawMask);
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_u32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, value) >> 23) < 159 ? (uint32_t)value : (__builtin_signbit(value) ? 0 : UINT32_MAX);
-  }
-  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)converted);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svcvt_u32_f32_z(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_u32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    converted[i] = (__builtin_bit_cast(uint32_t, value) >> 23) < 159 ? (uint32_t)value : (__builtin_signbit(value) ? 0 : UINT32_MAX);
-  }
-  return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)converted);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svcvt_u32_f32_z(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 converted = (cvectorization_ops_vector_u32)__builtin_neon_vcvtq_u32_v((cvectorization_ops_neon_i8)a, 50);
   return cvectorization_ops_selecting_or_zero_u32(rawMask, (cvectorization_ops_raw_vector_u32)converted);
@@ -141090,19 +141000,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const cvectorization_ops_mask_i32 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i32, cvectorization_ops_read_mask_i32, rawMask);
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    converted[i] = ((__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : (__builtin_signbit(value) ? INT32_MIN : INT32_MAX)) & mask[i];
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_z(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    converted[i] = ((__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : (__builtin_signbit(value) ? INT32_MIN : INT32_MAX)) & mask[i];
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_z(__builtin_sve_svcmpne_n_u32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_u32)rawMask, 0), (cvectorization_ops_sve_f32)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i32 converted = (cvectorization_ops_vector_i32)__builtin_neon_vcvtq_s32_v((cvectorization_ops_neon_i8)a, 34);
   return cvectorization_ops_selecting_or_zero_i32(rawMask, (cvectorization_ops_raw_vector_i32)converted);
@@ -141139,19 +141039,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
   const cvectorization_ops_mask_u64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_u64, cvectorization_ops_read_mask_u64, rawMask);
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_u64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, value) >> 52) < 1087 ? (uint64_t)value : (__builtin_signbit(value) ? 0 : UINT64_MAX);
-  }
-  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)converted);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_u64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    converted[i] = (__builtin_bit_cast(uint64_t, value) >> 52) < 1087 ? (uint64_t)value : (__builtin_signbit(value) ? 0 : UINT64_MAX);
-  }
-  return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)converted);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 converted = (cvectorization_ops_vector_u64)__builtin_neon_vcvtq_u64_v((cvectorization_ops_neon_i8)a, 51);
   return cvectorization_ops_selecting_or_zero_u64(rawMask, (cvectorization_ops_raw_vector_u64)converted);
@@ -141235,19 +141125,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
   const cvectorization_ops_mask_i64 mask = CVECTORIZATION_OPS_READ_MASK(cvectorization_ops_mask_i64, cvectorization_ops_read_mask_i64, rawMask);
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    converted[i] = ((__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : (__builtin_signbit(value) ? INT64_MIN : INT64_MAX)) & mask[i];
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    converted[i] = ((__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : (__builtin_signbit(value) ? INT64_MIN : INT64_MAX)) & mask[i];
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_z(__builtin_sve_svcmpne_n_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)rawMask, 0), (cvectorization_ops_sve_f64)a));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i64 converted = (cvectorization_ops_vector_i64)__builtin_neon_vcvtq_s64_v((cvectorization_ops_neon_i8)a, 35);
   return cvectorization_ops_selecting_or_zero_i64(rawMask, (cvectorization_ops_raw_vector_i64)converted);
@@ -141296,37 +141176,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_vector_rounding_to_nearest_or_even_f32_to_i32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    const float magnitude = __builtin_fabsf(value);
-    const bool negative = __builtin_signbit(value);
-    if (!(magnitude < 8388608.0f)) {
-      converted[i] = !(magnitude < 2147483648.0f) ? (negative ? INT32_MIN : INT32_MAX) : (int32_t)value;
-      continue;
-    }
-    const float bias = value < 0.0f ? -0.5f : 0.5f;
-    const int32_t rounded = (int32_t)(value + bias);
-    const float distance = __builtin_fabsf((float)rounded - value);
-    converted[i] = (rounded & 1) && distance == 0.5f ? rounded - (negative ? -1 : 1) : rounded;
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svrintn_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    const float magnitude = __builtin_fabsf(value);
-    const bool negative = __builtin_signbit(value);
-    if (!(magnitude < 8388608.0f)) {
-      converted[i] = !(magnitude < 2147483648.0f) ? (negative ? INT32_MIN : INT32_MAX) : (int32_t)value;
-      continue;
-    }
-    const float bias = value < 0.0f ? -0.5f : 0.5f;
-    const int32_t rounded = (int32_t)(value + bias);
-    const float distance = __builtin_fabsf((float)rounded - value);
-    converted[i] = (rounded & 1) && distance == 0.5f ? rounded - (negative ? -1 : 1) : rounded;
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svrintn_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a)));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i32 converted = (cvectorization_ops_vector_i32)__builtin_neon_vcvtnq_s32_v((cvectorization_ops_neon_i8)a, 34);
   return (cvectorization_ops_raw_vector_i32)(converted);
@@ -141371,37 +141223,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_rounding_to_nearest_or_even_f64_to_i64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    const double magnitude = __builtin_fabs(value);
-    const bool negative = __builtin_signbit(value);
-    if (!(magnitude < 4503599627370496.0)) {
-      converted[i] = !(magnitude < 9223372036854775808.0) ? (negative ? INT64_MIN : INT64_MAX) : (int64_t)value;
-      continue;
-    }
-    const double bias = value < 0.0 ? -0.5 : 0.5;
-    const int64_t rounded = (int64_t)(value + bias);
-    const double distance = __builtin_fabs((double)rounded - value);
-    converted[i] = (rounded & 1) && distance == 0.5 ? rounded - (negative ? -1 : 1) : rounded;
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svrintn_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    const double magnitude = __builtin_fabs(value);
-    const bool negative = __builtin_signbit(value);
-    if (!(magnitude < 4503599627370496.0)) {
-      converted[i] = !(magnitude < 9223372036854775808.0) ? (negative ? INT64_MIN : INT64_MAX) : (int64_t)value;
-      continue;
-    }
-    const double bias = value < 0.0 ? -0.5 : 0.5;
-    const int64_t rounded = (int64_t)(value + bias);
-    const double distance = __builtin_fabs((double)rounded - value);
-    converted[i] = (rounded & 1) && distance == 0.5 ? rounded - (negative ? -1 : 1) : rounded;
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svrintn_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a)));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i64 converted = (cvectorization_ops_vector_i64)__builtin_neon_vcvtnq_s64_v((cvectorization_ops_neon_i8)a, 35);
   return (cvectorization_ops_raw_vector_i64)(converted);
@@ -141460,23 +141284,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_vector_rounding_up_f32_to_i32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    const int32_t truncated = (__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : (__builtin_signbit(value) ? INT32_MIN : INT32_MAX);
-    const bool inexact = __builtin_fabsf(value) < 8388608.0f && (float)truncated < value;
-    converted[i] = inexact ? truncated + 1 : truncated;
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svrintp_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    const int32_t truncated = (__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : (__builtin_signbit(value) ? INT32_MIN : INT32_MAX);
-    const bool inexact = __builtin_fabsf(value) < 8388608.0f && (float)truncated < value;
-    converted[i] = inexact ? truncated + 1 : truncated;
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svrintp_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a)));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i32 converted = (cvectorization_ops_vector_i32)__builtin_neon_vcvtpq_s32_v((cvectorization_ops_neon_i8)a, 34);
   return (cvectorization_ops_raw_vector_i32)(converted);
@@ -141528,23 +141338,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_rounding_up_f64_to_i64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    const int64_t truncated = (__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : (__builtin_signbit(value) ? INT64_MIN : INT64_MAX);
-    const bool inexact = __builtin_fabs(value) < 4503599627370496.0 && (double)truncated < value;
-    converted[i] = inexact ? truncated + 1 : truncated;
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svrintp_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    const int64_t truncated = (__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : (__builtin_signbit(value) ? INT64_MIN : INT64_MAX);
-    const bool inexact = __builtin_fabs(value) < 4503599627370496.0 && (double)truncated < value;
-    converted[i] = inexact ? truncated + 1 : truncated;
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svrintp_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a)));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i64 converted = (cvectorization_ops_vector_i64)__builtin_neon_vcvtpq_s64_v((cvectorization_ops_neon_i8)a, 35);
   return (cvectorization_ops_raw_vector_i64)(converted);
@@ -141609,23 +141405,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_vector_rounding_down_f32_to_i32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = a[i];
-    const int32_t truncated = (__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : (__builtin_signbit(value) ? INT32_MIN : INT32_MAX);
-    const bool inexact = __builtin_fabsf(value) < 8388608.0f && (float)truncated > value;
-    converted[i] = inexact ? truncated - 1 : truncated;
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svrintm_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i32 converted;
-  for (size_t i = 0; i < 16; ++i) {
-    const float value = a[i];
-    const int32_t truncated = (__builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23) < 158 ? (int32_t)value : (__builtin_signbit(value) ? INT32_MIN : INT32_MAX);
-    const bool inexact = __builtin_fabsf(value) < 8388608.0f && (float)truncated > value;
-    converted[i] = inexact ? truncated - 1 : truncated;
-  }
-  return (cvectorization_ops_raw_vector_i32)(converted);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svcvt_s32_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svrintm_f32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a)));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i32 converted = (cvectorization_ops_vector_i32)__builtin_neon_vcvtmq_s32_v((cvectorization_ops_neon_i8)a, 34);
   return (cvectorization_ops_raw_vector_i32)(converted);
@@ -141677,23 +141459,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_rounding_down_f64_to_i64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 4; ++i) {
-    const double value = a[i];
-    const int64_t truncated = (__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : (__builtin_signbit(value) ? INT64_MIN : INT64_MAX);
-    const bool inexact = __builtin_fabs(value) < 4503599627370496.0 && (double)truncated > value;
-    converted[i] = inexact ? truncated - 1 : truncated;
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svrintm_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  cvectorization_ops_vector_i64 converted;
-  for (size_t i = 0; i < 8; ++i) {
-    const double value = a[i];
-    const int64_t truncated = (__builtin_bit_cast(uint64_t, __builtin_fabs(value)) >> 52) < 1086 ? (int64_t)value : (__builtin_signbit(value) ? INT64_MIN : INT64_MAX);
-    const bool inexact = __builtin_fabs(value) < 4503599627370496.0 && (double)truncated > value;
-    converted[i] = inexact ? truncated - 1 : truncated;
-  }
-  return (cvectorization_ops_raw_vector_i64)(converted);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svrintm_f64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a)));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_i64 converted = (cvectorization_ops_vector_i64)__builtin_neon_vcvtmq_s64_v((cvectorization_ops_neon_i8)a, 35);
   return (cvectorization_ops_raw_vector_i64)(converted);
@@ -141760,13 +141528,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svunpklo_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_convertvector(v, cvectorization_ops_vector_u16));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svunpklo_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_convertvector(v, cvectorization_ops_vector_u16));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svunpklo_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint8_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
@@ -141786,13 +141550,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_reinterpret_s16_u16(__builtin_sve_svunpklo_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_reinterpret_s16_u16(__builtin_sve_svunpklo_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_reinterpret_s16_u16(__builtin_sve_svunpklo_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint8_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
@@ -141812,13 +141572,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svunpklo_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_convertvector(v, cvectorization_ops_vector_u32));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svunpklo_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_convertvector(v, cvectorization_ops_vector_u32));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svunpklo_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint16_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -141838,13 +141594,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_reinterpret_s32_u32(__builtin_sve_svunpklo_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_reinterpret_s32_u32(__builtin_sve_svunpklo_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_reinterpret_s32_u32(__builtin_sve_svunpklo_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint16_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -141864,13 +141616,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svunpklo_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(v, cvectorization_ops_vector_u64));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svunpklo_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(v, cvectorization_ops_vector_u64));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svunpklo_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -141890,13 +141638,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_reinterpret_s64_u64(__builtin_sve_svunpklo_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_reinterpret_s64_u64(__builtin_sve_svunpklo_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_reinterpret_s64_u64(__builtin_sve_svunpklo_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -141914,13 +141658,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_lower_u32_to_f64(cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_u32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_u32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -141940,13 +141682,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svunpklo_s16((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svunpklo_s16((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int8_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svunpklo_s16((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int8_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
@@ -141966,13 +141704,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svunpklo_s32((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svunpklo_s32((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int16_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svunpklo_s32((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int16_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -141992,13 +141726,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svunpklo_s64((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svunpklo_s64((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svunpklo_s64((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -142016,13 +141746,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_lower_i32_to_f64(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_s32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_s32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -142040,27 +141768,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_vector_widening_lower_f32_to_u64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  cvectorization_ops_vector_u64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, value) >> 23;
-    result[i] = exponent < 191 ? (uint64_t)value : (bits & 0x80000000) != 0 ? 0 : UINT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  cvectorization_ops_vector_u64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, value) >> 23;
-    result[i] = exponent < 191 ? (uint64_t)value : (bits & 0x80000000) != 0 ? 0 : UINT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   typedef float narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1);
@@ -142092,27 +141804,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_lower_f32_to_i64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  cvectorization_ops_vector_i64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23;
-    result[i] = exponent < 190 ? (int64_t)value : (bits & 0x80000000) != 0 ? INT64_MIN : INT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  cvectorization_ops_vector_i64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23;
-    result[i] = exponent < 190 ? (int64_t)value : (bits & 0x80000000) != 0 ? INT64_MIN : INT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   typedef float narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1);
@@ -142143,13 +141839,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_lower_f32_to_f64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef float narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -142169,13 +141863,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svunpkhi_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_convertvector(v, cvectorization_ops_vector_u16));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svunpkhi_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_convertvector(v, cvectorization_ops_vector_u16));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svunpkhi_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint8_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
@@ -142195,13 +141885,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_reinterpret_s16_u16(__builtin_sve_svunpkhi_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_reinterpret_s16_u16(__builtin_sve_svunpkhi_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_reinterpret_s16_u16(__builtin_sve_svunpkhi_u16((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint8_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
@@ -142221,13 +141907,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svunpkhi_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_convertvector(v, cvectorization_ops_vector_u32));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svunpkhi_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_convertvector(v, cvectorization_ops_vector_u32));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svunpkhi_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint16_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
@@ -142247,13 +141929,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_reinterpret_s32_u32(__builtin_sve_svunpkhi_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_reinterpret_s32_u32(__builtin_sve_svunpkhi_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_reinterpret_s32_u32(__builtin_sve_svunpkhi_u32((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint16_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
@@ -142273,13 +141951,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svunpkhi_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(v, cvectorization_ops_vector_u64));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svunpkhi_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_u64)(__builtin_convertvector(v, cvectorization_ops_vector_u64));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svunpkhi_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -142299,13 +141973,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_reinterpret_s64_u64(__builtin_sve_svunpkhi_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_reinterpret_s64_u64(__builtin_sve_svunpkhi_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_reinterpret_s64_u64(__builtin_sve_svunpkhi_u64((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -142323,13 +141993,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_upper_u32_to_f64(cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_u32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_u32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -142349,13 +142017,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svunpkhi_s16((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svunpkhi_s16((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int8_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_convertvector(v, cvectorization_ops_vector_i16));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svunpkhi_s16((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int8_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63);
@@ -142375,13 +142039,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svunpkhi_s32((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svunpkhi_s32((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int16_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_convertvector(v, cvectorization_ops_vector_i32));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svunpkhi_s32((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int16_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
@@ -142401,13 +142061,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svunpkhi_s64((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svunpkhi_s64((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_i64)(__builtin_convertvector(v, cvectorization_ops_vector_i64));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svunpkhi_s64((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -142425,13 +142081,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_upper_i32_to_f64(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_s32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_s32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int32_t narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -142449,27 +142103,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_vector_widening_upper_f32_to_u64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  cvectorization_ops_vector_u64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, value) >> 23;
-    result[i] = exponent < 191 ? (uint64_t)value : (bits & 0x80000000) != 0 ? 0 : UINT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  cvectorization_ops_vector_u64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, value) >> 23;
-    result[i] = exponent < 191 ? (uint64_t)value : (bits & 0x80000000) != 0 ? 0 : UINT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   typedef float narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 2, 3);
@@ -142501,27 +142139,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_upper_f32_to_i64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  cvectorization_ops_vector_i64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23;
-    result[i] = exponent < 190 ? (int64_t)value : (bits & 0x80000000) != 0 ? INT64_MIN : INT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  cvectorization_ops_vector_i64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23;
-    result[i] = exponent < 190 ? (int64_t)value : (bits & 0x80000000) != 0 ? INT64_MIN : INT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   typedef float narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 2, 3);
@@ -142552,13 +142174,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_upper_f32_to_f64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(v, cvectorization_ops_vector_f64));
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef float narrow_vector __attribute__((vector_size(32)));
   const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
@@ -142576,27 +142196,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_vector_widening_lower_in_range_f32_to_u64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  typedef float float_vector __attribute__((vector_size(16)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(16)));
-  typedef int32_t signed_vector __attribute__((vector_size(16)));
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits) >> 23 < (unsigned_vector){191, 191, 191, 191});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_u64 result = __builtin_convertvector(resultClean, cvectorization_ops_vector_u64);
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  typedef float float_vector __attribute__((vector_size(32)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(32)));
-  typedef int32_t signed_vector __attribute__((vector_size(32)));
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits) >> 23 < (unsigned_vector){191, 191, 191, 191, 191, 191, 191, 191});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_u64 result = __builtin_convertvector(resultClean, cvectorization_ops_vector_u64);
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   typedef float narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1);
@@ -142639,29 +142243,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_lower_in_range_f32_to_i64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3);
-  typedef float float_vector __attribute__((vector_size(16)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(16)));
-  typedef int32_t signed_vector __attribute__((vector_size(16)));
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits & (unsigned_vector){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}) >> 23 < (unsigned_vector){190, 190, 190, 190});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_i64 resultConverted = __builtin_convertvector(resultClean, cvectorization_ops_vector_i64);
-  const cvectorization_ops_vector_i64 result = resultConverted | (~(cvectorization_ops_vector_i64)__builtin_convertvector(resultInRange, cvectorization_ops_vector_i64) & (cvectorization_ops_vector_i64){INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN});
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 1, 2, 3, 4, 5, 6, 7);
-  typedef float float_vector __attribute__((vector_size(32)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(32)));
-  typedef int32_t signed_vector __attribute__((vector_size(32)));
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits & (unsigned_vector){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}) >> 23 < (unsigned_vector){190, 190, 190, 190, 190, 190, 190, 190});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_i64 resultConverted = __builtin_convertvector(resultClean, cvectorization_ops_vector_i64);
-  const cvectorization_ops_vector_i64 result = resultConverted | (~(cvectorization_ops_vector_i64)__builtin_convertvector(resultInRange, cvectorization_ops_vector_i64) & (cvectorization_ops_vector_i64){INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN});
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip1_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   typedef float narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 1);
@@ -142705,27 +142291,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_vector_widening_upper_in_range_f32_to_u64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  typedef float float_vector __attribute__((vector_size(16)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(16)));
-  typedef int32_t signed_vector __attribute__((vector_size(16)));
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits) >> 23 < (unsigned_vector){191, 191, 191, 191});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_u64 result = __builtin_convertvector(resultClean, cvectorization_ops_vector_u64);
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  typedef float float_vector __attribute__((vector_size(32)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(32)));
-  typedef int32_t signed_vector __attribute__((vector_size(32)));
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits) >> 23 < (unsigned_vector){191, 191, 191, 191, 191, 191, 191, 191});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_u64 result = __builtin_convertvector(resultClean, cvectorization_ops_vector_u64);
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   typedef float narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 2, 3);
@@ -142768,29 +142338,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_upper_in_range_f32_to_i64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 4, 5, 6, 7);
-  typedef float float_vector __attribute__((vector_size(16)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(16)));
-  typedef int32_t signed_vector __attribute__((vector_size(16)));
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits & (unsigned_vector){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}) >> 23 < (unsigned_vector){190, 190, 190, 190});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_i64 resultConverted = __builtin_convertvector(resultClean, cvectorization_ops_vector_i64);
-  const cvectorization_ops_vector_i64 result = resultConverted | (~(cvectorization_ops_vector_i64)__builtin_convertvector(resultInRange, cvectorization_ops_vector_i64) & (cvectorization_ops_vector_i64){INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN});
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 8, 9, 10, 11, 12, 13, 14, 15);
-  typedef float float_vector __attribute__((vector_size(32)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(32)));
-  typedef int32_t signed_vector __attribute__((vector_size(32)));
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits & (unsigned_vector){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}) >> 23 < (unsigned_vector){190, 190, 190, 190, 190, 190, 190, 190});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_i64 resultConverted = __builtin_convertvector(resultClean, cvectorization_ops_vector_i64);
-  const cvectorization_ops_vector_i64 result = resultConverted | (~(cvectorization_ops_vector_i64)__builtin_convertvector(resultInRange, cvectorization_ops_vector_i64) & (cvectorization_ops_vector_i64){INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN});
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svzip2_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   typedef float narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 2, 3);
@@ -142836,9 +142388,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svextb_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)((cvectorization_ops_vector_u16)a & (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svextb_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)((cvectorization_ops_vector_u16)a & (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svextb_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)((cvectorization_ops_vector_u16)a & (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -142856,9 +142408,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svextb_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)a & (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svextb_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)a & (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svextb_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)((cvectorization_ops_vector_u16)a & (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -142876,9 +142428,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svexth_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)((cvectorization_ops_vector_u32)a & (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svexth_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)((cvectorization_ops_vector_u32)a & (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svexth_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)((cvectorization_ops_vector_u32)a & (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -142896,9 +142448,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svexth_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a & (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svexth_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a & (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svexth_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)((cvectorization_ops_vector_u32)a & (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -142916,9 +142468,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svextw_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)((cvectorization_ops_vector_u64)a & (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svextw_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)((cvectorization_ops_vector_u64)a & (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svextw_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)((cvectorization_ops_vector_u64)a & (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -142936,9 +142488,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svextw_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a & (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svextw_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a & (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svextw_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)((cvectorization_ops_vector_u64)a & (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -142957,9 +142509,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
   const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2, 4, 6), cvectorization_ops_vector_f64));
+  const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14), cvectorization_ops_vector_f64));
+  const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
@@ -142975,6 +142529,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svextb_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_s16_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svextb_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_s16_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svextb_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_s16_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a))));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef int8_t narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14);
@@ -142987,6 +142545,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svexth_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_s32_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svexth_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_s32_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svexth_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_s32_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a))));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef int16_t narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6);
@@ -142998,6 +142560,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_even_i32_to_i64(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svextw_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_s64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svextw_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_s64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a))));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svextw_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_s64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a))));
 #elif CVECTORIZATION_OPS_X86 >= 1 && CVECTORIZATION_OPS_X86 <= 3
   return cvectorization_ops_x86_promote_i32_to_i64((cvectorization_ops_x86_block_i64)__builtin_shufflevector(a, a, 0, 2, 4, 6));
@@ -143015,9 +142581,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
   const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2, 4, 6), cvectorization_ops_vector_f64));
+  const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14), cvectorization_ops_vector_f64));
+  const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int32_t narrow_vector __attribute__((vector_size(32)));
   typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
@@ -143035,27 +142603,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
   const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6);
-  cvectorization_ops_vector_u64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, value) >> 23;
-    result[i] = exponent < 191 ? (uint64_t)value : (bits & 0x80000000) != 0 ? 0 : UINT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14);
-  cvectorization_ops_vector_u64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, value) >> 23;
-    result[i] = exponent < 191 ? (uint64_t)value : (bits & 0x80000000) != 0 ? 0 : UINT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vcvtq_u64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2), cvectorization_ops_neon_f64)), 51));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143087,27 +142639,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
   const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6);
-  cvectorization_ops_vector_i64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23;
-    result[i] = exponent < 190 ? (int64_t)value : (bits & 0x80000000) != 0 ? INT64_MIN : INT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14);
-  cvectorization_ops_vector_i64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23;
-    result[i] = exponent < 190 ? (int64_t)value : (bits & 0x80000000) != 0 ? INT64_MIN : INT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vcvtq_s64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2), cvectorization_ops_neon_f64)), 35));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143135,9 +142671,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_even_f32_to_f64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2, 4, 6), cvectorization_ops_vector_f64));
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14), cvectorization_ops_vector_f64));
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef float narrow_vector __attribute__((vector_size(32)));
   typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
@@ -143153,6 +142691,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)), 8));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)), 8));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)), 8));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef uint8_t narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15);
@@ -143164,6 +142706,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_vector_widening_odd_u8_to_i16(cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)), 8));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)), 8));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svlsr_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a)), 8));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef uint8_t narrow_vector __attribute__((vector_size(8)));
@@ -143177,6 +142723,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), 16));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), 16));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), 16));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef uint16_t narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7);
@@ -143188,6 +142738,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_vector_widening_odd_u16_to_i32(cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), 16));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), 16));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svlsr_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), 16));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef uint16_t narrow_vector __attribute__((vector_size(8)));
@@ -143201,6 +142755,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), 32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), 32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), 32));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef uint32_t narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 1, 3);
@@ -143212,6 +142770,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_odd_u32_to_i64(cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), 32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), 32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svlsr_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), 32));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef uint32_t narrow_vector __attribute__((vector_size(8)));
@@ -143234,9 +142796,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
   const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_u32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3, 5, 7), cvectorization_ops_vector_f64));
+  const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_u32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15), cvectorization_ops_vector_f64));
+  const __SVUint32_t v = (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_u32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint32_t narrow_vector __attribute__((vector_size(32)));
   const cvectorization_ops_x86_i32 indices = *(const cvectorization_ops_x86_i32*)cvectorization_ops_x86_promote_odd_table_u32_to_f64();
@@ -143253,6 +142817,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svasr_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_s16_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)), 8));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svasr_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_s16_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)), 8));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svasr_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_s16_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a)), 8));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef int8_t narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15);
@@ -143265,6 +142833,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svasr_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_s32_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), 16));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svasr_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_s32_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), 16));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svasr_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_s32_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), 16));
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
   typedef int16_t narrow_vector __attribute__((vector_size(8)));
   const narrow_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7);
@@ -143276,6 +142848,10 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_vector_widening_odd_i32_to_i64(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_NEON == 2
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svasr_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_s64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), 32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svasr_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_s64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), 32));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svasr_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_s64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), 32));
 #elif CVECTORIZATION_OPS_X86 == 4
   const cvectorization_ops_vector_i64 wide = (cvectorization_ops_vector_i64)a;
@@ -143303,9 +142879,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_v
   const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_s32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3, 5, 7), cvectorization_ops_vector_f64));
+  const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_s32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15), cvectorization_ops_vector_f64));
+  const __SVInt32_t v = (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_s32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef int32_t narrow_vector __attribute__((vector_size(32)));
   const cvectorization_ops_x86_i32 indices = *(const cvectorization_ops_x86_i32*)cvectorization_ops_x86_promote_odd_table_i32_to_f64();
@@ -143331,27 +142909,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
   const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7);
-  cvectorization_ops_vector_u64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, value) >> 23;
-    result[i] = exponent < 191 ? (uint64_t)value : (bits & 0x80000000) != 0 ? 0 : UINT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15);
-  cvectorization_ops_vector_u64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, value) >> 23;
-    result[i] = exponent < 191 ? (uint64_t)value : (bits & 0x80000000) != 0 ? 0 : UINT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vcvtq_u64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3), cvectorization_ops_neon_f64)), 51));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143391,27 +142953,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
   const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float narrow_vector __attribute__((vector_size(16)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7);
-  cvectorization_ops_vector_i64 result;
-  for (size_t i = 0; i < 4; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23;
-    result[i] = exponent < 190 ? (int64_t)value : (bits & 0x80000000) != 0 ? INT64_MIN : INT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float narrow_vector __attribute__((vector_size(32)));
-  const narrow_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15);
-  cvectorization_ops_vector_i64 result;
-  for (size_t i = 0; i < 8; ++i) {
-    const float value = v[i];
-    const uint32_t bits = __builtin_bit_cast(uint32_t, value);
-    const uint32_t exponent = __builtin_bit_cast(uint32_t, __builtin_fabsf(value)) >> 23;
-    result[i] = exponent < 190 ? (int64_t)value : (bits & 0x80000000) != 0 ? INT64_MIN : INT64_MAX;
-  }
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vcvtq_s64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3), cvectorization_ops_neon_f64)), 35));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143447,9 +142993,11 @@ __attribute__((visibility("hidden"))) CVECTORIZATION_OPS_INLINE const int* cvect
 CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_vector_widening_odd_f32_to_f64(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3, 5, 7), cvectorization_ops_vector_f64));
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f64)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15), cvectorization_ops_vector_f64));
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f64)(cvectorization_ops_sve_f64)__builtin_sve_svcvt_f64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef float narrow_vector __attribute__((vector_size(32)));
   const cvectorization_ops_x86_i32 indices = *(const cvectorization_ops_x86_i32*)cvectorization_ops_x86_promote_odd_table_f32_to_f64();
@@ -143468,25 +143016,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
   const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float float_vector __attribute__((vector_size(16)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(16)));
-  typedef int32_t signed_vector __attribute__((vector_size(16)));
-  const float_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6);
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits) >> 23 < (unsigned_vector){191, 191, 191, 191});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_u64 result = __builtin_convertvector(resultClean, cvectorization_ops_vector_u64);
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float float_vector __attribute__((vector_size(32)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(32)));
-  typedef int32_t signed_vector __attribute__((vector_size(32)));
-  const float_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14);
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits) >> 23 < (unsigned_vector){191, 191, 191, 191, 191, 191, 191, 191});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_u64 result = __builtin_convertvector(resultClean, cvectorization_ops_vector_u64);
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vcvtq_u64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2), cvectorization_ops_neon_f64)), 51));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143534,27 +143068,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
   const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float float_vector __attribute__((vector_size(16)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(16)));
-  typedef int32_t signed_vector __attribute__((vector_size(16)));
-  const float_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6);
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits & (unsigned_vector){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}) >> 23 < (unsigned_vector){190, 190, 190, 190});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_i64 resultConverted = __builtin_convertvector(resultClean, cvectorization_ops_vector_i64);
-  const cvectorization_ops_vector_i64 result = resultConverted | (~(cvectorization_ops_vector_i64)__builtin_convertvector(resultInRange, cvectorization_ops_vector_i64) & (cvectorization_ops_vector_i64){INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN});
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float float_vector __attribute__((vector_size(32)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(32)));
-  typedef int32_t signed_vector __attribute__((vector_size(32)));
-  const float_vector v = __builtin_shufflevector(a, a, 0, 2, 4, 6, 8, 10, 12, 14);
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits & (unsigned_vector){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}) >> 23 < (unsigned_vector){190, 190, 190, 190, 190, 190, 190, 190});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_i64 resultConverted = __builtin_convertvector(resultClean, cvectorization_ops_vector_i64);
-  const cvectorization_ops_vector_i64 result = resultConverted | (~(cvectorization_ops_vector_i64)__builtin_convertvector(resultInRange, cvectorization_ops_vector_i64) & (cvectorization_ops_vector_i64){INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN});
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), v));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vcvtq_s64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(__builtin_shufflevector(a, a, 0, 2), cvectorization_ops_neon_f64)), 35));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143610,25 +143128,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_v
   const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float float_vector __attribute__((vector_size(16)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(16)));
-  typedef int32_t signed_vector __attribute__((vector_size(16)));
-  const float_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7);
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits) >> 23 < (unsigned_vector){191, 191, 191, 191});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_u64 result = __builtin_convertvector(resultClean, cvectorization_ops_vector_u64);
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float float_vector __attribute__((vector_size(32)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(32)));
-  typedef int32_t signed_vector __attribute__((vector_size(32)));
-  const float_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15);
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits) >> 23 < (unsigned_vector){191, 191, 191, 191, 191, 191, 191, 191});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_u64 result = __builtin_convertvector(resultClean, cvectorization_ops_vector_u64);
-  return (cvectorization_ops_raw_vector_u64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)__builtin_sve_svcvt_u64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u64)__builtin_neon_vcvtq_u64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3), cvectorization_ops_neon_f64)), 51));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143684,27 +143188,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_v
   const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef float float_vector __attribute__((vector_size(16)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(16)));
-  typedef int32_t signed_vector __attribute__((vector_size(16)));
-  const float_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7);
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits & (unsigned_vector){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}) >> 23 < (unsigned_vector){190, 190, 190, 190});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_i64 resultConverted = __builtin_convertvector(resultClean, cvectorization_ops_vector_i64);
-  const cvectorization_ops_vector_i64 result = resultConverted | (~(cvectorization_ops_vector_i64)__builtin_convertvector(resultInRange, cvectorization_ops_vector_i64) & (cvectorization_ops_vector_i64){INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN});
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef float float_vector __attribute__((vector_size(32)));
-  typedef uint32_t unsigned_vector __attribute__((vector_size(32)));
-  typedef int32_t signed_vector __attribute__((vector_size(32)));
-  const float_vector v = __builtin_shufflevector(a, a, 1, 3, 5, 7, 9, 11, 13, 15);
-  const unsigned_vector resultBits = (unsigned_vector)(v);
-  const signed_vector resultInRange = (signed_vector)((resultBits & (unsigned_vector){0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff}) >> 23 < (unsigned_vector){190, 190, 190, 190, 190, 190, 190, 190});
-  const float_vector resultClean = (float_vector)((unsigned_vector)resultInRange & resultBits);
-  const cvectorization_ops_vector_i64 resultConverted = __builtin_convertvector(resultClean, cvectorization_ops_vector_i64);
-  const cvectorization_ops_vector_i64 result = resultConverted | (~(cvectorization_ops_vector_i64)__builtin_convertvector(resultInRange, cvectorization_ops_vector_i64) & (cvectorization_ops_vector_i64){INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN, INT64_MIN});
-  return (cvectorization_ops_raw_vector_i64)(result);
+  const __SVFloat32_t v = (cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a);
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)__builtin_sve_svcvt_s64_f32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svtrn2_f32(v, v)));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i64)__builtin_neon_vcvtq_s64_v((cvectorization_ops_neon_i8)(__builtin_convertvector(__builtin_shufflevector(a, a, 1, 3), cvectorization_ops_neon_f64)), 35));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -143754,9 +143242,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svzip1_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a), (cvectorization_ops_sve_splat_u8(b) ? __builtin_sve_svdup_n_u8(b[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 4, 36, 5, 37, 6, 38, 7, 39, 16, 48, 17, 49, 18, 50, 19, 51, 20, 52, 21, 53, 22, 54, 23, 55));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u8((cvectorization_ops_sve_splat_u8(b) ? __builtin_sve_svdup_n_u8(b[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)b));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svzip1_u8(__builtin_sve_reinterpret_u8_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_u8_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(a, b, 0, 64, 1, 65, 2, 66, 3, 67, 4, 68, 5, 69, 6, 70, 7, 71, 16, 80, 17, 81, 18, 82, 19, 83, 20, 84, 21, 85, 22, 86, 23, 87, 32, 96, 33, 97, 34, 98, 35, 99, 36, 100, 37, 101, 38, 102, 39, 103, 48, 112, 49, 113, 50, 114, 51, 115, 52, 116, 53, 117, 54, 118, 55, 119));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u8((cvectorization_ops_sve_splat_u8(b) ? __builtin_sve_svdup_n_u8(b[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)b));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svzip1_u8(__builtin_sve_reinterpret_u8_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_u8_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(a, b, 0, 64, 1, 65, 2, 66, 3, 67, 4, 68, 5, 69, 6, 70, 7, 71, 16, 80, 17, 81, 18, 82, 19, 83, 20, 84, 21, 85, 22, 86, 23, 87, 32, 96, 33, 97, 34, 98, 35, 99, 36, 100, 37, 101, 38, 102, 39, 103, 48, 112, 49, 113, 50, 114, 51, 115, 52, 116, 53, 117, 54, 118, 55, 119));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143771,9 +143263,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svzip1_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 2, 18, 3, 19, 8, 24, 9, 25, 10, 26, 11, 27));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svzip1_u16(__builtin_sve_reinterpret_u16_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_u16_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svzip1_u16(__builtin_sve_reinterpret_u16_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_u16_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143788,9 +143284,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svzip1_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(a, b, 0, 8, 1, 9, 4, 12, 5, 13));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svzip1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 4, 20, 5, 21, 8, 24, 9, 25, 12, 28, 13, 29));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svzip1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 4, 20, 5, 21, 8, 24, 9, 25, 12, 28, 13, 29));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143805,9 +143305,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svzip1_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a), (cvectorization_ops_sve_splat_i8(b) ? __builtin_sve_svdup_n_s8(b[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 4, 36, 5, 37, 6, 38, 7, 39, 16, 48, 17, 49, 18, 50, 19, 51, 20, 52, 21, 53, 22, 54, 23, 55));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s8((cvectorization_ops_sve_splat_i8(b) ? __builtin_sve_svdup_n_s8(b[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)b));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svzip1_s8(__builtin_sve_reinterpret_s8_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_s8_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(a, b, 0, 64, 1, 65, 2, 66, 3, 67, 4, 68, 5, 69, 6, 70, 7, 71, 16, 80, 17, 81, 18, 82, 19, 83, 20, 84, 21, 85, 22, 86, 23, 87, 32, 96, 33, 97, 34, 98, 35, 99, 36, 100, 37, 101, 38, 102, 39, 103, 48, 112, 49, 113, 50, 114, 51, 115, 52, 116, 53, 117, 54, 118, 55, 119));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s8((cvectorization_ops_sve_splat_i8(b) ? __builtin_sve_svdup_n_s8(b[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)b));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svzip1_s8(__builtin_sve_reinterpret_s8_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_s8_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(a, b, 0, 64, 1, 65, 2, 66, 3, 67, 4, 68, 5, 69, 6, 70, 7, 71, 16, 80, 17, 81, 18, 82, 19, 83, 20, 84, 21, 85, 22, 86, 23, 87, 32, 96, 33, 97, 34, 98, 35, 99, 36, 100, 37, 101, 38, 102, 39, 103, 48, 112, 49, 113, 50, 114, 51, 115, 52, 116, 53, 117, 54, 118, 55, 119));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143822,9 +143326,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svzip1_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 2, 18, 3, 19, 8, 24, 9, 25, 10, 26, 11, 27));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s16((cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svzip1_s16(__builtin_sve_reinterpret_s16_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_s16_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s16((cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svzip1_s16(__builtin_sve_reinterpret_s16_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_s16_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143839,9 +143347,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svzip1_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(a, b, 0, 8, 1, 9, 4, 12, 5, 13));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s32((cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svzip1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 4, 20, 5, 21, 8, 24, 9, 25, 12, 28, 13, 29));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s32((cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svzip1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 4, 20, 5, 21, 8, 24, 9, 25, 12, 28, 13, 29));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143856,9 +143368,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svzip1_f32((cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a), (cvectorization_ops_sve_splat_f32(b) ? __builtin_sve_svdup_n_f32(b[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, b, 0, 8, 1, 9, 4, 12, 5, 13));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_f32((cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_f32((cvectorization_ops_sve_splat_f32(b) ? __builtin_sve_svdup_n_f32(b[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)b));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svzip1_f32(__builtin_sve_reinterpret_f32_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_f32_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 4, 20, 5, 21, 8, 24, 9, 25, 12, 28, 13, 29));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_f32((cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_f32((cvectorization_ops_sve_splat_f32(b) ? __builtin_sve_svdup_n_f32(b[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)b));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svzip1_f32(__builtin_sve_reinterpret_f32_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_f32_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 4, 20, 5, 21, 8, 24, 9, 25, 12, 28, 13, 29));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143873,9 +143389,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f16)(cvectorization_ops_sve_f16)__builtin_sve_svzip1_f16((cvectorization_ops_sve_splat_f16(a) ? __builtin_sve_svdup_n_f16(a[0]) : (__SVFloat16_t)(cvectorization_ops_sve_f16)a), (cvectorization_ops_sve_splat_f16(b) ? __builtin_sve_svdup_n_f16(b[0]) : (__SVFloat16_t)(cvectorization_ops_sve_f16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 16, 1, 17, 2, 18, 3, 19, 8, 24, 9, 25, 10, 26, 11, 27));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_f16((cvectorization_ops_sve_splat_f16(a) ? __builtin_sve_svdup_n_f16(a[0]) : (__SVFloat16_t)(cvectorization_ops_sve_f16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_f16((cvectorization_ops_sve_splat_f16(b) ? __builtin_sve_svdup_n_f16(b[0]) : (__SVFloat16_t)(cvectorization_ops_sve_f16)b));
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f16)(cvectorization_ops_sve_f16)__builtin_sve_svzip1_f16(__builtin_sve_reinterpret_f16_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_f16_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_f16((cvectorization_ops_sve_splat_f16(a) ? __builtin_sve_svdup_n_f16(a[0]) : (__SVFloat16_t)(cvectorization_ops_sve_f16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_f16((cvectorization_ops_sve_splat_f16(b) ? __builtin_sve_svdup_n_f16(b[0]) : (__SVFloat16_t)(cvectorization_ops_sve_f16)b));
+  return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f16)(cvectorization_ops_sve_f16)__builtin_sve_svzip1_f16(__builtin_sve_reinterpret_f16_u64(__builtin_sve_svuzp1_u64(aWords, aWords)), __builtin_sve_reinterpret_f16_u64(__builtin_sve_svuzp1_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)(__builtin_shufflevector(a, b, 0, 32, 1, 33, 2, 34, 3, 35, 8, 40, 9, 41, 10, 42, 11, 43, 16, 48, 17, 49, 18, 50, 19, 51, 24, 56, 25, 57, 26, 58, 27, 59));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143893,9 +143413,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svzip2_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a), (cvectorization_ops_sve_splat_u8(b) ? __builtin_sve_svdup_n_u8(b[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(a, b, 8, 40, 9, 41, 10, 42, 11, 43, 12, 44, 13, 45, 14, 46, 15, 47, 24, 56, 25, 57, 26, 58, 27, 59, 28, 60, 29, 61, 30, 62, 31, 63));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u8((cvectorization_ops_sve_splat_u8(b) ? __builtin_sve_svdup_n_u8(b[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)b));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svzip1_u8(__builtin_sve_reinterpret_u8_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_u8_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(a, b, 8, 72, 9, 73, 10, 74, 11, 75, 12, 76, 13, 77, 14, 78, 15, 79, 24, 88, 25, 89, 26, 90, 27, 91, 28, 92, 29, 93, 30, 94, 31, 95, 40, 104, 41, 105, 42, 106, 43, 107, 44, 108, 45, 109, 46, 110, 47, 111, 56, 120, 57, 121, 58, 122, 59, 123, 60, 124, 61, 125, 62, 126, 63, 127));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u8((cvectorization_ops_sve_splat_u8(a) ? __builtin_sve_svdup_n_u8(a[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u8((cvectorization_ops_sve_splat_u8(b) ? __builtin_sve_svdup_n_u8(b[0]) : (__SVUint8_t)(cvectorization_ops_sve_u8)b));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svzip1_u8(__builtin_sve_reinterpret_u8_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_u8_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(a, b, 8, 72, 9, 73, 10, 74, 11, 75, 12, 76, 13, 77, 14, 78, 15, 79, 24, 88, 25, 89, 26, 90, 27, 91, 28, 92, 29, 93, 30, 94, 31, 95, 40, 104, 41, 105, 42, 106, 43, 107, 44, 108, 45, 109, 46, 110, 47, 111, 56, 120, 57, 121, 58, 122, 59, 123, 60, 124, 61, 125, 62, 126, 63, 127));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143910,9 +143434,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svzip2_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(a, b, 4, 20, 5, 21, 6, 22, 7, 23, 12, 28, 13, 29, 14, 30, 15, 31));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svzip1_u16(__builtin_sve_reinterpret_u16_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_u16_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(a, b, 4, 36, 5, 37, 6, 38, 7, 39, 12, 44, 13, 45, 14, 46, 15, 47, 20, 52, 21, 53, 22, 54, 23, 55, 28, 60, 29, 61, 30, 62, 31, 63));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svzip1_u16(__builtin_sve_reinterpret_u16_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_u16_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(a, b, 4, 36, 5, 37, 6, 38, 7, 39, 12, 44, 13, 45, 14, 46, 15, 47, 20, 52, 21, 53, 22, 54, 23, 55, 28, 60, 29, 61, 30, 62, 31, 63));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143927,9 +143455,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u64 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svzip2_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(a, b, 2, 10, 3, 11, 6, 14, 7, 15));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svzip1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(a, b, 2, 18, 3, 19, 6, 22, 7, 23, 10, 26, 11, 27, 14, 30, 15, 31));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b));
+  return (cvectorization_ops_raw_vector_u64)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svzip1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u64)(__builtin_shufflevector(a, b, 2, 18, 3, 19, 6, 22, 7, 23, 10, 26, 11, 27, 14, 30, 15, 31));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143944,9 +143476,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svzip2_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a), (cvectorization_ops_sve_splat_i8(b) ? __builtin_sve_svdup_n_s8(b[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(a, b, 8, 40, 9, 41, 10, 42, 11, 43, 12, 44, 13, 45, 14, 46, 15, 47, 24, 56, 25, 57, 26, 58, 27, 59, 28, 60, 29, 61, 30, 62, 31, 63));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s8((cvectorization_ops_sve_splat_i8(b) ? __builtin_sve_svdup_n_s8(b[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)b));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svzip1_s8(__builtin_sve_reinterpret_s8_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_s8_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(a, b, 8, 72, 9, 73, 10, 74, 11, 75, 12, 76, 13, 77, 14, 78, 15, 79, 24, 88, 25, 89, 26, 90, 27, 91, 28, 92, 29, 93, 30, 94, 31, 95, 40, 104, 41, 105, 42, 106, 43, 107, 44, 108, 45, 109, 46, 110, 47, 111, 56, 120, 57, 121, 58, 122, 59, 123, 60, 124, 61, 125, 62, 126, 63, 127));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s8((cvectorization_ops_sve_splat_i8(a) ? __builtin_sve_svdup_n_s8(a[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s8((cvectorization_ops_sve_splat_i8(b) ? __builtin_sve_svdup_n_s8(b[0]) : (__SVInt8_t)(cvectorization_ops_sve_i8)b));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svzip1_s8(__builtin_sve_reinterpret_s8_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_s8_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(a, b, 8, 72, 9, 73, 10, 74, 11, 75, 12, 76, 13, 77, 14, 78, 15, 79, 24, 88, 25, 89, 26, 90, 27, 91, 28, 92, 29, 93, 30, 94, 31, 95, 40, 104, 41, 105, 42, 106, 43, 107, 44, 108, 45, 109, 46, 110, 47, 111, 56, 120, 57, 121, 58, 122, 59, 123, 60, 124, 61, 125, 62, 126, 63, 127));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143961,9 +143497,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svzip2_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(a, b, 4, 20, 5, 21, 6, 22, 7, 23, 12, 28, 13, 29, 14, 30, 15, 31));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s16((cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svzip1_s16(__builtin_sve_reinterpret_s16_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_s16_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(a, b, 4, 36, 5, 37, 6, 38, 7, 39, 12, 44, 13, 45, 14, 46, 15, 47, 20, 52, 21, 53, 22, 54, 23, 55, 28, 60, 29, 61, 30, 62, 31, 63));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s16((cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svzip1_s16(__builtin_sve_reinterpret_s16_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_s16_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(a, b, 4, 36, 5, 37, 6, 38, 7, 39, 12, 44, 13, 45, 14, 46, 15, 47, 20, 52, 21, 53, 22, 54, 23, 55, 28, 60, 29, 61, 30, 62, 31, 63));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143978,9 +143518,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i64 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svzip2_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(a, b, 2, 10, 3, 11, 6, 14, 7, 15));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s32((cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svzip1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(a, b, 2, 18, 3, 19, 6, 22, 7, 23, 10, 26, 11, 27, 14, 30, 15, 31));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_s32((cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b));
+  return (cvectorization_ops_raw_vector_i64)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svzip1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i64)(__builtin_shufflevector(a, b, 2, 18, 3, 19, 6, 22, 7, 23, 10, 26, 11, 27, 14, 30, 15, 31));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -143995,9 +143539,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f64 cvectorization_ops_z
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svzip2_f32((cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a), (cvectorization_ops_sve_splat_f32(b) ? __builtin_sve_svdup_n_f32(b[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, b, 2, 10, 3, 11, 6, 14, 7, 15));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_f32((cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_f32((cvectorization_ops_sve_splat_f32(b) ? __builtin_sve_svdup_n_f32(b[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)b));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svzip1_f32(__builtin_sve_reinterpret_f32_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_f32_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, b, 2, 18, 3, 19, 6, 22, 7, 23, 10, 26, 11, 27, 14, 30, 15, 31));
+  const __SVUint64_t aWords = __builtin_sve_reinterpret_u64_f32((cvectorization_ops_sve_splat_f32(a) ? __builtin_sve_svdup_n_f32(a[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)a));
+  const __SVUint64_t bWords = __builtin_sve_reinterpret_u64_f32((cvectorization_ops_sve_splat_f32(b) ? __builtin_sve_svdup_n_f32(b[0]) : (__SVFloat32_t)(cvectorization_ops_sve_f32)b));
+  return (cvectorization_ops_raw_vector_f64)((cvectorization_ops_vector_f32)(cvectorization_ops_sve_f32)__builtin_sve_svzip1_f32(__builtin_sve_reinterpret_f32_u64(__builtin_sve_svuzp2_u64(aWords, aWords)), __builtin_sve_reinterpret_f32_u64(__builtin_sve_svuzp2_u64(bWords, bWords))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f64)(__builtin_shufflevector(a, b, 2, 18, 3, 19, 6, 22, 7, 23, 10, 26, 11, 27, 14, 30, 15, 31));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -144019,15 +143567,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtnb_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), __builtin_sve_svqxtnb_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtnb_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), __builtin_sve_svqxtnb_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 16), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 16), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144069,15 +143613,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_elementwise_min((cvectorization_ops_vector_u8)__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), (cvectorization_ops_vector_u8){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144109,15 +143647,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtnb_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), __builtin_sve_svqxtnb_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtnb_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), __builtin_sve_svqxtnb_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 17), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 17), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144167,15 +143701,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_elementwise_min((cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), (cvectorization_ops_vector_u16){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144200,15 +143728,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtnb_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)), __builtin_sve_svqxtnb_u64((cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtnb_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)), __builtin_sve_svqxtnb_u64((cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 18), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 18), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144254,15 +143778,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_elementwise_min((cvectorization_ops_vector_u32)__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), (cvectorization_ops_vector_u32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144315,15 +143833,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtunb_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), __builtin_sve_svqxtunb_s16((cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), 0)), UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtunb_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), __builtin_sve_svqxtunb_s16((cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), 0)), UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)a, 16), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)b, 16), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144355,15 +143869,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_svqxtnb_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), __builtin_sve_svqxtnb_s16((cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), INT8_MIN), INT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_svqxtnb_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), __builtin_sve_svqxtnb_s16((cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), INT8_MIN), INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144395,15 +143905,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtunb_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), __builtin_sve_svqxtunb_s32((cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), 0)), UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtunb_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), __builtin_sve_svqxtunb_s32((cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), 0)), UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)a, 17), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)b, 17), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144447,15 +143953,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_svqxtnb_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), __builtin_sve_svqxtnb_s32((cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), INT16_MIN), INT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_svqxtnb_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), __builtin_sve_svqxtnb_s32((cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), INT16_MIN), INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144480,15 +143982,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtunb_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)), __builtin_sve_svqxtunb_s64((cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), 0)), UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtunb_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)), __builtin_sve_svqxtunb_s64((cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), 0)), UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)a, 18), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)b, 18), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144546,15 +144044,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_svqxtnb_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)), __builtin_sve_svqxtnb_s64((cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), INT32_MIN), INT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_svqxtnb_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)), __builtin_sve_svqxtnb_s64((cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), INT32_MIN), INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144612,15 +144106,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtnt_u16(__builtin_sve_svqxtnb_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtnt_u16(__builtin_sve_svqxtnb_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 16), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 16), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144652,15 +144142,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)__builtin_elementwise_min((cvectorization_ops_vector_u8)__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), (cvectorization_ops_vector_u8){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144682,15 +144166,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtnt_u32(__builtin_sve_svqxtnb_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtnt_u32(__builtin_sve_svqxtnb_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 17), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 17), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144730,15 +144210,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)__builtin_elementwise_min((cvectorization_ops_vector_u16)__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), (cvectorization_ops_vector_u16){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144760,15 +144234,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtnt_u64(__builtin_sve_svqxtnb_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtnt_u64(__builtin_sve_svqxtnb_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 18), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 18), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144813,15 +144283,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(a, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(b, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_elementwise_min((cvectorization_ops_vector_u32)__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15), (cvectorization_ops_vector_u32){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144866,15 +144330,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtunt_s16(__builtin_sve_svqxtunb_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), 0)), UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtunt_s16(__builtin_sve_svqxtunb_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), 0)), UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)a, 16), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)b, 16), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144896,15 +144356,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svqxtnt_s16(__builtin_sve_svqxtnb_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), INT8_MIN), INT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svqxtnt_s16(__builtin_sve_svqxtnb_s16((cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a)), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), (cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), INT8_MIN), INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144926,15 +144382,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtunt_s32(__builtin_sve_svqxtunb_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), 0)), UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtunt_s32(__builtin_sve_svqxtunb_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), 0)), UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)a, 17), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)b, 17), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144968,15 +144420,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svqxtnt_s32(__builtin_sve_svqxtnb_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), INT16_MIN), INT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svqxtnt_s32(__builtin_sve_svqxtnb_s32((cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a)), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), INT16_MIN), INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -144998,15 +144446,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtunt_s64(__builtin_sve_svqxtunb_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), 0)), UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtunt_s64(__builtin_sve_svqxtunb_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), 0)), UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)a, 18), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovun_v((cvectorization_ops_neon_i8)b, 18), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -145063,15 +144507,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqxtnt_s64(__builtin_sve_svqxtnb_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), INT32_MIN), INT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqxtnt_s64(__builtin_sve_svqxtnb_s64((cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a)), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), INT32_MIN), INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -145137,19 +144577,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
   const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtnb_u16(shiftedA), __builtin_sve_svqxtnb_u16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtnb_u16(shiftedA), __builtin_sve_svqxtnb_u16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -145217,19 +144655,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
   const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
   const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
@@ -145273,19 +144705,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtnb_u32(shiftedA), __builtin_sve_svqxtnb_u32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtnb_u32(shiftedA), __builtin_sve_svqxtnb_u32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -145371,19 +144801,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
   const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
@@ -145420,19 +144844,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtnb_u64(shiftedA), __builtin_sve_svqxtnb_u64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtnb_u64(shiftedA), __builtin_sve_svqxtnb_u64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -145528,19 +144950,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
   const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
@@ -145607,19 +145023,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
   const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtunb_s16(shiftedA), __builtin_sve_svqxtunb_s16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, 0)), UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtunb_s16(shiftedA), __builtin_sve_svqxtunb_s16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, 0)), UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -145675,19 +145089,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
   const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_svqxtnb_s16(shiftedA), __builtin_sve_svqxtnb_s16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MIN), INT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_svqxtnb_s16(shiftedA), __builtin_sve_svqxtnb_s16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MIN), INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -145743,19 +145155,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtunb_s32(shiftedA), __builtin_sve_svqxtunb_s32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, 0)), UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtunb_s32(shiftedA), __builtin_sve_svqxtunb_s32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, 0)), UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -145835,19 +145245,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_svqxtnb_s32(shiftedA), __builtin_sve_svqxtnb_s32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MIN), INT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_svqxtnb_s32(shiftedA), __builtin_sve_svqxtnb_s32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MIN), INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -145904,19 +145312,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtunb_s64(shiftedA), __builtin_sve_svqxtunb_s64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, 0)), UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtunb_s64(shiftedA), __builtin_sve_svqxtunb_s64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, 0)), UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146024,19 +145430,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_svqxtnb_s64(shiftedA), __builtin_sve_svqxtnb_s64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MIN), INT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_svqxtnb_s64(shiftedA), __builtin_sve_svqxtnb_s64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MIN), INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146151,19 +145555,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
   const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtnb_u16(shiftedA), __builtin_sve_svqxtnb_u16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtnb_u16(shiftedA), __builtin_sve_svqxtnb_u16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146231,19 +145633,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
   const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
   const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
@@ -146287,19 +145683,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtnb_u32(shiftedA), __builtin_sve_svqxtnb_u32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtnb_u32(shiftedA), __builtin_sve_svqxtnb_u32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146385,19 +145779,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
   const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
@@ -146434,19 +145822,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtnb_u64(shiftedA), __builtin_sve_svqxtnb_u64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtnb_u64(shiftedA), __builtin_sve_svqxtnb_u64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146542,19 +145928,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
   const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
@@ -146621,19 +146001,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
   const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtunb_s16(shiftedA), __builtin_sve_svqxtunb_s16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, 0)), UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_svqxtunb_s16(shiftedA), __builtin_sve_svqxtunb_s16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, 0)), UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146689,19 +146067,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
   const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_svqxtnb_s16(shiftedA), __builtin_sve_svqxtnb_s16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MIN), INT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_svqxtnb_s16(shiftedA), __builtin_sve_svqxtnb_s16(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svuzp1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MIN), INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146757,19 +146133,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtunb_s32(shiftedA), __builtin_sve_svqxtunb_s32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, 0)), UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_svqxtunb_s32(shiftedA), __builtin_sve_svqxtunb_s32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, 0)), UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146849,19 +146223,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_svqxtnb_s32(shiftedA), __builtin_sve_svqxtnb_s32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MIN), INT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_svqxtnb_s32(shiftedA), __builtin_sve_svqxtnb_s32(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svuzp1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MIN), INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -146918,19 +146290,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtunb_s64(shiftedA), __builtin_sve_svqxtunb_s64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, 0)), UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_svqxtunb_s64(shiftedA), __builtin_sve_svqxtunb_s64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, 0)), UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147038,19 +146408,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_svqxtnb_s64(shiftedA), __builtin_sve_svqxtnb_s64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MIN), INT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_svqxtnb_s64(shiftedA), __builtin_sve_svqxtnb_s64(shiftedB)));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svuzp1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MIN), INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147158,19 +146526,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
   const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtnt_u16(__builtin_sve_svqxtnb_u16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtnt_u16(__builtin_sve_svqxtnb_u16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147228,19 +146594,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
   const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
   const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
@@ -147274,19 +146634,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtnt_u32(__builtin_sve_svqxtnb_u32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtnt_u32(__builtin_sve_svqxtnb_u32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147362,19 +146720,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
   const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
@@ -147408,19 +146760,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtnt_u64(__builtin_sve_svqxtnb_u64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtnt_u64(__builtin_sve_svqxtnb_u64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147515,19 +146865,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
   const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
@@ -147586,19 +146930,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
   const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtunt_s16(__builtin_sve_svqxtunb_s16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, 0)), UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtunt_s16(__builtin_sve_svqxtunb_s16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, 0)), UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147644,19 +146986,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
   const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svqxtnt_s16(__builtin_sve_svqxtnb_s16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MIN), INT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svqxtnt_s16(__builtin_sve_svqxtnb_s16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MIN), INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147702,19 +147042,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtunt_s32(__builtin_sve_svqxtunb_s32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, 0)), UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtunt_s32(__builtin_sve_svqxtunb_s32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, 0)), UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147784,19 +147122,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svqxtnt_s32(__builtin_sve_svqxtnb_s32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MIN), INT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svqxtnt_s32(__builtin_sve_svqxtnb_s32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MIN), INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147850,19 +147186,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtunt_s64(__builtin_sve_svqxtunb_s64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, 0)), UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtunt_s64(__builtin_sve_svqxtunb_s64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, 0)), UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -147969,19 +147303,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqxtnt_s64(__builtin_sve_svqxtnb_s64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MIN), INT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqxtnt_s64(__builtin_sve_svqxtnb_s64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MIN), INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148088,19 +147420,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
   const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtnt_u16(__builtin_sve_svqxtnb_u16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtnt_u16(__builtin_sve_svqxtnb_u16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148158,19 +147488,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
   const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
-  const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVUint16_t shiftedA = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a), bits);
+  const __SVUint16_t shiftedB = (cvectorization_ops_sve_u16)(cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)(cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)(cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MAX)), __builtin_sve_reinterpret_s8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u16 shiftedA = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)a, bits);
   const cvectorization_ops_vector_u16 shiftedB = (cvectorization_ops_vector_u16)cvectorization_ops_rounding_shifted_right_u16((cvectorization_ops_raw_vector_u16)b, bits);
@@ -148204,19 +147528,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtnt_u32(__builtin_sve_svqxtnb_u32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtnt_u32(__builtin_sve_svqxtnb_u32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148292,19 +147614,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
-  const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVUint32_t shiftedA = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a), bits);
+  const __SVUint32_t shiftedB = (cvectorization_ops_sve_u32)(cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)(cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)(cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MAX)), __builtin_sve_reinterpret_s16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u32 shiftedA = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)a, bits);
   const cvectorization_ops_vector_u32 shiftedB = (cvectorization_ops_vector_u32)cvectorization_ops_rounding_shifted_right_u32((cvectorization_ops_raw_vector_u32)b, bits);
@@ -148338,19 +147654,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtnt_u64(__builtin_sve_svqxtnb_u64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtnt_u64(__builtin_sve_svqxtnb_u64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148445,19 +147759,13 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
-  const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(shiftedA, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(shiftedB, (cvectorization_ops_vector_u64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVUint64_t shiftedA = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a), bits);
+  const __SVUint64_t shiftedB = (cvectorization_ops_sve_u64)(cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)(cvectorization_ops_vector_u64)(cvectorization_ops_sve_u64)(cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MAX)), __builtin_sve_reinterpret_s32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   const cvectorization_ops_vector_u64 shiftedA = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)a, bits);
   const cvectorization_ops_vector_u64 shiftedB = (cvectorization_ops_vector_u64)cvectorization_ops_rounding_shifted_right_u64((cvectorization_ops_raw_vector_u64)b, bits);
@@ -148516,19 +147824,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
   const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtunt_s16(__builtin_sve_svqxtunb_s16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, 0)), UINT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svqxtunt_s16(__builtin_sve_svqxtunb_s16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i16){UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX, UINT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svtrn1_u8(__builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, 0)), UINT8_MAX)), __builtin_sve_reinterpret_u8_u16(__builtin_sve_svmin_n_u16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_reinterpret_u16_s16(__builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, 0)), UINT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148574,19 +147880,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i8 cvectorization_ops_ve
   const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
   return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svqxtnt_s16(__builtin_sve_svqxtnb_s16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MIN), INT8_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svqxtnt_s16(__builtin_sve_svqxtnb_s16(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i16 shiftedA = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)a, bits);
-  const cvectorization_ops_vector_i16 shiftedB = (cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)b, bits);
-  typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  const __SVInt16_t shiftedA = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(a) ? __builtin_sve_svdup_n_s16(a[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)a), bits);
+  const __SVInt16_t shiftedB = (cvectorization_ops_sve_i16)(cvectorization_ops_vector_i16)cvectorization_ops_rounding_shifted_right_i16((cvectorization_ops_raw_vector_i16)(cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)(cvectorization_ops_sve_splat_i16(b) ? __builtin_sve_svdup_n_s16(b[0]) : (__SVInt16_t)(cvectorization_ops_sve_i16)b), bits);
+  return (cvectorization_ops_raw_vector_i8)((cvectorization_ops_vector_i8)(cvectorization_ops_sve_i8)__builtin_sve_svtrn1_s8(__builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedA, INT8_MIN), INT8_MAX)), __builtin_sve_reinterpret_s8_s16(__builtin_sve_svmin_n_s16_x(__builtin_sve_svptrue_pat_b16(31), __builtin_sve_svmax_n_s16_x(__builtin_sve_svptrue_pat_b16(31), shiftedB, INT8_MIN), INT8_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148632,19 +147936,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
   const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtunt_s32(__builtin_sve_svqxtunb_s32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, 0)), UINT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svqxtunt_s32(__builtin_sve_svqxtunb_s32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i32){UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svtrn1_u16(__builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, 0)), UINT16_MAX)), __builtin_sve_reinterpret_u16_u32(__builtin_sve_svmin_n_u32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_reinterpret_u32_s32(__builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, 0)), UINT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148714,19 +148016,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i16 cvectorization_ops_v
   const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
   return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svqxtnt_s32(__builtin_sve_svqxtnb_s32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MIN), INT16_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svqxtnt_s32(__builtin_sve_svqxtnb_s32(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i32 shiftedA = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)a, bits);
-  const cvectorization_ops_vector_i32 shiftedB = (cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)b, bits);
-  typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  const __SVInt32_t shiftedA = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(a) ? __builtin_sve_svdup_n_s32(a[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)a), bits);
+  const __SVInt32_t shiftedB = (cvectorization_ops_sve_i32)(cvectorization_ops_vector_i32)cvectorization_ops_rounding_shifted_right_i32((cvectorization_ops_raw_vector_i32)(cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)(cvectorization_ops_sve_splat_i32(b) ? __builtin_sve_svdup_n_s32(b[0]) : (__SVInt32_t)(cvectorization_ops_sve_i32)b), bits);
+  return (cvectorization_ops_raw_vector_i16)((cvectorization_ops_vector_i16)(cvectorization_ops_sve_i16)__builtin_sve_svtrn1_s16(__builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedA, INT16_MIN), INT16_MAX)), __builtin_sve_reinterpret_s16_s32(__builtin_sve_svmin_n_s32_x(__builtin_sve_svptrue_pat_b32(31), __builtin_sve_svmax_n_s32_x(__builtin_sve_svptrue_pat_b32(31), shiftedB, INT16_MIN), INT16_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148780,19 +148080,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
   const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtunt_s64(__builtin_sve_svqxtunb_s64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, 0)), UINT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svqxtunt_s64(__builtin_sve_svqxtunb_s64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){0, 0, 0, 0, 0, 0, 0, 0}), (cvectorization_ops_vector_i64){UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX, UINT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svtrn1_u32(__builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, 0)), UINT32_MAX)), __builtin_sve_reinterpret_u32_u64(__builtin_sve_svmin_n_u64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_reinterpret_u64_s64(__builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, 0)), UINT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -148899,19 +148197,17 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_v
   const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqxtnt_s64(__builtin_sve_svqxtnb_s64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MIN), INT32_MAX))));
+#elif CVECTORIZATION_OPS_SVE == 2 && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svqxtnt_s64(__builtin_sve_svqxtnb_s64(shiftedA), shiftedB));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const cvectorization_ops_vector_i64 shiftedA = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)a, bits);
-  const cvectorization_ops_vector_i64 shiftedB = (cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)b, bits);
-  typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedA, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(shiftedB, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_vector_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  const __SVInt64_t shiftedA = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(a) ? __builtin_sve_svdup_n_s64(a[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)a), bits);
+  const __SVInt64_t shiftedB = (cvectorization_ops_sve_i64)(cvectorization_ops_vector_i64)cvectorization_ops_rounding_shifted_right_i64((cvectorization_ops_raw_vector_i64)(cvectorization_ops_vector_i64)(cvectorization_ops_sve_i64)(cvectorization_ops_sve_splat_i64(b) ? __builtin_sve_svdup_n_s64(b[0]) : (__SVInt64_t)(cvectorization_ops_sve_i64)b), bits);
+  return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)(cvectorization_ops_sve_i32)__builtin_sve_svtrn1_s32(__builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedA, INT32_MIN), INT32_MAX)), __builtin_sve_reinterpret_s32_s64(__builtin_sve_svmin_n_s64_x(__builtin_sve_svptrue_pat_b64(31), __builtin_sve_svmax_n_s64_x(__builtin_sve_svptrue_pat_b64(31), shiftedB, INT32_MIN), INT32_MAX))));
 #elif CVECTORIZATION_OPS_NEON
   if (__builtin_constant_p(bits)) {
     switch (bits) {
@@ -149016,15 +148312,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u8 cvectorization_ops_ve
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), __builtin_sve_reinterpret_u8_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(a, narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(b, narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), __builtin_sve_reinterpret_u8_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(a, narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(b, narrow_lanes);
-  return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_vector_u8)((cvectorization_ops_vector_u8)(cvectorization_ops_sve_u8)__builtin_sve_svuzp1_u8(__builtin_sve_reinterpret_u8_u16((cvectorization_ops_sve_splat_u16(a) ? __builtin_sve_svdup_n_u16(a[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)a)), __builtin_sve_reinterpret_u8_u16((cvectorization_ops_sve_splat_u16(b) ? __builtin_sve_svdup_n_u16(b[0]) : (__SVUint16_t)(cvectorization_ops_sve_u16)b))));
 #elif CVECTORIZATION_OPS_X86 == 6
   typedef uint8_t narrow_lanes __attribute__((vector_size(64)));
   return (cvectorization_ops_raw_vector_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
@@ -149052,15 +148342,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u16 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), __builtin_sve_reinterpret_u16_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(a, narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(b, narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), __builtin_sve_reinterpret_u16_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(a, narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(b, narrow_lanes);
-  return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_vector_u16)((cvectorization_ops_vector_u16)(cvectorization_ops_sve_u16)__builtin_sve_svuzp1_u16(__builtin_sve_reinterpret_u16_u32((cvectorization_ops_sve_splat_u32(a) ? __builtin_sve_svdup_n_u32(a[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)a)), __builtin_sve_reinterpret_u16_u32((cvectorization_ops_sve_splat_u32(b) ? __builtin_sve_svdup_n_u32(b[0]) : (__SVUint32_t)(cvectorization_ops_sve_u32)b))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   typedef uint16_t narrow_lanes __attribute__((vector_size(64)));
   return (cvectorization_ops_raw_vector_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
@@ -149092,15 +148376,9 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_v
 #if CVECTORIZATION_OPS_NEON == 2
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)), __builtin_sve_reinterpret_u32_u64((cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef uint32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(a, narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(b, narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)), __builtin_sve_reinterpret_u32_u64((cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b))));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  typedef uint32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(a, narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(b, narrow_lanes);
-  return (cvectorization_ops_raw_vector_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)(cvectorization_ops_sve_u32)__builtin_sve_svuzp1_u32(__builtin_sve_reinterpret_u32_u64((cvectorization_ops_sve_splat_u64(a) ? __builtin_sve_svdup_n_u64(a[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)a)), __builtin_sve_reinterpret_u32_u64((cvectorization_ops_sve_splat_u64(b) ? __builtin_sve_svdup_n_u64(b[0]) : (__SVUint64_t)(cvectorization_ops_sve_u64)b))));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   const cvectorization_ops_x86_i32 indices = *(const cvectorization_ops_x86_i32*)cvectorization_ops_x86_ordered_truncate2_to_table_u64_to_u32();
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_vpermi2vard512((cvectorization_ops_x86_i32)a, (cvectorization_ops_x86_i32)indices, (cvectorization_ops_x86_i32)b));
@@ -149124,15 +148402,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_mask
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149157,15 +148431,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_mask
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149190,15 +148460,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149223,15 +148489,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149256,15 +148518,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149289,15 +148547,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149356,15 +148610,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149423,15 +148673,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149490,15 +148736,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_mask
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149523,15 +148765,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_mask
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149556,15 +148794,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149589,15 +148823,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149622,15 +148852,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149655,15 +148881,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149722,15 +148944,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149789,15 +149007,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149856,15 +149070,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149889,15 +149099,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149922,15 +149128,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f16 cvectorization_ops_mas
   typedef int16_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int16_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int16_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i32){INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN, INT16_MIN}), (cvectorization_ops_vector_i32){INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
+  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int16_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_f16)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 1), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 1), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -149955,15 +149157,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -150022,15 +149220,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -150089,15 +149283,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_f32 cvectorization_ops_mas
   typedef int32_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int32_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int32_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i64){INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN, INT32_MIN}), (cvectorization_ops_vector_i64){INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX, INT32_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int32_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_f32)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 2), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 2), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -150156,15 +149346,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_mask
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -150189,15 +149375,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_mask
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -150222,15 +149404,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_u8 cvectorization_ops_mask
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_u8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -150255,15 +149433,11 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_mask_i8 cvectorization_ops_mask
   typedef int8_t narrow_lanes __attribute__((vector_size(16)));
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30));
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  typedef int8_t narrow_lanes __attribute__((vector_size(16)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31));
-#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
   typedef int8_t narrow_lanes __attribute__((vector_size(32)));
-  const narrow_lanes lower = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(a, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  const narrow_lanes upper = __builtin_convertvector(__builtin_elementwise_min(__builtin_elementwise_max(b, (cvectorization_ops_vector_i16){INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN, INT8_MIN}), (cvectorization_ops_vector_i16){INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX, INT8_MAX}), narrow_lanes);
-  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector(lower, upper, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62));
+#elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
+  typedef int8_t narrow_lanes __attribute__((vector_size(64)));
+  return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((narrow_lanes)a, (narrow_lanes)b, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126));
 #elif CVECTORIZATION_OPS_NEON
   return (cvectorization_ops_raw_mask_i8)(__builtin_shufflevector((cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)a, 0), (cvectorization_ops_neon_i8x8)__builtin_neon_vqmovn_v((cvectorization_ops_neon_i8)b, 0), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
