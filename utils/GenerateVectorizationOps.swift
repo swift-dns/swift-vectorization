@@ -26400,8 +26400,13 @@ func x86GatherTargets(
     }
     return TargetBodies(
         neon: { element in
-            firstLanes && element.bits == 32
-                ? hoistedGatheredFirst(otherwise: otherwise, for: element) : nil
+            guard firstLanes, element.bits == 32 else { return nil }
+            return x86ConstantOperandDispatch(
+                [index],
+                constant: gatheredFirst(otherwise: otherwise, for: element),
+                otherwise: hoistedGatheredFirst(otherwise: otherwise, for: element),
+                for: element
+            )
         },
         sve2_128: { element in
             sveGathering(

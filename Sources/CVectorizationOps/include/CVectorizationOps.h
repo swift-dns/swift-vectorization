@@ -44837,25 +44837,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_g
   }
   return (cvectorization_ops_raw_vector_u32)(v);
 #elif CVECTORIZATION_OPS_NEON
-  const int32_t index0 = indices[0];
-  const int32_t index1 = indices[1];
-  const int32_t index2 = indices[2];
-  const int32_t index3 = indices[3];
-  cvectorization_ops_vector_u32 v;
-  __builtin_memset(&v, 0, sizeof v);
-  if (0 < count) {
-    v[0] = from[index0];
+  if (__builtin_constant_p(__builtin_reduce_or(indices))) {
+    cvectorization_ops_vector_u32 v;
+    __builtin_memset(&v, 0, sizeof v);
+    for (size_t i = 0; i < 4; ++i) {
+      if (i < count) {
+        v[i] = from[indices[i]];
+      }
+    }
+    return (cvectorization_ops_raw_vector_u32)(v);
+  } else {
+    const int32_t index0 = indices[0];
+    const int32_t index1 = indices[1];
+    const int32_t index2 = indices[2];
+    const int32_t index3 = indices[3];
+    cvectorization_ops_vector_u32 v;
+    __builtin_memset(&v, 0, sizeof v);
+    if (0 < count) {
+      v[0] = from[index0];
+    }
+    if (1 < count) {
+      v[1] = from[index1];
+    }
+    if (2 < count) {
+      v[2] = from[index2];
+    }
+    if (3 < count) {
+      v[3] = from[index3];
+    }
+    return (cvectorization_ops_raw_vector_u32)(v);
   }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  if (2 < count) {
-    v[2] = from[index2];
-  }
-  if (3 < count) {
-    v[3] = from[index3];
-  }
-  return (cvectorization_ops_raw_vector_u32)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_gathersiv16si((cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}, (const void*)from, (cvectorization_ops_x86_i32)indices, (unsigned short)__builtin_ia32_bzhi_di(~0ull, (count < 16 ? count : 16)), (int)4));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -44904,24 +44915,34 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_u32 cvectorization_ops_g
   }
   return (cvectorization_ops_raw_vector_u32)(v);
 #elif CVECTORIZATION_OPS_NEON
-  const int32_t index0 = indices[0];
-  const int32_t index1 = indices[1];
-  const int32_t index2 = indices[2];
-  const int32_t index3 = indices[3];
-  cvectorization_ops_vector_u32 v = otherwise;
-  if (0 < count) {
-    v[0] = from[index0];
+  if (__builtin_constant_p(__builtin_reduce_or(indices))) {
+    cvectorization_ops_vector_u32 v = otherwise;
+    for (size_t i = 0; i < 4; ++i) {
+      if (i < count) {
+        v[i] = from[indices[i]];
+      }
+    }
+    return (cvectorization_ops_raw_vector_u32)(v);
+  } else {
+    const int32_t index0 = indices[0];
+    const int32_t index1 = indices[1];
+    const int32_t index2 = indices[2];
+    const int32_t index3 = indices[3];
+    cvectorization_ops_vector_u32 v = otherwise;
+    if (0 < count) {
+      v[0] = from[index0];
+    }
+    if (1 < count) {
+      v[1] = from[index1];
+    }
+    if (2 < count) {
+      v[2] = from[index2];
+    }
+    if (3 < count) {
+      v[3] = from[index3];
+    }
+    return (cvectorization_ops_raw_vector_u32)(v);
   }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  if (2 < count) {
-    v[2] = from[index2];
-  }
-  if (3 < count) {
-    v[3] = from[index3];
-  }
-  return (cvectorization_ops_raw_vector_u32)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_u32)((cvectorization_ops_vector_u32)__builtin_ia32_gathersiv16si((cvectorization_ops_x86_i32)otherwise, (const void*)from, (cvectorization_ops_x86_i32)indices, (unsigned short)__builtin_ia32_bzhi_di(~0ull, (count < 16 ? count : 16)), (int)4));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -100839,25 +100860,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_g
   }
   return (cvectorization_ops_raw_vector_i32)(v);
 #elif CVECTORIZATION_OPS_NEON
-  const int32_t index0 = indices[0];
-  const int32_t index1 = indices[1];
-  const int32_t index2 = indices[2];
-  const int32_t index3 = indices[3];
-  cvectorization_ops_vector_i32 v;
-  __builtin_memset(&v, 0, sizeof v);
-  if (0 < count) {
-    v[0] = from[index0];
+  if (__builtin_constant_p(__builtin_reduce_or((cvectorization_ops_vector_u32)indices))) {
+    cvectorization_ops_vector_i32 v;
+    __builtin_memset(&v, 0, sizeof v);
+    for (size_t i = 0; i < 4; ++i) {
+      if (i < count) {
+        v[i] = from[indices[i]];
+      }
+    }
+    return (cvectorization_ops_raw_vector_i32)(v);
+  } else {
+    const int32_t index0 = indices[0];
+    const int32_t index1 = indices[1];
+    const int32_t index2 = indices[2];
+    const int32_t index3 = indices[3];
+    cvectorization_ops_vector_i32 v;
+    __builtin_memset(&v, 0, sizeof v);
+    if (0 < count) {
+      v[0] = from[index0];
+    }
+    if (1 < count) {
+      v[1] = from[index1];
+    }
+    if (2 < count) {
+      v[2] = from[index2];
+    }
+    if (3 < count) {
+      v[3] = from[index3];
+    }
+    return (cvectorization_ops_raw_vector_i32)(v);
   }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  if (2 < count) {
-    v[2] = from[index2];
-  }
-  if (3 < count) {
-    v[3] = from[index3];
-  }
-  return (cvectorization_ops_raw_vector_i32)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_gathersiv16si((cvectorization_ops_x86_i32)(cvectorization_ops_x86_i32){0}, (const void*)from, (cvectorization_ops_x86_i32)indices, (unsigned short)__builtin_ia32_bzhi_di(~0ull, (count < 16 ? count : 16)), (int)4));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -100906,24 +100938,34 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_i32 cvectorization_ops_g
   }
   return (cvectorization_ops_raw_vector_i32)(v);
 #elif CVECTORIZATION_OPS_NEON
-  const int32_t index0 = indices[0];
-  const int32_t index1 = indices[1];
-  const int32_t index2 = indices[2];
-  const int32_t index3 = indices[3];
-  cvectorization_ops_vector_i32 v = otherwise;
-  if (0 < count) {
-    v[0] = from[index0];
+  if (__builtin_constant_p(__builtin_reduce_or((cvectorization_ops_vector_u32)indices))) {
+    cvectorization_ops_vector_i32 v = otherwise;
+    for (size_t i = 0; i < 4; ++i) {
+      if (i < count) {
+        v[i] = from[indices[i]];
+      }
+    }
+    return (cvectorization_ops_raw_vector_i32)(v);
+  } else {
+    const int32_t index0 = indices[0];
+    const int32_t index1 = indices[1];
+    const int32_t index2 = indices[2];
+    const int32_t index3 = indices[3];
+    cvectorization_ops_vector_i32 v = otherwise;
+    if (0 < count) {
+      v[0] = from[index0];
+    }
+    if (1 < count) {
+      v[1] = from[index1];
+    }
+    if (2 < count) {
+      v[2] = from[index2];
+    }
+    if (3 < count) {
+      v[3] = from[index3];
+    }
+    return (cvectorization_ops_raw_vector_i32)(v);
   }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  if (2 < count) {
-    v[2] = from[index2];
-  }
-  if (3 < count) {
-    v[3] = from[index3];
-  }
-  return (cvectorization_ops_raw_vector_i32)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_i32)((cvectorization_ops_vector_i32)__builtin_ia32_gathersiv16si((cvectorization_ops_x86_i32)otherwise, (const void*)from, (cvectorization_ops_x86_i32)indices, (unsigned short)__builtin_ia32_bzhi_di(~0ull, (count < 16 ? count : 16)), (int)4));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -125907,25 +125949,36 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_g
   }
   return (cvectorization_ops_raw_vector_f32)(v);
 #elif CVECTORIZATION_OPS_NEON
-  const int32_t index0 = indices[0];
-  const int32_t index1 = indices[1];
-  const int32_t index2 = indices[2];
-  const int32_t index3 = indices[3];
-  cvectorization_ops_vector_f32 v;
-  __builtin_memset(&v, 0, sizeof v);
-  if (0 < count) {
-    v[0] = from[index0];
+  if (__builtin_constant_p(__builtin_reduce_or((cvectorization_ops_vector_u32)indices))) {
+    cvectorization_ops_vector_f32 v;
+    __builtin_memset(&v, 0, sizeof v);
+    for (size_t i = 0; i < 4; ++i) {
+      if (i < count) {
+        v[i] = from[indices[i]];
+      }
+    }
+    return (cvectorization_ops_raw_vector_f32)(v);
+  } else {
+    const int32_t index0 = indices[0];
+    const int32_t index1 = indices[1];
+    const int32_t index2 = indices[2];
+    const int32_t index3 = indices[3];
+    cvectorization_ops_vector_f32 v;
+    __builtin_memset(&v, 0, sizeof v);
+    if (0 < count) {
+      v[0] = from[index0];
+    }
+    if (1 < count) {
+      v[1] = from[index1];
+    }
+    if (2 < count) {
+      v[2] = from[index2];
+    }
+    if (3 < count) {
+      v[3] = from[index3];
+    }
+    return (cvectorization_ops_raw_vector_f32)(v);
   }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  if (2 < count) {
-    v[2] = from[index2];
-  }
-  if (3 < count) {
-    v[3] = from[index3];
-  }
-  return (cvectorization_ops_raw_vector_f32)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_gathersiv16sf((cvectorization_ops_x86_f32)(cvectorization_ops_x86_f32){0}, (const void*)from, (cvectorization_ops_x86_i32)indices, (unsigned short)__builtin_ia32_bzhi_di(~0ull, (count < 16 ? count : 16)), (int)4));
 #elif CVECTORIZATION_OPS_X86 == 4
@@ -125963,24 +126016,34 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_raw_vector_f32 cvectorization_ops_g
   }
   return (cvectorization_ops_raw_vector_f32)(v);
 #elif CVECTORIZATION_OPS_NEON
-  const int32_t index0 = indices[0];
-  const int32_t index1 = indices[1];
-  const int32_t index2 = indices[2];
-  const int32_t index3 = indices[3];
-  cvectorization_ops_vector_f32 v = otherwise;
-  if (0 < count) {
-    v[0] = from[index0];
+  if (__builtin_constant_p(__builtin_reduce_or((cvectorization_ops_vector_u32)indices))) {
+    cvectorization_ops_vector_f32 v = otherwise;
+    for (size_t i = 0; i < 4; ++i) {
+      if (i < count) {
+        v[i] = from[indices[i]];
+      }
+    }
+    return (cvectorization_ops_raw_vector_f32)(v);
+  } else {
+    const int32_t index0 = indices[0];
+    const int32_t index1 = indices[1];
+    const int32_t index2 = indices[2];
+    const int32_t index3 = indices[3];
+    cvectorization_ops_vector_f32 v = otherwise;
+    if (0 < count) {
+      v[0] = from[index0];
+    }
+    if (1 < count) {
+      v[1] = from[index1];
+    }
+    if (2 < count) {
+      v[2] = from[index2];
+    }
+    if (3 < count) {
+      v[3] = from[index3];
+    }
+    return (cvectorization_ops_raw_vector_f32)(v);
   }
-  if (1 < count) {
-    v[1] = from[index1];
-  }
-  if (2 < count) {
-    v[2] = from[index2];
-  }
-  if (3 < count) {
-    v[3] = from[index3];
-  }
-  return (cvectorization_ops_raw_vector_f32)(v);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return (cvectorization_ops_raw_vector_f32)((cvectorization_ops_vector_f32)__builtin_ia32_gathersiv16sf((cvectorization_ops_x86_f32)otherwise, (const void*)from, (cvectorization_ops_x86_i32)indices, (unsigned short)__builtin_ia32_bzhi_di(~0ull, (count < 16 ? count : 16)), (int)4));
 #elif CVECTORIZATION_OPS_X86 == 4
