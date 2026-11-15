@@ -2347,6 +2347,11 @@ func sveReduction(_ name: String, for element: Element) -> String? {
     return "return \(reduced);"
 }
 
+func sveAcrossLanes(_ name: String, for element: Element) -> String {
+    let operands = [sveAllLanes(of: element), sveOperand("a", for: element)]
+    return "return \(sveBuiltin(name, operands, for: element));"
+}
+
 func sveReversed(for element: Element) -> String? {
     guard element.bits < 64 else { return nil }
     let reversed = sveBuiltin("rev", [sveOperand("a", for: element)], for: element)
@@ -15794,6 +15799,10 @@ let basicOps: [Op] = [
         unorderedNaNs: .acrossLanes,
         targets: TargetBodies(
             neon: { element in neonReduction("vaddvq", for: element) ?? builtinReduction("add") },
+            sve: { element in
+                element.category == .float
+                    ? sveAcrossLanes("addv", for: element) : builtinReduction("add")
+            },
             avx3: { element in x86Reduction(.sum, level: .avx3, for: element) },
             avx2: { element in x86Reduction(.sum, level: .avx2, for: element) },
             sse4: { element in x86Reduction(.sum, level: .sse4, for: element) },
@@ -15819,6 +15828,12 @@ let basicOps: [Op] = [
             },
             sve2_128: { element in
                 neonReduction("vminnmvq", for: element) ?? sveReduction("minv", for: element)
+            },
+            sve: { element in
+                guard element.category == .float else {
+                    return sveReduction("minv", for: element) ?? builtinReduction("min")
+                }
+                return sveAcrossLanes("minnmv", for: element)
             },
             avx3: { element in x86Reduction(.minimum, level: .avx3, for: element) },
             avx2: { element in x86Reduction(.minimum, level: .avx2, for: element) },
@@ -15865,6 +15880,12 @@ let basicOps: [Op] = [
             },
             sve2_128: { element in
                 neonReduction("vmaxnmvq", for: element) ?? sveReduction("maxv", for: element)
+            },
+            sve: { element in
+                guard element.category == .float else {
+                    return sveReduction("maxv", for: element) ?? builtinReduction("max")
+                }
+                return sveAcrossLanes("maxnmv", for: element)
             },
             avx3: { element in x86Reduction(.maximum, level: .avx3, for: element) },
             avx2: { element in x86Reduction(.maximum, level: .avx2, for: element) },

@@ -5057,17 +5057,9 @@ CVECTORIZATION_OPS_INLINE intptr_t cvectorization_ops_first_true_index_u8(cvecto
 CVECTORIZATION_OPS_INLINE uint8_t cvectorization_ops_sum_u8(cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint8_t sum = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint8_t sum = 0;
-  for (size_t i = 0; i < 64; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -5110,17 +5102,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u8 cvectorization_ops_
 CVECTORIZATION_OPS_INLINE uint8_t cvectorization_ops_smallest_u8(cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint8_t result = UINT8_MAX;
-  for (size_t i = 0; i < 32; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint8_t result = UINT8_MAX;
-  for (size_t i = 0; i < 64; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -5207,17 +5191,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u8 cvectorization_ops_
 CVECTORIZATION_OPS_INLINE uint8_t cvectorization_ops_largest_u8(cvectorization_ops_raw_vector_u8 rawA) {
   const cvectorization_ops_vector_u8 a = (cvectorization_ops_vector_u8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint8_t result = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint8_t result = 0;
-  for (size_t i = 0; i < 64; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -23043,17 +23019,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u16 cvectorization_ops
 CVECTORIZATION_OPS_INLINE uint16_t cvectorization_ops_sum_u16(cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint16_t sum = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint16_t sum = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -23119,17 +23087,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u16 cvectorization_ops
 CVECTORIZATION_OPS_INLINE uint16_t cvectorization_ops_smallest_u16(cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint16_t result = UINT16_MAX;
-  for (size_t i = 0; i < 16; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint16_t result = UINT16_MAX;
-  for (size_t i = 0; i < 32; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -23197,17 +23157,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u16 cvectorization_ops
 CVECTORIZATION_OPS_INLINE uint16_t cvectorization_ops_largest_u16(cvectorization_ops_raw_vector_u16 rawA) {
   const cvectorization_ops_vector_u16 a = (cvectorization_ops_vector_u16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint16_t result = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint16_t result = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -35599,17 +35551,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u32 cvectorization_ops
 CVECTORIZATION_OPS_INLINE uint32_t cvectorization_ops_sum_u32(cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint32_t sum = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint32_t sum = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -35656,17 +35600,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u32 cvectorization_ops
 CVECTORIZATION_OPS_INLINE uint32_t cvectorization_ops_smallest_u32(cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint32_t result = UINT32_MAX;
-  for (size_t i = 0; i < 8; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint32_t result = UINT32_MAX;
-  for (size_t i = 0; i < 16; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -35709,17 +35645,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u32 cvectorization_ops
 CVECTORIZATION_OPS_INLINE uint32_t cvectorization_ops_largest_u32(cvectorization_ops_raw_vector_u32 rawA) {
   const cvectorization_ops_vector_u32 a = (cvectorization_ops_vector_u32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint32_t result = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint32_t result = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -47940,17 +47868,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_u64 cvectorization_ops
 CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_sum_u64(cvectorization_ops_raw_vector_u64 rawA) {
   const cvectorization_ops_vector_u64 a = (cvectorization_ops_vector_u64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t sum = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t sum = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -48002,17 +47922,9 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_smallest_u64(cvectorizatio
   }
   return __builtin_sve_svminv_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t result = UINT64_MAX;
-  for (size_t i = 0; i < 4; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_sve_svminv_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t result = UINT64_MAX;
-  for (size_t i = 0; i < 8; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_sve_svminv_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a);
 #elif CVECTORIZATION_OPS_NEON
   return a[0] < a[1] ? a[0] : a[1];
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -48060,17 +47972,9 @@ CVECTORIZATION_OPS_INLINE uint64_t cvectorization_ops_largest_u64(cvectorization
   }
   return __builtin_sve_svmaxv_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t result = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_sve_svmaxv_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t result = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_sve_svmaxv_u64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_u64)a);
 #elif CVECTORIZATION_OPS_NEON
   return a[0] > a[1] ? a[0] : a[1];
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -61621,17 +61525,9 @@ CVECTORIZATION_OPS_INLINE intptr_t cvectorization_ops_first_true_index_i8(cvecto
 CVECTORIZATION_OPS_INLINE int8_t cvectorization_ops_sum_i8(cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint8_t sum = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    sum += a[i];
-  }
-  return (int8_t)sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint8_t sum = 0;
-  for (size_t i = 0; i < 64; ++i) {
-    sum += a[i];
-  }
-  return (int8_t)sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -61674,17 +61570,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i8 cvectorization_ops_
 CVECTORIZATION_OPS_INLINE int8_t cvectorization_ops_smallest_i8(cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t result = INT8_MAX;
-  for (size_t i = 0; i < 32; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t result = INT8_MAX;
-  for (size_t i = 0; i < 64; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -61769,17 +61657,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i8 cvectorization_ops_
 CVECTORIZATION_OPS_INLINE int8_t cvectorization_ops_largest_i8(cvectorization_ops_raw_vector_i8 rawA) {
   const cvectorization_ops_vector_i8 a = (cvectorization_ops_vector_i8)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int8_t result = INT8_MIN;
-  for (size_t i = 0; i < 32; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int8_t result = INT8_MIN;
-  for (size_t i = 0; i < 64; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -76976,17 +76856,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i16 cvectorization_ops
 CVECTORIZATION_OPS_INLINE int16_t cvectorization_ops_sum_i16(cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint16_t sum = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    sum += a[i];
-  }
-  return (int16_t)sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint16_t sum = 0;
-  for (size_t i = 0; i < 32; ++i) {
-    sum += a[i];
-  }
-  return (int16_t)sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -77047,17 +76919,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i16 cvectorization_ops
 CVECTORIZATION_OPS_INLINE int16_t cvectorization_ops_smallest_i16(cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t result = INT16_MAX;
-  for (size_t i = 0; i < 16; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t result = INT16_MAX;
-  for (size_t i = 0; i < 32; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -77118,17 +76982,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i16 cvectorization_ops
 CVECTORIZATION_OPS_INLINE int16_t cvectorization_ops_largest_i16(cvectorization_ops_raw_vector_i16 rawA) {
   const cvectorization_ops_vector_i16 a = (cvectorization_ops_vector_i16)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int16_t result = INT16_MIN;
-  for (size_t i = 0; i < 16; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int16_t result = INT16_MIN;
-  for (size_t i = 0; i < 32; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -89831,17 +89687,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i32 cvectorization_ops
 CVECTORIZATION_OPS_INLINE int32_t cvectorization_ops_sum_i32(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint32_t sum = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    sum += a[i];
-  }
-  return (int32_t)sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint32_t sum = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    sum += a[i];
-  }
-  return (int32_t)sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -89888,17 +89736,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i32 cvectorization_ops
 CVECTORIZATION_OPS_INLINE int32_t cvectorization_ops_smallest_i32(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t result = INT32_MAX;
-  for (size_t i = 0; i < 8; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t result = INT32_MAX;
-  for (size_t i = 0; i < 16; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_min(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -89941,17 +89781,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i32 cvectorization_ops
 CVECTORIZATION_OPS_INLINE int32_t cvectorization_ops_largest_i32(cvectorization_ops_raw_vector_i32 rawA) {
   const cvectorization_ops_vector_i32 a = (cvectorization_ops_vector_i32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int32_t result = INT32_MIN;
-  for (size_t i = 0; i < 8; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int32_t result = INT32_MIN;
-  for (size_t i = 0; i < 16; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_max(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -102497,17 +102329,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_i64 cvectorization_ops
 CVECTORIZATION_OPS_INLINE int64_t cvectorization_ops_sum_i64(cvectorization_ops_raw_vector_i64 rawA) {
   const cvectorization_ops_vector_i64 a = (cvectorization_ops_vector_i64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  uint64_t sum = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    sum += a[i];
-  }
-  return (int64_t)sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  uint64_t sum = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    sum += a[i];
-  }
-  return (int64_t)sum;
+  return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_reduce_add(a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -102559,17 +102383,9 @@ CVECTORIZATION_OPS_INLINE int64_t cvectorization_ops_smallest_i64(cvectorization
   }
   return __builtin_sve_svminv_s64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_i64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t result = INT64_MAX;
-  for (size_t i = 0; i < 4; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_sve_svminv_s64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_i64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t result = INT64_MAX;
-  for (size_t i = 0; i < 8; ++i) {
-    result = result < a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_sve_svminv_s64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_i64)a);
 #elif CVECTORIZATION_OPS_NEON
   return a[0] < a[1] ? a[0] : a[1];
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -102617,17 +102433,9 @@ CVECTORIZATION_OPS_INLINE int64_t cvectorization_ops_largest_i64(cvectorization_
   }
   return __builtin_sve_svmaxv_s64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_i64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  int64_t result = INT64_MIN;
-  for (size_t i = 0; i < 4; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_sve_svmaxv_s64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_i64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  int64_t result = INT64_MIN;
-  for (size_t i = 0; i < 8; ++i) {
-    result = result > a[i] ? result : a[i];
-  }
-  return result;
+  return __builtin_sve_svmaxv_s64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_i64)a);
 #elif CVECTORIZATION_OPS_NEON
   return a[0] > a[1] ? a[0] : a[1];
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -115026,17 +114834,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_f32 cvectorization_ops
 CVECTORIZATION_OPS_INLINE float cvectorization_ops_sum_f32(cvectorization_ops_raw_vector_f32 rawA) {
   const cvectorization_ops_vector_f32 a = (cvectorization_ops_vector_f32)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  float sum = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_sve_svaddv_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  float sum = 0;
-  for (size_t i = 0; i < 16; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_sve_svaddv_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_neon_vaddvq_f32((cvectorization_ops_neon_f32)a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -115081,59 +114881,9 @@ CVECTORIZATION_OPS_INLINE float cvectorization_ops_smallest_f32(cvectorization_o
 #if CVECTORIZATION_OPS_NEON == 2
   return __builtin_neon_vminnmvq_f32((cvectorization_ops_neon_f32)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const float lane0 = a[0];
-  const float lane1 = a[1];
-  const float lane2 = a[2];
-  const float lane3 = a[3];
-  const float lane4 = a[4];
-  const float lane5 = a[5];
-  const float lane6 = a[6];
-  const float lane7 = a[7];
-  float result = __builtin_inff();
-  result = result < lane0 ? result : lane0;
-  result = result < lane1 ? result : lane1;
-  result = result < lane2 ? result : lane2;
-  result = result < lane3 ? result : lane3;
-  result = result < lane4 ? result : lane4;
-  result = result < lane5 ? result : lane5;
-  result = result < lane6 ? result : lane6;
-  result = result < lane7 ? result : lane7;
-  return result;
+  return __builtin_sve_svminnmv_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const float lane0 = a[0];
-  const float lane1 = a[1];
-  const float lane2 = a[2];
-  const float lane3 = a[3];
-  const float lane4 = a[4];
-  const float lane5 = a[5];
-  const float lane6 = a[6];
-  const float lane7 = a[7];
-  const float lane8 = a[8];
-  const float lane9 = a[9];
-  const float lane10 = a[10];
-  const float lane11 = a[11];
-  const float lane12 = a[12];
-  const float lane13 = a[13];
-  const float lane14 = a[14];
-  const float lane15 = a[15];
-  float result = __builtin_inff();
-  result = result < lane0 ? result : lane0;
-  result = result < lane1 ? result : lane1;
-  result = result < lane2 ? result : lane2;
-  result = result < lane3 ? result : lane3;
-  result = result < lane4 ? result : lane4;
-  result = result < lane5 ? result : lane5;
-  result = result < lane6 ? result : lane6;
-  result = result < lane7 ? result : lane7;
-  result = result < lane8 ? result : lane8;
-  result = result < lane9 ? result : lane9;
-  result = result < lane10 ? result : lane10;
-  result = result < lane11 ? result : lane11;
-  result = result < lane12 ? result : lane12;
-  result = result < lane13 ? result : lane13;
-  result = result < lane14 ? result : lane14;
-  result = result < lane15 ? result : lane15;
-  return result;
+  return __builtin_sve_svminnmv_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_neon_vminvq_f32((cvectorization_ops_neon_f32)a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -115198,59 +114948,9 @@ CVECTORIZATION_OPS_INLINE float cvectorization_ops_largest_f32(cvectorization_op
 #if CVECTORIZATION_OPS_NEON == 2
   return __builtin_neon_vmaxnmvq_f32((cvectorization_ops_neon_f32)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const float lane0 = a[0];
-  const float lane1 = a[1];
-  const float lane2 = a[2];
-  const float lane3 = a[3];
-  const float lane4 = a[4];
-  const float lane5 = a[5];
-  const float lane6 = a[6];
-  const float lane7 = a[7];
-  float result = -__builtin_inff();
-  result = result > lane0 ? result : lane0;
-  result = result > lane1 ? result : lane1;
-  result = result > lane2 ? result : lane2;
-  result = result > lane3 ? result : lane3;
-  result = result > lane4 ? result : lane4;
-  result = result > lane5 ? result : lane5;
-  result = result > lane6 ? result : lane6;
-  result = result > lane7 ? result : lane7;
-  return result;
+  return __builtin_sve_svmaxnmv_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const float lane0 = a[0];
-  const float lane1 = a[1];
-  const float lane2 = a[2];
-  const float lane3 = a[3];
-  const float lane4 = a[4];
-  const float lane5 = a[5];
-  const float lane6 = a[6];
-  const float lane7 = a[7];
-  const float lane8 = a[8];
-  const float lane9 = a[9];
-  const float lane10 = a[10];
-  const float lane11 = a[11];
-  const float lane12 = a[12];
-  const float lane13 = a[13];
-  const float lane14 = a[14];
-  const float lane15 = a[15];
-  float result = -__builtin_inff();
-  result = result > lane0 ? result : lane0;
-  result = result > lane1 ? result : lane1;
-  result = result > lane2 ? result : lane2;
-  result = result > lane3 ? result : lane3;
-  result = result > lane4 ? result : lane4;
-  result = result > lane5 ? result : lane5;
-  result = result > lane6 ? result : lane6;
-  result = result > lane7 ? result : lane7;
-  result = result > lane8 ? result : lane8;
-  result = result > lane9 ? result : lane9;
-  result = result > lane10 ? result : lane10;
-  result = result > lane11 ? result : lane11;
-  result = result > lane12 ? result : lane12;
-  result = result > lane13 ? result : lane13;
-  result = result > lane14 ? result : lane14;
-  result = result > lane15 ? result : lane15;
-  return result;
+  return __builtin_sve_svmaxnmv_f32(__builtin_sve_svptrue_pat_b32(31), (cvectorization_ops_sve_f32)a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_neon_vmaxvq_f32((cvectorization_ops_neon_f32)a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -126972,17 +126672,9 @@ CVECTORIZATION_OPS_FUNCTION cvectorization_ops_raw_vector_f64 cvectorization_ops
 CVECTORIZATION_OPS_INLINE double cvectorization_ops_sum_f64(cvectorization_ops_raw_vector_f64 rawA) {
   const cvectorization_ops_vector_f64 a = (cvectorization_ops_vector_f64)rawA;
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  double sum = 0;
-  for (size_t i = 0; i < 4; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_sve_svaddv_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  double sum = 0;
-  for (size_t i = 0; i < 8; ++i) {
-    sum += a[i];
-  }
-  return sum;
+  return __builtin_sve_svaddv_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_neon_vaddvq_f64((cvectorization_ops_neon_f64)a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -127021,35 +126713,9 @@ CVECTORIZATION_OPS_INLINE double cvectorization_ops_smallest_f64(cvectorization_
 #if CVECTORIZATION_OPS_NEON == 2
   return __builtin_neon_vminnmvq_f64((cvectorization_ops_neon_f64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const double lane0 = a[0];
-  const double lane1 = a[1];
-  const double lane2 = a[2];
-  const double lane3 = a[3];
-  double result = __builtin_inf();
-  result = result < lane0 ? result : lane0;
-  result = result < lane1 ? result : lane1;
-  result = result < lane2 ? result : lane2;
-  result = result < lane3 ? result : lane3;
-  return result;
+  return __builtin_sve_svminnmv_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const double lane0 = a[0];
-  const double lane1 = a[1];
-  const double lane2 = a[2];
-  const double lane3 = a[3];
-  const double lane4 = a[4];
-  const double lane5 = a[5];
-  const double lane6 = a[6];
-  const double lane7 = a[7];
-  double result = __builtin_inf();
-  result = result < lane0 ? result : lane0;
-  result = result < lane1 ? result : lane1;
-  result = result < lane2 ? result : lane2;
-  result = result < lane3 ? result : lane3;
-  result = result < lane4 ? result : lane4;
-  result = result < lane5 ? result : lane5;
-  result = result < lane6 ? result : lane6;
-  result = result < lane7 ? result : lane7;
-  return result;
+  return __builtin_sve_svminnmv_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_neon_vminvq_f64((cvectorization_ops_neon_f64)a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
@@ -127104,35 +126770,9 @@ CVECTORIZATION_OPS_INLINE double cvectorization_ops_largest_f64(cvectorization_o
 #if CVECTORIZATION_OPS_NEON == 2
   return __builtin_neon_vmaxnmvq_f64((cvectorization_ops_neon_f64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 32
-  const double lane0 = a[0];
-  const double lane1 = a[1];
-  const double lane2 = a[2];
-  const double lane3 = a[3];
-  double result = -__builtin_inf();
-  result = result > lane0 ? result : lane0;
-  result = result > lane1 ? result : lane1;
-  result = result > lane2 ? result : lane2;
-  result = result > lane3 ? result : lane3;
-  return result;
+  return __builtin_sve_svmaxnmv_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a);
 #elif CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  const double lane0 = a[0];
-  const double lane1 = a[1];
-  const double lane2 = a[2];
-  const double lane3 = a[3];
-  const double lane4 = a[4];
-  const double lane5 = a[5];
-  const double lane6 = a[6];
-  const double lane7 = a[7];
-  double result = -__builtin_inf();
-  result = result > lane0 ? result : lane0;
-  result = result > lane1 ? result : lane1;
-  result = result > lane2 ? result : lane2;
-  result = result > lane3 ? result : lane3;
-  result = result > lane4 ? result : lane4;
-  result = result > lane5 ? result : lane5;
-  result = result > lane6 ? result : lane6;
-  result = result > lane7 ? result : lane7;
-  return result;
+  return __builtin_sve_svmaxnmv_f64(__builtin_sve_svptrue_pat_b64(31), (cvectorization_ops_sve_f64)a);
 #elif CVECTORIZATION_OPS_NEON
   return __builtin_neon_vmaxvq_f64((cvectorization_ops_neon_f64)a);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
