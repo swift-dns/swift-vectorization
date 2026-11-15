@@ -2689,6 +2689,12 @@ func comparableDeclarations(for element: Element) -> String {
     element.category == .float16 ? "\(halfPrecisionNativeVector(for: element))\n" : ""
 }
 
+func comparableHelperDeclarations(for element: Element) -> String {
+    guard element.category == .float16 else { return "" }
+    return
+        "typedef _Float16 native_vector __attribute__((vector_size(CVECTORIZATION_OPS_VECTOR_BYTES)));\n"
+}
+
 func constantNaNFunction(for element: Element) -> String {
     let v = comparableOperand("v", for: element)
     let function = cFunction(
@@ -2696,11 +2702,11 @@ func constantNaNFunction(for element: Element) -> String {
         name: cFunctionName("constantNaN", element),
         parameters: ["\(element.cVector) v"],
         body: """
-            \(comparableDeclarations(for: element))const bool found = __builtin_reduce_or(\(v) != \(v)) != 0;
+            \(comparableHelperDeclarations(for: element))const bool found = __builtin_reduce_or(\(v) != \(v)) != 0;
             return __builtin_constant_p(found) && found;
             """
     )
-    return element.category == .float16 ? "#if \(sve2_128Condition)\n\(function)#endif\n" : function
+    return element.category == .float16 ? "#if \(sveCondition)\n\(function)#endif\n" : function
 }
 
 func sveConstantNumbersFunction(for element: Element) -> String {
@@ -2710,12 +2716,11 @@ func sveConstantNumbersFunction(for element: Element) -> String {
         name: cFunctionName("sveConstantNumbers", element),
         parameters: ["\(element.cVector) a", "\(element.cVector) b"],
         body: """
-            \(comparableDeclarations(for: element))const bool found = __builtin_reduce_or((\(a) != \(a)) | (\(b) != \(b))) != 0;
+            \(comparableHelperDeclarations(for: element))const bool found = __builtin_reduce_or((\(a) != \(a)) | (\(b) != \(b))) != 0;
             return __builtin_constant_p(found) && !found;
             """
     )
-    let condition = element.category == .float16 ? sve2_128Condition : sveCondition
-    return "#if \(condition)\n\(function)#endif\n"
+    return "#if \(sveCondition)\n\(function)#endif\n"
 }
 
 func constantLaneFunction(for element: Element) -> String {
@@ -2729,7 +2734,7 @@ func constantLaneFunction(for element: Element) -> String {
             return __builtin_constant_p(found) && found;
             """
     )
-    return element.category == .float16 ? "#if \(sve2_128Condition)\n\(function)#endif\n" : function
+    return element.category == .float16 ? "#if \(sveCondition)\n\(function)#endif\n" : function
 }
 
 func sveConstantBarrier(
@@ -13191,7 +13196,8 @@ func sveAddingSubtracting(for element: Element) -> String {
 }
 
 func sveMultiplyAlternatingStatements(negatingAll: Bool, for element: Element) -> [String]? {
-    guard element.category == .float, let minusZero = sveBlockedLiteral(.minusZero, for: element)
+    guard element.category == .float || element.category == .float16,
+        let minusZero = sveBlockedLiteral(.minusZero, for: element)
     else { return nil }
     let negation = sveBuiltin(
         "neg",
@@ -33621,7 +33627,9 @@ func promoteNarrowSve(from source: Element, shape: Shape, to result: Element) ->
 
 func promoteNarrowSveConverting(from source: Element, to result: Element) -> String? {
     guard source.category == .float || result.category == .float else { return nil }
-    let duplicated = laneIndices(promotedLanes(to: result).flatMap { [$0, $0] })
+    let duplicated = laneIndices(
+        promotedLanes(to: result).flatMap { Array(repeating: $0, count: result.bits / source.bits) }
+    )
     let converted = sveBuiltin(
         "cvt_\(sveSuffix(of: result))",
         [sveAllLanes(of: source), sveOperand("zipped", for: source)],
@@ -35178,6 +35186,7 @@ func demoteSveUnzipped(
 
 func demoteSveConverting(
     _ conversion: FloatToIntConversion = .saturating,
+    shape: Shape = .half,
     from source: Element,
     to result: Element
 ) -> String {
@@ -35192,11 +35201,14 @@ func demoteSveConverting(
         for: source,
         predication: "x"
     )
-    let unzipped = sveBuiltin("uzp1", ["converted", "converted"], for: result)
+    let steps = (source.bits / result.bits).trailingZeroBitCount
+    let unzipped = (0..<steps).reduce("converted") { operand, _ in
+        sveBuiltin("uzp1", [operand, operand], for: result)
+    }
     return """
         const \(sveType(of: result)) converted = \(converted);
         const \(result.cVector) narrowed = \(sveResult(unzipped, for: result));
-        \(narrowedResult("narrowed", lanes: result.laneCount, .half, arm: true, for: result))
+        \(narrowedResult("narrowed", lanes: result.laneCount, shape, arm: true, for: result))
         """
 }
 
@@ -36364,13 +36376,14 @@ func halfPrecisionCopyingSignToMagnitude(for element: Element) -> String {
     let magnitude = "(\(bytes))\(unsignedBits("a", of: element))"
     let signs =
         "(\(bytes))\(unsignedBits("b", of: element)) & (\(bytes))\(signBitMask(for: element))"
-    return """
-        #if \(sve2_128Condition)
-        \(sveCopyingSign(for: element))
-        #else
-        \(vectorResult("\(magnitude) | (\(signs))", for: element))
-        #endif
-        """
+    return vectorResult("\(magnitude) | (\(signs))", for: element)
+}
+
+func halfPrecisionMaskFromVector(for element: Element) -> String {
+    """
+    \(halfPrecisionNativeVector(for: element))
+    \(maskResult("(\(element.cMask))((native_vector)a != (native_vector){0})", for: element))
+    """
 }
 
 func halfPrecisionSignBody(
@@ -36412,17 +36425,15 @@ func float16ConcatenatedDelegation(parity: Int, for element: Element) -> String 
     )
 }
 
-func halfPrecisionMaskFromVector(for element: Element) -> String {
-    """
-    \(halfPrecisionNativeVector(for: element))
-    \(maskResult("(\(element.cMask))((native_vector)a != (native_vector){0})", for: element))
-    """
-}
-
 let halfPrecisionTargetBodies: [String: TargetBodies<Element>] = [
     "maskFromVector": TargetBodies(
         sve2_128: { element in halfPrecisionMaskFromVector(for: element) },
         sve: { element in halfPrecisionMaskFromVector(for: element) }
+    ),
+    "copyingSign": TargetBodies(sve2: { sveCopyingSign(for: $0) }),
+    "copyingSignToMagnitude": TargetBodies(
+        sve2_128: { sveCopyingSign(for: $0) },
+        sve2: { sveCopyingSign(for: $0) }
     ),
     "concatenatingOdd": TargetBodies(
         sse2: { x86ConcatenatedParity(parity: 1, level: .sse2, for: $0) }
@@ -36783,6 +36794,20 @@ func float16PromotedNeon(
         """
 }
 
+func float16PromotedSve(
+    _ promotion: Float16Promotion,
+    from source: Element,
+    to result: Element
+) -> String? {
+    switch promotion {
+    case .narrow: return promoteNarrowSveConverting(from: source, to: result)
+    case .lower: return promoteLowerUpperSveConverting(.lower, from: source, to: result)
+    case .upper: return promoteLowerUpperSveConverting(.upper, from: source, to: result)
+    case .even: return promoteEvenOddSveConverting(parity: 0, from: source, to: result)
+    case .odd: return promoteEvenOddSveConverting(parity: 1, from: source, to: result)
+    }
+}
+
 func float16PromotionOps(_ promotion: Float16Promotion) -> [Op] {
     sourcedOps(accepting: promotion.accepts, includingHalfPrecision: true) { source, results in
         let software = sourced(source) { _, result in
@@ -36803,6 +36828,9 @@ func float16PromotionOps(_ promotion: Float16Promotion) -> [Op] {
             targets: TargetBodies(
                 neon: sourced(source) { source, result in
                     float16PromotedNeon(promotion, from: source, to: result)
+                },
+                sve: sourced(source) { source, result in
+                    float16PromotedSve(promotion, from: source, to: result)
                 },
                 avx3: hardware,
                 avx2: sourced(source) { _, result in
@@ -37062,6 +37090,9 @@ func float16DemoteOps(_ demotion: Float16Demotion) -> [Op] {
                 neon: sourced(source) { _, result in
                     float16DemotedNeon(demotion, to: result)
                 },
+                sve: sourced(source) { source, result in
+                    demoteSveConverting(shape: demotion.shape, from: source, to: result)
+                },
                 avx3: avx3,
                 avx2: sourced(source) { source, result in
                     x86F16cConditioned(
@@ -37259,6 +37290,26 @@ func float16ToIntegerNeon(_ conversion: FloatToIntConversion, to result: Element
         "const \(result.cVector) converted = (\(result.cVector))\(builtin)(\(operand), \(code));"
 }
 
+func float16ToIntegerSve(
+    _ conversion: FloatToIntConversion,
+    from source: Element,
+    to result: Element
+) -> String {
+    let all = sveAllLanes(of: source)
+    let operand = sveOperand("a", for: source)
+    let rounded =
+        conversion.sveRounding.map {
+            sveBuiltin($0, [all, operand], for: source, predication: "x")
+        } ?? operand
+    let converted = sveBuiltin(
+        "cvt_\(sveSuffix(of: result))",
+        [all, rounded],
+        for: source,
+        predication: "x"
+    )
+    return "const \(result.cVector) converted = \(sveResult(converted, for: result));"
+}
+
 func float16ToIntegerReference(
     _ conversion: FloatToIntConversion,
     masked: Bool,
@@ -37365,6 +37416,12 @@ func float16ToIntegerOps(
                     \(float16ConversionReturning(masked: masked, for: result))
                     """
                 },
+                sve: sourced(source) { source, result in
+                    """
+                    \(float16ToIntegerSve(conversion, from: source, to: result))
+                    \(float16ConversionReturning(masked: masked, for: result))
+                    """
+                },
                 avx3: roundsOnX86 ? rounded : nil,
                 avx2: roundsOnX86 ? rounded : nil,
                 sse4: roundsOnX86 ? rounded : nil
@@ -37402,6 +37459,18 @@ func float16FromIntegerOps(masked: Bool) -> [Op] {
                     #endif
                     \(float16ConversionReturning(masked: masked, for: result))
                     """
+                },
+                sve: sourced(source) { source, result in
+                    let converted = sveBuiltin(
+                        "cvt_\(sveSuffix(of: result))",
+                        [sveAllLanes(of: result), sveOperand("a", for: source)],
+                        for: source,
+                        predication: "x"
+                    )
+                    return """
+                        const \(result.cVector) converted = \(sveResult(converted, for: result));
+                        \(float16ConversionReturning(masked: masked, for: result))
+                        """
                 }
             ),
             referenceCall: { result, arguments in
@@ -37603,7 +37672,10 @@ let float16PowerOf2Ops = sourcedOps(
     accepting: float16PowerOf2Accepts,
     includingHalfPrecision: true
 ) { source, results in
-    Op(
+    let scaled = sourced(source) { source, result in
+        mulBitsPowerOf2Sve(from: source, to: result)
+    }
+    return Op(
         "multiplyingByPowerOf2",
         "MulByPow2",
         [.vector, .sourceVector],
@@ -37621,9 +37693,8 @@ let float16PowerOf2Ops = sourcedOps(
                 #endif
                 """
             },
-            sve2_128: sourced(source) { source, result in
-                mulBitsPowerOf2Sve(from: source, to: result)
-            }
+            sve2_128: scaled,
+            sve: scaled
         ),
         referenceCall: { result, arguments in float16PowerOf2Reference(to: result, arguments) },
         portable: sourced(source) { source, result in
@@ -37734,7 +37805,10 @@ let bfloat16PromoteOps: [Op] =
         sourcedOps(accepting: bfloat16PromotesToFloat, includingHalfPrecision: true) {
             source,
             results in
-            Op(
+            let shifted = sourced(source) { _, result in
+                bfloat16PromoteEvenOddSve(parity: parity, for: result)
+            }
+            return Op(
                 "vector",
                 highwayName,
                 [.tag, .sourceVector],
@@ -37744,9 +37818,8 @@ let bfloat16PromoteOps: [Op] =
                 vectorLabels: [label],
                 source: source,
                 targets: TargetBodies(
-                    sve2_128: sourced(source) { _, result in
-                        bfloat16PromoteEvenOddSve(parity: parity, for: result)
-                    },
+                    sve2_128: shifted,
+                    sve: shifted,
                     emu128: sourced(source) { source, result in
                         let lanes = (0..<result.laneCount).map { 2 * $0 + parity }
                         return bfloat16PromotePortable(of: lanes, from: source, to: result)
@@ -37762,6 +37835,9 @@ let bfloat16PromoteOps: [Op] =
 let bfloat16NeonNativeCondition = reorderMulNeonKeepsFirstCondition
 
 let bfloat16SveFeatureCondition = reorderMulSveKeepsFirstCondition
+
+let bfloat16WideSveFeatureCondition =
+    "defined(__ARM_FEATURE_SVE_BF16) && (\(bfloat16SveFeatureCondition))"
 
 let bfloat16SveConvertCondition =
     "defined(__ARM_FEATURE_SVE_BF16) && (HWY_COMPILER_CLANG >= 1200 || HWY_COMPILER_GCC_ACTUAL >= 1000)"
@@ -38101,7 +38177,10 @@ let bfloat16DemoteOps: [Op] =
     sourcedOps(accepting: bfloat16DemotesFromFloat, includingHalfPrecision: true) {
         source,
         results in
-        Op(
+        let converted = sourced(source) { source, result in
+            bfloat16DemoteSveHalf(from: source, to: result)
+        }
+        return Op(
             "halfVector",
             "DemoteTo",
             [.narrowTag(.half), .sourceVector],
@@ -38114,9 +38193,8 @@ let bfloat16DemoteOps: [Op] =
                 neon: sourced(source) { source, result in
                     bfloat16DemoteNeonHalf(from: source, to: result)
                 },
-                sve2_128: sourced(source) { source, result in
-                    bfloat16DemoteSveHalf(from: source, to: result)
-                },
+                sve2_128: converted,
+                sve: converted,
                 avx3dl: sourced(source) { source, result in
                     bfloat16DemoteAvx3Half(from: source, to: result)
                 },
@@ -38146,7 +38224,10 @@ let bfloat16DemoteOps: [Op] =
         sourcedOps(accepting: bfloat16DemotesFromFloat, includingHalfPrecision: true) {
             source,
             results in
-            Op(
+            let converted = sourced(source) { source, result in
+                bfloat16DemoteSveTwoVectors(ordered: ordered, from: source, to: result)
+            }
+            return Op(
                 "vector",
                 highwayName,
                 [.tag, .sourceVector, .sourceVector],
@@ -38159,9 +38240,8 @@ let bfloat16DemoteOps: [Op] =
                     neon: sourced(source) { source, result in
                         bfloat16DemoteNeonTwoVectors(ordered: ordered, from: source, to: result)
                     },
-                    sve2_128: sourced(source) { source, result in
-                        bfloat16DemoteSveTwoVectors(ordered: ordered, from: source, to: result)
-                    },
+                    sve2_128: converted,
+                    sve: converted,
                     avx3dl: sourced(source) { source, result in
                         bfloat16DemoteAvx3TwoVectors(ordered: ordered, from: source, to: result)
                     },
@@ -38301,6 +38381,13 @@ func bfloat16PairwiseOps(masked: Bool) -> [Op] {
             guard let native else { return generic }
             return widenMulChoice([(native.condition, finished(native.kernel))], otherwise: generic)
         }
+        func sve(_ condition: String) -> (Element) -> String {
+            sourced(source) { _, result in
+                let even = bfloat16SveCall("bfmlalb", bfloat16SveZero(for: result), for: result)
+                let odd = sveResult(bfloat16SveCall("bfmlalt", even, for: result), for: result)
+                return body(result, fusing: 1, native: (condition, ("", odd)))
+            }
+        }
         return Op(
             "multiplyPairwiseAdding",
             masked ? "MaskedWidenMulPairwiseAdd" : "WidenMulPairwiseAdd",
@@ -38316,15 +38403,8 @@ func bfloat16PairwiseOps(masked: Bool) -> [Op] {
                     let dot = bfloat16NeonCall("vbfdotq", bfloat16Zero(for: result), for: result)
                     return body(result, fusing: 0, native: (bfloat16NeonNativeCondition, ("", dot)))
                 },
-                sve2_128: sourced(source) { _, result in
-                    let even = bfloat16SveCall("bfmlalb", bfloat16SveZero(for: result), for: result)
-                    let odd = bfloat16SveCall("bfmlalt", even, for: result)
-                    return body(
-                        result,
-                        fusing: 1,
-                        native: (bfloat16SveFeatureCondition, ("", sveResult(odd, for: result)))
-                    )
-                },
+                sve2_128: sve(bfloat16SveFeatureCondition),
+                sve: sve(bfloat16WideSveFeatureCondition),
                 avx3dl: sourced(source) { _, result in
                     let dot = bfloat16Avx3Call(bfloat16Zero(for: result), for: result)
                     return body(
@@ -38368,6 +38448,15 @@ let bfloat16ReorderOps = sourcedOps(
             otherwise: generic
         )
     }
+    func sve(_ condition: String) -> (Element) -> String {
+        sourced(source) { _, result in
+            let dot = sveResult(
+                bfloat16SveCall("bfdot", sveSplatOperand("c", for: result), for: result),
+                for: result
+            )
+            return body(result, native: (condition, ("", dot)))
+        }
+    }
     return Op(
         "multiplyAccumulatingInAnyOrder",
         "ReorderWidenMulAccumulate",
@@ -38384,13 +38473,8 @@ let bfloat16ReorderOps = sourcedOps(
                 let dot = bfloat16NeonCall("vbfdotq", "c", for: result)
                 return body(result, native: (bfloat16NeonNativeCondition, ("", dot)))
             },
-            sve2_128: sourced(source) { _, result in
-                let dot = sveResult(
-                    bfloat16SveCall("bfdot", sveSplatOperand("c", for: result), for: result),
-                    for: result
-                )
-                return body(result, native: (bfloat16SveFeatureCondition, ("", dot)))
-            },
+            sve2_128: sve(bfloat16SveFeatureCondition),
+            sve: sve(bfloat16WideSveFeatureCondition),
             avx3dl: sourced(source) { _, result in
                 body(result, native: (bfloat16Avx3Condition, bfloat16Avx3Call("c", for: result)))
             }
@@ -38418,6 +38502,16 @@ let bfloat16MulAddOps = [
                 otherwise: generic
             )
         }
+        func sve(_ condition: String) -> (Element) -> String {
+            sourced(source) { _, result in
+                let name = parity == 0 ? "bfmlalb" : "bfmlalt"
+                let call = sveResult(
+                    bfloat16SveCall(name, sveSplatOperand("c", for: result), for: result),
+                    for: result
+                )
+                return body(result, native: (condition, ("", call)))
+            }
+        }
         return Op(
             swiftName,
             highwayName,
@@ -38434,14 +38528,8 @@ let bfloat16MulAddOps = [
                     let call = bfloat16NeonCall(name, "c", for: result)
                     return body(result, native: (bfloat16NeonNativeCondition, ("", call)))
                 },
-                sve2_128: sourced(source) { _, result in
-                    let name = parity == 0 ? "bfmlalb" : "bfmlalt"
-                    let call = sveResult(
-                        bfloat16SveCall(name, sveSplatOperand("c", for: result), for: result),
-                        for: result
-                    )
-                    return body(result, native: (bfloat16SveFeatureCondition, ("", call)))
-                }
+                sve2_128: sve(bfloat16SveFeatureCondition),
+                sve: sve(bfloat16WideSveFeatureCondition)
             ),
             portable: sourced(source) { _, result in body(result, native: nil) }
         )
@@ -39246,9 +39334,9 @@ let float16NativeBodies: [String: (Element) -> String] = [
     "roundedDown": { float16NativeRounded(.down, for: $0) },
 ]
 
-func float16SveSum(for element: Element) -> String {
+func float16SveReduction(_ name: String, for element: Element) -> String {
     let reduced = sveBuiltin(
-        "addv",
+        name,
         [sveAllLanes(of: element), sveOperand("a", for: element)],
         for: element
     )
@@ -39285,7 +39373,7 @@ let float16SveBodies: [String: (Element) -> String?] = [
     "clamped": { portableClamped(for: $0) },
     "smallest": { float16NativeReduction("vminnmvq_f16", for: $0) },
     "largest": { float16NativeReduction("vmaxnmvq_f16", for: $0) },
-    "sum": { float16SveSum(for: $0) },
+    "sum": { float16SveReduction("addv", for: $0) },
     "sumWhere": { sveMaskedSum(for: $0) },
     "multiplyingComplexWhereOtherwise": { element in
         sveMergingSelecting(
@@ -39352,6 +39440,80 @@ func float16SveMaskedArithmetic(of op: Op) -> ((Element) -> String?)? {
     guard let arithmetic = family.sveArithmetic else { return nil }
     if merging && family.divides { return { sveMergingDividing(for: $0) } }
     return { sveMaskedArithmetic(arithmetic, merging: merging, for: $0) }
+}
+
+func float16SvePredicated(_ name: String, _ operands: [String], for element: Element) -> String {
+    let call = sveBuiltin(
+        name,
+        [sveAllLanes(of: element)] + operands.map { sveOperand($0, for: element) },
+        for: element,
+        predication: "x"
+    )
+    return sveResult(call, for: element)
+}
+
+func float16SveExtremum(
+    _ name: String,
+    blocking lane: SveBlockedLane,
+    for element: Element
+) -> String {
+    sveConstantBarrier(blocking: .both([.notANumber, lane]), for: element) {
+        vectorResult(float16SvePredicated("\(name)nm", [$0, $1], for: element), for: element)
+    }
+}
+
+func float16SveEstimate(_ name: String, for element: Element) -> String {
+    let estimate = sveBuiltin(name, [sveOperand("a", for: element)], for: element)
+    return vectorResult(sveResult(estimate, for: element), for: element)
+}
+
+let float16WideSveBodies: [String: (Element) -> String?] = [
+    "absoluteDifference": {
+        vectorResult(float16SvePredicated("abd", ["a", "b"], for: $0), for: $0)
+    },
+    "approximateReciprocal": { float16SveEstimate("recpe", for: $0) },
+    "approximateReciprocalSquareRoot": { float16SveEstimate("rsqrte", for: $0) },
+    "minimum": { float16SveExtremum("min", blocking: .minusInfinity, for: $0) },
+    "maximum": { float16SveExtremum("max", blocking: .infinity, for: $0) },
+    "maximumWhere": { element in
+        sveConstantBarrier(blocking: .both([.notANumber, .minusInfinity]), for: element) {
+            let operation = float16SvePredicated("max", [$0, $1], for: element)
+            return maskedSelecting(operation, merging: false, for: element)
+        }
+    },
+    "smallest": { float16SveReduction("minnmv", for: $0) },
+    "largest": { float16SveReduction("maxnmv", for: $0) },
+    "multiplyAddingSubtracting": {
+        sveMultiplyAlternatingStatements(negatingAll: false, for: $0)?.joined(separator: "\n")
+    },
+    "multiplySubtractingAdding": {
+        sveMultiplyAlternatingStatements(negatingAll: true, for: $0)?.joined(separator: "\n")
+    },
+    "pairwiseAdding": { _ in nil },
+    "exponent": { _ in nil },
+]
+
+let float16WideSve2Bodies: [String: (Element) -> String?] = [
+    "pairwiseAdding": { svePredicatedBinary("addp", predication: "m", for: $0) },
+    "exponent": { sveExponent(for: $0) },
+]
+
+func float16WideSveBody(of op: Op) -> ((Element) -> String?)? {
+    let native = float16NativeBodies[op.identifier].map { native in
+        { (element: Element) -> String? in native(element) }
+    }
+    guard
+        let body = float16WideSveBodies[op.identifier] ?? float16SveBodies[op.identifier]
+            ?? float16SveMaskedArithmetic(of: op) ?? native
+    else { return nil }
+    return { element in
+        body(element).map { text in
+            guard !text.contains("__builtin_neon_") else {
+                fatalError("The wide SVE body of \(op.identifier) on Float16 calls NEON")
+            }
+            return text
+        }
+    }
 }
 
 let float16SseBodies: [String: (Element) -> String] = [
@@ -39709,12 +39871,18 @@ func float16ArithmeticVariant(of op: Op) -> Op {
             },
             sve2_128: float16SveBodies[op.identifier] ?? float16SveMaskedArithmetic(of: op),
             sve2_128Splat: float16SveSplatBodies[op.identifier],
+            sve: float16WideSveBody(of: op),
+            sve2: float16WideSve2Bodies[op.identifier],
+            sveSplat: float16SveSplatBodies[op.identifier],
             avx3: halves ?? nativeMasks ?? { float16Fallback(op, for: $0, x86: true) },
             avx2: halves ?? truncatedMasks ?? float16Avx2Bodies[op.identifier],
             ssse3: float16SsseBodies[op.identifier],
             sse2: float16SseBodies[op.identifier] ?? halves
         ),
-        helpers: TargetBodies(sve2_128: float16SveHelpers[op.identifier]),
+        helpers: TargetBodies(
+            sve2_128: float16SveHelpers[op.identifier],
+            sve: float16SveHelpers[op.identifier]
+        ),
         outOfLineOnSVE: op.outOfLineOnSVE?.including([float16]),
         referenceCall: float16ReferenceCall(of: op),
         portable: { float16Fallback(op, for: $0) }
