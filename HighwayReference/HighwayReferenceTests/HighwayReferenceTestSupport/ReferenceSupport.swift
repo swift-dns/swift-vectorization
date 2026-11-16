@@ -179,7 +179,7 @@ extension Double: ReferenceLane {
 }
 
 package protocol ReferenceVector {
-    associatedtype Simd: SIMD where Simd.Scalar: ReferenceLane
+    associatedtype Simd: Swift.SIMD where Simd.Scalar: ReferenceLane
     associatedtype InputLane: ReferenceLane = Simd.Scalar
 
     init(_ simd: Simd)
@@ -234,7 +234,7 @@ extension ReferenceNarrowMask {
 }
 
 package protocol ReferenceMask {
-    associatedtype Storage: SIMD
+    associatedtype Storage: Swift.SIMD
     where Storage.Scalar: ReferenceLane & FixedWidthInteger & SignedInteger
 
     init(_ simd: SIMDMask<Storage>)
@@ -337,7 +337,7 @@ package enum Inputs {
         ).map { V(V.Simd($0)) }
     }
 
-    package static func vectors<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func vectors<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane {
         vectorLanes(V.Scalar.self, count: V.scalarCount, seed: seed).map { V($0) }
     }
@@ -352,7 +352,7 @@ package enum Inputs {
         vectorLanes(V.Lane.self, count: V.laneCount, seed: seed).map { V(lanes: $0) }
     }
 
-    package static func conversions<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func conversions<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane {
         conversionLanes(V.Scalar.self, count: V.scalarCount, seed: seed).map { V($0) }
     }
@@ -563,7 +563,7 @@ package enum Inputs {
         return [identity] + splats + random
     }
 
-    package static func tableIndices<V: SIMD>(
+    package static func tableIndices<V: Swift.SIMD>(
         _ type: V.Type,
         offset: Int = 0,
         perByte: Bool = false,
@@ -584,7 +584,7 @@ package enum Inputs {
         return byteIndices(V.self, offset: offset, count: count, seed: seed, inContract: inContract)
     }
 
-    package static func tableIndices<V: SIMD>(
+    package static func tableIndices<V: Swift.SIMD>(
         _ type: V.Type,
         offset: Int = 0,
         perByte: Bool,
@@ -596,7 +596,7 @@ package enum Inputs {
         return byteIndices(V.self, offset: offset, count: count, seed: seed, inContract: inContract)
     }
 
-    private static func byteIndices<V: SIMD>(
+    private static func byteIndices<V: Swift.SIMD>(
         _ type: V.Type,
         offset: Int,
         count: Int,
@@ -654,7 +654,7 @@ package enum Inputs {
         }
     }
 
-    package static func shiftCounts<V: SIMD>(
+    package static func shiftCounts<V: Swift.SIMD>(
         _ type: V.Type,
         seed: UInt64,
         inContract: Bool
@@ -907,7 +907,7 @@ package func withGuardedLanes<Lane: ReferenceLane, Result>(
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(_ operands: V...) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(_ operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
         operands.contains { first in
@@ -918,7 +918,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(multiplying a: V, _ b: V, adding c: V) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(multiplying a: V, _ b: V, adding c: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
         let (first, second, addend) = (a[lane], b[lane], c[lane])
@@ -932,25 +932,25 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasNaNs<V: SIMD>(negating operands: V...) -> Bool
+package func hasNaNs<V: Swift.SIMD>(negating operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(negating a: V, _ b: V, adding c: V) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(negating a: V, _ b: V, adding c: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     hasNaNs(negating: a, b) || hasUnorderedNaNs(multiplying: a, b, adding: c)
 }
 
 @inlinable
-package func negatedLanes<V: SIMD>(of vector: V) -> V
+package func negatedLanes<V: Swift.SIMD>(of vector: V) -> V
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     V((0..<V.scalarCount).map { -vector[$0] })
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(alternatingNegation a: V, _ b: V) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(alternatingNegation a: V, _ b: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
         let second = lane.isMultiple(of: 2) ? -b[lane] : b[lane]
@@ -959,7 +959,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(adjacentLanesOf operands: V...) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(adjacentLanesOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     operands.contains { operand in
         stride(from: 0, to: V.scalarCount, by: 2).contains { lane in
@@ -970,7 +970,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(adjacentQuadsOf operands: V...) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(adjacentQuadsOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint & SIMDScalar {
     operands.contains { operand in
         stride(from: 0, to: V.scalarCount, by: 4).contains { lane in
@@ -980,7 +980,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint & SIMDScalar {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(complexLanesOf operands: V...) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(complexLanesOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     let large = V.Scalar.greatestFiniteMagnitude.squareRoot() / 4
     return stride(from: 0, to: V.scalarCount, by: 2).contains { lane in
@@ -997,7 +997,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(lanesOf vector: V) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(lanesOf vector: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     let lanes = (0..<V.scalarCount).map { vector[$0] }
     let payloads = Set(lanes.filter { $0.isNaN }.map { $0.bits })
@@ -1009,7 +1009,7 @@ package func hex<Lane: ReferenceLane>(_ lane: Lane) -> String {
     "0x" + String(lane.bits, radix: 16)
 }
 
-package func describe<V: SIMD>(_ vector: V) -> String where V.Scalar: ReferenceLane {
+package func describe<V: Swift.SIMD>(_ vector: V) -> String where V.Scalar: ReferenceLane {
     "[" + (0..<V.scalarCount).map { hex(vector[$0]) }.joined(separator: ", ") + "]"
 }
 
@@ -1044,7 +1044,7 @@ package func bytes<Lane: ReferenceLane>(of lanes: [Lane]) -> [UInt8] {
     }
 }
 
-package func bytes<V: SIMD>(of vector: V) -> [UInt8] where V.Scalar: ReferenceLane {
+package func bytes<V: Swift.SIMD>(of vector: V) -> [UInt8] where V.Scalar: ReferenceLane {
     bytes(of: (0..<V.scalarCount).map { vector[$0] })
 }
 
@@ -1056,7 +1056,7 @@ package func bytes<V: ReferenceNarrowVector>(of vector: V) -> [UInt8] {
     bytes(of: vector.lanes)
 }
 
-package func registerBytes<V: SIMD>(of vector: V) -> [UInt8] where V.Scalar: ReferenceLane {
+package func registerBytes<V: Swift.SIMD>(of vector: V) -> [UInt8] where V.Scalar: ReferenceLane {
     bytes(of: vector)
 }
 
@@ -1089,7 +1089,7 @@ package final class Mismatches {
         self.operation = operation
     }
 
-    package func check<V: SIMD>(
+    package func check<V: Swift.SIMD>(
         _ port: V,
         _ reference: V,
         _ inputs: @autoclosure () -> String

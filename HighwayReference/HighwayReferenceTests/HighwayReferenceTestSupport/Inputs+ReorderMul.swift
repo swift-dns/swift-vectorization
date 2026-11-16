@@ -1,5 +1,5 @@
 extension Inputs {
-    package static func accumulators<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func accumulators<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane & FixedWidthInteger {
         let edges = accumulatorEdges(V.Scalar.self)
         let splats = edges.map { V(repeating: $0) }

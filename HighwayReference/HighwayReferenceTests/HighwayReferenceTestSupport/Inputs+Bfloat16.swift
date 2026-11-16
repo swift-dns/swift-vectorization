@@ -11,7 +11,7 @@ extension Float {
 }
 
 extension Inputs {
-    package static func bfloat16Demotions<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func bfloat16Demotions<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar == Float {
         let edges = Float.bfloat16DemotionEdges
         let splats = edges.map { V(repeating: $0) }
@@ -21,7 +21,7 @@ extension Inputs {
         return conversions(type, seed: seed) + splats + windows
     }
 
-    package static func accumulators<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func accumulators<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane & BinaryFloatingPoint {
         vectors(type, seed: seed)
     }
@@ -69,7 +69,7 @@ where A.InputLane == BFloat16, A.Simd.Scalar == UInt16 {
     }
 }
 
-package func hasUnorderedNaNs<A: ReferenceVector, V: SIMD>(
+package func hasUnorderedNaNs<A: ReferenceVector, V: Swift.SIMD>(
     widening a: A,
     _ b: A,
     parity: Int,
@@ -80,7 +80,7 @@ package func hasUnorderedNaNs<A: ReferenceVector, V: SIMD>(
     }
 }
 
-package func hasUnorderedNaNs<A: ReferenceVector, V: SIMD>(
+package func hasUnorderedNaNs<A: ReferenceVector, V: Swift.SIMD>(
     widening a: A,
     _ b: A,
     accumulating c: V,

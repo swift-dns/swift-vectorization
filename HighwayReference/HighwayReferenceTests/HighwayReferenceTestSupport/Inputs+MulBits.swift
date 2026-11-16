@@ -1,5 +1,5 @@
 extension Inputs {
-    package static func exponents<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func exponents<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane & FixedWidthInteger & SignedInteger {
         var generator = SplitMix64(seed: seed)
         let (bias, mantissaBits) =
@@ -48,7 +48,7 @@ extension Inputs {
         exponents(V.Simd.self, seed: seed).map(V.init)
     }
 
-    package static func byteIndices<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func byteIndices<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane & FixedWidthInteger {
         let sweeps = (0..<256).map { start in
             V((0..<V.scalarCount).map { V.Scalar(truncatingIfNeeded: start + $0) })

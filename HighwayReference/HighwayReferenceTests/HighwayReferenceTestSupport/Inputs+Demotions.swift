@@ -48,7 +48,7 @@ extension UInt64: DemotionLane {
 }
 
 extension Inputs {
-    package static func floatDemotions<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func floatDemotions<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: DemotionLane {
         let edges = V.Scalar.demotionEdges
         let splats = edges.map { V(repeating: $0) }
