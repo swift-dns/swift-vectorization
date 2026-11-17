@@ -30,8 +30,10 @@ jobs:
         # `-msve-vector-bits`, so the two `-Xllvm` options tell it the vector length, without which
         # it pads SVE ops with `ptrue` and `sel` the C compiler would not.
         # Highway's NEON_BF16 target requires AES, FP16, DOTPROD, BF16 and I8MM but no SVE, which
-        # `-march=armv8.6-a+aes+fp16` turns on. Clang 21 marks Highway's SVE, SVE_256 and SVE2
-        # targets broken, so the wide SVE rows lift that.
+        # `-march=armv8.6-a+aes+fp16` turns on. Clang 21 cannot compile Highway's casts between
+        # bf16 and f16 vectors there with optimizations on, so that row tests in debug only.
+        # Clang 21 marks Highway's SVE, SVE_256 and SVE2 targets broken, so the wide SVE rows lift
+        # that.
         target:
           - &neon_without_aes
             name: &neon_without_aes_name NEON_WITHOUT_AES
@@ -48,11 +50,10 @@ jobs:
             runner: ubuntu-24.04-arm
             flags: "-Xcc -march=armv8.6-a+aes+fp16"
             compare-codegen: false
-            debug-tests: false
-            release-tests: true
+            debug-tests: true
+            release-tests: false
             sde-cpu: ""
             qemu-cpu: ""
-            base: *neon_without_aes
           - name: SVE2_128
             expected-target: SVE2_128
             runner: ubuntu-24.04-arm
@@ -374,9 +375,16 @@ jobs:
             printf '%s\n' "There is no test runner in HighwayReference/.build/release" >&2
             exit 1
           fi
+          failed_runners=()
           for runner in "${runners[@]}"; do
-            qemu-aarch64 -cpu "${QEMU_CPU}" "${runner}" --testing-library swift-testing --skip Trap
+            if ! qemu-aarch64 -cpu "${QEMU_CPU}" "${runner}" --testing-library swift-testing --skip Trap; then
+              failed_runners+=( "${runner}" )
+            fi
           done
+          if [[ "${#failed_runners[@]}" -gt 0 ]]; then
+            printf '%s\n' "These test runners failed under QEMU:" "${failed_runners[@]}" >&2
+            exit 1
+          fi
 
       - name: Compare the codegen of the ops with highway's
         if: ${{ matrix.mode == 'codegen' && matrix.target.compare-codegen }}
@@ -423,7 +431,8 @@ jobs:
           SIMD_EXPECTED_TARGET: ${{ matrix.target.expected-target }}
         run: |
           read -r -a flags <<< "${FLAGS}"
-          swift test --sanitize=address --sanitize=undefined --package-path HighwayReference "${flags[@]}"
+          swift test --disable-xctest --sanitize=address --sanitize=undefined \
+            --package-path HighwayReference "${flags[@]}"
 
   macos-base-fingerprints:
     name: reference-tests (NEON_WITHOUT_AES, fingerprints)
