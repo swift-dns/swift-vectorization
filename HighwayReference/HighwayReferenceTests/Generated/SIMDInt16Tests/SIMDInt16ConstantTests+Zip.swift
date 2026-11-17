@@ -7,19 +7,22 @@ import Vectorization
 
 extension SIMDInt16ConstantTests {
     @inline(__always)
-    private func checkZippingLowerFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkZippingLowerFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("zippingLowerFromInt8 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x7589_4267_E47C_62EE)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x7589_4267_E47C_62EE)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.zippingLower(SIMDInt8.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.zippingLowerI8ToI16(SIMDInt8.repeating(value).raw, b.raw)
+                H.zippingLower(SIMD<Int8>.repeating(value), b),
+                H(
+                    raw: HighwayReference.zippingLowerI8ToI16(
+                        SIMD<Int8>.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "b: \(describe(b))"
             )
@@ -28,19 +31,22 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkZippingLowerFromInt8ConstantB(_ value: SIMDInt8.Lane) {
+    private func checkZippingLowerFromInt8ConstantB(_ value: Int8) {
         let mismatches = Mismatches("zippingLowerFromInt8 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x6CF4_0C67_DFA5_828C)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x6CF4_0C67_DFA5_828C)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.zippingLower(a, SIMDInt8.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.zippingLowerI8ToI16(a.raw, SIMDInt8.repeating(value).raw)
+                H.zippingLower(a, SIMD<Int8>.repeating(value)),
+                H(
+                    raw: HighwayReference.zippingLowerI8ToI16(
+                        a.raw,
+                        SIMD<Int8>.repeating(value).raw
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -99,19 +105,22 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkZippingUpperFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkZippingUpperFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("zippingUpperFromInt8 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x01FE_B085_6029_C6FD)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x01FE_B085_6029_C6FD)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.zippingUpper(SIMDInt8.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.zippingUpperI8ToI16(SIMDInt8.repeating(value).raw, b.raw)
+                H.zippingUpper(SIMD<Int8>.repeating(value), b),
+                H(
+                    raw: HighwayReference.zippingUpperI8ToI16(
+                        SIMD<Int8>.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "b: \(describe(b))"
             )
@@ -120,19 +129,22 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkZippingUpperFromInt8ConstantB(_ value: SIMDInt8.Lane) {
+    private func checkZippingUpperFromInt8ConstantB(_ value: Int8) {
         let mismatches = Mismatches("zippingUpperFromInt8 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xE8AC_2A85_5202_274B)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xE8AC_2A85_5202_274B)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.zippingUpper(a, SIMDInt8.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.zippingUpperI8ToI16(a.raw, SIMDInt8.repeating(value).raw)
+                H.zippingUpper(a, SIMD<Int8>.repeating(value)),
+                H(
+                    raw: HighwayReference.zippingUpperI8ToI16(
+                        a.raw,
+                        SIMD<Int8>.repeating(value).raw
+                    )
                 ),
                 "a: \(describe(a))"
             )

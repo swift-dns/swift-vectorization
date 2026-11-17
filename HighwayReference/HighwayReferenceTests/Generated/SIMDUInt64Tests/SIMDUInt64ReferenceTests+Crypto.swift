@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDUInt64ReferenceTests {
     @Test func carrylessMultiplyingLower() {
         let mismatches = Mismatches("carrylessMultiplyingLower")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCA00_5F16_ACBC_B485)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCA00_5E16_ACBC_B2D2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCA00_5F16_ACBC_B485)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCA00_5E16_ACBC_B2D2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.carrylessMultiplyingLower(a, b),
-                H.Vector(raw: HighwayReference.carrylessMultiplyingLowerU64(a.raw, b.raw)),
+                H(raw: HighwayReference.carrylessMultiplyingLowerU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func carrylessMultiplyingUpper() {
         let mismatches = Mismatches("carrylessMultiplyingUpper")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9161_4A33_1221_F870)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9161_4B33_1221_FA23)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9161_4A33_1221_F870)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9161_4B33_1221_FA23)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.carrylessMultiplyingUpper(a, b),
-                H.Vector(raw: HighwayReference.carrylessMultiplyingUpperU64(a.raw, b.raw)),
+                H(raw: HighwayReference.carrylessMultiplyingUpperU64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

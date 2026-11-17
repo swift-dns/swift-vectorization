@@ -29,6 +29,7 @@ struct Element {
     var mask: String { "Mask\(suffix)" }
     var outVector: String { "OutVector\(suffix)" }
     var namespace: String { "SIMD\(swiftType)" }
+    var vectorType: String { "SIMD<\(swiftType)>" }
     var laneCount: Int { width / (bits / 8) }
     var blockLaneCount: Int { 16 / (bits / 8) }
     var cSuffix: String { suffix.lowercased() }
@@ -119,6 +120,9 @@ struct Element {
     func cVector(of shape: Shape) -> String { "cvectorization_ops_\(shape.cName)_\(cSuffix)" }
     func cRawVector(of shape: Shape) -> String {
         "cvectorization_ops_raw_\(shape.cName)_\(cSuffix)"
+    }
+    func rawVectorType(of shape: Shape) -> String {
+        shape == .full && !hasOpaqueVector ? cVector : cRawVector(of: shape)
     }
     func cToRawVector(of shape: Shape) -> String {
         "cvectorization_ops_to_raw_\(shape.cName)_\(cSuffix)"
@@ -749,12 +753,12 @@ let codegenCountAlternatives = [
     CodegenAlternative(name: "two", value: { _ in "2" }),
     CodegenAlternative(
         name: "laneCount",
-        value: { "\($0.namespace).laneCount" },
+        value: { "\($0.vectorType).laneCount" },
         highwayValue: highwayLaneCount
     ),
     CodegenAlternative(
         name: "twiceLaneCount",
-        value: { "2 * \($0.namespace).laneCount" },
+        value: { "2 * \($0.vectorType).laneCount" },
         highwayValue: { "2 * \(highwayLaneCount(of: $0))" },
         fitsOneVector: false
     ),
@@ -1051,6 +1055,28 @@ func signedElement(of element: Element) -> Element {
         fatalError("There is no signed element of \(element.bits) bits")
     }
     return signed
+}
+
+func wideElement(of element: Element) -> Element? {
+    switch element.category {
+    case .unsignedInteger, .signedInteger:
+        return element.bits < 64 ? resizedElement(of: element, bits: element.bits * 2) : nil
+    case .float, .float16:
+        return elements.first { $0.isFloatingPoint && $0.bits == element.bits * 2 }
+    case .bfloat16:
+        return nil
+    }
+}
+
+func narrowElement(of element: Element) -> Element? {
+    elements.first { wideElement(of: $0)?.suffix == element.suffix }
+}
+
+func floatElement(of element: Element) -> Element? {
+    guard element.category == .unsignedInteger || element.category == .signedInteger,
+        element.bits >= 16
+    else { return nil }
+    return elements.first { $0.isFloatingPoint && $0.bits == element.bits }
 }
 
 func resizedElement(of element: Element, bits: Int) -> Element {
@@ -13562,20 +13588,32 @@ func takesPointerIndices(_ op: Op) -> Bool {
 
 /// The ops whose types depend on more than the element type of their protocol's conformer.
 func isOutsideProtocols(_ op: Op) -> Bool {
-    takesPointerIndices(op) || op.parameters.contains(.constIndexPointer) || usesNarrowTypes(op)
+    takesIndexTypes(op) || usesNarrowTypes(op)
+}
+
+func takesIndexTypes(_ op: Op) -> Bool {
+    takesPointerIndices(op) || op.parameters.contains(.constIndexPointer)
 }
 
 func usesNarrowTypes(_ op: Op) -> Bool {
+    !narrowShapes(of: op).isEmpty
+}
+
+func narrowShapes(of op: Op) -> Set<Shape> {
+    var shapes = Set(
+        op.parameters.compactMap { parameter -> Shape? in
+            switch parameter {
+            case .narrowVector, .sourceNarrowVector, .narrowMask, .sourceNarrowMask:
+                return parameter.shape
+            default: return nil
+            }
+        }
+    )
     switch op.returns {
-    case .narrowVector, .narrowMask: return true
+    case .narrowVector(let shape), .narrowMask(let shape): shapes.insert(shape)
     default: break
     }
-    return op.parameters.contains { parameter in
-        switch parameter {
-        case .narrowVector, .sourceNarrowVector, .narrowMask, .sourceNarrowMask: return true
-        default: return false
-        }
-    }
+    return shapes
 }
 
 /// What a span form of a gather or a scatter checks: that the indices, or the byte offsets, of the
@@ -13586,7 +13624,7 @@ func gatherChecks(of op: Op, for element: Element) -> [Check] {
     let isOffsets = parameter == .pointerOffsets
     let operand = isOffsets ? "byteOffsets" : "indices"
     let stride = isOffsets ? "MemoryLayout<Lane>.stride" : "1"
-    let limit = "\(indexElement.namespace).indexLimit(count: span.count, stride: \(stride))"
+    let limit = "\(indexElement.vectorType).indexLimit(count: span.count, stride: \(stride))"
     let message =
         isOffsets
         ? "Byte offset is negative or leaves no room for a lane in the span"
@@ -13663,23 +13701,14 @@ func laneCapabilityStatements(of op: Op, for element: Element) -> String {
 
 func laneCapabilityMembers(for element: Element) -> String {
     var output = ""
-    for capability in laneCapabilities where capability.applies.matches(element) {
+    let requirements = staticRequirementNames(of: element)
+    for capability in laneCapabilities
+    where capability.applies.matches(element) && !requirements.contains(capability.name) {
         let name = capability.name
         output += "    @export(implementation) @inline(always)\n"
         output += "    public static var \(name): Bool { \(cFunctionName(name, element))() }\n\n"
     }
     return output
-}
-
-func laneCapabilityRequirements(indent: String) -> String {
-    laneCapabilities.filter { classicElements.allSatisfy($0.applies.matches) }.map {
-        """
-        \(indent)/// Whether a `Vector` holds enough lanes for `\($0.opName)` on the target this was compiled for.
-        \(indent)static var \($0.name): Bool { get }
-
-
-        """
-    }.joined()
 }
 
 func x86Sse2LookupTables(for element: Element) -> Element {
@@ -31475,9 +31504,9 @@ let mulBitsPowerOf2Ops = sourcedOps(accepting: mulBitsPowerOf2Accepts) { source,
 
 func mulBitsSourceInputs(of op: Op, operand: Element, seed: String) -> String? {
     switch op.highwayName {
-    case "MulByPow2": return "Inputs.exponents(\(operand.namespace).Vector.self, \(seed))"
+    case "MulByPow2": return "Inputs.exponents(\(operand.vectorType).self, \(seed))"
     case "MultiRotateRight", "BitShuffle":
-        return "Inputs.byteIndices(\(operand.namespace).Vector.self, \(seed))"
+        return "Inputs.byteIndices(\(operand.vectorType).self, \(seed))"
     default: return nil
     }
 }
@@ -32973,14 +33002,14 @@ func widenMulCornerTests(of op: Op, for element: Element) -> [String] {
         let operand = operandElement(of: parameter, for: element, source: op.source)
         let (inputsName, type) =
             parameter.isSourced
-            ? ("widenMulOperands", "\(operand.namespace).Vector")
-            : ("widenMulAccumulators", "H.Vector")
+            ? ("widenMulOperands", operand.vectorType)
+            : ("widenMulAccumulators", "H")
         let values = "Inputs.\(inputsName)(\(type).self)"
         return ReferenceInput(
             parameter: input.parameter,
             name: input.name,
             values: parameter.shape == .full
-                ? values : "\(values).map { \(operand.namespace).lowerHalf($0) }"
+                ? values : "\(values).map { \(operand.vectorType).lowerHalf($0) }"
         )
     }
     guard let accumulator = inputs.last else { return [] }
@@ -33354,7 +33383,7 @@ func reorderMulPairingTest(of reorder: Op, from source: Element, to element: Ele
     let test = "\(reorder.swiftName)\(uppercasedFirst(rearrange.swiftName))From\(source.swiftType)"
     let seeds = ["0", "1"].map { "seed: \(referenceTestSeed(element, test, $0))" }
     let operands = (0..<2).map {
-        "Inputs.conversions(\(source.namespace).Vector.self, \(seeds[$0]))"
+        "Inputs.conversions(\(source.vectorType).self, \(seeds[$0]))"
     }
     let reorderReference = referenceCall(
         referenceFunctionName(of: reorder, for: element),
@@ -33377,23 +33406,23 @@ func reorderMulPairingTest(of reorder: Op, from source: Element, to element: Ele
         var portSum1 = H.zero()
         var referenceSum0 = H.zero()
         var referenceSum1 = H.zero()
-        var products = [H.Lane](repeating: 0, count: H.laneCount)
+        var products = [Lane](repeating: 0, count: H.laneCount)
         for (a, b) in steps {
         portSum0 = H.\(reorder.swiftName)(a, b, portSum0, &portSum1)
-        referenceSum0 = H.Vector(raw: \(reorderReference))
+        referenceSum0 = H(raw: \(reorderReference))
         for lane in products.indices {
-        let even = H.Lane(truncatingIfNeeded: a.simd[2 * lane]) &* H.Lane(truncatingIfNeeded: b.simd[2 * lane])
-        let odd = H.Lane(truncatingIfNeeded: a.simd[2 * lane + 1]) &* H.Lane(truncatingIfNeeded: b.simd[2 * lane + 1])
+        let even = Lane(truncatingIfNeeded: a.simd[2 * lane]) &* Lane(truncatingIfNeeded: b.simd[2 * lane])
+        let odd = Lane(truncatingIfNeeded: a.simd[2 * lane + 1]) &* Lane(truncatingIfNeeded: b.simd[2 * lane + 1])
         products[lane] = products[lane] &+ even &+ odd
         }
         }
         let described = { steps.map { "\\(describe($0.0)) * \\(describe($0.1))" }.joined(separator: ", ") }
         let rearranged = H.\(rearrange.swiftName)(portSum0, portSum1)
-        let referenceRearranged = H.Vector(raw: \(rearrangeReference))
+        let referenceRearranged = H(raw: \(rearrangeReference))
         mismatches.check(portSum0, referenceSum0, "steps: \\(described()), sum0")
         mismatches.check(portSum1, referenceSum1, "steps: \\(described()), sum1")
         mismatches.check(rearranged, referenceRearranged, "steps: \\(described()), rearranged")
-        mismatches.check(rearranged, H.Vector(H.Vector.Simd(products)), "steps: \\(described()), products")
+        mismatches.check(rearranged, H(H.SIMDType(products)), "steps: \\(described()), products")
         }
         """
     return referenceTestFunction(
@@ -34635,7 +34664,7 @@ func integerDemotionSourceInputs(
     guard op.section == .singleVectorDemotion, operand.category != .float,
         result.category != .float
     else { return nil }
-    return "Inputs.integerDemotions(\(operand.namespace).Vector.self, to: H.Lane.self, \(seed))"
+    return "Inputs.integerDemotions(\(operand.vectorType).self, to: Lane.self, \(seed))"
 }
 
 func demoteSingleOps(_ shape: Shape, _ highwayName: String, shift: DemoteShift? = nil) -> [Op] {
@@ -34683,7 +34712,7 @@ func float16DemotionSourceInputs(
 ) -> String? {
     guard op.highwayName == "DemoteTo", operand.category == .float, element.category == .float16
     else { return nil }
-    return "Inputs.float16Demotions(\(operand.namespace).Vector.self, \(seed))"
+    return "Inputs.float16Demotions(\(operand.vectorType).self, \(seed))"
 }
 
 func floatDemotionSourceInputs(
@@ -34696,7 +34725,7 @@ func floatDemotionSourceInputs(
     guard demotions.contains(op.highwayName), demoteFloatConverts(operand, element) else {
         return nil
     }
-    return "Inputs.floatDemotions(\(operand.namespace).Vector.self, \(seed))"
+    return "Inputs.floatDemotions(\(operand.vectorType).self, \(seed))"
 }
 
 func narrowedResult(
@@ -37882,7 +37911,7 @@ func bfloat16DemotionSourceInputs(
     seed: String
 ) -> String? {
     guard bfloat16DemotesFromFloat(operand, element) else { return nil }
-    return "Inputs.bfloat16Demotions(\(operand.namespace).Vector.self, \(seed))"
+    return "Inputs.bfloat16Demotions(\(operand.vectorType).self, \(seed))"
 }
 
 enum Bfloat16Rounding {
@@ -40123,7 +40152,7 @@ struct Binding {
 func bindings(
     of op: Op,
     for element: Element,
-    scope: String = "",
+    scope: String? = nil,
     checked: Bool = true
 ) -> [Binding] {
     var vectorNames = ["a", "b", "c", "d"].makeIterator()
@@ -40165,9 +40194,10 @@ func bindings(
                     argument: referenceConversion(shape.conversion(conversion), name, for: operand),
                     swiftLabel: swiftLabels.next(for: parameter) ?? "_",
                     swiftName: name,
-                    swiftType: parameter.isSourced
-                        ? "\(operand.namespace).\(shape.swiftVector)"
-                        : "\(scope)\(shape.swiftVector)",
+                    swiftType: swiftVectorType(
+                        shape,
+                        scope: parameter.isSourced ? operand.swiftType : scope
+                    ),
                     isInOut: false
                 )
             )
@@ -40179,7 +40209,7 @@ func bindings(
                     argument: referenceConversion("fromPort", "indices", for: element),
                     swiftLabel: checkedLabel("at", checked: checked),
                     swiftName: "indices",
-                    swiftType: "\(scope)Vector",
+                    swiftType: swiftVectorType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40193,7 +40223,7 @@ func bindings(
                     argument: "hn::IndicesFromVec(\(element.tag)(), \(vector))",
                     swiftLabel: checkedLabel("at", checked: checked),
                     swiftName: "indices",
-                    swiftType: "\(scope)Indices",
+                    swiftType: swiftIndicesType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40206,7 +40236,7 @@ func bindings(
                     argument: referenceConversion("fromPort", "indices", for: indexElement),
                     swiftLabel: "at",
                     swiftName: "indices",
-                    swiftType: "\(scope)Indices",
+                    swiftType: swiftIndicesType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40225,8 +40255,10 @@ func bindings(
                     ),
                     swiftLabel: swiftLabels.next(for: parameter) ?? "_",
                     swiftName: name,
-                    swiftType: parameter.isSourced
-                        ? "\(operand.namespace).\(shape.swiftMask)" : "\(scope)\(shape.swiftMask)",
+                    swiftType: swiftMaskType(
+                        shape,
+                        scope: parameter.isSourced ? operand.swiftType : scope
+                    ),
                     isInOut: false
                 )
             )
@@ -40239,7 +40271,7 @@ func bindings(
                     argument: referenceConversion("fromPort", "vector", for: indexElement),
                     swiftLabel: checkedLabel("from", checked: checked),
                     swiftName: "vector",
-                    swiftType: "\(scope)Indices",
+                    swiftType: swiftIndicesType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40251,7 +40283,7 @@ func bindings(
                     argument: element.hwyScalar("value"),
                     swiftLabel: "_",
                     swiftName: "value",
-                    swiftType: "\(scope)Lane",
+                    swiftType: swiftLaneType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40263,7 +40295,7 @@ func bindings(
                     argument: element.hwyScalar("value"),
                     swiftLabel: "with",
                     swiftName: "value",
-                    swiftType: "\(scope)Lane",
+                    swiftType: swiftLaneType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40291,7 +40323,7 @@ func bindings(
                         "hn::Create\(count)(\(tupleTag(of: element))(), \(members.joined(separator: ", ")))",
                     swiftLabel: "_",
                     swiftName: "tuple",
-                    swiftType: tupleType("\(scope)Vector", count: count),
+                    swiftType: tupleType(swiftVectorType(scope: scope), count: count),
                     isInOut: false
                 )
             )
@@ -40315,7 +40347,7 @@ func bindings(
                     argument: element.hwyPointer("from", isConst: true),
                     swiftLabel: "from",
                     swiftName: "from",
-                    swiftType: "UnsafePointer<\(scope)Lane>",
+                    swiftType: "UnsafePointer<\(swiftLaneType(scope: scope))>",
                     isInOut: false
                 )
             )
@@ -40327,7 +40359,7 @@ func bindings(
                     argument: element.hwyPointer("to", isConst: false),
                     swiftLabel: "to",
                     swiftName: "to",
-                    swiftType: "UnsafeMutablePointer<\(scope)Lane>",
+                    swiftType: "UnsafeMutablePointer<\(swiftLaneType(scope: scope))>",
                     isInOut: false
                 )
             )
@@ -40425,7 +40457,7 @@ func bindings(
                     argument: "inPlace<\(element.vector)>(\(name))",
                     swiftLabel: "_",
                     swiftName: name,
-                    swiftType: "\(scope)Vector",
+                    swiftType: swiftVectorType(scope: scope),
                     isInOut: true
                 )
             )
@@ -40437,7 +40469,7 @@ func bindings(
                     argument: referenceConversion("fromPort", "fill", for: element),
                     swiftLabel: parameter.overloading?.label,
                     swiftName: "fill",
-                    swiftType: "\(scope)Vector",
+                    swiftType: swiftVectorType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40449,7 +40481,7 @@ func bindings(
                     argument: element.hwyScalar("fill"),
                     swiftLabel: parameter.overloading?.label,
                     swiftName: "fill",
-                    swiftType: "\(scope)Lane",
+                    swiftType: swiftLaneType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40461,7 +40493,7 @@ func bindings(
                     argument: referenceConversion("fromPort", "otherwise", for: element),
                     swiftLabel: parameter.overloading?.label,
                     swiftName: "otherwise",
-                    swiftType: "\(scope)Vector",
+                    swiftType: swiftVectorType(scope: scope),
                     isInOut: false
                 )
             )
@@ -40542,7 +40574,7 @@ func bindings(
                     argument: referenceConversion("fromPort", name, for: indexElement),
                     swiftLabel: name,
                     swiftName: name,
-                    swiftType: "\(indexElement.namespace).Vector",
+                    swiftType: indexElement.vectorType,
                     isInOut: false
                 )
             )
@@ -40825,50 +40857,61 @@ func tupleType(_ vector: String, count: Int) -> String {
     "(\(Array(repeating: vector, count: count).joined(separator: ", ")))"
 }
 
-func swiftReturnType(_ returns: ReturnType, scope: String = "") -> String {
+func swiftVectorType(_ shape: Shape = .full, scope: String?) -> String {
+    guard let scope else { return shape == .full ? "SIMD" : shape.swiftVector }
+    return shape == .full ? "SIMD<\(scope)>" : "SIMD<\(scope)>.\(shape.swiftVector)"
+}
+
+func swiftMaskType(_ shape: Shape = .full, scope: String?) -> String {
+    guard let scope else { return shape.swiftMask }
+    return "SIMD<\(scope)>.\(shape.swiftMask)"
+}
+
+func swiftIndicesType(scope: String?) -> String {
+    scope.map { "SIMD<\($0)>.Indices" } ?? "Indices"
+}
+
+func swiftLaneType(scope: String?) -> String {
+    scope ?? "Lane"
+}
+
+func swiftReturnType(_ returns: ReturnType, scope: String? = nil) -> String {
     switch returns {
-    case .vector: return "\(scope)Vector"
-    case .laneIndices: return "\(scope)Indices"
-    case .mask: return "\(scope)Mask"
-    case .lane: return "\(scope)Lane"
+    case .vector: return swiftVectorType(scope: scope)
+    case .laneIndices: return swiftIndicesType(scope: scope)
+    case .mask: return swiftMaskType(scope: scope)
+    case .lane: return swiftLaneType(scope: scope)
     case .count, .index: return "Int"
     case .bits: return "UInt64"
     case .boolean: return "Bool"
     case .void: return "Void"
-    case .indices: return "\(scope)Indices"
-    case .tuple(let count): return tupleType("\(scope)Vector", count: count)
-    case .narrowVector(let shape): return "\(scope)\(shape.swiftVector)"
-    case .narrowMask(let shape): return "\(scope)\(shape.swiftMask)"
+    case .indices: return swiftIndicesType(scope: scope)
+    case .tuple(let count): return tupleType(swiftVectorType(scope: scope), count: count)
+    case .narrowVector(let shape): return swiftVectorType(shape, scope: scope)
+    case .narrowMask(let shape): return swiftMaskType(shape, scope: scope)
     }
 }
 
 func importedReturnType(_ returns: ReturnType, _ element: Element) -> String {
     switch returns {
-    case .vector: return "\(element.namespace).Vector"
-    case .laneIndices: return "\(laneIndexElement(of: element).namespace).Vector"
-    case .mask: return "\(element.namespace).Mask"
+    case .vector: return element.vectorType
+    case .laneIndices: return laneIndexElement(of: element).vectorType
+    case .mask: return swiftMaskType(scope: element.swiftType)
     case .lane: return element.swiftType
     case .count, .index: return "Int"
     case .bits: return "UInt64"
     case .boolean: return "Bool"
     case .void: return "Void"
-    case .indices: return "\(laneIndexElement(of: element).namespace).Vector"
-    case .tuple(let count): return tupleType("\(element.namespace).Vector", count: count)
-    case .narrowVector(let shape): return "\(element.namespace).\(shape.swiftVector)"
-    case .narrowMask(let shape): return "\(element.namespace).\(shape.swiftMask)"
+    case .indices: return laneIndexElement(of: element).vectorType
+    case .tuple(let count): return tupleType(element.vectorType, count: count)
+    case .narrowVector(let shape): return swiftVectorType(shape, scope: element.swiftType)
+    case .narrowMask(let shape): return swiftMaskType(shape, scope: element.swiftType)
     }
 }
 
 let generationNotice = """
     // Generated by utils/GenerateVectorizationOps.swift. Do not edit.
     """
-
-func unavailableSendableConformance(of type: String) -> String {
-    """
-    @available(*, unavailable)
-    extension \(type): Sendable {}
-    """
-}
 
 func neonBridgeType(of element: Element) -> String {
     let name =
@@ -42334,7 +42377,7 @@ let targetCapabilities = [
     TargetCapability(
         swiftName: "hasNativeBFloat16DotProduct",
         highwayName: "HWY_NATIVE_DOT_BF16",
-        summary: "Whether `multiplyAccumulatingInAnyOrder` on `SIMDBFloat16` lanes has a native "
+        summary: "Whether `multiplyAccumulatingInAnyOrder` on `SIMD<BFloat16>` lanes has a native "
             + "instruction.",
         values: [
             (
@@ -42370,7 +42413,7 @@ let targetCapabilities = [
     TargetCapability(
         swiftName: "hasNativeFloat16Arithmetic",
         highwayName: "HWY_HAVE_FLOAT16",
-        summary: "Whether `SIMDFloat16` arithmetic runs on native instructions rather than "
+        summary: "Whether `SIMD<Float16>` arithmetic runs on native instructions rather than "
             + "through `Float`.",
         values: [
             (
@@ -43902,44 +43945,38 @@ func generateHeader() -> String {
 func swiftArgument(
     _ binding: Binding,
     _ parameter: Parameter,
-    for element: Element,
-    source: Element? = nil
+    for element: Element
 ) -> String {
     switch parameter {
     case .tag, .sourceTag, .narrowTag, .sourceNarrowTag: return ""
     case .shiftAmount: return "Int32(clamping: \(binding.swiftName))"
     case .immediate: return "Int32(truncatingIfNeeded: \(binding.swiftName))"
-    default: return rawArgument(binding.swiftName, parameter, for: element, source: source)
+    default: return rawArgument(binding.swiftName, parameter, for: element)
     }
 }
 
 func rawArgument(
     _ name: String,
     _ parameter: Parameter,
-    for element: Element,
-    source: Element? = nil
+    for element: Element
 ) -> String {
     switch parameter {
     case .vector, .shiftCounts, .indices, .laneIndices, .lookupIndices, .indexVector, .fillVector,
-        .otherwiseVector, .pointerIndices, .pointerOffsets, .sourceVector, .signedSourceVector:
-        let operand = operandElement(of: parameter, for: element, source: source)
-        return operand.hasOpaqueVector ? "\(name).raw" : name
-    case .mask, .whereMask, .sourceMask, .narrowVector, .sourceNarrowVector, .narrowMask,
+        .otherwiseVector, .pointerIndices, .pointerOffsets, .sourceVector, .signedSourceVector,
+        .mask, .whereMask, .sourceMask, .narrowVector, .sourceNarrowVector, .narrowMask,
         .sourceNarrowMask:
         return "\(name).raw"
     case .lane, .insertedLane, .fillLane: return element.swiftScalarArgument(name)
-    case .outVector: return element.hasOpaqueVector ? "&\(name).raw" : "&\(name)"
+    case .outVector: return "&\(name).raw"
     case .tuple(let count):
-        let members = (0..<count).map { member in
-            "v\(member): \(element.hasOpaqueVector ? "\(name).\(member).raw" : "\(name).\(member)")"
-        }
+        let members = (0..<count).map { member in "v\(member): \(name).\(member).raw" }
         return "\(element.cTuple(count))(\(members.joined(separator: ", ")))"
     default: return name
     }
 }
 
-func vectorFromRaw(_ call: String, of element: Element) -> String {
-    element.hasOpaqueVector ? "Vector(raw: \(call))" : call
+func vectorFromRaw(_ call: String) -> String {
+    "SIMD(raw: \(call))"
 }
 
 func importedType(
@@ -43953,20 +43990,20 @@ func importedType(
     case .tag, .sourceTag, .narrowTag, .sourceNarrowTag: return ""
     case .narrowVector, .sourceNarrowVector:
         let operand = operandElement(of: parameter, for: element, source: source)
-        return "\(operand.namespace).\(parameter.shape.swiftVector)"
+        return swiftVectorType(parameter.shape, scope: operand.swiftType)
     case .vector, .shiftCounts, .indices, .laneIndices, .lookupIndices, .indexVector, .outVector,
         .fillVector, .otherwiseVector, .pointerIndices, .pointerOffsets, .sourceVector,
         .signedSourceVector:
         let operand = operandElement(of: parameter, for: element, source: source)
-        return "\(operand.namespace).Vector"
+        return operand.vectorType
     case .mask, .whereMask, .sourceMask:
         let operand = operandElement(of: parameter, for: element, source: source)
-        return "\(operand.namespace).Mask"
+        return swiftMaskType(scope: operand.swiftType)
     case .narrowMask, .sourceNarrowMask:
         let operand = operandElement(of: parameter, for: element, source: source)
-        return "\(operand.namespace).\(parameter.shape.swiftMask)"
+        return swiftMaskType(parameter.shape, scope: operand.swiftType)
     case .lane, .fillLane, .insertedLane: return element.swiftType
-    case .tuple(let count): return tupleType("\(element.namespace).Vector", count: count)
+    case .tuple(let count): return tupleType(element.vectorType, count: count)
     case .constLanePointer: return "UnsafePointer<\(element.swiftType)>"
     case .lanePointer: return "UnsafeMutablePointer<\(element.swiftType)>"
     case .constBytePointer, .constBitsPointer: return "UnsafePointer<UInt8>"
@@ -43999,19 +44036,31 @@ func swiftCallArgument(_ binding: Binding, passing expression: String? = nil) ->
     return label == "_" ? value : "\(label): \(value)"
 }
 
+/// How a Swift call passes the parameters of `op` on to a function that has the same ones.
+func swiftCallArguments(of op: Op, for element: Element, checked: Bool = true) -> String {
+    var arguments: [String] = []
+    for (binding, parameter) in zip(bindings(of: op, for: element, checked: checked), op.parameters)
+    {
+        if parameter.isTag { continue }
+        arguments.append(swiftCallArgument(binding))
+    }
+    return op.swiftOrdered(arguments).joined(separator: ", ")
+}
+
 func swiftSignature(
     of op: Op,
     for element: Element,
+    scope: String? = nil,
     checked: Bool = true
 ) -> (parameters: String, arguments: String) {
-    let parameterBindings = bindings(of: op, for: element, checked: checked)
+    let parameterBindings = bindings(of: op, for: element, scope: scope, checked: checked)
     var declarations: [String] = []
     var arguments: [String] = []
 
     for (binding, parameter) in zip(parameterBindings, op.parameters) {
         if parameter.isTag { continue }
         declarations.append(swiftDeclaration(binding))
-        arguments.append(swiftArgument(binding, parameter, for: element, source: op.source))
+        arguments.append(swiftArgument(binding, parameter, for: element))
     }
 
     return (
@@ -44034,13 +44083,13 @@ func swiftBody(of op: Op, for element: Element, arguments: String, spanned: Bool
     let call = "\(keyword)\(function)(\(arguments))"
     switch op.returns {
     case .count, .index: return "Int(\(call))"
-    case .vector: return vectorFromRaw(call, of: element)
+    case .vector: return vectorFromRaw(call)
     case .laneIndices: return "Indices(raw: \(call))"
     case .mask: return "Mask(raw: \(call))"
     case .lane: return element.swiftScalarResult(call)
     case .indices: return "Indices(raw: \(call))"
     case .tuple(let count):
-        let members = (0..<count).map { vectorFromRaw("tuple.v\($0)", of: element) }
+        let members = (0..<count).map { vectorFromRaw("tuple.v\($0)") }
         return "{ tuple in (\(members.joined(separator: ", "))) }(\(call))"
     case .narrowVector(let shape): return "\(shape.swiftVector)(raw: \(call))"
     case .narrowMask(let shape): return "\(shape.swiftMask)(raw: \(call))"
@@ -44102,16 +44151,21 @@ struct SpanForms {
     }
 }
 
-func spanElement(of parameter: Parameter, for element: Element, narrow: Element? = nil) -> String {
+func spanElement(
+    of parameter: Parameter,
+    for element: Element,
+    narrow: Element? = nil,
+    scope: String? = nil
+) -> String {
     if parameter == .narrowLanePointer, let narrow { return narrow.swiftType }
     if parameter.isBytePointer { return "UInt8" }
     if parameter == .constIndexPointer { return laneIndexElement(of: element).swiftType }
-    return "Lane"
+    return swiftLaneType(scope: scope)
 }
 
-func spanForms(of op: Op, for element: Element) -> SpanForms? {
+func spanForms(of op: Op, for element: Element, scope: String? = nil) -> SpanForms? {
     guard let extent = op.span else { return nil }
-    let parameterBindings = bindings(of: op, for: element)
+    let parameterBindings = bindings(of: op, for: element, scope: scope)
     let takesCountFromSpan = if case .first = extent { true } else { false }
     let hasSeveralSpans = op.parameters.filter(\.isPointer).count > 1
 
@@ -44129,7 +44183,12 @@ func spanForms(of op: Op, for element: Element) -> SpanForms? {
                     SpanArgument(
                         label: label,
                         name: hasSeveralSpans ? label : "span",
-                        element: spanElement(of: parameter, for: element, narrow: op.narrowElement),
+                        element: spanElement(
+                            of: parameter,
+                            for: element,
+                            narrow: op.narrowElement,
+                            scope: scope
+                        ),
                         isMutable: parameter.isMutablePointer,
                         extent: parameter.isBytePointer ? .maskBytes : extent
                     )
@@ -44197,7 +44256,7 @@ func spanForms(of op: WideningOp, from narrow: Element, to wide: Element) -> Spa
         returns: .vector,
         bridgeCall: { pointers, count in
             let countArgument = op.takesCount ? ", \(count)" : ""
-            return vectorFromRaw("unsafe \(function)(\(pointers[0])\(countArgument))", of: wide)
+            return vectorFromRaw("unsafe \(function)(\(pointers[0])\(countArgument))")
         }
     )
 }
@@ -44510,40 +44569,17 @@ func checkedFormMembers(of op: Op, for element: Element) -> String {
     let returnKeyword = op.returns == .void ? "" : "return "
     let checked = swiftSignature(of: op, for: element)
     let unchecked = swiftSignature(of: op, for: element, checked: false)
-    var uncheckedArguments: [String] = []
-    for (binding, parameter) in zip(bindings(of: op, for: element, checked: false), op.parameters) {
-        if parameter.isTag { continue }
-        uncheckedArguments.append(swiftCallArgument(binding))
-    }
     let body = swiftBody(of: op, for: element, arguments: unchecked.arguments)
     return checkedMembers(
         op.swiftName,
         checked: checked.parameters,
         unchecked: (
-            unchecked.parameters, op.swiftOrdered(uncheckedArguments).joined(separator: ", ")
+            unchecked.parameters, swiftCallArguments(of: op, for: element, checked: false)
         ),
         returnClause: returnClause,
         checks: uncheckedFormChecks(of: op, for: element),
         uncheckedBody: "\(returnKeyword)\(body)"
     )
-}
-
-func checkedFormRequirements(of op: Op, indent: String) -> String {
-    let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
-    let unchecked = swiftSignature(of: op, for: elements[0], checked: false)
-    return "\(indent)@unsafe static func \(op.swiftName)(\(unchecked.parameters))\(returnClause)\n"
-}
-
-func spanRequirements(_ forms: SpanForms, indent: String) -> String {
-    let returnClause = forms.returns == .void ? "" : " -> \(swiftReturnType(forms.returns))"
-    let checked = spanSignature(forms, checked: true)
-    var output = "\(indent)\(spanAvailability)\n"
-    output += "\(indent)static func \(forms.name)(\(checked.parameters))\(returnClause)\n"
-    if forms.takesCountFromSpans { return output }
-    let unchecked = spanSignature(forms, checked: false)
-    output += "\(indent)\(spanAvailability)\n"
-    output += "\(indent)@unsafe static func \(forms.name)(\(unchecked.parameters))\(returnClause)\n"
-    return output
 }
 
 /// The name of the form of a store op that appends to an `OutputSpan`, after `UniqueArray`'s
@@ -44691,159 +44727,2008 @@ func outputSpanMembers(_ forms: SpanForms) -> String {
     )
 }
 
-func outputSpanRequirements(_ forms: SpanForms, indent: String) -> String {
-    let name = outputSpanName(forms)
-    let checked = outputSpanSignature(forms, checked: true)
-    let unchecked = outputSpanSignature(forms, checked: false)
-    var output = "\(indent)\(spanAvailability)\n"
-    output += "\(indent)static func \(name)(\(checked.parameters))\n"
-    output += "\(indent)\(spanAvailability)\n"
-    output += "\(indent)@unsafe static func \(name)(\(unchecked.parameters))\n"
-    return output
-}
-
 let integerElements = classicElements.filter { $0.category != .float }
-let floatElements = classicElements.filter { $0.category == .float }
 
-func opsApplyingToAll(_ candidates: [Element]) -> [Op] {
-    ops.filter { op in op.source == nil && candidates.allSatisfy(op.applies.matches) }
+/// A protocol that lane types conform to. It requires the ops that every conformer has and that no
+/// ancestor already requires. A half-precision conformer has an op if any op of its identifier
+/// applies to it. A protocol that carries only shape ops requires just the ops that take or return a
+/// vector or a mask of one of its shapes, not every op that happens to exist on all of its
+/// conformers. Any other protocol requires the ops whose narrow shapes are all among its own and
+/// its ancestors'. A protocol that carries no ops only states how its conformers link to other lane
+/// types.
+struct ElementProtocol {
+    let name: String
+    let parents: [String]
+    let documentation: String
+    let conformers: [Element]
+    let shapes: [Shape]
+    let carriesOnlyShapeOps: Bool
+    var constraints = ""
+    var carriesOps = true
+
+    var parentProtocols: [ElementProtocol] {
+        parents.compactMap { parent in elementProtocols.first { $0.name == parent } }
+    }
+
+    var ancestors: [ElementProtocol] {
+        var ancestors: [ElementProtocol] = []
+        for ancestor in parentProtocols.flatMap({ [$0] + $0.ancestors })
+        where !ancestors.contains(where: { $0.name == ancestor.name }) {
+            ancestors.append(ancestor)
+        }
+        return ancestors
+    }
+
+    func isConformed(by element: Element) -> Bool {
+        conformers.contains { $0.suffix == element.suffix }
+    }
 }
 
-let universalOps = opsApplyingToAll(classicElements)
-let integerOnlyOps = opsApplyingToAll(integerElements)
-    .filter { op in !universalOps.contains { $0.identifier == op.identifier } }
-let floatOnlyOps = opsApplyingToAll(floatElements)
-    .filter { op in !universalOps.contains { $0.identifier == op.identifier } }
-    .filter { op in hasAll([op], for: float16) }
+let elementProtocols = [
+    ElementProtocol(
+        name: "SIMDElement",
+        parents: [],
+        documentation: """
+            /// A lane type that `SIMD` can hold, and the ops every such type has.
+            ///
+            /// Conformances are the lane types themselves, so that a kernel can be written once and
+            /// used for any lane type: `func sum<Lane: SIMDNumericElement>(_ a: SIMD<Lane>) -> Lane`.
+            """,
+        conformers: elements,
+        shapes: [.full, .half, .block],
+        carriesOnlyShapeOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDNumericElement",
+        parents: ["SIMDElement"],
+        documentation: """
+            /// The lane types that have numeric ops, which are all but `BFloat16`, and the ops only
+            /// they have.
+            """,
+        conformers: elements.filter { $0.category != .bfloat16 },
+        shapes: [],
+        carriesOnlyShapeOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDIntegerElement",
+        parents: ["SIMDNumericElement"],
+        documentation: "/// The ops that only the integer lane types have.",
+        conformers: integerElements,
+        shapes: [],
+        carriesOnlyShapeOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDUnsignedIntegerElement",
+        parents: ["SIMDIntegerElement"],
+        documentation: "/// The ops that only the unsigned integer lane types have.",
+        conformers: elements.filter { $0.category == .unsignedInteger },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        constraints: "UnsignedLane == Self"
+    ),
+    ElementProtocol(
+        name: "SIMDSignedElement",
+        parents: ["SIMDNumericElement"],
+        documentation: """
+            /// The ops that only the signed integer and floating point lane types have.
+            """,
+        conformers: elements.filter { $0.category == .signedInteger || $0.isFloatingPoint },
+        shapes: [],
+        carriesOnlyShapeOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDSignedIntegerElement",
+        parents: ["SIMDIntegerElement", "SIMDSignedElement"],
+        documentation: "/// The ops that only the signed integer lane types have.",
+        conformers: elements.filter { $0.category == .signedInteger },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        constraints: "SignedLane == Self"
+    ),
+    ElementProtocol(
+        name: "SIMDFloatElement",
+        parents: ["SIMDSignedElement"],
+        documentation: "/// The ops that only the floating point lane types have.",
+        conformers: elements.filter(\.isFloatingPoint),
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        constraints: """
+            SignedLane: SIMDFloatConvertibleElement, UnsignedLane: SIMDFloatConvertibleElement, \
+            SignedLane.FloatLane == Self, UnsignedLane.FloatLane == Self
+            """
+    ),
+    ElementProtocol(
+        name: "SIMDQuarterVectorElement",
+        parents: ["SIMDElement"],
+        documentation: "/// The lane types that have quarter vectors, and the ops on them.",
+        conformers: elements.filter { $0.supports(.quarter) },
+        shapes: [.quarter],
+        carriesOnlyShapeOps: true
+    ),
+    ElementProtocol(
+        name: "SIMDEighthVectorElement",
+        parents: ["SIMDQuarterVectorElement"],
+        documentation: "/// The lane types that have eighth vectors, and the ops on them.",
+        conformers: elements.filter { $0.supports(.eighth) },
+        shapes: [.eighth],
+        carriesOnlyShapeOps: true
+    ),
+    ElementProtocol(
+        name: "SIMDWidenableElement",
+        parents: ["SIMDElement"],
+        documentation: "/// The lane types that have a lane type twice as wide of the same kind.",
+        conformers: elements.filter { wideElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDNarrowableElement",
+        parents: ["SIMDElement"],
+        documentation: "/// The lane types that have a lane type half as wide of the same kind.",
+        conformers: elements.filter { narrowElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDFloatConvertibleElement",
+        parents: ["SIMDIntegerElement"],
+        documentation:
+            "/// The integer lane types that have a floating point lane type of the same width.",
+        conformers: elements.filter { floatElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDWideIntegerElement",
+        parents: ["SIMDIntegerElement", "SIMDNarrowableElement"],
+        documentation: """
+            /// The integer lane types that have an integer lane type half as wide, which in turn has
+            /// one twice as wide.
+            """,
+        conformers: integerElements.filter { narrowElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        constraints:
+            "NarrowLane: SIMDWidenableIntegerElement, UnsignedLane: SIMDWideIntegerElement",
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDWidenableIntegerElement",
+        parents: ["SIMDIntegerElement", "SIMDWidenableElement"],
+        documentation: "/// The integer lane types that have an integer lane type twice as wide.",
+        conformers: integerElements.filter { wideElement(of: $0) != nil },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        constraints: "WideLane: SIMDWideIntegerElement",
+        carriesOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDGatherableElement",
+        parents: ["SIMDNumericElement"],
+        documentation: "/// The lane types that `gather` and `scatter` work on.",
+        conformers: elements.filter { $0.bits >= 32 },
+        shapes: [],
+        carriesOnlyShapeOps: false,
+        carriesOps: false
+    ),
+]
 
-func protocolRequirements(_ requirementOps: [Op], indent: String) -> String {
-    var output = ""
-    for op in requirementOps where !isOutsideProtocols(op) {
-        let signature = swiftSignature(of: op, for: elements[0])
-        let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns))"
-        output += "\(indent)static func \(op.swiftName)(\(signature.parameters))\(returnClause)\n"
-        if hasCheckedForms(op) {
-            output += checkedFormRequirements(of: op, indent: indent)
-        }
-        if let forms = spanForms(of: op, for: elements[0]) {
-            output += spanRequirements(forms, indent: indent)
-            if forms.isMutable && forms.appendsToOutput {
-                output += outputSpanRequirements(forms, indent: indent)
-            }
+/// An associated type of the protocol `protocolName` that names the lane type a lane type relates
+/// to, which is `target` of that lane type, and what that lane type must conform to.
+struct ElementLink {
+    let name: String
+    let protocolName: String
+    let bound: String
+    let target: (Element) -> Element?
+}
+
+let elementLinks = [
+    ElementLink(
+        name: "UnsignedLane",
+        protocolName: "SIMDElement",
+        bound: "SIMDUnsignedIntegerElement where UnsignedLane.UnsignedLane == UnsignedLane",
+        target: { unsignedElement(of: $0) }
+    ),
+    ElementLink(
+        name: "SignedLane",
+        protocolName: "SIMDElement",
+        bound: "SIMDSignedIntegerElement where SignedLane.SignedLane == SignedLane",
+        target: { signedElement(of: $0) }
+    ),
+    ElementLink(
+        name: "WideLane",
+        protocolName: "SIMDWidenableElement",
+        bound: "SIMDNarrowableElement where WideLane.NarrowLane == Self",
+        target: { wideElement(of: $0) }
+    ),
+    ElementLink(
+        name: "NarrowLane",
+        protocolName: "SIMDNarrowableElement",
+        bound: "SIMDWidenableElement where NarrowLane.WideLane == Self",
+        target: { narrowElement(of: $0) }
+    ),
+    ElementLink(
+        name: "FloatLane",
+        protocolName: "SIMDFloatConvertibleElement",
+        bound: "SIMDFloatElement",
+        target: { floatElement(of: $0) }
+    ),
+]
+
+func isProvided(_ op: Op, by element: Element) -> Bool {
+    op.applies.matches(element)
+        || (element.isHalfPrecision
+            && ops.contains { $0.identifier == op.identifier && $0.applies.matches(element) })
+}
+
+func isCarried(_ op: Op, by elementProtocol: ElementProtocol) -> Bool {
+    guard elementProtocol.carriesOps, op.source == nil, !takesIndexTypes(op) else { return false }
+    let shapes = narrowShapes(of: op)
+    guard elementProtocol.carriesOnlyShapeOps else {
+        let carried = ([elementProtocol] + elementProtocol.ancestors).flatMap(\.shapes)
+        return shapes.isSubset(of: carried)
+    }
+    return !shapes.isDisjoint(with: elementProtocol.shapes)
+}
+
+func isRequirable(_ op: Op, by elementProtocol: ElementProtocol) -> Bool {
+    isCarried(op, by: elementProtocol)
+        && elementProtocol.conformers.allSatisfy { isProvided(op, by: $0) }
+}
+
+func requiringProtocols(of op: Op) -> [ElementProtocol] {
+    let requiring = elementProtocols.filter { elementProtocol in
+        isRequirable(op, by: elementProtocol)
+            && !elementProtocol.ancestors.contains { isRequirable(op, by: $0) }
+    }
+    if requiring.count > 1 {
+        let names = requiring.map(\.name).joined(separator: " and ")
+        fatalError("\(op.identifier) would be required by both \(names)")
+    }
+    return requiring
+}
+
+let protocolRequirementOps: [String: [Op]] = {
+    var requirements: [String: [Op]] = [:]
+    for op in ops {
+        for elementProtocol in requiringProtocols(of: op) {
+            requirements[elementProtocol.name, default: []].append(op)
         }
     }
-    return output
+    return requirements
+}()
+
+/// The lane types that `element` links to in `elementProtocol` and that are compiled out where
+/// `element` is not, which makes the conformance compiled out there too.
+func compiledOutLinks(of elementProtocol: ElementProtocol, for element: Element) -> [Element] {
+    guard element.compilationCondition == nil else { return [] }
+    return elementLinks.filter { $0.protocolName == elementProtocol.name }
+        .compactMap { $0.target(element) }.filter { $0.compilationCondition != nil }
 }
 
-func generateProtocols() -> String {
-    let declarations = """
-        /// An element type that vectors can hold, and the ops every such type has.
-        ///
-        /// Conformances are the `SIMD…` enumerations, so that a kernel can be written once and
-        /// used for any element type: `func sum<E: SIMDElement>(_ type: E.Type, …)`.
-        public protocol SIMDElement {
-            associatedtype Lane
-            associatedtype Vector
-            associatedtype Mask
-            associatedtype Indices
-
-            /// How many lanes of `Lane` a `Vector` holds on the target this was compiled for.
-            static var laneCount: Int { get }
-
-            /// How many 16-byte blocks a `Vector` holds on the target this was compiled for.
-            static var blockCount: Int { get }
-
-        \(laneCapabilityRequirements(indent: "    "))\(protocolRequirements(universalOps, indent: "    "))}
-
-        /// The ops that only the integer element types have.
-        public protocol SIMDIntegerElement: SIMDElement {
-        \(protocolRequirements(integerOnlyOps, indent: "    "))}
-
-        /// The ops that only the floating point element types have.
-        public protocol SIMDFloatElement: SIMDElement {
-        \(protocolRequirements(floatOnlyOps, indent: "    "))}
-        """
-
-    return "\(generationNotice)\n\n\(declarations)\n"
-}
-
-func vectorDeclaration(of element: Element) -> String {
-    """
-    public struct Vector: Sendable {
-        /// The SIMD type a `Vector` converts to and from, whose width is the target's.
-        public typealias SIMDType = \(element.cVector)
-
-        public var raw: \(element.cRawVector)
-
-        @export(implementation) @inline(always)
-        public init(raw: \(element.cRawVector)) {
-            self.raw = raw
-        }
-
-        @export(implementation) @inline(always)
-        public init(_ simd: SIMDType) {
-            raw = \(element.cToRawVector)(simd)
-        }
-
-        @export(implementation) @inline(always)
-        public var simd: SIMDType { \(element.cFromRawVector)(raw) }
+func protocolConformances(of element: Element, compiledOut: Bool = false) -> [String] {
+    let conformed = elementProtocols.filter {
+        $0.isConformed(by: element)
+            && compiledOutLinks(of: $0, for: element).isEmpty == !compiledOut
     }
-    """
+    let inherited = Set(conformed.flatMap { $0.ancestors.map(\.name) })
+    return conformed.map(\.name).filter { !inherited.contains($0) }
 }
 
-func maskDeclaration(of element: Element) -> String {
-    """
-    public struct Mask: Sendable {
-        /// The SIMD mask type a `Mask` converts to and from, whose width is the target's.
-        public typealias SIMDType = SIMDMask<\(element.cMask)>
-
-        public var raw: \(element.cRawMask)
-
-        @export(implementation) @inline(always)
-        public init(raw: \(element.cRawMask)) {
-            self.raw = raw
-        }
-
-        @export(implementation) @inline(always)
-        public init(_ simd: SIMDType) {
-            raw = \(element.cToRawMask)(simd._storage)
-        }
-
-        @export(implementation) @inline(always)
-        public var simd: SIMDType {
-            SIMDType(\(element.cFromRawMask)(raw))
-        }
-    }
-    """
+func rawTypeName(of shape: Shape, isMask: Bool = false) -> String {
+    "_Raw\(isMask ? shape.swiftMask : shape.swiftVector)"
 }
 
-func indicesDeclaration(of element: Element) -> String {
-    "public typealias Indices = \(laneIndexElement(of: element).namespace).Vector"
+func simdTypeName(of shape: Shape, isMask: Bool = false) -> String {
+    "_SIMD\(isMask ? shape.swiftMask : shape.swiftVector)"
 }
 
-func narrowDeclaration(
-    named name: String,
-    shape: Shape,
-    simd: String,
-    raw: String,
-    toRaw: String,
-    fromRaw: String
-) -> String {
+func simdTypeDocumentation(of name: String, shape: Shape, isMask: Bool = false) -> String {
     let width =
         switch shape {
-        case .full: "the target's width"
+        case .full: "whose width is the target's"
         case .half: "half the target's width"
         case .quarter: "a quarter of the target's width"
         case .eighth: "an eighth of the target's width"
         case .block: "128 bits wide"
         }
+    let subject = shape != .full ? "SIMD type that" : isMask ? "SIMD mask type a" : "SIMD type a"
+    return "/// The \(subject) `\(name)` converts to and from, \(width)."
+}
+
+struct StaticRequirement {
+    let name: String
+    let type: String
+    let documentation: String
+}
+
+func staticRequirements(of elementProtocol: ElementProtocol) -> [StaticRequirement] {
+    guard elementProtocol.carriesOps, !elementProtocol.carriesOnlyShapeOps else { return [] }
+    var requirements: [StaticRequirement] = []
+    if elementProtocol.parents.isEmpty {
+        requirements = [
+            StaticRequirement(
+                name: "laneCount",
+                type: "Int",
+                documentation:
+                    "How many lanes of `Lane` a `SIMD<Lane>` holds on the target this was compiled for."
+            ),
+            StaticRequirement(
+                name: "blockCount",
+                type: "Int",
+                documentation:
+                    "How many 16-byte blocks a `SIMD<Lane>` holds on the target this was compiled for."
+            ),
+        ]
+    }
+    for capability in laneCapabilities
+    where elementProtocol.conformers.allSatisfy(capability.applies.matches)
+        && !elementProtocol.ancestors.contains(where: {
+            $0.conformers.allSatisfy(capability.applies.matches)
+        })
+    {
+        requirements.append(
+            StaticRequirement(
+                name: capability.name,
+                type: "Bool",
+                documentation:
+                    "Whether a `SIMD<Lane>` holds enough lanes for `\(capability.opName)` on the target this was compiled for."
+            )
+        )
+    }
+    return requirements
+}
+
+func staticWitnessBody(of requirement: StaticRequirement, for element: Element) -> String {
+    let call = "\(cFunctionName(requirement.name, element))()"
+    return requirement.type == "Int" ? "Int(\(call))" : call
+}
+
+func staticRequirementNames(of element: Element) -> Set<String> {
+    Set(
+        elementProtocols.filter { $0.isConformed(by: element) }
+            .flatMap { staticRequirements(of: $0).map(\.name) }
+    )
+}
+
+/// A form of an op as a protocol requirement, and as the generic and the per-lane functions that
+/// forward to one another: its name and parameters, and the arguments that pass them on to the
+/// concrete function of the same name.
+struct RequirementForm {
+    let name: String
+    var parameters: String
+    let returnClause: String
+    var arguments: String
+    var hasSpanAvailability = false
+    var isUnchecked = false
+    var takesPointers = false
+
+    var unsafeAttribute: String { isUnchecked ? "@unsafe " : "" }
+    var callKeyword: String { isUnchecked || takesPointers ? "unsafe " : "" }
+    var availability: String { hasSpanAvailability ? "\(spanAvailability)\n" : "" }
+}
+
+func spanRequirementForms(_ forms: SpanForms, scope: String?) -> [RequirementForm] {
+    let returnClause =
+        forms.returns == .void ? "" : " -> \(swiftReturnType(forms.returns, scope: scope))"
+    let checked = spanSignature(forms, checked: true)
+    var requirementForms = [
+        RequirementForm(
+            name: forms.name,
+            parameters: checked.parameters,
+            returnClause: returnClause,
+            arguments: checked.arguments,
+            hasSpanAvailability: true
+        )
+    ]
+    if forms.takesCountFromSpans { return requirementForms }
+    let unchecked = spanSignature(forms, checked: false)
+    requirementForms.append(
+        RequirementForm(
+            name: forms.name,
+            parameters: unchecked.parameters,
+            returnClause: returnClause,
+            arguments: unchecked.arguments,
+            hasSpanAvailability: true,
+            isUnchecked: true
+        )
+    )
+    return requirementForms
+}
+
+func outputSpanRequirementForms(_ forms: SpanForms) -> [RequirementForm] {
+    let name = outputSpanName(forms)
+    let checked = outputSpanSignature(forms, checked: true)
+    let unchecked = outputSpanSignature(forms, checked: false)
+    return [
+        RequirementForm(
+            name: name,
+            parameters: checked.parameters,
+            returnClause: "",
+            arguments: checked.arguments,
+            hasSpanAvailability: true
+        ),
+        RequirementForm(
+            name: name,
+            parameters: unchecked.parameters,
+            returnClause: "",
+            arguments: unchecked.arguments,
+            hasSpanAvailability: true,
+            isUnchecked: true
+        ),
+    ]
+}
+
+func requirementForms(
+    of op: Op,
+    for element: Element = elements[0],
+    scope: String?
+) -> [RequirementForm] {
+    let returnClause = op.returns == .void ? "" : " -> \(swiftReturnType(op.returns, scope: scope))"
+    var forms = [
+        RequirementForm(
+            name: op.swiftName,
+            parameters: swiftSignature(of: op, for: element, scope: scope).parameters,
+            returnClause: returnClause,
+            arguments: swiftCallArguments(of: op, for: element),
+            takesPointers: isUnsafe(op)
+        )
+    ]
+    if hasCheckedForms(op) {
+        forms.append(
+            RequirementForm(
+                name: op.swiftName,
+                parameters: swiftSignature(of: op, for: element, scope: scope, checked: false)
+                    .parameters,
+                returnClause: returnClause,
+                arguments: swiftCallArguments(of: op, for: element, checked: false),
+                isUnchecked: true
+            )
+        )
+    }
+    if let spans = spanForms(of: op, for: element, scope: scope) {
+        forms += spanRequirementForms(spans, scope: scope)
+        if spans.isMutable && spans.appendsToOutput {
+            forms += outputSpanRequirementForms(spans)
+        }
+    }
+    return forms
+}
+
+func requirementDeclaration(_ form: RequirementForm, generics: String = "") -> String {
+    let availability = form.hasSpanAvailability ? "    \(spanAvailability)\n" : ""
+    let signature = "static func _\(form.name)\(generics)(\(form.parameters))\(form.returnClause)"
+    return "\(availability)    \(form.unsafeAttribute)\(signature)\n"
+}
+
+func protocolDeclaration(_ elementProtocol: ElementProtocol) -> String {
+    var members = ""
+    for shape in elementProtocol.shapes {
+        members += "    associatedtype \(rawTypeName(of: shape)): Sendable\n"
+        if shape.hasMask {
+            members += "    associatedtype \(rawTypeName(of: shape, isMask: true)): Sendable\n"
+        }
+        members += "    associatedtype \(simdTypeName(of: shape))\n"
+        if shape.hasMask {
+            members += "    associatedtype \(simdTypeName(of: shape, isMask: true))\n"
+        }
+    }
+    if elementProtocol.parents.isEmpty {
+        members +=
+            "    associatedtype IndexLane: SIMDElement where IndexLane.IndexLane == IndexLane\n"
+    }
+    for link in elementLinks where link.protocolName == elementProtocol.name {
+        members += "    associatedtype \(link.name): \(link.bound)\n"
+    }
+    let statics = staticRequirements(of: elementProtocol)
+    if !statics.isEmpty {
+        members += "\n"
+        members += statics.map { "    static var _\($0.name): \($0.type) { get }\n" }.joined()
+    }
+    let forms = (protocolRequirementOps[elementProtocol.name] ?? []).flatMap {
+        requirementForms(of: $0, scope: "Self")
+    }
+    if !forms.isEmpty {
+        members += "\n"
+        members += forms.map { requirementDeclaration($0) }.joined()
+    }
+    let links = linkRequirements[elementProtocol.name] ?? []
+    if !links.isEmpty {
+        members += "\n"
+        members += links.joined()
+    }
+    let parents = elementProtocol.parents.joined(separator: ", ")
+    let inheritance = parents.isEmpty ? "" : ": \(parents)"
+    let constraints =
+        elementProtocol.constraints.isEmpty ? "" : " where \(elementProtocol.constraints)"
     return """
-        public struct \(name): Sendable {
-            /// The SIMD type that `\(name)` converts to and from, \(width).
-            public typealias SIMDType = \(simd)
+        \(elementProtocol.documentation)
+        public protocol \(elementProtocol.name)\(inheritance)\(constraints) {
+        \(members)}
+        """
+}
 
-            public var raw: \(raw)
+func generateProtocols() -> String {
+    let declarations = elementProtocols.map(protocolDeclaration).joined(separator: "\n\n")
+    return "\(generationNotice)\n\n\(declarations)\n"
+}
 
+func genericTypeDeclaration(named name: String, shape: Shape, isMask: Bool) -> String {
+    """
+    public struct \(name): Sendable {
+        \(simdTypeDocumentation(of: name, shape: shape, isMask: isMask))
+        public typealias SIMDType = Lane.\(simdTypeName(of: shape, isMask: isMask))
+
+        public var raw: Lane.\(rawTypeName(of: shape, isMask: isMask))
+
+        @export(implementation) @inline(always)
+        public init(raw: Lane.\(rawTypeName(of: shape, isMask: isMask))) {
+            self.raw = raw
+        }
+    }
+    """
+}
+
+func nestedTypeDeclarations(of elementProtocol: ElementProtocol) -> [String] {
+    elementProtocol.shapes.flatMap { shape in
+        var declarations: [String] = []
+        if shape != .full {
+            declarations.append(
+                genericTypeDeclaration(named: shape.swiftVector, shape: shape, isMask: false)
+            )
+        }
+        if shape.hasMask {
+            declarations.append(
+                genericTypeDeclaration(named: shape.swiftMask, shape: shape, isMask: true)
+            )
+        }
+        if shape == .full {
+            declarations.append("public typealias Indices = SIMD<Lane.IndexLane>")
+        }
+        return declarations
+    }
+}
+
+func swiftIndented(_ text: String) -> String {
+    text.split(separator: "\n", omittingEmptySubsequences: false)
+        .map { $0.isEmpty ? "" : "    \($0)" }.joined(separator: "\n")
+}
+
+func generateSIMD() -> String {
+    let root = elementProtocols[0]
+    let nested = swiftIndented(nestedTypeDeclarations(of: root).joined(separator: "\n\n"))
+    var output = """
+        \(generationNotice)
+
+        /// A vector of `Lane` values as wide as the target's vectors, and the ops over such vectors.
+        public struct SIMD<Lane: SIMDElement>: Sendable {
+            \(simdTypeDocumentation(of: "SIMD", shape: .full))
+            public typealias SIMDType = Lane._SIMDVector
+
+            public var raw: Lane._RawVector
+
+            @export(implementation) @inline(always)
+            public init(raw: Lane._RawVector) {
+                self.raw = raw
+            }
+
+        \(nested)
+        }
+
+        """
+    for elementProtocol in elementProtocols.dropFirst() where !elementProtocol.shapes.isEmpty {
+        let declarations = swiftIndented(
+            nestedTypeDeclarations(of: elementProtocol).joined(separator: "\n\n")
+        )
+        output += """
+
+            extension SIMD where Lane: \(elementProtocol.name) {
+            \(declarations)
+            }
+
+            """
+    }
+    return output
+}
+
+func forwardingMember(
+    _ form: RequirementForm,
+    named name: String,
+    calling callee: String,
+    disfavored: Bool,
+    generics: String = "",
+    constraints: String = "",
+    body: String? = nil
+) -> String {
+    let disfavoredAttribute = disfavored ? "@_disfavoredOverload " : ""
+    let whereClause = constraints.isEmpty ? "" : " where \(constraints)"
+    return """
+            \(form.availability)\(form.unsafeAttribute)\(disfavoredAttribute)@export(implementation) @inline(always)
+            public static func \(name)\(generics)(\(form.parameters))\(form.returnClause)\(whereClause) {
+                \(body ?? "\(form.callKeyword)\(callee)(\(form.arguments))")
+            }
+        """
+}
+
+func forwardingProperty(
+    _ requirement: StaticRequirement,
+    named name: String,
+    calling callee: String,
+    documented: Bool,
+    disfavored: Bool
+) -> String {
+    let documentation = documented ? "/// \(requirement.documentation)\n" : ""
+    let disfavoredAttribute = disfavored ? "@_disfavoredOverload " : ""
+    return """
+            \(documentation)\(disfavoredAttribute)@export(implementation) @inline(always)
+            public static var \(name): \(requirement.type) { \(callee) }
+        """
+}
+
+/// An op that a cross-type form generalizes, as declared on `lane`, with the lane type `source` of
+/// the operand that makes it cross-type.
+struct LinkInstance {
+    let op: Op
+    let lane: Element
+    let source: Element
+}
+
+func linkSource(of op: Op, for lane: Element) -> Element? {
+    op.source ?? (takesIndexTypes(op) ? signedElement(of: lane) : nil)
+}
+
+let opsByIdentifier = Dictionary(grouping: ops, by: \.identifier)
+
+func linkInstances(of identifiers: [String]) -> [LinkInstance] {
+    identifiers.flatMap { identifier in
+        (opsByIdentifier[identifier] ?? []).flatMap { op in
+            elements.filter { op.applies.matches($0) }.compactMap { lane in
+                linkSource(of: op, for: lane).map { LinkInstance(op: op, lane: lane, source: $0) }
+            }
+        }
+    }
+}
+
+func isSame(_ element: Element?, as other: Element) -> Bool {
+    element?.suffix == other.suffix
+}
+
+func isConformer(_ element: Element, of protocolName: String) -> Bool {
+    elementProtocols.contains { $0.name == protocolName && $0.isConformed(by: element) }
+}
+
+enum LinkAnchor {
+    case lane
+    case source
+}
+
+/// A generic type that the tests call a form through with one lane type, the other being spelled
+/// from it: `parameter` declares the lane type, `spelling` is the other one in terms of it, and
+/// `linked` is the other one for a lane type.
+struct LinkWrapper {
+    let parameter: String
+    let spelling: String
+    let linked: (Element) -> Element?
+}
+
+/// A way to call an op that has a source operand of another lane type through generic code. The
+/// generic function constrains the two lane types as `genericParameter` and `constraint` say, and
+/// forwards to a requirement of `protocolName` that the `anchor` lane type implements by calling the
+/// op it already has. `requirementLane` and `requirementSource` spell the two lane types there.
+struct LinkForm {
+    let fileName: String
+    let heading: String
+    let identifiers: [String]
+    let admits: (_ lane: Element, _ source: Element) -> Bool
+    let protocolName: String
+    let anchor: LinkAnchor
+    let requirementLane: String
+    let requirementSource: String
+    let extending: String
+    let genericParameter: String
+    let constraint: String
+    var labelSuffix = ""
+    var witnesses: ((_ lane: Element, _ source: Element) -> Bool)?
+    var anchorsSignedSibling = false
+    var convertsSourceMasks = false
+    var convertsResultMask = false
+    var sourceWrapper: LinkWrapper?
+    var laneWrapper: LinkWrapper?
+
+    var anchorSpelling: String { anchor == .lane ? "Lane" : "Source" }
+
+    var publicSource: String { genericParameter.isEmpty ? "Lane.\(requirementSource)" : "Source" }
+
+    func isWitnessed(_ instance: LinkInstance) -> Bool {
+        (witnesses ?? admits)(instance.lane, instance.source)
+    }
+
+    func anchors(of instance: LinkInstance) -> [Element] {
+        let anchor = anchor == .lane ? instance.lane : instance.source
+        return anchorsSignedSibling ? [anchor, signedElement(of: anchor)] : [anchor]
+    }
+}
+
+func isWideInteger(_ element: Element) -> Bool {
+    isConformer(element, of: "SIMDWideIntegerElement")
+}
+
+func isUnsignedWideInteger(_ element: Element) -> Bool {
+    isWideInteger(element) && element.category == .unsignedInteger
+}
+
+let clampIdentifiers = [
+    "halfVectorClamping", "halfVectorClampingShiftedRightBy",
+    "halfVectorClampingRoundingShiftedRightBy", "vectorClamping", "vectorClampingInAnyOrder",
+    "vectorClampingShiftedRightBy", "vectorClampingRoundingShiftedRightBy",
+    "vectorClampingInAnyOrderShiftedRightBy", "vectorClampingInAnyOrderRoundingShiftedRightBy",
+]
+
+let linkForms = [
+    LinkForm(
+        fileName: "Widening",
+        heading: "Source.Wide == Lane",
+        identifiers: [
+            "vectorWidening", "vectorWideningLower", "vectorWideningUpper", "vectorWideningEven",
+            "vectorWideningOdd", "sumsOf2", "zippingLower",
+        ],
+        admits: { lane, source in isSame(wideElement(of: source), as: lane) },
+        protocolName: "SIMDWidenableElement",
+        anchor: .source,
+        requirementLane: "WideLane",
+        requirementSource: "Self",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDWidenableElement",
+        constraint: "Source.WideLane == Lane",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWidenableElement",
+            spelling: "Source.WideLane",
+            linked: { wideElement(of: $0) }
+        ),
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDNarrowableElement",
+            spelling: "Lane.NarrowLane",
+            linked: { narrowElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "NarrowOperands",
+        heading: "operands of Lane.Narrow",
+        identifiers: ["multiplyingEven", "multiplyingOdd", "multiplyAccumulating", "zippingUpper"],
+        admits: { lane, source in isWideInteger(lane) && isSame(narrowElement(of: lane), as: source)
+        },
+        protocolName: "SIMDWideIntegerElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "NarrowLane",
+        extending: "SIMD where Lane: SIMDWideIntegerElement",
+        genericParameter: "",
+        constraint: "",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWidenableIntegerElement",
+            spelling: "Source.WideLane",
+            linked: { wideElement(of: $0) }
+        ),
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDWideIntegerElement",
+            spelling: "Lane.NarrowLane",
+            linked: { narrowElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "ClampingToSigned",
+        heading: "Source.Narrow.Signed or .Unsigned == Lane",
+        identifiers: clampIdentifiers,
+        admits: { lane, source in
+            isWideInteger(source)
+                && isSame(narrowElement(of: source).map(signedElement(of:)), as: lane)
+        },
+        protocolName: "SIMDWideIntegerElement",
+        anchor: .source,
+        requirementLane: "NarrowLane.SignedLane",
+        requirementSource: "Self",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDWideIntegerElement",
+        constraint: "Source.NarrowLane.SignedLane == Lane",
+        labelSuffix: "ToSigned",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWideIntegerElement",
+            spelling: "Source.NarrowLane.SignedLane",
+            linked: { narrowElement(of: $0).map(signedElement(of:)) }
+        )
+    ),
+    LinkForm(
+        fileName: "ClampingToUnsigned",
+        heading: "Source.Narrow.Signed or .Unsigned == Lane",
+        identifiers: clampIdentifiers,
+        admits: { lane, source in
+            isWideInteger(source)
+                && isSame(narrowElement(of: source).map(unsignedElement(of:)), as: lane)
+        },
+        protocolName: "SIMDWideIntegerElement",
+        anchor: .source,
+        requirementLane: "NarrowLane.UnsignedLane",
+        requirementSource: "Self",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDWideIntegerElement",
+        constraint: "Source.NarrowLane.UnsignedLane == Lane",
+        labelSuffix: "ToUnsigned",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWideIntegerElement",
+            spelling: "Source.NarrowLane.UnsignedLane",
+            linked: { narrowElement(of: $0).map(unsignedElement(of:)) }
+        )
+    ),
+    LinkForm(
+        fileName: "ConvertingToFloat",
+        heading: "Source.Float == Lane, and source Lane.Float",
+        identifiers: ["vectorConverting", "vectorConvertingWhere"],
+        admits: { lane, source in isSame(floatElement(of: source), as: lane) },
+        protocolName: "SIMDFloatConvertibleElement",
+        anchor: .source,
+        requirementLane: "FloatLane",
+        requirementSource: "Self",
+        extending: "SIMD where Lane: SIMDFloatElement",
+        genericParameter: "Source: SIMDFloatConvertibleElement",
+        constraint: "Source.FloatLane == Lane",
+        labelSuffix: "ToFloat",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDFloatConvertibleElement",
+            spelling: "Source.FloatLane",
+            linked: { floatElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "ConvertingFromFloat",
+        heading: "Source.Float == Lane, and source Lane.Float",
+        identifiers: ["vectorConverting", "vectorConvertingWhere"],
+        admits: { lane, source in isSame(floatElement(of: lane), as: source) },
+        protocolName: "SIMDFloatConvertibleElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "FloatLane",
+        extending: "SIMD where Lane: SIMDFloatConvertibleElement",
+        genericParameter: "",
+        constraint: "",
+        labelSuffix: "FromFloat",
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDFloatConvertibleElement",
+            spelling: "Lane.FloatLane",
+            linked: { floatElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "ConvertingFromFloat",
+        heading: "source Lane.Float",
+        identifiers: ["vectorConvertingInRange"],
+        admits: { lane, source in isSame(floatElement(of: lane), as: source) },
+        protocolName: "SIMDFloatConvertibleElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "FloatLane",
+        extending: "SIMD where Lane: SIMDFloatConvertibleElement",
+        genericParameter: "",
+        constraint: "",
+        labelSuffix: "FromFloat",
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDFloatConvertibleElement",
+            spelling: "Lane.FloatLane",
+            linked: { floatElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "Rounding",
+        heading: "Source.Signed == Lane",
+        identifiers: [
+            "vectorRoundingToNearestOrEven", "vectorRoundingUp", "vectorRoundingDown",
+        ],
+        admits: { lane, source in
+            source.isFloatingPoint && isSame(signedElement(of: source), as: lane)
+        },
+        protocolName: "SIMDFloatElement",
+        anchor: .source,
+        requirementLane: "SignedLane",
+        requirementSource: "Self",
+        extending: "SIMD where Lane: SIMDIntegerElement",
+        genericParameter: "Source: SIMDFloatElement",
+        constraint: "Source.SignedLane == Lane",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDFloatElement",
+            spelling: "Source.SignedLane",
+            linked: { signedElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "Exponents",
+        heading: "exponents of Lane.Signed",
+        identifiers: ["multiplyingByPowerOf2"],
+        admits: { lane, source in
+            lane.isFloatingPoint && isSame(signedElement(of: lane), as: source)
+        },
+        protocolName: "SIMDFloatElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "SignedLane",
+        extending: "SIMD where Lane: SIMDFloatElement",
+        genericParameter: "",
+        constraint: "",
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDFloatElement",
+            spelling: "Lane.SignedLane",
+            linked: { signedElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "BiasedExponent",
+        heading: "Source.Unsigned == Lane",
+        identifiers: ["biasedExponent"],
+        admits: { lane, source in
+            source.isFloatingPoint && isSame(unsignedElement(of: source), as: lane)
+        },
+        protocolName: "SIMDFloatElement",
+        anchor: .source,
+        requirementLane: "UnsignedLane",
+        requirementSource: "Self",
+        extending: "SIMD where Lane: SIMDIntegerElement",
+        genericParameter: "Source: SIMDFloatElement",
+        constraint: "Source.UnsignedLane == Lane",
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDFloatElement",
+            spelling: "Source.UnsignedLane",
+            linked: { unsignedElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "Truncating",
+        heading: "unsigned Source, Source.Narrow == Lane",
+        identifiers: ["halfVectorTruncatingIfNeeded", "vectorTruncatingIfNeeded"],
+        admits: { lane, source in
+            isUnsignedWideInteger(source) && isSame(narrowElement(of: source), as: lane)
+        },
+        protocolName: "SIMDWideIntegerElement",
+        anchor: .source,
+        requirementLane: "UnsignedLane.NarrowLane",
+        requirementSource: "UnsignedLane",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDUnsignedIntegerElement & SIMDWideIntegerElement",
+        constraint: "Source.NarrowLane == Lane",
+        anchorsSignedSibling: true,
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDUnsignedIntegerElement & SIMDWideIntegerElement",
+            spelling: "Source.NarrowLane",
+            linked: { narrowElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "MaskNarrowing",
+        heading: "source twice as wide as a widenable Lane",
+        identifiers: ["maskNarrowing", "halfMaskNarrowing"],
+        admits: { lane, source in
+            wideElement(of: lane).map {
+                isSame(unsignedElement(of: source), as: unsignedElement(of: $0))
+            } ?? false
+        },
+        protocolName: "SIMDWidenableElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "WideLane.UnsignedLane",
+        extending: "SIMD where Lane: SIMDWidenableElement",
+        genericParameter: "Source: SIMDElement",
+        constraint: "Source.UnsignedLane == Lane.WideLane.UnsignedLane",
+        witnesses: { lane, source in
+            wideElement(of: lane).map { isSame(unsignedElement(of: $0), as: source) } ?? false
+        },
+        convertsSourceMasks: true,
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDWidenableElement",
+            spelling: "Lane.WideLane",
+            linked: { wideElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "MaskWidening",
+        heading: "widenable source half as wide as Lane",
+        identifiers: ["maskWidening"],
+        admits: { lane, source in
+            wideElement(of: source).map {
+                isSame(unsignedElement(of: lane), as: unsignedElement(of: $0))
+            } ?? false
+        },
+        protocolName: "SIMDWidenableElement",
+        anchor: .source,
+        requirementLane: "WideLane.UnsignedLane",
+        requirementSource: "Self",
+        extending: "SIMD",
+        genericParameter: "Source: SIMDWidenableElement",
+        constraint: "Lane.UnsignedLane == Source.WideLane.UnsignedLane",
+        witnesses: { lane, source in
+            wideElement(of: source).map { isSame(unsignedElement(of: $0), as: lane) } ?? false
+        },
+        convertsResultMask: true,
+        sourceWrapper: LinkWrapper(
+            parameter: "Source: SIMDWidenableElement",
+            spelling: "Source.WideLane",
+            linked: { wideElement(of: $0) }
+        )
+    ),
+    LinkForm(
+        fileName: "Gather",
+        heading: "indices of Lane.Signed",
+        identifiers: [
+            "gather", "gatherByteOffsets", "gatherFirst", "gatherFirstOtherwise", "gatherWhere",
+            "gatherWhereOtherwise", "scatter", "scatterByteOffsets", "scatterFirst", "scatterWhere",
+        ],
+        admits: { lane, source in
+            isConformer(lane, of: "SIMDGatherableElement")
+                && isSame(signedElement(of: lane), as: source)
+        },
+        protocolName: "SIMDGatherableElement",
+        anchor: .lane,
+        requirementLane: "Self",
+        requirementSource: "SignedLane",
+        extending: "SIMD where Lane: SIMDGatherableElement",
+        genericParameter: "",
+        constraint: "",
+        laneWrapper: LinkWrapper(
+            parameter: "Lane: SIMDGatherableElement",
+            spelling: "Lane.SignedLane",
+            linked: { signedElement(of: $0) }
+        )
+    ),
+]
+
+func suffixingLabel(_ text: String, with suffix: String) -> String {
+    guard !suffix.isEmpty else { return text }
+    let end = text.firstIndex { !$0.isLetter && !$0.isNumber } ?? text.endIndex
+    guard end != text.startIndex else { fatalError("\(text) has no label to add \(suffix) to") }
+    return "\(text[..<end])\(suffix)\(text[end...])"
+}
+
+extension RequirementForm {
+    func respelled(source: Element, as spelling: String) -> RequirementForm {
+        var form = self
+        form.parameters = parameters.replacingOccurrences(
+            of: "<\(source.swiftType)>",
+            with: "<\(spelling)>"
+        )
+        return form
+    }
+
+    func relabeledParameters(with suffix: String) -> RequirementForm {
+        var form = self
+        form.parameters = suffixingLabel(parameters, with: suffix)
+        return form
+    }
+
+    func relabeledArguments(with suffix: String) -> RequirementForm {
+        var form = self
+        form.arguments = suffixingLabel(arguments, with: suffix)
+        return form
+    }
+}
+
+func linkRepresentatives(of linkForm: LinkForm) -> [LinkInstance] {
+    linkForm.identifiers.map { identifier in
+        let instances = linkInstances(of: [identifier]).filter(linkForm.isWitnessed)
+        guard let representative = instances.first else {
+            fatalError("\(linkForm.heading) admits no instance of \(identifier)")
+        }
+        return representative
+    }
+}
+
+func linkRequirementForms(of linkForm: LinkForm, instance: LinkInstance) -> [RequirementForm] {
+    requirementForms(of: instance.op, for: instance.lane, scope: linkForm.requirementLane).map {
+        $0.respelled(source: instance.source, as: linkForm.requirementSource)
+            .relabeledParameters(with: linkForm.labelSuffix)
+    }
+}
+
+func linkRequirementDeclarations(of linkForm: LinkForm) -> [String] {
+    linkRepresentatives(of: linkForm).flatMap { representative in
+        let expected = linkRequirementForms(of: linkForm, instance: representative)
+        for instance in linkInstances(of: [representative.op.identifier])
+        where linkForm.isWitnessed(instance) {
+            let forms = linkRequirementForms(of: linkForm, instance: instance)
+            guard
+                forms.count == expected.count
+                    && zip(forms, expected).allSatisfy({
+                        $0.parameters == $1.parameters && $0.returnClause == $1.returnClause
+                    })
+            else {
+                fatalError(
+                    "\(linkForm.heading) spells \(instance.op.identifier) differently for \(instance.lane.swiftType) from \(instance.source.swiftType)"
+                )
+            }
+        }
+        return expected.map { requirementDeclaration($0) }
+    }
+}
+
+func linkWitnessMembers(of linkForm: LinkForm, for element: Element) -> [SectionMember] {
+    linkInstances(of: linkForm.identifiers).filter { instance in
+        linkForm.isWitnessed(instance)
+            && linkForm.anchors(of: instance).contains { isSame($0, as: element) }
+    }.map { instance in
+        let involved = element.compilationCondition == nil ? [instance.lane, instance.source] : []
+        let forms = requirementForms(
+            of: instance.op,
+            for: instance.lane,
+            scope: instance.lane.swiftType
+        )
+        return SectionMember(
+            section: instance.op.section,
+            inside: forms.map {
+                guarded(
+                    forwardingMember(
+                        $0.relabeledParameters(with: linkForm.labelSuffix),
+                        named: "_\($0.name)",
+                        calling: "\(instance.lane.vectorType).\($0.name)",
+                        disfavored: false
+                    ),
+                    involving: involved,
+                    testing: false
+                )
+            }
+        )
+    }
+}
+
+func wrappedArguments(_ arguments: String, in function: String) -> String {
+    arguments.split(separator: ", ").map { argument in
+        let parts = argument.split(separator: ":", maxSplits: 1)
+        guard parts.count == 2 else { return "\(function)(\(argument))" }
+        return "\(parts[0]): \(function)(\(parts[1].dropFirst()))"
+    }.joined(separator: ", ")
+}
+
+func linkPublicMembers(of linkForm: LinkForm) -> [SectionMember] {
+    linkRepresentatives(of: linkForm).map { representative in
+        let forms = requirementForms(of: representative.op, for: representative.lane, scope: nil)
+        return SectionMember(
+            section: representative.op.section,
+            inside: forms.map { form in
+                let spelled = form.respelled(
+                    source: representative.source,
+                    as: linkForm.publicSource
+                )
+                .relabeledArguments(with: linkForm.labelSuffix)
+                let callee = "\(linkForm.anchorSpelling)._\(form.name)"
+                let arguments =
+                    linkForm.convertsSourceMasks
+                    ? wrappedArguments(spelled.arguments, in: "Source._maskToUnsigned")
+                    : spelled.arguments
+                let call = "\(spelled.callKeyword)\(callee)(\(arguments))"
+                return forwardingMember(
+                    spelled,
+                    named: form.name,
+                    calling: callee,
+                    disfavored: true,
+                    generics: linkForm.genericParameter.isEmpty
+                        ? "" : "<\(linkForm.genericParameter)>",
+                    constraints: linkForm.constraint,
+                    body: linkForm.convertsResultMask
+                        ? fromUnsignedMask(call, to: "Lane") : call
+                )
+            }
+        )
+    }
+}
+
+func shapeProtocolName(_ shape: Shape) -> String {
+    guard let shapeProtocol = elementProtocols.first(where: { $0.shapes.contains(shape) }) else {
+        fatalError("No protocol has \(shape) shapes")
+    }
+    return shapeProtocol.name
+}
+
+func resultShape(of op: Op) -> Shape {
+    switch op.returns {
+    case .vector: return .full
+    case .narrowVector(let shape): return shape
+    default: fatalError("\(op.identifier) does not return a vector")
+    }
+}
+
+struct DispatchSource {
+    let element: Element
+    let shape: Shape
+    let op: Op
+
+    var labelSuffix: String { "Of\(shape.prefix)\(element.swiftType)" }
+}
+
+/// An op that every lane type has for a source operand of any other lane type and any shape it has.
+/// Its generic function asks the source's lane type for the op's result type, which asks the result's
+/// lane type back, as one requirement per source on the result's protocol and one on the source's.
+struct DispatchFamily {
+    let identifier: String
+    let resultShape: Shape
+    let sources: [DispatchSource]
+
+    var extending: String {
+        let name = shapeProtocolName(resultShape)
+        return name == elementProtocols[0].name ? "SIMD" : "SIMD where Lane: \(name)"
+    }
+
+    var fileName: String {
+        "AnySource\(shapeProtocolName(resultShape) == elementProtocols[0].name ? "" : resultShape.prefix)"
+    }
+
+    var sourceShapes: [Shape] {
+        sources.map(\.shape).reduce(into: []) { shapes, shape in
+            if !shapes.contains(shape) { shapes.append(shape) }
+        }
+    }
+}
+
+let dispatchIdentifiers = [
+    "vectorBitPattern", "vectorResizing", "vectorZeroExtendingResizing", "halfVectorResizing",
+    "halfVectorZeroExtendingResizing", "quarterVectorResizing",
+    "quarterVectorZeroExtendingResizing", "eighthVectorResizing",
+    "eighthVectorZeroExtendingResizing",
+]
+
+let dispatchFamilies = dispatchIdentifiers.map { identifier in
+    let familyOps = opsByIdentifier[identifier] ?? []
+    var sources: [DispatchSource] = []
+    for op in familyOps {
+        guard let element = op.source else { fatalError("\(identifier) has no source") }
+        if !sources.contains(where: {
+            isSame($0.element, as: element) && $0.shape == op.sourceShape
+        }) {
+            sources.append(DispatchSource(element: element, shape: op.sourceShape, op: op))
+        }
+    }
+    return DispatchFamily(
+        identifier: identifier,
+        resultShape: resultShape(of: familyOps[0]),
+        sources: sources
+    )
+}
+
+func dispatchLane(of source: DispatchSource) -> Element {
+    guard let lane = elements.first(where: { source.op.applies.matches($0) }) else {
+        fatalError("\(source.op.identifier) applies to no lane type")
+    }
+    return lane
+}
+
+func dispatchRequirementForm(_ source: DispatchSource, scope: String) -> RequirementForm {
+    guard
+        let form = requirementForms(of: source.op, for: dispatchLane(of: source), scope: scope)
+            .first
+    else { fatalError("\(source.op.identifier) has no form") }
+    return form
+}
+
+func guardedRequirement(_ text: String, involving involved: [Element]) -> String {
+    guard let element = involved.first(where: { $0.compilationCondition != nil }),
+        let condition = element.compilationCondition
+    else { return text }
+    return "#if \(condition)\n    \(element.swiftAvailability ?? "")\n\(text)#endif\n"
+}
+
+func dispatchRequirementDeclarations() -> [String: [String]] {
+    var declarations: [String: [String]] = [:]
+    for family in dispatchFamilies {
+        for source in family.sources {
+            var form = dispatchRequirementForm(source, scope: "Self")
+            form = form.relabeledParameters(with: source.labelSuffix)
+            declarations[shapeProtocolName(family.resultShape), default: []].append(
+                guardedRequirement(requirementDeclaration(form), involving: [source.element])
+            )
+        }
+        for shape in family.sourceShapes {
+            guard let source = family.sources.first(where: { $0.shape == shape }) else { continue }
+            var form = dispatchRequirementForm(source, scope: "Result")
+            form = form.respelled(source: source.element, as: "Self")
+            form.parameters += ", as result: Result.Type"
+            let generics = "<Result: \(shapeProtocolName(family.resultShape))>"
+            declarations[shapeProtocolName(shape), default: []].append(
+                requirementDeclaration(form, generics: generics)
+            )
+        }
+    }
+    return declarations
+}
+
+func dispatchWitnessMembers(for element: Element) -> [SectionMember] {
+    var members: [SectionMember] = []
+    for family in dispatchFamilies {
+        let instances = linkInstances(of: [family.identifier])
+        if element.supports(family.resultShape) {
+            for source in family.sources {
+                let involved = element.compilationCondition == nil ? [source.element] : []
+                let form = dispatchRequirementForm(source, scope: element.swiftType)
+                    .relabeledParameters(with: source.labelSuffix)
+                let isIdentity =
+                    isSame(element, as: source.element) && source.shape == family.resultShape
+                let exists = instances.contains {
+                    isSame($0.lane, as: element) && isSame($0.source, as: source.element)
+                        && $0.op.sourceShape == source.shape
+                }
+                guard isIdentity != exists else {
+                    fatalError(
+                        "\(family.identifier) from \(source.element.swiftType) on \(element.swiftType) is neither an op nor the identity"
+                    )
+                }
+                members.append(
+                    SectionMember(
+                        section: source.op.section,
+                        inside: [
+                            guarded(
+                                forwardingMember(
+                                    form,
+                                    named: "_\(form.name)",
+                                    calling: "\(element.vectorType).\(form.name)",
+                                    disfavored: false,
+                                    body: isIdentity ? "a" : nil
+                                ),
+                                involving: involved,
+                                testing: false
+                            )
+                        ]
+                    )
+                )
+            }
+        }
+        for shape in family.sourceShapes where element.supports(shape) {
+            guard
+                let source = family.sources.first(where: {
+                    isSame($0.element, as: element) && $0.shape == shape
+                })
+            else {
+                fatalError("\(family.identifier) has no \(shape) source of \(element.swiftType)")
+            }
+            var form = dispatchRequirementForm(source, scope: "Result")
+            form.parameters += ", as result: Result.Type"
+            let callee = "Result._\(form.name)"
+            members.append(
+                SectionMember(
+                    section: source.op.section,
+                    inside: [
+                        forwardingMember(
+                            form,
+                            named: "_\(form.name)",
+                            calling: callee,
+                            disfavored: false,
+                            generics: "<Result: \(shapeProtocolName(family.resultShape))>",
+                            body:
+                                "\(callee)(\(form.relabeledArguments(with: source.labelSuffix).arguments))"
+                        )
+                    ]
+                )
+            )
+        }
+    }
+    return members
+}
+
+func dispatchPublicMembers(of family: DispatchFamily) -> [SectionMember] {
+    family.sourceShapes.map { shape in
+        guard let source = family.sources.first(where: { $0.shape == shape }) else {
+            fatalError("\(family.identifier) has no \(shape) source")
+        }
+        let publicForm = requirementForms(of: source.op, for: dispatchLane(of: source), scope: nil)[
+            0
+        ]
+        .respelled(source: source.element, as: "Source")
+        let callee = "Source._\(publicForm.name)"
+        return SectionMember(
+            section: source.op.section,
+            inside: [
+                forwardingMember(
+                    publicForm,
+                    named: publicForm.name,
+                    calling: callee,
+                    disfavored: true,
+                    generics: "<Source: \(shapeProtocolName(shape))>",
+                    body: "\(callee)(\(publicForm.arguments), as: Lane.self)"
+                )
+            ]
+        )
+    }
+}
+
+func toUnsignedMask(_ expression: String, of lane: String) -> String {
+    "\(lane)._maskToUnsigned(\(expression))"
+}
+
+func fromUnsignedMask(_ expression: String, to lane: String) -> String {
+    "\(lane)._mask(fromUnsigned: \(expression))"
+}
+
+func rebindingRequirementDeclarations() -> [String] {
+    [
+        "    static func _maskToUnsigned(_ mask: SIMD<Self>.Mask) -> SIMD<UnsignedLane>.Mask\n",
+        "    static func _mask(fromUnsigned mask: SIMD<UnsignedLane>.Mask) -> SIMD<Self>.Mask\n",
+    ]
+}
+
+func rebindingWitnessMembers(for element: Element) -> [SectionMember] {
+    let op = rebindingOps[0]
+    let unsigned = unsignedElement(of: element)
+    let isUnsigned = isSame(unsigned, as: element)
+    let toUnsigned =
+        isUnsigned ? "mask" : "\(unsigned.vectorType).\(op.swiftName)(\(op.label): mask)"
+    let fromUnsigned =
+        isUnsigned ? "mask" : "\(element.vectorType).\(op.swiftName)(\(op.label): mask)"
+    return [
+        SectionMember(
+            section: op.section,
+            inside: [
+                """
+                    @export(implementation) @inline(always)
+                    public static func _maskToUnsigned(_ mask: \(swiftMaskType(scope: element.swiftType))) -> \(swiftMaskType(scope: unsigned.swiftType)) {
+                        \(toUnsigned)
+                    }
+                """,
+                """
+                    @export(implementation) @inline(always)
+                    public static func _mask(fromUnsigned mask: \(swiftMaskType(scope: unsigned.swiftType))) -> \(swiftMaskType(scope: element.swiftType)) {
+                        \(fromUnsigned)
+                    }
+                """,
+            ]
+        )
+    ]
+}
+
+func rebindingPublicMembers() -> [SectionMember] {
+    let op = rebindingOps[0]
+    return [
+        SectionMember(
+            section: op.section,
+            inside: [
+                """
+                    @_disfavoredOverload @export(implementation) @inline(always)
+                    public static func \(op.swiftName)<Source: SIMDElement>(\(op.label) mask: SIMD<Source>.Mask) -> Mask
+                    where Source.UnsignedLane == Lane.UnsignedLane {
+                        \(fromUnsignedMask(toUnsignedMask("mask", of: "Source"), to: "Lane"))
+                    }
+                """
+            ]
+        )
+    ]
+}
+
+let linkRequirements: [String: [String]] = {
+    var requirements = dispatchRequirementDeclarations()
+    requirements[elementProtocols[0].name, default: []] += rebindingRequirementDeclarations()
+    for linkForm in linkForms {
+        requirements[linkForm.protocolName, default: []] += linkRequirementDeclarations(
+            of: linkForm
+        )
+    }
+    return requirements
+}()
+
+func linkWitnesses(of element: Element) -> [SectionMember] {
+    dispatchWitnessMembers(for: element) + rebindingWitnessMembers(for: element)
+        + linkForms.flatMap { linkWitnessMembers(of: $0, for: element) }
+}
+
+struct LinkGroup {
+    let fileName: String
+    let extending: String
+    var members: [SectionMember]
+}
+
+func linkGroups() -> [LinkGroup] {
+    var groups: [LinkGroup] = []
+    func add(_ members: [SectionMember], fileName: String, extending: String) {
+        if let index = groups.firstIndex(where: { $0.fileName == fileName }) {
+            guard groups[index].extending == extending else {
+                fatalError("\(fileName) extends both \(groups[index].extending) and \(extending)")
+            }
+            groups[index].members += members
+        } else {
+            groups.append(LinkGroup(fileName: fileName, extending: extending, members: members))
+        }
+    }
+    for family in dispatchFamilies {
+        add(
+            dispatchPublicMembers(of: family),
+            fileName: family.fileName,
+            extending: family.extending
+        )
+    }
+    add(rebindingPublicMembers(), fileName: "SameWidth", extending: "SIMD")
+    for linkForm in linkForms {
+        add(
+            linkPublicMembers(of: linkForm),
+            fileName: linkForm.fileName,
+            extending: linkForm.extending
+        )
+    }
+    return groups
+}
+
+enum LinkVariant: String {
+    case pair = "Pair"
+    case source = "BySource"
+    case lane = "ByLane"
+}
+
+func linkVariants(of linkForm: LinkForm) -> [LinkVariant] {
+    var variants: [LinkVariant] = []
+    if !linkForm.genericParameter.isEmpty { variants.append(.pair) }
+    if linkForm.sourceWrapper != nil { variants.append(.source) }
+    if linkForm.laneWrapper != nil { variants.append(.lane) }
+    return variants
+}
+
+func isAdmitted(_ instance: LinkInstance, by linkForm: LinkForm, as variant: LinkVariant) -> Bool {
+    guard linkForm.admits(instance.lane, instance.source) else { return false }
+    switch variant {
+    case .pair: return true
+    case .source:
+        return isSame(linkForm.sourceWrapper?.linked(instance.source), as: instance.lane)
+    case .lane:
+        return isSame(linkForm.laneWrapper?.linked(instance.lane), as: instance.source)
+    }
+}
+
+func linkWrapperName(_ fileName: String, as variant: LinkVariant) -> String {
+    "Generic\(fileName)\(variant.rawValue)"
+}
+
+func linkWrapperSpelling(
+    of linkForm: LinkForm,
+    as variant: LinkVariant
+) -> (lane: String, source: String) {
+    switch variant {
+    case .pair: return ("Lane", "Source")
+    case .source: return (linkForm.sourceWrapper?.spelling ?? "", "Source")
+    case .lane: return ("Lane", linkForm.laneWrapper?.spelling ?? "")
+    }
+}
+
+func laneBound(of extending: String) -> String {
+    let prefix = "SIMD where "
+    return extending.hasPrefix(prefix)
+        ? String(extending.dropFirst(prefix.count)) : "Lane: SIMDElement"
+}
+
+func linkWrapperParameters(of linkForm: LinkForm, as variant: LinkVariant) -> String {
+    switch variant {
+    case .pair: return "\(laneBound(of: linkForm.extending)), \(linkForm.genericParameter)"
+    case .source: return linkForm.sourceWrapper?.parameter ?? ""
+    case .lane: return linkForm.laneWrapper?.parameter ?? ""
+    }
+}
+
+func wrapperMember(_ form: RequirementForm, lane: String, constraints: String = "") -> String {
+    let whereClause = constraints.isEmpty ? "" : " where \(constraints)"
+    return """
+            \(form.availability)\(form.unsafeAttribute)package static func \(form.name)(\(form.parameters))\(form.returnClause)\(whereClause) {
+                \(form.callKeyword)SIMD<\(lane)>.\(form.name)(\(form.arguments))
+            }
+        """
+}
+
+func linkWrapperMembers(of linkForm: LinkForm, as variant: LinkVariant) -> [String] {
+    let spelling = linkWrapperSpelling(of: linkForm, as: variant)
+    return linkRepresentatives(of: linkForm).flatMap { representative in
+        requirementForms(of: representative.op, for: representative.lane, scope: spelling.lane)
+            .map {
+                wrapperMember(
+                    $0.respelled(source: representative.source, as: spelling.source),
+                    lane: spelling.lane
+                )
+            }
+    }
+}
+
+func dispatchWrapperMembers() -> [String] {
+    dispatchFamilies.flatMap { family in
+        family.sourceShapes.map { shape in
+            guard let source = family.sources.first(where: { $0.shape == shape }) else {
+                fatalError("\(family.identifier) has no \(shape) source")
+            }
+            let form = requirementForms(
+                of: source.op,
+                for: dispatchLane(of: source),
+                scope: "Lane"
+            )[0].respelled(source: source.element, as: "Source")
+            var constraints: [String] = []
+            if shapeProtocolName(shape) != elementProtocols[0].name {
+                constraints.append("Source: \(shapeProtocolName(shape))")
+            }
+            if shapeProtocolName(family.resultShape) != elementProtocols[0].name {
+                constraints.append("Lane: \(shapeProtocolName(family.resultShape))")
+            }
+            return wrapperMember(
+                form,
+                lane: "Lane",
+                constraints: constraints.joined(separator: ", ")
+            )
+        }
+    }
+}
+
+func rebindingWrapperMember() -> String {
+    let op = rebindingOps[0]
+    return """
+            package static func \(op.swiftName)(\(op.label) mask: SIMD<Source>.Mask) -> SIMD<Lane>.Mask {
+                SIMD<Lane>.\(op.swiftName)(\(op.label): mask)
+            }
+        """
+}
+
+struct LinkWrapperType {
+    let name: String
+    let parameters: String
+    let constraint: String
+    var members: [String]
+}
+
+func linkWrapperTypes() -> [LinkWrapperType] {
+    var types: [LinkWrapperType] = []
+    func add(_ type: LinkWrapperType) {
+        if let index = types.firstIndex(where: { $0.name == type.name }) {
+            types[index].members += type.members
+        } else {
+            types.append(type)
+        }
+    }
+    add(
+        LinkWrapperType(
+            name: linkWrapperName("AnySource", as: .pair),
+            parameters: "Lane: SIMDElement, Source: SIMDElement",
+            constraint: "",
+            members: dispatchWrapperMembers()
+        )
+    )
+    add(
+        LinkWrapperType(
+            name: linkWrapperName("SameWidth", as: .pair),
+            parameters: "Lane: SIMDElement, Source: SIMDElement",
+            constraint: "Source.UnsignedLane == Lane.UnsignedLane",
+            members: [rebindingWrapperMember()]
+        )
+    )
+    for linkForm in linkForms {
+        for variant in linkVariants(of: linkForm) {
+            add(
+                LinkWrapperType(
+                    name: linkWrapperName(linkForm.fileName, as: variant),
+                    parameters: linkWrapperParameters(of: linkForm, as: variant),
+                    constraint: variant == .pair ? linkForm.constraint : "",
+                    members: linkWrapperMembers(of: linkForm, as: variant)
+                )
+            )
+        }
+    }
+    return types
+}
+
+func generateLinkWrappers() -> String {
+    let declarations = linkWrapperTypes().map { type in
+        let constraint = type.constraint.isEmpty ? "" : " where \(type.constraint)"
+        return """
+            package enum \(type.name)<\(type.parameters)>\(constraint) {
+            \(type.members.joined(separator: "\n\n"))
+            }
+            """
+    }
+    return """
+        \(generationNotice)
+
+        package import Vectorization
+
+        \(declarations.joined(separator: "\n\n"))
+
+        """
+}
+
+func linkTest(
+    _ instance: LinkInstance,
+    through wrapper: String,
+    suffix: String,
+    checked: Bool
+) -> String {
+    let op = instance.op
+    let element = instance.lane
+    let test = "\(op.testIdentifier)\(suffix)\(checked ? "" : "Unchecked")"
+    let inputs = referenceInputs(of: op, for: element, test: test, inContract: true)
+    let calls = referenceCalls(
+        of: op,
+        for: element,
+        pointer: referencePointer(of: op, guarded: false),
+        referencePointer: paddedPointer(of: op),
+        destination: referenceDestination(of: op, guarded: false),
+        checked: checked
+    )
+    let concreteCall = "H.\(op.swiftName)("
+    guard let range = calls.port.range(of: concreteCall) else {
+        fatalError("\(calls.port) does not call \(concreteCall)")
+    }
+    let generic = calls.port.replacingCharacters(in: range, with: "\(wrapper).\(op.swiftName)(")
+    let concrete = (0..<op.parameters.filter { $0 == .outVector }.count).reduce(calls.port) {
+        $0.replacingOccurrences(of: "&p\($1)", with: "&r\($1)")
+    }
+    let (declarations, statements) = referenceStatements(
+        of: op,
+        for: element,
+        inputs: inputs,
+        guarded: false,
+        calls: (port: generic, reference: concrete)
+    )
+    return referenceTestFunction(
+        test,
+        label: "\(op.testIdentifier) through \(wrapper)",
+        for: element,
+        inputs: inputs,
+        declarations: declarations,
+        disabling: laneCapabilityDisabling(of: op, for: element),
+        loopCondition: referenceLoopCondition(of: op, for: element, inputs: inputs),
+        statements: statements
+    )
+}
+
+func linkTestMembers(for element: Element) -> [SectionMember] {
+    func involving(_ instance: LinkInstance) -> [Element] {
+        element.compilationCondition == nil ? [instance.source] : []
+    }
+    var members: [SectionMember] = []
+    for family in dispatchFamilies {
+        let name = linkWrapperName("AnySource", as: .pair)
+        let tests = linkInstances(of: [family.identifier]).filter { isSame($0.lane, as: element) }
+            .map { instance in
+                let wrapper = "\(name)<\(element.swiftType), \(instance.source.swiftType)>"
+                return guarded(
+                    linkTest(
+                        instance,
+                        through: wrapper,
+                        suffix: "Through\(LinkVariant.pair.rawValue)",
+                        checked: true
+                    ),
+                    involving: involving(instance),
+                    testing: true
+                )
+            }
+        members.append(SectionMember(section: family.sources[0].op.section, inside: tests))
+    }
+    let rebinding = rebindingOps[0]
+    members.append(
+        SectionMember(
+            section: rebinding.section,
+            inside: rebindingSources(of: element).map { source in
+                guarded(
+                    linkRebindingTest(rebinding, from: source, to: element),
+                    involving: element.compilationCondition == nil ? [source] : [],
+                    testing: true
+                )
+            }
+        )
+    )
+    for linkForm in linkForms {
+        let instances = linkInstances(of: linkForm.identifiers).filter {
+            isSame($0.lane, as: element) && linkForm.admits($0.lane, $0.source)
+        }
+        let tests = instances.flatMap { instance in
+            linkVariants(of: linkForm).filter {
+                isAdmitted(instance, by: linkForm, as: $0)
+            }.flatMap { variant -> [String] in
+                let arguments =
+                    switch variant {
+                    case .pair: "\(element.swiftType), \(instance.source.swiftType)"
+                    case .source: instance.source.swiftType
+                    case .lane: element.swiftType
+                    }
+                let wrapper = "\(linkWrapperName(linkForm.fileName, as: variant))<\(arguments)>"
+                let hasUncheckedForm =
+                    takesIndices(instance.op) || takesLaneIndex(instance.op)
+                    || !instance.op.immediates.isEmpty
+                return (hasUncheckedForm ? [true, false] : [true]).map { checked in
+                    guarded(
+                        linkTest(
+                            instance,
+                            through: wrapper,
+                            suffix: "Through\(variant.rawValue)",
+                            checked: checked
+                        ),
+                        involving: involving(instance),
+                        testing: true
+                    )
+                }
+            }
+        }
+        members.append(
+            SectionMember(
+                section: opsByIdentifier[linkForm.identifiers[0]]?.first?.section
+                    ?? .initialization,
+                inside: tests
+            )
+        )
+    }
+    return members
+}
+
+func linkRebindingTest(_ op: RebindingOp, from source: Element, to target: Element) -> String {
+    let wrapper =
+        "\(linkWrapperName("SameWidth", as: .pair))<\(target.swiftType), \(source.swiftType)>"
+    let test =
+        "\(op.swiftName)\(uppercasedFirst(op.label))From\(source.swiftType)Through\(LinkVariant.pair.rawValue)"
+    let seed = "seed: \(referenceTestSeed(target, test, "0"))"
+    let inputs = [
+        ReferenceInput(
+            parameter: .mask,
+            name: "mask",
+            values: maskInputs("\(source.vectorType).Mask", seed: seed, nonCanonical: false)
+        )
+    ]
+    let port = "\(wrapper).\(op.swiftName)(\(op.label): mask)"
+    let concrete = portCall(op.swiftName, ["\(op.label): mask"])
+    return referenceTestFunction(
+        test,
+        label: "\(op.swiftName) \(op.label) from \(source.swiftType) through \(wrapper)",
+        for: target,
+        inputs: inputs,
+        statements:
+            "mismatches.check(\(port), \(concrete), \(referenceDescription(of: inputs)))"
+    )
+}
+
+func generateLinkTests(_ element: Element) -> String {
+    """
+    \(generationNotice)
+
+    \(referenceTestImports)
+
+    @Suite("\(element.namespace) generic cross-type ops against the concrete ones")
+    struct \(element.namespace)LinkTests {
+        typealias H = \(element.vectorType)
+        typealias Lane = \(element.swiftType)
+    }
+
+    """
+}
+
+func generateGenericMembers(of elementProtocol: ElementProtocol) -> [SectionMember] {
+    var members = staticRequirements(of: elementProtocol).map { requirement in
+        SectionMember(
+            section: .initialization,
+            inside: [
+                forwardingProperty(
+                    requirement,
+                    named: requirement.name,
+                    calling: "Lane._\(requirement.name)",
+                    documented: true,
+                    disfavored: true
+                )
+            ]
+        )
+    }
+    members += (protocolRequirementOps[elementProtocol.name] ?? []).map { op in
+        SectionMember(
+            section: op.section,
+            inside: requirementForms(of: op, scope: nil).map {
+                forwardingMember(
+                    $0,
+                    named: $0.name,
+                    calling: "Lane._\($0.name)",
+                    disfavored: true
+                )
+            }
+        )
+    }
+    return members
+}
+
+func generateElementWitnesses(_ element: Element) -> [SectionMember] {
+    var members: [SectionMember] = []
+    for elementProtocol in elementProtocols where elementProtocol.isConformed(by: element) {
+        members += staticRequirements(of: elementProtocol).map { requirement in
+            SectionMember(
+                section: .initialization,
+                inside: [
+                    forwardingProperty(
+                        requirement,
+                        named: "_\(requirement.name)",
+                        calling: staticWitnessBody(of: requirement, for: element),
+                        documented: false,
+                        disfavored: false
+                    )
+                ]
+            )
+        }
+        members += (protocolRequirementOps[elementProtocol.name] ?? []).map { op in
+            SectionMember(
+                section: op.section,
+                inside: requirementForms(of: op, scope: element.swiftType).map {
+                    forwardingMember(
+                        $0,
+                        named: "_\($0.name)",
+                        calling: "\(element.vectorType).\($0.name)",
+                        disfavored: false
+                    )
+                }
+            )
+        }
+    }
+    return members + linkWitnesses(of: element)
+}
+
+func simdMaskType(of element: Element, shape: Shape) -> String {
+    shape == .full ? "SIMDMask<\(element.cMask)>" : element.cMask(of: shape)
+}
+
+func conformanceAliases(of elementProtocol: ElementProtocol, for element: Element) -> String {
+    var aliases = ""
+    for shape in elementProtocol.shapes {
+        aliases +=
+            "    public typealias \(rawTypeName(of: shape)) = \(element.rawVectorType(of: shape))\n"
+        if shape.hasMask {
+            aliases +=
+                "    public typealias \(rawTypeName(of: shape, isMask: true)) = \(element.cRawMask(of: shape))\n"
+        }
+        aliases +=
+            "    public typealias \(simdTypeName(of: shape)) = \(element.cVector(of: shape))\n"
+        if shape.hasMask {
+            aliases +=
+                "    public typealias \(simdTypeName(of: shape, isMask: true)) = \(simdMaskType(of: element, shape: shape))\n"
+        }
+    }
+    if elementProtocol.parents.isEmpty {
+        aliases +=
+            "    public typealias IndexLane = \(laneIndexElement(of: element).swiftType)\n"
+    }
+    for link in elementLinks where link.protocolName == elementProtocol.name {
+        guard let target = link.target(element) else {
+            fatalError(
+                "\(element.swiftType) conforms to \(elementProtocol.name) without a \(link.name)"
+            )
+        }
+        aliases += "    public typealias \(link.name) = \(target.swiftType)\n"
+    }
+    return aliases
+}
+
+func generateElementConformance(_ element: Element) -> String {
+    func conformance(compiledOut: Bool) -> String {
+        let conformed = elementProtocols.filter {
+            $0.isConformed(by: element)
+                && compiledOutLinks(of: $0, for: element).isEmpty == !compiledOut
+        }
+        let aliases = conformed.map { conformanceAliases(of: $0, for: element) }.joined()
+        let names = protocolConformances(of: element, compiledOut: compiledOut)
+            .joined(separator: ", ")
+        guard compiledOut else {
+            let availability = element.swiftAvailability.map { "\($0)\n" } ?? ""
+            return "\(availability)extension \(element.swiftType): \(names) {\n\(aliases)}\n"
+        }
+        let linked = conformed.flatMap { compiledOutLinks(of: $0, for: element) }[0]
+        return """
+            #if \(linked.compilationCondition ?? "")
+            \(linked.swiftAvailability ?? "")
+            extension \(element.swiftType): \(names) {
+            \(aliases)}
+            #endif
+
+            """
+    }
+    var output = "\(generationNotice)\n\n\(elementImports)\n\n\(conformance(compiledOut: false))"
+    if !protocolConformances(of: element, compiledOut: true).isEmpty {
+        output += "\n\(conformance(compiledOut: true))"
+    }
+    return output
+}
+
+func concreteTypeMembers(
+    raw: String,
+    toRaw: String?,
+    fromRaw: String?,
+    isMask: Bool = false
+) -> String {
+    let conversion = toRaw.map { "\($0)(simd\(isMask ? "._storage" : ""))" } ?? "simd"
+    let reading = fromRaw.map { isMask ? "SIMDType(\($0)(raw))" : "\($0)(raw)" } ?? "raw"
+    return """
             @export(implementation) @inline(always)
             public init(raw: \(raw)) {
                 self.raw = raw
@@ -44851,51 +46736,88 @@ func narrowDeclaration(
 
             @export(implementation) @inline(always)
             public init(_ simd: SIMDType) {
-                raw = \(toRaw)(simd)
+                raw = \(conversion)
             }
 
             @export(implementation) @inline(always)
-            public var simd: SIMDType { \(fromRaw)(raw) }
-        }
+            public var simd: SIMDType { \(reading) }
+
         """
 }
 
-func narrowVectorDeclaration(of element: Element, shape: Shape) -> String {
-    narrowDeclaration(
-        named: shape.swiftVector,
-        shape: shape,
-        simd: element.cVector(of: shape),
-        raw: element.cRawVector(of: shape),
-        toRaw: element.cToRawVector(of: shape),
-        fromRaw: element.cFromRawVector(of: shape)
-    )
+func concreteExtension(
+    _ type: String,
+    of element: Element,
+    members: String
+) -> String {
+    let availability = element.swiftAvailability.map { "\($0)\n" } ?? ""
+    return "\(availability)extension \(type) where Lane == \(element.swiftType) {\n\(members)}\n"
 }
 
-func narrowMaskDeclaration(of element: Element, shape: Shape) -> String {
-    narrowDeclaration(
-        named: shape.swiftMask,
-        shape: shape,
-        simd: element.cMask(of: shape),
-        raw: element.cRawMask(of: shape),
-        toRaw: element.cToRawMask(of: shape),
-        fromRaw: element.cFromRawMask(of: shape)
-    )
+func narrowConcreteExtensions(of element: Element, shape: Shape) -> [String] {
+    var extensions = [
+        concreteExtension(
+            "SIMD.\(shape.swiftVector)",
+            of: element,
+            members: concreteTypeMembers(
+                raw: element.cRawVector(of: shape),
+                toRaw: element.cToRawVector(of: shape),
+                fromRaw: element.cFromRawVector(of: shape)
+            )
+        )
+    ]
+    if shape.hasMask {
+        extensions.append(
+            concreteExtension(
+                "SIMD.\(shape.swiftMask)",
+                of: element,
+                members: concreteTypeMembers(
+                    raw: element.cRawMask(of: shape),
+                    toRaw: element.cToRawMask(of: shape),
+                    fromRaw: element.cFromRawMask(of: shape)
+                )
+            )
+        )
+    }
+    return extensions
 }
 
-func typeDeclarations(of element: Element) -> String {
-    let lane = "public typealias Lane = \(element.swiftType)"
-    let mask = maskDeclaration(of: element)
-    let indices = indicesDeclaration(of: element)
-    let narrow = narrowShapes(of: element).map {
-        let masks = $0.hasMask ? "\n\n\(narrowMaskDeclaration(of: element, shape: $0))" : ""
-        return "\n\n\(narrowVectorDeclaration(of: element, shape: $0))\(masks)"
+func generateElement(_ element: Element) -> String {
+    var extensions = [
+        concreteExtension(
+            "SIMD",
+            of: element,
+            members: concreteTypeMembers(
+                raw: element.rawVectorType(of: .full),
+                toRaw: element.hasOpaqueVector ? element.cToRawVector : nil,
+                fromRaw: element.hasOpaqueVector ? element.cFromRawVector : nil
+            )
+        ),
+        concreteExtension(
+            "SIMD.Mask",
+            of: element,
+            members: concreteTypeMembers(
+                raw: element.cRawMask,
+                toRaw: element.cToRawMask,
+                fromRaw: element.cFromRawMask,
+                isMask: true
+            )
+        ),
+    ]
+    extensions += narrowShapes(of: element).flatMap {
+        narrowConcreteExtensions(of: element, shape: $0)
     }
-    .joined()
-    guard element.hasOpaqueVector else {
-        return
-            "\(lane)\npublic typealias Vector = \(element.cVector)\n\n\(mask)\n\n\(indices)\(narrow)"
+    let staticMembers = laneCapabilityMembers(for: element) + indexLimitMembers(for: element)
+    if !staticMembers.isEmpty {
+        extensions.append(concreteExtension("SIMD", of: element, members: staticMembers))
     }
-    return "\(lane)\n\n\(vectorDeclaration(of: element))\n\n\(mask)\n\n\(indices)\(narrow)"
+    return """
+        \(generationNotice)
+
+        \(elementImports)
+
+        \(extensions.joined(separator: "\n"))
+        """
 }
 
 func opMembers(of op: Op, for element: Element) -> String {
@@ -44931,9 +46853,9 @@ func wideningMembers(_ op: WideningOp, for element: Element) -> String {
         output += "    @export(implementation) @inline(always)\n"
         output += "    public static func \(op.swiftName)("
         output += "from: UnsafePointer<\(narrow.swiftType)>\(countParameter)"
-        output += ") -> Vector {\n"
+        output += ") -> SIMD {\n"
         let call = "unsafe \(function)(from\(countArgument))"
-        output += "        \(vectorFromRaw(call, of: element))\n"
+        output += "        \(vectorFromRaw(call))\n"
         output += "    }\n\n"
         output += spanMembers(spanForms(of: op, from: narrow, to: element))
     }
@@ -44959,7 +46881,7 @@ func rebindingMembers(_ op: RebindingOp, for element: Element) -> String {
         let function = cRebindingFunctionName(op, from: source, to: element)
         var member = "    @export(implementation) @inline(always)\n"
         member += "    public static func \(op.swiftName)"
-        member += "(\(op.label) mask: \(source.namespace).Mask) -> Mask {\n"
+        member += "(\(op.label) mask: \(swiftMaskType(scope: source.swiftType))) -> Mask {\n"
         member += "        Mask(raw: \(function)(mask.raw))\n"
         member += "    }\n"
         output += guarded(member, rebinding: source, to: element, testing: false) + "\n\n"
@@ -44973,11 +46895,11 @@ func repeatingBlockMembers(for element: Element) -> String {
     output += "    @export(implementation) @inline(always)\n"
     output += "    public static func \(repeatingBlockName)("
     output += blockLanes.map { "_ \($0): Lane" }.joined(separator: ", ")
-    output += ") -> Vector {\n"
+    output += ") -> SIMD {\n"
     let blockFunction = cFunctionName(repeatingBlockName, element)
     let blockCall =
         "\(blockFunction)(\(blockLanes.map(element.swiftScalarArgument).joined(separator: ", ")))"
-    output += "        \(vectorFromRaw(blockCall, of: element))\n"
+    output += "        \(vectorFromRaw(blockCall))\n"
     output += "    }\n\n"
     return output
 }
@@ -45044,50 +46966,6 @@ func generateElementMembers(_ element: Element) -> [SectionMember] {
 }
 
 let elementImports = "public import CVectorizationOps"
-
-func hasAll(_ requirements: [Op], for element: Element) -> Bool {
-    requirements.allSatisfy { op in
-        isOutsideProtocols(op)
-            || ops.contains { $0.identifier == op.identifier && $0.applies.matches(element) }
-    }
-}
-
-func protocolConformances(of element: Element) -> [String] {
-    switch element.category {
-    case .float: return ["SIMDElement", "SIMDFloatElement"]
-    case .unsignedInteger, .signedInteger: return ["SIMDElement", "SIMDIntegerElement"]
-    case .float16, .bfloat16:
-        guard hasAll(universalOps, for: element) else { return [] }
-        return ["SIMDElement"] + (hasAll(floatOnlyOps, for: element) ? ["SIMDFloatElement"] : [])
-    }
-}
-
-func generateElement(_ element: Element) -> String {
-    let conformances = protocolConformances(of: element) + ["SendableMetatype"]
-
-    var output = """
-        \(generationNotice)
-
-        \(elementImports)
-
-        /// Vectors of `\(element.swiftType)`, and the ops over them.
-        \(element.swiftAvailability.map { "\($0)\n" } ?? "")public enum \(element.namespace): \(conformances.joined(separator: ", ")) {
-            \(typeDeclarations(of: element))
-
-            @export(implementation) @inline(always)
-            public static var laneCount: Int { Int(\(cFunctionName("laneCount", element))()) }
-
-            @export(implementation) @inline(always)
-            public static var blockCount: Int { Int(\(cFunctionName("blockCount", element))()) }
-
-
-        """
-    output += laneCapabilityMembers(for: element)
-    output += indexLimitMembers(for: element)
-    output += "}\n\n\(unavailableSendableConformance(of: element.namespace))\n"
-
-    return output
-}
 
 func fnv1a(_ text: String) -> UInt64 {
     text.utf8.reduce(0xCBF2_9CE4_8422_2325) { ($0 ^ UInt64($1)) &* 0x100_0000_01B3 }
@@ -45158,7 +47036,7 @@ func pointerLanes(
         return op.clampsSpanCount && !guarded ? "2 * H.laneCount" : alternativeLanes(alternative)
     case .table(let lanes)?: return String(lanes)
     case .maskBytes?: return "(H.laneCount + 7) / 8"
-    case .block?: return "16 / MemoryLayout<H.Lane>.size"
+    case .block?: return "16 / MemoryLayout<Lane>.size"
     case .halfVector?, .quarterVector?, .eighthVector?:
         return partialExtentLanes(op.span, prefix: "H.")
     case .gathered?: return "H.laneCount"
@@ -45170,7 +47048,7 @@ func pointeeType(of op: Op, for element: Element) -> String {
     if let narrow = op.narrowElement { return narrow.swiftType }
     if op.parameters.contains(.constIndexPointer) { return laneIndexElement(of: element).swiftType }
     if case .maskBytes? = op.span { return "UInt8" }
-    return "H.Lane"
+    return "Lane"
 }
 
 func pointerExpression(_ closureParameter: String, aligned: Bool) -> String {
@@ -45193,7 +47071,7 @@ func indexInputs(
     guard let contract = op.indexContract else {
         fatalError("\(op.swiftName) takes indices but has no index contract")
     }
-    let type = parameter.isLaneIndices ? "H.Indices" : "H.Vector"
+    let type = parameter.isLaneIndices ? "H.Indices" : "H"
     let offset = contract.offset == 0 ? "" : "offset: \(contract.offset), "
     let perByte = contract.isPerByte ? "perByte: true, " : ""
     let count = contract.count.expression(laneCount: "H.laneCount")
@@ -45204,17 +47082,17 @@ func indexInputs(
 
 func divisorInputs(_ vectors: String, spreadSeed: String, for element: Element) -> String {
     let negatives =
-        element.category == .signedInteger ? " + [H.Vector(H.Vector.Simd(repeating: -1))]" : ""
+        element.category == .signedInteger ? " + [H(H.SIMDType(repeating: -1))]" : ""
     let shifted =
-        "H.Vector(vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index)))"
+        "H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))"
     let spread =
-        "Inputs.vectors(H.Vector.self, \(spreadSeed)).enumerated().map { index, vector in \(shifted) }"
+        "Inputs.vectors(H.self, \(spreadSeed)).enumerated().map { index, vector in \(shifted) }"
     return "\(vectors)\(negatives) + \(spread)"
 }
 
 func byteSweepInputs(_ vectors: String) -> String {
-    let lanes = "(0..<H.laneCount).map { H.Lane(truncatingIfNeeded: start + $0) }"
-    return "\(vectors) + (0..<256).map { start in H.Vector(H.Vector.Simd(\(lanes))) }"
+    let lanes = "(0..<H.laneCount).map { Lane(truncatingIfNeeded: start + $0) }"
+    return "\(vectors) + (0..<256).map { start in H(H.SIMDType(\(lanes))) }"
 }
 
 func immediate(named name: String, of op: Op) -> ImmediateArgument {
@@ -45260,25 +47138,29 @@ func referenceInputs(
                 ?? floatDemotionSourceInputs(of: op, operand: operand, for: element, seed: seed)
                 ?? float16DemotionSourceInputs(of: op, operand: operand, for: element, seed: seed)
                 ?? bfloat16DemotionSourceInputs(operand: operand, for: element, seed: seed)
-                ?? "Inputs.conversions(\(operand.namespace).Vector.self, \(seed))"
+                ?? "Inputs.conversions(\(operand.vectorType).self, \(seed))"
         case .narrowVector(let shape):
             values = "Inputs.vectors(H.\(shape.swiftVector).self, \(seed)).map(poisoningUpperBytes)"
         case .sourceNarrowVector(let shape):
-            values = "Inputs.conversions(\(operand.namespace).\(shape.swiftVector).self, \(seed))"
+            values = "Inputs.conversions(\(operand.vectorType).\(shape.swiftVector).self, \(seed))"
             values += ".map(poisoningUpperBytes)"
         case .sourceMask:
-            values = maskInputs("\(operand.namespace).Mask", seed: seed, nonCanonical: nonCanonical)
+            values = maskInputs(
+                "\(operand.vectorType).Mask",
+                seed: seed,
+                nonCanonical: nonCanonical
+            )
         case .narrowMask(let shape):
             values = maskInputs("H.\(shape.swiftMask)", seed: seed, nonCanonical: nonCanonical)
         case .sourceNarrowMask(let shape):
             values = maskInputs(
-                "\(operand.namespace).\(shape.swiftMask)",
+                "\(operand.vectorType).\(shape.swiftMask)",
                 seed: seed,
                 nonCanonical: nonCanonical
             )
         case .vector, .fillVector, .otherwiseVector, .outVector:
             let generator = op.accumulates ? "accumulators" : "vectors"
-            values = "Inputs.\(generator)(H.Vector.self, \(seed))"
+            values = "Inputs.\(generator)(H.self, \(seed))"
             if op.divides && element.category != .float && parameter == .vector
                 && inputs.contains(where: { $0.parameter == .vector })
             {
@@ -45303,15 +47185,15 @@ func referenceInputs(
                 values += ".filter { (0...H.laneCount).contains(\(count)) }"
             }
         case .lane, .fillLane, .insertedLane:
-            values = "Inputs.lanes(H.Lane.self, \(seed))"
+            values = "Inputs.lanes(Lane.self, \(seed))"
         case .flag:
             values = "[false, true]"
         case .maskBits:
-            values = "Inputs.maskBits(lanes: 16 / MemoryLayout<H.Lane>.size, \(seed))"
+            values = "Inputs.maskBits(lanes: 16 / MemoryLayout<Lane>.size, \(seed))"
         case .laneIndex:
             values = "Inputs.laneIndices(lanes: H.laneCount)"
         case .tuple(let count):
-            values = "Inputs.tuples\(count)(of: Inputs.vectors(H.Vector.self, \(seed)))"
+            values = "Inputs.tuples\(count)(of: Inputs.vectors(H.self, \(seed)))"
         case .tupleIndex:
             values = "Inputs.tupleIndices(count: \(tupleCount(of: op)))"
         case .count where op.clampsSpanCount:
@@ -45323,7 +47205,7 @@ func referenceInputs(
         case .shiftAmount:
             values = "Inputs.shiftAmounts(bits: \(element.bits), inContract: \(inContract))"
         case .shiftCounts:
-            values = "Inputs.shiftCounts(H.Vector.self, \(seed), inContract: \(inContract))"
+            values = "Inputs.shiftCounts(H.self, \(seed), inContract: \(inContract))"
         case .laneAmount:
             values = "Inputs.laneAmounts(lanes: H.laneCount, inContract: \(inContract))"
         case .roundConstant:
@@ -45345,11 +47227,11 @@ func referenceInputs(
             let pointee = isBytes ? "UInt8" : pointeeType(of: op, for: element)
             values = "Inputs.buffers(\(pointee).self, count: \(lanes), \(seed))"
         case .pointerIndices, .pointerOffsets:
-            let vector = "\(signedElement(of: element).namespace).Vector"
+            let vector = signedElement(of: element).vectorType
             let lanes = pointerLanes(of: op)
             let count =
                 parameter == .pointerOffsets
-                ? "(\(lanes) - 1) * MemoryLayout<H.Lane>.stride + 1" : lanes
+                ? "(\(lanes) - 1) * MemoryLayout<Lane>.stride + 1" : lanes
             values =
                 "Inputs.tableIndices(\(vector).self, count: \(count), \(seed), inContract: true)"
         }
@@ -45422,14 +47304,14 @@ func referenceResult(
     on type: String = "H"
 ) -> String {
     switch returns {
-    case .vector: return opaqueVector(call, of: element, on: type)
+    case .vector: return opaqueVector(call, on: type)
     case .narrowVector(let shape): return "\(type).\(shape.swiftVector)(raw: \(call))"
     case .narrowMask(let shape): return "\(type).\(shape.swiftMask)(raw: \(call))"
     case .laneIndices: return "\(type).Indices(raw: \(call))"
     case .mask: return "\(type).Mask(raw: \(call))"
     case .indices: return "\(type).Indices(raw: \(call))"
     case .tuple(let count):
-        let members = (0..<count).map { opaqueVector("tuple.v\($0)", of: element, on: type) }
+        let members = (0..<count).map { opaqueVector("tuple.v\($0)", on: type) }
         return "{ tuple in (\(members.joined(separator: ", "))) }(\(call))"
     case .lane:
         return element.isHalfPrecision ? "\(element.swiftType)(bitPattern: \(call))" : call
@@ -45457,7 +47339,7 @@ func referenceCalls(
         if let constant = constants[binding.swiftName] {
             portArguments.append(swiftCallArgument(binding, passing: constant.port))
             referenceArguments.append(
-                rawArgument(constant.reference, parameter, for: element, source: op.source)
+                rawArgument(constant.reference, parameter, for: element)
             )
             continue
         }
@@ -45472,7 +47354,7 @@ func referenceCalls(
             .sourceNarrowMask:
             portArguments.append(swiftCallArgument(binding))
             referenceArguments.append(
-                swiftArgument(binding, parameter, for: element, source: op.source)
+                swiftArgument(binding, parameter, for: element)
             )
         case .constLanePointer, .lanePointer, .constBytePointer, .bytePointer, .constBitsPointer,
             .constIndexPointer, .narrowLanePointer:
@@ -45616,7 +47498,7 @@ func compressedPrefixComparison(
         []
     )
     let lanes = ["portResult", "referenceResult"].map { result in
-        "(0..<checkedLanes).map { \(simdVector(result, of: element))[$0] }"
+        "(0..<checkedLanes).map { \(simdVector(result))[$0] }"
     }
     return """
         let checkedLanes = compressedLaneCount(bits: \(source), lanes: H.laneCount, tailIsDeterministic: \(isDeterministic))
@@ -45758,7 +47640,7 @@ func poisonedIndexStatements(of op: Op, inputs: [ReferenceInput]) -> String {
     guard let operand = inputs.first(where: { $0.parameter.isPointerIndices }) else { return "" }
     let pastEnd =
         operand.parameter == .pointerOffsets
-        ? "H.laneCount * MemoryLayout<H.Lane>.stride" : "H.laneCount"
+        ? "H.laneCount * MemoryLayout<Lane>.stride" : "H.laneCount"
     let unused: String
     if inputs.contains(where: { $0.parameter == .whereMask }) {
         unused = "where: mask"
@@ -45878,7 +47760,7 @@ func referenceStatements(
             : "\(portCall("bits", ["of: mask"])).nonzeroBitCount"
         let lanes = defined == .trueLanes ? trueCount : "H.laneCount - \(trueCount)"
         let results = ["port", "reference"].map { result in
-            let simd = simdVector(result, of: element)
+            let simd = simdVector(result)
             return "(0..<checkedLanes).map { \(simd)[$0] }"
         }
         statements = """
@@ -45890,7 +47772,7 @@ func referenceStatements(
     } else if op.growth == .unspecified {
         let source = op.source ?? element
         let shape = op.sourceShape
-        let type = "\(source.namespace)\(shape == .full ? "" : ".\(shape.swiftVector)")"
+        let type = "\(source.vectorType)\(shape == .full ? "" : ".\(shape.swiftVector)")"
         let results = ["port", "reference"].map { "Array(bytes(of: \($0)).prefix(definedBytes))" }
         let resultType: String
         switch op.returns {
@@ -45904,8 +47786,8 @@ func referenceStatements(
         statements = """
             let port = \(calls.port)
             let reference = \(calls.reference)
-            let definedBytes = \(type).laneCount * MemoryLayout<\(source.namespace).Lane>.stride
-            let grownBytes = \(resultType).laneCount * MemoryLayout<H.Lane>.stride
+            let definedBytes = \(type).laneCount * MemoryLayout<\(source.swiftType)>.stride
+            let grownBytes = \(resultType).laneCount * MemoryLayout<Lane>.stride
             let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, \(register))
             mismatches.check(\(results[0]), \(results[1]), \(description))
             mismatches.check(\(grown[0]), \(grown[1]), \(description))
@@ -46068,7 +47950,7 @@ func rebindingReferenceTest(
         ReferenceInput(
             parameter: .mask,
             name: "mask",
-            values: maskInputs("\(source.namespace).Mask", seed: seed, nonCanonical: nonCanonical)
+            values: maskInputs("\(source.vectorType).Mask", seed: seed, nonCanonical: nonCanonical)
         )
     ]
     let port = portCall(op.swiftName, ["\(op.label): mask"])
@@ -46093,10 +47975,10 @@ func repeatingBlockReferenceTest(for element: Element) -> String {
     let vectors = ReferenceInput(
         parameter: .vector,
         name: "vector",
-        values: "Inputs.vectors(H.Vector.self, \(seed))"
+        values: "Inputs.vectors(H.self, \(seed))"
     )
     let lanes = repeatingBlockLanes(of: element).indices.map {
-        element.swiftLane(fromSimd: "\(simdVector("vector", of: element))[\($0)]")
+        element.swiftLane(fromSimd: "\(simdVector("vector"))[\($0)]")
     }
     let function = referenceFunctionName(repeatingBlockName, element)
     let port = portCall(repeatingBlockName, lanes)
@@ -46149,71 +48031,77 @@ func laneCountReferenceTest(for element: Element) -> String {
     )
 }
 
-func simdVector(_ expression: String, of element: Element) -> String {
-    element.hasOpaqueVector ? "\(expression).simd" : expression
+func simdVector(_ expression: String) -> String {
+    "\(expression).simd"
 }
 
-func opaqueVector(_ expression: String, of element: Element, on type: String = "H") -> String {
-    element.hasOpaqueVector ? "\(type).Vector(raw: \(expression))" : expression
+func opaqueVector(_ expression: String, on type: String = "H") -> String {
+    "\(type)(raw: \(expression))"
 }
 
 func narrowReferenceConformance(of element: Element, shape: Shape) -> String {
-    let lanes =
-        shape == .block
-        ? "16 / MemoryLayout<\(element.swiftType)>.stride"
-        : "\(element.namespace).laneCount / \(shape.fraction ?? 1)"
+    let vector = "\(element.vectorType).\(shape.swiftVector)"
     return """
-        extension \(element.namespace).\(shape.swiftVector): ReferenceNarrowVector {
-            package static var laneCount: Int { \(lanes) }
-
-            package init(lanes: [\(element.swiftType)]) {
-                self = lanes.withUnsafeBufferPointer { buffer in
-                    unsafe \(element.namespace).load\(shape.prefix)(from: buffer.baseAddress!)
-                }
+        package static func \(lowercasedFirstWord(shape.swiftVector))(lanes: [\(element.swiftType)]) -> \(vector) {
+            lanes.withUnsafeBufferPointer { buffer in
+                unsafe \(element.vectorType).load\(shape.prefix)(from: buffer.baseAddress!)
             }
+        }
 
-            package var lanes: [\(element.swiftType)] {
-                var lanes = [\(element.swiftType)](repeating: \(element.swiftZeroLane), count: Self.laneCount)
-                lanes.withUnsafeMutableBufferPointer { buffer in
-                    unsafe \(element.namespace).store(self, to: buffer.baseAddress!)
-                }
-                return lanes
+        package static func lanes(of vector: \(vector)) -> [\(element.swiftType)] {
+            var lanes = [\(element.swiftType)](repeating: \(element.swiftZeroLane), count: \(vector).laneCount)
+            lanes.withUnsafeMutableBufferPointer { buffer in
+                unsafe \(element.vectorType).store(vector, to: buffer.baseAddress!)
             }
+            return lanes
         }
         """
 }
 
-func narrowMaskReferenceConformance(of element: Element, shape: Shape) -> String {
-    """
-    extension \(element.namespace).\(shape.swiftMask): ReferenceNarrowMask {
-        package typealias Lane = \(element.swiftMaskLane)
-
-        package static var laneCount: Int { \(element.namespace).laneCount / \(shape.fraction ?? 1) }
-    }
-    """
-}
-
 func referenceConformances(of element: Element) -> String {
-    var blocks: [String] = []
-    if element.hasOpaqueVector {
-        let body =
-            element.isHalfPrecision
-            ? "{\n    package typealias InputLane = \(element.swiftType)\n\n"
-                + "    package static func simdLane(_ lane: InputLane) -> UInt16 { lane.bitPattern }\n}"
-            : "{}"
-        blocks.append("extension \(element.namespace).Vector: ReferenceVector \(body)")
-    }
-    blocks.append("extension \(element.namespace).Mask: ReferenceMask {}")
-    for shape in narrowShapes(of: element) {
-        blocks.append(narrowReferenceConformance(of: element, shape: shape))
-        if shape.hasMask {
-            blocks.append(narrowMaskReferenceConformance(of: element, shape: shape))
+    let vector = element.vectorType
+    let mask = "\(vector).Mask"
+    var members = [
+        """
+        package static func vector(_ simd: \(vector).SIMDType) -> \(vector) {
+            \(vector)(simd)
         }
+        """,
+        """
+        package static func simd(of vector: \(vector)) -> \(vector).SIMDType {
+            vector.simd
+        }
+        """,
+        """
+        package static func mask(_ simd: \(mask).SIMDType) -> \(mask) {
+            \(mask)(simd)
+        }
+        """,
+        """
+        package static func simd(of mask: \(mask)) -> \(mask).SIMDType {
+            mask.simd
+        }
+        """,
+    ]
+    if element.category == .bfloat16 {
+        members.insert(
+            "package static func simdLane(_ lane: \(element.swiftType)) -> UInt16 { lane.bitPattern }",
+            at: 0
+        )
     }
+    members += narrowShapes(of: element).map { narrowReferenceConformance(of: element, shape: $0) }
+    let protocolName =
+        element.supports(.eighth)
+        ? "ReferenceEighthElement"
+        : element.supports(.quarter) ? "ReferenceQuarterElement" : "ReferenceElement"
     let attribute = element.swiftAvailability.map { "\($0)\n" } ?? ""
-    let conformances = blocks.map { "\(attribute)\($0)" }.joined(separator: "\n\n")
-    guard let condition = element.compilationCondition else { return conformances }
-    return "#if \(condition)\n\(conformances)\n#endif"
+    let conformance = """
+        \(attribute)extension \(element.swiftType): \(protocolName) {
+        \(swiftIndented(members.joined(separator: "\n\n")))
+        }
+        """
+    guard let condition = element.compilationCondition else { return conformance }
+    return "#if \(condition)\n\(conformance)\n#endif"
 }
 
 func referenceTests(of op: Op, for element: Element) -> [String] {
@@ -46528,7 +48416,8 @@ func generateReferenceTests(_ element: Element) -> String {
 
         @Suite("\(element.namespace) against Highway")
         struct \(element.namespace)ReferenceTests {
-            typealias H = \(element.namespace)
+            typealias H = \(element.vectorType)
+            typealias Lane = \(element.swiftType)
 
         \(tests.joined(separator: "\n\n"))
         }
@@ -46536,11 +48425,11 @@ func generateReferenceTests(_ element: Element) -> String {
         """
 }
 
-func generateReferenceConformances(of conformingElements: [Element], importing: String) -> String {
+func generateReferenceConformances(of conformingElements: [Element]) -> String {
     """
     \(generationNotice)
 
-    \(importing)
+    package import Vectorization
 
     \(conformingElements.map(referenceConformances(of:)).joined(separator: "\n\n"))
 
@@ -46643,14 +48532,14 @@ func codegenFunctions(
     let portKeyword = isUnsafe.port ? "unsafe " : ""
     let referenceKeyword = isUnsafe.reference ? "unsafe " : ""
     let hasReturn = returns != .void
-    let portReturn = swiftReturnType(returns, scope: "\(element.namespace).")
+    let portReturn = swiftReturnType(returns, scope: element.swiftType)
     let referenceReturn = importedReturnType(returns, element)
     let functions = [
         codegenFunction(
             codegenFunctionName("port", referenceName, constantParameter: constantParameter),
             parameters: port.parameters,
             returnClause: hasReturn ? " -> \(portReturn)" : "",
-            call: portKeyword + portCall(swiftName, port.arguments, on: element.namespace)
+            call: portKeyword + portCall(swiftName, port.arguments, on: element.vectorType)
         ),
         codegenFunction(
             codegenFunctionName("highway", referenceName, constantParameter: constantParameter),
@@ -46665,7 +48554,7 @@ func codegenFunctions(
                     ),
                     returning: returns,
                     for: element,
-                    on: element.namespace
+                    on: element.vectorType
                 )
         ),
     ]
@@ -46707,7 +48596,7 @@ struct CodegenSide {
 
     var namespace: String {
         switch kind {
-        case .port: return element.namespace
+        case .port: return element.vectorType
         case .highway: return referenceNamespace(of: element)
         }
     }
@@ -46716,7 +48605,7 @@ struct CodegenSide {
 
     func returnType(_ returns: ReturnType) -> String {
         switch kind {
-        case .port: return swiftReturnType(returns, scope: "\(element.namespace).")
+        case .port: return swiftReturnType(returns, scope: element.swiftType)
         case .highway: return importedReturnType(returns, element)
         }
     }
@@ -46739,7 +48628,7 @@ struct CodegenSide {
                 swiftCallArgument($0, passing: $1)
             }
             let portKeyword = isUnsafe(op) || takesIndices(op) ? "unsafe " : ""
-            return portKeyword + portCall(op.swiftName, labelled, on: element.namespace)
+            return portKeyword + portCall(op.swiftName, labelled, on: element.vectorType)
         case .highway:
             let converted = zip(op.swiftOrdered(op.operands), arguments).map {
                 rawArgument($1, $0, for: element)
@@ -46751,7 +48640,7 @@ struct CodegenSide {
                 in: referenceNothrowNamespace
             )
             return keyword
-                + referenceResult(call, returning: op.returns, for: element, on: element.namespace)
+                + referenceResult(call, returning: op.returns, for: element, on: element.vectorType)
         }
     }
 
@@ -46762,14 +48651,14 @@ struct CodegenSide {
     func repeatingBlock(_ lanes: [String]) -> String {
         switch kind {
         case .port:
-            return portCall(repeatingBlockName, lanes, on: element.namespace)
+            return portCall(repeatingBlockName, lanes, on: element.vectorType)
         case .highway:
             let call = referenceCall(
                 referenceFunctionName(repeatingBlockName, element),
                 lanes,
                 in: referenceNothrowNamespace
             )
-            return referenceResult(call, returning: .vector, for: element, on: element.namespace)
+            return referenceResult(call, returning: .vector, for: element, on: element.vectorType)
         }
     }
 }
@@ -46906,12 +48795,7 @@ func codegenFunctions(
             {
                 portArguments.append(swiftCallArgument(binding, passing: constant.port))
                 referenceArguments.append(
-                    rawArgument(
-                        constant.reference,
-                        parameter.kind,
-                        for: element,
-                        source: parameter.source
-                    )
+                    rawArgument(constant.reference, parameter.kind, for: element)
                 )
                 continue
             }
@@ -46925,12 +48809,7 @@ func codegenFunctions(
                 )
             )
             referenceArguments.append(
-                rawArgument(
-                    binding.swiftName,
-                    parameter.kind,
-                    for: element,
-                    source: parameter.source
-                )
+                rawArgument(binding.swiftName, parameter.kind, for: element)
             )
         }
 
@@ -46981,7 +48860,7 @@ func codegenParameters(of op: Op, for element: Element) -> [CodegenParameter] {
     let parameterBindings = bindings(
         of: op,
         for: element,
-        scope: "\(element.namespace).",
+        scope: element.swiftType,
         checked: false
     )
     for (binding, parameter) in zip(parameterBindings, op.parameters) {
@@ -47106,7 +48985,7 @@ func repeatingBlockCodegenFunctions(for element: Element) -> String {
         for: element,
         returns: .vector,
         isUnsafe: (port: false, reference: false),
-        port: (lanes.map { "_ \($0): \(element.namespace).Lane" }, lanes),
+        port: (lanes.map { "_ \($0): \(element.swiftType)" }, lanes),
         reference: (
             lanes.map { "_ \($0): \(element.swiftType)" },
             lanes.map(element.swiftScalarArgument)
@@ -47153,7 +49032,7 @@ func referenceSpanForms(of op: Op, for element: Element) -> SpanForms? {
             call,
             returning: op.returns,
             for: element,
-            on: element.namespace
+            on: "SIMD"
         )
         return "unsafe \(result)"
     }
@@ -47170,7 +49049,7 @@ func referenceSpanForms(of op: WideningOp, from narrow: Element, to wide: Elemen
             op.takesCount ? [pointers[0], count] : [pointers[0]],
             in: referenceNothrowNamespace
         )
-        return "unsafe \(referenceResult(call, returning: .vector, for: wide, on: wide.namespace))"
+        return "unsafe \(referenceResult(call, returning: .vector, for: wide, on: "SIMD"))"
     }
     return forms
 }
@@ -47181,8 +49060,8 @@ func referenceSpanNamespace(of element: Element) -> String {
     """
     \(element.swiftAvailability.map { "\($0)\n" } ?? "")public enum \(referenceNamespace(of: element)) {
         public typealias Lane = \(element.swiftType)
-        public typealias Vector = \(element.namespace).Vector
-        public typealias Mask = \(element.namespace).Mask
+        public typealias SIMD = Vectorization.SIMD<\(element.swiftType)>
+        public typealias Mask = SIMD.Mask
 
         @export(implementation) @inline(always)
         public static var laneCount: Int {
@@ -48161,49 +50040,55 @@ func unorderedNaNsCondition(
     guard element.category == .float || element.category == .float16,
         let unorderedNaNs = op.unorderedNaNs
     else { return nil }
-    let multiplicands = vectors.filter { $0 != "c" }.joined(separator: ", ")
+    func simd(_ vector: String) -> String {
+        sources.contains(vector) && op.source?.category == .bfloat16 ? vector : "\(vector).simd"
+    }
+    let multiplicands = vectors.filter { $0 != "c" }.map(simd).joined(separator: ", ")
     let hasAddend = vectors.contains("c")
     let accumulators = vectors.filter { !sources.contains($0) }
     switch (unorderedNaNs, vectors.count) {
     case (.perLane, 2), (.perLane, 3), (.multiplyAdd, 2):
-        return "!hasUnorderedNaNs(\(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(\(vectors.map(simd).joined(separator: ", ")))"
     case (.negatedAddend, 2) where hasAddend:
-        return "!hasUnorderedNaNs(\(multiplicands), negatedLanes(of: c))"
+        return "!hasUnorderedNaNs(\(multiplicands), negatedLanes(of: c.simd))"
     case (.alternatingAddend, 2) where hasAddend:
-        return "!hasUnorderedNaNs(alternatingNegation: \(multiplicands), c)"
+        return "!hasUnorderedNaNs(alternatingNegation: \(multiplicands), c.simd)"
     case (.alternatingNegatedAddend, 2) where hasAddend:
-        return "!hasUnorderedNaNs(alternatingNegation: \(multiplicands), negatedLanes(of: c))"
+        return "!hasUnorderedNaNs(alternatingNegation: \(multiplicands), negatedLanes(of: c.simd))"
     case (.negatedAddend, 2), (.alternatingAddend, 2), (.alternatingNegatedAddend, 2):
-        return "!hasUnorderedNaNs(\(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(\(vectors.map(simd).joined(separator: ", ")))"
     case (.adjacentLanes, _):
-        return "!hasUnorderedNaNs(adjacentLanesOf: \(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(adjacentLanesOf: \(vectors.map(simd).joined(separator: ", ")))"
     case (.adjacentQuads, _):
-        return "!hasUnorderedNaNs(adjacentQuadsOf: \(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(adjacentQuadsOf: \(vectors.map(simd).joined(separator: ", ")))"
     case (.alternatingNegation, 2):
-        return "!hasUnorderedNaNs(alternatingNegation: \(vectors.joined(separator: ", ")))"
+        return
+            "!hasUnorderedNaNs(alternatingNegation: \(vectors.map(simd).joined(separator: ", ")))"
     case (.alternatingNegation, 1):
         return nil
     case (.multiplyAdd, 3), (.negatedAddend, 3), (.alternatingAddend, 3),
         (.alternatingNegatedAddend, 3):
-        return "!hasUnorderedNaNs(multiplying: \(vectors[0]), \(vectors[1]), adding: \(vectors[2]))"
+        return
+            "!hasUnorderedNaNs(multiplying: \(simd(vectors[0])), \(simd(vectors[1])), adding: \(simd(vectors[2])))"
     case (.negatedMultiplicand, 3):
-        return "!hasUnorderedNaNs(negating: \(vectors[0]), \(vectors[1]), adding: \(vectors[2]))"
+        return
+            "!hasUnorderedNaNs(negating: \(simd(vectors[0])), \(simd(vectors[1])), adding: \(simd(vectors[2])))"
     case (.negatedMultiplicand, 2):
-        return "!hasNaNs(negating: \(vectors.filter { $0 != "c" }.joined(separator: ", ")))"
+        return "!hasNaNs(negating: \(multiplicands))"
     case (.acrossLanes, 1):
-        return "!hasUnorderedNaNs(lanesOf: \(vectors[0]))"
+        return "!hasUnorderedNaNs(lanesOf: \(simd(vectors[0])))"
     case (.complexLanes, _):
-        return "!hasUnorderedNaNs(complexLanesOf: \(vectors.joined(separator: ", ")))"
+        return "!hasUnorderedNaNs(complexLanesOf: \(vectors.map(simd).joined(separator: ", ")))"
     case (.widenedPairs, _) where sources.count == 2:
         return "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]))"
     case (.widenedEven, _) where sources.count == 2 && accumulators.count == 1,
         (.widenedOdd, _) where sources.count == 2 && accumulators.count == 1:
         let parity = unorderedNaNs == .widenedEven ? 0 : 1
         return
-            "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]), parity: \(parity), adding: \(accumulators[0]))"
+            "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]), parity: \(parity), adding: \(simd(accumulators[0])))"
     case (.widenedAccumulating, _) where sources.count == 2 && accumulators.count == 2:
         return
-            "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]), accumulating: \(accumulators[0]), \(accumulators[1]))"
+            "!hasUnorderedNaNs(widening: \(sources[0]), \(sources[1]), accumulating: \(simd(accumulators[0])), \(simd(accumulators[1])))"
     default:
         return nil
     }
@@ -48363,7 +50248,7 @@ func codegenRebindingTest(
         ReferenceInput(
             parameter: .mask,
             name: "mask",
-            values: "Inputs.masks(\(source.namespace).Mask.self, \(seed))"
+            values: "Inputs.masks(\(source.vectorType).Mask.self, \(seed))"
         )
     ]
     let calls = codegenCalls(
@@ -48389,10 +50274,10 @@ func codegenRepeatingBlockTest(for element: Element) -> String {
     let vectors = ReferenceInput(
         parameter: .vector,
         name: "vector",
-        values: "Inputs.vectors(H.Vector.self, \(seed))"
+        values: "Inputs.vectors(H.self, \(seed))"
     )
     let lanes = repeatingBlockLanes(of: element).indices
-        .map { element.swiftLane(fromSimd: "\(simdVector("vector", of: element))[\($0)]") }
+        .map { element.swiftLane(fromSimd: "\(simdVector("vector"))[\($0)]") }
         .joined(separator: ", ")
     let referenceName = referenceFunctionName(repeatingBlockName, element)
     let function = codegenFunctionName("port", referenceName)
@@ -48428,10 +50313,10 @@ func codegenKernelInputs(
         let seed = "seed: \(referenceTestSeed(element, test, String(inputs.count)))"
         switch parameter.kind {
         case .vector:
-            let values = "Inputs.vectors(H.Vector.self, \(seed))"
+            let values = "Inputs.vectors(H.self, \(seed))"
             inputs.append(ReferenceInput(parameter: .vector, name: parameter.name, values: values))
         case .lane:
-            let values = "Inputs.lanes(H.Lane.self, \(seed))"
+            let values = "Inputs.lanes(Lane.self, \(seed))"
             inputs.append(ReferenceInput(parameter: .lane, name: parameter.name, values: values))
         case .pointer, .span, .byteSpan, .mutableSpan:
             let isBytes =
@@ -48440,7 +50325,7 @@ func codegenKernelInputs(
             let values =
                 isBytes
                 ? "Inputs.byteBuffers(count: \(codegenKernelLength), \(seed))"
-                : "Inputs.buffers(H.Lane.self, count: \(codegenKernelLength), \(seed))"
+                : "Inputs.buffers(Lane.self, count: \(codegenKernelLength), \(seed))"
             inputs.append(
                 ReferenceInput(parameter: .constLanePointer, name: parameter.name, values: values)
             )
@@ -48651,7 +50536,8 @@ func generateCodegenTests(_ element: Element) -> String {
 
     @Suite("\(element.namespace) codegen against Highway")
     struct \(element.namespace)CodegenTests {
-        typealias H = \(element.namespace)
+        typealias H = \(element.vectorType)
+        typealias Lane = \(element.swiftType)
     }
 
     """
@@ -48792,7 +50678,7 @@ func integerSplats(for element: Element) -> [ConstantValue] {
         [0, 1, 15, 16, 26, 127, 128, 255, 256, 257, 65280, 65281]
         + (signed ? [-1, -16, -17, -128, -129] : [])
     let fitting = candidates.filter { (lower...upper).contains($0) }
-    let extremes = [("Max", "H.Lane.max", upper), ("Min", "H.Lane.min", lower)]
+    let extremes = [("Max", "Lane.max", upper), ("Min", "Lane.min", lower)]
         .filter { _, _, value in signed || value == upper }
         .filter { _, _, value in !fitting.contains(value) }
     return integerConstants(fitting)
@@ -48814,7 +50700,7 @@ let floatSplats = [
     ConstantValue(name: "MinusInfinity", literal: "-.infinity"),
     ConstantValue(name: "NaN", literal: ".nan"),
     ConstantValue(name: "MinusNaN", literal: "-.nan"),
-    ConstantValue(name: "PayloadNaN", literal: "H.Lane(nan: 1, signaling: false)"),
+    ConstantValue(name: "PayloadNaN", literal: "Lane(nan: 1, signaling: false)"),
     ConstantValue(name: "SignalingNaN", literal: ".signalingNaN"),
     ConstantValue(name: "MinusSignalingNaN", literal: "-.signalingNaN"),
     ConstantValue(name: "LeastNonzero", literal: ".leastNonzeroMagnitude"),
@@ -48831,7 +50717,7 @@ let bfloatSplats = [
 ].map { name, bits in
     ConstantValue(
         name: name,
-        literal: "H.Lane(bitPattern: 0x\(String(format: "%04X", bits)))"
+        literal: "Lane(bitPattern: 0x\(String(format: "%04X", bits)))"
     )
 }
 
@@ -49203,17 +51089,17 @@ func isConstantVector(_ parameter: Parameter) -> Bool {
 }
 
 func constantNamespace(of operand: Element, for element: Element) -> String {
-    operand.suffix == element.suffix ? "H" : operand.namespace
+    operand.suffix == element.suffix ? "H" : operand.vectorType
 }
 
 func constantLane(of operand: Element, for element: Element) -> String {
-    "\(constantNamespace(of: operand, for: element)).Lane"
+    operand.suffix == element.suffix ? "Lane" : operand.swiftType
 }
 
 func constantType(
     of parameter: Parameter,
     for element: Element,
-    lane: String = "H.Lane"
+    lane: String = "Lane"
 )
     -> String
 {
@@ -49247,7 +51133,7 @@ func constantHelper(
     let blockLanes = (0..<operand.blockLaneCount).map { values[$0 % values.count] }
     let splat =
         op.parameters[index].isPointerIndices
-        ? portCall("repeating", [value], on: operand.namespace)
+        ? portCall("repeating", [value], on: operand.vectorType)
         : alternating
             ? portCall(repeatingBlockName, blockLanes)
             : portCall("repeating", [value], on: constantNamespace(of: operand, for: element))
@@ -49518,7 +51404,7 @@ func constantTests(of op: Op, for element: Element) -> [String] {
         let lane = constantLane(of: operand, for: element)
         let infix = position == 0 ? "" : operand.namespace
         for value in constantSplats(for: operand) {
-            let literal = value.literal.replacingOccurrences(of: "H.Lane", with: lane)
+            let literal = value.literal.replacingOccurrences(of: "Lane", with: lane)
             members.append(
                 constantTest(
                     "\(op.testIdentifier)Constant\(infix)Splat\(value.name)",
@@ -49632,7 +51518,8 @@ func generateConstantTests(_ element: Element) -> String {
 
     @Suite("\(element.namespace) constants against Highway")
     struct \(element.namespace)ConstantTests {
-        typealias H = \(element.namespace)
+        typealias H = \(element.vectorType)
+        typealias Lane = \(element.swiftType)
     }
 
     """
@@ -49799,6 +51686,14 @@ func entirelyGuardedCondition(of members: [SectionMember]) -> String? {
     return condition
 }
 
+func exposesVectorization(_ source: String) -> Bool {
+    source.range(of: #"public [^{]*\b(SIMD\w*|BFloat16)\b"#, options: .regularExpression) != nil
+}
+
+func usesCVectorizationOps(_ source: String) -> Bool {
+    source.contains("cvectorization_ops_")
+}
+
 func sectionFile(
     _ members: [SectionMember],
     imports: String,
@@ -49824,6 +51719,15 @@ func sectionFile(
     let outside = members.flatMap(\.outside)
     if !outside.isEmpty {
         output += "\n\(outside.joined(separator: "\n\n"))\n"
+    }
+    if !exposesVectorization(output) {
+        output = output.replacingOccurrences(
+            of: "public import Vectorization",
+            with: "import Vectorization"
+        )
+    }
+    if !usesCVectorizationOps(output) {
+        output = output.replacingOccurrences(of: "\(elementImports)\n", with: "")
     }
     return conditioned(
         output,
@@ -49998,15 +51902,16 @@ let generatedFunctions = headerFunctions(of: generatedHeader)
 try write(generatedHeader, to: headerPath)
 try write(generateReferenceHeader(), to: referenceHeaderPath)
 try write(
-    generateReferenceConformances(of: classicElements, importing: "import Vectorization"),
+    generateReferenceConformances(of: classicElements),
     to: "\(generatedReferenceSupportRoot)/ReferenceConformances.swift"
 )
 try write(
-    generateReferenceConformances(
-        of: halfPrecisionElements,
-        importing: "package import Vectorization"
-    ),
+    generateReferenceConformances(of: halfPrecisionElements),
     to: "\(generatedReferenceSupportRoot)/HalfPrecisionConformances.swift"
+)
+try write(
+    generateLinkWrappers(),
+    to: "\(generatedReferenceSupportRoot)/GenericLinks.swift"
 )
 try write(
     generateReferenceTargetTests(),
@@ -50014,6 +51919,28 @@ try write(
 )
 try write(generateCodegenTarget(), to: "\(generatedCodegenRoot)/HighwayTargetCodegen.swift")
 try write(generateProtocols(), to: "\(generatedSwiftRoot)/SIMDElement.swift")
+try write(generateSIMD(), to: "\(generatedSwiftRoot)/SIMD.swift")
+for elementProtocol in elementProtocols {
+    try writeSections(
+        generateGenericMembers(of: elementProtocol),
+        named: "SIMD+Generic\(elementProtocol.name.dropFirst("SIMD".count))",
+        in: generatedSwiftRoot,
+        imports: "",
+        extending: elementProtocol.parents.isEmpty
+            ? "SIMD" : "SIMD where Lane: \(elementProtocol.name)",
+        balancing: true
+    )
+}
+for group in linkGroups() {
+    try writeSections(
+        group.members,
+        named: "SIMD+Generic\(group.fileName)",
+        in: generatedSwiftRoot,
+        imports: "",
+        extending: group.extending,
+        balancing: true
+    )
+}
 try write(generateCacheControl(), to: "\(generatedSwiftRoot)/SIMDTarget+CacheControl.swift")
 try write(
     generateTargetCapabilities(),
@@ -50026,17 +51953,32 @@ try write(
 try write(generateTargetSet(), to: "\(generatedSwiftRoot)/SIMDTargetSet.swift")
 try write(generateSupportedTargetsSource(), to: supportedTargetsSourcePath)
 for element in elements {
-    let swiftDirectory = "\(generatedSwiftRoot)/\(element.namespace)"
+    let swiftDirectory = "\(generatedSwiftRoot)/\(element.swiftType)"
+    let witnessesName = "\(element.swiftType)+SIMDElement"
+    try write(
+        conditioned(generateElementConformance(element), for: element),
+        to: "\(swiftDirectory)/\(witnessesName).swift"
+    )
+    try writeSections(
+        generateElementWitnesses(element),
+        named: witnessesName,
+        in: swiftDirectory,
+        imports: elementImports,
+        extending: element.swiftType,
+        for: element,
+        balancing: true
+    )
+    let membersName = "SIMD+\(element.swiftType)"
     try write(
         conditioned(generateElement(element), for: element),
-        to: "\(swiftDirectory)/\(element.namespace).swift"
+        to: "\(swiftDirectory)/\(membersName).swift"
     )
     try writeSections(
         generateElementMembers(element),
-        named: element.namespace,
+        named: membersName,
         in: swiftDirectory,
         imports: elementImports,
-        extending: element.namespace,
+        extending: "SIMD where Lane == \(element.swiftType)",
         for: element,
         balancing: true
     )
@@ -50083,6 +52025,22 @@ for element in elements {
         extending: constantTestsName,
         for: element,
         testing: true
+    )
+
+    let linkTestsName = "\(element.namespace)LinkTests"
+    try write(
+        conditioned(generateLinkTests(element), for: element),
+        to: "\(testsDirectory)/\(linkTestsName).swift"
+    )
+    try writeSections(
+        linkTestMembers(for: element),
+        named: linkTestsName,
+        in: testsDirectory,
+        imports: referenceTestImports,
+        extending: linkTestsName,
+        for: element,
+        testing: true,
+        balancing: true
     )
 
     let codegenDirectory = "\(generatedCodegenRoot)/\(element.namespace)"

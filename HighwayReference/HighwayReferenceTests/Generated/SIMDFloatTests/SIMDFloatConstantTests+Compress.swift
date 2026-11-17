@@ -7,18 +7,22 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkCompressedConstantA(_ value: H.Lane) {
+    private func checkCompressedConstantA(_ value: Lane) {
         let mismatches = Mismatches("compressed with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x93AC_BBB0_E58E_D825)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for mask in maskInputs {
             let port = H.compressed(H.repeating(value), where: mask)
-            let reference = HighwayReference.compressedF32(H.repeating(value), mask.raw)
+            let reference = H(raw: HighwayReference.compressedF32(H.repeating(value).raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF32() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
-                (0..<checkedLanes).map { port[$0] },
-                (0..<checkedLanes).map { reference[$0] },
+                (0..<checkedLanes).map { port.simd[$0] },
+                (0..<checkedLanes).map { reference.simd[$0] },
                 "mask: \(describe(mask))"
             )
         }
@@ -82,7 +86,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func compressedConstantSplatPayloadNaN() {
-        checkCompressedConstantA(H.Lane(nan: 1, signaling: false))
+        checkCompressedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func compressedConstantSplatSignalingNaN() {
@@ -102,19 +106,25 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkCompressedNotConstantA(_ value: H.Lane) {
+    private func checkCompressedNotConstantA(_ value: Lane) {
         let mismatches = Mismatches("compressedNot with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x60F2_1845_F61D_0782)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for mask in maskInputs {
             let port = H.compressedNot(H.repeating(value), where: mask)
-            let reference = HighwayReference.compressedNotF32(H.repeating(value), mask.raw)
+            let reference = H(
+                raw: HighwayReference.compressedNotF32(H.repeating(value).raw, mask.raw)
+            )
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicF32()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
             mismatches.check(
-                (0..<checkedLanes).map { port[$0] },
-                (0..<checkedLanes).map { reference[$0] },
+                (0..<checkedLanes).map { port.simd[$0] },
+                (0..<checkedLanes).map { reference.simd[$0] },
                 "mask: \(describe(mask))"
             )
         }
@@ -178,7 +188,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func compressedNotConstantSplatPayloadNaN() {
-        checkCompressedNotConstantA(H.Lane(nan: 1, signaling: false))
+        checkCompressedNotConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func compressedNotConstantSplatSignalingNaN() {
@@ -198,14 +208,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkPartitionedConstantA(_ value: H.Lane) {
+    private func checkPartitionedConstantA(_ value: Lane) {
         let mismatches = Mismatches("partitioned with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2F52_5D36_451B_99A5)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.partitioned(H.repeating(value), where: mask),
-                HighwayReference.partitionedF32(H.repeating(value), mask.raw),
+                H(raw: HighwayReference.partitionedF32(H.repeating(value).raw, mask.raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -269,7 +283,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func partitionedConstantSplatPayloadNaN() {
-        checkPartitionedConstantA(H.Lane(nan: 1, signaling: false))
+        checkPartitionedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func partitionedConstantSplatSignalingNaN() {
@@ -289,11 +303,15 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreCompressedConstantA(_ value: H.Lane) {
+    private func checkStoreCompressedConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeCompressed with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4170_7009_2A64_849C)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for mask in maskInputs {
             var portLanes = sentinel
             let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
@@ -306,7 +324,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -374,7 +392,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func storeCompressedConstantSplatPayloadNaN() {
-        checkStoreCompressedConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreCompressedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeCompressedConstantSplatSignalingNaN() {
@@ -394,11 +412,15 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreCompressedBlendedConstantA(_ value: H.Lane) {
+    private func checkStoreCompressedBlendedConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeCompressedBlended with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA335_0159_A4B1_E850)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for mask in maskInputs {
             var portLanes = sentinel
             let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
@@ -411,7 +433,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             let referenceResult = referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.storeCompressedBlendedF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!
                 )
@@ -479,7 +501,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func storeCompressedBlendedConstantSplatPayloadNaN() {
-        checkStoreCompressedBlendedConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreCompressedBlendedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeCompressedBlendedConstantSplatSignalingNaN() {
@@ -499,22 +521,28 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkCompressedBitsConstantA(_ value: H.Lane) {
+    private func checkCompressedBitsConstantA(_ value: Lane) {
         let mismatches = Mismatches("compressedBits with a repeating \(hex(value))")
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
             seed: 0xFB88_FE3C_BD4B_DB65
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for bits in bitsInputs {
             let (portResult, referenceResult) = bits.withUnsafeBufferPointer { source in
                 (
                     unsafe H.compressed(H.repeating(value), bits: source.baseAddress!),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe HighwayReference.compressedBitsF32(
-                            H.repeating(value),
-                            source.baseAddress!
+                        unsafe H(
+                            raw: HighwayReference.compressedBitsF32(
+                                H.repeating(value).raw,
+                                source.baseAddress!
+                            )
                         )
                     }
                 )
@@ -525,8 +553,8 @@ extension SIMDFloatConstantTests {
                 tailIsDeterministic: HighwayReference.compressTailIsDeterministicF32()
             )
             mismatches.check(
-                (0..<checkedLanes).map { portResult[$0] },
-                (0..<checkedLanes).map { referenceResult[$0] },
+                (0..<checkedLanes).map { portResult.simd[$0] },
+                (0..<checkedLanes).map { referenceResult.simd[$0] },
                 "bits: \(describe(bits))"
             )
         }
@@ -590,7 +618,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func compressedBitsConstantSplatPayloadNaN() {
-        checkCompressedBitsConstantA(H.Lane(nan: 1, signaling: false))
+        checkCompressedBitsConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func compressedBitsConstantSplatSignalingNaN() {
@@ -610,15 +638,19 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreCompressedBitsConstantA(_ value: H.Lane) {
+    private func checkStoreCompressedBitsConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeCompressedBits with a repeating \(hex(value))")
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
             seed: 0x0F17_6E74_2969_C770
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for bits in bitsInputs {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -634,7 +666,7 @@ extension SIMDFloatConstantTests {
                     referenceLanes.withUnsafeMutableBufferPointer { destination in
                         (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
                             unsafe HighwayReference.storeCompressedBitsF32(
-                                H.repeating(value),
+                                H.repeating(value).raw,
                                 source.baseAddress!,
                                 destination.baseAddress!
                             )
@@ -705,7 +737,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func storeCompressedBitsConstantSplatPayloadNaN() {
-        checkStoreCompressedBitsConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreCompressedBitsConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeCompressedBitsConstantSplatSignalingNaN() {

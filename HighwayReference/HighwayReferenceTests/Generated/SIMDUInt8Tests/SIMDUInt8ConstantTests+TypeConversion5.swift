@@ -7,20 +7,20 @@ import Vectorization
 
 extension SIMDUInt8ConstantTests {
     @inline(__always)
-    private func checkHalfVectorZeroExtendingResizingFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkHalfVectorZeroExtendingResizingFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches(
             "halfVectorZeroExtendingResizingFromFloat with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
+            H.halfVector(zeroExtendingResizing: SIMD<Float>.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF32ToU8(
-                    SIMDFloat.repeating(value)
+                    SIMD<Float>.repeating(value).raw
                 )
             ),
             ""
@@ -85,9 +85,7 @@ extension SIMDUInt8ConstantTests {
     }
 
     @Test func halfVectorZeroExtendingResizingFromFloatConstantSplatPayloadNaN() {
-        checkHalfVectorZeroExtendingResizingFromFloatConstantA(
-            SIMDFloat.Lane(nan: 1, signaling: false)
-        )
+        checkHalfVectorZeroExtendingResizingFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func halfVectorZeroExtendingResizingFromFloatConstantSplatSignalingNaN() {
@@ -107,21 +105,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkQuarterVectorZeroExtendingResizingFromFloatConstantA(_ value: SIMDFloat.Lane)
-    {
+    private func checkQuarterVectorZeroExtendingResizingFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches(
             "quarterVectorZeroExtendingResizingFromFloat with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.quarterVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
+            H.quarterVector(zeroExtendingResizing: SIMD<Float>.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF32ToU8(
-                    SIMDFloat.repeating(value)
+                    SIMD<Float>.repeating(value).raw
                 )
             ),
             ""
@@ -186,9 +183,7 @@ extension SIMDUInt8ConstantTests {
     }
 
     @Test func quarterVectorZeroExtendingResizingFromFloatConstantSplatPayloadNaN() {
-        checkQuarterVectorZeroExtendingResizingFromFloatConstantA(
-            SIMDFloat.Lane(nan: 1, signaling: false)
-        )
+        checkQuarterVectorZeroExtendingResizingFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func quarterVectorZeroExtendingResizingFromFloatConstantSplatSignalingNaN() {
@@ -208,20 +203,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkEighthVectorZeroExtendingResizingFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkEighthVectorZeroExtendingResizingFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches(
             "eighthVectorZeroExtendingResizingFromFloat with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.eighthVector(zeroExtendingResizing: SIMDFloat.repeating(value)),
+            H.eighthVector(zeroExtendingResizing: SIMD<Float>.repeating(value)),
             H.EighthVector(
                 raw: HighwayReference.eighthVectorZeroExtendingResizingF32ToU8(
-                    SIMDFloat.repeating(value)
+                    SIMD<Float>.repeating(value).raw
                 )
             ),
             ""
@@ -286,9 +281,7 @@ extension SIMDUInt8ConstantTests {
     }
 
     @Test func eighthVectorZeroExtendingResizingFromFloatConstantSplatPayloadNaN() {
-        checkEighthVectorZeroExtendingResizingFromFloatConstantA(
-            SIMDFloat.Lane(nan: 1, signaling: false)
-        )
+        checkEighthVectorZeroExtendingResizingFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func eighthVectorZeroExtendingResizingFromFloatConstantSplatSignalingNaN() {
@@ -308,20 +301,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorZeroExtendingResizingFromDoubleConstantA(_ value: SIMDDouble.Lane) {
+    private func checkVectorZeroExtendingResizingFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches(
             "vectorZeroExtendingResizingFromDouble with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(zeroExtendingResizing: SIMDDouble.repeating(value)),
-            H.Vector(
+            H.vector(zeroExtendingResizing: SIMD<Double>.repeating(value)),
+            H(
                 raw: HighwayReference.vectorZeroExtendingResizingF64ToU8(
-                    SIMDDouble.repeating(value)
+                    SIMD<Double>.repeating(value).raw
                 )
             ),
             ""
@@ -386,9 +379,7 @@ extension SIMDUInt8ConstantTests {
     }
 
     @Test func vectorZeroExtendingResizingFromDoubleConstantSplatPayloadNaN() {
-        checkVectorZeroExtendingResizingFromDoubleConstantA(
-            SIMDDouble.Lane(nan: 1, signaling: false)
-        )
+        checkVectorZeroExtendingResizingFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func vectorZeroExtendingResizingFromDoubleConstantSplatSignalingNaN() {
@@ -408,20 +399,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkHalfVectorZeroExtendingResizingFromDoubleConstantA(_ value: SIMDDouble.Lane) {
+    private func checkHalfVectorZeroExtendingResizingFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches(
             "halfVectorZeroExtendingResizingFromDouble with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
+            H.halfVector(zeroExtendingResizing: SIMD<Double>.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF64ToU8(
-                    SIMDDouble.repeating(value)
+                    SIMD<Double>.repeating(value).raw
                 )
             ),
             ""
@@ -486,9 +477,7 @@ extension SIMDUInt8ConstantTests {
     }
 
     @Test func halfVectorZeroExtendingResizingFromDoubleConstantSplatPayloadNaN() {
-        checkHalfVectorZeroExtendingResizingFromDoubleConstantA(
-            SIMDDouble.Lane(nan: 1, signaling: false)
-        )
+        checkHalfVectorZeroExtendingResizingFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func halfVectorZeroExtendingResizingFromDoubleConstantSplatSignalingNaN() {
@@ -508,22 +497,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkQuarterVectorZeroExtendingResizingFromDoubleConstantA(
-        _ value: SIMDDouble.Lane
-    ) {
+    private func checkQuarterVectorZeroExtendingResizingFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches(
             "quarterVectorZeroExtendingResizingFromDouble with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.quarterVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
+            H.quarterVector(zeroExtendingResizing: SIMD<Double>.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF64ToU8(
-                    SIMDDouble.repeating(value)
+                    SIMD<Double>.repeating(value).raw
                 )
             ),
             ""
@@ -588,9 +575,7 @@ extension SIMDUInt8ConstantTests {
     }
 
     @Test func quarterVectorZeroExtendingResizingFromDoubleConstantSplatPayloadNaN() {
-        checkQuarterVectorZeroExtendingResizingFromDoubleConstantA(
-            SIMDDouble.Lane(nan: 1, signaling: false)
-        )
+        checkQuarterVectorZeroExtendingResizingFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func quarterVectorZeroExtendingResizingFromDoubleConstantSplatSignalingNaN() {
@@ -610,21 +595,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkEighthVectorZeroExtendingResizingFromDoubleConstantA(_ value: SIMDDouble.Lane)
-    {
+    private func checkEighthVectorZeroExtendingResizingFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches(
             "eighthVectorZeroExtendingResizingFromDouble with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.eighthVector(zeroExtendingResizing: SIMDDouble.repeating(value)),
+            H.eighthVector(zeroExtendingResizing: SIMD<Double>.repeating(value)),
             H.EighthVector(
                 raw: HighwayReference.eighthVectorZeroExtendingResizingF64ToU8(
-                    SIMDDouble.repeating(value)
+                    SIMD<Double>.repeating(value).raw
                 )
             ),
             ""
@@ -689,9 +673,7 @@ extension SIMDUInt8ConstantTests {
     }
 
     @Test func eighthVectorZeroExtendingResizingFromDoubleConstantSplatPayloadNaN() {
-        checkEighthVectorZeroExtendingResizingFromDoubleConstantA(
-            SIMDDouble.Lane(nan: 1, signaling: false)
-        )
+        checkEighthVectorZeroExtendingResizingFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func eighthVectorZeroExtendingResizingFromDoubleConstantSplatSignalingNaN() {
@@ -712,20 +694,20 @@ extension SIMDUInt8ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkVectorZeroExtendingResizingFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkVectorZeroExtendingResizingFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches(
             "vectorZeroExtendingResizingFromFloat16 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
-            H.Vector(
+            H.vector(zeroExtendingResizing: SIMD<Float16>.repeating(value)),
+            H(
                 raw: HighwayReference.vectorZeroExtendingResizingF16ToU8(
-                    SIMDFloat16.repeating(value)
+                    SIMD<Float16>.repeating(value).raw
                 )
             ),
             ""
@@ -820,9 +802,7 @@ extension SIMDUInt8ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorZeroExtendingResizingFromFloat16ConstantSplatPayloadNaN() {
-        checkVectorZeroExtendingResizingFromFloat16ConstantA(
-            SIMDFloat16.Lane(nan: 1, signaling: false)
-        )
+        checkVectorZeroExtendingResizingFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -852,21 +832,20 @@ extension SIMDUInt8ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(_ value: SIMDFloat16.Lane)
-    {
+    private func checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches(
             "halfVectorZeroExtendingResizingFromFloat16 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
+            H.halfVector(zeroExtendingResizing: SIMD<Float16>.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorZeroExtendingResizingF16ToU8(
-                    SIMDFloat16.repeating(value)
+                    SIMD<Float16>.repeating(value).raw
                 )
             ),
             ""
@@ -961,9 +940,7 @@ extension SIMDUInt8ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func halfVectorZeroExtendingResizingFromFloat16ConstantSplatPayloadNaN() {
-        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(
-            SIMDFloat16.Lane(nan: 1, signaling: false)
-        )
+        checkHalfVectorZeroExtendingResizingFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -993,22 +970,20 @@ extension SIMDUInt8ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkQuarterVectorZeroExtendingResizingFromFloat16ConstantA(
-        _ value: SIMDFloat16.Lane
-    ) {
+    private func checkQuarterVectorZeroExtendingResizingFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches(
             "quarterVectorZeroExtendingResizingFromFloat16 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.quarterVector(zeroExtendingResizing: SIMDFloat16.repeating(value)),
+            H.quarterVector(zeroExtendingResizing: SIMD<Float16>.repeating(value)),
             H.QuarterVector(
                 raw: HighwayReference.quarterVectorZeroExtendingResizingF16ToU8(
-                    SIMDFloat16.repeating(value)
+                    SIMD<Float16>.repeating(value).raw
                 )
             ),
             ""
@@ -1104,7 +1079,7 @@ extension SIMDUInt8ConstantTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func quarterVectorZeroExtendingResizingFromFloat16ConstantSplatPayloadNaN() {
         checkQuarterVectorZeroExtendingResizingFromFloat16ConstantA(
-            SIMDFloat16.Lane(nan: 1, signaling: false)
+            Float16(nan: 1, signaling: false)
         )
     }
     #endif

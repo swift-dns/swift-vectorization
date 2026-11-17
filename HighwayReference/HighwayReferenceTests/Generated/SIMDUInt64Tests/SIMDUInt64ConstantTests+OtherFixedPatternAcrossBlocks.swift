@@ -9,11 +9,11 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkBroadcastingLaneConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingLane with lane \(lane)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4035_005B_6BDD_8CEF)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4035_005B_6BDD_8CEF)
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneU64(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -60,11 +60,11 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkBroadcastingLaneUncheckedConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingLane unchecked with lane \(lane)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0702_8B37_4171_F04F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0702_8B37_4171_F04F)
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, laneUnchecked: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneU64(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -109,18 +109,18 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBroadcastingLaneConstantA(_ value: H.Lane) {
+    private func checkBroadcastingLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("broadcastingLane with a repeating \(hex(value))")
         let laneInputs = Array(0...H.laneCount - 1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for lane in laneInputs {
             mismatches.check(
                 H.broadcasting(H.repeating(value), lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneU64(
                         H.repeating(value).raw,
                         Int32(truncatingIfNeeded: lane)
@@ -181,17 +181,17 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func broadcastingLaneConstantSplatMax() {
-        checkBroadcastingLaneConstantA(H.Lane.max)
+        checkBroadcastingLaneConstantA(Lane.max)
     }
 
     @inline(__always)
     private func checkBroadcastingBlockConstantBlock(_ block: Int) {
         let mismatches = Mismatches("broadcastingBlock with block \(block)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA8E6_82F6_1858_3B89)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA8E6_82F6_1858_3B89)
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockU64(
                         a.raw,
                         Int32(truncatingIfNeeded: block)
@@ -222,11 +222,11 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkBroadcastingBlockUncheckedConstantBlock(_ block: Int) {
         let mismatches = Mismatches("broadcastingBlock unchecked with block \(block)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB8E7_05AB_EBAA_33BB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB8E7_05AB_EBAA_33BB)
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockU64(
                         a.raw,
                         Int32(truncatingIfNeeded: block)

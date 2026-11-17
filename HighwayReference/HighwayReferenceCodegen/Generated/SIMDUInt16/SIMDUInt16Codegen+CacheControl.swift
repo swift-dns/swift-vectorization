@@ -6,7 +6,7 @@ public import Vectorization
 extension HighwayReferenceUInt16 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         precondition(
             span.withUnsafeBufferPointer {
@@ -19,7 +19,7 @@ extension HighwayReferenceUInt16 {
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         assert(
             span.withUnsafeBufferPointer {
@@ -38,25 +38,24 @@ extension HighwayReferenceUInt16 {
 }
 
 @inline(never)
-public func portStoreStreamingU16(_ a: SIMDUInt16.Vector, to: UnsafeMutablePointer<SIMDUInt16.Lane>)
-{
-    unsafe SIMDUInt16.storeStreaming(a, to: to)
+public func portStoreStreamingU16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
+    unsafe SIMD<UInt16>.storeStreaming(a, to: to)
 }
 
 @inline(never)
-public func highwayStoreStreamingU16(_ a: SIMDUInt16.Vector, to: UnsafeMutablePointer<UInt16>) {
+public func highwayStoreStreamingU16(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
     unsafe HighwayReference.Nothrow.storeStreamingU16(a.raw, to)
 }
 
 @inline(never)
-public func portStoreStreamingU16ConstantA(to: UnsafeMutablePointer<SIMDUInt16.Lane>) {
-    unsafe SIMDUInt16.storeStreaming(SIMDUInt16.repeating(26), to: to)
+public func portStoreStreamingU16ConstantA(to: UnsafeMutablePointer<UInt16>) {
+    unsafe SIMD<UInt16>.storeStreaming(SIMD<UInt16>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreStreamingU16ConstantA(to: UnsafeMutablePointer<UInt16>) {
     unsafe HighwayReference.Nothrow.storeStreamingU16(
-        SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+        SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
         to
     )
 }

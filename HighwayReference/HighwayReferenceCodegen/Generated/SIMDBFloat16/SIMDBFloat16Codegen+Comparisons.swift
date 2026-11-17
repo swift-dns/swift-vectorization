@@ -4,25 +4,25 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portIsNegativeBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.isNegative(a)
+public func portIsNegativeBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.isNegative(a)
 }
 
 @inline(never)
-public func highwayIsNegativeBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.Mask(raw: HighwayReference.Nothrow.isNegativeBF16(a.raw))
+public func highwayIsNegativeBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.Mask(raw: HighwayReference.Nothrow.isNegativeBF16(a.raw))
 }
 
 @inline(never)
-public func portIsNegativeBF16ConstantA() -> SIMDBFloat16.Mask {
-    SIMDBFloat16.isNegative(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portIsNegativeBF16ConstantA() -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.isNegative(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayIsNegativeBF16ConstantA() -> SIMDBFloat16.Mask {
-    SIMDBFloat16.Mask(
+public func highwayIsNegativeBF16ConstantA() -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.Mask(
         raw: HighwayReference.Nothrow.isNegativeBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )

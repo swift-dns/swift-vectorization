@@ -58,7 +58,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func maskFromVector() {
         let mismatches = Mismatches("portMaskFromVectorF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB2CD_76AF_85D0_437D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB2CD_76AF_85D0_437D)
         for a in aInputs {
             mismatches.check(
                 portMaskFromVectorF32(from: a),
@@ -101,7 +101,7 @@ extension SIMDFloatCodegenTests {
     @Test func repeatingBlockMask() {
         let mismatches = Mismatches("portRepeatingBlockMaskF32")
         let bitsInputs = Inputs.maskBits(
-            lanes: 16 / MemoryLayout<H.Lane>.size,
+            lanes: 16 / MemoryLayout<Lane>.size,
             seed: 0x4559_C2EE_AFDE_BFEC
         )
         for bits in bitsInputs {

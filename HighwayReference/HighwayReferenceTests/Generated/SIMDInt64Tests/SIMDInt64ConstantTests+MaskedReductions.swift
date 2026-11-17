@@ -7,12 +7,12 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkSmallestWhereConstantA(_ value: H.Lane) {
+    private func checkSmallestWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("smallestWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA115_4249_1C18_C7C1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for mask in maskInputs {
@@ -94,20 +94,20 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func smallestWhereConstantSplatMax() {
-        checkSmallestWhereConstantA(H.Lane.max)
+        checkSmallestWhereConstantA(Lane.max)
     }
 
     @Test func smallestWhereConstantSplatMin() {
-        checkSmallestWhereConstantA(H.Lane.min)
+        checkSmallestWhereConstantA(Lane.min)
     }
 
     @inline(__always)
-    private func checkLargestWhereConstantA(_ value: H.Lane) {
+    private func checkLargestWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("largestWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9BE7_84AB_C3EE_1E16)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for mask in maskInputs {
@@ -189,10 +189,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func largestWhereConstantSplatMax() {
-        checkLargestWhereConstantA(H.Lane.max)
+        checkLargestWhereConstantA(Lane.max)
     }
 
     @Test func largestWhereConstantSplatMin() {
-        checkLargestWhereConstantA(H.Lane.min)
+        checkLargestWhereConstantA(Lane.min)
     }
 }

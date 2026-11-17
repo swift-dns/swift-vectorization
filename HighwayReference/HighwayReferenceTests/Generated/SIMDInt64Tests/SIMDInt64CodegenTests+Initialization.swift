@@ -15,7 +15,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func repeating() {
         let mismatches = Mismatches("portRepeatingI64")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xBB90_FDAC_317D_36DB)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xBB90_FDAC_317D_36DB)
         for value in valueInputs {
             mismatches.check(
                 portRepeatingI64(value),
@@ -34,7 +34,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func iota() {
         let mismatches = Mismatches("portIotaI64")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x89EA_82CC_1B71_3973)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x89EA_82CC_1B71_3973)
         for value in valueInputs {
             mismatches.check(portIotaI64(value), highwayIotaI64(value), "value: \(hex(value))")
         }
@@ -63,7 +63,7 @@ extension SIMDInt64CodegenTests {
     @Test func repeatingWhere() {
         let mismatches = Mismatches("portRepeatingWhereI64")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF465_9EF0_8C7E_ACD8)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xF465_9FF0_8C7E_AE8B)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xF465_9FF0_8C7E_AE8B)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 portRepeatingWhereI64(value, where: mask),
@@ -89,9 +89,9 @@ extension SIMDInt64CodegenTests {
 
     @Test func repeatingWhereOtherwise() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseI64")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8DC4_C0E3_3161_576C)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8DC4_C0E3_3161_576C)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8DC4_C1E3_3161_591F)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x8DC4_C2E3_3161_5AD2)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x8DC4_C2E3_3161_5AD2)
         for (otherwise, mask, value) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -109,7 +109,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func repeatingWhereOtherwiseConstantValue() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseI64ConstantValue")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x7473_F634_F27E_CBCB)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7473_F634_F27E_CBCB)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7473_F534_F27E_CA18)
         for (otherwise, mask) in everyPair(otherwiseInputs, maskInputs) {
             mismatches.check(
@@ -124,7 +124,7 @@ extension SIMDInt64CodegenTests {
     @Test func repeatingWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseI64ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4CDA_3C51_8977_A28F)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x4CDA_3D51_8977_A442)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x4CDA_3D51_8977_A442)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 portRepeatingWhereOtherwiseI64ConstantOtherwise(value, where: mask),
@@ -137,7 +137,7 @@ extension SIMDInt64CodegenTests {
 
     @Test func repeatingBlock() {
         let mismatches = Mismatches("portRepeatingBlockI64")
-        let vectorInputs = Inputs.vectors(H.Vector.self, seed: 0xBDAC_3AA9_819A_94DA)
+        let vectorInputs = Inputs.vectors(H.self, seed: 0xBDAC_3AA9_819A_94DA)
         for vector in vectorInputs {
             mismatches.check(
                 portRepeatingBlockI64(vector.simd[0], vector.simd[1]),

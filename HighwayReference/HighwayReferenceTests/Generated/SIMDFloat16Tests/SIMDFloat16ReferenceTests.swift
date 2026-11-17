@@ -8,7 +8,8 @@ import Vectorization
 
 @Suite("SIMDFloat16 against Highway")
 struct SIMDFloat16ReferenceTests {
-    typealias H = SIMDFloat16
+    typealias H = SIMD<Float16>
+    typealias Lane = Float16
 
     @Test func laneCount() {
         let mismatches = Mismatches("laneCount")

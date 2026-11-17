@@ -9,8 +9,8 @@ extension SIMDInt32ConstantTests {
     @inline(__always)
     private func checkStoreFirstConstantCount(_ count: Int) {
         let mismatches = Mismatches("storeFirst with count \(count)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0874_6FDF_6CA4_3531)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0874_6FDF_6CA4_3531)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -128,8 +128,8 @@ extension SIMDInt32ConstantTests {
     @inline(__always)
     private func checkStoreFirstConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("storeFirst with count \(count) before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD41E_9B60_4EC6_760E)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD41E_9B60_4EC6_760E)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe H.storeFirst(a, to: destination, count: count)

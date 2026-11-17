@@ -4,116 +4,115 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portShiftedLeftBytesI32ConstantA() -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shiftedLeftBytes(SIMDInt32.repeating(26), byUnchecked: 1)
+public func portShiftedLeftBytesI32ConstantA() -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shiftedLeftBytes(SIMD<Int32>.repeating(26), byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedLeftBytesI32ConstantA() -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayShiftedLeftBytesI32ConstantA() -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.shiftedLeftBytesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1
         )
     )
 }
 
 @inline(never)
-public func portShiftedLeftBytesI32ConstantBytes(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shiftedLeftBytes(a, byUnchecked: 1)
+public func portShiftedLeftBytesI32ConstantBytes(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shiftedLeftBytes(a, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedLeftBytesI32ConstantBytes(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedLeftBytesI32(a.raw, 1))
+public func highwayShiftedLeftBytesI32ConstantBytes(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.shiftedLeftBytesI32(a.raw, 1))
 }
 
 @inline(never)
-public func portShiftedRightBytesI32ConstantA() -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shiftedRightBytes(SIMDInt32.repeating(26), byUnchecked: 1)
+public func portShiftedRightBytesI32ConstantA() -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shiftedRightBytes(SIMD<Int32>.repeating(26), byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedRightBytesI32ConstantA() -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayShiftedRightBytesI32ConstantA() -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.shiftedRightBytesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1
         )
     )
 }
 
 @inline(never)
-public func portShiftedRightBytesI32ConstantBytes(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shiftedRightBytes(a, byUnchecked: 1)
+public func portShiftedRightBytesI32ConstantBytes(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shiftedRightBytes(a, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedRightBytesI32ConstantBytes(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedRightBytesI32(a.raw, 1))
+public func highwayShiftedRightBytesI32ConstantBytes(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.shiftedRightBytesI32(a.raw, 1))
 }
 
 @inline(never)
-public func portShiftedLeftLanesI32ConstantA() -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shiftedLeftLanes(SIMDInt32.repeating(26), byUnchecked: 1)
+public func portShiftedLeftLanesI32ConstantA() -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shiftedLeftLanes(SIMD<Int32>.repeating(26), byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedLeftLanesI32ConstantA() -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayShiftedLeftLanesI32ConstantA() -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.shiftedLeftLanesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1
         )
     )
 }
 
 @inline(never)
-public func portShiftedLeftLanesI32ConstantLanes(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shiftedLeftLanes(a, byUnchecked: 1)
+public func portShiftedLeftLanesI32ConstantLanes(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shiftedLeftLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedLeftLanesI32ConstantLanes(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedLeftLanesI32(a.raw, 1))
+public func highwayShiftedLeftLanesI32ConstantLanes(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.shiftedLeftLanesI32(a.raw, 1))
 }
 
 @inline(never)
-public func portShiftedRightLanesI32ConstantA() -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shiftedRightLanes(SIMDInt32.repeating(26), byUnchecked: 1)
+public func portShiftedRightLanesI32ConstantA() -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shiftedRightLanes(SIMD<Int32>.repeating(26), byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedRightLanesI32ConstantA() -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayShiftedRightLanesI32ConstantA() -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.shiftedRightLanesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1
         )
     )
 }
 
 @inline(never)
-public func portShiftedRightLanesI32ConstantLanes(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shiftedRightLanes(a, byUnchecked: 1)
+public func portShiftedRightLanesI32ConstantLanes(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shiftedRightLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedRightLanesI32ConstantLanes(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.shiftedRightLanesI32(a.raw, 1))
+public func highwayShiftedRightLanesI32ConstantLanes(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.shiftedRightLanesI32(a.raw, 1))
 }
 
 @inline(never)
-public func portCombinedShiftedRightBytesI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.combinedShiftedRightBytes(SIMDInt32.repeating(26), b, byUnchecked: 1)
+public func portCombinedShiftedRightBytesI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.combinedShiftedRightBytes(SIMD<Int32>.repeating(26), b, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayCombinedShiftedRightBytesI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
-    SIMDInt32.Vector(
+public func highwayCombinedShiftedRightBytesI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.combinedShiftedRightBytesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             1
         )
@@ -121,17 +120,16 @@ public func highwayCombinedShiftedRightBytesI32ConstantA(_ b: SIMDInt32.Vector) 
 }
 
 @inline(never)
-public func portCombinedShiftedRightBytesI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.combinedShiftedRightBytes(a, SIMDInt32.repeating(26), byUnchecked: 1)
+public func portCombinedShiftedRightBytesI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.combinedShiftedRightBytes(a, SIMD<Int32>.repeating(26), byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayCombinedShiftedRightBytesI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
-    SIMDInt32.Vector(
+public func highwayCombinedShiftedRightBytesI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.combinedShiftedRightBytesI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1
         )
     )
@@ -139,31 +137,30 @@ public func highwayCombinedShiftedRightBytesI32ConstantB(_ a: SIMDInt32.Vector) 
 
 @inline(never)
 public func portCombinedShiftedRightBytesI32ConstantBytes(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.combinedShiftedRightBytes(a, b, byUnchecked: 1)
+    _ a: SIMD<Int32>,
+    _ b: SIMD<Int32>
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.combinedShiftedRightBytes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedShiftedRightBytesI32ConstantBytes(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.combinedShiftedRightBytesI32(a.raw, b.raw, 1))
+    _ a: SIMD<Int32>,
+    _ b: SIMD<Int32>
+) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.combinedShiftedRightBytesI32(a.raw, b.raw, 1))
 }
 
 @inline(never)
-public func portCombinedShiftedRightLanesI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.combinedShiftedRightLanes(SIMDInt32.repeating(26), b, byUnchecked: 1)
+public func portCombinedShiftedRightLanesI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.combinedShiftedRightLanes(SIMD<Int32>.repeating(26), b, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayCombinedShiftedRightLanesI32ConstantA(_ b: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
-    SIMDInt32.Vector(
+public func highwayCombinedShiftedRightLanesI32ConstantA(_ b: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.combinedShiftedRightLanesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             1
         )
@@ -171,17 +168,16 @@ public func highwayCombinedShiftedRightLanesI32ConstantA(_ b: SIMDInt32.Vector) 
 }
 
 @inline(never)
-public func portCombinedShiftedRightLanesI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.combinedShiftedRightLanes(a, SIMDInt32.repeating(26), byUnchecked: 1)
+public func portCombinedShiftedRightLanesI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.combinedShiftedRightLanes(a, SIMD<Int32>.repeating(26), byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayCombinedShiftedRightLanesI32ConstantB(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector
-{
-    SIMDInt32.Vector(
+public func highwayCombinedShiftedRightLanesI32ConstantB(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.combinedShiftedRightLanesI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1
         )
     )
@@ -189,16 +185,16 @@ public func highwayCombinedShiftedRightLanesI32ConstantB(_ a: SIMDInt32.Vector) 
 
 @inline(never)
 public func portCombinedShiftedRightLanesI32ConstantLanes(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.combinedShiftedRightLanes(a, b, byUnchecked: 1)
+    _ a: SIMD<Int32>,
+    _ b: SIMD<Int32>
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.combinedShiftedRightLanes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedShiftedRightLanesI32ConstantLanes(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.combinedShiftedRightLanesI32(a.raw, b.raw, 1))
+    _ a: SIMD<Int32>,
+    _ b: SIMD<Int32>
+) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.combinedShiftedRightLanesI32(a.raw, b.raw, 1))
 }

@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func isNaN() {
         let mismatches = Mismatches("portIsNaNF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAD1B_D91D_F8E2_4EB6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAD1B_D91D_F8E2_4EB6)
         for a in aInputs {
             mismatches.check(portIsNaNF64(a), highwayIsNaNF64(a), "a: \(describe(a))")
         }
@@ -24,8 +24,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func isEitherNaN() {
         let mismatches = Mismatches("portIsEitherNaNF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9A70_E718_5082_9FAD)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9A70_E618_5082_9DFA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9A70_E718_5082_9FAD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9A70_E618_5082_9DFA)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portIsEitherNaNF64(a, b),
@@ -38,7 +38,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func isEitherNaNConstantA() {
         let mismatches = Mismatches("portIsEitherNaNF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x39F3_9FB8_1E22_13B1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x39F3_9FB8_1E22_13B1)
         for b in bInputs {
             mismatches.check(
                 portIsEitherNaNF64ConstantA(b),
@@ -51,7 +51,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func isEitherNaNConstantB() {
         let mismatches = Mismatches("portIsEitherNaNF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x20A1_19B8_0FFA_73FF)
+        let aInputs = Inputs.vectors(H.self, seed: 0x20A1_19B8_0FFA_73FF)
         for a in aInputs {
             mismatches.check(
                 portIsEitherNaNF64ConstantB(a),
@@ -64,7 +64,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func isInfinite() {
         let mismatches = Mismatches("portIsInfiniteF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6FA4_7095_388D_FF7B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6FA4_7095_388D_FF7B)
         for a in aInputs {
             mismatches.check(portIsInfiniteF64(a), highwayIsInfiniteF64(a), "a: \(describe(a))")
         }
@@ -79,7 +79,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func isFinite() {
         let mismatches = Mismatches("portIsFiniteF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x189A_163F_AD01_8604)
+        let aInputs = Inputs.vectors(H.self, seed: 0x189A_163F_AD01_8604)
         for a in aInputs {
             mismatches.check(portIsFiniteF64(a), highwayIsFiniteF64(a), "a: \(describe(a))")
         }

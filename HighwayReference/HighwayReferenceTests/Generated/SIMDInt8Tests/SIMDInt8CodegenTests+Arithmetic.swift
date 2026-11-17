@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDInt8CodegenTests {
     @Test func adding() {
         let mismatches = Mismatches("portAddingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6BDE_B0A5_59B7_5CC7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6BDE_AFA5_59B7_5B14)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6BDE_B0A5_59B7_5CC7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6BDE_AFA5_59B7_5B14)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portAddingI8(a, b),
@@ -23,7 +23,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func addingConstantA() {
         let mismatches = Mismatches("portAddingI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCA85_05E3_2820_7D53)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCA85_05E3_2820_7D53)
         for b in bInputs {
             mismatches.check(
                 portAddingI8ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func addingConstantB() {
         let mismatches = Mismatches("portAddingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD386_BBE3_2D53_5615)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD386_BBE3_2D53_5615)
         for a in aInputs {
             mismatches.check(
                 portAddingI8ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func subtracting() {
         let mismatches = Mismatches("portSubtractingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7BDB_A69C_7492_61B4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7BDB_A79C_7492_6367)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7BDB_A69C_7492_61B4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7BDB_A79C_7492_6367)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portSubtractingI8(a, b),
@@ -63,7 +63,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func subtractingConstantA() {
         let mismatches = Mismatches("portSubtractingI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3801_175D_2A6E_935A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3801_175D_2A6E_935A)
         for b in bInputs {
             mismatches.check(
                 portSubtractingI8ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func subtractingConstantB() {
         let mismatches = Mismatches("portSubtractingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2E92_615D_24DE_E8B8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2E92_615D_24DE_E8B8)
         for a in aInputs {
             mismatches.check(
                 portSubtractingI8ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func addingSubtracting() {
         let mismatches = Mismatches("portAddingSubtractingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9E1D_4E32_4948_710B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9E1D_4D32_4948_6F58)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9E1D_4E32_4948_710B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9E1D_4D32_4948_6F58)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portAddingSubtractingI8(a, b),
@@ -103,7 +103,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func addingSubtractingConstantA() {
         let mismatches = Mismatches("portAddingSubtractingI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0877_4D70_320B_91C7)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0877_4D70_320B_91C7)
         for b in bInputs {
             mismatches.check(
                 portAddingSubtractingI8ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func addingSubtractingConstantB() {
         let mismatches = Mismatches("portAddingSubtractingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1032_E370_3629_7189)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1032_E370_3629_7189)
         for a in aInputs {
             mismatches.check(
                 portAddingSubtractingI8ConstantB(a),
@@ -129,17 +129,12 @@ extension SIMDInt8CodegenTests {
 
     @Test func dividing() {
         let mismatches = Mismatches("portDividingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDBF7_1333_643D_83F0)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDBF7_1333_643D_83F0)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xDBF7_1433_643D_85A3) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0x07E4_E543_3227_2734).enumerated().map {
+            Inputs.vectors(H.self, seed: 0xDBF7_1433_643D_85A3) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0x07E4_E543_3227_2734).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
@@ -154,15 +149,10 @@ extension SIMDInt8CodegenTests {
     @Test func dividingConstantA() {
         let mismatches = Mismatches("portDividingI8ConstantA")
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x6675_5867_6432_9226) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0x642D_869E_760A_B52D).enumerated().map {
+            Inputs.vectors(H.self, seed: 0x6675_5867_6432_9226) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0x642D_869E_760A_B52D).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for b in bInputs {
             mismatches.check(
@@ -176,7 +166,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func dividingConstantB() {
         let mismatches = Mismatches("portDividingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5DE0_4267_5F5B_E824)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5DE0_4267_5F5B_E824)
         for a in aInputs {
             mismatches.check(
                 portDividingI8ConstantB(a),
@@ -189,9 +179,9 @@ extension SIMDInt8CodegenTests {
 
     @Test func clamped() {
         let mismatches = Mismatches("portClampedI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x44B5_1875_279F_5ADE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x44B5_1975_279F_5C91)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x44B5_1675_279F_5778)
+        let aInputs = Inputs.vectors(H.self, seed: 0x44B5_1875_279F_5ADE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x44B5_1975_279F_5C91)
+        let cInputs = Inputs.vectors(H.self, seed: 0x44B5_1675_279F_5778)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x62E2_179A_4DDB_80FA) {
             mismatches.check(
                 portClampedI8(a, between: b, and: c),
@@ -204,8 +194,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func clampedConstantA() {
         let mismatches = Mismatches("portClampedI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA431_26E8_6E0B_054C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xA431_29E8_6E0B_0A65)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA431_26E8_6E0B_054C)
+        let cInputs = Inputs.vectors(H.self, seed: 0xA431_29E8_6E0B_0A65)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portClampedI8ConstantA(between: b, and: c),
@@ -218,8 +208,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func clampedConstantB() {
         let mismatches = Mismatches("portClampedI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD83_ACE8_7C32_A4FE)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xBD83_AAE8_7C32_A198)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBD83_ACE8_7C32_A4FE)
+        let cInputs = Inputs.vectors(H.self, seed: 0xBD83_AAE8_7C32_A198)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portClampedI8ConstantB(a, and: c),
@@ -232,8 +222,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func clampedConstantC() {
         let mismatches = Mismatches("portClampedI8ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB481_F5E8_76FF_CA89)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB481_F4E8_76FF_C8D6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB481_F5E8_76FF_CA89)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB481_F4E8_76FF_C8D6)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portClampedI8ConstantC(a, between: b),
@@ -246,8 +236,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func absoluteDifference() {
         let mismatches = Mismatches("portAbsoluteDifferenceI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCB8E_A6BF_6ABB_3EFC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCB8E_A7BF_6ABB_40AF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCB8E_A6BF_6ABB_3EFC)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCB8E_A7BF_6ABB_40AF)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portAbsoluteDifferenceI8(a, b),
@@ -260,7 +250,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func absoluteDifferenceConstantA() {
         let mismatches = Mismatches("portAbsoluteDifferenceI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7AAE_D777_150C_B0C2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7AAE_D777_150C_B0C2)
         for b in bInputs {
             mismatches.check(
                 portAbsoluteDifferenceI8ConstantA(b),
@@ -273,7 +263,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func absoluteDifferenceConstantB() {
         let mismatches = Mismatches("portAbsoluteDifferenceI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71AC_A177_0FD8_FE80)
+        let aInputs = Inputs.vectors(H.self, seed: 0x71AC_A177_0FD8_FE80)
         for a in aInputs {
             mismatches.check(
                 portAbsoluteDifferenceI8ConstantB(a),
@@ -286,7 +276,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func negated() {
         let mismatches = Mismatches("portNegatedI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1DA1_B2B0_E6A4_C16E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1DA1_B2B0_E6A4_C16E)
         for a in aInputs {
             mismatches.check(portNegatedI8(a), highwayNegatedI8(a), "a: \(describe(a))")
         }
@@ -301,7 +291,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func saturatingNegated() {
         let mismatches = Mismatches("portSaturatingNegatedI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFA90_B11B_059C_E390)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFA90_B11B_059C_E390)
         for a in aInputs {
             mismatches.check(
                 portSaturatingNegatedI8(a),
@@ -324,7 +314,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func magnitude() {
         let mismatches = Mismatches("portMagnitudeI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2D56_20EE_05D9_C16E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2D56_20EE_05D9_C16E)
         for a in aInputs {
             mismatches.check(portMagnitudeI8(a), highwayMagnitudeI8(a), "a: \(describe(a))")
         }
@@ -339,7 +329,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func saturatingMagnitude() {
         let mismatches = Mismatches("portSaturatingMagnitudeI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBB32_8B27_BD0A_FC08)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBB32_8B27_BD0A_FC08)
         for a in aInputs {
             mismatches.check(
                 portSaturatingMagnitudeI8(a),
@@ -362,17 +352,12 @@ extension SIMDInt8CodegenTests {
 
     @Test func remainder() {
         let mismatches = Mismatches("portRemainderI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAB89_9615_CBB5_F5E3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAB89_9615_CBB5_F5E3)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xAB89_9515_CBB5_F430) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0x2888_6788_9598_E11F).enumerated().map {
+            Inputs.vectors(H.self, seed: 0xAB89_9515_CBB5_F430) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0x2888_6788_9598_E11F).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
@@ -387,15 +372,10 @@ extension SIMDInt8CodegenTests {
     @Test func remainderConstantA() {
         let mismatches = Mismatches("portRemainderI8ConstantA")
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xB005_E738_36E2_C19F) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0xAEF2_4641_66B2_1870).enumerated().map {
+            Inputs.vectors(H.self, seed: 0xB005_E738_36E2_C19F) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0xAEF2_4641_66B2_1870).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for b in bInputs {
             mismatches.check(
@@ -409,7 +389,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func remainderConstantB() {
         let mismatches = Mismatches("portRemainderI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB89B_1D38_3BB9_A201)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB89B_1D38_3BB9_A201)
         for a in aInputs {
             mismatches.check(
                 portRemainderI8ConstantB(a),
@@ -422,8 +402,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func saturatingAdding() {
         let mismatches = Mismatches("portSaturatingAddingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x88D6_FFFD_20DF_7745)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x88D6_FEFD_20DF_7592)
+        let aInputs = Inputs.vectors(H.self, seed: 0x88D6_FFFD_20DF_7745)
+        let bInputs = Inputs.vectors(H.self, seed: 0x88D6_FEFD_20DF_7592)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portSaturatingAddingI8(a, b),
@@ -436,7 +416,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func saturatingAddingConstantA() {
         let mismatches = Mismatches("portSaturatingAddingI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x57F0_95E8_244F_C729)
+        let bInputs = Inputs.vectors(H.self, seed: 0x57F0_95E8_244F_C729)
         for b in bInputs {
             mismatches.check(
                 portSaturatingAddingI8ConstantA(b),
@@ -449,7 +429,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func saturatingAddingConstantB() {
         let mismatches = Mismatches("portSaturatingAddingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3E31_2FE8_15CB_8BF7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3E31_2FE8_15CB_8BF7)
         for a in aInputs {
             mismatches.check(
                 portSaturatingAddingI8ConstantB(a),
@@ -462,8 +442,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func saturatingSubtracting() {
         let mismatches = Mismatches("portSaturatingSubtractingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5B7C_EE0E_27F6_7C26)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5B7C_EF0E_27F6_7DD9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5B7C_EE0E_27F6_7C26)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5B7C_EF0E_27F6_7DD9)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portSaturatingSubtractingI8(a, b),
@@ -476,7 +456,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func saturatingSubtractingConstantA() {
         let mismatches = Mismatches("portSaturatingSubtractingI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF599_9545_625A_1014)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF599_9545_625A_1014)
         for b in bInputs {
             mismatches.check(
                 portSaturatingSubtractingI8ConstantA(b),
@@ -489,7 +469,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func saturatingSubtractingConstantB() {
         let mismatches = Mismatches("portSaturatingSubtractingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1032_7B45_7197_1586)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1032_7B45_7197_1586)
         for a in aInputs {
             mismatches.check(
                 portSaturatingSubtractingI8ConstantB(a),
@@ -502,8 +482,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func roundedAverage() {
         let mismatches = Mismatches("portRoundedAverageI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8B16_9E14_3739_D4EA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8B16_9F14_3739_D69D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8B16_9E14_3739_D4EA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8B16_9F14_3739_D69D)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portRoundedAverageI8(a, b),
@@ -516,7 +496,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func roundedAverageConstantA() {
         let mismatches = Mismatches("portRoundedAverageI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6E60_3F79_356B_0EB8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6E60_3F79_356B_0EB8)
         for b in bInputs {
             mismatches.check(
                 portRoundedAverageI8ConstantA(b),
@@ -529,7 +509,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func roundedAverageConstantB() {
         let mismatches = Mismatches("portRoundedAverageI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8965_C579_4504_42EA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8965_C579_4504_42EA)
         for a in aInputs {
             mismatches.check(
                 portRoundedAverageI8ConstantB(a),
@@ -542,8 +522,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func pairwiseAdding() {
         let mismatches = Mismatches("portPairwiseAddingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4CA3_B746_A04B_3523)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4CA3_B646_A04B_3370)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4CA3_B746_A04B_3523)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4CA3_B646_A04B_3370)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portPairwiseAddingI8(a, b),
@@ -556,7 +536,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func pairwiseAddingConstantA() {
         let mismatches = Mismatches("portPairwiseAddingI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2EEE_3D0D_4861_BEDF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2EEE_3D0D_4861_BEDF)
         for b in bInputs {
             mismatches.check(
                 portPairwiseAddingI8ConstantA(b),
@@ -569,7 +549,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func pairwiseAddingConstantB() {
         let mismatches = Mismatches("portPairwiseAddingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3783_730D_4D38_9F41)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3783_730D_4D38_9F41)
         for a in aInputs {
             mismatches.check(
                 portPairwiseAddingI8ConstantB(a),
@@ -582,8 +562,8 @@ extension SIMDInt8CodegenTests {
 
     @Test func pairwiseSubtracting() {
         let mismatches = Mismatches("portPairwiseSubtractingI8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9484_2EC5_20BF_EAD0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9484_2FC5_20BF_EC83)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9484_2EC5_20BF_EAD0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9484_2FC5_20BF_EC83)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portPairwiseSubtractingI8(a, b),
@@ -596,7 +576,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func pairwiseSubtractingConstantA() {
         let mismatches = Mismatches("portPairwiseSubtractingI8ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x34BE_40C7_0749_0886)
+        let bInputs = Inputs.vectors(H.self, seed: 0x34BE_40C7_0749_0886)
         for b in bInputs {
             mismatches.check(
                 portPairwiseSubtractingI8ConstantA(b),
@@ -609,7 +589,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func pairwiseSubtractingConstantB() {
         let mismatches = Mismatches("portPairwiseSubtractingI8ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2C29_2AC7_0272_5E84)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2C29_2AC7_0272_5E84)
         for a in aInputs {
             mismatches.check(
                 portPairwiseSubtractingI8ConstantB(a),

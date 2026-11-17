@@ -9,16 +9,12 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkLoadFirstConstantCount(_ count: Int) {
         let mismatches = Mismatches("loadFirst with count \(count)")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xDA88_CA74_4E90_9173
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDA88_CA74_4E90_9173)
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirst(from: source.baseAddress!, count: count),
-                    unsafe H.Vector(raw: HighwayReference.loadFirstI64(source.baseAddress!, count))
+                    unsafe H(raw: HighwayReference.loadFirstI64(source.baseAddress!, count))
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -97,17 +93,13 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkLoadFirstConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("loadFirst with count \(count) before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x8359_6873_B614_B098
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x8359_6873_B614_B098)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count),
-                    unsafe H.Vector(raw: HighwayReference.loadFirstI64(source, count))
+                    unsafe H(raw: HighwayReference.loadFirstI64(source, count))
                 )
             }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -184,17 +176,13 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkLoadWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkLoadWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("loadWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x371C_0184_8926_C768)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x371C_0484_8926_CC81
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x371C_0484_8926_CC81)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, from) in everyPair(maskInputs, fromInputs) {
@@ -205,7 +193,7 @@ extension SIMDInt64ConstantTests {
                         where: mask,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadWhereOtherwiseI64(
                             H.repeating(value).raw,
                             mask.raw,
@@ -292,22 +280,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func loadWhereOtherwiseConstantSplatMax() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkLoadWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @Test func loadWhereOtherwiseConstantSplatMin() {
-        checkLoadWhereOtherwiseConstantOtherwise(H.Lane.min)
+        checkLoadWhereOtherwiseConstantOtherwise(Lane.min)
     }
 
     @inline(__always)
     private func checkLoadFirstOtherwiseConstantCount(_ count: Int) {
         let mismatches = Mismatches("loadFirstOtherwise with count \(count)")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xE1AB_279F_D053_619B)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xE1AB_269F_D053_5FE8
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xE1AB_279F_D053_619B)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE1AB_269F_D053_5FE8)
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -316,7 +300,7 @@ extension SIMDInt64ConstantTests {
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstOtherwiseI64(
                             otherwise.raw,
                             source.baseAddress!,
@@ -405,18 +389,14 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkLoadFirstOtherwiseConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("loadFirstOtherwise with count \(count) before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x6BD1_BC94_7628_D1C0)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x6BD1_BD94_7628_D373
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x6BD1_BC94_7628_D1C0)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x6BD1_BD94_7628_D373)
         for (otherwise, from) in everyPair(otherwiseInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(Array(from.prefix(count))) {
                 source in
                 (
                     unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstOtherwiseI64(otherwise.raw, source, count)
                     )
                 )
@@ -499,17 +479,13 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkLoadFirstOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkLoadFirstOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("loadFirstOtherwise with otherwise repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x6FDB_26B1_F879_D78D
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x6FDB_26B1_F879_D78D)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (from, count) in everyPair(fromInputs, countInputs) {
@@ -520,7 +496,7 @@ extension SIMDInt64ConstantTests {
                         count: count,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.loadFirstOtherwiseI64(
                             H.repeating(value).raw,
                             source.baseAddress!,
@@ -607,10 +583,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func loadFirstOtherwiseConstantSplatMax() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane.max)
+        checkLoadFirstOtherwiseConstantOtherwise(Lane.max)
     }
 
     @Test func loadFirstOtherwiseConstantSplatMin() {
-        checkLoadFirstOtherwiseConstantOtherwise(H.Lane.min)
+        checkLoadFirstOtherwiseConstantOtherwise(Lane.min)
     }
 }

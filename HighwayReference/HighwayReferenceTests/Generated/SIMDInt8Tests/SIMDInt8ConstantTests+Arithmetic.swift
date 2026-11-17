@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
-    private func checkAddingConstantA(_ value: H.Lane) {
+    private func checkAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("adding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0BBE_D6C6_B171_7FC1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0BBE_D6C6_B171_7FC1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.adding(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.addingI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.addingI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkAddingConstantB(_ value: H.Lane) {
+    private func checkAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("adding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF26C_50C6_A349_E00F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF26C_50C6_A349_E00F)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.adding(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.addingI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.addingI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -95,18 +95,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkSubtractingConstantA(_ value: H.Lane) {
+    private func checkSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("subtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF890_0917_F99B_101C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF890_0917_F99B_101C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.subtracting(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.subtractingI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.subtractingI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -114,18 +114,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkSubtractingConstantB(_ value: H.Lane) {
+    private func checkSubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("subtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x11E2_8F18_07C2_AFCE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x11E2_8F18_07C2_AFCE)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.subtracting(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.subtractingI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.subtractingI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -183,18 +183,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkSaturatingAddingConstantA(_ value: H.Lane) {
+    private func checkSaturatingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8DC2_26F3_FCA8_060F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8DC2_26F3_FCA8_060F)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.saturatingAdding(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.saturatingAddingI8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.saturatingAddingI8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -202,18 +202,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkSaturatingAddingConstantB(_ value: H.Lane) {
+    private func checkSaturatingAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x957D_5CF4_00C5_42B1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x957D_5CF4_00C5_42B1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.saturatingAdding(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.saturatingAddingI8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.saturatingAddingI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -271,20 +271,18 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkSaturatingSubtractingConstantB(_ value: H.Lane) {
+    private func checkSaturatingSubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("saturatingSubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5591_1AD9_2186_51F4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5591_1AD9_2186_51F4)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.saturatingSubtracting(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.saturatingSubtractingI8(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.saturatingSubtractingI8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }

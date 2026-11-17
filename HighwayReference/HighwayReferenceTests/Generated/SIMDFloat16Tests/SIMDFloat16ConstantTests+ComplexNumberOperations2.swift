@@ -8,27 +8,29 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkMultiplyAddingComplexConjugateWhereConstantA(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConjugateWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyAddingComplexConjugateWhere with a repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC026_6CC1_549C_CEA3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC026_6EC1_549C_D209)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xC026_6DC1_549C_D056)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC026_6EC1_549C_D209)
+        let cInputs = Inputs.vectors(H.self, seed: 0xC026_6DC1_549C_D056)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0xDACD_B734_1C24_54A5)
-        where !hasUnorderedNaNs(complexLanesOf: H.repeating(value), b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: H.repeating(value).simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(H.repeating(value), b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF16(
-                    mask.raw,
-                    H.repeating(value),
-                    b,
-                    c
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateWhereF16(
+                        mask.raw,
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b)), c: \(describe(c))"
             )
@@ -37,27 +39,29 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingComplexConjugateWhereConstantB(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConjugateWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyAddingComplexConjugateWhere with b repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDABF_71C1_63DA_08C2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDABF_72C1_63DA_0A75)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDABF_70C1_63DA_070F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDABF_72C1_63DA_0A75)
+        let cInputs = Inputs.vectors(H.self, seed: 0xDABF_70C1_63DA_070F)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0xBD73_F3B5_2128_DD06)
-        where !hasUnorderedNaNs(complexLanesOf: a, H.repeating(value), c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, H.repeating(value).simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, H.repeating(value), c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF16(
-                    mask.raw,
-                    a,
-                    H.repeating(value),
-                    c
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateWhereF16(
+                        mask.raw,
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), c: \(describe(c))"
             )
@@ -66,27 +70,29 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingComplexConjugateWhereConstantC(_ value: H.Lane) {
+    private func checkMultiplyAddingComplexConjugateWhereConstantC(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyAddingComplexConjugateWhere with c repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD22A_5AC1_5F03_5D0D)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD22A_59C1_5F03_5B5A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD22A_58C1_5F03_59A7)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD22A_59C1_5F03_5B5A)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD22A_58C1_5F03_59A7)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xFC2E_8931_DBA0_AA5F)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, H.repeating(value)) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, H.repeating(value), where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF16(
-                    mask.raw,
-                    a,
-                    b,
-                    H.repeating(value)
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateWhereF16(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
@@ -179,9 +185,9 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func multiplyAddingComplexConjugateWhereConstantSplatPayloadNaN() {
-        checkMultiplyAddingComplexConjugateWhereConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyAddingComplexConjugateWhereConstantB(H.Lane(nan: 1, signaling: false))
-        checkMultiplyAddingComplexConjugateWhereConstantC(H.Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConjugateWhereConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConjugateWhereConstantB(Lane(nan: 1, signaling: false))
+        checkMultiplyAddingComplexConjugateWhereConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyAddingComplexConjugateWhereConstantSplatSignalingNaN() {

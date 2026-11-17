@@ -35,7 +35,7 @@ extension SIMDBFloat16ReferenceTests {
     @Test func repeatingBlockMask() {
         let mismatches = Mismatches("repeatingBlockMask")
         let bitsInputs = Inputs.maskBits(
-            lanes: 16 / MemoryLayout<H.Lane>.size,
+            lanes: 16 / MemoryLayout<Lane>.size,
             seed: 0x0168_8F53_EF14_1832
         )
         for bits in bitsInputs {

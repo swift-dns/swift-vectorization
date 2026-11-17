@@ -4,7 +4,7 @@ import Vectorization
 
 @Suite("Float16 fused multiply-add")
 struct Float16FusedTests {
-    typealias Vector = SIMDFloat16.Vector
+    typealias Vector = SIMD<Float16>
 
     struct Fused {
         let name: String
@@ -14,16 +14,16 @@ struct Float16FusedTests {
 
     static func operations() -> [Fused] {
         [
-            Fused(name: "multiplyAdding", port: SIMDFloat16.multiplyAdding) { a, b, c, _ in
+            Fused(name: "multiplyAdding", port: SIMD<Float16>.multiplyAdding) { a, b, c, _ in
                 c + a * b
             },
-            Fused(name: "negatedMultiplyAdding", port: SIMDFloat16.negatedMultiplyAdding) {
+            Fused(name: "negatedMultiplyAdding", port: SIMD<Float16>.negatedMultiplyAdding) {
                 a,
                 b,
                 c,
                 _ in c - a * b
             },
-            Fused(name: "multiplySubtracting", port: SIMDFloat16.multiplySubtracting) {
+            Fused(name: "multiplySubtracting", port: SIMD<Float16>.multiplySubtracting) {
                 a,
                 b,
                 c,
@@ -31,15 +31,15 @@ struct Float16FusedTests {
             },
             Fused(
                 name: "negatedMultiplySubtracting",
-                port: SIMDFloat16.negatedMultiplySubtracting
+                port: SIMD<Float16>.negatedMultiplySubtracting
             ) { a, b, c, _ in -(a * b) - c },
             Fused(
                 name: "multiplyAddingSubtracting",
-                port: SIMDFloat16.multiplyAddingSubtracting
+                port: SIMD<Float16>.multiplyAddingSubtracting
             ) { a, b, c, lane in lane.isMultiple(of: 2) ? a * b - c : a * b + c },
             Fused(
                 name: "multiplySubtractingAdding",
-                port: SIMDFloat16.multiplySubtractingAdding
+                port: SIMD<Float16>.multiplySubtractingAdding
             ) { a, b, c, lane in lane.isMultiple(of: 2) ? a * b + c : a * b - c },
         ]
     }
@@ -63,13 +63,13 @@ struct Float16FusedTests {
     func verify(_ triples: [(Float16, Float16, Float16)]) {
         for operation in Self.operations() {
             var mismatches: [String] = []
-            let laneCount = SIMDFloat16.laneCount
+            let laneCount = SIMD<Float16>.laneCount
             for start in stride(from: 0, to: triples.count, by: laneCount) {
                 let chunk = (0..<laneCount).map { triples[min(start + $0, triples.count - 1)] }
                 let result = operation.port(
-                    Vector(chunk.map(\.0)),
-                    Vector(chunk.map(\.1)),
-                    Vector(chunk.map(\.2))
+                    Vector(raw: .init(chunk.map(\.0))),
+                    Vector(raw: .init(chunk.map(\.1))),
+                    Vector(raw: .init(chunk.map(\.2)))
                 )
                 for lane in 0..<laneCount {
                     let (a, b, c) = chunk[lane]
@@ -78,10 +78,11 @@ struct Float16FusedTests {
                     )
                     let same =
                         expected.isNaN
-                        ? result[lane].isNaN : expected.bitPattern == result[lane].bitPattern
+                        ? result.raw[lane].isNaN
+                        : expected.bitPattern == result.raw[lane].bitPattern
                     if !same {
                         mismatches.append(
-                            "\(a.bitPattern) \(b.bitPattern) \(c.bitPattern): \(result[lane].bitPattern) instead of \(expected.bitPattern)"
+                            "\(a.bitPattern) \(b.bitPattern) \(c.bitPattern): \(result.raw[lane].bitPattern) instead of \(expected.bitPattern)"
                         )
                     }
                 }

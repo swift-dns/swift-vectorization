@@ -8,29 +8,33 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func sum() {
         let mismatches = Mismatches("sum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDF4F_8089_1FE7_126B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDF4F_8089_1FE7_126B)
         for a in aInputs {
-            mismatches.check(H.sum(a), HighwayReference.sumF32(a), "a: \(describe(a))")
+            mismatches.check(H.sum(a), HighwayReference.sumF32(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
 
     @Test func smallest() {
         let mismatches = Mismatches("smallest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x42C2_432F_5335_A5CF)
+        let aInputs = Inputs.vectors(H.self, seed: 0x42C2_432F_5335_A5CF)
         for a in aInputs {
-            mismatches.check(H.smallest(a), HighwayReference.smallestF32(a), "a: \(describe(a))")
+            mismatches.check(
+                H.smallest(a),
+                HighwayReference.smallestF32(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
 
     @Test func smallestOrNaN() {
         let mismatches = Mismatches("smallestOrNaN")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4194_1324_2948_D81D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4194_1324_2948_D81D)
         for a in aInputs {
             mismatches.check(
                 H.smallestOrNaN(a),
-                HighwayReference.smallestOrNaNF32(a),
+                HighwayReference.smallestOrNaNF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -39,20 +43,20 @@ extension SIMDFloatReferenceTests {
 
     @Test func largest() {
         let mismatches = Mismatches("largest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4AFC_26B0_A5FA_9598)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4AFC_26B0_A5FA_9598)
         for a in aInputs {
-            mismatches.check(H.largest(a), HighwayReference.largestF32(a), "a: \(describe(a))")
+            mismatches.check(H.largest(a), HighwayReference.largestF32(a.raw), "a: \(describe(a))")
         }
         mismatches.record()
     }
 
     @Test func largestOrNaN() {
         let mismatches = Mismatches("largestOrNaN")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2192_FA8A_EB61_45A8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2192_FA8A_EB61_45A8)
         for a in aInputs {
             mismatches.check(
                 H.largestOrNaN(a),
-                HighwayReference.largestOrNaNF32(a),
+                HighwayReference.largestOrNaNF32(a.raw),
                 "a: \(describe(a))"
             )
         }
@@ -61,11 +65,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func repeatingSum() {
         let mismatches = Mismatches("repeatingSum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCEB4_B7C9_5CEE_8462)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCEB4_B7C9_5CEE_8462)
         for a in aInputs {
             mismatches.check(
                 H.repeatingSum(a),
-                HighwayReference.repeatingSumF32(a),
+                H(raw: HighwayReference.repeatingSumF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -74,11 +78,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func repeatingSmallest() {
         let mismatches = Mismatches("repeatingSmallest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9F3C_805A_7092_9FA4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9F3C_805A_7092_9FA4)
         for a in aInputs {
             mismatches.check(
                 H.repeatingSmallest(a),
-                HighwayReference.repeatingSmallestF32(a),
+                H(raw: HighwayReference.repeatingSmallestF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -87,11 +91,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func repeatingLargest() {
         let mismatches = Mismatches("repeatingLargest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x202E_341E_25E3_F94D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x202E_341E_25E3_F94D)
         for a in aInputs {
             mismatches.check(
                 H.repeatingLargest(a),
-                HighwayReference.repeatingLargestF32(a),
+                H(raw: HighwayReference.repeatingLargestF32(a.raw)),
                 "a: \(describe(a))"
             )
         }

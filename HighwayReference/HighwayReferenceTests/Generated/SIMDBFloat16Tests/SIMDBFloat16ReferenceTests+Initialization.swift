@@ -8,17 +8,17 @@ import Vectorization
 extension SIMDBFloat16ReferenceTests {
     @Test func zero() {
         let mismatches = Mismatches("zero")
-        mismatches.check(H.zero(), H.Vector(raw: HighwayReference.zeroBF16()), "")
+        mismatches.check(H.zero(), H(raw: HighwayReference.zeroBF16()), "")
         mismatches.record()
     }
 
     @Test func repeating() {
         let mismatches = Mismatches("repeating")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x89A9_3535_958B_D6C7)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x89A9_3535_958B_D6C7)
         for value in valueInputs {
             mismatches.check(
                 H.repeating(value),
-                H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+                H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
                 "value: \(hex(value))"
             )
         }
@@ -27,37 +27,37 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func signBit() {
         let mismatches = Mismatches("signBit")
-        mismatches.check(H.signBit(), H.Vector(raw: HighwayReference.signBitBF16()), "")
+        mismatches.check(H.signBit(), H(raw: HighwayReference.signBitBF16()), "")
         mismatches.record()
     }
 
     @Test func nan() {
         let mismatches = Mismatches("nan")
-        mismatches.check(H.nan(), H.Vector(raw: HighwayReference.nanBF16()), "")
+        mismatches.check(H.nan(), H(raw: HighwayReference.nanBF16()), "")
         mismatches.record()
     }
 
     @Test func infinity() {
         let mismatches = Mismatches("infinity")
-        mismatches.check(H.infinity(), H.Vector(raw: HighwayReference.infinityBF16()), "")
+        mismatches.check(H.infinity(), H(raw: HighwayReference.infinityBF16()), "")
         mismatches.record()
     }
 
     @Test func unspecified() {
         let mismatches = Mismatches("unspecified")
         _ = H.unspecified()
-        _ = H.Vector(raw: HighwayReference.unspecifiedBF16())
+        _ = H(raw: HighwayReference.unspecifiedBF16())
         mismatches.record()
     }
 
     @Test func repeatingWhere() {
         let mismatches = Mismatches("repeatingWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB261_CAF2_AAC4_FE94)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xB261_CBF2_AAC5_0047)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xB261_CBF2_AAC5_0047)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask),
-                H.Vector(raw: HighwayReference.repeatingWhereBF16(mask.raw, value.bitPattern)),
+                H(raw: HighwayReference.repeatingWhereBF16(mask.raw, value.bitPattern)),
                 "mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -67,11 +67,11 @@ extension SIMDBFloat16ReferenceTests {
     @Test func repeatingWhereNonCanonical() {
         let mismatches = Mismatches("repeatingWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xACF1_C2F6_7583_040B)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xACF1_C1F6_7583_0258)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xACF1_C1F6_7583_0258)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask),
-                H.Vector(raw: HighwayReference.repeatingWhereBF16(mask.raw, value.bitPattern)),
+                H(raw: HighwayReference.repeatingWhereBF16(mask.raw, value.bitPattern)),
                 "mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -80,9 +80,9 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func repeatingWhereOtherwise() {
         let mismatches = Mismatches("repeatingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x117A_EE6A_805E_5768)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x117A_EE6A_805E_5768)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x117A_EF6A_805E_591B)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x117A_F06A_805E_5ACE)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x117A_F06A_805E_5ACE)
         for (otherwise, mask, value) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -91,7 +91,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.repeatingWhereOtherwiseBF16(
                         otherwise.raw,
                         mask.raw,
@@ -106,9 +106,9 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func repeatingWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("repeatingWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xAD4B_69A8_9C5E_DEE7)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xAD4B_69A8_9C5E_DEE7)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xAD4B_68A8_9C5E_DD34)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xAD4B_6BA8_9C5E_E24D)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xAD4B_6BA8_9C5E_E24D)
         for (otherwise, mask, value) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -117,7 +117,7 @@ extension SIMDBFloat16ReferenceTests {
         ) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.repeatingWhereOtherwiseBF16(
                         otherwise.raw,
                         mask.raw,
@@ -132,7 +132,7 @@ extension SIMDBFloat16ReferenceTests {
 
     @Test func repeatingBlock() {
         let mismatches = Mismatches("repeatingBlock")
-        let vectorInputs = Inputs.vectors(H.Vector.self, seed: 0x5A5E_D65A_D33D_0C8E)
+        let vectorInputs = Inputs.vectors(H.self, seed: 0x5A5E_D65A_D33D_0C8E)
         for vector in vectorInputs {
             mismatches.check(
                 H.repeatingBlock(
@@ -145,7 +145,7 @@ extension SIMDBFloat16ReferenceTests {
                     BFloat16(bitPattern: vector.simd[6]),
                     BFloat16(bitPattern: vector.simd[7])
                 ),
-                H.Vector(
+                H(
                     raw: HighwayReference.repeatingBlockBF16(
                         BFloat16(bitPattern: vector.simd[0]).bitPattern,
                         BFloat16(bitPattern: vector.simd[1]).bitPattern,

@@ -10,12 +10,8 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedLeftByWhere() {
         let mismatches = Mismatches("portShiftedLeftByWhereU32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xAEE4_226B_2DB4_26CD)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAEE4_216B_2DB4_251A)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xAEE4_206B_2DB4_2367,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xAEE4_216B_2DB4_251A)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xAEE4_206B_2DB4_2367, inContract: true)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x32E5_97FC_C211_3D9F)
         {
             mismatches.check(
@@ -30,11 +26,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedLeftByWhereConstantA() {
         let mismatches = Mismatches("portShiftedLeftByWhereU32ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x80D7_496F_6117_E59E)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x80D7_476F_6117_E238,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x80D7_476F_6117_E238, inContract: true)
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 portShiftedLeftByWhereU32ConstantA(by: b, where: mask),
@@ -48,7 +40,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedLeftByWhereConstantB() {
         let mismatches = Mismatches("portShiftedLeftByWhereU32ConstantB")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x65D1_C46F_517E_B31F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x65D1_C36F_517E_B16C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x65D1_C36F_517E_B16C)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portShiftedLeftByWhereU32ConstantB(a, where: mask),
@@ -61,14 +53,10 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedLeftByWhereOtherwise() {
         let mismatches = Mismatches("portShiftedLeftByWhereOtherwiseU32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x9339_E800_EBEB_A9FF)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x9339_E800_EBEB_A9FF)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9339_E700_EBEB_A84C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9339_EA00_EBEB_AD65)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x9339_E900_EBEB_ABB2,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x9339_EA00_EBEB_AD65)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x9339_E900_EBEB_ABB2, inContract: true)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -87,13 +75,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedLeftByWhereOtherwiseConstantA() {
         let mismatches = Mismatches("portShiftedLeftByWhereOtherwiseU32ConstantA")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xC808_0C9F_7500_1D18)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xC808_0C9F_7500_1D18)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC808_0D9F_7500_1ECB)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xC808_0F9F_7500_2231,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xC808_0F9F_7500_2231, inContract: true)
         for (otherwise, mask, b) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -119,9 +103,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedLeftByWhereOtherwiseConstantB() {
         let mismatches = Mismatches("portShiftedLeftByWhereOtherwiseU32ConstantB")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xCFC3_C39F_791E_34ED)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xCFC3_C39F_791E_34ED)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCFC3_C29F_791E_333A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCFC3_C19F_791E_3187)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCFC3_C19F_791E_3187)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -144,12 +128,8 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedLeftByWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portShiftedLeftByWhereOtherwiseU32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF730_2B32_EE9E_1EE6)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF730_2A32_EE9E_1D33)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xF730_2932_EE9E_1B80,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xF730_2A32_EE9E_1D33)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xF730_2932_EE9E_1B80, inContract: true)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xDF5A_C0B0_8AD2_14D3)
         {
             mismatches.check(
@@ -164,12 +144,8 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedRightByWhere() {
         let mismatches = Mismatches("portShiftedRightByWhereU32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x84BB_9302_A298_6B46)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x84BB_9402_A298_6CF9)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x84BB_9102_A298_67E0,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x84BB_9402_A298_6CF9)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x84BB_9102_A298_67E0, inContract: true)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xEE5A_EC96_9201_7A42)
         {
             mismatches.check(
@@ -184,11 +160,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedRightByWhereConstantA() {
         let mismatches = Mismatches("portShiftedRightByWhereU32ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9677_056E_60C9_BB67)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x9677_076E_60C9_BECD,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x9677_076E_60C9_BECD, inContract: true)
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 portShiftedRightByWhereU32ConstantA(by: b, where: mask),
@@ -202,7 +174,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedRightByWhereConstantB() {
         let mismatches = Mismatches("portShiftedRightByWhereU32ConstantB")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xAF5C_6A6E_6E94_5126)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAF5C_6B6E_6E94_52D9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAF5C_6B6E_6E94_52D9)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portShiftedRightByWhereU32ConstantB(a, where: mask),
@@ -215,14 +187,10 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedRightByWhereOtherwise() {
         let mismatches = Mismatches("portShiftedRightByWhereOtherwiseU32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x0F97_B6CD_979B_F6EE)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x0F97_B6CD_979B_F6EE)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0F97_B7CD_979B_F8A1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0F97_B4CD_979B_F388)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x0F97_B5CD_979B_F53B,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x0F97_B4CD_979B_F388)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x0F97_B5CD_979B_F53B, inContract: true)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -241,13 +209,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedRightByWhereOtherwiseConstantA() {
         let mismatches = Mismatches("portShiftedRightByWhereOtherwiseU32ConstantA")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x3CE8_6406_FC56_400F)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3CE8_6406_FC56_400F)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3CE8_6306_FC56_3E5C)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x3CE8_6506_FC56_41C2,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x3CE8_6506_FC56_41C2, inContract: true)
         for (otherwise, mask, b) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -273,9 +237,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedRightByWhereOtherwiseConstantB() {
         let mismatches = Mismatches("portShiftedRightByWhereOtherwiseU32ConstantB")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x563A_E907_0A7D_DE0E)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x563A_E907_0A7D_DE0E)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x563A_EA07_0A7D_DFC1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x563A_E707_0A7D_DAA8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x563A_E707_0A7D_DAA8)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -298,12 +262,8 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedRightByWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portShiftedRightByWhereOtherwiseU32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xADBC_F18E_E347_D1F1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xADBC_EE8E_E347_CCD8)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xADBC_EF8E_E347_CE8B,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xADBC_EE8E_E347_CCD8)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xADBC_EF8E_E347_CE8B, inContract: true)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x2709_F9BA_2C63_B75A)
         {
             mismatches.check(
@@ -318,7 +278,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedLeftWhere() {
         let mismatches = Mismatches("portShiftedLeftWhereU32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7A65_4552_FEB7_C17E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7A65_4652_FEB7_C331)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7A65_4652_FEB7_C331)
         let bitsInputs = Inputs.shiftAmounts(bits: 32, inContract: true)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -352,7 +312,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedLeftWhereConstantBits() {
         let mismatches = Mismatches("portShiftedLeftWhereU32ConstantBits")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1A02_EDEF_9158_5C6A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A02_EEEF_9158_5E1D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1A02_EEEF_9158_5E1D)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portShiftedLeftWhereU32ConstantBits(a, where: mask),
@@ -365,9 +325,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedLeftWhereOtherwise() {
         let mismatches = Mismatches("portShiftedLeftWhereOtherwiseU32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA5D4_F0AE_E583_DC86)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA5D4_F0AE_E583_DC86)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA5D4_F1AE_E583_DE39)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA5D4_EEAE_E583_D920)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA5D4_EEAE_E583_D920)
         let bitsInputs = Inputs.shiftAmounts(bits: 32, inContract: true)
         for (otherwise, mask, a, bits) in mixedQuadruples(
             otherwiseInputs,
@@ -397,7 +357,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedLeftWhereOtherwiseConstantA() {
         let mismatches = Mismatches("portShiftedLeftWhereOtherwiseU32ConstantA")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA0E0_D791_1056_1AA7)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA0E0_D791_1056_1AA7)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA0E0_D691_1056_18F4)
         let bitsInputs = Inputs.shiftAmounts(bits: 32, inContract: true)
         for (otherwise, mask, bits) in mixedTriples(
@@ -425,9 +385,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedLeftWhereOtherwiseConstantBits() {
         let mismatches = Mismatches("portShiftedLeftWhereOtherwiseU32ConstantBits")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xE460_5CDF_F9E6_33B2)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xE460_5CDF_F9E6_33B2)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE460_5DDF_F9E6_3565)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE460_5ADF_F9E6_304C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE460_5ADF_F9E6_304C)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -450,7 +410,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedLeftWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portShiftedLeftWhereOtherwiseU32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x45A1_E408_F0A9_24B9)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x45A1_E108_F0A9_1FA0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x45A1_E108_F0A9_1FA0)
         let bitsInputs = Inputs.shiftAmounts(bits: 32, inContract: true)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -478,7 +438,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedRightWhere() {
         let mismatches = Mismatches("portShiftedRightWhereU32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8CE1_A019_DB25_4989)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8CE1_9F19_DB25_47D6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8CE1_9F19_DB25_47D6)
         let bitsInputs = Inputs.shiftAmounts(bits: 32, inContract: true)
         for (mask, a, bits) in mixedTriples(
             maskInputs,
@@ -512,7 +472,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedRightWhereConstantBits() {
         let mismatches = Mismatches("portShiftedRightWhereU32ConstantBits")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x817C_D305_FCD2_FEE1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x817C_D205_FCD2_FD2E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x817C_D205_FCD2_FD2E)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portShiftedRightWhereU32ConstantBits(a, where: mask),
@@ -525,9 +485,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedRightWhereOtherwise() {
         let mismatches = Mismatches("portShiftedRightWhereOtherwiseU32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5623_0D93_FBD6_350B)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x5623_0D93_FBD6_350B)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5623_0C93_FBD6_3358)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5623_0F93_FBD6_3871)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5623_0F93_FBD6_3871)
         let bitsInputs = Inputs.shiftAmounts(bits: 32, inContract: true)
         for (otherwise, mask, a, bits) in mixedQuadruples(
             otherwiseInputs,
@@ -557,7 +517,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedRightWhereOtherwiseConstantA() {
         let mismatches = Mismatches("portShiftedRightWhereOtherwiseU32ConstantA")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xEA5F_F4DC_94E9_1C14)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xEA5F_F4DC_94E9_1C14)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEA5F_F5DC_94E9_1DC7)
         let bitsInputs = Inputs.shiftAmounts(bits: 32, inContract: true)
         for (otherwise, mask, bits) in mixedTriples(
@@ -585,9 +545,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func shiftedRightWhereOtherwiseConstantBits() {
         let mismatches = Mismatches("portShiftedRightWhereOtherwiseU32ConstantBits")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x4A31_45E7_AF97_0D57)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x4A31_45E7_AF97_0D57)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4A31_44E7_AF97_0BA4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4A31_47E7_AF97_10BD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4A31_47E7_AF97_10BD)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -610,7 +570,7 @@ extension SIMDUInt32CodegenTests {
     @Test func shiftedRightWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portShiftedRightWhereOtherwiseU32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7992_937D_B88C_625A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7992_927D_B88C_60A7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7992_927D_B88C_60A7)
         let bitsInputs = Inputs.shiftAmounts(bits: 32, inContract: true)
         for (mask, a, bits) in mixedTriples(
             maskInputs,

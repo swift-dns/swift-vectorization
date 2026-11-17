@@ -6,17 +6,17 @@ public import Vectorization
 extension HighwayReferenceInt32 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadExpanded(from span: Span<Lane>, where mask: Mask) -> Vector {
+    public static func loadExpanded(from span: Span<Lane>, where mask: Mask) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe loadExpanded(fromUnchecked: span, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> Vector {
+    public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt32.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereI32(
                     mask.raw,
                     $0.baseAddress.unsafelyUnwrapped
@@ -30,8 +30,8 @@ extension HighwayReferenceInt32 {
     public static func loadExpanded(
         from span: Span<Lane>,
         where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
+        otherwise: SIMD
+    ) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe loadExpanded(fromUnchecked: span, where: mask, otherwise: otherwise)
     }
@@ -41,11 +41,11 @@ extension HighwayReferenceInt32 {
     public static func loadExpanded(
         fromUnchecked span: Span<Lane>,
         where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
+        otherwise: SIMD
+    ) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe SIMDInt32.Vector(
+            unsafe SIMD(
                 raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI32(
                     otherwise.raw,
                     mask.raw,
@@ -58,28 +58,25 @@ extension HighwayReferenceInt32 {
 }
 
 @inline(never)
-public func portExpandedI32(_ a: SIMDInt32.Vector, where mask: SIMDInt32.Mask) -> SIMDInt32.Vector {
-    SIMDInt32.expanded(a, where: mask)
+public func portExpandedI32(_ a: SIMD<Int32>, where mask: SIMD<Int32>.Mask) -> SIMD<Int32> {
+    SIMD<Int32>.expanded(a, where: mask)
 }
 
 @inline(never)
-public func highwayExpandedI32(
-    _ a: SIMDInt32.Vector,
-    where mask: SIMDInt32.Mask
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.expandedI32(a.raw, mask.raw))
+public func highwayExpandedI32(_ a: SIMD<Int32>, where mask: SIMD<Int32>.Mask) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.expandedI32(a.raw, mask.raw))
 }
 
 @inline(never)
-public func portExpandedI32ConstantA(where mask: SIMDInt32.Mask) -> SIMDInt32.Vector {
-    SIMDInt32.expanded(SIMDInt32.repeating(26), where: mask)
+public func portExpandedI32ConstantA(where mask: SIMD<Int32>.Mask) -> SIMD<Int32> {
+    SIMD<Int32>.expanded(SIMD<Int32>.repeating(26), where: mask)
 }
 
 @inline(never)
-public func highwayExpandedI32ConstantA(where mask: SIMDInt32.Mask) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayExpandedI32ConstantA(where mask: SIMD<Int32>.Mask) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.expandedI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             mask.raw
         )
     )
@@ -87,56 +84,56 @@ public func highwayExpandedI32ConstantA(where mask: SIMDInt32.Mask) -> SIMDInt32
 
 @inline(never)
 public func portLoadExpandedWhereI32(
-    from: UnsafePointer<SIMDInt32.Lane>,
-    where mask: SIMDInt32.Mask
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.loadExpanded(from: from, where: mask)
+    from: UnsafePointer<Int32>,
+    where mask: SIMD<Int32>.Mask
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.loadExpanded(from: from, where: mask)
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereI32(
     from: UnsafePointer<Int32>,
-    where mask: SIMDInt32.Mask
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.loadExpandedWhereI32(mask.raw, from))
+    where mask: SIMD<Int32>.Mask
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.loadExpandedWhereI32(mask.raw, from))
 }
 
 @inline(never)
 public func portLoadExpandedWhereOtherwiseI32(
-    from: UnsafePointer<SIMDInt32.Lane>,
-    where mask: SIMDInt32.Mask,
-    otherwise: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.loadExpanded(from: from, where: mask, otherwise: otherwise)
+    from: UnsafePointer<Int32>,
+    where mask: SIMD<Int32>.Mask,
+    otherwise: SIMD<Int32>
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.loadExpanded(from: from, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereOtherwiseI32(
     from: UnsafePointer<Int32>,
-    where mask: SIMDInt32.Mask,
-    otherwise: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.Vector(
+    where mask: SIMD<Int32>.Mask,
+    otherwise: SIMD<Int32>
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI32(otherwise.raw, mask.raw, from)
     )
 }
 
 @inline(never)
 public func portLoadExpandedWhereOtherwiseI32ConstantOtherwise(
-    from: UnsafePointer<SIMDInt32.Lane>,
-    where mask: SIMDInt32.Mask
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.loadExpanded(from: from, where: mask, otherwise: SIMDInt32.repeating(26))
+    from: UnsafePointer<Int32>,
+    where mask: SIMD<Int32>.Mask
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.loadExpanded(from: from, where: mask, otherwise: SIMD<Int32>.repeating(26))
 }
 
 @inline(never)
 public func highwayLoadExpandedWhereOtherwiseI32ConstantOtherwise(
     from: UnsafePointer<Int32>,
-    where mask: SIMDInt32.Mask
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.Vector(
+    where mask: SIMD<Int32>.Mask
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.loadExpandedWhereOtherwiseI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             mask.raw,
             from
         )

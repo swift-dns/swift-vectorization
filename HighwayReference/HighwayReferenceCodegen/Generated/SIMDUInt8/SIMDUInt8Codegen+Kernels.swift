@@ -4,40 +4,38 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portMaskedLowercaseU8(_ v: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.bitwiseOr(
+public func portMaskedLowercaseU8(_ v: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.bitwiseOr(
         v,
-        SIMDUInt8.selectingOrZero(
-            SIMDUInt8.lessThan(
-                SIMDUInt8.subtracting(v, SIMDUInt8.repeating(0x41)),
-                SIMDUInt8.repeating(26)
+        SIMD<UInt8>.selectingOrZero(
+            SIMD<UInt8>.lessThan(
+                SIMD<UInt8>.subtracting(v, SIMD<UInt8>.repeating(0x41)),
+                SIMD<UInt8>.repeating(26)
             ),
-            SIMDUInt8.repeating(0x20)
+            SIMD<UInt8>.repeating(0x20)
         )
     )
 }
 
 @inline(never)
-public func highwayMaskedLowercaseU8(_ v: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayMaskedLowercaseU8(_ v: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.bitwiseOrU8(
             v.raw,
-            SIMDUInt8.Vector(
+            SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.selectingOrZeroU8(
-                    SIMDUInt8.Mask(
+                    SIMD<UInt8>.Mask(
                         raw: HighwayReference.Nothrow.lessThanU8(
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.subtractingU8(
                                     v.raw,
-                                    SIMDUInt8.Vector(
-                                        raw: HighwayReference.Nothrow.repeatingU8(0x41)
-                                    ).raw
+                                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x41)).raw
                                 )
                             ).raw,
-                            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x20)).raw
+                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x20)).raw
                 )
             ).raw
         )
@@ -45,52 +43,52 @@ public func highwayMaskedLowercaseU8(_ v: SIMDUInt8.Vector) -> SIMDUInt8.Vector 
 }
 
 @inline(never)
-public func portDigitValuesU8(_ v: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    let letters = SIMDUInt8.subtracting(v, SIMDUInt8.repeating(0x61))
-    let numbers = SIMDUInt8.adding(
-        SIMDUInt8.minimum(
-            SIMDUInt8.subtracting(v, SIMDUInt8.repeating(0x30)),
-            SIMDUInt8.repeating(36)
+public func portDigitValuesU8(_ v: SIMD<UInt8>) -> SIMD<UInt8> {
+    let letters = SIMD<UInt8>.subtracting(v, SIMD<UInt8>.repeating(0x61))
+    let numbers = SIMD<UInt8>.adding(
+        SIMD<UInt8>.minimum(
+            SIMD<UInt8>.subtracting(v, SIMD<UInt8>.repeating(0x30)),
+            SIMD<UInt8>.repeating(36)
         ),
-        SIMDUInt8.repeating(26)
+        SIMD<UInt8>.repeating(26)
     )
-    return SIMDUInt8.selecting(
-        SIMDUInt8.lessThan(letters, SIMDUInt8.repeating(26)),
+    return SIMD<UInt8>.selecting(
+        SIMD<UInt8>.lessThan(letters, SIMD<UInt8>.repeating(26)),
         letters,
         numbers
     )
 }
 
 @inline(never)
-public func highwayDigitValuesU8(_ v: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    let letters = SIMDUInt8.Vector(
+public func highwayDigitValuesU8(_ v: SIMD<UInt8>) -> SIMD<UInt8> {
+    let letters = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.subtractingU8(
             v.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
         )
     )
-    let numbers = SIMDUInt8.Vector(
+    let numbers = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.addingU8(
-            SIMDUInt8.Vector(
+            SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.minimumU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.subtractingU8(
                             v.raw,
-                            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x30)).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x30)).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
+                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
                 )
             ).raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
-    return SIMDUInt8.Vector(
+    return SIMD<UInt8>(
         raw: HighwayReference.Nothrow.selectingU8(
-            SIMDUInt8.Mask(
+            SIMD<UInt8>.Mask(
                 raw: HighwayReference.Nothrow.lessThanU8(
                     letters.raw,
-                    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
                 )
             ).raw,
             letters.raw,
@@ -100,42 +98,42 @@ public func highwayDigitValuesU8(_ v: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
 }
 
 @inline(never)
-public func portNoneAboveU8(_ v: SIMDUInt8.Vector) -> Bool {
-    SIMDUInt8.allFalse(SIMDUInt8.greaterThan(v, SIMDUInt8.repeating(26)))
+public func portNoneAboveU8(_ v: SIMD<UInt8>) -> Bool {
+    SIMD<UInt8>.allFalse(SIMD<UInt8>.greaterThan(v, SIMD<UInt8>.repeating(26)))
 }
 
 @inline(never)
-public func highwayNoneAboveU8(_ v: SIMDUInt8.Vector) -> Bool {
+public func highwayNoneAboveU8(_ v: SIMD<UInt8>) -> Bool {
     HighwayReference.Nothrow.allFalseU8(
-        SIMDUInt8.Mask(
+        SIMD<UInt8>.Mask(
             raw: HighwayReference.Nothrow.greaterThanU8(
                 v.raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
             )
         ).raw
     )
 }
 
 @inline(never)
-public func portLargestDigitU8(from: UnsafePointer<SIMDUInt8.Lane>, count: Int) -> Bool {
-    var largest = SIMDUInt8.zero()
-    let laneCount = SIMDUInt8.laneCount
+public func portLargestDigitU8(from: UnsafePointer<UInt8>, count: Int) -> Bool {
+    var largest = SIMD<UInt8>.zero()
+    let laneCount = SIMD<UInt8>.laneCount
     var from = unsafe from
     var count = count
     while count >= laneCount {
-        let loaded = unsafe SIMDUInt8.load(from: from)
-        let letters = SIMDUInt8.subtracting(loaded, SIMDUInt8.repeating(0x61))
-        let numbers = SIMDUInt8.adding(
-            SIMDUInt8.minimum(
-                SIMDUInt8.subtracting(loaded, SIMDUInt8.repeating(0x30)),
-                SIMDUInt8.repeating(36)
+        let loaded = unsafe SIMD<UInt8>.load(from: from)
+        let letters = SIMD<UInt8>.subtracting(loaded, SIMD<UInt8>.repeating(0x61))
+        let numbers = SIMD<UInt8>.adding(
+            SIMD<UInt8>.minimum(
+                SIMD<UInt8>.subtracting(loaded, SIMD<UInt8>.repeating(0x30)),
+                SIMD<UInt8>.repeating(36)
             ),
-            SIMDUInt8.repeating(26)
+            SIMD<UInt8>.repeating(26)
         )
-        largest = SIMDUInt8.maximum(
+        largest = SIMD<UInt8>.maximum(
             largest,
-            SIMDUInt8.selecting(
-                SIMDUInt8.lessThan(letters, SIMDUInt8.repeating(26)),
+            SIMD<UInt8>.selecting(
+                SIMD<UInt8>.lessThan(letters, SIMD<UInt8>.repeating(26)),
                 letters,
                 numbers
             )
@@ -144,70 +142,69 @@ public func portLargestDigitU8(from: UnsafePointer<SIMDUInt8.Lane>, count: Int) 
         count -= laneCount
     }
     if count > 0 {
-        let loaded = unsafe SIMDUInt8.loadFirst(from: from, count: count)
-        let letters = SIMDUInt8.subtracting(loaded, SIMDUInt8.repeating(0x61))
-        let numbers = SIMDUInt8.adding(
-            SIMDUInt8.minimum(
-                SIMDUInt8.subtracting(loaded, SIMDUInt8.repeating(0x30)),
-                SIMDUInt8.repeating(36)
+        let loaded = unsafe SIMD<UInt8>.loadFirst(from: from, count: count)
+        let letters = SIMD<UInt8>.subtracting(loaded, SIMD<UInt8>.repeating(0x61))
+        let numbers = SIMD<UInt8>.adding(
+            SIMD<UInt8>.minimum(
+                SIMD<UInt8>.subtracting(loaded, SIMD<UInt8>.repeating(0x30)),
+                SIMD<UInt8>.repeating(36)
             ),
-            SIMDUInt8.repeating(26)
+            SIMD<UInt8>.repeating(26)
         )
-        largest = SIMDUInt8.maximum(
+        largest = SIMD<UInt8>.maximum(
             largest,
-            SIMDUInt8.selectingOrZero(
-                SIMDUInt8.firstLanes(count: count),
-                SIMDUInt8.selecting(
-                    SIMDUInt8.lessThan(letters, SIMDUInt8.repeating(26)),
+            SIMD<UInt8>.selectingOrZero(
+                SIMD<UInt8>.firstLanes(count: count),
+                SIMD<UInt8>.selecting(
+                    SIMD<UInt8>.lessThan(letters, SIMD<UInt8>.repeating(26)),
                     letters,
                     numbers
                 )
             )
         )
     }
-    return SIMDUInt8.allFalse(SIMDUInt8.greaterThan(largest, SIMDUInt8.repeating(35)))
+    return SIMD<UInt8>.allFalse(SIMD<UInt8>.greaterThan(largest, SIMD<UInt8>.repeating(35)))
 }
 
 @inline(never)
 public func highwayLargestDigitU8(from: UnsafePointer<UInt8>, count: Int) -> Bool {
-    var largest = SIMDUInt8.Vector(raw: HighwayReference.Nothrow.zeroU8())
+    var largest = SIMD<UInt8>(raw: HighwayReference.Nothrow.zeroU8())
     let laneCount = HighwayReferenceUInt8.laneCount
     var from = unsafe from
     var count = count
     while count >= laneCount {
-        let loaded = unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.loadU8(from))
-        let letters = SIMDUInt8.Vector(
+        let loaded = unsafe SIMD<UInt8>(raw: HighwayReference.Nothrow.loadU8(from))
+        let letters = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.subtractingU8(
                 loaded.raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
             )
         )
-        let numbers = SIMDUInt8.Vector(
+        let numbers = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.addingU8(
-                SIMDUInt8.Vector(
+                SIMD<UInt8>(
                     raw: HighwayReference.Nothrow.minimumU8(
-                        SIMDUInt8.Vector(
+                        SIMD<UInt8>(
                             raw: HighwayReference.Nothrow.subtractingU8(
                                 loaded.raw,
-                                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x30))
-                                    .raw
+                                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x30)).raw
                             )
                         ).raw,
-                        SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
+                        SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
                     )
                 ).raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
             )
         )
-        largest = SIMDUInt8.Vector(
+        largest = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.maximumU8(
                 largest.raw,
-                SIMDUInt8.Vector(
+                SIMD<UInt8>(
                     raw: HighwayReference.Nothrow.selectingU8(
-                        SIMDUInt8.Mask(
+                        SIMD<UInt8>.Mask(
                             raw: HighwayReference.Nothrow.lessThanU8(
                                 letters.raw,
-                                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
                             )
                         ).raw,
                         letters.raw,
@@ -220,44 +217,42 @@ public func highwayLargestDigitU8(from: UnsafePointer<UInt8>, count: Int) -> Boo
         count -= laneCount
     }
     if count > 0 {
-        let loaded = unsafe SIMDUInt8.Vector(raw: HighwayReference.Nothrow.loadFirstU8(from, count))
-        let letters = SIMDUInt8.Vector(
+        let loaded = unsafe SIMD<UInt8>(raw: HighwayReference.Nothrow.loadFirstU8(from, count))
+        let letters = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.subtractingU8(
                 loaded.raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
             )
         )
-        let numbers = SIMDUInt8.Vector(
+        let numbers = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.addingU8(
-                SIMDUInt8.Vector(
+                SIMD<UInt8>(
                     raw: HighwayReference.Nothrow.minimumU8(
-                        SIMDUInt8.Vector(
+                        SIMD<UInt8>(
                             raw: HighwayReference.Nothrow.subtractingU8(
                                 loaded.raw,
-                                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x30))
-                                    .raw
+                                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x30)).raw
                             )
                         ).raw,
-                        SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
+                        SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
                     )
                 ).raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
             )
         )
-        largest = SIMDUInt8.Vector(
+        largest = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.maximumU8(
                 largest.raw,
-                SIMDUInt8.Vector(
+                SIMD<UInt8>(
                     raw: HighwayReference.Nothrow.selectingOrZeroU8(
-                        SIMDUInt8.Mask(raw: HighwayReference.Nothrow.firstLanesU8(count)).raw,
-                        SIMDUInt8.Vector(
+                        SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.firstLanesU8(count)).raw,
+                        SIMD<UInt8>(
                             raw: HighwayReference.Nothrow.selectingU8(
-                                SIMDUInt8.Mask(
+                                SIMD<UInt8>.Mask(
                                     raw: HighwayReference.Nothrow.lessThanU8(
                                         letters.raw,
-                                        SIMDUInt8.Vector(
-                                            raw: HighwayReference.Nothrow.repeatingU8(26)
-                                        ).raw
+                                        SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26))
+                                            .raw
                                     )
                                 ).raw,
                                 letters.raw,
@@ -270,18 +265,18 @@ public func highwayLargestDigitU8(from: UnsafePointer<UInt8>, count: Int) -> Boo
         )
     }
     return HighwayReference.Nothrow.allFalseU8(
-        SIMDUInt8.Mask(
+        SIMD<UInt8>.Mask(
             raw: HighwayReference.Nothrow.greaterThanU8(
                 largest.raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(35)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(35)).raw
             )
         ).raw
     )
 }
 
 @inline(never)
-public func portUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    let byte1High = SIMDUInt8.repeatingBlock(
+public func portUTF8LookupStepU8(_ input: SIMD<UInt8>) -> SIMD<UInt8> {
+    let byte1High = SIMD<UInt8>.repeatingBlock(
         2,
         2,
         2,
@@ -299,7 +294,7 @@ public func portUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vector 
         21,
         73
     )
-    let byte1Low = SIMDUInt8.repeatingBlock(
+    let byte1Low = SIMD<UInt8>.repeatingBlock(
         231,
         163,
         131,
@@ -317,37 +312,54 @@ public func portUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vector 
         203,
         203
     )
-    let byte2High = SIMDUInt8.repeatingBlock(1, 1, 1, 1, 1, 1, 1, 1, 230, 174, 186, 186, 1, 1, 1, 1)
-    let prev1 = SIMDUInt8.slide1Up(input)
-    let prev2 = SIMDUInt8.slideUpLanes(input, by: 2)
-    let prev3 = SIMDUInt8.slideUpLanes(input, by: 3)
-    return SIMDUInt8.bitwiseXor(
-        SIMDUInt8.bitwiseAnd(
-            SIMDUInt8.bitwiseAnd(
-                unsafe SIMDUInt8.tableLookupBytes(
+    let byte2High = SIMD<UInt8>.repeatingBlock(
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        230,
+        174,
+        186,
+        186,
+        1,
+        1,
+        1,
+        1
+    )
+    let prev1 = SIMD<UInt8>.slide1Up(input)
+    let prev2 = SIMD<UInt8>.slideUpLanes(input, by: 2)
+    let prev3 = SIMD<UInt8>.slideUpLanes(input, by: 3)
+    return SIMD<UInt8>.bitwiseXor(
+        SIMD<UInt8>.bitwiseAnd(
+            SIMD<UInt8>.bitwiseAnd(
+                unsafe SIMD<UInt8>.tableLookupBytes(
                     byte1High,
-                    atUnchecked: SIMDUInt8.shiftedRight(prev1, by: 4)
+                    atUnchecked: SIMD<UInt8>.shiftedRight(prev1, by: 4)
                 ),
-                unsafe SIMDUInt8.tableLookupBytes(
+                unsafe SIMD<UInt8>.tableLookupBytes(
                     byte1Low,
-                    atUnchecked: SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
+                    atUnchecked: SIMD<UInt8>.bitwiseAnd(prev1, SIMD<UInt8>.repeating(0x0F))
                 )
             ),
-            unsafe SIMDUInt8.tableLookupBytes(
+            unsafe SIMD<UInt8>.tableLookupBytes(
                 byte2High,
-                atUnchecked: SIMDUInt8.shiftedRight(input, by: 4)
+                atUnchecked: SIMD<UInt8>.shiftedRight(input, by: 4)
             )
         ),
-        SIMDUInt8.bitwiseOr(
-            SIMDUInt8.saturatingSubtracting(prev2, SIMDUInt8.repeating(0x60)),
-            SIMDUInt8.saturatingSubtracting(prev3, SIMDUInt8.repeating(0x70))
+        SIMD<UInt8>.bitwiseOr(
+            SIMD<UInt8>.saturatingSubtracting(prev2, SIMD<UInt8>.repeating(0x60)),
+            SIMD<UInt8>.saturatingSubtracting(prev3, SIMD<UInt8>.repeating(0x70))
         )
     )
 }
 
 @inline(never)
-public func highwayUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    let byte1High = SIMDUInt8.Vector(
+public func highwayUTF8LookupStepU8(_ input: SIMD<UInt8>) -> SIMD<UInt8> {
+    let byte1High = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.repeatingBlockU8(
             2,
             2,
@@ -367,7 +379,7 @@ public func highwayUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vect
             73
         )
     )
-    let byte1Low = SIMDUInt8.Vector(
+    let byte1Low = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.repeatingBlockU8(
             231,
             163,
@@ -387,7 +399,7 @@ public func highwayUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vect
             203
         )
     )
-    let byte2High = SIMDUInt8.Vector(
+    let byte2High = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.repeatingBlockU8(
             1,
             1,
@@ -407,30 +419,30 @@ public func highwayUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vect
             1
         )
     )
-    let prev1 = SIMDUInt8.Vector(raw: HighwayReference.Nothrow.slide1UpU8(input.raw))
-    let prev2 = SIMDUInt8.Vector(raw: HighwayReference.Nothrow.slideUpLanesU8(input.raw, 2))
-    let prev3 = SIMDUInt8.Vector(raw: HighwayReference.Nothrow.slideUpLanesU8(input.raw, 3))
-    return SIMDUInt8.Vector(
+    let prev1 = SIMD<UInt8>(raw: HighwayReference.Nothrow.slide1UpU8(input.raw))
+    let prev2 = SIMD<UInt8>(raw: HighwayReference.Nothrow.slideUpLanesU8(input.raw, 2))
+    let prev3 = SIMD<UInt8>(raw: HighwayReference.Nothrow.slideUpLanesU8(input.raw, 3))
+    return SIMD<UInt8>(
         raw: HighwayReference.Nothrow.bitwiseXorU8(
-            SIMDUInt8.Vector(
+            SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseAndU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.bitwiseAndU8(
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.tableLookupBytesU8(
                                     byte1High.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.shiftedRightU8(prev1.raw, 4)
                                     ).raw
                                 )
                             ).raw,
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.tableLookupBytesU8(
                                     byte1Low.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.bitwiseAndU8(
                                             prev1.raw,
-                                            SIMDUInt8.Vector(
+                                            SIMD<UInt8>(
                                                 raw: HighwayReference.Nothrow.repeatingU8(0x0F)
                                             ).raw
                                         )
@@ -439,28 +451,27 @@ public func highwayUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vect
                             ).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.tableLookupBytesU8(
                             byte2High.raw,
-                            SIMDUInt8.Vector(
-                                raw: HighwayReference.Nothrow.shiftedRightU8(input.raw, 4)
-                            ).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedRightU8(input.raw, 4))
+                                .raw
                         )
                     ).raw
                 )
             ).raw,
-            SIMDUInt8.Vector(
+            SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseOrU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.saturatingSubtractingU8(
                             prev2.raw,
-                            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x60)).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x60)).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.saturatingSubtractingU8(
                             prev3.raw,
-                            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x70)).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x70)).raw
                         )
                     ).raw
                 )
@@ -471,29 +482,29 @@ public func highwayUTF8LookupStepU8(_ input: SIMDUInt8.Vector) -> SIMDUInt8.Vect
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portLargestDigitSpanU8(_ inputBytesSpan: Span<SIMDUInt8.Lane>) -> Bool {
+public func portLargestDigitSpanU8(_ inputBytesSpan: Span<UInt8>) -> Bool {
     let count = inputBytesSpan.count
     guard count > 0 else {
         return true
     }
 
-    let laneCount = SIMDUInt8.laneCount
+    let laneCount = SIMD<UInt8>.laneCount
     var remainingBytesSpan = inputBytesSpan
-    var largestDigit = SIMDUInt8.zero()
+    var largestDigit = SIMD<UInt8>.zero()
     while remainingBytesSpan.count >= laneCount {
-        let loaded = SIMDUInt8.load(from: remainingBytesSpan)
-        let letters = SIMDUInt8.subtracting(loaded, SIMDUInt8.repeating(0x61))
-        let numbers = SIMDUInt8.adding(
-            SIMDUInt8.minimum(
-                SIMDUInt8.subtracting(loaded, SIMDUInt8.repeating(0x30)),
-                SIMDUInt8.repeating(36)
+        let loaded = SIMD<UInt8>.load(from: remainingBytesSpan)
+        let letters = SIMD<UInt8>.subtracting(loaded, SIMD<UInt8>.repeating(0x61))
+        let numbers = SIMD<UInt8>.adding(
+            SIMD<UInt8>.minimum(
+                SIMD<UInt8>.subtracting(loaded, SIMD<UInt8>.repeating(0x30)),
+                SIMD<UInt8>.repeating(36)
             ),
-            SIMDUInt8.repeating(26)
+            SIMD<UInt8>.repeating(26)
         )
-        largestDigit = SIMDUInt8.maximum(
+        largestDigit = SIMD<UInt8>.maximum(
             largestDigit,
-            SIMDUInt8.selecting(
-                SIMDUInt8.lessThan(letters, SIMDUInt8.repeating(26)),
+            SIMD<UInt8>.selecting(
+                SIMD<UInt8>.lessThan(letters, SIMD<UInt8>.repeating(26)),
                 letters,
                 numbers
             )
@@ -505,28 +516,28 @@ public func portLargestDigitSpanU8(_ inputBytesSpan: Span<SIMDUInt8.Lane>) -> Bo
     }
     if !remainingBytesSpan.isEmpty {
         let remaining = remainingBytesSpan.count
-        let loaded = SIMDUInt8.loadFirst(from: remainingBytesSpan)
-        let letters = SIMDUInt8.subtracting(loaded, SIMDUInt8.repeating(0x61))
-        let numbers = SIMDUInt8.adding(
-            SIMDUInt8.minimum(
-                SIMDUInt8.subtracting(loaded, SIMDUInt8.repeating(0x30)),
-                SIMDUInt8.repeating(36)
+        let loaded = SIMD<UInt8>.loadFirst(from: remainingBytesSpan)
+        let letters = SIMD<UInt8>.subtracting(loaded, SIMD<UInt8>.repeating(0x61))
+        let numbers = SIMD<UInt8>.adding(
+            SIMD<UInt8>.minimum(
+                SIMD<UInt8>.subtracting(loaded, SIMD<UInt8>.repeating(0x30)),
+                SIMD<UInt8>.repeating(36)
             ),
-            SIMDUInt8.repeating(26)
+            SIMD<UInt8>.repeating(26)
         )
-        largestDigit = SIMDUInt8.maximum(
+        largestDigit = SIMD<UInt8>.maximum(
             largestDigit,
-            SIMDUInt8.selectingOrZero(
-                SIMDUInt8.firstLanes(count: remaining),
-                SIMDUInt8.selecting(
-                    SIMDUInt8.lessThan(letters, SIMDUInt8.repeating(26)),
+            SIMD<UInt8>.selectingOrZero(
+                SIMD<UInt8>.firstLanes(count: remaining),
+                SIMD<UInt8>.selecting(
+                    SIMD<UInt8>.lessThan(letters, SIMD<UInt8>.repeating(26)),
                     letters,
                     numbers
                 )
             )
         )
     }
-    return SIMDUInt8.allFalse(SIMDUInt8.greaterThan(largestDigit, SIMDUInt8.repeating(35)))
+    return SIMD<UInt8>.allFalse(SIMD<UInt8>.greaterThan(largestDigit, SIMD<UInt8>.repeating(35)))
 }
 
 @available(SwiftStdlib 5.1, *)
@@ -539,41 +550,40 @@ public func highwayLargestDigitSpanU8(_ inputBytesSpan: Span<UInt8>) -> Bool {
 
     let laneCount = HighwayReferenceUInt8.laneCount
     var remainingBytesSpan = inputBytesSpan
-    var largestDigit = SIMDUInt8.Vector(raw: HighwayReference.Nothrow.zeroU8())
+    var largestDigit = SIMD<UInt8>(raw: HighwayReference.Nothrow.zeroU8())
     while remainingBytesSpan.count >= laneCount {
         let loaded = HighwayReferenceUInt8.load(from: remainingBytesSpan)
-        let letters = SIMDUInt8.Vector(
+        let letters = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.subtractingU8(
                 loaded.raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
             )
         )
-        let numbers = SIMDUInt8.Vector(
+        let numbers = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.addingU8(
-                SIMDUInt8.Vector(
+                SIMD<UInt8>(
                     raw: HighwayReference.Nothrow.minimumU8(
-                        SIMDUInt8.Vector(
+                        SIMD<UInt8>(
                             raw: HighwayReference.Nothrow.subtractingU8(
                                 loaded.raw,
-                                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x30))
-                                    .raw
+                                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x30)).raw
                             )
                         ).raw,
-                        SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
+                        SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
                     )
                 ).raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
             )
         )
-        largestDigit = SIMDUInt8.Vector(
+        largestDigit = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.maximumU8(
                 largestDigit.raw,
-                SIMDUInt8.Vector(
+                SIMD<UInt8>(
                     raw: HighwayReference.Nothrow.selectingU8(
-                        SIMDUInt8.Mask(
+                        SIMD<UInt8>.Mask(
                             raw: HighwayReference.Nothrow.lessThanU8(
                                 letters.raw,
-                                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
                             )
                         ).raw,
                         letters.raw,
@@ -590,43 +600,41 @@ public func highwayLargestDigitSpanU8(_ inputBytesSpan: Span<UInt8>) -> Bool {
     if !remainingBytesSpan.isEmpty {
         let remaining = remainingBytesSpan.count
         let loaded = HighwayReferenceUInt8.loadFirst(from: remainingBytesSpan)
-        let letters = SIMDUInt8.Vector(
+        let letters = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.subtractingU8(
                 loaded.raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x61)).raw
             )
         )
-        let numbers = SIMDUInt8.Vector(
+        let numbers = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.addingU8(
-                SIMDUInt8.Vector(
+                SIMD<UInt8>(
                     raw: HighwayReference.Nothrow.minimumU8(
-                        SIMDUInt8.Vector(
+                        SIMD<UInt8>(
                             raw: HighwayReference.Nothrow.subtractingU8(
                                 loaded.raw,
-                                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x30))
-                                    .raw
+                                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x30)).raw
                             )
                         ).raw,
-                        SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
+                        SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(36)).raw
                     )
                 ).raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
             )
         )
-        largestDigit = SIMDUInt8.Vector(
+        largestDigit = SIMD<UInt8>(
             raw: HighwayReference.Nothrow.maximumU8(
                 largestDigit.raw,
-                SIMDUInt8.Vector(
+                SIMD<UInt8>(
                     raw: HighwayReference.Nothrow.selectingOrZeroU8(
-                        SIMDUInt8.Mask(raw: HighwayReference.Nothrow.firstLanesU8(remaining)).raw,
-                        SIMDUInt8.Vector(
+                        SIMD<UInt8>.Mask(raw: HighwayReference.Nothrow.firstLanesU8(remaining)).raw,
+                        SIMD<UInt8>(
                             raw: HighwayReference.Nothrow.selectingU8(
-                                SIMDUInt8.Mask(
+                                SIMD<UInt8>.Mask(
                                     raw: HighwayReference.Nothrow.lessThanU8(
                                         letters.raw,
-                                        SIMDUInt8.Vector(
-                                            raw: HighwayReference.Nothrow.repeatingU8(26)
-                                        ).raw
+                                        SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26))
+                                            .raw
                                     )
                                 ).raw,
                                 letters.raw,
@@ -639,10 +647,10 @@ public func highwayLargestDigitSpanU8(_ inputBytesSpan: Span<UInt8>) -> Bool {
         )
     }
     return HighwayReference.Nothrow.allFalseU8(
-        SIMDUInt8.Mask(
+        SIMD<UInt8>.Mask(
             raw: HighwayReference.Nothrow.greaterThanU8(
                 largestDigit.raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(35)).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(35)).raw
             )
         ).raw
     )
@@ -651,32 +659,32 @@ public func highwayLargestDigitSpanU8(_ inputBytesSpan: Span<UInt8>) -> Bool {
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portMaskedLowercaseSpanU8(
-    span: Span<SIMDUInt8.Lane>,
-    into output: inout OutputSpan<SIMDUInt8.Lane>
+    span: Span<UInt8>,
+    into output: inout OutputSpan<UInt8>
 ) -> Int {
-    let laneCount = SIMDUInt8.laneCount
+    let laneCount = SIMD<UInt8>.laneCount
     var remainingBytesSpan = span
     while !remainingBytesSpan.isEmpty {
         let windowLength = min(laneCount, remainingBytesSpan.count)
         let window =
             if windowLength == laneCount {
-                SIMDUInt8.load(from: remainingBytesSpan)
+                SIMD<UInt8>.load(from: remainingBytesSpan)
             } else {
-                SIMDUInt8.loadFirst(from: remainingBytesSpan)
+                SIMD<UInt8>.loadFirst(from: remainingBytesSpan)
             }
-        if SIMDUInt8.allFalse(SIMDUInt8.greaterThan(window, SIMDUInt8.repeating(0x7F))) {
-            let isUppercasedLetter = SIMDUInt8.lessThan(
-                SIMDUInt8.subtracting(window, SIMDUInt8.repeating(0x41)),
-                SIMDUInt8.repeating(26)
+        if SIMD<UInt8>.allFalse(SIMD<UInt8>.greaterThan(window, SIMD<UInt8>.repeating(0x7F))) {
+            let isUppercasedLetter = SIMD<UInt8>.lessThan(
+                SIMD<UInt8>.subtracting(window, SIMD<UInt8>.repeating(0x41)),
+                SIMD<UInt8>.repeating(26)
             )
-            let lowercased = SIMDUInt8.bitwiseOr(
+            let lowercased = SIMD<UInt8>.bitwiseOr(
                 window,
-                SIMDUInt8.selectingOrZero(isUppercasedLetter, SIMDUInt8.repeating(0b0010_0000))
+                SIMD<UInt8>.selectingOrZero(isUppercasedLetter, SIMD<UInt8>.repeating(0b0010_0000))
             )
             if windowLength == laneCount {
-                unsafe SIMDUInt8.append(lowercased, toUnchecked: &output)
+                unsafe SIMD<UInt8>.append(lowercased, toUnchecked: &output)
             } else {
-                unsafe SIMDUInt8.append(
+                unsafe SIMD<UInt8>.append(
                     lowercased,
                     addingCount: windowLength,
                     toUnchecked: &output
@@ -712,32 +720,31 @@ public func highwayMaskedLowercaseSpanU8(
                 HighwayReferenceUInt8.loadFirst(from: remainingBytesSpan)
             }
         if HighwayReference.Nothrow.allFalseU8(
-            SIMDUInt8.Mask(
+            SIMD<UInt8>.Mask(
                 raw: HighwayReference.Nothrow.greaterThanU8(
                     window.raw,
-                    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x7F)).raw
+                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x7F)).raw
                 )
             ).raw
         ) {
-            let isUppercasedLetter = SIMDUInt8.Mask(
+            let isUppercasedLetter = SIMD<UInt8>.Mask(
                 raw: HighwayReference.Nothrow.lessThanU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.subtractingU8(
                             window.raw,
-                            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x41)).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x41)).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
                 )
             )
-            let lowercased = SIMDUInt8.Vector(
+            let lowercased = SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseOrU8(
                     window.raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.selectingOrZeroU8(
                             isUppercasedLetter.raw,
-                            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0b0010_0000))
-                                .raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0b0010_0000)).raw
                         )
                     ).raw
                 )
@@ -766,18 +773,18 @@ public func highwayMaskedLowercaseSpanU8(
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
+public func portUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
     let count = bytes.count
     guard count > 0 else {
         return true
     }
 
-    let laneCount = SIMDUInt8.laneCount
+    let laneCount = SIMD<UInt8>.laneCount
     guard _fastPath(laneCount >= 16) else {
         return false
     }
 
-    let byte1High = SIMDUInt8.repeatingBlock(
+    let byte1High = SIMD<UInt8>.repeatingBlock(
         2,
         2,
         2,
@@ -795,7 +802,7 @@ public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
         21,
         73
     )
-    let byte1Low = SIMDUInt8.repeatingBlock(
+    let byte1Low = SIMD<UInt8>.repeatingBlock(
         231,
         163,
         131,
@@ -813,36 +820,53 @@ public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
         203,
         203
     )
-    let byte2High = SIMDUInt8.repeatingBlock(1, 1, 1, 1, 1, 1, 1, 1, 230, 174, 186, 186, 1, 1, 1, 1)
-    let headBytes = SIMDUInt8.loadFirst(from: bytes)
+    let byte2High = SIMD<UInt8>.repeatingBlock(
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        230,
+        174,
+        186,
+        186,
+        1,
+        1,
+        1,
+        1
+    )
+    let headBytes = SIMD<UInt8>.loadFirst(from: bytes)
     let input = headBytes
-    let prev1 = SIMDUInt8.slide1Up(headBytes)
-    let prev2 = SIMDUInt8.slideUpLanes(headBytes, by: 2)
-    let prev3 = SIMDUInt8.slideUpLanes(headBytes, by: 3)
-    let specialCases = SIMDUInt8.bitwiseAnd(
-        SIMDUInt8.bitwiseAnd(
-            unsafe SIMDUInt8.tableLookupBytes(
+    let prev1 = SIMD<UInt8>.slide1Up(headBytes)
+    let prev2 = SIMD<UInt8>.slideUpLanes(headBytes, by: 2)
+    let prev3 = SIMD<UInt8>.slideUpLanes(headBytes, by: 3)
+    let specialCases = SIMD<UInt8>.bitwiseAnd(
+        SIMD<UInt8>.bitwiseAnd(
+            unsafe SIMD<UInt8>.tableLookupBytes(
                 byte1High,
-                atUnchecked: SIMDUInt8.shiftedRight(prev1, by: 4)
+                atUnchecked: SIMD<UInt8>.shiftedRight(prev1, by: 4)
             ),
-            unsafe SIMDUInt8.tableLookupBytes(
+            unsafe SIMD<UInt8>.tableLookupBytes(
                 byte1Low,
-                atUnchecked: SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
+                atUnchecked: SIMD<UInt8>.bitwiseAnd(prev1, SIMD<UInt8>.repeating(0x0F))
             )
         ),
-        unsafe SIMDUInt8.tableLookupBytes(
+        unsafe SIMD<UInt8>.tableLookupBytes(
             byte2High,
-            atUnchecked: SIMDUInt8.shiftedRight(input, by: 4)
+            atUnchecked: SIMD<UInt8>.shiftedRight(input, by: 4)
         )
     )
-    let mustBe23Continuation = SIMDUInt8.bitwiseAnd(
-        SIMDUInt8.bitwiseOr(
-            SIMDUInt8.saturatingSubtracting(prev2, SIMDUInt8.repeating(0xE0 &- 0x80)),
-            SIMDUInt8.saturatingSubtracting(prev3, SIMDUInt8.repeating(0xF0 &- 0x80))
+    let mustBe23Continuation = SIMD<UInt8>.bitwiseAnd(
+        SIMD<UInt8>.bitwiseOr(
+            SIMD<UInt8>.saturatingSubtracting(prev2, SIMD<UInt8>.repeating(0xE0 &- 0x80)),
+            SIMD<UInt8>.saturatingSubtracting(prev3, SIMD<UInt8>.repeating(0xF0 &- 0x80))
         ),
-        SIMDUInt8.repeating(0x80)
+        SIMD<UInt8>.repeating(0x80)
     )
-    var errors = SIMDUInt8.bitwiseXor(mustBe23Continuation, specialCases)
+    var errors = SIMD<UInt8>.bitwiseXor(mustBe23Continuation, specialCases)
 
     if count > laneCount {
         var remainingBytesSpan = unsafe bytes.extracting(
@@ -850,48 +874,48 @@ public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
         )
         while remainingBytesSpan.count >= laneCount &+ 3 {
             let windowCount = remainingBytesSpan.count
-            let input = unsafe SIMDUInt8.load(
+            let input = unsafe SIMD<UInt8>.load(
                 fromUnchecked: remainingBytesSpan.extracting(
                     unchecked: Range(uncheckedBounds: (3, windowCount))
                 )
             )
-            let prev1 = unsafe SIMDUInt8.load(
+            let prev1 = unsafe SIMD<UInt8>.load(
                 fromUnchecked: remainingBytesSpan.extracting(
                     unchecked: Range(uncheckedBounds: (2, windowCount))
                 )
             )
-            let prev2 = unsafe SIMDUInt8.load(
+            let prev2 = unsafe SIMD<UInt8>.load(
                 fromUnchecked: remainingBytesSpan.extracting(
                     unchecked: Range(uncheckedBounds: (1, windowCount))
                 )
             )
-            let prev3 = unsafe SIMDUInt8.load(fromUnchecked: remainingBytesSpan)
-            let specialCases = SIMDUInt8.bitwiseAnd(
-                SIMDUInt8.bitwiseAnd(
-                    unsafe SIMDUInt8.tableLookupBytes(
+            let prev3 = unsafe SIMD<UInt8>.load(fromUnchecked: remainingBytesSpan)
+            let specialCases = SIMD<UInt8>.bitwiseAnd(
+                SIMD<UInt8>.bitwiseAnd(
+                    unsafe SIMD<UInt8>.tableLookupBytes(
                         byte1High,
-                        atUnchecked: SIMDUInt8.shiftedRight(prev1, by: 4)
+                        atUnchecked: SIMD<UInt8>.shiftedRight(prev1, by: 4)
                     ),
-                    unsafe SIMDUInt8.tableLookupBytes(
+                    unsafe SIMD<UInt8>.tableLookupBytes(
                         byte1Low,
-                        atUnchecked: SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
+                        atUnchecked: SIMD<UInt8>.bitwiseAnd(prev1, SIMD<UInt8>.repeating(0x0F))
                     )
                 ),
-                unsafe SIMDUInt8.tableLookupBytes(
+                unsafe SIMD<UInt8>.tableLookupBytes(
                     byte2High,
-                    atUnchecked: SIMDUInt8.shiftedRight(input, by: 4)
+                    atUnchecked: SIMD<UInt8>.shiftedRight(input, by: 4)
                 )
             )
-            let mustBe23Continuation = SIMDUInt8.bitwiseAnd(
-                SIMDUInt8.bitwiseOr(
-                    SIMDUInt8.saturatingSubtracting(prev2, SIMDUInt8.repeating(0xE0 &- 0x80)),
-                    SIMDUInt8.saturatingSubtracting(prev3, SIMDUInt8.repeating(0xF0 &- 0x80))
+            let mustBe23Continuation = SIMD<UInt8>.bitwiseAnd(
+                SIMD<UInt8>.bitwiseOr(
+                    SIMD<UInt8>.saturatingSubtracting(prev2, SIMD<UInt8>.repeating(0xE0 &- 0x80)),
+                    SIMD<UInt8>.saturatingSubtracting(prev3, SIMD<UInt8>.repeating(0xF0 &- 0x80))
                 ),
-                SIMDUInt8.repeating(0x80)
+                SIMD<UInt8>.repeating(0x80)
             )
-            errors = SIMDUInt8.bitwiseOr(
+            errors = SIMD<UInt8>.bitwiseOr(
                 errors,
-                SIMDUInt8.bitwiseXor(mustBe23Continuation, specialCases)
+                SIMD<UInt8>.bitwiseXor(mustBe23Continuation, specialCases)
             )
             let remainingBytesRange = unsafe Range<Int>(
                 uncheckedBounds: (laneCount, remainingBytesSpan.count)
@@ -902,48 +926,48 @@ public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
         }
         if remainingBytesSpan.count > 3 {
             let windowCount = remainingBytesSpan.count
-            let input = unsafe SIMDUInt8.loadFirst(
+            let input = unsafe SIMD<UInt8>.loadFirst(
                 from: remainingBytesSpan.extracting(
                     unchecked: Range(uncheckedBounds: (3, windowCount))
                 )
             )
-            let prev1 = unsafe SIMDUInt8.loadFirst(
+            let prev1 = unsafe SIMD<UInt8>.loadFirst(
                 from: remainingBytesSpan.extracting(
                     unchecked: Range(uncheckedBounds: (2, windowCount))
                 )
             )
-            let prev2 = unsafe SIMDUInt8.loadFirst(
+            let prev2 = unsafe SIMD<UInt8>.loadFirst(
                 from: remainingBytesSpan.extracting(
                     unchecked: Range(uncheckedBounds: (1, windowCount))
                 )
             )
-            let prev3 = SIMDUInt8.loadFirst(from: remainingBytesSpan)
-            let specialCases = SIMDUInt8.bitwiseAnd(
-                SIMDUInt8.bitwiseAnd(
-                    unsafe SIMDUInt8.tableLookupBytes(
+            let prev3 = SIMD<UInt8>.loadFirst(from: remainingBytesSpan)
+            let specialCases = SIMD<UInt8>.bitwiseAnd(
+                SIMD<UInt8>.bitwiseAnd(
+                    unsafe SIMD<UInt8>.tableLookupBytes(
                         byte1High,
-                        atUnchecked: SIMDUInt8.shiftedRight(prev1, by: 4)
+                        atUnchecked: SIMD<UInt8>.shiftedRight(prev1, by: 4)
                     ),
-                    unsafe SIMDUInt8.tableLookupBytes(
+                    unsafe SIMD<UInt8>.tableLookupBytes(
                         byte1Low,
-                        atUnchecked: SIMDUInt8.bitwiseAnd(prev1, SIMDUInt8.repeating(0x0F))
+                        atUnchecked: SIMD<UInt8>.bitwiseAnd(prev1, SIMD<UInt8>.repeating(0x0F))
                     )
                 ),
-                unsafe SIMDUInt8.tableLookupBytes(
+                unsafe SIMD<UInt8>.tableLookupBytes(
                     byte2High,
-                    atUnchecked: SIMDUInt8.shiftedRight(input, by: 4)
+                    atUnchecked: SIMD<UInt8>.shiftedRight(input, by: 4)
                 )
             )
-            let mustBe23Continuation = SIMDUInt8.bitwiseAnd(
-                SIMDUInt8.bitwiseOr(
-                    SIMDUInt8.saturatingSubtracting(prev2, SIMDUInt8.repeating(0xE0 &- 0x80)),
-                    SIMDUInt8.saturatingSubtracting(prev3, SIMDUInt8.repeating(0xF0 &- 0x80))
+            let mustBe23Continuation = SIMD<UInt8>.bitwiseAnd(
+                SIMD<UInt8>.bitwiseOr(
+                    SIMD<UInt8>.saturatingSubtracting(prev2, SIMD<UInt8>.repeating(0xE0 &- 0x80)),
+                    SIMD<UInt8>.saturatingSubtracting(prev3, SIMD<UInt8>.repeating(0xF0 &- 0x80))
                 ),
-                SIMDUInt8.repeating(0x80)
+                SIMD<UInt8>.repeating(0x80)
             )
-            errors = SIMDUInt8.bitwiseOr(
+            errors = SIMD<UInt8>.bitwiseOr(
                 errors,
-                SIMDUInt8.bitwiseXor(mustBe23Continuation, specialCases)
+                SIMD<UInt8>.bitwiseXor(mustBe23Continuation, specialCases)
             )
         }
     }
@@ -957,7 +981,7 @@ public func portUTF8LookupSpanU8(_ bytes: Span<SIMDUInt8.Lane>) -> Bool {
         }
     }
 
-    return SIMDUInt8.allFalse(SIMDUInt8.notEqualTo(errors, SIMDUInt8.zero()))
+    return SIMD<UInt8>.allFalse(SIMD<UInt8>.notEqualTo(errors, SIMD<UInt8>.zero()))
 }
 
 @available(SwiftStdlib 5.1, *)
@@ -973,7 +997,7 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
         return false
     }
 
-    let byte1High = SIMDUInt8.Vector(
+    let byte1High = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.repeatingBlockU8(
             2,
             2,
@@ -993,7 +1017,7 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
             73
         )
     )
-    let byte1Low = SIMDUInt8.Vector(
+    let byte1Low = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.repeatingBlockU8(
             231,
             163,
@@ -1013,7 +1037,7 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
             203
         )
     )
-    let byte2High = SIMDUInt8.Vector(
+    let byte2High = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.repeatingBlockU8(
             1,
             1,
@@ -1035,70 +1059,63 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
     )
     let headBytes = HighwayReferenceUInt8.loadFirst(from: bytes)
     let input = headBytes
-    let prev1 = SIMDUInt8.Vector(raw: HighwayReference.Nothrow.slide1UpU8(headBytes.raw))
-    let prev2 = SIMDUInt8.Vector(raw: HighwayReference.Nothrow.slideUpLanesU8(headBytes.raw, 2))
-    let prev3 = SIMDUInt8.Vector(raw: HighwayReference.Nothrow.slideUpLanesU8(headBytes.raw, 3))
-    let specialCases = SIMDUInt8.Vector(
+    let prev1 = SIMD<UInt8>(raw: HighwayReference.Nothrow.slide1UpU8(headBytes.raw))
+    let prev2 = SIMD<UInt8>(raw: HighwayReference.Nothrow.slideUpLanesU8(headBytes.raw, 2))
+    let prev3 = SIMD<UInt8>(raw: HighwayReference.Nothrow.slideUpLanesU8(headBytes.raw, 3))
+    let specialCases = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.bitwiseAndU8(
-            SIMDUInt8.Vector(
+            SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseAndU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.tableLookupBytesU8(
                             byte1High.raw,
-                            SIMDUInt8.Vector(
-                                raw: HighwayReference.Nothrow.shiftedRightU8(prev1.raw, 4)
-                            ).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedRightU8(prev1.raw, 4))
+                                .raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.tableLookupBytesU8(
                             byte1Low.raw,
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.bitwiseAndU8(
                                     prev1.raw,
-                                    SIMDUInt8.Vector(
-                                        raw: HighwayReference.Nothrow.repeatingU8(0x0F)
-                                    ).raw
+                                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x0F)).raw
                                 )
                             ).raw
                         )
                     ).raw
                 )
             ).raw,
-            SIMDUInt8.Vector(
+            SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.tableLookupBytesU8(
                     byte2High.raw,
-                    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightU8(input.raw, 4)).raw
+                    SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedRightU8(input.raw, 4)).raw
                 )
             ).raw
         )
     )
-    let mustBe23Continuation = SIMDUInt8.Vector(
+    let mustBe23Continuation = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.bitwiseAndU8(
-            SIMDUInt8.Vector(
+            SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseOrU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.saturatingSubtractingU8(
                             prev2.raw,
-                            SIMDUInt8.Vector(
-                                raw: HighwayReference.Nothrow.repeatingU8(0xE0 &- 0x80)
-                            ).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0xE0 &- 0x80)).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.saturatingSubtractingU8(
                             prev3.raw,
-                            SIMDUInt8.Vector(
-                                raw: HighwayReference.Nothrow.repeatingU8(0xF0 &- 0x80)
-                            ).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0xF0 &- 0x80)).raw
                         )
                     ).raw
                 )
             ).raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x80)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x80)).raw
         )
     )
-    var errors = SIMDUInt8.Vector(
+    var errors = SIMD<UInt8>(
         raw: HighwayReference.Nothrow.bitwiseXorU8(mustBe23Continuation.raw, specialCases.raw)
     )
 
@@ -1124,25 +1141,25 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
                 )
             )
             let prev3 = unsafe HighwayReferenceUInt8.load(fromUnchecked: remainingBytesSpan)
-            let specialCases = SIMDUInt8.Vector(
+            let specialCases = SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseAndU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.bitwiseAndU8(
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.tableLookupBytesU8(
                                     byte1High.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.shiftedRightU8(prev1.raw, 4)
                                     ).raw
                                 )
                             ).raw,
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.tableLookupBytesU8(
                                     byte1Low.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.bitwiseAndU8(
                                             prev1.raw,
-                                            SIMDUInt8.Vector(
+                                            SIMD<UInt8>(
                                                 raw: HighwayReference.Nothrow.repeatingU8(0x0F)
                                             ).raw
                                         )
@@ -1151,45 +1168,44 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
                             ).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.tableLookupBytesU8(
                             byte2High.raw,
-                            SIMDUInt8.Vector(
-                                raw: HighwayReference.Nothrow.shiftedRightU8(input.raw, 4)
-                            ).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedRightU8(input.raw, 4))
+                                .raw
                         )
                     ).raw
                 )
             )
-            let mustBe23Continuation = SIMDUInt8.Vector(
+            let mustBe23Continuation = SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseAndU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.bitwiseOrU8(
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.saturatingSubtractingU8(
                                     prev2.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.repeatingU8(0xE0 &- 0x80)
                                     ).raw
                                 )
                             ).raw,
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.saturatingSubtractingU8(
                                     prev3.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.repeatingU8(0xF0 &- 0x80)
                                     ).raw
                                 )
                             ).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x80)).raw
+                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x80)).raw
                 )
             )
-            errors = SIMDUInt8.Vector(
+            errors = SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseOrU8(
                     errors.raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.bitwiseXorU8(
                             mustBe23Continuation.raw,
                             specialCases.raw
@@ -1222,25 +1238,25 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
                 )
             )
             let prev3 = HighwayReferenceUInt8.loadFirst(from: remainingBytesSpan)
-            let specialCases = SIMDUInt8.Vector(
+            let specialCases = SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseAndU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.bitwiseAndU8(
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.tableLookupBytesU8(
                                     byte1High.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.shiftedRightU8(prev1.raw, 4)
                                     ).raw
                                 )
                             ).raw,
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.tableLookupBytesU8(
                                     byte1Low.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.bitwiseAndU8(
                                             prev1.raw,
-                                            SIMDUInt8.Vector(
+                                            SIMD<UInt8>(
                                                 raw: HighwayReference.Nothrow.repeatingU8(0x0F)
                                             ).raw
                                         )
@@ -1249,45 +1265,44 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
                             ).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.tableLookupBytesU8(
                             byte2High.raw,
-                            SIMDUInt8.Vector(
-                                raw: HighwayReference.Nothrow.shiftedRightU8(input.raw, 4)
-                            ).raw
+                            SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedRightU8(input.raw, 4))
+                                .raw
                         )
                     ).raw
                 )
             )
-            let mustBe23Continuation = SIMDUInt8.Vector(
+            let mustBe23Continuation = SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseAndU8(
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.bitwiseOrU8(
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.saturatingSubtractingU8(
                                     prev2.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.repeatingU8(0xE0 &- 0x80)
                                     ).raw
                                 )
                             ).raw,
-                            SIMDUInt8.Vector(
+                            SIMD<UInt8>(
                                 raw: HighwayReference.Nothrow.saturatingSubtractingU8(
                                     prev3.raw,
-                                    SIMDUInt8.Vector(
+                                    SIMD<UInt8>(
                                         raw: HighwayReference.Nothrow.repeatingU8(0xF0 &- 0x80)
                                     ).raw
                                 )
                             ).raw
                         )
                     ).raw,
-                    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(0x80)).raw
+                    SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(0x80)).raw
                 )
             )
-            errors = SIMDUInt8.Vector(
+            errors = SIMD<UInt8>(
                 raw: HighwayReference.Nothrow.bitwiseOrU8(
                     errors.raw,
-                    SIMDUInt8.Vector(
+                    SIMD<UInt8>(
                         raw: HighwayReference.Nothrow.bitwiseXorU8(
                             mustBe23Continuation.raw,
                             specialCases.raw
@@ -1308,10 +1323,10 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
     }
 
     return HighwayReference.Nothrow.allFalseU8(
-        SIMDUInt8.Mask(
+        SIMD<UInt8>.Mask(
             raw: HighwayReference.Nothrow.notEqualToU8(
                 errors.raw,
-                SIMDUInt8.Vector(raw: HighwayReference.Nothrow.zeroU8()).raw
+                SIMD<UInt8>(raw: HighwayReference.Nothrow.zeroU8()).raw
             )
         ).raw
     )
@@ -1319,17 +1334,14 @@ public func highwayUTF8LookupSpanU8(_ bytes: Span<UInt8>) -> Bool {
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumAboveSpanU8(
-    above t: SIMDUInt8.Lane,
-    in values: Span<SIMDUInt8.Lane>
-) -> SIMDUInt8.Lane {
-    let laneCount = SIMDUInt8.laneCount
-    let threshold = SIMDUInt8.repeating(t)
-    var total: SIMDUInt8.Lane = 0
+public func portSumAboveSpanU8(above t: UInt8, in values: Span<UInt8>) -> UInt8 {
+    let laneCount = SIMD<UInt8>.laneCount
+    let threshold = SIMD<UInt8>.repeating(t)
+    var total: UInt8 = 0
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
-        let loaded = SIMDUInt8.load(from: remainingValuesSpan)
-        total &+= SIMDUInt8.sum(loaded, where: SIMDUInt8.greaterThan(loaded, threshold))
+        let loaded = SIMD<UInt8>.load(from: remainingValuesSpan)
+        total &+= SIMD<UInt8>.sum(loaded, where: SIMD<UInt8>.greaterThan(loaded, threshold))
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
         )
@@ -1362,20 +1374,20 @@ public func highwaySumAboveSpanU8(above t: UInt8, in values: Span<UInt8>) -> UIn
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portCountEqualAboveSpanU8(
-    above t: SIMDUInt8.Lane,
-    in values: Span<SIMDUInt8.Lane>,
-    matching others: Span<SIMDUInt8.Lane>
+    above t: UInt8,
+    in values: Span<UInt8>,
+    matching others: Span<UInt8>
 ) -> Int {
-    let laneCount = SIMDUInt8.laneCount
-    let threshold = SIMDUInt8.repeating(t)
+    let laneCount = SIMD<UInt8>.laneCount
+    let threshold = SIMD<UInt8>.repeating(t)
     var count = 0
     var remainingValuesSpan = values
     var remainingOthersSpan = others
     while remainingValuesSpan.count >= laneCount && remainingOthersSpan.count >= laneCount {
-        let loaded = SIMDUInt8.load(from: remainingValuesSpan)
-        let other = SIMDUInt8.load(from: remainingOthersSpan)
-        count &+= SIMDUInt8.trueCount(
-            SIMDUInt8.equalTo(loaded, other, where: SIMDUInt8.greaterThan(loaded, threshold))
+        let loaded = SIMD<UInt8>.load(from: remainingValuesSpan)
+        let other = SIMD<UInt8>.load(from: remainingOthersSpan)
+        count &+= SIMD<UInt8>.trueCount(
+            SIMD<UInt8>.equalTo(loaded, other, where: SIMD<UInt8>.greaterThan(loaded, threshold))
         )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
@@ -1425,20 +1437,20 @@ public func highwayCountEqualAboveSpanU8(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portClampAboveSpanU8(
-    atMost t: SIMDUInt8.Lane,
-    in values: Span<SIMDUInt8.Lane>,
-    into output: inout MutableSpan<SIMDUInt8.Lane>
+    atMost t: UInt8,
+    in values: Span<UInt8>,
+    into output: inout MutableSpan<UInt8>
 ) -> Int {
-    let laneCount = SIMDUInt8.laneCount
-    let limit = SIMDUInt8.repeating(t)
+    let laneCount = SIMD<UInt8>.laneCount
+    let limit = SIMD<UInt8>.repeating(t)
     var remainingValuesSpan = values
     var remainingOutputSpan = output._mutatingExtracting(...)
     while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
-        let loaded = SIMDUInt8.load(from: remainingValuesSpan)
-        SIMDUInt8.store(
+        let loaded = SIMD<UInt8>.load(from: remainingValuesSpan)
+        SIMD<UInt8>.store(
             limit,
             to: &remainingOutputSpan,
-            where: SIMDUInt8.greaterThan(loaded, limit)
+            where: SIMD<UInt8>.greaterThan(loaded, limit)
         )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
@@ -1491,18 +1503,18 @@ public func highwayClampAboveSpanU8(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portSelectBelowSpanU8(
-    below t: SIMDUInt8.Lane,
-    in values: Span<SIMDUInt8.Lane>,
-    into output: inout MutableSpan<SIMDUInt8.Lane>
+    below t: UInt8,
+    in values: Span<UInt8>,
+    into output: inout MutableSpan<UInt8>
 ) -> Int {
-    let laneCount = SIMDUInt8.laneCount
-    let threshold = SIMDUInt8.repeating(t)
+    let laneCount = SIMD<UInt8>.laneCount
+    let threshold = SIMD<UInt8>.repeating(t)
     var remainingValuesSpan = values
     var remainingOutputSpan = output._mutatingExtracting(...)
     while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
-        let loaded = SIMDUInt8.load(from: remainingValuesSpan)
-        SIMDUInt8.store(
-            SIMDUInt8.selectingOrZero(SIMDUInt8.lessThan(loaded, threshold), loaded),
+        let loaded = SIMD<UInt8>.load(from: remainingValuesSpan)
+        SIMD<UInt8>.store(
+            SIMD<UInt8>.selectingOrZero(SIMD<UInt8>.lessThan(loaded, threshold), loaded),
             to: &remainingOutputSpan
         )
         let remainingValuesRange = unsafe Range<Int>(

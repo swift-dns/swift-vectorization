@@ -8,12 +8,12 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkExtractingBlockConstantA(_ value: H.Lane) {
+    private func checkExtractingBlockConstantA(_ value: Lane) {
         let mismatches = Mismatches("extractingBlock with a repeating \(hex(value))")
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for index in indexInputs {
@@ -21,7 +21,7 @@ extension SIMDFloat16ConstantTests {
                 H.block(H.repeating(value), at: index),
                 H.BlockVector(
                     raw: HighwayReference.extractingBlockF16(
-                        H.repeating(value),
+                        H.repeating(value).raw,
                         Int32(truncatingIfNeeded: index)
                     )
                 ),
@@ -88,7 +88,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func extractingBlockConstantSplatPayloadNaN() {
-        checkExtractingBlockConstantA(H.Lane(nan: 1, signaling: false))
+        checkExtractingBlockConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func extractingBlockConstantSplatSignalingNaN() {
@@ -108,7 +108,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkReplacingBlockConstantA(_ value: H.Lane) {
+    private func checkReplacingBlockConstantA(_ value: Lane) {
         let mismatches = Mismatches("replacingBlock with a repeating \(hex(value))")
         let indexInputs = Array(0...H.laneCount / 8 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x4AE7_33E2_0E60_E2CD).map(
@@ -116,16 +116,18 @@ extension SIMDFloat16ConstantTests {
         )
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (index, b) in everyPair(indexInputs, bInputs) {
             mismatches.check(
                 H.replacingBlock(H.repeating(value), at: index, with: b),
-                HighwayReference.replacingBlockF16(
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: index),
-                    b.raw
+                H(
+                    raw: HighwayReference.replacingBlockF16(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
                 ),
                 "index: \(index), b: \(describe(b))"
             )
@@ -190,7 +192,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func replacingBlockConstantSplatPayloadNaN() {
-        checkReplacingBlockConstantA(H.Lane(nan: 1, signaling: false))
+        checkReplacingBlockConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func replacingBlockConstantSplatSignalingNaN() {

@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDUInt8ReferenceTests {
     @Test func reversed() {
         let mismatches = Mismatches("reversed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x89A2_083A_0BB1_073C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x89A2_083A_0BB1_073C)
         for a in aInputs {
             mismatches.check(
                 H.reversed(a),
-                H.Vector(raw: HighwayReference.reversedU8(a.raw)),
+                H(raw: HighwayReference.reversedU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -21,11 +21,11 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func bitReversed() {
         let mismatches = Mismatches("bitReversed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7B07_CA7B_27AC_33D1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7B07_CA7B_27AC_33D1)
         for a in aInputs {
             mismatches.check(
                 H.bitReversed(a),
-                H.Vector(raw: HighwayReference.bitReversedU8(a.raw)),
+                H(raw: HighwayReference.bitReversedU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -34,11 +34,11 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func reversedBlocks() {
         let mismatches = Mismatches("reversedBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC3BC_6054_F4AE_1FF2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC3BC_6054_F4AE_1FF2)
         for a in aInputs {
             mismatches.check(
                 H.reversedBlocks(a),
-                H.Vector(raw: HighwayReference.reversedBlocksU8(a.raw)),
+                H(raw: HighwayReference.reversedBlocksU8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -47,11 +47,11 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func reversed2() {
         let mismatches = Mismatches("reversed2")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBA92_C3A1_F642_F2FC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBA92_C3A1_F642_F2FC)
         for a in aInputs {
             mismatches.check(
                 H.reversed2(a),
-                H.Vector(raw: HighwayReference.reversed2U8(a.raw)),
+                H(raw: HighwayReference.reversed2U8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -60,11 +60,11 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func reversed4() {
         let mismatches = Mismatches("reversed4")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEF57_CDA2_1460_955A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEF57_CDA2_1460_955A)
         for a in aInputs {
             mismatches.check(
                 H.reversed4(a),
-                H.Vector(raw: HighwayReference.reversed4U8(a.raw)),
+                H(raw: HighwayReference.reversed4U8(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -73,11 +73,11 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func reversed8() {
         let mismatches = Mismatches("reversed8")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x113F_69A2_275E_DF0E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x113F_69A2_275E_DF0E)
         for a in aInputs {
             mismatches.check(
                 H.reversed8(a),
-                H.Vector(raw: HighwayReference.reversed8U8(a.raw)),
+                H(raw: HighwayReference.reversed8U8(a.raw)),
                 "a: \(describe(a))"
             )
         }

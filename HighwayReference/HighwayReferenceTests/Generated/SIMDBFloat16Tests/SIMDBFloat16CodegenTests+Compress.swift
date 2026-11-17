@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func compressed() {
         let mismatches = Mismatches("portCompressedBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x92AE_44FB_607F_916D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x92AE_44FB_607F_916D)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x92AE_43FB_607F_8FBA)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = portCompressedBF16(a, where: mask)
@@ -46,7 +46,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func compressedNot() {
         let mismatches = Mismatches("portCompressedNotBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x43DA_CAC0_61DD_DA58)
+        let aInputs = Inputs.vectors(H.self, seed: 0x43DA_CAC0_61DD_DA58)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x43DA_CBC0_61DD_DC0B)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = portCompressedNotBF16(a, where: mask)
@@ -83,7 +83,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func compressedBits() {
         let mismatches = Mismatches("portCompressedBitsBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1B9B_7B6E_4B73_5505)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1B9B_7B6E_4B73_5505)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
@@ -114,7 +114,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func compressedBitsBeforeGuardPage() {
         let mismatches = Mismatches("portCompressedBitsBF16 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC643_5A73_7787_2192)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC643_5A73_7787_2192)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,

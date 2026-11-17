@@ -7,17 +7,17 @@ import Vectorization
 
 extension SIMDUInt8ConstantTests {
     @inline(__always)
-    private func checkCreate2ConstantA(_ value: H.Lane) {
+    private func checkCreate2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("create2 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x606F_962F_07CE_E55E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x606F_962F_07CE_E55E)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for b in bInputs {
             let port = H.create2(H.repeating(value), b)
-            let reference = { tuple in (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1)) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
                 HighwayReference.create2U8(H.repeating(value).raw, b.raw)
             )
             mismatches.check(port.0, reference.0, "b: \(describe(b))")
@@ -27,17 +27,17 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate2ConstantB(_ value: H.Lane) {
+    private func checkCreate2ConstantB(_ value: Lane) {
         let mismatches = Mismatches("create2 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5700_E02F_023F_3ABC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5700_E02F_023F_3ABC)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for a in aInputs {
             let port = H.create2(a, H.repeating(value))
-            let reference = { tuple in (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1)) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
                 HighwayReference.create2U8(a.raw, H.repeating(value).raw)
             )
             mismatches.check(port.0, reference.0, "a: \(describe(a))")
@@ -87,20 +87,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate3ConstantA(_ value: H.Lane) {
+    private func checkCreate3ConstantA(_ value: Lane) {
         let mismatches = Mismatches("create3 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9C18_D010_83F5_CCEF)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x9C18_D110_83F5_CEA2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9C18_D010_83F5_CCEF)
+        let cInputs = Inputs.vectors(H.self, seed: 0x9C18_D110_83F5_CEA2)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             let port = H.create3(H.repeating(value), b, c)
-            let reference = { tuple in
-                (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2))
-            }(HighwayReference.create3U8(H.repeating(value).raw, b.raw, c.raw))
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
+                HighwayReference.create3U8(H.repeating(value).raw, b.raw, c.raw)
+            )
             mismatches.check(port.0, reference.0, "b: \(describe(b)), c: \(describe(c))")
             mismatches.check(port.1, reference.1, "b: \(describe(b)), c: \(describe(c))")
             mismatches.check(port.2, reference.2, "b: \(describe(b)), c: \(describe(c))")
@@ -109,20 +109,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate3ConstantB(_ value: H.Lane) {
+    private func checkCreate3ConstantB(_ value: Lane) {
         let mismatches = Mismatches("create3 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA587_8610_8985_7791)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xA587_8410_8985_742B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA587_8610_8985_7791)
+        let cInputs = Inputs.vectors(H.self, seed: 0xA587_8410_8985_742B)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             let port = H.create3(a, H.repeating(value), c)
-            let reference = { tuple in
-                (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2))
-            }(HighwayReference.create3U8(a.raw, H.repeating(value).raw, c.raw))
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
+                HighwayReference.create3U8(a.raw, H.repeating(value).raw, c.raw)
+            )
             mismatches.check(port.0, reference.0, "a: \(describe(a)), c: \(describe(c))")
             mismatches.check(port.1, reference.1, "a: \(describe(a)), c: \(describe(c))")
             mismatches.check(port.2, reference.2, "a: \(describe(a)), c: \(describe(c))")
@@ -131,20 +131,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate3ConstantC(_ value: H.Lane) {
+    private func checkCreate3ConstantC(_ value: Lane) {
         let mismatches = Mismatches("create3 with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAE1C_9D10_8E5C_2346)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAE1C_9E10_8E5C_24F9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE1C_9D10_8E5C_2346)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAE1C_9E10_8E5C_24F9)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             let port = H.create3(a, b, H.repeating(value))
-            let reference = { tuple in
-                (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2))
-            }(HighwayReference.create3U8(a.raw, b.raw, H.repeating(value).raw))
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
+                HighwayReference.create3U8(a.raw, b.raw, H.repeating(value).raw)
+            )
             mismatches.check(port.0, reference.0, "a: \(describe(a)), b: \(describe(b))")
             mismatches.check(port.1, reference.1, "a: \(describe(a)), b: \(describe(b))")
             mismatches.check(port.2, reference.2, "a: \(describe(a)), b: \(describe(b))")
@@ -201,23 +201,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate4ConstantA(_ value: H.Lane) {
+    private func checkCreate4ConstantA(_ value: Lane) {
         let mismatches = Mismatches("create4 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC4FF_B2A2_DEAB_7F2C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xC4FF_B5A2_DEAB_8445)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xC4FF_B4A2_DEAB_8292)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC4FF_B2A2_DEAB_7F2C)
+        let cInputs = Inputs.vectors(H.self, seed: 0xC4FF_B5A2_DEAB_8445)
+        let dInputs = Inputs.vectors(H.self, seed: 0xC4FF_B4A2_DEAB_8292)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for (b, c, d) in mixedTriples(bInputs, cInputs, dInputs, seed: 0x502A_09A7_5C25_5379) {
             let port = H.create4(H.repeating(value), b, c, d)
             let reference = { tuple in
-                (
-                    H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2),
-                    H.Vector(raw: tuple.v3)
-                )
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
             }(HighwayReference.create4U8(H.repeating(value).raw, b.raw, c.raw, d.raw))
             mismatches.check(
                 port.0,
@@ -244,23 +241,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate4ConstantB(_ value: H.Lane) {
+    private func checkCreate4ConstantB(_ value: Lane) {
         let mismatches = Mismatches("create4 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE005_38A2_EE44_B35E)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE005_36A2_EE44_AFF8)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xE005_37A2_EE44_B1AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE005_38A2_EE44_B35E)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE005_36A2_EE44_AFF8)
+        let dInputs = Inputs.vectors(H.self, seed: 0xE005_37A2_EE44_B1AB)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for (a, c, d) in mixedTriples(aInputs, cInputs, dInputs, seed: 0xF0F3_6A51_7CC7_4E7A) {
             let port = H.create4(a, H.repeating(value), c, d)
             let reference = { tuple in
-                (
-                    H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2),
-                    H.Vector(raw: tuple.v3)
-                )
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
             }(HighwayReference.create4U8(a.raw, H.repeating(value).raw, c.raw, d.raw))
             mismatches.check(
                 port.0,
@@ -287,23 +281,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate4ConstantC(_ value: H.Lane) {
+    private func checkCreate4ConstantC(_ value: Lane) {
         let mismatches = Mismatches("create4 with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD703_81A2_E911_D8E9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD703_80A2_E911_D736)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xD703_7EA2_E911_D3D0)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD703_81A2_E911_D8E9)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD703_80A2_E911_D736)
+        let dInputs = Inputs.vectors(H.self, seed: 0xD703_7EA2_E911_D3D0)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for (a, b, d) in mixedTriples(aInputs, bInputs, dInputs, seed: 0x6ADE_1D8B_E5EB_35A3) {
             let port = H.create4(a, b, H.repeating(value), d)
             let reference = { tuple in
-                (
-                    H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2),
-                    H.Vector(raw: tuple.v3)
-                )
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
             }(HighwayReference.create4U8(a.raw, b.raw, H.repeating(value).raw, d.raw))
             mismatches.check(
                 port.0,
@@ -330,23 +321,20 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkCreate4ConstantD(_ value: H.Lane) {
+    private func checkCreate4ConstantD(_ value: Lane) {
         let mismatches = Mismatches("create4 with d repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF056_06A2_F739_76E8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF056_07A2_F739_789B)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF056_08A2_F739_7A4E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF056_06A2_F739_76E8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF056_07A2_F739_789B)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF056_08A2_F739_7A4E)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x2799_7441_00B8_97E4) {
             let port = H.create4(a, b, c, H.repeating(value))
             let reference = { tuple in
-                (
-                    H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2),
-                    H.Vector(raw: tuple.v3)
-                )
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
             }(HighwayReference.create4U8(a.raw, b.raw, c.raw, H.repeating(value).raw))
             mismatches.check(
                 port.0,

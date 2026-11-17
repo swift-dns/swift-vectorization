@@ -6,372 +6,416 @@ public import Vectorization
 
 @inline(never)
 public func portEqualToWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.equalTo(a, b, where: mask)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.equalTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.equalToWhereF16(mask.raw, a, b))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(raw: HighwayReference.Nothrow.equalToWhereF16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portEqualToWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.equalTo(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, where: mask)
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.equalTo(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.equalToWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portEqualToWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.equalTo(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.equalTo(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
 public func highwayEqualToWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.equalToWhereF16(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
 
 @inline(never)
 public func portNotEqualToWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.notEqualTo(a, b, where: mask)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.notEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.notEqualToWhereF16(mask.raw, a, b))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(raw: HighwayReference.Nothrow.notEqualToWhereF16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portNotEqualToWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.notEqualTo(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, where: mask)
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.notEqualTo(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.notEqualToWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portNotEqualToWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.notEqualTo(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.notEqualTo(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
 public func highwayNotEqualToWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.notEqualToWhereF16(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.lessThan(a, b, where: mask)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.lessThan(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.lessThanWhereF16(mask.raw, a, b))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(raw: HighwayReference.Nothrow.lessThanWhereF16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portLessThanWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.lessThan(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, where: mask)
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.lessThan(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.lessThanWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.lessThan(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.lessThan(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
 public func highwayLessThanWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.lessThanWhereF16(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.greaterThan(a, b, where: mask)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.greaterThan(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.greaterThanWhereF16(mask.raw, a, b))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(raw: HighwayReference.Nothrow.greaterThanWhereF16(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portGreaterThanWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.greaterThan(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, where: mask)
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.greaterThan(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.greaterThanWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.greaterThan(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.greaterThan(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.greaterThanWhereF16(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanOrEqualToWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.lessThanOrEqualTo(a, b, where: mask)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.lessThanOrEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.lessThanOrEqualToWhereF16(mask.raw, a, b))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
+        raw: HighwayReference.Nothrow.lessThanOrEqualToWhereF16(mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
 public func portLessThanOrEqualToWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.lessThanOrEqualTo(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, where: mask)
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.lessThanOrEqualTo(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
+        b,
+        where: mask
+    )
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portLessThanOrEqualToWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.lessThanOrEqualTo(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.lessThanOrEqualTo(
+        a,
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
+        where: mask
+    )
 }
 
 @inline(never)
 public func highwayLessThanOrEqualToWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToWhereF16(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.greaterThanOrEqualTo(a, b, where: mask)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.greaterThanOrEqualTo(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereF16(mask.raw, a, b))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
+        raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereF16(mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.greaterThanOrEqualTo(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, where: mask)
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.greaterThanOrEqualTo(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
+        b,
+        where: mask
+    )
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereF16(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-            b
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
         )
     )
 }
 
 @inline(never)
 public func portGreaterThanOrEqualToWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.greaterThanOrEqualTo(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), where: mask)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.greaterThanOrEqualTo(
+        a,
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
+        where: mask
+    )
 }
 
 @inline(never)
 public func highwayGreaterThanOrEqualToWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToWhereF16(
             mask.raw,
-            a,
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }

@@ -12,7 +12,7 @@ extension SIMDInt16ReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.vector(from: mask),
-                H.Vector(raw: HighwayReference.vectorFromMaskI16(mask.raw)),
+                H(raw: HighwayReference.vectorFromMaskI16(mask.raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -25,7 +25,7 @@ extension SIMDInt16ReferenceTests {
         for mask in maskInputs {
             mismatches.check(
                 H.vector(from: mask),
-                H.Vector(raw: HighwayReference.vectorFromMaskI16(mask.raw)),
+                H(raw: HighwayReference.vectorFromMaskI16(mask.raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -155,8 +155,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskNarrowingFromUInt32() {
         let mismatches = Mismatches("maskNarrowingFromUInt32")
-        let aInputs = Inputs.masks(SIMDUInt32.Mask.self, seed: 0x4B32_921E_CC24_5953)
-        let bInputs = Inputs.masks(SIMDUInt32.Mask.self, seed: 0x4B32_911E_CC24_57A0)
+        let aInputs = Inputs.masks(SIMD<UInt32>.Mask.self, seed: 0x4B32_921E_CC24_5953)
+        let bInputs = Inputs.masks(SIMD<UInt32>.Mask.self, seed: 0x4B32_911E_CC24_57A0)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.mask(narrowing: a, b),
@@ -169,8 +169,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskNarrowingFromUInt32NonCanonical() {
         let mismatches = Mismatches("maskNarrowingFromUInt32 with masks from arbitrary vectors")
-        let aInputs = Inputs.nonCanonicalMasks(SIMDUInt32.Mask.self, seed: 0x3721_B979_C0B2_06A8)
-        let bInputs = Inputs.nonCanonicalMasks(SIMDUInt32.Mask.self, seed: 0x3721_BA79_C0B2_085B)
+        let aInputs = Inputs.nonCanonicalMasks(SIMD<UInt32>.Mask.self, seed: 0x3721_B979_C0B2_06A8)
+        let bInputs = Inputs.nonCanonicalMasks(SIMD<UInt32>.Mask.self, seed: 0x3721_BA79_C0B2_085B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.mask(narrowing: a, b),
@@ -183,8 +183,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskNarrowingFromInt32() {
         let mismatches = Mismatches("maskNarrowingFromInt32")
-        let aInputs = Inputs.masks(SIMDInt32.Mask.self, seed: 0x2AC2_1884_27C6_9A98)
-        let bInputs = Inputs.masks(SIMDInt32.Mask.self, seed: 0x2AC2_1984_27C6_9C4B)
+        let aInputs = Inputs.masks(SIMD<Int32>.Mask.self, seed: 0x2AC2_1884_27C6_9A98)
+        let bInputs = Inputs.masks(SIMD<Int32>.Mask.self, seed: 0x2AC2_1984_27C6_9C4B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.mask(narrowing: a, b),
@@ -197,8 +197,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskNarrowingFromInt32NonCanonical() {
         let mismatches = Mismatches("maskNarrowingFromInt32 with masks from arbitrary vectors")
-        let aInputs = Inputs.nonCanonicalMasks(SIMDInt32.Mask.self, seed: 0xC7D9_DB45_A2D7_0997)
-        let bInputs = Inputs.nonCanonicalMasks(SIMDInt32.Mask.self, seed: 0xC7D9_DA45_A2D7_07E4)
+        let aInputs = Inputs.nonCanonicalMasks(SIMD<Int32>.Mask.self, seed: 0xC7D9_DB45_A2D7_0997)
+        let bInputs = Inputs.nonCanonicalMasks(SIMD<Int32>.Mask.self, seed: 0xC7D9_DA45_A2D7_07E4)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.mask(narrowing: a, b),
@@ -211,8 +211,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskNarrowingFromFloat() {
         let mismatches = Mismatches("maskNarrowingFromFloat")
-        let aInputs = Inputs.masks(SIMDFloat.Mask.self, seed: 0xD581_4DDE_655F_2DA2)
-        let bInputs = Inputs.masks(SIMDFloat.Mask.self, seed: 0xD581_4EDE_655F_2F55)
+        let aInputs = Inputs.masks(SIMD<Float>.Mask.self, seed: 0xD581_4DDE_655F_2DA2)
+        let bInputs = Inputs.masks(SIMD<Float>.Mask.self, seed: 0xD581_4EDE_655F_2F55)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.mask(narrowing: a, b),
@@ -225,8 +225,8 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskNarrowingFromFloatNonCanonical() {
         let mismatches = Mismatches("maskNarrowingFromFloat with masks from arbitrary vectors")
-        let aInputs = Inputs.nonCanonicalMasks(SIMDFloat.Mask.self, seed: 0xD0D3_D686_30F8_F0D9)
-        let bInputs = Inputs.nonCanonicalMasks(SIMDFloat.Mask.self, seed: 0xD0D3_D586_30F8_EF26)
+        let aInputs = Inputs.nonCanonicalMasks(SIMD<Float>.Mask.self, seed: 0xD0D3_D686_30F8_F0D9)
+        let bInputs = Inputs.nonCanonicalMasks(SIMD<Float>.Mask.self, seed: 0xD0D3_D586_30F8_EF26)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.mask(narrowing: a, b),
@@ -239,7 +239,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskWideningFromHalfUInt8() {
         let mismatches = Mismatches("maskWideningFromHalfUInt8")
-        let maskInputs = Inputs.masks(SIMDUInt8.HalfMask.self, seed: 0xB86F_B3B2_8021_7027)
+        let maskInputs = Inputs.masks(SIMD<UInt8>.HalfMask.self, seed: 0xB86F_B3B2_8021_7027)
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -253,7 +253,7 @@ extension SIMDInt16ReferenceTests {
     @Test func maskWideningFromHalfUInt8NonCanonical() {
         let mismatches = Mismatches("maskWideningFromHalfUInt8 with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(
-            SIMDUInt8.HalfMask.self,
+            SIMD<UInt8>.HalfMask.self,
             seed: 0xB14B_9D79_C6B1_D474
         )
         for mask in maskInputs {
@@ -268,7 +268,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskWideningFromHalfInt8() {
         let mismatches = Mismatches("maskWideningFromHalfInt8")
-        let maskInputs = Inputs.masks(SIMDInt8.HalfMask.self, seed: 0x21ED_8000_C065_9EBC)
+        let maskInputs = Inputs.masks(SIMD<Int8>.HalfMask.self, seed: 0x21ED_8000_C065_9EBC)
         for mask in maskInputs {
             mismatches.check(
                 H.mask(widening: mask),
@@ -282,7 +282,7 @@ extension SIMDInt16ReferenceTests {
     @Test func maskWideningFromHalfInt8NonCanonical() {
         let mismatches = Mismatches("maskWideningFromHalfInt8 with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(
-            SIMDInt8.HalfMask.self,
+            SIMD<Int8>.HalfMask.self,
             seed: 0x32DB_65C8_F108_2A73
         )
         for mask in maskInputs {
@@ -297,7 +297,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func halfMaskNarrowingFromUInt32() {
         let mismatches = Mismatches("halfMaskNarrowingFromUInt32")
-        let maskInputs = Inputs.masks(SIMDUInt32.Mask.self, seed: 0xBBC2_BBF3_F930_D8AC)
+        let maskInputs = Inputs.masks(SIMD<UInt32>.Mask.self, seed: 0xBBC2_BBF3_F930_D8AC)
         for mask in maskInputs {
             mismatches.check(
                 H.halfMask(narrowing: mask),
@@ -310,7 +310,10 @@ extension SIMDInt16ReferenceTests {
 
     @Test func halfMaskNarrowingFromUInt32NonCanonical() {
         let mismatches = Mismatches("halfMaskNarrowingFromUInt32 with masks from arbitrary vectors")
-        let maskInputs = Inputs.nonCanonicalMasks(SIMDUInt32.Mask.self, seed: 0x3263_9868_288F_B523)
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMD<UInt32>.Mask.self,
+            seed: 0x3263_9868_288F_B523
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.halfMask(narrowing: mask),
@@ -323,7 +326,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func halfMaskNarrowingFromInt32() {
         let mismatches = Mismatches("halfMaskNarrowingFromInt32")
-        let maskInputs = Inputs.masks(SIMDInt32.Mask.self, seed: 0xDA69_486D_9E33_8875)
+        let maskInputs = Inputs.masks(SIMD<Int32>.Mask.self, seed: 0xDA69_486D_9E33_8875)
         for mask in maskInputs {
             mismatches.check(
                 H.halfMask(narrowing: mask),
@@ -336,7 +339,10 @@ extension SIMDInt16ReferenceTests {
 
     @Test func halfMaskNarrowingFromInt32NonCanonical() {
         let mismatches = Mismatches("halfMaskNarrowingFromInt32 with masks from arbitrary vectors")
-        let maskInputs = Inputs.nonCanonicalMasks(SIMDInt32.Mask.self, seed: 0xF880_8AA5_BCE2_EDB2)
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMD<Int32>.Mask.self,
+            seed: 0xF880_8AA5_BCE2_EDB2
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.halfMask(narrowing: mask),
@@ -349,7 +355,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func halfMaskNarrowingFromFloat() {
         let mismatches = Mismatches("halfMaskNarrowingFromFloat")
-        let maskInputs = Inputs.masks(SIMDFloat.Mask.self, seed: 0xED6A_84A2_5B9B_4D83)
+        let maskInputs = Inputs.masks(SIMD<Float>.Mask.self, seed: 0xED6A_84A2_5B9B_4D83)
         for mask in maskInputs {
             mismatches.check(
                 H.halfMask(narrowing: mask),
@@ -362,7 +368,10 @@ extension SIMDInt16ReferenceTests {
 
     @Test func halfMaskNarrowingFromFloatNonCanonical() {
         let mismatches = Mismatches("halfMaskNarrowingFromFloat with masks from arbitrary vectors")
-        let maskInputs = Inputs.nonCanonicalMasks(SIMDFloat.Mask.self, seed: 0x6612_4BF3_75B3_7C58)
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMD<Float>.Mask.self,
+            seed: 0x6612_4BF3_75B3_7C58
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.halfMask(narrowing: mask),
@@ -375,7 +384,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func quarterMaskNarrowingFromUInt64() {
         let mismatches = Mismatches("quarterMaskNarrowingFromUInt64")
-        let maskInputs = Inputs.masks(SIMDUInt64.Mask.self, seed: 0xB953_29CD_C9D0_FA48)
+        let maskInputs = Inputs.masks(SIMD<UInt64>.Mask.self, seed: 0xB953_29CD_C9D0_FA48)
         for mask in maskInputs {
             mismatches.check(
                 H.quarterMask(narrowing: mask),
@@ -390,7 +399,10 @@ extension SIMDInt16ReferenceTests {
         let mismatches = Mismatches(
             "quarterMaskNarrowingFromUInt64 with masks from arbitrary vectors"
         )
-        let maskInputs = Inputs.nonCanonicalMasks(SIMDUInt64.Mask.self, seed: 0x31EF_F1EC_89DB_2BC7)
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMD<UInt64>.Mask.self,
+            seed: 0x31EF_F1EC_89DB_2BC7
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.quarterMask(narrowing: mask),
@@ -403,7 +415,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func quarterMaskNarrowingFromInt64() {
         let mismatches = Mismatches("quarterMaskNarrowingFromInt64")
-        let maskInputs = Inputs.masks(SIMDInt64.Mask.self, seed: 0x9A70_147A_A86C_4C8F)
+        let maskInputs = Inputs.masks(SIMD<Int64>.Mask.self, seed: 0x9A70_147A_A86C_4C8F)
         for mask in maskInputs {
             mismatches.check(
                 H.quarterMask(narrowing: mask),
@@ -418,7 +430,10 @@ extension SIMDInt16ReferenceTests {
         let mismatches = Mismatches(
             "quarterMaskNarrowingFromInt64 with masks from arbitrary vectors"
         )
-        let maskInputs = Inputs.nonCanonicalMasks(SIMDInt64.Mask.self, seed: 0x05A2_66AA_E105_B51C)
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMD<Int64>.Mask.self,
+            seed: 0x05A2_66AA_E105_B51C
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.quarterMask(narrowing: mask),
@@ -431,7 +446,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func quarterMaskNarrowingFromDouble() {
         let mismatches = Mismatches("quarterMaskNarrowingFromDouble")
-        let maskInputs = Inputs.masks(SIMDDouble.Mask.self, seed: 0x6EE3_DB99_19BF_88CB)
+        let maskInputs = Inputs.masks(SIMD<Double>.Mask.self, seed: 0x6EE3_DB99_19BF_88CB)
         for mask in maskInputs {
             mismatches.check(
                 H.quarterMask(narrowing: mask),
@@ -446,7 +461,10 @@ extension SIMDInt16ReferenceTests {
         let mismatches = Mismatches(
             "quarterMaskNarrowingFromDouble with masks from arbitrary vectors"
         )
-        let maskInputs = Inputs.nonCanonicalMasks(SIMDDouble.Mask.self, seed: 0x584B_9B29_C640_DDE0)
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMD<Double>.Mask.self,
+            seed: 0x584B_9B29_C640_DDE0
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.quarterMask(narrowing: mask),
@@ -459,7 +477,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskRebindingFromUInt16() {
         let mismatches = Mismatches("mask rebinding from UInt16")
-        let maskInputs = Inputs.masks(SIMDUInt16.Mask.self, seed: 0x41F7_2B3D_C15E_C932)
+        let maskInputs = Inputs.masks(SIMD<UInt16>.Mask.self, seed: 0x41F7_2B3D_C15E_C932)
         for mask in maskInputs {
             mismatches.check(
                 H.mask(rebinding: mask),
@@ -472,7 +490,10 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskRebindingFromUInt16NonCanonical() {
         let mismatches = Mismatches("mask rebinding from UInt16 with masks from arbitrary vectors")
-        let maskInputs = Inputs.nonCanonicalMasks(SIMDUInt16.Mask.self, seed: 0xBF5E_F256_025C_A6A9)
+        let maskInputs = Inputs.nonCanonicalMasks(
+            SIMD<UInt16>.Mask.self,
+            seed: 0xBF5E_F256_025C_A6A9
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.mask(rebinding: mask),
@@ -486,7 +507,7 @@ extension SIMDInt16ReferenceTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func maskRebindingFromFloat16() {
         let mismatches = Mismatches("mask rebinding from Float16")
-        let maskInputs = Inputs.masks(SIMDFloat16.Mask.self, seed: 0xE807_8D6A_EE4F_2274)
+        let maskInputs = Inputs.masks(SIMD<Float16>.Mask.self, seed: 0xE807_8D6A_EE4F_2274)
         for mask in maskInputs {
             mismatches.check(
                 H.mask(rebinding: mask),
@@ -502,7 +523,7 @@ extension SIMDInt16ReferenceTests {
     @Test func maskRebindingFromFloat16NonCanonical() {
         let mismatches = Mismatches("mask rebinding from Float16 with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(
-            SIMDFloat16.Mask.self,
+            SIMD<Float16>.Mask.self,
             seed: 0x002B_C5ED_8311_C6EB
         )
         for mask in maskInputs {
@@ -518,7 +539,7 @@ extension SIMDInt16ReferenceTests {
 
     @Test func maskRebindingFromBFloat16() {
         let mismatches = Mismatches("mask rebinding from BFloat16")
-        let maskInputs = Inputs.masks(SIMDBFloat16.Mask.self, seed: 0x242D_6DF9_5DA6_2316)
+        let maskInputs = Inputs.masks(SIMD<BFloat16>.Mask.self, seed: 0x242D_6DF9_5DA6_2316)
         for mask in maskInputs {
             mismatches.check(
                 H.mask(rebinding: mask),
@@ -534,7 +555,7 @@ extension SIMDInt16ReferenceTests {
             "mask rebinding from BFloat16 with masks from arbitrary vectors"
         )
         let maskInputs = Inputs.nonCanonicalMasks(
-            SIMDBFloat16.Mask.self,
+            SIMD<BFloat16>.Mask.self,
             seed: 0x5B93_EE9E_42AC_3885
         )
         for mask in maskInputs {

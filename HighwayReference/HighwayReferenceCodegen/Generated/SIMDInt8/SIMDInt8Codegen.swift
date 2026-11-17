@@ -5,8 +5,8 @@ public import Vectorization
 
 public enum HighwayReferenceInt8 {
     public typealias Lane = Int8
-    public typealias Vector = SIMDInt8.Vector
-    public typealias Mask = SIMDInt8.Mask
+    public typealias SIMD = Vectorization.SIMD<Int8>
+    public typealias Mask = SIMD.Mask
 
     @export(implementation) @inline(always)
     public static var laneCount: Int {

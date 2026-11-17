@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDUInt64CodegenTests {
     @Test func carrylessMultiplyingLower() {
         let mismatches = Mismatches("portCarrylessMultiplyingLowerU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCA00_5F16_ACBC_B485)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCA00_5E16_ACBC_B2D2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCA00_5F16_ACBC_B485)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCA00_5E16_ACBC_B2D2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portCarrylessMultiplyingLowerU64(a, b),
@@ -23,7 +23,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func carrylessMultiplyingLowerConstantA() {
         let mismatches = Mismatches("portCarrylessMultiplyingLowerU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x70EA_A6CB_B843_CA69)
+        let bInputs = Inputs.vectors(H.self, seed: 0x70EA_A6CB_B843_CA69)
         for b in bInputs {
             mismatches.check(
                 portCarrylessMultiplyingLowerU64ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func carrylessMultiplyingLowerConstantB() {
         let mismatches = Mismatches("portCarrylessMultiplyingLowerU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x572B_40CB_A9BF_8F37)
+        let aInputs = Inputs.vectors(H.self, seed: 0x572B_40CB_A9BF_8F37)
         for a in aInputs {
             mismatches.check(
                 portCarrylessMultiplyingLowerU64ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDUInt64CodegenTests {
 
     @Test func carrylessMultiplyingUpper() {
         let mismatches = Mismatches("portCarrylessMultiplyingUpperU64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9161_4A33_1221_F870)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9161_4B33_1221_FA23)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9161_4A33_1221_F870)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9161_4B33_1221_FA23)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portCarrylessMultiplyingUpperU64(a, b),
@@ -63,7 +63,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func carrylessMultiplyingUpperConstantA() {
         let mismatches = Mismatches("portCarrylessMultiplyingUpperU64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9834_9FC2_E91A_37A6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9834_9FC2_E91A_37A6)
         for b in bInputs {
             mismatches.check(
                 portCarrylessMultiplyingUpperU64ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDUInt64CodegenTests {
 
     @Test func carrylessMultiplyingUpperConstantB() {
         let mismatches = Mismatches("portCarrylessMultiplyingUpperU64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8F9F_89C2_E443_8DA4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8F9F_89C2_E443_8DA4)
         for a in aInputs {
             mismatches.check(
                 portCarrylessMultiplyingUpperU64ConstantB(a),

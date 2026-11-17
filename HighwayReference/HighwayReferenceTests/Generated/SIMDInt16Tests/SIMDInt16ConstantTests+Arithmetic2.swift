@@ -16,12 +16,12 @@ extension SIMDInt16ConstantTests {
         let mismatches = Mismatches(
             "sumsOfShuffledQuadAbsoluteDifferencesFromInt8 with i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)"
         )
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x4116_9C9F_D16C_1E22)
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x4116_9D9F_D16C_1FD5)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x4116_9C9F_D16C_1E22)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x4116_9D9F_D16C_1FD5)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.sumsOfShuffledQuadAbsoluteDifferences(a, b, i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.sumsOfShuffledQuadAbsoluteDifferencesI8ToI16(
                         a.raw,
                         b.raw,
@@ -1071,12 +1071,12 @@ extension SIMDInt16ConstantTests {
         let mismatches = Mismatches(
             "sumsOfShuffledQuadAbsoluteDifferencesFromInt8 unchecked with i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)"
         )
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x4206_D7C8_9262_4F38)
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x4206_D8C8_9262_50EB)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x4206_D7C8_9262_4F38)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x4206_D8C8_9262_50EB)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.sumsOfShuffledQuadAbsoluteDifferences(a, b, unchecked: i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.sumsOfShuffledQuadAbsoluteDifferencesI8ToI16(
                         a.raw,
                         b.raw,

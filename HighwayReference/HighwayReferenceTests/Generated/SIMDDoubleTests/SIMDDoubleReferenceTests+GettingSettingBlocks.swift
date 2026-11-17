@@ -8,13 +8,16 @@ import Vectorization
 extension SIMDDoubleReferenceTests {
     @Test func extractingBlock() {
         let mismatches = Mismatches("extractingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x47AE_F739_A668_864B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x47AE_F739_A668_864B)
         let indexInputs = Array(0...H.laneCount / 2 - 1)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
                 H.block(a, at: index),
                 H.BlockVector(
-                    raw: HighwayReference.extractingBlockF64(a, Int32(truncatingIfNeeded: index))
+                    raw: HighwayReference.extractingBlockF64(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index)
+                    )
                 ),
                 "a: \(describe(a)), index: \(index)"
             )
@@ -24,13 +27,16 @@ extension SIMDDoubleReferenceTests {
 
     @Test func extractingBlockUnchecked() {
         let mismatches = Mismatches("extractingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC02A_7EC1_0AEE_65DF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC02A_7EC1_0AEE_65DF)
         let indexInputs = Array(0...H.laneCount / 2 - 1)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
                 unsafe H.block(a, atUnchecked: index),
                 H.BlockVector(
-                    raw: HighwayReference.extractingBlockF64(a, Int32(truncatingIfNeeded: index))
+                    raw: HighwayReference.extractingBlockF64(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index)
+                    )
                 ),
                 "a: \(describe(a)), index: \(index)"
             )
@@ -40,7 +46,7 @@ extension SIMDDoubleReferenceTests {
 
     @Test func replacingBlock() {
         let mismatches = Mismatches("replacingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB837_29D1_6867_5C2F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB837_29D1_6867_5C2F)
         let indexInputs = Array(0...H.laneCount / 2 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0xB837_2BD1_6867_5F95).map(
             poisoningUpperBytes
@@ -53,7 +59,13 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 H.replacingBlock(a, at: index, with: b),
-                HighwayReference.replacingBlockF64(a, Int32(truncatingIfNeeded: index), b.raw),
+                H(
+                    raw: HighwayReference.replacingBlockF64(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
                 "a: \(describe(a)), index: \(index), b: \(describe(b))"
             )
         }
@@ -62,7 +74,7 @@ extension SIMDDoubleReferenceTests {
 
     @Test func replacingBlockUnchecked() {
         let mismatches = Mismatches("replacingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE8A0_A9DF_FC6A_EB13)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE8A0_A9DF_FC6A_EB13)
         let indexInputs = Array(0...H.laneCount / 2 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0xE8A0_ABDF_FC6A_EE79).map(
             poisoningUpperBytes
@@ -75,7 +87,13 @@ extension SIMDDoubleReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingBlock(a, atUnchecked: index, with: b),
-                HighwayReference.replacingBlockF64(a, Int32(truncatingIfNeeded: index), b.raw),
+                H(
+                    raw: HighwayReference.replacingBlockF64(
+                        a.raw,
+                        Int32(truncatingIfNeeded: index),
+                        b.raw
+                    )
+                ),
                 "a: \(describe(a)), index: \(index), b: \(describe(b))"
             )
         }

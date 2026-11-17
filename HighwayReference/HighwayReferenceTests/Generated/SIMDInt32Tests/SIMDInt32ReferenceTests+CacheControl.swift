@@ -8,8 +8,8 @@ import Vectorization
 extension SIMDInt32ReferenceTests {
     @Test func storeStreaming() {
         let mismatches = Mismatches("storeStreaming")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA09A_CA68_A8CC_1CA6)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA09A_CA68_A8CC_1CA6)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
                 destination in unsafe H.storeStreaming(a, to: destination)
@@ -24,8 +24,8 @@ extension SIMDInt32ReferenceTests {
 
     @Test func storeStreamingBeforeGuardPage() {
         let mismatches = Mismatches("storeStreaming before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0758_CD42_F5F5_D357)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0758_CD42_F5F5_D357)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeStreaming(a, to: destination)
@@ -40,8 +40,8 @@ extension SIMDInt32ReferenceTests {
 
     @Test func storeStreamingUncheckedSpan() {
         let mismatches = Mismatches("storeStreaming unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1940_13FC_D2DD_3554)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1940_13FC_D2DD_3554)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
                 destination in

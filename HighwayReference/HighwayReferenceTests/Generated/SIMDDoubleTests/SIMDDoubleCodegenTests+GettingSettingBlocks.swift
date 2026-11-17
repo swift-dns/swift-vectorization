@@ -19,7 +19,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func extractingBlockConstantIndex() {
         let mismatches = Mismatches("portExtractingBlockF64ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7706_225B_618B_8CD3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7706_225B_618B_8CD3)
         for a in aInputs {
             mismatches.check(
                 portExtractingBlockF64ConstantIndex(a),
@@ -47,7 +47,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func replacingBlockConstantIndex() {
         let mismatches = Mismatches("portReplacingBlockF64ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x300C_FBEC_0D5D_E0EF)
+        let aInputs = Inputs.vectors(H.self, seed: 0x300C_FBEC_0D5D_E0EF)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x300C_FDEC_0D5D_E455).map(
             poisoningUpperBytes
         )

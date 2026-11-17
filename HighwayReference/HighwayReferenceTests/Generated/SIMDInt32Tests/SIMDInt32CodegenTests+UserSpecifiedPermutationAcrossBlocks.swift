@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDInt32CodegenTests {
     @Test func tableLookupLanes() {
         let mismatches = Mismatches("portTableLookupLanesI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x960A_CA49_3454_36F8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x960A_CA49_3454_36F8)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: H.laneCount,
@@ -46,7 +46,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func tableLookupLanesConstantIndices() {
         let mismatches = Mismatches("portTableLookupLanesI32ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x437B_0DB0_1C7D_0437)
+        let aInputs = Inputs.vectors(H.self, seed: 0x437B_0DB0_1C7D_0437)
         for a in aInputs {
             mismatches.check(
                 portTableLookupLanesI32ConstantIndices(a),
@@ -59,8 +59,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func twoTablesLookupLanes() {
         let mismatches = Mismatches("portTwoTablesLookupLanesI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA26E_1A77_65D5_7DD5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA26E_1977_65D5_7C22)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA26E_1A77_65D5_7DD5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA26E_1977_65D5_7C22)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
@@ -84,7 +84,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func twoTablesLookupLanesConstantA() {
         let mismatches = Mismatches("portTwoTablesLookupLanesI32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDBFF_F821_9D0F_2DF9)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDBFF_F821_9D0F_2DF9)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
@@ -103,7 +103,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func twoTablesLookupLanesConstantB() {
         let mismatches = Mismatches("portTwoTablesLookupLanesI32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC167_1221_8DD2_2887)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC167_1221_8DD2_2887)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
@@ -122,8 +122,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func twoTablesLookupLanesConstantIndices() {
         let mismatches = Mismatches("portTwoTablesLookupLanesI32ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1042_41FA_C703_04E8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1042_42FA_C703_069B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1042_41FA_C703_04E8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1042_42FA_C703_069B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portTwoTablesLookupLanesI32ConstantIndices(a, b),
@@ -161,7 +161,7 @@ extension SIMDInt32CodegenTests {
     @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
     func lookup8() {
         let mismatches = Mismatches("portLookup8I32")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x12CD_4D0B_E190_561F)
+        let fromInputs = Inputs.buffers(Lane.self, count: 8, seed: 0x12CD_4D0B_E190_561F)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 8,
@@ -188,7 +188,7 @@ extension SIMDInt32CodegenTests {
     @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
     func lookup8BeforeGuardPage() {
         let mismatches = Mismatches("portLookup8I32 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x5AF2_3182_10CB_7224)
+        let fromInputs = Inputs.buffers(Lane.self, count: 8, seed: 0x5AF2_3182_10CB_7224)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 8,
@@ -214,7 +214,7 @@ extension SIMDInt32CodegenTests {
     @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
     func lookup8ConstantIndices() {
         let mismatches = Mismatches("portLookup8I32ConstantIndices")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x9174_FA2B_998D_3CF6)
+        let fromInputs = Inputs.buffers(Lane.self, count: 8, seed: 0x9174_FA2B_998D_3CF6)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 8) {
                 source in
@@ -231,7 +231,7 @@ extension SIMDInt32CodegenTests {
     @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
     func lookup8ConstantIndicesBeforeGuardPage() {
         let mismatches = Mismatches("portLookup8I32ConstantIndices before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x6BBF_917E_A33E_3487)
+        let fromInputs = Inputs.buffers(Lane.self, count: 8, seed: 0x6BBF_917E_A33E_3487)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
@@ -247,7 +247,7 @@ extension SIMDInt32CodegenTests {
     @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
     func lookup16() {
         let mismatches = Mismatches("portLookup16I32")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0xDD1C_4CF6_E704_E920)
+        let fromInputs = Inputs.buffers(Lane.self, count: 16, seed: 0xDD1C_4CF6_E704_E920)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 16,
@@ -274,7 +274,7 @@ extension SIMDInt32CodegenTests {
     @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
     func lookup16BeforeGuardPage() {
         let mismatches = Mismatches("portLookup16I32 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0x12E5_1E11_6E65_3199)
+        let fromInputs = Inputs.buffers(Lane.self, count: 16, seed: 0x12E5_1E11_6E65_3199)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 16,
@@ -300,7 +300,7 @@ extension SIMDInt32CodegenTests {
     @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
     func lookup16ConstantIndices() {
         let mismatches = Mismatches("portLookup16I32ConstantIndices")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0xA9BF_0BE3_0E73_93EF)
+        let fromInputs = Inputs.buffers(Lane.self, count: 16, seed: 0xA9BF_0BE3_0E73_93EF)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withAlignedLanes(from, laneCount: 16) {
                 source in
@@ -317,7 +317,7 @@ extension SIMDInt32CodegenTests {
     @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
     func lookup16ConstantIndicesBeforeGuardPage() {
         let mismatches = Mismatches("portLookup16I32ConstantIndices before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0xAAD9_EC3B_0945_BDD4)
+        let fromInputs = Inputs.buffers(Lane.self, count: 16, seed: 0xAAD9_EC3B_0945_BDD4)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
@@ -342,7 +342,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func shuffledPer4LanesConstantI3() {
         let mismatches = Mismatches("portShuffledPer4LanesI32ConstantI3")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5087_3336_65AC_6AA8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5087_3336_65AC_6AA8)
         for a in aInputs {
             mismatches.check(
                 portShuffledPer4LanesI32ConstantI3(a),

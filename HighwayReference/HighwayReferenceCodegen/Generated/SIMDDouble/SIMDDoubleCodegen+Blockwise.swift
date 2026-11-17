@@ -5,202 +5,210 @@ public import Vectorization
 
 @inline(never)
 public func portTableLookupBytesF64(
-    _ a: SIMDDouble.Vector,
-    atUnchecked indices: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.tableLookupBytes(a, atUnchecked: indices)
+    _ a: SIMD<Double>,
+    atUnchecked indices: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.tableLookupBytes(a, atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesF64(
-    _ a: SIMDDouble.Vector,
-    atUnchecked indices: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.tableLookupBytesF64(a, indices)
+    _ a: SIMD<Double>,
+    atUnchecked indices: SIMD<Double>
+) -> SIMD<Double> {
+    SIMD<Double>(raw: HighwayReference.Nothrow.tableLookupBytesF64(a.raw, indices.raw))
 }
 
 @inline(never)
-public func portTableLookupBytesF64ConstantA(
-    atUnchecked indices: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.tableLookupBytes(SIMDDouble.repeating(1.5), atUnchecked: indices)
+public func portTableLookupBytesF64ConstantA(atUnchecked indices: SIMD<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.tableLookupBytes(SIMD<Double>.repeating(1.5), atUnchecked: indices)
 }
 
 @inline(never)
-public func highwayTableLookupBytesF64ConstantA(
-    atUnchecked indices: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.tableLookupBytesF64(
-        HighwayReference.Nothrow.repeatingF64(1.5),
-        indices
+public func highwayTableLookupBytesF64ConstantA(atUnchecked indices: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.tableLookupBytesF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            indices.raw
+        )
     )
 }
 
 @inline(never)
-public func portTableLookupBytesF64ConstantIndices(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.tableLookupBytes(a, atUnchecked: SIMDDouble.repeating(Double(bitPattern: 3)))
+public func portTableLookupBytesF64ConstantIndices(_ a: SIMD<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.tableLookupBytes(
+        a,
+        atUnchecked: SIMD<Double>.repeating(Double(bitPattern: 3))
+    )
 }
 
 @inline(never)
-public func highwayTableLookupBytesF64ConstantIndices(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.tableLookupBytesF64(
-        a,
-        HighwayReference.Nothrow.repeatingF64(Double(bitPattern: 3))
+public func highwayTableLookupBytesF64ConstantIndices(_ a: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.tableLookupBytesF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(Double(bitPattern: 3))).raw
+        )
     )
 }
 
 @inline(never)
 public func portTableLookupBytesOrZeroF64(
-    _ a: SIMDDouble.Vector,
-    atUnchecked indices: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.tableLookupBytesOrZero(a, atUnchecked: indices)
+    _ a: SIMD<Double>,
+    atUnchecked indices: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.tableLookupBytesOrZero(a, atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesOrZeroF64(
-    _ a: SIMDDouble.Vector,
-    atUnchecked indices: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.tableLookupBytesOrZeroF64(a, indices)
+    _ a: SIMD<Double>,
+    atUnchecked indices: SIMD<Double>
+) -> SIMD<Double> {
+    SIMD<Double>(raw: HighwayReference.Nothrow.tableLookupBytesOrZeroF64(a.raw, indices.raw))
 }
 
 @inline(never)
 public func portTableLookupBytesOrZeroF64ConstantA(
-    atUnchecked indices: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.tableLookupBytesOrZero(SIMDDouble.repeating(1.5), atUnchecked: indices)
+    atUnchecked indices: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.tableLookupBytesOrZero(SIMD<Double>.repeating(1.5), atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupBytesOrZeroF64ConstantA(
-    atUnchecked indices: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.tableLookupBytesOrZeroF64(
-        HighwayReference.Nothrow.repeatingF64(1.5),
-        indices
+    atUnchecked indices: SIMD<Double>
+) -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.tableLookupBytesOrZeroF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            indices.raw
+        )
     )
 }
 
 @inline(never)
-public func portTableLookupBytesOrZeroF64ConstantIndices(
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.tableLookupBytesOrZero(
+public func portTableLookupBytesOrZeroF64ConstantIndices(_ a: SIMD<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.tableLookupBytesOrZero(
         a,
-        atUnchecked: SIMDDouble.repeating(Double(bitPattern: 3))
+        atUnchecked: SIMD<Double>.repeating(Double(bitPattern: 3))
     )
 }
 
 @inline(never)
-public func highwayTableLookupBytesOrZeroF64ConstantIndices(
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.tableLookupBytesOrZeroF64(
-        a,
-        HighwayReference.Nothrow.repeatingF64(Double(bitPattern: 3))
+public func highwayTableLookupBytesOrZeroF64ConstantIndices(_ a: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.tableLookupBytesOrZeroF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(Double(bitPattern: 3))).raw
+        )
     )
 }
 
 @inline(never)
-public func portPairwiseAddingBlocksF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    SIMDDouble.pairwiseAddingBlocks(a, b)
+public func portPairwiseAddingBlocksF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>.pairwiseAddingBlocks(a, b)
 }
 
 @inline(never)
-public func highwayPairwiseAddingBlocksF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.pairwiseAddingBlocksF64(a, b)
+public func highwayPairwiseAddingBlocksF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(raw: HighwayReference.Nothrow.pairwiseAddingBlocksF64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portPairwiseAddingBlocksF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    SIMDDouble.pairwiseAddingBlocks(SIMDDouble.repeating(1.5), b)
+public func portPairwiseAddingBlocksF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>.pairwiseAddingBlocks(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayPairwiseAddingBlocksF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.pairwiseAddingBlocksF64(HighwayReference.Nothrow.repeatingF64(1.5), b)
+public func highwayPairwiseAddingBlocksF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.pairwiseAddingBlocksF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
-public func portPairwiseAddingBlocksF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    SIMDDouble.pairwiseAddingBlocks(a, SIMDDouble.repeating(1.5))
+public func portPairwiseAddingBlocksF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>.pairwiseAddingBlocks(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayPairwiseAddingBlocksF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.pairwiseAddingBlocksF64(a, HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayPairwiseAddingBlocksF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.pairwiseAddingBlocksF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
-public func portPairwiseSubtractingBlocksF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    SIMDDouble.pairwiseSubtractingBlocks(a, b)
+public func portPairwiseSubtractingBlocksF64(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>.pairwiseSubtractingBlocks(a, b)
 }
 
 @inline(never)
 public func highwayPairwiseSubtractingBlocksF64(
-    _ a: SIMDDouble.Vector,
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.pairwiseSubtractingBlocksF64(a, b)
+    _ a: SIMD<Double>,
+    _ b: SIMD<Double>
+) -> SIMD<Double> {
+    SIMD<Double>(raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksF64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portPairwiseSubtractingBlocksF64ConstantA(_ b: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    SIMDDouble.pairwiseSubtractingBlocks(SIMDDouble.repeating(1.5), b)
+public func portPairwiseSubtractingBlocksF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>.pairwiseSubtractingBlocks(SIMD<Double>.repeating(1.5), b)
 }
 
 @inline(never)
-public func highwayPairwiseSubtractingBlocksF64ConstantA(
-    _ b: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.pairwiseSubtractingBlocksF64(
-        HighwayReference.Nothrow.repeatingF64(1.5),
-        b
+public func highwayPairwiseSubtractingBlocksF64ConstantA(_ b: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
-public func portPairwiseSubtractingBlocksF64ConstantB(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    SIMDDouble.pairwiseSubtractingBlocks(a, SIMDDouble.repeating(1.5))
+public func portPairwiseSubtractingBlocksF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>.pairwiseSubtractingBlocks(a, SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayPairwiseSubtractingBlocksF64ConstantB(
-    _ a: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.pairwiseSubtractingBlocksF64(
-        a,
-        HighwayReference.Nothrow.repeatingF64(1.5)
+public func highwayPairwiseSubtractingBlocksF64ConstantB(_ a: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.pairwiseSubtractingBlocksF64(
+            a.raw,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
-public func portBroadcastingInBlocksF64ConstantA() -> SIMDDouble.Vector {
-    unsafe SIMDDouble.broadcastingInBlocks(SIMDDouble.repeating(1.5), laneUnchecked: 1)
+public func portBroadcastingInBlocksF64ConstantA() -> SIMD<Double> {
+    unsafe SIMD<Double>.broadcastingInBlocks(SIMD<Double>.repeating(1.5), laneUnchecked: 1)
 }
 
 @inline(never)
-public func highwayBroadcastingInBlocksF64ConstantA() -> SIMDDouble.Vector {
-    HighwayReference.Nothrow.broadcastingInBlocksF64(HighwayReference.Nothrow.repeatingF64(1.5), 1)
+public func highwayBroadcastingInBlocksF64ConstantA() -> SIMD<Double> {
+    SIMD<Double>(
+        raw: HighwayReference.Nothrow.broadcastingInBlocksF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            1
+        )
+    )
 }
 
 @inline(never)
-public func portBroadcastingInBlocksF64ConstantLane(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.broadcastingInBlocks(a, laneUnchecked: 1)
+public func portBroadcastingInBlocksF64ConstantLane(_ a: SIMD<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.broadcastingInBlocks(a, laneUnchecked: 1)
 }
 
 @inline(never)
-public func highwayBroadcastingInBlocksF64ConstantLane(_ a: SIMDDouble.Vector) -> SIMDDouble.Vector
-{
-    HighwayReference.Nothrow.broadcastingInBlocksF64(a, 1)
+public func highwayBroadcastingInBlocksF64ConstantLane(_ a: SIMD<Double>) -> SIMD<Double> {
+    SIMD<Double>(raw: HighwayReference.Nothrow.broadcastingInBlocksF64(a.raw, 1))
 }

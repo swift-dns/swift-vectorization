@@ -6,7 +6,7 @@ public import Vectorization
 extension HighwayReferenceBFloat16 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         precondition(
             span.withUnsafeBufferPointer {
@@ -19,7 +19,7 @@ extension HighwayReferenceBFloat16 {
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         assert(
             span.withUnsafeBufferPointer {
@@ -38,28 +38,24 @@ extension HighwayReferenceBFloat16 {
 }
 
 @inline(never)
-public func portStoreStreamingBF16(
-    _ a: SIMDBFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDBFloat16.Lane>
-) {
-    unsafe SIMDBFloat16.storeStreaming(a, to: to)
+public func portStoreStreamingBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloat16>) {
+    unsafe SIMD<BFloat16>.storeStreaming(a, to: to)
 }
 
 @inline(never)
-public func highwayStoreStreamingBF16(_ a: SIMDBFloat16.Vector, to: UnsafeMutablePointer<BFloat16>)
-{
+public func highwayStoreStreamingBF16(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloat16>) {
     unsafe HighwayReference.Nothrow.storeStreamingBF16(a.raw, to)
 }
 
 @inline(never)
-public func portStoreStreamingBF16ConstantA(to: UnsafeMutablePointer<SIMDBFloat16.Lane>) {
-    unsafe SIMDBFloat16.storeStreaming(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), to: to)
+public func portStoreStreamingBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
+    unsafe SIMD<BFloat16>.storeStreaming(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), to: to)
 }
 
 @inline(never)
 public func highwayStoreStreamingBF16ConstantA(to: UnsafeMutablePointer<BFloat16>) {
     unsafe HighwayReference.Nothrow.storeStreamingBF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw,
         to

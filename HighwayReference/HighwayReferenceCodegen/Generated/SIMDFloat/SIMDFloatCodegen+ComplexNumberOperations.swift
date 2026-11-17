@@ -4,495 +4,538 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portComplexConjugateF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.complexConjugate(a)
+public func portComplexConjugateF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.complexConjugate(a)
 }
 
 @inline(never)
-public func highwayComplexConjugateF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.complexConjugateF32(a)
+public func highwayComplexConjugateF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.complexConjugateF32(a.raw))
 }
 
 @inline(never)
-public func portComplexConjugateF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.complexConjugate(SIMDFloat.repeating(1.5))
+public func portComplexConjugateF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.complexConjugate(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayComplexConjugateF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.complexConjugateF32(HighwayReference.Nothrow.repeatingF32(1.5))
-}
-
-@inline(never)
-public func portMultiplyingComplexF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplex(a, b)
-}
-
-@inline(never)
-public func highwayMultiplyingComplexF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexF32(a, b)
-}
-
-@inline(never)
-public func portMultiplyingComplexF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplex(SIMDFloat.repeating(1.5), b)
-}
-
-@inline(never)
-public func highwayMultiplyingComplexF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexF32(HighwayReference.Nothrow.repeatingF32(1.5), b)
-}
-
-@inline(never)
-public func portMultiplyingComplexF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplex(a, SIMDFloat.repeating(1.5))
-}
-
-@inline(never)
-public func highwayMultiplyingComplexF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexF32(a, HighwayReference.Nothrow.repeatingF32(1.5))
-}
-
-@inline(never)
-public func portMultiplyingComplexConjugateF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplexConjugate(a, b)
-}
-
-@inline(never)
-public func highwayMultiplyingComplexConjugateF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF32(a, b)
-}
-
-@inline(never)
-public func portMultiplyingComplexConjugateF32ConstantA(_ b: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplexConjugate(SIMDFloat.repeating(1.5), b)
-}
-
-@inline(never)
-public func highwayMultiplyingComplexConjugateF32ConstantA(
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+public func highwayComplexConjugateF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.complexConjugateF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateF32ConstantB(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplexConjugate(a, SIMDFloat.repeating(1.5))
+public func portMultiplyingComplexF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplex(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateF32ConstantB(
-    _ a: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+public func highwayMultiplyingComplexF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.multiplyingComplexF32(a.raw, b.raw))
+}
+
+@inline(never)
+public func portMultiplyingComplexF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplex(SIMD<Float>.repeating(1.5), b)
+}
+
+@inline(never)
+public func highwayMultiplyingComplexF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
+    )
+}
+
+@inline(never)
+public func portMultiplyingComplexF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplex(a, SIMD<Float>.repeating(1.5))
+}
+
+@inline(never)
+public func highwayMultiplyingComplexF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
+}
+
+@inline(never)
+public func portMultiplyingComplexConjugateF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplexConjugate(a, b)
+}
+
+@inline(never)
+public func highwayMultiplyingComplexConjugateF32(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>
+{
+    SIMD<Float>(raw: HighwayReference.Nothrow.multiplyingComplexConjugateF32(a.raw, b.raw))
+}
+
+@inline(never)
+public func portMultiplyingComplexConjugateF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplexConjugate(SIMD<Float>.repeating(1.5), b)
+}
+
+@inline(never)
+public func highwayMultiplyingComplexConjugateF32ConstantA(_ b: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
+    )
+}
+
+@inline(never)
+public func portMultiplyingComplexConjugateF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplexConjugate(a, SIMD<Float>.repeating(1.5))
+}
+
+@inline(never)
+public func highwayMultiplyingComplexConjugateF32ConstantB(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplex(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplex(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.multiplyAddingComplexF32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portMultiplyAddingComplexF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplex(SIMDFloat.repeating(1.5), b, c)
+public func portMultiplyAddingComplexF32ConstantA(_ b: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
+{
+    SIMD<Float>.multiplyAddingComplex(SIMD<Float>.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
-public func portMultiplyAddingComplexF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplex(a, SIMDFloat.repeating(1.5), c)
+public func portMultiplyAddingComplexF32ConstantB(_ a: SIMD<Float>, _ c: SIMD<Float>) -> SIMD<Float>
+{
+    SIMD<Float>.multiplyAddingComplex(a, SIMD<Float>.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
-public func portMultiplyAddingComplexF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplex(a, b, SIMDFloat.repeating(1.5))
+public func portMultiplyAddingComplexF32ConstantC(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float>
+{
+    SIMD<Float>.multiplyAddingComplex(a, b, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexF32(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF32(
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplexConjugate(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplexConjugate(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(a.raw, b.raw, c.raw)
+    )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplexConjugate(SIMDFloat.repeating(1.5), b, c)
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplexConjugate(SIMD<Float>.repeating(1.5), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplexConjugate(a, SIMDFloat.repeating(1.5), c)
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplexConjugate(a, SIMD<Float>.repeating(1.5), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplexConjugate(a, b, SIMDFloat.repeating(1.5))
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplexConjugate(a, b, SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF32(
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplex(SIMDFloat.repeating(1.5), b, where: mask, otherwise: otherwise)
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplex(SIMD<Float>.repeating(1.5), b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplex(a, SIMDFloat.repeating(1.5), where: mask, otherwise: otherwise)
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplex(a, SIMD<Float>.repeating(1.5), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask,
-    otherwise: SIMDFloat.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask,
+    otherwise: SIMD<Float>
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseF32ConstantOtherwise(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplex(a, b, where: mask, otherwise: SIMDFloat.repeating(1.5))
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplex(a, b, where: mask, otherwise: SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseF32ConstantOtherwise(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        mask.raw,
-        a,
-        b
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplexConjugate(a, b, where: mask)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplexConjugate(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(mask.raw, a, b)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplexConjugate(SIMDFloat.repeating(1.5), b, where: mask)
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplexConjugate(SIMD<Float>.repeating(1.5), b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyingComplexConjugate(a, SIMDFloat.repeating(1.5), where: mask)
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyingComplexConjugate(a, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+    _ a: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplexConjugate(a, b, c, where: mask)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplexConjugate(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereF32(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(mask.raw, a, b, c)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplexConjugate(SIMDFloat.repeating(1.5), b, c, where: mask)
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplexConjugate(SIMD<Float>.repeating(1.5), b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereF32ConstantA(
-    _ b: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        b,
-        c
+    _ b: SIMD<Float>,
+    _ c: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
+            mask.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplexConjugate(a, SIMDFloat.repeating(1.5), c, where: mask)
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplexConjugate(a, SIMD<Float>.repeating(1.5), c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereF32ConstantB(
-    _ a: SIMDFloat.Vector,
-    _ c: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF32(1.5),
-        c
+    _ a: SIMD<Float>,
+    _ c: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
+            mask.raw,
+            a.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    SIMDFloat.multiplyAddingComplexConjugate(a, b, SIMDFloat.repeating(1.5), where: mask)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>.multiplyAddingComplexConjugate(a, b, SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereF32ConstantC(
-    _ a: SIMDFloat.Vector,
-    _ b: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
-        mask.raw,
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF32(1.5)
+    _ a: SIMD<Float>,
+    _ b: SIMD<Float>,
+    where mask: SIMD<Float>.Mask
+) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF32(
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
     )
 }

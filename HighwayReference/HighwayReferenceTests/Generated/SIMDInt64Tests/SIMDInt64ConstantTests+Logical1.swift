@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkBitwiseAndConstantA(_ value: H.Lane) {
+    private func checkBitwiseAndConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAnd with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6C4D_AC72_3F5F_416C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6C4D_AC72_3F5F_416C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.bitwiseAnd(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.bitwiseAndI64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.bitwiseAndI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndConstantB(_ value: H.Lane) {
+    private func checkBitwiseAndConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAnd with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8753_3272_4EF8_759E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8753_3272_4EF8_759E)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.bitwiseAnd(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseAndI64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseAndI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -130,28 +130,28 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func bitwiseAndConstantSplatMax() {
-        checkBitwiseAndConstantA(H.Lane.max)
-        checkBitwiseAndConstantB(H.Lane.max)
+        checkBitwiseAndConstantA(Lane.max)
+        checkBitwiseAndConstantB(Lane.max)
     }
 
     @Test func bitwiseAndConstantSplatMin() {
-        checkBitwiseAndConstantA(H.Lane.min)
-        checkBitwiseAndConstantB(H.Lane.min)
+        checkBitwiseAndConstantA(Lane.min)
+        checkBitwiseAndConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseOrConstantA(_ value: H.Lane) {
+    private func checkBitwiseOrConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOr with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB3DA_6EE1_B305_CE38)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB3DA_6EE1_B305_CE38)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.bitwiseOr(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.bitwiseOrI64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.bitwiseOrI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -159,18 +159,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrConstantB(_ value: H.Lane) {
+    private func checkBitwiseOrConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOr with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCEDF_F4E1_C29F_026A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCEDF_F4E1_C29F_026A)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.bitwiseOr(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseOrI64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseOrI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -263,28 +263,28 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func bitwiseOrConstantSplatMax() {
-        checkBitwiseOrConstantA(H.Lane.max)
-        checkBitwiseOrConstantB(H.Lane.max)
+        checkBitwiseOrConstantA(Lane.max)
+        checkBitwiseOrConstantB(Lane.max)
     }
 
     @Test func bitwiseOrConstantSplatMin() {
-        checkBitwiseOrConstantA(H.Lane.min)
-        checkBitwiseOrConstantB(H.Lane.min)
+        checkBitwiseOrConstantA(Lane.min)
+        checkBitwiseOrConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseXorConstantA(_ value: H.Lane) {
+    private func checkBitwiseXorConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXor with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCCA8_9EA9_FF1C_E6C0)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCCA8_9EA9_FF1C_E6C0)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.bitwiseXor(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.bitwiseXorI64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.bitwiseXorI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -292,18 +292,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXorConstantB(_ value: H.Lane) {
+    private func checkBitwiseXorConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXor with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE668_24AA_0DA1_5852)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE668_24AA_0DA1_5852)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.bitwiseXor(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseXorI64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseXorI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -396,28 +396,28 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func bitwiseXorConstantSplatMax() {
-        checkBitwiseXorConstantA(H.Lane.max)
-        checkBitwiseXorConstantB(H.Lane.max)
+        checkBitwiseXorConstantA(Lane.max)
+        checkBitwiseXorConstantB(Lane.max)
     }
 
     @Test func bitwiseXorConstantSplatMin() {
-        checkBitwiseXorConstantA(H.Lane.min)
-        checkBitwiseXorConstantB(H.Lane.min)
+        checkBitwiseXorConstantA(Lane.min)
+        checkBitwiseXorConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseAndNotConstantA(_ value: H.Lane) {
+    private func checkBitwiseAndNotConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAndNot with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5178_8632_ED2F_4CE5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5178_8632_ED2F_4CE5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.bitwiseAndNot(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.bitwiseAndNotI64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.bitwiseAndNotI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -425,18 +425,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseAndNotConstantB(_ value: H.Lane) {
+    private func checkBitwiseAndNotConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseAndNot with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x37B9_8032_DEAB_B4D3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x37B9_8032_DEAB_B4D3)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.bitwiseAndNot(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseAndNotI64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseAndNotI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -529,31 +529,29 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func bitwiseAndNotConstantSplatMax() {
-        checkBitwiseAndNotConstantA(H.Lane.max)
-        checkBitwiseAndNotConstantB(H.Lane.max)
+        checkBitwiseAndNotConstantA(Lane.max)
+        checkBitwiseAndNotConstantB(Lane.max)
     }
 
     @Test func bitwiseAndNotConstantSplatMin() {
-        checkBitwiseAndNotConstantA(H.Lane.min)
-        checkBitwiseAndNotConstantB(H.Lane.min)
+        checkBitwiseAndNotConstantA(Lane.min)
+        checkBitwiseAndNotConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseXor3ConstantA(_ value: H.Lane) {
+    private func checkBitwiseXor3ConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXor3 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x869E_FC06_1F69_CE01)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x869E_F906_1F69_C8E8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x869E_FC06_1F69_CE01)
+        let cInputs = Inputs.vectors(H.self, seed: 0x869E_F906_1F69_C8E8)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.bitwiseXor(H.repeating(value), b, c),
-                H.Vector(
-                    raw: HighwayReference.bitwiseXor3I64(H.repeating(value).raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.bitwiseXor3I64(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -561,21 +559,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXor3ConstantB(_ value: H.Lane) {
+    private func checkBitwiseXor3ConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXor3 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D4C_7606_1142_2E4F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6D4C_7806_1142_31B5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D4C_7606_1142_2E4F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6D4C_7806_1142_31B5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.bitwiseXor(a, H.repeating(value), c),
-                H.Vector(
-                    raw: HighwayReference.bitwiseXor3I64(a.raw, H.repeating(value).raw, c.raw)
-                ),
+                H(raw: HighwayReference.bitwiseXor3I64(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -583,21 +579,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseXor3ConstantC(_ value: H.Lane) {
+    private func checkBitwiseXor3ConstantC(_ value: Lane) {
         let mismatches = Mismatches("bitwiseXor3 with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7507_AD06_155F_6CA4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7507_AE06_155F_6E57)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7507_AD06_155F_6CA4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7507_AE06_155F_6E57)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseXor(a, b, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.bitwiseXor3I64(a.raw, b.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.bitwiseXor3I64(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -707,31 +701,31 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func bitwiseXor3ConstantSplatMax() {
-        checkBitwiseXor3ConstantA(H.Lane.max)
-        checkBitwiseXor3ConstantB(H.Lane.max)
-        checkBitwiseXor3ConstantC(H.Lane.max)
+        checkBitwiseXor3ConstantA(Lane.max)
+        checkBitwiseXor3ConstantB(Lane.max)
+        checkBitwiseXor3ConstantC(Lane.max)
     }
 
     @Test func bitwiseXor3ConstantSplatMin() {
-        checkBitwiseXor3ConstantA(H.Lane.min)
-        checkBitwiseXor3ConstantB(H.Lane.min)
-        checkBitwiseXor3ConstantC(H.Lane.min)
+        checkBitwiseXor3ConstantA(Lane.min)
+        checkBitwiseXor3ConstantB(Lane.min)
+        checkBitwiseXor3ConstantC(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseOr3ConstantA(_ value: H.Lane) {
+    private func checkBitwiseOr3ConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOr3 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2A3B_A8B5_487A_51C9)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2A3B_A5B5_487A_4CB0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2A3B_A8B5_487A_51C9)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2A3B_A5B5_487A_4CB0)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.bitwiseOr(H.repeating(value), b, c),
-                H.Vector(raw: HighwayReference.bitwiseOr3I64(H.repeating(value).raw, b.raw, c.raw)),
+                H(raw: HighwayReference.bitwiseOr3I64(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -739,19 +733,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOr3ConstantB(_ value: H.Lane) {
+    private func checkBitwiseOr3ConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOr3 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x107C_42B5_39F6_1697)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x107C_44B5_39F6_19FD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x107C_42B5_39F6_1697)
+        let cInputs = Inputs.vectors(H.self, seed: 0x107C_44B5_39F6_19FD)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.bitwiseOr(a, H.repeating(value), c),
-                H.Vector(raw: HighwayReference.bitwiseOr3I64(a.raw, H.repeating(value).raw, c.raw)),
+                H(raw: HighwayReference.bitwiseOr3I64(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -759,19 +753,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOr3ConstantC(_ value: H.Lane) {
+    private func checkBitwiseOr3ConstantC(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOr3 with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x19EA_D9B5_3F85_8C8C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x19EA_DAB5_3F85_8E3F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x19EA_D9B5_3F85_8C8C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x19EA_DAB5_3F85_8E3F)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOr(a, b, H.repeating(value)),
-                H.Vector(raw: HighwayReference.bitwiseOr3I64(a.raw, b.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.bitwiseOr3I64(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -881,33 +875,31 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func bitwiseOr3ConstantSplatMax() {
-        checkBitwiseOr3ConstantA(H.Lane.max)
-        checkBitwiseOr3ConstantB(H.Lane.max)
-        checkBitwiseOr3ConstantC(H.Lane.max)
+        checkBitwiseOr3ConstantA(Lane.max)
+        checkBitwiseOr3ConstantB(Lane.max)
+        checkBitwiseOr3ConstantC(Lane.max)
     }
 
     @Test func bitwiseOr3ConstantSplatMin() {
-        checkBitwiseOr3ConstantA(H.Lane.min)
-        checkBitwiseOr3ConstantB(H.Lane.min)
-        checkBitwiseOr3ConstantC(H.Lane.min)
+        checkBitwiseOr3ConstantA(Lane.min)
+        checkBitwiseOr3ConstantB(Lane.min)
+        checkBitwiseOr3ConstantC(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseOrAndConstantA(_ value: H.Lane) {
+    private func checkBitwiseOrAndConstantA(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOrAnd with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC2C6_2513_E2DB_0C95)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xC2C6_2213_E2DB_077C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC2C6_2513_E2DB_0C95)
+        let cInputs = Inputs.vectors(H.self, seed: 0xC2C6_2213_E2DB_077C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.bitwiseOrAnd(H.repeating(value), b, c),
-                H.Vector(
-                    raw: HighwayReference.bitwiseOrAndI64(H.repeating(value).raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.bitwiseOrAndI64(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -915,21 +907,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrAndConstantB(_ value: H.Lane) {
+    private func checkBitwiseOrAndConstantB(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOrAnd with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA9E0_9F13_D510_3EC3)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xA9E0_A113_D510_4229)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA9E0_9F13_D510_3EC3)
+        let cInputs = Inputs.vectors(H.self, seed: 0xA9E0_A113_D510_4229)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.bitwiseOrAnd(a, H.repeating(value), c),
-                H.Vector(
-                    raw: HighwayReference.bitwiseOrAndI64(a.raw, H.repeating(value).raw, c.raw)
-                ),
+                H(raw: HighwayReference.bitwiseOrAndI64(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -937,21 +927,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBitwiseOrAndConstantC(_ value: H.Lane) {
+    private func checkBitwiseOrAndConstantC(_ value: Lane) {
         let mismatches = Mismatches("bitwiseOrAnd with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB275_5613_D9E6_4758)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB275_5713_D9E6_490B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB275_5613_D9E6_4758)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB275_5713_D9E6_490B)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.bitwiseOrAnd(a, b, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.bitwiseOrAndI64(a.raw, b.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.bitwiseOrAndI64(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -1061,14 +1049,14 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func bitwiseOrAndConstantSplatMax() {
-        checkBitwiseOrAndConstantA(H.Lane.max)
-        checkBitwiseOrAndConstantB(H.Lane.max)
-        checkBitwiseOrAndConstantC(H.Lane.max)
+        checkBitwiseOrAndConstantA(Lane.max)
+        checkBitwiseOrAndConstantB(Lane.max)
+        checkBitwiseOrAndConstantC(Lane.max)
     }
 
     @Test func bitwiseOrAndConstantSplatMin() {
-        checkBitwiseOrAndConstantA(H.Lane.min)
-        checkBitwiseOrAndConstantB(H.Lane.min)
-        checkBitwiseOrAndConstantC(H.Lane.min)
+        checkBitwiseOrAndConstantA(Lane.min)
+        checkBitwiseOrAndConstantB(Lane.min)
+        checkBitwiseOrAndConstantC(Lane.min)
     }
 }

@@ -5,72 +5,75 @@ public import Vectorization
 
 @inline(never)
 public func portSlideMaskUpLanesU32(
-    _ mask: SIMDUInt32.Mask,
+    _ mask: SIMD<UInt32>.Mask,
     byUnchecked lanes: Int
-) -> SIMDUInt32.Mask {
-    unsafe SIMDUInt32.slideUpLanes(mask, byUnchecked: lanes)
+) -> SIMD<UInt32>.Mask {
+    unsafe SIMD<UInt32>.slideUpLanes(mask, byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideMaskUpLanesU32(
-    _ mask: SIMDUInt32.Mask,
+    _ mask: SIMD<UInt32>.Mask,
     byUnchecked lanes: Int
-) -> SIMDUInt32.Mask {
-    SIMDUInt32.Mask(raw: HighwayReference.Nothrow.slideMaskUpLanesU32(mask.raw, lanes))
+) -> SIMD<UInt32>.Mask {
+    SIMD<UInt32>.Mask(raw: HighwayReference.Nothrow.slideMaskUpLanesU32(mask.raw, lanes))
 }
 
 @inline(never)
-public func portSlideMaskUpLanesU32ConstantLanes(_ mask: SIMDUInt32.Mask) -> SIMDUInt32.Mask {
-    unsafe SIMDUInt32.slideUpLanes(mask, byUnchecked: 1)
+public func portSlideMaskUpLanesU32ConstantLanes(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32>.Mask {
+    unsafe SIMD<UInt32>.slideUpLanes(mask, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwaySlideMaskUpLanesU32ConstantLanes(_ mask: SIMDUInt32.Mask) -> SIMDUInt32.Mask {
-    SIMDUInt32.Mask(raw: HighwayReference.Nothrow.slideMaskUpLanesU32(mask.raw, 1))
+public func highwaySlideMaskUpLanesU32ConstantLanes(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32>.Mask
+{
+    SIMD<UInt32>.Mask(raw: HighwayReference.Nothrow.slideMaskUpLanesU32(mask.raw, 1))
 }
 
 @inline(never)
 public func portSlideMaskDownLanesU32(
-    _ mask: SIMDUInt32.Mask,
+    _ mask: SIMD<UInt32>.Mask,
     byUnchecked lanes: Int
-) -> SIMDUInt32.Mask {
-    unsafe SIMDUInt32.slideDownLanes(mask, byUnchecked: lanes)
+) -> SIMD<UInt32>.Mask {
+    unsafe SIMD<UInt32>.slideDownLanes(mask, byUnchecked: lanes)
 }
 
 @inline(never)
 public func highwaySlideMaskDownLanesU32(
-    _ mask: SIMDUInt32.Mask,
+    _ mask: SIMD<UInt32>.Mask,
     byUnchecked lanes: Int
-) -> SIMDUInt32.Mask {
-    SIMDUInt32.Mask(raw: HighwayReference.Nothrow.slideMaskDownLanesU32(mask.raw, lanes))
+) -> SIMD<UInt32>.Mask {
+    SIMD<UInt32>.Mask(raw: HighwayReference.Nothrow.slideMaskDownLanesU32(mask.raw, lanes))
 }
 
 @inline(never)
-public func portSlideMaskDownLanesU32ConstantLanes(_ mask: SIMDUInt32.Mask) -> SIMDUInt32.Mask {
-    unsafe SIMDUInt32.slideDownLanes(mask, byUnchecked: 1)
+public func portSlideMaskDownLanesU32ConstantLanes(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32>.Mask {
+    unsafe SIMD<UInt32>.slideDownLanes(mask, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwaySlideMaskDownLanesU32ConstantLanes(_ mask: SIMDUInt32.Mask) -> SIMDUInt32.Mask {
-    SIMDUInt32.Mask(raw: HighwayReference.Nothrow.slideMaskDownLanesU32(mask.raw, 1))
+public func highwaySlideMaskDownLanesU32ConstantLanes(
+    _ mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32>.Mask {
+    SIMD<UInt32>.Mask(raw: HighwayReference.Nothrow.slideMaskDownLanesU32(mask.raw, 1))
 }
 
 @inline(never)
-public func portSlideMask1UpU32(_ mask: SIMDUInt32.Mask) -> SIMDUInt32.Mask {
-    SIMDUInt32.slide1Up(mask)
+public func portSlideMask1UpU32(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32>.Mask {
+    SIMD<UInt32>.slide1Up(mask)
 }
 
 @inline(never)
-public func highwaySlideMask1UpU32(_ mask: SIMDUInt32.Mask) -> SIMDUInt32.Mask {
-    SIMDUInt32.Mask(raw: HighwayReference.Nothrow.slideMask1UpU32(mask.raw))
+public func highwaySlideMask1UpU32(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32>.Mask {
+    SIMD<UInt32>.Mask(raw: HighwayReference.Nothrow.slideMask1UpU32(mask.raw))
 }
 
 @inline(never)
-public func portSlideMask1DownU32(_ mask: SIMDUInt32.Mask) -> SIMDUInt32.Mask {
-    SIMDUInt32.slide1Down(mask)
+public func portSlideMask1DownU32(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32>.Mask {
+    SIMD<UInt32>.slide1Down(mask)
 }
 
 @inline(never)
-public func highwaySlideMask1DownU32(_ mask: SIMDUInt32.Mask) -> SIMDUInt32.Mask {
-    SIMDUInt32.Mask(raw: HighwayReference.Nothrow.slideMask1DownU32(mask.raw))
+public func highwaySlideMask1DownU32(_ mask: SIMD<UInt32>.Mask) -> SIMD<UInt32>.Mask {
+    SIMD<UInt32>.Mask(raw: HighwayReference.Nothrow.slideMask1DownU32(mask.raw))
 }

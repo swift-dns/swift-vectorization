@@ -7,20 +7,18 @@ import Vectorization
 
 extension SIMDUInt8ConstantTests {
     @inline(__always)
-    private func checkConcatenatingUpperLowerConstantB(_ value: H.Lane) {
+    private func checkConcatenatingUpperLowerConstantB(_ value: Lane) {
         let mismatches = Mismatches("concatenatingUpperLower with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9971_039C_65D1_161F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9971_039C_65D1_161F)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.concatenatingUpperLower(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.concatenatingUpperLowerU8(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.concatenatingUpperLowerU8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -60,18 +58,18 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingEvenConstantA(_ value: H.Lane) {
+    private func checkConcatenatingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("concatenatingEven with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAFDB_5FF8_52AA_D5D6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAFDB_5FF8_52AA_D5D6)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.concatenatingEven(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.concatenatingEvenU8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.concatenatingEvenU8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -79,18 +77,18 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingEvenConstantB(_ value: H.Lane) {
+    private func checkConcatenatingEvenConstantB(_ value: Lane) {
         let mismatches = Mismatches("concatenatingEven with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA81F_C9F8_4E8C_F614)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA81F_C9F8_4E8C_F614)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.concatenatingEven(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.concatenatingEvenU8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.concatenatingEvenU8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -138,20 +136,18 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingWholeLowerConstantA(_ value: H.Lane) {
+    private func checkInterleavingWholeLowerConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingWholeLower with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEBC6_4096_3CEE_3874)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEBC6_4096_3CEE_3874)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingWholeLower(H.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.interleavingWholeLowerU8(H.repeating(value).raw, b.raw)
-                ),
+                H(raw: HighwayReference.interleavingWholeLowerU8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -159,20 +155,18 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingWholeLowerConstantB(_ value: H.Lane) {
+    private func checkInterleavingWholeLowerConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingWholeLower with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x04AB_A696_4AB8_CFE6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x04AB_A696_4AB8_CFE6)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingWholeLower(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.interleavingWholeLowerU8(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.interleavingWholeLowerU8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -220,20 +214,18 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingWholeUpperConstantA(_ value: H.Lane) {
+    private func checkInterleavingWholeUpperConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingWholeUpper with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0DCA_D333_CA5B_43B3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0DCA_D333_CA5B_43B3)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.interleavingWholeUpper(H.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.interleavingWholeUpperU8(H.repeating(value).raw, b.raw)
-                ),
+                H(raw: HighwayReference.interleavingWholeUpperU8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -241,20 +233,18 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingWholeUpperConstantB(_ value: H.Lane) {
+    private func checkInterleavingWholeUpperConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingWholeUpper with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x16CD_0933_CF8E_F5F5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x16CD_0933_CF8E_F5F5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.interleavingWholeUpper(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.interleavingWholeUpperU8(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.interleavingWholeUpperU8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }

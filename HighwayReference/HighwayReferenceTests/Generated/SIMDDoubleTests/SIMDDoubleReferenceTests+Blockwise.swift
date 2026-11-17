@@ -8,9 +8,9 @@ import Vectorization
 extension SIMDDoubleReferenceTests {
     @Test func tableLookupBytes() {
         let mismatches = Mismatches("tableLookupBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x41AA_D85E_A80C_CC32)
+        let aInputs = Inputs.vectors(H.self, seed: 0x41AA_D85E_A80C_CC32)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0x41AA_D95E_A80C_CDE5,
@@ -19,7 +19,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.tableLookupBytes(a, at: indices),
-                HighwayReference.tableLookupBytesF64(a, indices),
+                H(raw: HighwayReference.tableLookupBytesF64(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -28,9 +28,9 @@ extension SIMDDoubleReferenceTests {
 
     @Test func tableLookupBytesUnchecked() {
         let mismatches = Mismatches("tableLookupBytes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE563_2929_3BF7_A66C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE563_2929_3BF7_A66C)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0xE563_2A29_3BF7_A81F,
@@ -39,7 +39,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytes(a, atUnchecked: indices),
-                HighwayReference.tableLookupBytesF64(a, indices),
+                H(raw: HighwayReference.tableLookupBytesF64(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -49,9 +49,9 @@ extension SIMDDoubleReferenceTests {
     @Test(.disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"))
     func tableLookupBytesOutOfContract() {
         let mismatches = Mismatches("tableLookupBytes out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x25D7_324A_67FD_6C3F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x25D7_324A_67FD_6C3F)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0x25D7_314A_67FD_6A8C,
@@ -60,7 +60,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytes(a, atUnchecked: indices),
-                HighwayReference.tableLookupBytesF64(a, indices),
+                H(raw: HighwayReference.tableLookupBytesF64(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -69,9 +69,9 @@ extension SIMDDoubleReferenceTests {
 
     @Test func tableLookupBytesOrZero() {
         let mismatches = Mismatches("tableLookupBytesOrZero")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5278_ACE8_2415_FF99)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5278_ACE8_2415_FF99)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -81,7 +81,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.tableLookupBytesOrZero(a, at: indices),
-                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                H(raw: HighwayReference.tableLookupBytesOrZeroF64(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -90,9 +90,9 @@ extension SIMDDoubleReferenceTests {
 
     @Test func tableLookupBytesOrZeroUnchecked() {
         let mismatches = Mismatches("tableLookupBytesOrZero unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3F89_72AB_CF45_6579)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3F89_72AB_CF45_6579)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -102,7 +102,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytesOrZero(a, atUnchecked: indices),
-                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                H(raw: HighwayReference.tableLookupBytesOrZeroF64(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -112,9 +112,9 @@ extension SIMDDoubleReferenceTests {
     @Test(.disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"))
     func tableLookupBytesOrZeroOutOfContract() {
         let mismatches = Mismatches("tableLookupBytesOrZero out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8FA5_0E55_B61D_C352)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8FA5_0E55_B61D_C352)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -124,7 +124,7 @@ extension SIMDDoubleReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupBytesOrZero(a, atUnchecked: indices),
-                HighwayReference.tableLookupBytesOrZeroF64(a, indices),
+                H(raw: HighwayReference.tableLookupBytesOrZeroF64(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -133,12 +133,13 @@ extension SIMDDoubleReferenceTests {
 
     @Test func pairwiseAddingBlocks() {
         let mismatches = Mismatches("pairwiseAddingBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8ED5_0234_AF84_976C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8ED5_0334_AF84_991F)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(adjacentLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x8ED5_0234_AF84_976C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8ED5_0334_AF84_991F)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(adjacentLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.pairwiseAddingBlocks(a, b),
-                HighwayReference.pairwiseAddingBlocksF64(a, b),
+                H(raw: HighwayReference.pairwiseAddingBlocksF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -147,12 +148,12 @@ extension SIMDDoubleReferenceTests {
 
     @Test func pairwiseSubtractingBlocks() {
         let mismatches = Mismatches("pairwiseSubtractingBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCCBB_BDFC_E1E7_07F5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCCBB_BCFC_E1E7_0642)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCCBB_BDFC_E1E7_07F5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCCBB_BCFC_E1E7_0642)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(a, b),
-                HighwayReference.pairwiseSubtractingBlocksF64(a, b),
+                H(raw: HighwayReference.pairwiseSubtractingBlocksF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -161,12 +162,17 @@ extension SIMDDoubleReferenceTests {
 
     @Test func broadcastingInBlocks() {
         let mismatches = Mismatches("broadcastingInBlocks")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3854_4DD4_8B55_B40B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3854_4DD4_8B55_B40B)
         let laneInputs = Array(0...1)
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 H.broadcastingInBlocks(a, lane: lane),
-                HighwayReference.broadcastingInBlocksF64(a, Int32(truncatingIfNeeded: lane)),
+                H(
+                    raw: HighwayReference.broadcastingInBlocksF64(
+                        a.raw,
+                        Int32(truncatingIfNeeded: lane)
+                    )
+                ),
                 "a: \(describe(a)), lane: \(lane)"
             )
         }
@@ -175,12 +181,17 @@ extension SIMDDoubleReferenceTests {
 
     @Test func broadcastingInBlocksUnchecked() {
         let mismatches = Mismatches("broadcastingInBlocks unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB42C_7D80_C878_3A9F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB42C_7D80_C878_3A9F)
         let laneInputs = Array(0...1)
         for (a, lane) in everyPair(aInputs, laneInputs) {
             mismatches.check(
                 unsafe H.broadcastingInBlocks(a, laneUnchecked: lane),
-                HighwayReference.broadcastingInBlocksF64(a, Int32(truncatingIfNeeded: lane)),
+                H(
+                    raw: HighwayReference.broadcastingInBlocksF64(
+                        a.raw,
+                        Int32(truncatingIfNeeded: lane)
+                    )
+                ),
                 "a: \(describe(a)), lane: \(lane)"
             )
         }

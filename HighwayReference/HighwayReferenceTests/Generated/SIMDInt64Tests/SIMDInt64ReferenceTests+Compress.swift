@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDInt64ReferenceTests {
     @Test func compressed() {
         let mismatches = Mismatches("compressed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x07D5_ADFC_777E_89B9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x07D5_ADFC_777E_89B9)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x07D5_ACFC_777E_8806)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressed(a, where: mask)
-            let reference = H.Vector(raw: HighwayReference.compressedI64(a.raw, mask.raw))
+            let reference = H(raw: HighwayReference.compressedI64(a.raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicI64() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
@@ -26,11 +26,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func compressedNonCanonical() {
         let mismatches = Mismatches("compressed with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x95A0_FA11_ABDB_A8FE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x95A0_FA11_ABDB_A8FE)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x95A0_FB11_ABDB_AAB1)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressed(a, where: mask)
-            let reference = H.Vector(raw: HighwayReference.compressedI64(a.raw, mask.raw))
+            let reference = H(raw: HighwayReference.compressedI64(a.raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicI64() ? H.laneCount : H.trueCount(mask)
             mismatches.check(
@@ -44,11 +44,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func compressedNot() {
         let mismatches = Mismatches("compressedNot")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCFE4_5488_7F63_87F4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCFE4_5488_7F63_87F4)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCFE4_5588_7F63_89A7)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressedNot(a, where: mask)
-            let reference = H.Vector(raw: HighwayReference.compressedNotI64(a.raw, mask.raw))
+            let reference = H(raw: HighwayReference.compressedNotI64(a.raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicI64()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
@@ -63,11 +63,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func compressedNotNonCanonical() {
         let mismatches = Mismatches("compressedNot with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x675B_C333_F55F_F46B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x675B_C333_F55F_F46B)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x675B_C233_F55F_F2B8)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let port = H.compressedNot(a, where: mask)
-            let reference = H.Vector(raw: HighwayReference.compressedNotI64(a.raw, mask.raw))
+            let reference = H(raw: HighwayReference.compressedNotI64(a.raw, mask.raw))
             let checkedLanes =
                 HighwayReference.compressTailIsDeterministicI64()
                 ? H.laneCount : H.laneCount - H.trueCount(mask)
@@ -82,12 +82,12 @@ extension SIMDInt64ReferenceTests {
 
     @Test func partitioned() {
         let mismatches = Mismatches("partitioned")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE03C_6494_7E8B_87E9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE03C_6494_7E8B_87E9)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE03C_6394_7E8B_8636)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.partitioned(a, where: mask),
-                H.Vector(raw: HighwayReference.partitionedI64(a.raw, mask.raw)),
+                H(raw: HighwayReference.partitionedI64(a.raw, mask.raw)),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -96,12 +96,12 @@ extension SIMDInt64ReferenceTests {
 
     @Test func partitionedNonCanonical() {
         let mismatches = Mismatches("partitioned with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4992_0D24_E3EB_7A6E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4992_0D24_E3EB_7A6E)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4992_0E24_E3EB_7C21)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.partitioned(a, where: mask),
-                H.Vector(raw: HighwayReference.partitionedI64(a.raw, mask.raw)),
+                H(raw: HighwayReference.partitionedI64(a.raw, mask.raw)),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -110,9 +110,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressed() {
         let mismatches = Mismatches("storeCompressed")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x15B8_3122_36A6_46F6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x15B8_3122_36A6_46F6)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x15B8_3222_36A6_48A9)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
@@ -142,9 +142,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedBeforeGuardPage() {
         let mismatches = Mismatches("storeCompressed before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0BB2_BB10_14DB_8287)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0BB2_BB10_14DB_8287)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0BB2_BA10_14DB_80D4)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let (portResult, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeCompressed(a, where: mask, to: destination)
@@ -169,9 +169,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedNonCanonical() {
         let mismatches = Mismatches("storeCompressed with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7AA3_2DE0_E803_EAE5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7AA3_2DE0_E803_EAE5)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7AA3_2CE0_E803_E932)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
@@ -201,9 +201,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedUncheckedSpan() {
         let mismatches = Mismatches("storeCompressed unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9642_6B48_C763_B1A4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9642_6B48_C763_B1A4)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9642_6C48_C763_B357)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
@@ -235,9 +235,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedBlended() {
         let mismatches = Mismatches("storeCompressedBlended")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9190_68D6_6E04_3A3A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9190_68D6_6E04_3A3A)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9190_69D6_6E04_3BED)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
@@ -267,9 +267,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedBlendedBeforeGuardPage() {
         let mismatches = Mismatches("storeCompressedBlended before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x48A7_BD16_4959_843B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x48A7_BD16_4959_843B)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x48A7_BC16_4959_8288)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let (portResult, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeCompressedBlended(a, where: mask, to: destination)
@@ -294,9 +294,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedBlendedNonCanonical() {
         let mismatches = Mismatches("storeCompressedBlended with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x97A2_9165_57D3_21D1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x97A2_9165_57D3_21D1)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x97A2_9065_57D3_201E)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
@@ -326,9 +326,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedBlendedUncheckedSpan() {
         let mismatches = Mismatches("storeCompressedBlended unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x33BC_6BB4_4576_B380)
+        let aInputs = Inputs.vectors(H.self, seed: 0x33BC_6BB4_4576_B380)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x33BC_6CB4_4576_B533)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             let portResult = portLanes.withUnsafeMutableBufferPointer { destination in
@@ -360,7 +360,7 @@ extension SIMDInt64ReferenceTests {
 
     @Test func compressedBits() {
         let mismatches = Mismatches("compressedBits")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1023_6177_C3BC_1A09)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1023_6177_C3BC_1A09)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
@@ -371,7 +371,7 @@ extension SIMDInt64ReferenceTests {
                 (
                     unsafe H.compressed(a, bits: source.baseAddress!),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe H.Vector(
+                        unsafe H(
                             raw: HighwayReference.compressedBitsI64(a.raw, padded.baseAddress!)
                         )
                     }
@@ -393,7 +393,7 @@ extension SIMDInt64ReferenceTests {
 
     @Test func compressedBitsBeforeGuardPage() {
         let mismatches = Mismatches("compressedBits before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8ACB_4A34_564E_C2A6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8ACB_4A34_564E_C2A6)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
@@ -404,7 +404,7 @@ extension SIMDInt64ReferenceTests {
                 (
                     unsafe H.compressed(a, bits: source),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe H.Vector(
+                        unsafe H(
                             raw: HighwayReference.compressedBitsI64(a.raw, padded.baseAddress!)
                         )
                     }
@@ -426,7 +426,7 @@ extension SIMDInt64ReferenceTests {
 
     @Test func compressedBitsUncheckedSpan() {
         let mismatches = Mismatches("compressedBits unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x218D_AAE9_DDC8_3301)
+        let aInputs = Inputs.vectors(H.self, seed: 0x218D_AAE9_DDC8_3301)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
@@ -463,13 +463,13 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedBits() {
         let mismatches = Mismatches("storeCompressedBits")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEDEF_525D_3E52_A9FA)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEDEF_525D_3E52_A9FA)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
             seed: 0xEDEF_535D_3E52_ABAD
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -509,13 +509,13 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedBitsBeforeGuardPage() {
         let mismatches = Mismatches("storeCompressedBits before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC186_CF4D_FCDA_77FB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC186_CF4D_FCDA_77FB)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
             seed: 0xC186_CE4D_FCDA_7648
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             let (portResult, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe withGuardedLanes(bits) { source in
@@ -550,13 +550,13 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeCompressedBitsUncheckedSpan() {
         let mismatches = Mismatches("storeCompressedBits unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x95CE_CFFE_AB5D_2B40)
+        let aInputs = Inputs.vectors(H.self, seed: 0x95CE_CFFE_AB5D_2B40)
         let bitsInputs = Inputs.buffers(
             UInt8.self,
             count: (H.laneCount + 7) / 8,
             seed: 0x95CE_D0FE_AB5D_2CF3
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             var portLanes = sentinel
             var referenceLanes = sentinel

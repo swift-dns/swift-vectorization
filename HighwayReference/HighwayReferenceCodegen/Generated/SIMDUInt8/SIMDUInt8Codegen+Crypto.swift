@@ -4,253 +4,220 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portAesRoundU8(_ a: SIMDUInt8.Vector, roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector
-{
-    SIMDUInt8.aesRound(a, roundKey: b)
+public func portAesRoundU8(_ a: SIMD<UInt8>, roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesRound(a, roundKey: b)
 }
 
 @inline(never)
-public func highwayAesRoundU8(
-    _ a: SIMDUInt8.Vector,
-    roundKey b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.aesRoundU8(a.raw, b.raw))
+public func highwayAesRoundU8(_ a: SIMD<UInt8>, roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.aesRoundU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portAesRoundU8ConstantA(roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesRound(SIMDUInt8.repeating(26), roundKey: b)
+public func portAesRoundU8ConstantA(roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesRound(SIMD<UInt8>.repeating(26), roundKey: b)
 }
 
 @inline(never)
-public func highwayAesRoundU8ConstantA(roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesRoundU8ConstantA(roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesRoundU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portAesRoundU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesRound(a, roundKey: SIMDUInt8.repeating(26))
+public func portAesRoundU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesRound(a, roundKey: SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayAesRoundU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesRoundU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesRoundU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portAesLastRoundU8(
-    _ a: SIMDUInt8.Vector,
-    roundKey b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesLastRound(a, roundKey: b)
+public func portAesLastRoundU8(_ a: SIMD<UInt8>, roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesLastRound(a, roundKey: b)
 }
 
 @inline(never)
-public func highwayAesLastRoundU8(
-    _ a: SIMDUInt8.Vector,
-    roundKey b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.aesLastRoundU8(a.raw, b.raw))
+public func highwayAesLastRoundU8(_ a: SIMD<UInt8>, roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.aesLastRoundU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portAesLastRoundU8ConstantA(roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesLastRound(SIMDUInt8.repeating(26), roundKey: b)
+public func portAesLastRoundU8ConstantA(roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesLastRound(SIMD<UInt8>.repeating(26), roundKey: b)
 }
 
 @inline(never)
-public func highwayAesLastRoundU8ConstantA(roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesLastRoundU8ConstantA(roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesLastRoundU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portAesLastRoundU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesLastRound(a, roundKey: SIMDUInt8.repeating(26))
+public func portAesLastRoundU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesLastRound(a, roundKey: SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayAesLastRoundU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesLastRoundU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesLastRoundU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portAesRoundInverseU8(
-    _ a: SIMDUInt8.Vector,
-    roundKey b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesRoundInverse(a, roundKey: b)
+public func portAesRoundInverseU8(_ a: SIMD<UInt8>, roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesRoundInverse(a, roundKey: b)
 }
 
 @inline(never)
-public func highwayAesRoundInverseU8(
-    _ a: SIMDUInt8.Vector,
-    roundKey b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.aesRoundInverseU8(a.raw, b.raw))
+public func highwayAesRoundInverseU8(_ a: SIMD<UInt8>, roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.aesRoundInverseU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portAesRoundInverseU8ConstantA(roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesRoundInverse(SIMDUInt8.repeating(26), roundKey: b)
+public func portAesRoundInverseU8ConstantA(roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesRoundInverse(SIMD<UInt8>.repeating(26), roundKey: b)
 }
 
 @inline(never)
-public func highwayAesRoundInverseU8ConstantA(roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesRoundInverseU8ConstantA(roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesRoundInverseU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portAesRoundInverseU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesRoundInverse(a, roundKey: SIMDUInt8.repeating(26))
+public func portAesRoundInverseU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesRoundInverse(a, roundKey: SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayAesRoundInverseU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesRoundInverseU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesRoundInverseU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portAesLastRoundInverseU8(
-    _ a: SIMDUInt8.Vector,
-    roundKey b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesLastRoundInverse(a, roundKey: b)
+public func portAesLastRoundInverseU8(_ a: SIMD<UInt8>, roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesLastRoundInverse(a, roundKey: b)
 }
 
 @inline(never)
-public func highwayAesLastRoundInverseU8(
-    _ a: SIMDUInt8.Vector,
-    roundKey b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.aesLastRoundInverseU8(a.raw, b.raw))
+public func highwayAesLastRoundInverseU8(_ a: SIMD<UInt8>, roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.aesLastRoundInverseU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portAesLastRoundInverseU8ConstantA(roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesLastRoundInverse(SIMDUInt8.repeating(26), roundKey: b)
+public func portAesLastRoundInverseU8ConstantA(roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesLastRoundInverse(SIMD<UInt8>.repeating(26), roundKey: b)
 }
 
 @inline(never)
-public func highwayAesLastRoundInverseU8ConstantA(roundKey b: SIMDUInt8.Vector) -> SIMDUInt8.Vector
-{
-    SIMDUInt8.Vector(
+public func highwayAesLastRoundInverseU8ConstantA(roundKey b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesLastRoundInverseU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portAesLastRoundInverseU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesLastRoundInverse(a, roundKey: SIMDUInt8.repeating(26))
+public func portAesLastRoundInverseU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesLastRoundInverse(a, roundKey: SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayAesLastRoundInverseU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesLastRoundInverseU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesLastRoundInverseU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portAesInverseMixColumnsU8(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesInverseMixColumns(a)
+public func portAesInverseMixColumnsU8(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesInverseMixColumns(a)
 }
 
 @inline(never)
-public func highwayAesInverseMixColumnsU8(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.aesInverseMixColumnsU8(a.raw))
+public func highwayAesInverseMixColumnsU8(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.aesInverseMixColumnsU8(a.raw))
 }
 
 @inline(never)
-public func portAesInverseMixColumnsU8ConstantA() -> SIMDUInt8.Vector {
-    SIMDUInt8.aesInverseMixColumns(SIMDUInt8.repeating(26))
+public func portAesInverseMixColumnsU8ConstantA() -> SIMD<UInt8> {
+    SIMD<UInt8>.aesInverseMixColumns(SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayAesInverseMixColumnsU8ConstantA() -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesInverseMixColumnsU8ConstantA() -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesInverseMixColumnsU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portAesKeyGenerationAssistU8(
-    _ a: SIMDUInt8.Vector,
-    roundConstant: UInt8
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesKeyGenerationAssist(a, roundConstant: roundConstant)
+public func portAesKeyGenerationAssistU8(_ a: SIMD<UInt8>, roundConstant: UInt8) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesKeyGenerationAssist(a, roundConstant: roundConstant)
 }
 
 @inline(never)
-public func highwayAesKeyGenerationAssistU8(
-    _ a: SIMDUInt8.Vector,
-    roundConstant: UInt8
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.aesKeyGenerationAssistU8(a.raw, roundConstant))
+public func highwayAesKeyGenerationAssistU8(_ a: SIMD<UInt8>, roundConstant: UInt8) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.aesKeyGenerationAssistU8(a.raw, roundConstant))
 }
 
 @inline(never)
-public func portAesKeyGenerationAssistU8ConstantA(roundConstant: UInt8) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesKeyGenerationAssist(SIMDUInt8.repeating(26), roundConstant: roundConstant)
+public func portAesKeyGenerationAssistU8ConstantA(roundConstant: UInt8) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesKeyGenerationAssist(SIMD<UInt8>.repeating(26), roundConstant: roundConstant)
 }
 
 @inline(never)
-public func highwayAesKeyGenerationAssistU8ConstantA(roundConstant: UInt8) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayAesKeyGenerationAssistU8ConstantA(roundConstant: UInt8) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.aesKeyGenerationAssistU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             roundConstant
         )
     )
 }
 
 @inline(never)
-public func portAesKeyGenerationAssistU8ConstantRoundConstant(
-    _ a: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.aesKeyGenerationAssist(a, roundConstant: 1)
+public func portAesKeyGenerationAssistU8ConstantRoundConstant(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.aesKeyGenerationAssist(a, roundConstant: 1)
 }
 
 @inline(never)
-public func highwayAesKeyGenerationAssistU8ConstantRoundConstant(
-    _ a: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.aesKeyGenerationAssistU8(a.raw, 1))
+public func highwayAesKeyGenerationAssistU8ConstantRoundConstant(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.aesKeyGenerationAssistU8(a.raw, 1))
 }

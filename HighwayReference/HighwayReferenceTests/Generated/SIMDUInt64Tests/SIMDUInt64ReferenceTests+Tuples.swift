@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDUInt64ReferenceTests {
     @Test func create2() {
         let mismatches = Mismatches("create2")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0EF9_DEE2_7B07_FDF8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0EF9_DFE2_7B07_FFAB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0EF9_DEE2_7B07_FDF8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0EF9_DFE2_7B07_FFAB)
         for (a, b) in everyPair(aInputs, bInputs) {
             let port = H.create2(a, b)
-            let reference = { tuple in (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1)) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
                 HighwayReference.create2U64(a.raw, b.raw)
             )
             mismatches.check(port.0, reference.0, "a: \(describe(a)), b: \(describe(b))")
@@ -23,14 +23,12 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func get2() {
         let mismatches = Mismatches("get2")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0x3825_5C8E_9BF5_4756)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0x3825_5C8E_9BF5_4756))
         let indexInputs = Inputs.tupleIndices(count: 2)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
                 H.get2(tuple, at: index),
-                H.Vector(
+                H(
                     raw: HighwayReference.get2U64(
                         cvectorization_ops_tuple2_u64(v0: tuple.0.raw, v1: tuple.1.raw),
                         index
@@ -44,14 +42,12 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func get2Unchecked() {
         let mismatches = Mismatches("get2 unchecked")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0xDF05_B508_3FF3_6DB0)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0xDF05_B508_3FF3_6DB0))
         let indexInputs = Inputs.tupleIndices(count: 2)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
                 unsafe H.get2(tuple, atUnchecked: index),
-                H.Vector(
+                H(
                     raw: HighwayReference.get2U64(
                         cvectorization_ops_tuple2_u64(v0: tuple.0.raw, v1: tuple.1.raw),
                         index
@@ -65,11 +61,9 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func set2() {
         let mismatches = Mismatches("set2")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0x649E_4158_1C17_9092)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0x649E_4158_1C17_9092))
         let indexInputs = Inputs.tupleIndices(count: 2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x649E_3F58_1C17_8D2C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x649E_3F58_1C17_8D2C)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -77,7 +71,7 @@ extension SIMDUInt64ReferenceTests {
             seed: 0xB062_A3AD_485E_88D6
         ) {
             let port = H.set2(tuple, at: index, to: a)
-            let reference = { tuple in (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1)) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
                 HighwayReference.set2U64(
                     cvectorization_ops_tuple2_u64(v0: tuple.0.raw, v1: tuple.1.raw),
                     index,
@@ -100,11 +94,9 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func set2Unchecked() {
         let mismatches = Mismatches("set2 unchecked")
-        let tupleInputs = Inputs.tuples2(
-            of: Inputs.vectors(H.Vector.self, seed: 0xBD67_8ABA_1C51_810C)
-        )
+        let tupleInputs = Inputs.tuples2(of: Inputs.vectors(H.self, seed: 0xBD67_8ABA_1C51_810C))
         let indexInputs = Inputs.tupleIndices(count: 2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD67_8CBA_1C51_8472)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBD67_8CBA_1C51_8472)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -112,7 +104,7 @@ extension SIMDUInt64ReferenceTests {
             seed: 0xA247_0E21_8459_E360
         ) {
             let port = unsafe H.set2(tuple, atUnchecked: index, to: a)
-            let reference = { tuple in (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1)) }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1)) }(
                 HighwayReference.set2U64(
                     cvectorization_ops_tuple2_u64(v0: tuple.0.raw, v1: tuple.1.raw),
                     index,
@@ -135,14 +127,14 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func create3() {
         let mismatches = Mismatches("create3")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0664_A7E2_7631_1BE3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0664_A6E2_7631_1A30)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x0664_A9E2_7631_1F49)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0664_A7E2_7631_1BE3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0664_A6E2_7631_1A30)
+        let cInputs = Inputs.vectors(H.self, seed: 0x0664_A9E2_7631_1F49)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x8EC5_EB6B_AA8D_6265) {
             let port = H.create3(a, b, c)
-            let reference = { tuple in
-                (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2))
-            }(HighwayReference.create3U64(a.raw, b.raw, c.raw))
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
+                HighwayReference.create3U64(a.raw, b.raw, c.raw)
+            )
             mismatches.check(
                 port.0,
                 reference.0,
@@ -164,14 +156,12 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func get3() {
         let mismatches = Mismatches("get3")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x3069_C58E_97D7_65E1)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x3069_C58E_97D7_65E1))
         let indexInputs = Inputs.tupleIndices(count: 3)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
                 H.get3(tuple, at: index),
-                H.Vector(
+                H(
                     raw: HighwayReference.get3U64(
                         cvectorization_ops_tuple3_u64(
                             v0: tuple.0.raw,
@@ -189,14 +179,12 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func get3Unchecked() {
         let mismatches = Mismatches("get3 unchecked")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x55FE_B5A2_F6F4_1FA1)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x55FE_B5A2_F6F4_1FA1))
         let indexInputs = Inputs.tupleIndices(count: 3)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
                 unsafe H.get3(tuple, atUnchecked: index),
-                H.Vector(
+                H(
                     raw: HighwayReference.get3U64(
                         cvectorization_ops_tuple3_u64(
                             v0: tuple.0.raw,
@@ -214,11 +202,9 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func set3() {
         let mismatches = Mismatches("set3")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x5CE2_AA58_17F9_AF1D)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x5CE2_AA58_17F9_AF1D))
         let indexInputs = Inputs.tupleIndices(count: 3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5CE2_A858_17F9_ABB7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5CE2_A858_17F9_ABB7)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -226,9 +212,7 @@ extension SIMDUInt64ReferenceTests {
             seed: 0x4D93_00DC_DA87_1D6F
         ) {
             let port = H.set3(tuple, at: index, to: a)
-            let reference = { tuple in
-                (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2))
-            }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
                 HighwayReference.set3U64(
                     cvectorization_ops_tuple3_u64(
                         v0: tuple.0.raw,
@@ -260,11 +244,9 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func set3Unchecked() {
         let mismatches = Mismatches("set3 unchecked")
-        let tupleInputs = Inputs.tuples3(
-            of: Inputs.vectors(H.Vector.self, seed: 0x2999_6DF6_F982_8EDD)
-        )
+        let tupleInputs = Inputs.tuples3(of: Inputs.vectors(H.self, seed: 0x2999_6DF6_F982_8EDD))
         let indexInputs = Inputs.tupleIndices(count: 3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2999_6BF6_F982_8B77)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2999_6BF6_F982_8B77)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -272,9 +254,7 @@ extension SIMDUInt64ReferenceTests {
             seed: 0x124C_B933_1710_8DAF
         ) {
             let port = unsafe H.set3(tuple, atUnchecked: index, to: a)
-            let reference = { tuple in
-                (H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2))
-            }(
+            let reference = { tuple in (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2)) }(
                 HighwayReference.set3U64(
                     cvectorization_ops_tuple3_u64(
                         v0: tuple.0.raw,
@@ -306,10 +286,10 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func create4() {
         let mismatches = Mismatches("create4")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFEA9_10E2_7213_3A6E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFEA9_11E2_7213_3C21)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xFEA9_0EE2_7213_3708)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0xFEA9_0FE2_7213_38BB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFEA9_10E2_7213_3A6E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFEA9_11E2_7213_3C21)
+        let cInputs = Inputs.vectors(H.self, seed: 0xFEA9_0EE2_7213_3708)
+        let dInputs = Inputs.vectors(H.self, seed: 0xFEA9_0FE2_7213_38BB)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -319,10 +299,7 @@ extension SIMDUInt64ReferenceTests {
         ) {
             let port = H.create4(a, b, c, d)
             let reference = { tuple in
-                (
-                    H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2),
-                    H.Vector(raw: tuple.v3)
-                )
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
             }(HighwayReference.create4U64(a.raw, b.raw, c.raw, d.raw))
             mismatches.check(
                 port.0,
@@ -350,14 +327,12 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func get4() {
         let mismatches = Mismatches("get4")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0x4A29_2A8E_A65B_9F60)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0x4A29_2A8E_A65B_9F60))
         let indexInputs = Inputs.tupleIndices(count: 4)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
                 H.get4(tuple, at: index),
-                H.Vector(
+                H(
                     raw: HighwayReference.get4U64(
                         cvectorization_ops_tuple4_u64(
                             v0: tuple.0.raw,
@@ -376,14 +351,12 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func get4Unchecked() {
         let mismatches = Mismatches("get4 unchecked")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0x9563_9581_F5F1_05E6)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0x9563_9581_F5F1_05E6))
         let indexInputs = Inputs.tupleIndices(count: 4)
         for (tuple, index) in everyPair(tupleInputs, indexInputs) {
             mismatches.check(
                 unsafe H.get4(tuple, atUnchecked: index),
-                H.Vector(
+                H(
                     raw: HighwayReference.get4U64(
                         cvectorization_ops_tuple4_u64(
                             v0: tuple.0.raw,
@@ -402,11 +375,9 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func set4() {
         let mismatches = Mismatches("set4")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0x318C_5757_FF6B_B914)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0x318C_5757_FF6B_B914))
         let indexInputs = Inputs.tupleIndices(count: 4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x318C_5957_FF6B_BC7A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x318C_5957_FF6B_BC7A)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -415,10 +386,7 @@ extension SIMDUInt64ReferenceTests {
         ) {
             let port = H.set4(tuple, at: index, to: a)
             let reference = { tuple in
-                (
-                    H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2),
-                    H.Vector(raw: tuple.v3)
-                )
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
             }(
                 HighwayReference.set4U64(
                     cvectorization_ops_tuple4_u64(
@@ -457,11 +425,9 @@ extension SIMDUInt64ReferenceTests {
 
     @Test func set4Unchecked() {
         let mismatches = Mismatches("set4 unchecked")
-        let tupleInputs = Inputs.tuples4(
-            of: Inputs.vectors(H.Vector.self, seed: 0xD296_07D6_8370_F1CA)
-        )
+        let tupleInputs = Inputs.tuples4(of: Inputs.vectors(H.self, seed: 0xD296_07D6_8370_F1CA))
         let indexInputs = Inputs.tupleIndices(count: 4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD296_05D6_8370_EE64)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD296_05D6_8370_EE64)
         for (tuple, index, a) in mixedTriples(
             tupleInputs,
             indexInputs,
@@ -470,10 +436,7 @@ extension SIMDUInt64ReferenceTests {
         ) {
             let port = unsafe H.set4(tuple, atUnchecked: index, to: a)
             let reference = { tuple in
-                (
-                    H.Vector(raw: tuple.v0), H.Vector(raw: tuple.v1), H.Vector(raw: tuple.v2),
-                    H.Vector(raw: tuple.v3)
-                )
+                (H(raw: tuple.v0), H(raw: tuple.v1), H(raw: tuple.v2), H(raw: tuple.v3))
             }(
                 HighwayReference.set4U64(
                     cvectorization_ops_tuple4_u64(

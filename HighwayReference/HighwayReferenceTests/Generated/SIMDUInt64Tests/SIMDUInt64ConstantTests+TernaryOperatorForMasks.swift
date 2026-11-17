@@ -7,20 +7,18 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkSelectingOrZeroConstantA(_ value: H.Lane) {
+    private func checkSelectingOrZeroConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingOrZero with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x12A2_7970_147D_838C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
                 H.selectingOrZero(mask, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.selectingOrZeroU64(mask.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.selectingOrZeroU64(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -76,25 +74,23 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func selectingOrZeroConstantSplatMax() {
-        checkSelectingOrZeroConstantA(H.Lane.max)
+        checkSelectingOrZeroConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantA(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x212D_E838_36D0_8A5C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x212D_EB38_36D0_8F75)
+        let bInputs = Inputs.vectors(H.self, seed: 0x212D_E838_36D0_8A5C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x212D_EB38_36D0_8F75)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.selecting(H.repeating(value), b, c),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorU64(H.repeating(value).raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorU64(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -102,21 +98,19 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantB(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3A80_6E38_44F8_2A0E)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x3A80_6C38_44F8_26A8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3A80_6E38_44F8_2A0E)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3A80_6C38_44F8_26A8)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.selecting(a, H.repeating(value), c),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorU64(a.raw, H.repeating(value).raw, c.raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorU64(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -124,21 +118,19 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantC(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantC(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x317E_3738_3FC4_7619)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x317E_3638_3FC4_7466)
+        let aInputs = Inputs.vectors(H.self, seed: 0x317E_3738_3FC4_7619)
+        let bInputs = Inputs.vectors(H.self, seed: 0x317E_3638_3FC4_7466)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selecting(a, b, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorU64(a.raw, b.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorU64(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -218,8 +210,8 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func selectingByVectorConstantSplatMax() {
-        checkSelectingByVectorConstantA(H.Lane.max)
-        checkSelectingByVectorConstantB(H.Lane.max)
-        checkSelectingByVectorConstantC(H.Lane.max)
+        checkSelectingByVectorConstantA(Lane.max)
+        checkSelectingByVectorConstantB(Lane.max)
+        checkSelectingByVectorConstantC(Lane.max)
     }
 }

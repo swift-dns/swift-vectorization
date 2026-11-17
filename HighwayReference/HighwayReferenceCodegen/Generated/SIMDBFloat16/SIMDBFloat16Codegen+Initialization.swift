@@ -4,107 +4,101 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portZeroBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.zero()
+public func portZeroBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.zero()
 }
 
 @inline(never)
-public func highwayZeroBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.zeroBF16())
+public func highwayZeroBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.zeroBF16())
 }
 
 @inline(never)
-public func portRepeatingBF16(_ value: SIMDBFloat16.Lane) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.repeating(value)
+public func portRepeatingBF16(_ value: BFloat16) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.repeating(value)
 }
 
 @inline(never)
-public func highwayRepeatingBF16(_ value: BFloat16) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.repeatingBF16(value.bitPattern))
+public func highwayRepeatingBF16(_ value: BFloat16) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.repeatingBF16(value.bitPattern))
 }
 
 @inline(never)
-public func portRepeatingBF16ConstantValue() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.repeating(BFloat16(bitPattern: 26))
+public func portRepeatingBF16ConstantValue() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26))
 }
 
 @inline(never)
-public func highwayRepeatingBF16ConstantValue() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
-    )
+public func highwayRepeatingBF16ConstantValue() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern))
 }
 
 @inline(never)
-public func portSignBitBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.signBit()
+public func portSignBitBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.signBit()
 }
 
 @inline(never)
-public func highwaySignBitBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.signBitBF16())
+public func highwaySignBitBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.signBitBF16())
 }
 
 @inline(never)
-public func portNanBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.nan()
+public func portNanBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.nan()
 }
 
 @inline(never)
-public func highwayNanBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.nanBF16())
+public func highwayNanBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.nanBF16())
 }
 
 @inline(never)
-public func portInfinityBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.infinity()
+public func portInfinityBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.infinity()
 }
 
 @inline(never)
-public func highwayInfinityBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.infinityBF16())
+public func highwayInfinityBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.infinityBF16())
 }
 
 @inline(never)
-public func portUnspecifiedBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.unspecified()
+public func portUnspecifiedBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.unspecified()
 }
 
 @inline(never)
-public func highwayUnspecifiedBF16() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.unspecifiedBF16())
+public func highwayUnspecifiedBF16() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.unspecifiedBF16())
 }
 
 @inline(never)
 public func portRepeatingWhereBF16(
-    _ value: SIMDBFloat16.Lane,
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.repeating(value, where: mask)
+    _ value: BFloat16,
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.repeating(value, where: mask)
 }
 
 @inline(never)
 public func highwayRepeatingWhereBF16(
     _ value: BFloat16,
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.repeatingWhereBF16(mask.raw, value.bitPattern)
-    )
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.repeatingWhereBF16(mask.raw, value.bitPattern))
 }
 
 @inline(never)
-public func portRepeatingWhereBF16ConstantValue(
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.repeating(BFloat16(bitPattern: 26), where: mask)
+public func portRepeatingWhereBF16ConstantValue(where mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26), where: mask)
 }
 
 @inline(never)
 public func highwayRepeatingWhereBF16ConstantValue(
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.repeatingWhereBF16(
             mask.raw,
             BFloat16(bitPattern: 26).bitPattern
@@ -114,20 +108,20 @@ public func highwayRepeatingWhereBF16ConstantValue(
 
 @inline(never)
 public func portRepeatingWhereOtherwiseBF16(
-    _ value: SIMDBFloat16.Lane,
-    where mask: SIMDBFloat16.Mask,
-    otherwise: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.repeating(value, where: mask, otherwise: otherwise)
+    _ value: BFloat16,
+    where mask: SIMD<BFloat16>.Mask,
+    otherwise: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.repeating(value, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseBF16(
     _ value: BFloat16,
-    where mask: SIMDBFloat16.Mask,
-    otherwise: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+    where mask: SIMD<BFloat16>.Mask,
+    otherwise: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseBF16(
             otherwise.raw,
             mask.raw,
@@ -138,18 +132,18 @@ public func highwayRepeatingWhereOtherwiseBF16(
 
 @inline(never)
 public func portRepeatingWhereOtherwiseBF16ConstantValue(
-    where mask: SIMDBFloat16.Mask,
-    otherwise: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.repeating(BFloat16(bitPattern: 26), where: mask, otherwise: otherwise)
+    where mask: SIMD<BFloat16>.Mask,
+    otherwise: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseBF16ConstantValue(
-    where mask: SIMDBFloat16.Mask,
-    otherwise: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+    where mask: SIMD<BFloat16>.Mask,
+    otherwise: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseBF16(
             otherwise.raw,
             mask.raw,
@@ -160,24 +154,24 @@ public func highwayRepeatingWhereOtherwiseBF16ConstantValue(
 
 @inline(never)
 public func portRepeatingWhereOtherwiseBF16ConstantOtherwise(
-    _ value: SIMDBFloat16.Lane,
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.repeating(
+    _ value: BFloat16,
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.repeating(
         value,
         where: mask,
-        otherwise: SIMDBFloat16.repeating(BFloat16(bitPattern: 26))
+        otherwise: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayRepeatingWhereOtherwiseBF16ConstantOtherwise(
     _ value: BFloat16,
-    where mask: SIMDBFloat16.Mask
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+    where mask: SIMD<BFloat16>.Mask
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.repeatingWhereOtherwiseBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             mask.raw,
@@ -188,16 +182,16 @@ public func highwayRepeatingWhereOtherwiseBF16ConstantOtherwise(
 
 @inline(never)
 public func portRepeatingBlockBF16(
-    _ v0: SIMDBFloat16.Lane,
-    _ v1: SIMDBFloat16.Lane,
-    _ v2: SIMDBFloat16.Lane,
-    _ v3: SIMDBFloat16.Lane,
-    _ v4: SIMDBFloat16.Lane,
-    _ v5: SIMDBFloat16.Lane,
-    _ v6: SIMDBFloat16.Lane,
-    _ v7: SIMDBFloat16.Lane
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7)
+    _ v0: BFloat16,
+    _ v1: BFloat16,
+    _ v2: BFloat16,
+    _ v3: BFloat16,
+    _ v4: BFloat16,
+    _ v5: BFloat16,
+    _ v6: BFloat16,
+    _ v7: BFloat16
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.repeatingBlock(v0, v1, v2, v3, v4, v5, v6, v7)
 }
 
 @inline(never)
@@ -210,8 +204,8 @@ public func highwayRepeatingBlockBF16(
     _ v5: BFloat16,
     _ v6: BFloat16,
     _ v7: BFloat16
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.repeatingBlockBF16(
             v0.bitPattern,
             v1.bitPattern,

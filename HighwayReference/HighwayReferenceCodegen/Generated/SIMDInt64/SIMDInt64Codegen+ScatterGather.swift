@@ -4,108 +4,96 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portGatherI64(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices)
+public func portGatherI64(from: UnsafePointer<Int64>, indices: SIMD<Int64>) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices)
 }
 
 @inline(never)
-public func highwayGatherI64(
-    from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(raw: HighwayReference.Nothrow.gatherI64(from, indices.raw))
+public func highwayGatherI64(from: UnsafePointer<Int64>, indices: SIMD<Int64>) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(raw: HighwayReference.Nothrow.gatherI64(from, indices.raw))
 }
 
 @inline(never)
-public func portGatherI64ConstantIndices(from: UnsafePointer<SIMDInt64.Lane>) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: SIMDInt64.repeating(1))
+public func portGatherI64ConstantIndices(from: UnsafePointer<Int64>) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: SIMD<Int64>.repeating(1))
 }
 
 @inline(never)
-public func highwayGatherI64ConstantIndices(from: UnsafePointer<Int64>) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+public func highwayGatherI64ConstantIndices(from: UnsafePointer<Int64>) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherI64(
             from,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
         )
     )
 }
 
 @inline(never)
 public func portGatherByteOffsetsI64(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    byteOffsets: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, byteOffsets: byteOffsets)
+    from: UnsafePointer<Int64>,
+    byteOffsets: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, byteOffsets: byteOffsets)
 }
 
 @inline(never)
 public func highwayGatherByteOffsetsI64(
     from: UnsafePointer<Int64>,
-    byteOffsets: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
-        raw: HighwayReference.Nothrow.gatherByteOffsetsI64(from, byteOffsets.raw)
-    )
+    byteOffsets: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(raw: HighwayReference.Nothrow.gatherByteOffsetsI64(from, byteOffsets.raw))
 }
 
 @inline(never)
-public func portGatherByteOffsetsI64ConstantByteOffsets(
-    from: UnsafePointer<SIMDInt64.Lane>
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, byteOffsets: SIMDInt64.repeating(1))
+public func portGatherByteOffsetsI64ConstantByteOffsets(from: UnsafePointer<Int64>) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, byteOffsets: SIMD<Int64>.repeating(1))
 }
 
 @inline(never)
 public func highwayGatherByteOffsetsI64ConstantByteOffsets(
     from: UnsafePointer<Int64>
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherByteOffsetsI64(
             from,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
         )
     )
 }
 
 @inline(never)
 public func portGatherFirstI64(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
     count: Int
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, count: count)
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, count: count)
 }
 
 @inline(never)
 public func highwayGatherFirstI64(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
+    indices: SIMD<Int64>,
     count: Int
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(raw: HighwayReference.Nothrow.gatherFirstI64(from, indices.raw, count))
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(raw: HighwayReference.Nothrow.gatherFirstI64(from, indices.raw, count))
 }
 
 @inline(never)
-public func portGatherFirstI64ConstantIndices(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    count: Int
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: SIMDInt64.repeating(1), count: count)
+public func portGatherFirstI64ConstantIndices(from: UnsafePointer<Int64>, count: Int) -> SIMD<Int64>
+{
+    unsafe SIMD<Int64>.gather(from: from, indices: SIMD<Int64>.repeating(1), count: count)
 }
 
 @inline(never)
 public func highwayGatherFirstI64ConstantIndices(
     from: UnsafePointer<Int64>,
     count: Int
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstI64(
             from,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw,
             count
         )
     )
@@ -113,50 +101,50 @@ public func highwayGatherFirstI64ConstantIndices(
 
 @inline(never)
 public func portGatherFirstI64ConstantCount(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, count: 1)
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, count: 1)
 }
 
 @inline(never)
 public func highwayGatherFirstI64ConstantCount(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(raw: HighwayReference.Nothrow.gatherFirstI64(from, indices.raw, 1))
+    indices: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(raw: HighwayReference.Nothrow.gatherFirstI64(from, indices.raw, 1))
 }
 
 @inline(never)
 public func portGatherFirstI64ConstantCountTwo(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, count: 2)
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, count: 2)
 }
 
 @inline(never)
 public func highwayGatherFirstI64ConstantCountTwo(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(raw: HighwayReference.Nothrow.gatherFirstI64(from, indices.raw, 2))
+    indices: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(raw: HighwayReference.Nothrow.gatherFirstI64(from, indices.raw, 2))
 }
 
 @inline(never)
 public func portGatherFirstI64ConstantCountLaneCount(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, count: SIMDInt64.laneCount)
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, count: SIMD<Int64>.laneCount)
 }
 
 @inline(never)
 public func highwayGatherFirstI64ConstantCountLaneCount(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    indices: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstI64(
             from,
             indices.raw,
@@ -167,18 +155,18 @@ public func highwayGatherFirstI64ConstantCountLaneCount(
 
 @inline(never)
 public func portGatherFirstI64ConstantCountTwiceLaneCount(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, count: 2 * SIMDInt64.laneCount)
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, count: 2 * SIMD<Int64>.laneCount)
 }
 
 @inline(never)
 public func highwayGatherFirstI64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    indices: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstI64(
             from,
             indices.raw,
@@ -189,22 +177,22 @@ public func highwayGatherFirstI64ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portGatherFirstOtherwiseI64(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
     count: Int,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, count: count, otherwise: otherwise)
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, count: count, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayGatherFirstOtherwiseI64(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
+    indices: SIMD<Int64>,
     count: Int,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI64(
             otherwise.raw,
             from,
@@ -216,13 +204,13 @@ public func highwayGatherFirstOtherwiseI64(
 
 @inline(never)
 public func portGatherFirstOtherwiseI64ConstantIndices(
-    from: UnsafePointer<SIMDInt64.Lane>,
+    from: UnsafePointer<Int64>,
     count: Int,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(
         from: from,
-        indices: SIMDInt64.repeating(1),
+        indices: SIMD<Int64>.repeating(1),
         count: count,
         otherwise: otherwise
     )
@@ -232,13 +220,13 @@ public func portGatherFirstOtherwiseI64ConstantIndices(
 public func highwayGatherFirstOtherwiseI64ConstantIndices(
     from: UnsafePointer<Int64>,
     count: Int,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI64(
             otherwise.raw,
             from,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw,
             count
         )
     )
@@ -246,47 +234,47 @@ public func highwayGatherFirstOtherwiseI64ConstantIndices(
 
 @inline(never)
 public func portGatherFirstOtherwiseI64ConstantCount(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, count: 1, otherwise: otherwise)
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, count: 1, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayGatherFirstOtherwiseI64ConstantCount(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    indices: SIMD<Int64>,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI64(otherwise.raw, from, indices.raw, 1)
     )
 }
 
 @inline(never)
 public func portGatherFirstOtherwiseI64ConstantOtherwise(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
     count: Int
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(
         from: from,
         indices: indices,
         count: count,
-        otherwise: SIMDInt64.repeating(26)
+        otherwise: SIMD<Int64>.repeating(26)
     )
 }
 
 @inline(never)
 public func highwayGatherFirstOtherwiseI64ConstantOtherwise(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
+    indices: SIMD<Int64>,
     count: Int
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             from,
             indices.raw,
             count
@@ -296,34 +284,34 @@ public func highwayGatherFirstOtherwiseI64ConstantOtherwise(
 
 @inline(never)
 public func portGatherFirstOtherwiseI64ConstantCountTwo(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, count: 2, otherwise: otherwise)
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, count: 2, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayGatherFirstOtherwiseI64ConstantCountTwo(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    indices: SIMD<Int64>,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI64(otherwise.raw, from, indices.raw, 2)
     )
 }
 
 @inline(never)
 public func portGatherFirstOtherwiseI64ConstantCountLaneCount(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(
         from: from,
         indices: indices,
-        count: SIMDInt64.laneCount,
+        count: SIMD<Int64>.laneCount,
         otherwise: otherwise
     )
 }
@@ -331,10 +319,10 @@ public func portGatherFirstOtherwiseI64ConstantCountLaneCount(
 @inline(never)
 public func highwayGatherFirstOtherwiseI64ConstantCountLaneCount(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    indices: SIMD<Int64>,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI64(
             otherwise.raw,
             from,
@@ -346,14 +334,14 @@ public func highwayGatherFirstOtherwiseI64ConstantCountLaneCount(
 
 @inline(never)
 public func portGatherFirstOtherwiseI64ConstantCountTwiceLaneCount(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(
         from: from,
         indices: indices,
-        count: 2 * SIMDInt64.laneCount,
+        count: 2 * SIMD<Int64>.laneCount,
         otherwise: otherwise
     )
 }
@@ -361,10 +349,10 @@ public func portGatherFirstOtherwiseI64ConstantCountTwiceLaneCount(
 @inline(never)
 public func highwayGatherFirstOtherwiseI64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    indices: SIMD<Int64>,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherFirstOtherwiseI64(
             otherwise.raw,
             from,
@@ -376,64 +364,62 @@ public func highwayGatherFirstOtherwiseI64ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portGatherWhereI64(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, where: mask)
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, where: mask)
 }
 
 @inline(never)
 public func highwayGatherWhereI64(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
-        raw: HighwayReference.Nothrow.gatherWhereI64(mask.raw, from, indices.raw)
-    )
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(raw: HighwayReference.Nothrow.gatherWhereI64(mask.raw, from, indices.raw))
 }
 
 @inline(never)
 public func portGatherWhereI64ConstantIndices(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: SIMDInt64.repeating(1), where: mask)
+    from: UnsafePointer<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: SIMD<Int64>.repeating(1), where: mask)
 }
 
 @inline(never)
 public func highwayGatherWhereI64ConstantIndices(
     from: UnsafePointer<Int64>,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherWhereI64(
             mask.raw,
             from,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
         )
     )
 }
 
 @inline(never)
 public func portGatherWhereOtherwiseI64(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(from: from, indices: indices, where: mask, otherwise: otherwise)
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(from: from, indices: indices, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayGatherWhereOtherwiseI64(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherWhereOtherwiseI64(
             otherwise.raw,
             mask.raw,
@@ -445,13 +431,13 @@ public func highwayGatherWhereOtherwiseI64(
 
 @inline(never)
 public func portGatherWhereOtherwiseI64ConstantIndices(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(
+    from: UnsafePointer<Int64>,
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(
         from: from,
-        indices: SIMDInt64.repeating(1),
+        indices: SIMD<Int64>.repeating(1),
         where: mask,
         otherwise: otherwise
     )
@@ -460,42 +446,42 @@ public func portGatherWhereOtherwiseI64ConstantIndices(
 @inline(never)
 public func highwayGatherWhereOtherwiseI64ConstantIndices(
     from: UnsafePointer<Int64>,
-    where mask: SIMDInt64.Mask,
-    otherwise: SIMDInt64.Vector
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    where mask: SIMD<Int64>.Mask,
+    otherwise: SIMD<Int64>
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherWhereOtherwiseI64(
             otherwise.raw,
             mask.raw,
             from,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
         )
     )
 }
 
 @inline(never)
 public func portGatherWhereOtherwiseI64ConstantOtherwise(
-    from: UnsafePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.gather(
+    from: UnsafePointer<Int64>,
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>.gather(
         from: from,
         indices: indices,
         where: mask,
-        otherwise: SIMDInt64.repeating(26)
+        otherwise: SIMD<Int64>.repeating(26)
     )
 }
 
 @inline(never)
 public func highwayGatherWhereOtherwiseI64ConstantOtherwise(
     from: UnsafePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
-) -> SIMDInt64.Vector {
-    unsafe SIMDInt64.Vector(
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
+) -> SIMD<Int64> {
+    unsafe SIMD<Int64>(
         raw: HighwayReference.Nothrow.gatherWhereOtherwiseI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             mask.raw,
             from,
             indices.raw
@@ -504,91 +490,81 @@ public func highwayGatherWhereOtherwiseI64ConstantOtherwise(
 }
 
 @inline(never)
-public func portScatterI64(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
-) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: indices)
+public func portScatterI64(_ a: SIMD<Int64>, to: UnsafeMutablePointer<Int64>, indices: SIMD<Int64>)
+{
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: indices)
 }
 
 @inline(never)
 public func highwayScatterI64(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector
+    indices: SIMD<Int64>
 ) {
     unsafe HighwayReference.Nothrow.scatterI64(a.raw, to, indices.raw)
 }
 
 @inline(never)
-public func portScatterI64ConstantA(
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
-) {
-    unsafe SIMDInt64.scatter(SIMDInt64.repeating(26), to: to, indices: indices)
+public func portScatterI64ConstantA(to: UnsafeMutablePointer<Int64>, indices: SIMD<Int64>) {
+    unsafe SIMD<Int64>.scatter(SIMD<Int64>.repeating(26), to: to, indices: indices)
 }
 
 @inline(never)
-public func highwayScatterI64ConstantA(to: UnsafeMutablePointer<Int64>, indices: SIMDInt64.Vector) {
+public func highwayScatterI64ConstantA(to: UnsafeMutablePointer<Int64>, indices: SIMD<Int64>) {
     unsafe HighwayReference.Nothrow.scatterI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
         to,
         indices.raw
     )
 }
 
 @inline(never)
-public func portScatterI64ConstantIndices(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>
-) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: SIMDInt64.repeating(1))
+public func portScatterI64ConstantIndices(_ a: SIMD<Int64>, to: UnsafeMutablePointer<Int64>) {
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: SIMD<Int64>.repeating(1))
 }
 
 @inline(never)
-public func highwayScatterI64ConstantIndices(_ a: SIMDInt64.Vector, to: UnsafeMutablePointer<Int64>)
-{
+public func highwayScatterI64ConstantIndices(_ a: SIMD<Int64>, to: UnsafeMutablePointer<Int64>) {
     unsafe HighwayReference.Nothrow.scatterI64(
         a.raw,
         to,
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
     )
 }
 
 @inline(never)
 public func portScatterByteOffsetsI64(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    byteOffsets: SIMDInt64.Vector
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
+    byteOffsets: SIMD<Int64>
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, byteOffsets: byteOffsets)
+    unsafe SIMD<Int64>.scatter(a, to: to, byteOffsets: byteOffsets)
 }
 
 @inline(never)
 public func highwayScatterByteOffsetsI64(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    byteOffsets: SIMDInt64.Vector
+    byteOffsets: SIMD<Int64>
 ) {
     unsafe HighwayReference.Nothrow.scatterByteOffsetsI64(a.raw, to, byteOffsets.raw)
 }
 
 @inline(never)
 public func portScatterByteOffsetsI64ConstantA(
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    byteOffsets: SIMDInt64.Vector
+    to: UnsafeMutablePointer<Int64>,
+    byteOffsets: SIMD<Int64>
 ) {
-    unsafe SIMDInt64.scatter(SIMDInt64.repeating(26), to: to, byteOffsets: byteOffsets)
+    unsafe SIMD<Int64>.scatter(SIMD<Int64>.repeating(26), to: to, byteOffsets: byteOffsets)
 }
 
 @inline(never)
 public func highwayScatterByteOffsetsI64ConstantA(
     to: UnsafeMutablePointer<Int64>,
-    byteOffsets: SIMDInt64.Vector
+    byteOffsets: SIMD<Int64>
 ) {
     unsafe HighwayReference.Nothrow.scatterByteOffsetsI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
         to,
         byteOffsets.raw
     )
@@ -596,39 +572,39 @@ public func highwayScatterByteOffsetsI64ConstantA(
 
 @inline(never)
 public func portScatterByteOffsetsI64ConstantByteOffsets(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, byteOffsets: SIMDInt64.repeating(1))
+    unsafe SIMD<Int64>.scatter(a, to: to, byteOffsets: SIMD<Int64>.repeating(1))
 }
 
 @inline(never)
 public func highwayScatterByteOffsetsI64ConstantByteOffsets(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>
 ) {
     unsafe HighwayReference.Nothrow.scatterByteOffsetsI64(
         a.raw,
         to,
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
     )
 }
 
 @inline(never)
 public func portScatterFirstI64(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
+    indices: SIMD<Int64>,
     count: Int
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: indices, count: count)
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: indices, count: count)
 }
 
 @inline(never)
 public func highwayScatterFirstI64(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector,
+    indices: SIMD<Int64>,
     count: Int
 ) {
     unsafe HighwayReference.Nothrow.scatterFirstI64(a.raw, to, indices.raw, count)
@@ -636,21 +612,21 @@ public func highwayScatterFirstI64(
 
 @inline(never)
 public func portScatterFirstI64ConstantA(
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
+    to: UnsafeMutablePointer<Int64>,
+    indices: SIMD<Int64>,
     count: Int
 ) {
-    unsafe SIMDInt64.scatter(SIMDInt64.repeating(26), to: to, indices: indices, count: count)
+    unsafe SIMD<Int64>.scatter(SIMD<Int64>.repeating(26), to: to, indices: indices, count: count)
 }
 
 @inline(never)
 public func highwayScatterFirstI64ConstantA(
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector,
+    indices: SIMD<Int64>,
     count: Int
 ) {
     unsafe HighwayReference.Nothrow.scatterFirstI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
         to,
         indices.raw,
         count
@@ -659,77 +635,77 @@ public func highwayScatterFirstI64ConstantA(
 
 @inline(never)
 public func portScatterFirstI64ConstantIndices(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
     count: Int
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: SIMDInt64.repeating(1), count: count)
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: SIMD<Int64>.repeating(1), count: count)
 }
 
 @inline(never)
 public func highwayScatterFirstI64ConstantIndices(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
     count: Int
 ) {
     unsafe HighwayReference.Nothrow.scatterFirstI64(
         a.raw,
         to,
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw,
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw,
         count
     )
 }
 
 @inline(never)
 public func portScatterFirstI64ConstantCount(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
+    indices: SIMD<Int64>
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: indices, count: 1)
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: indices, count: 1)
 }
 
 @inline(never)
 public func highwayScatterFirstI64ConstantCount(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector
+    indices: SIMD<Int64>
 ) {
     unsafe HighwayReference.Nothrow.scatterFirstI64(a.raw, to, indices.raw, 1)
 }
 
 @inline(never)
 public func portScatterFirstI64ConstantCountTwo(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
+    indices: SIMD<Int64>
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: indices, count: 2)
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: indices, count: 2)
 }
 
 @inline(never)
 public func highwayScatterFirstI64ConstantCountTwo(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector
+    indices: SIMD<Int64>
 ) {
     unsafe HighwayReference.Nothrow.scatterFirstI64(a.raw, to, indices.raw, 2)
 }
 
 @inline(never)
 public func portScatterFirstI64ConstantCountLaneCount(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
+    indices: SIMD<Int64>
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: indices, count: SIMDInt64.laneCount)
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: indices, count: SIMD<Int64>.laneCount)
 }
 
 @inline(never)
 public func highwayScatterFirstI64ConstantCountLaneCount(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector
+    indices: SIMD<Int64>
 ) {
     unsafe HighwayReference.Nothrow.scatterFirstI64(
         a.raw,
@@ -741,18 +717,18 @@ public func highwayScatterFirstI64ConstantCountLaneCount(
 
 @inline(never)
 public func portScatterFirstI64ConstantCountTwiceLaneCount(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
+    indices: SIMD<Int64>
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: indices, count: 2 * SIMDInt64.laneCount)
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: indices, count: 2 * SIMD<Int64>.laneCount)
 }
 
 @inline(never)
 public func highwayScatterFirstI64ConstantCountTwiceLaneCount(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector
+    indices: SIMD<Int64>
 ) {
     unsafe HighwayReference.Nothrow.scatterFirstI64(
         a.raw,
@@ -764,41 +740,41 @@ public func highwayScatterFirstI64ConstantCountTwiceLaneCount(
 
 @inline(never)
 public func portScatterWhereI64(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: indices, where: mask)
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: indices, where: mask)
 }
 
 @inline(never)
 public func highwayScatterWhereI64(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
 ) {
     unsafe HighwayReference.Nothrow.scatterWhereI64(a.raw, mask.raw, to, indices.raw)
 }
 
 @inline(never)
 public func portScatterWhereI64ConstantA(
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
+    to: UnsafeMutablePointer<Int64>,
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
 ) {
-    unsafe SIMDInt64.scatter(SIMDInt64.repeating(26), to: to, indices: indices, where: mask)
+    unsafe SIMD<Int64>.scatter(SIMD<Int64>.repeating(26), to: to, indices: indices, where: mask)
 }
 
 @inline(never)
 public func highwayScatterWhereI64ConstantA(
     to: UnsafeMutablePointer<Int64>,
-    indices: SIMDInt64.Vector,
-    where mask: SIMDInt64.Mask
+    indices: SIMD<Int64>,
+    where mask: SIMD<Int64>.Mask
 ) {
     unsafe HighwayReference.Nothrow.scatterWhereI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
         mask.raw,
         to,
         indices.raw
@@ -807,23 +783,23 @@ public func highwayScatterWhereI64ConstantA(
 
 @inline(never)
 public func portScatterWhereI64ConstantIndices(
-    _ a: SIMDInt64.Vector,
-    to: UnsafeMutablePointer<SIMDInt64.Lane>,
-    where mask: SIMDInt64.Mask
+    _ a: SIMD<Int64>,
+    to: UnsafeMutablePointer<Int64>,
+    where mask: SIMD<Int64>.Mask
 ) {
-    unsafe SIMDInt64.scatter(a, to: to, indices: SIMDInt64.repeating(1), where: mask)
+    unsafe SIMD<Int64>.scatter(a, to: to, indices: SIMD<Int64>.repeating(1), where: mask)
 }
 
 @inline(never)
 public func highwayScatterWhereI64ConstantIndices(
-    _ a: SIMDInt64.Vector,
+    _ a: SIMD<Int64>,
     to: UnsafeMutablePointer<Int64>,
-    where mask: SIMDInt64.Mask
+    where mask: SIMD<Int64>.Mask
 ) {
     unsafe HighwayReference.Nothrow.scatterWhereI64(
         a.raw,
         mask.raw,
         to,
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(1)).raw
     )
 }

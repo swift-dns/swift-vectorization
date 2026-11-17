@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func minimum() {
         let mismatches = Mismatches("portMinimumF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x52C5_C28C_3FB1_94BF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x52C5_C18C_3FB1_930C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x52C5_C28C_3FB1_94BF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x52C5_C18C_3FB1_930C)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMinimumF64(a, b),
@@ -23,7 +23,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func minimumConstantA() {
         let mismatches = Mismatches("portMinimumF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD71C_76A2_F0C2_248B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD71C_76A2_F0C2_248B)
         for b in bInputs {
             mismatches.check(
                 portMinimumF64ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func minimumConstantB() {
         let mismatches = Mismatches("portMinimumF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDED8_2CA2_F4E0_3AAD)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDED8_2CA2_F4E0_3AAD)
         for a in aInputs {
             mismatches.check(
                 portMinimumF64ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximum() {
         let mismatches = Mismatches("portMaximumF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4266_42C9_0F39_A435)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4266_41C9_0F39_A282)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4266_42C9_0F39_A435)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4266_41C9_0F39_A282)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMaximumF64(a, b),
@@ -63,7 +63,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximumConstantA() {
         let mismatches = Mismatches("portMaximumF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7B10_D913_5E27_E1D9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7B10_D913_5E27_E1D9)
         for b in bInputs {
             mismatches.check(
                 portMaximumF64ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximumConstantB() {
         let mismatches = Mismatches("portMaximumF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x622B_7313_505D_4A67)
+        let aInputs = Inputs.vectors(H.self, seed: 0x622B_7313_505D_4A67)
         for a in aInputs {
             mismatches.check(
                 portMaximumF64ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func minimumNumber() {
         let mismatches = Mismatches("portMinimumNumberF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x972F_9B2A_67D3_A046)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x972F_9C2A_67D3_A1F9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x972F_9B2A_67D3_A046)
+        let bInputs = Inputs.vectors(H.self, seed: 0x972F_9C2A_67D3_A1F9)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMinimumNumberF64(a, b),
@@ -103,7 +103,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func minimumNumberConstantA() {
         let mismatches = Mismatches("portMinimumNumberF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9BF7_F82A_CB1C_A8B4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9BF7_F82A_CB1C_A8B4)
         for b in bInputs {
             mismatches.check(
                 portMinimumNumberF64ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func minimumNumberConstantB() {
         let mismatches = Mismatches("portMinimumNumberF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB4DD_5E2A_D8E7_4026)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB4DD_5E2A_D8E7_4026)
         for a in aInputs {
             mismatches.check(
                 portMinimumNumberF64ConstantB(a),
@@ -129,8 +129,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximumNumber() {
         let mismatches = Mismatches("portMaximumNumberF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD39E_C18F_3D62_5FC0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD39E_C28F_3D62_6173)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD39E_C18F_3D62_5FC0)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD39E_C28F_3D62_6173)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMaximumNumberF64(a, b),
@@ -143,7 +143,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximumNumberConstantA() {
         let mismatches = Mismatches("portMaximumNumberF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBF68_F0BA_F5E3_2AB6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBF68_F0BA_F5E3_2AB6)
         for b in bInputs {
             mismatches.check(
                 portMaximumNumberF64ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximumNumberConstantB() {
         let mismatches = Mismatches("portMaximumNumberF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB5FA_5ABA_F053_B674)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB5FA_5ABA_F053_B674)
         for a in aInputs {
             mismatches.check(
                 portMaximumNumberF64ConstantB(a),
@@ -169,9 +169,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func minimumMagnitude() {
         let mismatches = Mismatches("portMinimumMagnitudeF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1DD9_01CB_5EBF_07F1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1DD9_00CB_5EBF_063E)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x1DD9_01CB_5EBF_07F1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1DD9_00CB_5EBF_063E)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portMinimumMagnitudeF64(a, b),
                 highwayMinimumMagnitudeF64(a, b),
@@ -183,7 +183,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func minimumMagnitudeConstantA() {
         let mismatches = Mismatches("portMinimumMagnitudeF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCEEE_24F5_A1A5_2A65)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCEEE_24F5_A1A5_2A65)
         for b in bInputs {
             mismatches.check(
                 portMinimumMagnitudeF64ConstantA(b),
@@ -196,7 +196,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func minimumMagnitudeConstantB() {
         let mismatches = Mismatches("portMinimumMagnitudeF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB52F_1EF5_9321_9253)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB52F_1EF5_9321_9253)
         for a in aInputs {
             mismatches.check(
                 portMinimumMagnitudeF64ConstantB(a),
@@ -209,9 +209,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximumMagnitude() {
         let mismatches = Mismatches("portMaximumMagnitudeF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x64D9_63F8_DDA2_3ABB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x64D9_62F8_DDA2_3908)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x64D9_63F8_DDA2_3ABB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x64D9_62F8_DDA2_3908)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portMaximumMagnitudeF64(a, b),
                 highwayMaximumMagnitudeF64(a, b),
@@ -223,7 +223,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximumMagnitudeConstantA() {
         let mismatches = Mismatches("portMaximumMagnitudeF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF11F_FE8E_BC7D_13B7)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF11F_FE8E_BC7D_13B7)
         for b in bInputs {
             mismatches.check(
                 portMaximumMagnitudeF64ConstantA(b),
@@ -236,7 +236,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maximumMagnitudeConstantB() {
         let mismatches = Mismatches("portMaximumMagnitudeF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF9B5_148E_C153_BDB9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF9B5_148E_C153_BDB9)
         for a in aInputs {
             mismatches.check(
                 portMaximumMagnitudeF64ConstantB(a),

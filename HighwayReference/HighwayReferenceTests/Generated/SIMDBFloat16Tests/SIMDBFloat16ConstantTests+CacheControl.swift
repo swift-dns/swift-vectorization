@@ -7,14 +7,14 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkStoreStreamingConstantA(_ value: H.Lane) {
+    private func checkStoreStreamingConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeStreaming with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in unsafe H.storeStreaming(H.repeating(value), to: destination)
         }
@@ -27,78 +27,78 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func storeStreamingConstantSplatZero() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x0000))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func storeStreamingConstantSplatNegativeZero() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x8000))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func storeStreamingConstantSplatOne() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x3F80))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func storeStreamingConstantSplatMinusOne() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0xBF80))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func storeStreamingConstantSplatTwo() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x4000))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func storeStreamingConstantSplatHalf() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x3F00))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func storeStreamingConstantSplatFour() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x4080))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func storeStreamingConstantSplatQuarter() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x3E80))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func storeStreamingConstantSplatOnePointFive() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func storeStreamingConstantSplatMinusTwoPointFive() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0xC020))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func storeStreamingConstantSplatInfinity() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x7F80))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func storeStreamingConstantSplatMinusInfinity() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0xFF80))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func storeStreamingConstantSplatNaN() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func storeStreamingConstantSplatMinusNaN() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func storeStreamingConstantSplatPayloadNaN() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func storeStreamingConstantSplatSignalingNaN() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x7F81))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func storeStreamingConstantSplatMinusSignalingNaN() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0xFF81))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func storeStreamingConstantSplatLeastNonzero() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x0001))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func storeStreamingConstantSplatGreatest() {
-        checkStoreStreamingConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkStoreStreamingConstantA(Lane(bitPattern: 0x7F7F))
     }
 }

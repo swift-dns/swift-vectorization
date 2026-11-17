@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func vectorConvertingFromFloat() {
         let mismatches = Mismatches("portVectorConvertingF32ToBF16")
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x7443_EA08_CFD8_6802)
-        let bInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x7443_EB08_CFD8_69B5)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x7443_EA08_CFD8_6802)
+        let bInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x7443_EB08_CFD8_69B5)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorConvertingF32ToBF16(converting: a, b),
@@ -23,7 +23,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func vectorConvertingFromFloatConstantA() {
         let mismatches = Mismatches("portVectorConvertingF32ToBF16ConstantA")
-        let bInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x9BEC_E2DA_FA34_D350)
+        let bInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x9BEC_E2DA_FA34_D350)
         for b in bInputs {
             mismatches.check(
                 portVectorConvertingF32ToBF16ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func vectorConvertingFromFloatConstantB() {
         let mismatches = Mismatches("portVectorConvertingF32ToBF16ConstantB")
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0xB4D2_68DB_07FF_A122)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0xB4D2_68DB_07FF_A122)
         for a in aInputs {
             mismatches.check(
                 portVectorConvertingF32ToBF16ConstantB(converting: a),
@@ -49,8 +49,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func vectorConvertingInAnyOrderFromFloat() {
         let mismatches = Mismatches("portVectorConvertingInAnyOrderF32ToBF16")
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x153F_0AAC_D44D_964D)
-        let bInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x153F_09AC_D44D_949A)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x153F_0AAC_D44D_964D)
+        let bInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x153F_09AC_D44D_949A)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorConvertingInAnyOrderF32ToBF16(convertingInAnyOrder: a, b),
@@ -63,7 +63,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func vectorConvertingInAnyOrderFromFloatConstantA() {
         let mismatches = Mismatches("portVectorConvertingInAnyOrderF32ToBF16ConstantA")
-        let bInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x4357_8BA9_42A0_2DD1)
+        let bInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x4357_8BA9_42A0_2DD1)
         for b in bInputs {
             mismatches.check(
                 portVectorConvertingInAnyOrderF32ToBF16ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func vectorConvertingInAnyOrderFromFloatConstantB() {
         let mismatches = Mismatches("portVectorConvertingInAnyOrderF32ToBF16ConstantB")
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x2852_05A9_3306_F99F)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x2852_05A9_3306_F99F)
         for a in aInputs {
             mismatches.check(
                 portVectorConvertingInAnyOrderF32ToBF16ConstantB(convertingInAnyOrder: a),

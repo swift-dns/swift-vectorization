@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDUInt8ConstantTests {
     @inline(__always)
-    private func checkMultiplyingConstantA(_ value: H.Lane) {
+    private func checkMultiplyingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplying with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2483_4188_4A01_F64C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2483_4188_4A01_F64C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.multiplying(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.multiplyingU8(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.multiplyingU8(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDUInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingConstantB(_ value: H.Lane) {
+    private func checkMultiplyingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplying with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3DD5_C788_5829_95FE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3DD5_C788_5829_95FE)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU8(value)),
+            H(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.multiplying(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.multiplyingU8(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.multiplyingU8(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }

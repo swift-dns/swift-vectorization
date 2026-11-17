@@ -9,23 +9,23 @@ import Vectorization
 extension SIMDInt16ConstantTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkVectorConvertingWhereFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkVectorConvertingWhereFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches(
             "vectorConvertingWhereFromFloat16 with a repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x978B_AC04_E820_9C2E)
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
-                H.vector(converting: SIMDFloat16.repeating(value), where: mask),
-                H.Vector(
+                H.vector(converting: SIMD<Float16>.repeating(value), where: mask),
+                H(
                     raw: HighwayReference.vectorConvertingWhereF16ToI16(
                         mask.raw,
-                        SIMDFloat16.repeating(value)
+                        SIMD<Float16>.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask))"
@@ -121,7 +121,7 @@ extension SIMDInt16ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorConvertingWhereFromFloat16ConstantSplatPayloadNaN() {
-        checkVectorConvertingWhereFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkVectorConvertingWhereFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 

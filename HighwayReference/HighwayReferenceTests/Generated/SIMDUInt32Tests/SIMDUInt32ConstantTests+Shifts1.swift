@@ -9,13 +9,11 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkShiftedLeftConstantBits(_ bits: Int) {
         let mismatches = Mismatches("shiftedLeft with bits \(bits)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0A92_0DC5_9468_5455)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0A92_0DC5_9468_5455)
         for a in aInputs {
             mismatches.check(
                 H.shiftedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedLeftTemplateU32(a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.shiftedLeftTemplateU32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a))"
             )
         }
@@ -153,13 +151,11 @@ extension SIMDUInt32ConstantTests {
     @inline(__always)
     private func checkShiftedRightConstantBits(_ bits: Int) {
         let mismatches = Mismatches("shiftedRight with bits \(bits)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8610_1619_6BFC_CEB8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8610_1619_6BFC_CEB8)
         for a in aInputs {
             mismatches.check(
                 H.shiftedRight(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.shiftedRightTemplateU32(a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.shiftedRightTemplateU32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a))"
             )
         }
@@ -295,18 +291,18 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkShiftedLeftByConstantB(_ value: H.Lane) {
+    private func checkShiftedLeftByConstantB(_ value: Lane) {
         let mismatches = Mismatches("shiftedLeftBy with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x741D_9D10_CACB_C5E0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x741D_9D10_CACB_C5E0)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.shiftedLeft(a, by: H.repeating(value)),
-                H.Vector(raw: HighwayReference.shiftedLeftByU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.shiftedLeftByU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -402,22 +398,22 @@ extension SIMDUInt32ConstantTests {
             "EMU128 has no defined result for these shift counts"
         )
     ) func shiftedLeftByConstantSplatMax() {
-        checkShiftedLeftByConstantB(H.Lane.max)
+        checkShiftedLeftByConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkShiftedRightByConstantB(_ value: H.Lane) {
+    private func checkShiftedRightByConstantB(_ value: Lane) {
         let mismatches = Mismatches("shiftedRightBy with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71E8_04F8_9778_C7E7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x71E8_04F8_9778_C7E7)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.shiftedRight(a, by: H.repeating(value)),
-                H.Vector(raw: HighwayReference.shiftedRightByU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.shiftedRightByU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -513,24 +509,22 @@ extension SIMDUInt32ConstantTests {
             "EMU128 has no defined result for these shift counts"
         )
     ) func shiftedRightByConstantSplatMax() {
-        checkShiftedRightByConstantB(H.Lane.max)
+        checkShiftedRightByConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkRoundingShiftedRightByConstantB(_ value: H.Lane) {
+    private func checkRoundingShiftedRightByConstantB(_ value: Lane) {
         let mismatches = Mismatches("roundingShiftedRightBy with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5A07_650B_B9D5_4F5B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5A07_650B_B9D5_4F5B)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.roundingShiftedRight(a, by: H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.roundingShiftedRightByU32(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.roundingShiftedRightByU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -626,17 +620,17 @@ extension SIMDUInt32ConstantTests {
             "EMU128 has no defined result for these shift counts"
         )
     ) func roundingShiftedRightByConstantSplatMax() {
-        checkRoundingShiftedRightByConstantB(H.Lane.max)
+        checkRoundingShiftedRightByConstantB(Lane.max)
     }
 
     @inline(__always)
     private func checkRoundingShiftedRightConstantBits(_ bits: Int) {
         let mismatches = Mismatches("roundingShiftedRight with bits \(bits)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1C00_9C93_AAF4_986C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1C00_9C93_AAF4_986C)
         for a in aInputs {
             mismatches.check(
                 H.roundingShiftedRight(a, by: bits),
-                H.Vector(
+                H(
                     raw: HighwayReference.roundingShiftedRightTemplateU32(
                         a.raw,
                         Int32(clamping: bits)
@@ -777,18 +771,18 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkRotatedLeftByConstantB(_ value: H.Lane) {
+    private func checkRotatedLeftByConstantB(_ value: Lane) {
         let mismatches = Mismatches("rotatedLeftBy with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5761_E046_2D17_F81C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5761_E046_2D17_F81C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.rotatedLeft(a, by: H.repeating(value)),
-                H.Vector(raw: HighwayReference.rotatedLeftByU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.rotatedLeftByU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -884,22 +878,22 @@ extension SIMDUInt32ConstantTests {
             "EMU128 has no defined result for these shift counts"
         )
     ) func rotatedLeftByConstantSplatMax() {
-        checkRotatedLeftByConstantB(H.Lane.max)
+        checkRotatedLeftByConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkRotatedRightByConstantB(_ value: H.Lane) {
+    private func checkRotatedRightByConstantB(_ value: Lane) {
         let mismatches = Mismatches("rotatedRightBy with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4A63_5A21_F1F5_62DB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4A63_5A21_F1F5_62DB)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.rotatedRight(a, by: H.repeating(value)),
-                H.Vector(raw: HighwayReference.rotatedRightByU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.rotatedRightByU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -995,19 +989,17 @@ extension SIMDUInt32ConstantTests {
             "EMU128 has no defined result for these shift counts"
         )
     ) func rotatedRightByConstantSplatMax() {
-        checkRotatedRightByConstantB(H.Lane.max)
+        checkRotatedRightByConstantB(Lane.max)
     }
 
     @inline(__always)
     private func checkRotatedLeftConstantBits(_ bits: Int) {
         let mismatches = Mismatches("rotatedLeft with bits \(bits)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D35_4BFA_7011_C9C1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D35_4BFA_7011_C9C1)
         for a in aInputs {
             mismatches.check(
                 H.rotatedLeft(a, by: bits),
-                H.Vector(
-                    raw: HighwayReference.rotatedLeftTemplateU32(a.raw, Int32(clamping: bits))
-                ),
+                H(raw: HighwayReference.rotatedLeftTemplateU32(a.raw, Int32(clamping: bits))),
                 "a: \(describe(a))"
             )
         }

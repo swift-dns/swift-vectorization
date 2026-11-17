@@ -10,8 +10,8 @@ import Vectorization
 extension SIMDFloat16CodegenTests {
     @Test func sum() {
         let mismatches = Mismatches("portSumF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4E5F_60E3_CFBA_9EDD)
-        for a in aInputs where !hasUnorderedNaNs(lanesOf: a) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x4E5F_60E3_CFBA_9EDD)
+        for a in aInputs where !hasUnorderedNaNs(lanesOf: a.simd) {
             mismatches.check(portSumF16(a), highwaySumF16(a), "a: \(describe(a))")
         }
         mismatches.record()
@@ -25,7 +25,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func smallest() {
         let mismatches = Mismatches("portSmallestF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF6B3_11C9_3F22_18D1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF6B3_11C9_3F22_18D1)
         for a in aInputs {
             mismatches.check(portSmallestF16(a), highwaySmallestF16(a), "a: \(describe(a))")
         }
@@ -40,7 +40,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func largest() {
         let mismatches = Mismatches("portLargestF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x665F_8013_705A_4402)
+        let aInputs = Inputs.vectors(H.self, seed: 0x665F_8013_705A_4402)
         for a in aInputs {
             mismatches.check(portLargestF16(a), highwayLargestF16(a), "a: \(describe(a))")
         }
@@ -55,7 +55,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func smallestOrNaN() {
         let mismatches = Mismatches("portSmallestOrNaNF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB603_A96D_8DDD_E1FB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB603_A96D_8DDD_E1FB)
         for a in aInputs {
             mismatches.check(
                 portSmallestOrNaNF16(a),
@@ -74,7 +74,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func largestOrNaN() {
         let mismatches = Mismatches("portLargestOrNaNF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x36FB_C25A_972D_720E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x36FB_C25A_972D_720E)
         for a in aInputs {
             mismatches.check(portLargestOrNaNF16(a), highwayLargestOrNaNF16(a), "a: \(describe(a))")
         }
@@ -89,8 +89,8 @@ extension SIMDFloat16CodegenTests {
 
     @Test func repeatingSum() {
         let mismatches = Mismatches("portRepeatingSumF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5E11_7B6C_93C6_E434)
-        for a in aInputs where !hasUnorderedNaNs(lanesOf: a) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x5E11_7B6C_93C6_E434)
+        for a in aInputs where !hasUnorderedNaNs(lanesOf: a.simd) {
             mismatches.check(portRepeatingSumF16(a), highwayRepeatingSumF16(a), "a: \(describe(a))")
         }
         mismatches.record()
@@ -104,7 +104,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func repeatingSmallest() {
         let mismatches = Mismatches("portRepeatingSmallestF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x430D_8ADF_4E48_3E2E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x430D_8ADF_4E48_3E2E)
         for a in aInputs {
             mismatches.check(
                 portRepeatingSmallestF16(a),
@@ -127,7 +127,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func repeatingLargest() {
         let mismatches = Mismatches("portRepeatingLargestF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7D5A_FCB8_D626_0467)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7D5A_FCB8_D626_0467)
         for a in aInputs {
             mismatches.check(
                 portRepeatingLargestF16(a),

@@ -4,145 +4,145 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portReversedI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.reversed(a)
+public func portReversedI8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>.reversed(a)
 }
 
 @inline(never)
-public func highwayReversedI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.reversedI8(a.raw))
+public func highwayReversedI8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.reversedI8(a.raw))
 }
 
 @inline(never)
-public func portReversedI8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.reversed(SIMDInt8.repeating(26))
+public func portReversedI8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>.reversed(SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
-public func highwayReversedI8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+public func highwayReversedI8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.reversedI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portBitReversedI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.bitReversed(a)
+public func portBitReversedI8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>.bitReversed(a)
 }
 
 @inline(never)
-public func highwayBitReversedI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.bitReversedI8(a.raw))
+public func highwayBitReversedI8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.bitReversedI8(a.raw))
 }
 
 @inline(never)
-public func portBitReversedI8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.bitReversed(SIMDInt8.repeating(26))
+public func portBitReversedI8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>.bitReversed(SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
-public func highwayBitReversedI8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+public func highwayBitReversedI8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.bitReversedI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portReversedBlocksI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.reversedBlocks(a)
+public func portReversedBlocksI8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>.reversedBlocks(a)
 }
 
 @inline(never)
-public func highwayReversedBlocksI8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.reversedBlocksI8(a.raw))
+public func highwayReversedBlocksI8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.reversedBlocksI8(a.raw))
 }
 
 @inline(never)
-public func portReversedBlocksI8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.reversedBlocks(SIMDInt8.repeating(26))
+public func portReversedBlocksI8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>.reversedBlocks(SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
-public func highwayReversedBlocksI8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+public func highwayReversedBlocksI8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.reversedBlocksI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portReversed2I8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.reversed2(a)
+public func portReversed2I8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>.reversed2(a)
 }
 
 @inline(never)
-public func highwayReversed2I8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.reversed2I8(a.raw))
+public func highwayReversed2I8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.reversed2I8(a.raw))
 }
 
 @inline(never)
-public func portReversed2I8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.reversed2(SIMDInt8.repeating(26))
+public func portReversed2I8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>.reversed2(SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
-public func highwayReversed2I8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+public func highwayReversed2I8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.reversed2I8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portReversed4I8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.reversed4(a)
+public func portReversed4I8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>.reversed4(a)
 }
 
 @inline(never)
-public func highwayReversed4I8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.reversed4I8(a.raw))
+public func highwayReversed4I8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.reversed4I8(a.raw))
 }
 
 @inline(never)
-public func portReversed4I8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.reversed4(SIMDInt8.repeating(26))
+public func portReversed4I8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>.reversed4(SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
-public func highwayReversed4I8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+public func highwayReversed4I8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.reversed4I8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portReversed8I8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.reversed8(a)
+public func portReversed8I8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>.reversed8(a)
 }
 
 @inline(never)
-public func highwayReversed8I8(_ a: SIMDInt8.Vector) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.reversed8I8(a.raw))
+public func highwayReversed8I8(_ a: SIMD<Int8>) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.reversed8I8(a.raw))
 }
 
 @inline(never)
-public func portReversed8I8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.reversed8(SIMDInt8.repeating(26))
+public func portReversed8I8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>.reversed8(SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
-public func highwayReversed8I8ConstantA() -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+public func highwayReversed8I8ConstantA() -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.reversed8I8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw
         )
     )
 }

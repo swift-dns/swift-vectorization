@@ -7,14 +7,18 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkMinimumConstantA(_ value: H.Lane) {
+    private func checkMinimumConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimum with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x82FA_9A97_56EC_54C8)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x82FA_9A97_56EC_54C8)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.minimum(H.repeating(value), b),
-                HighwayReference.minimumF32(H.repeating(value), b),
+                H(raw: HighwayReference.minimumF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -22,14 +26,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMinimumConstantB(_ value: H.Lane) {
+    private func checkMinimumConstantB(_ value: Lane) {
         let mismatches = Mismatches("minimum with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9C4D_2097_6513_F47A)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x9C4D_2097_6513_F47A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.minimum(a, H.repeating(value)),
-                HighwayReference.minimumF32(a, H.repeating(value)),
+                H(raw: HighwayReference.minimumF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -107,8 +115,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func minimumConstantSplatPayloadNaN() {
-        checkMinimumConstantA(H.Lane(nan: 1, signaling: false))
-        checkMinimumConstantB(H.Lane(nan: 1, signaling: false))
+        checkMinimumConstantA(Lane(nan: 1, signaling: false))
+        checkMinimumConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func minimumConstantSplatSignalingNaN() {
@@ -132,14 +140,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumConstantA(_ value: H.Lane) {
+    private func checkMaximumConstantA(_ value: Lane) {
         let mismatches = Mismatches("maximum with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x289C_D128_B94A_9B02)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x289C_D128_B94A_9B02)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.maximum(H.repeating(value), b),
-                HighwayReference.maximumF32(H.repeating(value), b),
+                H(raw: HighwayReference.maximumF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -147,14 +159,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumConstantB(_ value: H.Lane) {
+    private func checkMaximumConstantB(_ value: Lane) {
         let mismatches = Mismatches("maximum with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1F9A_9B28_B416_E8C0)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x1F9A_9B28_B416_E8C0)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.maximum(a, H.repeating(value)),
-                HighwayReference.maximumF32(a, H.repeating(value)),
+                H(raw: HighwayReference.maximumF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -232,8 +248,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func maximumConstantSplatPayloadNaN() {
-        checkMaximumConstantA(H.Lane(nan: 1, signaling: false))
-        checkMaximumConstantB(H.Lane(nan: 1, signaling: false))
+        checkMaximumConstantA(Lane(nan: 1, signaling: false))
+        checkMaximumConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func maximumConstantSplatSignalingNaN() {
@@ -257,14 +273,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMinimumNumberConstantA(_ value: H.Lane) {
+    private func checkMinimumNumberConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimumNumber with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE3BB_245F_B955_A473)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xE3BB_245F_B955_A473)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.minimumNumber(H.repeating(value), b),
-                HighwayReference.minimumNumberF32(H.repeating(value), b),
+                H(raw: HighwayReference.minimumNumberF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -272,14 +292,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMinimumNumberConstantB(_ value: H.Lane) {
+    private func checkMinimumNumberConstantB(_ value: Lane) {
         let mismatches = Mismatches("minimumNumber with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xECBD_5A5F_BE89_56B5)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xECBD_5A5F_BE89_56B5)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.minimumNumber(a, H.repeating(value)),
-                HighwayReference.minimumNumberF32(a, H.repeating(value)),
+                H(raw: HighwayReference.minimumNumberF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -357,8 +381,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func minimumNumberConstantSplatPayloadNaN() {
-        checkMinimumNumberConstantA(H.Lane(nan: 1, signaling: false))
-        checkMinimumNumberConstantB(H.Lane(nan: 1, signaling: false))
+        checkMinimumNumberConstantA(Lane(nan: 1, signaling: false))
+        checkMinimumNumberConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func minimumNumberConstantSplatSignalingNaN() {
@@ -382,14 +406,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumNumberConstantA(_ value: H.Lane) {
+    private func checkMaximumNumberConstantA(_ value: Lane) {
         let mismatches = Mismatches("maximumNumber with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2F72_81D1_8580_A149)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x2F72_81D1_8580_A149)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.maximumNumber(H.repeating(value), b),
-                HighwayReference.maximumNumberF32(H.repeating(value), b),
+                H(raw: HighwayReference.maximumNumberF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -397,14 +425,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumNumberConstantB(_ value: H.Lane) {
+    private func checkMaximumNumberConstantB(_ value: Lane) {
         let mismatches = Mismatches("maximumNumber with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x15B3_1BD1_76FC_6617)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x15B3_1BD1_76FC_6617)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.maximumNumber(a, H.repeating(value)),
-                HighwayReference.maximumNumberF32(a, H.repeating(value)),
+                H(raw: HighwayReference.maximumNumberF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -482,8 +514,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func maximumNumberConstantSplatPayloadNaN() {
-        checkMaximumNumberConstantA(H.Lane(nan: 1, signaling: false))
-        checkMaximumNumberConstantB(H.Lane(nan: 1, signaling: false))
+        checkMaximumNumberConstantA(Lane(nan: 1, signaling: false))
+        checkMaximumNumberConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func maximumNumberConstantSplatSignalingNaN() {
@@ -507,14 +539,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMinimumMagnitudeConstantA(_ value: H.Lane) {
+    private func checkMinimumMagnitudeConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimumMagnitude with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4CAA_459D_EB04_9A58)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x4CAA_459D_EB04_9A58)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.minimumMagnitude(H.repeating(value), b),
-                HighwayReference.minimumMagnitudeF32(H.repeating(value), b),
+                H(raw: HighwayReference.minimumMagnitudeF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -522,14 +558,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMinimumMagnitudeConstantB(_ value: H.Lane) {
+    private func checkMinimumMagnitudeConstantB(_ value: Lane) {
         let mismatches = Mismatches("minimumMagnitude with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x65FC_CB9D_F92C_3A0A)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x65FC_CB9D_F92C_3A0A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.minimumMagnitude(a, H.repeating(value)),
-                HighwayReference.minimumMagnitudeF32(a, H.repeating(value)),
+                H(raw: HighwayReference.minimumMagnitudeF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -607,8 +647,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func minimumMagnitudeConstantSplatPayloadNaN() {
-        checkMinimumMagnitudeConstantA(H.Lane(nan: 1, signaling: false))
-        checkMinimumMagnitudeConstantB(H.Lane(nan: 1, signaling: false))
+        checkMinimumMagnitudeConstantA(Lane(nan: 1, signaling: false))
+        checkMinimumMagnitudeConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func minimumMagnitudeConstantSplatSignalingNaN() {
@@ -632,14 +672,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumMagnitudeConstantA(_ value: H.Lane) {
+    private func checkMaximumMagnitudeConstantA(_ value: Lane) {
         let mismatches = Mismatches("maximumMagnitude with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDF5B_628C_DEBE_9856)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0xDF5B_628C_DEBE_9856)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.maximumMagnitude(H.repeating(value), b),
-                HighwayReference.maximumMagnitudeF32(H.repeating(value), b),
+                H(raw: HighwayReference.maximumMagnitudeF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -647,14 +691,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumMagnitudeConstantB(_ value: H.Lane) {
+    private func checkMaximumMagnitudeConstantB(_ value: Lane) {
         let mismatches = Mismatches("maximumMagnitude with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD79F_CC8C_DAA0_B894)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xD79F_CC8C_DAA0_B894)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.maximumMagnitude(a, H.repeating(value)),
-                HighwayReference.maximumMagnitudeF32(a, H.repeating(value)),
+                H(raw: HighwayReference.maximumMagnitudeF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -732,8 +780,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func maximumMagnitudeConstantSplatPayloadNaN() {
-        checkMaximumMagnitudeConstantA(H.Lane(nan: 1, signaling: false))
-        checkMaximumMagnitudeConstantB(H.Lane(nan: 1, signaling: false))
+        checkMaximumMagnitudeConstantA(Lane(nan: 1, signaling: false))
+        checkMaximumMagnitudeConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func maximumMagnitudeConstantSplatSignalingNaN() {

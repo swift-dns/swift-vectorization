@@ -7,10 +7,18 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkSumConstantA(_ value: H.Lane) {
+    private func checkSumConstantA(_ value: Lane) {
         let mismatches = Mismatches("sum with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        mismatches.check(H.sum(H.repeating(value)), HighwayReference.sumF64(H.repeating(value)), "")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        mismatches.check(
+            H.sum(H.repeating(value)),
+            HighwayReference.sumF64(H.repeating(value).raw),
+            ""
+        )
         mismatches.record()
     }
 
@@ -71,7 +79,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func sumConstantSplatPayloadNaN() {
-        checkSumConstantA(H.Lane(nan: 1, signaling: false))
+        checkSumConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func sumConstantSplatSignalingNaN() {
@@ -91,12 +99,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSmallestConstantA(_ value: H.Lane) {
+    private func checkSmallestConstantA(_ value: Lane) {
         let mismatches = Mismatches("smallest with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.smallest(H.repeating(value)),
-            HighwayReference.smallestF64(H.repeating(value)),
+            HighwayReference.smallestF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -159,7 +171,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func smallestConstantSplatPayloadNaN() {
-        checkSmallestConstantA(H.Lane(nan: 1, signaling: false))
+        checkSmallestConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func smallestConstantSplatSignalingNaN() {
@@ -179,12 +191,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSmallestOrNaNConstantA(_ value: H.Lane) {
+    private func checkSmallestOrNaNConstantA(_ value: Lane) {
         let mismatches = Mismatches("smallestOrNaN with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.smallestOrNaN(H.repeating(value)),
-            HighwayReference.smallestOrNaNF64(H.repeating(value)),
+            HighwayReference.smallestOrNaNF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -247,7 +263,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func smallestOrNaNConstantSplatPayloadNaN() {
-        checkSmallestOrNaNConstantA(H.Lane(nan: 1, signaling: false))
+        checkSmallestOrNaNConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func smallestOrNaNConstantSplatSignalingNaN() {
@@ -267,12 +283,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkLargestConstantA(_ value: H.Lane) {
+    private func checkLargestConstantA(_ value: Lane) {
         let mismatches = Mismatches("largest with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.largest(H.repeating(value)),
-            HighwayReference.largestF64(H.repeating(value)),
+            HighwayReference.largestF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -335,7 +355,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func largestConstantSplatPayloadNaN() {
-        checkLargestConstantA(H.Lane(nan: 1, signaling: false))
+        checkLargestConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func largestConstantSplatSignalingNaN() {
@@ -355,12 +375,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkLargestOrNaNConstantA(_ value: H.Lane) {
+    private func checkLargestOrNaNConstantA(_ value: Lane) {
         let mismatches = Mismatches("largestOrNaN with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.largestOrNaN(H.repeating(value)),
-            HighwayReference.largestOrNaNF64(H.repeating(value)),
+            HighwayReference.largestOrNaNF64(H.repeating(value).raw),
             ""
         )
         mismatches.record()
@@ -423,7 +447,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func largestOrNaNConstantSplatPayloadNaN() {
-        checkLargestOrNaNConstantA(H.Lane(nan: 1, signaling: false))
+        checkLargestOrNaNConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func largestOrNaNConstantSplatSignalingNaN() {
@@ -443,12 +467,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkRepeatingSumConstantA(_ value: H.Lane) {
+    private func checkRepeatingSumConstantA(_ value: Lane) {
         let mismatches = Mismatches("repeatingSum with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.repeatingSum(H.repeating(value)),
-            HighwayReference.repeatingSumF64(H.repeating(value)),
+            H(raw: HighwayReference.repeatingSumF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -511,7 +539,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func repeatingSumConstantSplatPayloadNaN() {
-        checkRepeatingSumConstantA(H.Lane(nan: 1, signaling: false))
+        checkRepeatingSumConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func repeatingSumConstantSplatSignalingNaN() {
@@ -531,12 +559,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkRepeatingSmallestConstantA(_ value: H.Lane) {
+    private func checkRepeatingSmallestConstantA(_ value: Lane) {
         let mismatches = Mismatches("repeatingSmallest with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.repeatingSmallest(H.repeating(value)),
-            HighwayReference.repeatingSmallestF64(H.repeating(value)),
+            H(raw: HighwayReference.repeatingSmallestF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -599,7 +631,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func repeatingSmallestConstantSplatPayloadNaN() {
-        checkRepeatingSmallestConstantA(H.Lane(nan: 1, signaling: false))
+        checkRepeatingSmallestConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func repeatingSmallestConstantSplatSignalingNaN() {
@@ -619,12 +651,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkRepeatingLargestConstantA(_ value: H.Lane) {
+    private func checkRepeatingLargestConstantA(_ value: Lane) {
         let mismatches = Mismatches("repeatingLargest with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.repeatingLargest(H.repeating(value)),
-            HighwayReference.repeatingLargestF64(H.repeating(value)),
+            H(raw: HighwayReference.repeatingLargestF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -687,7 +723,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func repeatingLargestConstantSplatPayloadNaN() {
-        checkRepeatingLargestConstantA(H.Lane(nan: 1, signaling: false))
+        checkRepeatingLargestConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func repeatingLargestConstantSplatSignalingNaN() {

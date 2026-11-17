@@ -4,315 +4,305 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portEqualToI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.equalTo(a, b)
+public func portEqualToI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.equalTo(a, b)
 }
 
 @inline(never)
-public func highwayEqualToI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.equalToI64(a.raw, b.raw))
+public func highwayEqualToI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.equalToI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portEqualToI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.equalTo(SIMDInt64.repeating(26), b)
+public func portEqualToI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.equalTo(SIMD<Int64>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayEqualToI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayEqualToI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.equalToI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portEqualToI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.equalTo(a, SIMDInt64.repeating(26))
+public func portEqualToI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.equalTo(a, SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayEqualToI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayEqualToI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.equalToI64(
             a.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portNotEqualToI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.notEqualTo(a, b)
+public func portNotEqualToI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.notEqualTo(a, b)
 }
 
 @inline(never)
-public func highwayNotEqualToI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.notEqualToI64(a.raw, b.raw))
+public func highwayNotEqualToI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.notEqualToI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portNotEqualToI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.notEqualTo(SIMDInt64.repeating(26), b)
+public func portNotEqualToI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.notEqualTo(SIMD<Int64>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayNotEqualToI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayNotEqualToI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.notEqualToI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portNotEqualToI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.notEqualTo(a, SIMDInt64.repeating(26))
+public func portNotEqualToI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.notEqualTo(a, SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayNotEqualToI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayNotEqualToI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.notEqualToI64(
             a.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portLessThanI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.lessThan(a, b)
+public func portLessThanI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.lessThan(a, b)
 }
 
 @inline(never)
-public func highwayLessThanI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.lessThanI64(a.raw, b.raw))
+public func highwayLessThanI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.lessThanI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portLessThanI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.lessThan(SIMDInt64.repeating(26), b)
+public func portLessThanI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.lessThan(SIMD<Int64>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayLessThanI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayLessThanI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.lessThanI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portLessThanI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.lessThan(a, SIMDInt64.repeating(26))
+public func portLessThanI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.lessThan(a, SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayLessThanI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayLessThanI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.lessThanI64(
             a.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portGreaterThanI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.greaterThan(a, b)
+public func portGreaterThanI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.greaterThan(a, b)
 }
 
 @inline(never)
-public func highwayGreaterThanI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.greaterThanI64(a.raw, b.raw))
+public func highwayGreaterThanI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.greaterThanI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portGreaterThanI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.greaterThan(SIMDInt64.repeating(26), b)
+public func portGreaterThanI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.greaterThan(SIMD<Int64>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayGreaterThanI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayGreaterThanI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.greaterThanI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portGreaterThanI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.greaterThan(a, SIMDInt64.repeating(26))
+public func portGreaterThanI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.greaterThan(a, SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayGreaterThanI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayGreaterThanI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.greaterThanI64(
             a.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portLessThanOrEqualToI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask
-{
-    SIMDInt64.lessThanOrEqualTo(a, b)
+public func portLessThanOrEqualToI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.lessThanOrEqualTo(a, b)
 }
 
 @inline(never)
-public func highwayLessThanOrEqualToI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.lessThanOrEqualToI64(a.raw, b.raw))
+public func highwayLessThanOrEqualToI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.lessThanOrEqualToI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portLessThanOrEqualToI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.lessThanOrEqualTo(SIMDInt64.repeating(26), b)
+public func portLessThanOrEqualToI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.lessThanOrEqualTo(SIMD<Int64>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayLessThanOrEqualToI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayLessThanOrEqualToI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portLessThanOrEqualToI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.lessThanOrEqualTo(a, SIMDInt64.repeating(26))
+public func portLessThanOrEqualToI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.lessThanOrEqualTo(a, SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayLessThanOrEqualToI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayLessThanOrEqualToI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.lessThanOrEqualToI64(
             a.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portGreaterThanOrEqualToI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Mask {
-    SIMDInt64.greaterThanOrEqualTo(a, b)
+public func portGreaterThanOrEqualToI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.greaterThanOrEqualTo(a, b)
 }
 
 @inline(never)
-public func highwayGreaterThanOrEqualToI64(
-    _ a: SIMDInt64.Vector,
-    _ b: SIMDInt64.Vector
-) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.greaterThanOrEqualToI64(a.raw, b.raw))
+public func highwayGreaterThanOrEqualToI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.greaterThanOrEqualToI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portGreaterThanOrEqualToI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.greaterThanOrEqualTo(SIMDInt64.repeating(26), b)
+public func portGreaterThanOrEqualToI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.greaterThanOrEqualTo(SIMD<Int64>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayGreaterThanOrEqualToI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayGreaterThanOrEqualToI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portGreaterThanOrEqualToI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.greaterThanOrEqualTo(a, SIMDInt64.repeating(26))
+public func portGreaterThanOrEqualToI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.greaterThanOrEqualTo(a, SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayGreaterThanOrEqualToI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayGreaterThanOrEqualToI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.greaterThanOrEqualToI64(
             a.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portIsNegativeI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.isNegative(a)
+public func portIsNegativeI64(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.isNegative(a)
 }
 
 @inline(never)
-public func highwayIsNegativeI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.isNegativeI64(a.raw))
+public func highwayIsNegativeI64(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.isNegativeI64(a.raw))
 }
 
 @inline(never)
-public func portIsNegativeI64ConstantA() -> SIMDInt64.Mask {
-    SIMDInt64.isNegative(SIMDInt64.repeating(26))
+public func portIsNegativeI64ConstantA() -> SIMD<Int64>.Mask {
+    SIMD<Int64>.isNegative(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayIsNegativeI64ConstantA() -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayIsNegativeI64ConstantA() -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.isNegativeI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portTestingBitI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.testingBit(a, b)
+public func portTestingBitI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.testingBit(a, b)
 }
 
 @inline(never)
-public func highwayTestingBitI64(_ a: SIMDInt64.Vector, _ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(raw: HighwayReference.Nothrow.testingBitI64(a.raw, b.raw))
+public func highwayTestingBitI64(_ a: SIMD<Int64>, _ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(raw: HighwayReference.Nothrow.testingBitI64(a.raw, b.raw))
 }
 
 @inline(never)
-public func portTestingBitI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.testingBit(SIMDInt64.repeating(26), b)
+public func portTestingBitI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.testingBit(SIMD<Int64>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayTestingBitI64ConstantA(_ b: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayTestingBitI64ConstantA(_ b: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.testingBitI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portTestingBitI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.testingBit(a, SIMDInt64.repeating(26))
+public func portTestingBitI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.testingBit(a, SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayTestingBitI64ConstantB(_ a: SIMDInt64.Vector) -> SIMDInt64.Mask {
-    SIMDInt64.Mask(
+public func highwayTestingBitI64ConstantB(_ a: SIMD<Int64>) -> SIMD<Int64>.Mask {
+    SIMD<Int64>.Mask(
         raw: HighwayReference.Nothrow.testingBitI64(
             a.raw,
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }

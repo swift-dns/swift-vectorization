@@ -7,20 +7,18 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkPairwiseAddingBlocksConstantA(_ value: H.Lane) {
+    private func checkPairwiseAddingBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("pairwiseAddingBlocks with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDEB7_CB4B_C480_F805)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDEB7_CB4B_C480_F805)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.pairwiseAddingBlocks(H.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.pairwiseAddingBlocksI64(H.repeating(value).raw, b.raw)
-                ),
+                H(raw: HighwayReference.pairwiseAddingBlocksI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -28,20 +26,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseAddingBlocksConstantB(_ value: H.Lane) {
+    private func checkPairwiseAddingBlocksConstantB(_ value: Lane) {
         let mismatches = Mismatches("pairwiseAddingBlocks with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC4F8_454B_B5FC_8673)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC4F8_454B_B5FC_8673)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.pairwiseAddingBlocks(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.pairwiseAddingBlocksI64(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.pairwiseAddingBlocksI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -134,28 +130,28 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func pairwiseAddingBlocksConstantSplatMax() {
-        checkPairwiseAddingBlocksConstantA(H.Lane.max)
-        checkPairwiseAddingBlocksConstantB(H.Lane.max)
+        checkPairwiseAddingBlocksConstantA(Lane.max)
+        checkPairwiseAddingBlocksConstantB(Lane.max)
     }
 
     @Test func pairwiseAddingBlocksConstantSplatMin() {
-        checkPairwiseAddingBlocksConstantA(H.Lane.min)
-        checkPairwiseAddingBlocksConstantB(H.Lane.min)
+        checkPairwiseAddingBlocksConstantA(Lane.min)
+        checkPairwiseAddingBlocksConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkPairwiseSubtractingBlocksConstantA(_ value: H.Lane) {
+    private func checkPairwiseSubtractingBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("pairwiseSubtractingBlocks with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x00DB_F89F_5112_8F08)
+        let bInputs = Inputs.vectors(H.self, seed: 0x00DB_F89F_5112_8F08)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(H.repeating(value), b),
-                H.Vector(
+                H(
                     raw: HighwayReference.pairwiseSubtractingBlocksI64(
                         H.repeating(value).raw,
                         b.raw
@@ -168,18 +164,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseSubtractingBlocksConstantB(_ value: H.Lane) {
+    private func checkPairwiseSubtractingBlocksConstantB(_ value: Lane) {
         let mismatches = Mismatches("pairwiseSubtractingBlocks with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A2E_7E9F_5F3A_2EBA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1A2E_7E9F_5F3A_2EBA)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.pairwiseSubtractingBlocks(a, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.pairwiseSubtractingBlocksI64(
                         a.raw,
                         H.repeating(value).raw
@@ -277,23 +273,23 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func pairwiseSubtractingBlocksConstantSplatMax() {
-        checkPairwiseSubtractingBlocksConstantA(H.Lane.max)
-        checkPairwiseSubtractingBlocksConstantB(H.Lane.max)
+        checkPairwiseSubtractingBlocksConstantA(Lane.max)
+        checkPairwiseSubtractingBlocksConstantB(Lane.max)
     }
 
     @Test func pairwiseSubtractingBlocksConstantSplatMin() {
-        checkPairwiseSubtractingBlocksConstantA(H.Lane.min)
-        checkPairwiseSubtractingBlocksConstantB(H.Lane.min)
+        checkPairwiseSubtractingBlocksConstantA(Lane.min)
+        checkPairwiseSubtractingBlocksConstantB(Lane.min)
     }
 
     @inline(__always)
     private func checkBroadcastingInBlocksConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingInBlocks with lane \(lane)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x38BE_F7A1_CFF0_3DC8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x38BE_F7A1_CFF0_3DC8)
         for a in aInputs {
             mismatches.check(
                 H.broadcastingInBlocks(a, lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingInBlocksI64(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -316,11 +312,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkBroadcastingInBlocksUncheckedConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingInBlocks unchecked with lane \(lane)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD4B5_353D_6E87_DBB2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD4B5_353D_6E87_DBB2)
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcastingInBlocks(a, laneUnchecked: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingInBlocksI64(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -341,18 +337,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBroadcastingInBlocksConstantA(_ value: H.Lane) {
+    private func checkBroadcastingInBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("broadcastingInBlocks with a repeating \(hex(value))")
         let laneInputs = Array(0...1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for lane in laneInputs {
             mismatches.check(
                 H.broadcastingInBlocks(H.repeating(value), lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingInBlocksI64(
                         H.repeating(value).raw,
                         Int32(truncatingIfNeeded: lane)
@@ -433,10 +429,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func broadcastingInBlocksConstantSplatMax() {
-        checkBroadcastingInBlocksConstantA(H.Lane.max)
+        checkBroadcastingInBlocksConstantA(Lane.max)
     }
 
     @Test func broadcastingInBlocksConstantSplatMin() {
-        checkBroadcastingInBlocksConstantA(H.Lane.min)
+        checkBroadcastingInBlocksConstantA(Lane.min)
     }
 }

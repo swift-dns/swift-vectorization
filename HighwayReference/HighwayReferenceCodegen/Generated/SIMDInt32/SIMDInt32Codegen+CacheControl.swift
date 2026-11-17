@@ -6,7 +6,7 @@ public import Vectorization
 extension HighwayReferenceInt32 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         precondition(
             span.withUnsafeBufferPointer {
@@ -19,7 +19,7 @@ extension HighwayReferenceInt32 {
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         assert(
             span.withUnsafeBufferPointer {
@@ -38,24 +38,24 @@ extension HighwayReferenceInt32 {
 }
 
 @inline(never)
-public func portStoreStreamingI32(_ a: SIMDInt32.Vector, to: UnsafeMutablePointer<SIMDInt32.Lane>) {
-    unsafe SIMDInt32.storeStreaming(a, to: to)
+public func portStoreStreamingI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>) {
+    unsafe SIMD<Int32>.storeStreaming(a, to: to)
 }
 
 @inline(never)
-public func highwayStoreStreamingI32(_ a: SIMDInt32.Vector, to: UnsafeMutablePointer<Int32>) {
+public func highwayStoreStreamingI32(_ a: SIMD<Int32>, to: UnsafeMutablePointer<Int32>) {
     unsafe HighwayReference.Nothrow.storeStreamingI32(a.raw, to)
 }
 
 @inline(never)
-public func portStoreStreamingI32ConstantA(to: UnsafeMutablePointer<SIMDInt32.Lane>) {
-    unsafe SIMDInt32.storeStreaming(SIMDInt32.repeating(26), to: to)
+public func portStoreStreamingI32ConstantA(to: UnsafeMutablePointer<Int32>) {
+    unsafe SIMD<Int32>.storeStreaming(SIMD<Int32>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreStreamingI32ConstantA(to: UnsafeMutablePointer<Int32>) {
     unsafe HighwayReference.Nothrow.storeStreamingI32(
-        SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+        SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
         to
     )
 }

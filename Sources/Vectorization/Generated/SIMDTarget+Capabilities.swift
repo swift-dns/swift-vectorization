@@ -17,7 +17,7 @@ extension SIMDTarget {
     @export(implementation) @inline(always)
     public static var hasNativeMasking: Bool { cvectorization_ops_has_native_masking() }
 
-    /// Whether `multiplyAccumulatingInAnyOrder` on `SIMDBFloat16` lanes has a native instruction.
+    /// Whether `multiplyAccumulatingInAnyOrder` on `SIMD<BFloat16>` lanes has a native instruction.
     @export(implementation) @inline(always)
     public static var hasNativeBFloat16DotProduct: Bool {
         cvectorization_ops_has_native_bfloat16_dot_product()
@@ -39,7 +39,7 @@ extension SIMDTarget {
         cvectorization_ops_has_native64_bit_multiply()
     }
 
-    /// Whether `SIMDFloat16` arithmetic runs on native instructions rather than through `Float`.
+    /// Whether `SIMD<Float16>` arithmetic runs on native instructions rather than through `Float`.
     @export(implementation) @inline(always)
     public static var hasNativeFloat16Arithmetic: Bool {
         cvectorization_ops_has_native_float16_arithmetic()

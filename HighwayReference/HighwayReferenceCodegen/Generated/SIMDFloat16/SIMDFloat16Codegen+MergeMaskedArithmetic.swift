@@ -6,29 +6,31 @@ public import Vectorization
 
 @inline(never)
 public func portSquareRootWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.squareRoot(a, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.squareRoot(a, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwaySquareRootWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.squareRootWhereOtherwiseF16(otherwise, mask.raw, a)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.squareRootWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw)
+    )
 }
 
 @inline(never)
 public func portSquareRootWhereOtherwiseF16ConstantA(
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.squareRoot(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.squareRoot(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -36,68 +38,78 @@ public func portSquareRootWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwaySquareRootWhereOtherwiseF16ConstantA(
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.squareRootWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.squareRootWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portSquareRootWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.squareRoot(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.squareRoot(
         a,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwaySquareRootWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.squareRootWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.squareRootWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw
+        )
     )
 }
 
 @inline(never)
 public func portAddingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.adding(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.adding(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayAddingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.addingWhereOtherwiseF16(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.addingWhereOtherwiseF16(otherwise.raw, mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
 public func portAddingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.adding(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.adding(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         where: mask,
         otherwise: otherwise
@@ -106,27 +118,31 @@ public func portAddingWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayAddingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.addingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.addingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portAddingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.adding(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.adding(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -134,69 +150,89 @@ public func portAddingWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayAddingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.addingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.addingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portAddingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.adding(a, b, where: mask, otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.adding(
+        a,
+        b,
+        where: mask,
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
+    )
 }
 
 @inline(never)
 public func highwayAddingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.addingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.addingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portSubtractingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.subtracting(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.subtracting(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwaySubtractingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.subtractingWhereOtherwiseF16(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.subtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portSubtractingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.subtracting(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.subtracting(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         where: mask,
         otherwise: otherwise
@@ -205,27 +241,31 @@ public func portSubtractingWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwaySubtractingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.subtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.subtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portSubtractingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.subtracting(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.subtracting(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -233,74 +273,89 @@ public func portSubtractingWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwaySubtractingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.subtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.subtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portSubtractingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.subtracting(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.subtracting(
         a,
         b,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwaySubtractingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.subtractingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.subtractingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplying(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplying(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingWhereOtherwiseF16(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMultiplyingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplying(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplying(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         where: mask,
         otherwise: otherwise
@@ -309,27 +364,31 @@ public func portMultiplyingWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayMultiplyingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplying(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplying(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -337,74 +396,89 @@ public func portMultiplyingWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayMultiplyingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplying(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplying(
         a,
         b,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayMultiplyingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portDividingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.dividing(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.dividing(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayDividingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.dividingWhereOtherwiseF16(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.dividingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portDividingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.dividing(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.dividing(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         where: mask,
         otherwise: otherwise
@@ -413,27 +487,31 @@ public func portDividingWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayDividingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.dividingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.dividingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portDividingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.dividing(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.dividing(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -441,74 +519,89 @@ public func portDividingWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayDividingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.dividingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.dividingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portDividingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.dividing(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.dividing(
         a,
         b,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayDividingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.dividingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.dividingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.minimum(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.minimum(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMinimumWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.minimumWhereOtherwiseF16(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMinimumWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.minimum(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.minimum(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         where: mask,
         otherwise: otherwise
@@ -517,27 +610,31 @@ public func portMinimumWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayMinimumWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.minimumWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.minimum(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.minimum(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -545,74 +642,89 @@ public func portMinimumWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayMinimumWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.minimumWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMinimumWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.minimum(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.minimum(
         a,
         b,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayMinimumWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.minimumWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.minimumWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.maximum(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.maximum(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMaximumWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.maximumWhereOtherwiseF16(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMaximumWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.maximum(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.maximum(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         where: mask,
         otherwise: otherwise
@@ -621,27 +733,31 @@ public func portMaximumWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayMaximumWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.maximumWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.maximum(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.maximum(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -649,77 +765,93 @@ public func portMaximumWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayMaximumWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.maximumWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMaximumWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.maximum(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.maximum(
         a,
         b,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayMaximumWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.maximumWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.maximumWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(a, b, c, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAdding(a, b, c, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyAddingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(otherwise, mask.raw, a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMultiplyAddingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAdding(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         c,
         where: mask,
@@ -729,30 +861,34 @@ public func portMultiplyAddingWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayMultiplyAddingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAdding(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         c,
         where: mask,
         otherwise: otherwise
@@ -761,31 +897,35 @@ public func portMultiplyAddingWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayMultiplyAddingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingWhereOtherwiseF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAdding(
         a,
         b,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -793,83 +933,99 @@ public func portMultiplyAddingWhereOtherwiseF16ConstantC(
 
 @inline(never)
 public func highwayMultiplyAddingWhereOtherwiseF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAdding(
         a,
         b,
         c,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayMultiplyAddingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b,
-        c
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(otherwise, mask.raw, a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMultiplySubtractingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         c,
         where: mask,
@@ -879,30 +1035,34 @@ public func portMultiplySubtractingWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayMultiplySubtractingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         c,
         where: mask,
         otherwise: otherwise
@@ -911,31 +1071,35 @@ public func portMultiplySubtractingWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayMultiplySubtractingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingWhereOtherwiseF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(
         a,
         b,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -943,83 +1107,99 @@ public func portMultiplySubtractingWhereOtherwiseF16ConstantC(
 
 @inline(never)
 public func highwayMultiplySubtractingWhereOtherwiseF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(
         a,
         b,
         c,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayMultiplySubtractingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b,
-        c
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(otherwise, mask.raw, a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         c,
         where: mask,
@@ -1029,30 +1209,34 @@ public func portNegatedMultiplyAddingWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         c,
         where: mask,
         otherwise: otherwise
@@ -1061,31 +1245,35 @@ public func portNegatedMultiplyAddingWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereOtherwiseF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(
         a,
         b,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -1093,89 +1281,99 @@ public func portNegatedMultiplyAddingWhereOtherwiseF16ConstantC(
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereOtherwiseF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(
         a,
         b,
         c,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b,
-        c
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        b,
-        c
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         c,
         where: mask,
@@ -1185,30 +1383,34 @@ public func portNegatedMultiplySubtractingWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         c,
         where: mask,
         otherwise: otherwise
@@ -1217,31 +1419,35 @@ public func portNegatedMultiplySubtractingWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereOtherwiseF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(
         a,
         b,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -1249,49 +1455,57 @@ public func portNegatedMultiplySubtractingWhereOtherwiseF16ConstantC(
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereOtherwiseF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(
         a,
         b,
         c,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b,
-        c
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 #endif

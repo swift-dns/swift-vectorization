@@ -21,7 +21,7 @@ extension SIMDInt32ReferenceTests {
 
     @Test func maskFromVector() {
         let mismatches = Mismatches("maskFromVector")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA022_8D3A_B406_5C2E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA022_8D3A_B406_5C2E)
         for a in aInputs {
             mismatches.check(
                 H.mask(from: a),
@@ -48,7 +48,7 @@ extension SIMDInt32ReferenceTests {
     @Test func repeatingBlockMask() {
         let mismatches = Mismatches("repeatingBlockMask")
         let bitsInputs = Inputs.maskBits(
-            lanes: 16 / MemoryLayout<H.Lane>.size,
+            lanes: 16 / MemoryLayout<Lane>.size,
             seed: 0xA62C_432F_2CAB_896F
         )
         for bits in bitsInputs {

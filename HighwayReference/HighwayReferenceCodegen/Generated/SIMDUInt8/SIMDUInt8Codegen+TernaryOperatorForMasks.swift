@@ -5,158 +5,132 @@ public import Vectorization
 
 @inline(never)
 public func portSelectingU8(
-    _ mask: SIMDUInt8.Mask,
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.selecting(mask, a, b)
+    _ mask: SIMD<UInt8>.Mask,
+    _ a: SIMD<UInt8>,
+    _ b: SIMD<UInt8>
+) -> SIMD<UInt8> {
+    SIMD<UInt8>.selecting(mask, a, b)
 }
 
 @inline(never)
 public func highwaySelectingU8(
-    _ mask: SIMDUInt8.Mask,
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.selectingU8(mask.raw, a.raw, b.raw))
+    _ mask: SIMD<UInt8>.Mask,
+    _ a: SIMD<UInt8>,
+    _ b: SIMD<UInt8>
+) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.selectingU8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
-public func portSelectingU8ConstantA(
-    _ mask: SIMDUInt8.Mask,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.selecting(mask, SIMDUInt8.repeating(26), b)
+public func portSelectingU8ConstantA(_ mask: SIMD<UInt8>.Mask, _ b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.selecting(mask, SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
-public func highwaySelectingU8ConstantA(
-    _ mask: SIMDUInt8.Mask,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwaySelectingU8ConstantA(_ mask: SIMD<UInt8>.Mask, _ b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.selectingU8(
             mask.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portSelectingU8ConstantB(
-    _ mask: SIMDUInt8.Mask,
-    _ a: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.selecting(mask, a, SIMDUInt8.repeating(26))
+public func portSelectingU8ConstantB(_ mask: SIMD<UInt8>.Mask, _ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.selecting(mask, a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwaySelectingU8ConstantB(
-    _ mask: SIMDUInt8.Mask,
-    _ a: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwaySelectingU8ConstantB(_ mask: SIMD<UInt8>.Mask, _ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.selectingU8(
             mask.raw,
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portSelectingOrZeroU8(_ mask: SIMDUInt8.Mask, _ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector
-{
-    SIMDUInt8.selectingOrZero(mask, a)
+public func portSelectingOrZeroU8(_ mask: SIMD<UInt8>.Mask, _ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.selectingOrZero(mask, a)
 }
 
 @inline(never)
-public func highwaySelectingOrZeroU8(
-    _ mask: SIMDUInt8.Mask,
-    _ a: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.selectingOrZeroU8(mask.raw, a.raw))
+public func highwaySelectingOrZeroU8(_ mask: SIMD<UInt8>.Mask, _ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.selectingOrZeroU8(mask.raw, a.raw))
 }
 
 @inline(never)
-public func portSelectingOrZeroU8ConstantA(_ mask: SIMDUInt8.Mask) -> SIMDUInt8.Vector {
-    SIMDUInt8.selectingOrZero(mask, SIMDUInt8.repeating(26))
+public func portSelectingOrZeroU8ConstantA(_ mask: SIMD<UInt8>.Mask) -> SIMD<UInt8> {
+    SIMD<UInt8>.selectingOrZero(mask, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwaySelectingOrZeroU8ConstantA(_ mask: SIMDUInt8.Mask) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwaySelectingOrZeroU8ConstantA(_ mask: SIMD<UInt8>.Mask) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.selectingOrZeroU8(
             mask.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portZeroingSelectedU8(_ mask: SIMDUInt8.Mask, _ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector
-{
-    SIMDUInt8.zeroingSelected(mask, a)
+public func portZeroingSelectedU8(_ mask: SIMD<UInt8>.Mask, _ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.zeroingSelected(mask, a)
 }
 
 @inline(never)
-public func highwayZeroingSelectedU8(
-    _ mask: SIMDUInt8.Mask,
-    _ a: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.zeroingSelectedU8(mask.raw, a.raw))
+public func highwayZeroingSelectedU8(_ mask: SIMD<UInt8>.Mask, _ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.zeroingSelectedU8(mask.raw, a.raw))
 }
 
 @inline(never)
-public func portZeroingSelectedU8ConstantA(_ mask: SIMDUInt8.Mask) -> SIMDUInt8.Vector {
-    SIMDUInt8.zeroingSelected(mask, SIMDUInt8.repeating(26))
+public func portZeroingSelectedU8ConstantA(_ mask: SIMD<UInt8>.Mask) -> SIMD<UInt8> {
+    SIMD<UInt8>.zeroingSelected(mask, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayZeroingSelectedU8ConstantA(_ mask: SIMDUInt8.Mask) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayZeroingSelectedU8ConstantA(_ mask: SIMD<UInt8>.Mask) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.zeroingSelectedU8(
             mask.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portSelectingByVectorU8(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector,
-    _ c: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.selecting(a, b, c)
+    _ a: SIMD<UInt8>,
+    _ b: SIMD<UInt8>,
+    _ c: SIMD<UInt8>
+) -> SIMD<UInt8> {
+    SIMD<UInt8>.selecting(a, b, c)
 }
 
 @inline(never)
 public func highwaySelectingByVectorU8(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector,
-    _ c: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.selectingByVectorU8(a.raw, b.raw, c.raw))
+    _ a: SIMD<UInt8>,
+    _ b: SIMD<UInt8>,
+    _ c: SIMD<UInt8>
+) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.selectingByVectorU8(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portSelectingByVectorU8ConstantA(
-    _ b: SIMDUInt8.Vector,
-    _ c: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.selecting(SIMDUInt8.repeating(26), b, c)
+public func portSelectingByVectorU8ConstantA(_ b: SIMD<UInt8>, _ c: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.selecting(SIMD<UInt8>.repeating(26), b, c)
 }
 
 @inline(never)
-public func highwaySelectingByVectorU8ConstantA(
-    _ b: SIMDUInt8.Vector,
-    _ c: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwaySelectingByVectorU8ConstantA(_ b: SIMD<UInt8>, _ c: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.selectingByVectorU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw,
             c.raw
         )
@@ -164,45 +138,33 @@ public func highwaySelectingByVectorU8ConstantA(
 }
 
 @inline(never)
-public func portSelectingByVectorU8ConstantB(
-    _ a: SIMDUInt8.Vector,
-    _ c: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.selecting(a, SIMDUInt8.repeating(26), c)
+public func portSelectingByVectorU8ConstantB(_ a: SIMD<UInt8>, _ c: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.selecting(a, SIMD<UInt8>.repeating(26), c)
 }
 
 @inline(never)
-public func highwaySelectingByVectorU8ConstantB(
-    _ a: SIMDUInt8.Vector,
-    _ c: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwaySelectingByVectorU8ConstantB(_ a: SIMD<UInt8>, _ c: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.selectingByVectorU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             c.raw
         )
     )
 }
 
 @inline(never)
-public func portSelectingByVectorU8ConstantC(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.selecting(a, b, SIMDUInt8.repeating(26))
+public func portSelectingByVectorU8ConstantC(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.selecting(a, b, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwaySelectingByVectorU8ConstantC(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwaySelectingByVectorU8ConstantC(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.selectingByVectorU8(
             a.raw,
             b.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }

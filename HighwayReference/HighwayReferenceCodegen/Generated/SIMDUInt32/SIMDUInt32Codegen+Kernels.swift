@@ -4,17 +4,17 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portNoneAboveU32(_ v: SIMDUInt32.Vector) -> Bool {
-    SIMDUInt32.allFalse(SIMDUInt32.greaterThan(v, SIMDUInt32.repeating(26)))
+public func portNoneAboveU32(_ v: SIMD<UInt32>) -> Bool {
+    SIMD<UInt32>.allFalse(SIMD<UInt32>.greaterThan(v, SIMD<UInt32>.repeating(26)))
 }
 
 @inline(never)
-public func highwayNoneAboveU32(_ v: SIMDUInt32.Vector) -> Bool {
+public func highwayNoneAboveU32(_ v: SIMD<UInt32>) -> Bool {
     HighwayReference.Nothrow.allFalseU32(
-        SIMDUInt32.Mask(
+        SIMD<UInt32>.Mask(
             raw: HighwayReference.Nothrow.greaterThanU32(
                 v.raw,
-                SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+                SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
             )
         ).raw
     )
@@ -22,33 +22,33 @@ public func highwayNoneAboveU32(_ v: SIMDUInt32.Vector) -> Bool {
 
 @inline(never)
 public func portSmallestAtLeastU32(
-    from: UnsafePointer<SIMDUInt32.Lane>,
+    from: UnsafePointer<UInt32>,
     count: Int,
-    atLeast n: SIMDUInt32.Lane
-) -> SIMDUInt32.Lane {
-    let identity = SIMDUInt32.repeating(.max)
-    let threshold = SIMDUInt32.repeating(n)
+    atLeast n: UInt32
+) -> UInt32 {
+    let identity = SIMD<UInt32>.repeating(.max)
+    let threshold = SIMD<UInt32>.repeating(n)
     var accumulator = identity
-    let laneCount = SIMDUInt32.laneCount
+    let laneCount = SIMD<UInt32>.laneCount
     var from = unsafe from
     var count = count
     while count >= laneCount {
-        let loaded = unsafe SIMDUInt32.load(from: from)
-        accumulator = SIMDUInt32.minimum(
+        let loaded = unsafe SIMD<UInt32>.load(from: from)
+        accumulator = SIMD<UInt32>.minimum(
             accumulator,
-            SIMDUInt32.selecting(SIMDUInt32.lessThan(loaded, threshold), identity, loaded)
+            SIMD<UInt32>.selecting(SIMD<UInt32>.lessThan(loaded, threshold), identity, loaded)
         )
         unsafe from += laneCount
         count -= laneCount
     }
     if count > 0 {
-        let loaded = unsafe SIMDUInt32.loadFirst(from: from, count: count)
-        accumulator = SIMDUInt32.minimum(
+        let loaded = unsafe SIMD<UInt32>.loadFirst(from: from, count: count)
+        accumulator = SIMD<UInt32>.minimum(
             accumulator,
-            SIMDUInt32.selecting(SIMDUInt32.lessThan(loaded, threshold), identity, loaded)
+            SIMD<UInt32>.selecting(SIMD<UInt32>.lessThan(loaded, threshold), identity, loaded)
         )
     }
-    return SIMDUInt32.smallest(accumulator)
+    return SIMD<UInt32>.smallest(accumulator)
 }
 
 @inline(never)
@@ -57,20 +57,20 @@ public func highwaySmallestAtLeastU32(
     count: Int,
     atLeast n: UInt32
 ) -> UInt32 {
-    let identity = SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(.max))
-    let threshold = SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(n))
+    let identity = SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(.max))
+    let threshold = SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(n))
     var accumulator = identity
     let laneCount = HighwayReferenceUInt32.laneCount
     var from = unsafe from
     var count = count
     while count >= laneCount {
-        let loaded = unsafe SIMDUInt32.Vector(raw: HighwayReference.Nothrow.loadU32(from))
-        accumulator = SIMDUInt32.Vector(
+        let loaded = unsafe SIMD<UInt32>(raw: HighwayReference.Nothrow.loadU32(from))
+        accumulator = SIMD<UInt32>(
             raw: HighwayReference.Nothrow.minimumU32(
                 accumulator.raw,
-                SIMDUInt32.Vector(
+                SIMD<UInt32>(
                     raw: HighwayReference.Nothrow.selectingU32(
-                        SIMDUInt32.Mask(
+                        SIMD<UInt32>.Mask(
                             raw: HighwayReference.Nothrow.lessThanU32(loaded.raw, threshold.raw)
                         ).raw,
                         identity.raw,
@@ -83,15 +83,13 @@ public func highwaySmallestAtLeastU32(
         count -= laneCount
     }
     if count > 0 {
-        let loaded = unsafe SIMDUInt32.Vector(
-            raw: HighwayReference.Nothrow.loadFirstU32(from, count)
-        )
-        accumulator = SIMDUInt32.Vector(
+        let loaded = unsafe SIMD<UInt32>(raw: HighwayReference.Nothrow.loadFirstU32(from, count))
+        accumulator = SIMD<UInt32>(
             raw: HighwayReference.Nothrow.minimumU32(
                 accumulator.raw,
-                SIMDUInt32.Vector(
+                SIMD<UInt32>(
                     raw: HighwayReference.Nothrow.selectingU32(
-                        SIMDUInt32.Mask(
+                        SIMD<UInt32>.Mask(
                             raw: HighwayReference.Nothrow.lessThanU32(loaded.raw, threshold.raw)
                         ).raw,
                         identity.raw,
@@ -106,22 +104,19 @@ public func highwaySmallestAtLeastU32(
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSmallestAtLeastSpanU32(
-    atLeast n: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>
-) -> SIMDUInt32.Lane {
-    let laneCount = SIMDUInt32.laneCount
-    let identity = SIMDUInt32.repeating(.max)
-    let threshold = SIMDUInt32.repeating(n)
+public func portSmallestAtLeastSpanU32(atLeast n: UInt32, in values: Span<UInt32>) -> UInt32 {
+    let laneCount = SIMD<UInt32>.laneCount
+    let identity = SIMD<UInt32>.repeating(.max)
+    let threshold = SIMD<UInt32>.repeating(n)
     var accumulator = identity
 
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
-        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
-        let isBelow = SIMDUInt32.lessThan(loaded, threshold)
-        accumulator = SIMDUInt32.minimum(
+        let loaded = SIMD<UInt32>.load(from: remainingValuesSpan)
+        let isBelow = SIMD<UInt32>.lessThan(loaded, threshold)
+        accumulator = SIMD<UInt32>.minimum(
             accumulator,
-            SIMDUInt32.selecting(isBelow, identity, loaded)
+            SIMD<UInt32>.selecting(isBelow, identity, loaded)
         )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
@@ -129,34 +124,34 @@ public func portSmallestAtLeastSpanU32(
         remainingValuesSpan = unsafe remainingValuesSpan.extracting(unchecked: remainingValuesRange)
     }
     if !remainingValuesSpan.isEmpty {
-        let loaded = SIMDUInt32.loadFirst(from: remainingValuesSpan)
-        let isBelow = SIMDUInt32.lessThan(loaded, threshold)
-        accumulator = SIMDUInt32.minimum(
+        let loaded = SIMD<UInt32>.loadFirst(from: remainingValuesSpan)
+        let isBelow = SIMD<UInt32>.lessThan(loaded, threshold)
+        accumulator = SIMD<UInt32>.minimum(
             accumulator,
-            SIMDUInt32.selecting(isBelow, identity, loaded)
+            SIMD<UInt32>.selecting(isBelow, identity, loaded)
         )
     }
-    return SIMDUInt32.smallest(accumulator)
+    return SIMD<UInt32>.smallest(accumulator)
 }
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func highwaySmallestAtLeastSpanU32(atLeast n: UInt32, in values: Span<UInt32>) -> UInt32 {
     let laneCount = HighwayReferenceUInt32.laneCount
-    let identity = SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(.max))
-    let threshold = SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(n))
+    let identity = SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(.max))
+    let threshold = SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(n))
     var accumulator = identity
 
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
         let loaded = HighwayReferenceUInt32.load(from: remainingValuesSpan)
-        let isBelow = SIMDUInt32.Mask(
+        let isBelow = SIMD<UInt32>.Mask(
             raw: HighwayReference.Nothrow.lessThanU32(loaded.raw, threshold.raw)
         )
-        accumulator = SIMDUInt32.Vector(
+        accumulator = SIMD<UInt32>(
             raw: HighwayReference.Nothrow.minimumU32(
                 accumulator.raw,
-                SIMDUInt32.Vector(
+                SIMD<UInt32>(
                     raw: HighwayReference.Nothrow.selectingU32(
                         isBelow.raw,
                         identity.raw,
@@ -172,13 +167,13 @@ public func highwaySmallestAtLeastSpanU32(atLeast n: UInt32, in values: Span<UIn
     }
     if !remainingValuesSpan.isEmpty {
         let loaded = HighwayReferenceUInt32.loadFirst(from: remainingValuesSpan)
-        let isBelow = SIMDUInt32.Mask(
+        let isBelow = SIMD<UInt32>.Mask(
             raw: HighwayReference.Nothrow.lessThanU32(loaded.raw, threshold.raw)
         )
-        accumulator = SIMDUInt32.Vector(
+        accumulator = SIMD<UInt32>(
             raw: HighwayReference.Nothrow.minimumU32(
                 accumulator.raw,
-                SIMDUInt32.Vector(
+                SIMD<UInt32>(
                     raw: HighwayReference.Nothrow.selectingU32(
                         isBelow.raw,
                         identity.raw,
@@ -193,31 +188,31 @@ public func highwaySmallestAtLeastSpanU32(atLeast n: UInt32, in values: Span<UIn
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumWideningSpanU32(_ bytes: Span<UInt8>) -> SIMDUInt32.Lane {
-    let laneCount = SIMDUInt32.laneCount
-    var total = SIMDUInt32.zero()
+public func portSumWideningSpanU32(_ bytes: Span<UInt8>) -> UInt32 {
+    let laneCount = SIMD<UInt32>.laneCount
+    var total = SIMD<UInt32>.zero()
     var remainingBytesSpan = bytes
     while remainingBytesSpan.count >= laneCount {
-        total = SIMDUInt32.adding(total, SIMDUInt32.loadWidening(from: remainingBytesSpan))
+        total = SIMD<UInt32>.adding(total, SIMD<UInt32>.loadWidening(from: remainingBytesSpan))
         let remainingBytesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingBytesSpan.count)
         )
         remainingBytesSpan = unsafe remainingBytesSpan.extracting(unchecked: remainingBytesRange)
     }
     if !remainingBytesSpan.isEmpty {
-        total = SIMDUInt32.adding(total, SIMDUInt32.loadFirstWidening(from: remainingBytesSpan))
+        total = SIMD<UInt32>.adding(total, SIMD<UInt32>.loadFirstWidening(from: remainingBytesSpan))
     }
-    return SIMDUInt32.sum(total)
+    return SIMD<UInt32>.sum(total)
 }
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func highwaySumWideningSpanU32(_ bytes: Span<UInt8>) -> UInt32 {
     let laneCount = HighwayReferenceUInt32.laneCount
-    var total = SIMDUInt32.Vector(raw: HighwayReference.Nothrow.zeroU32())
+    var total = SIMD<UInt32>(raw: HighwayReference.Nothrow.zeroU32())
     var remainingBytesSpan = bytes
     while remainingBytesSpan.count >= laneCount {
-        total = SIMDUInt32.Vector(
+        total = SIMD<UInt32>(
             raw: HighwayReference.Nothrow.addingU32(
                 total.raw,
                 HighwayReferenceUInt32.loadWidening(from: remainingBytesSpan).raw
@@ -229,7 +224,7 @@ public func highwaySumWideningSpanU32(_ bytes: Span<UInt8>) -> UInt32 {
         remainingBytesSpan = unsafe remainingBytesSpan.extracting(unchecked: remainingBytesRange)
     }
     if !remainingBytesSpan.isEmpty {
-        total = SIMDUInt32.Vector(
+        total = SIMD<UInt32>(
             raw: HighwayReference.Nothrow.addingU32(
                 total.raw,
                 HighwayReferenceUInt32.loadFirstWidening(from: remainingBytesSpan).raw
@@ -241,17 +236,14 @@ public func highwaySumWideningSpanU32(_ bytes: Span<UInt8>) -> UInt32 {
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumAboveSpanU32(
-    above t: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>
-) -> SIMDUInt32.Lane {
-    let laneCount = SIMDUInt32.laneCount
-    let threshold = SIMDUInt32.repeating(t)
-    var total: SIMDUInt32.Lane = 0
+public func portSumAboveSpanU32(above t: UInt32, in values: Span<UInt32>) -> UInt32 {
+    let laneCount = SIMD<UInt32>.laneCount
+    let threshold = SIMD<UInt32>.repeating(t)
+    var total: UInt32 = 0
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
-        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
-        total &+= SIMDUInt32.sum(loaded, where: SIMDUInt32.greaterThan(loaded, threshold))
+        let loaded = SIMD<UInt32>.load(from: remainingValuesSpan)
+        total &+= SIMD<UInt32>.sum(loaded, where: SIMD<UInt32>.greaterThan(loaded, threshold))
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
         )
@@ -284,20 +276,20 @@ public func highwaySumAboveSpanU32(above t: UInt32, in values: Span<UInt32>) -> 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portCountEqualAboveSpanU32(
-    above t: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>,
-    matching others: Span<SIMDUInt32.Lane>
+    above t: UInt32,
+    in values: Span<UInt32>,
+    matching others: Span<UInt32>
 ) -> Int {
-    let laneCount = SIMDUInt32.laneCount
-    let threshold = SIMDUInt32.repeating(t)
+    let laneCount = SIMD<UInt32>.laneCount
+    let threshold = SIMD<UInt32>.repeating(t)
     var count = 0
     var remainingValuesSpan = values
     var remainingOthersSpan = others
     while remainingValuesSpan.count >= laneCount && remainingOthersSpan.count >= laneCount {
-        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
-        let other = SIMDUInt32.load(from: remainingOthersSpan)
-        count &+= SIMDUInt32.trueCount(
-            SIMDUInt32.equalTo(loaded, other, where: SIMDUInt32.greaterThan(loaded, threshold))
+        let loaded = SIMD<UInt32>.load(from: remainingValuesSpan)
+        let other = SIMD<UInt32>.load(from: remainingOthersSpan)
+        count &+= SIMD<UInt32>.trueCount(
+            SIMD<UInt32>.equalTo(loaded, other, where: SIMD<UInt32>.greaterThan(loaded, threshold))
         )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
@@ -347,20 +339,20 @@ public func highwayCountEqualAboveSpanU32(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portClampAboveSpanU32(
-    atMost t: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>,
-    into output: inout MutableSpan<SIMDUInt32.Lane>
+    atMost t: UInt32,
+    in values: Span<UInt32>,
+    into output: inout MutableSpan<UInt32>
 ) -> Int {
-    let laneCount = SIMDUInt32.laneCount
-    let limit = SIMDUInt32.repeating(t)
+    let laneCount = SIMD<UInt32>.laneCount
+    let limit = SIMD<UInt32>.repeating(t)
     var remainingValuesSpan = values
     var remainingOutputSpan = output._mutatingExtracting(...)
     while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
-        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
-        SIMDUInt32.store(
+        let loaded = SIMD<UInt32>.load(from: remainingValuesSpan)
+        SIMD<UInt32>.store(
             limit,
             to: &remainingOutputSpan,
-            where: SIMDUInt32.greaterThan(loaded, limit)
+            where: SIMD<UInt32>.greaterThan(loaded, limit)
         )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
@@ -413,18 +405,18 @@ public func highwayClampAboveSpanU32(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portSelectBelowSpanU32(
-    below t: SIMDUInt32.Lane,
-    in values: Span<SIMDUInt32.Lane>,
-    into output: inout MutableSpan<SIMDUInt32.Lane>
+    below t: UInt32,
+    in values: Span<UInt32>,
+    into output: inout MutableSpan<UInt32>
 ) -> Int {
-    let laneCount = SIMDUInt32.laneCount
-    let threshold = SIMDUInt32.repeating(t)
+    let laneCount = SIMD<UInt32>.laneCount
+    let threshold = SIMD<UInt32>.repeating(t)
     var remainingValuesSpan = values
     var remainingOutputSpan = output._mutatingExtracting(...)
     while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
-        let loaded = SIMDUInt32.load(from: remainingValuesSpan)
-        SIMDUInt32.store(
-            SIMDUInt32.selectingOrZero(SIMDUInt32.lessThan(loaded, threshold), loaded),
+        let loaded = SIMD<UInt32>.load(from: remainingValuesSpan)
+        SIMD<UInt32>.store(
+            SIMD<UInt32>.selectingOrZero(SIMD<UInt32>.lessThan(loaded, threshold), loaded),
             to: &remainingOutputSpan
         )
         let remainingValuesRange = unsafe Range<Int>(

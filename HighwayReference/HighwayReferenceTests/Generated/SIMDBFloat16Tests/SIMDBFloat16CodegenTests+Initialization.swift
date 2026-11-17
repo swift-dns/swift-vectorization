@@ -15,7 +15,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func repeating() {
         let mismatches = Mismatches("portRepeatingBF16")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x89A9_3535_958B_D6C7)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x89A9_3535_958B_D6C7)
         for value in valueInputs {
             mismatches.check(
                 portRepeatingBF16(value),
@@ -60,7 +60,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func repeatingWhere() {
         let mismatches = Mismatches("portRepeatingWhereBF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB261_CAF2_AAC4_FE94)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xB261_CBF2_AAC5_0047)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xB261_CBF2_AAC5_0047)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 portRepeatingWhereBF16(value, where: mask),
@@ -86,9 +86,9 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func repeatingWhereOtherwise() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseBF16")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x117A_EE6A_805E_5768)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x117A_EE6A_805E_5768)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x117A_EF6A_805E_591B)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x117A_F06A_805E_5ACE)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x117A_F06A_805E_5ACE)
         for (otherwise, mask, value) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -106,7 +106,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func repeatingWhereOtherwiseConstantValue() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseBF16ConstantValue")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA8A0_4930_5248_8047)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA8A0_4930_5248_8047)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA8A0_4830_5248_7E94)
         for (otherwise, mask) in everyPair(otherwiseInputs, maskInputs) {
             mismatches.check(
@@ -121,7 +121,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func repeatingWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseBF16ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1F36_1706_209E_3C13)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x1F36_1806_209E_3DC6)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x1F36_1806_209E_3DC6)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 portRepeatingWhereOtherwiseBF16ConstantOtherwise(value, where: mask),
@@ -134,7 +134,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func repeatingBlock() {
         let mismatches = Mismatches("portRepeatingBlockBF16")
-        let vectorInputs = Inputs.vectors(H.Vector.self, seed: 0x5A5E_D65A_D33D_0C8E)
+        let vectorInputs = Inputs.vectors(H.self, seed: 0x5A5E_D65A_D33D_0C8E)
         for vector in vectorInputs {
             mismatches.check(
                 portRepeatingBlockBF16(

@@ -10,11 +10,11 @@ extension SIMDFloat16ReferenceTests {
     @Test func isNaNWhere() {
         let mismatches = Mismatches("isNaNWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x63B2_2EE8_89EB_90F0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x63B2_2FE8_89EB_92A3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x63B2_2FE8_89EB_92A3)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.isNaN(a, where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a)),
+                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -24,11 +24,11 @@ extension SIMDFloat16ReferenceTests {
     @Test func isNaNWhereNonCanonical() {
         let mismatches = Mismatches("isNaNWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x4890_BFE8_E391_F0AF)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4890_BEE8_E391_EEFC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4890_BEE8_E391_EEFC)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.isNaN(a, where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a)),
+                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, a.raw)),
                 "mask: \(describe(mask)), a: \(describe(a))"
             )
         }

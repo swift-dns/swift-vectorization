@@ -3,20 +3,20 @@ import Vectorization
 
 @Suite("Resizing vectors and blocks")
 struct ResizeTests {
-    typealias H = SIMDUInt8
-    typealias W = SIMDUInt32
+    typealias H = SIMD<UInt8>
+    typealias W = SIMD<UInt32>
 
     var lanes: Int { H.laneCount }
     var source: ContiguousArray<UInt8> { ContiguousArray((0..<lanes).map { UInt8($0) + 1 }) }
 
-    func bytes(of vector: H.Vector) -> [UInt8] {
+    func bytes(of vector: H) -> [UInt8] {
         var output = ContiguousArray<UInt8>(repeating: 0xFF, count: lanes)
         var destination = output.mutableSpan
         H.store(vector, to: &destination)
         return Array(output)
     }
 
-    func bytes(of vector: W.Vector) -> [UInt8] {
+    func bytes(of vector: W) -> [UInt8] {
         var output = ContiguousArray<UInt32>(repeating: 0xFFFF_FFFF, count: W.laneCount)
         var destination = output.mutableSpan
         W.store(vector, to: &destination)
@@ -147,14 +147,18 @@ struct ResizeTests {
     @Test("Checked block ops trap on an index outside the vector")
     func checkedBlockOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.block(SIMDUInt8.zero(), at: SIMDUInt8.blockCount)
+            _ = SIMD<UInt8>.block(SIMD<UInt8>.zero(), at: SIMD<UInt8>.blockCount)
         }
         await #expect(processExitsWith: .failure) {
-            _ = SIMDUInt8.block(SIMDUInt8.zero(), at: -1)
+            _ = SIMD<UInt8>.block(SIMD<UInt8>.zero(), at: -1)
         }
         await #expect(processExitsWith: .failure) {
-            let block = SIMDUInt8.block(SIMDUInt8.zero(), at: 0)
-            _ = SIMDUInt8.replacingBlock(SIMDUInt8.zero(), at: SIMDUInt8.blockCount, with: block)
+            let block = SIMD<UInt8>.block(SIMD<UInt8>.zero(), at: 0)
+            _ = SIMD<UInt8>.replacingBlock(
+                SIMD<UInt8>.zero(),
+                at: SIMD<UInt8>.blockCount,
+                with: block
+            )
         }
     }
     #endif

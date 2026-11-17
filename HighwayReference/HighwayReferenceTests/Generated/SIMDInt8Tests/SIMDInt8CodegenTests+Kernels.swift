@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDInt8CodegenTests {
     @Test func maskedLowercase() {
         let mismatches = Mismatches("portMaskedLowercaseI8")
-        let vInputs = Inputs.vectors(H.Vector.self, seed: 0xDFF2_7927_9174_EFBA)
+        let vInputs = Inputs.vectors(H.self, seed: 0xDFF2_7927_9174_EFBA)
         for v in vInputs {
             mismatches.check(
                 portMaskedLowercaseI8(v),
@@ -22,7 +22,7 @@ extension SIMDInt8CodegenTests {
 
     @Test func noneAbove() {
         let mismatches = Mismatches("portNoneAboveI8")
-        let vInputs = Inputs.vectors(H.Vector.self, seed: 0x3012_6B20_FF67_723B)
+        let vInputs = Inputs.vectors(H.self, seed: 0x3012_6B20_FF67_723B)
         for v in vInputs {
             mismatches.check(portNoneAboveI8(v), highwayNoneAboveI8(v), "v: \(describe(v))")
         }
@@ -32,12 +32,12 @@ extension SIMDInt8CodegenTests {
     @Test func sumAboveSpan() {
         let mismatches = Mismatches("portSumAboveSpanI8")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0xFB7E_C33B_95CF_5331
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0xFB7E_C23B_95CF_517E)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0xFB7E_C23B_95CF_517E)
         for (values, valuesCount, t) in mixedTriples(
             valuesInputs,
             valuesCountInputs,
@@ -57,18 +57,18 @@ extension SIMDInt8CodegenTests {
     @Test func countEqualAboveSpan() {
         let mismatches = Mismatches("portCountEqualAboveSpanI8")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x3D89_7152_E297_56D5
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
         let othersInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x3D89_6F52_E297_536F
         )
         let othersCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x3D89_7052_E297_5522)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0x3D89_7052_E297_5522)
         for (values, valuesCount, others, othersCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,
@@ -99,18 +99,18 @@ extension SIMDInt8CodegenTests {
     @Test func clampAboveSpan() {
         let mismatches = Mismatches("portClampAboveSpanI8")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x68CA_01AB_EAFA_AFD5
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
         let outputInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x68C9_FFAB_EAFA_AC6F
         )
         let outputCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x68CA_00AB_EAFA_AE22)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0x68CA_00AB_EAFA_AE22)
         for (values, valuesCount, output, outputCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,
@@ -146,18 +146,18 @@ extension SIMDInt8CodegenTests {
     @Test func selectBelowSpan() {
         let mismatches = Mismatches("portSelectBelowSpanI8")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0xCB07_8AF9_B6FB_254E
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
         let outputInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0xCB07_88F9_B6FB_21E8
         )
         let outputCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0xCB07_8BF9_B6FB_2701)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0xCB07_8BF9_B6FB_2701)
         for (values, valuesCount, output, outputCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,

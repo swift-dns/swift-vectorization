@@ -4,161 +4,183 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSumF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Lane {
-    SIMDFloat.sum(a)
+public func portSumF32(_ a: SIMD<Float>) -> Float {
+    SIMD<Float>.sum(a)
 }
 
 @inline(never)
-public func highwaySumF32(_ a: SIMDFloat.Vector) -> Float {
-    HighwayReference.Nothrow.sumF32(a)
+public func highwaySumF32(_ a: SIMD<Float>) -> Float {
+    HighwayReference.Nothrow.sumF32(a.raw)
 }
 
 @inline(never)
-public func portSumF32ConstantA() -> SIMDFloat.Lane {
-    SIMDFloat.sum(SIMDFloat.repeating(1.5))
+public func portSumF32ConstantA() -> Float {
+    SIMD<Float>.sum(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySumF32ConstantA() -> Float {
-    HighwayReference.Nothrow.sumF32(HighwayReference.Nothrow.repeatingF32(1.5))
+    HighwayReference.Nothrow.sumF32(
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portSmallestF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Lane {
-    SIMDFloat.smallest(a)
+public func portSmallestF32(_ a: SIMD<Float>) -> Float {
+    SIMD<Float>.smallest(a)
 }
 
 @inline(never)
-public func highwaySmallestF32(_ a: SIMDFloat.Vector) -> Float {
-    HighwayReference.Nothrow.smallestF32(a)
+public func highwaySmallestF32(_ a: SIMD<Float>) -> Float {
+    HighwayReference.Nothrow.smallestF32(a.raw)
 }
 
 @inline(never)
-public func portSmallestF32ConstantA() -> SIMDFloat.Lane {
-    SIMDFloat.smallest(SIMDFloat.repeating(1.5))
+public func portSmallestF32ConstantA() -> Float {
+    SIMD<Float>.smallest(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySmallestF32ConstantA() -> Float {
-    HighwayReference.Nothrow.smallestF32(HighwayReference.Nothrow.repeatingF32(1.5))
+    HighwayReference.Nothrow.smallestF32(
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portSmallestOrNaNF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Lane {
-    SIMDFloat.smallestOrNaN(a)
+public func portSmallestOrNaNF32(_ a: SIMD<Float>) -> Float {
+    SIMD<Float>.smallestOrNaN(a)
 }
 
 @inline(never)
-public func highwaySmallestOrNaNF32(_ a: SIMDFloat.Vector) -> Float {
-    HighwayReference.Nothrow.smallestOrNaNF32(a)
+public func highwaySmallestOrNaNF32(_ a: SIMD<Float>) -> Float {
+    HighwayReference.Nothrow.smallestOrNaNF32(a.raw)
 }
 
 @inline(never)
-public func portSmallestOrNaNF32ConstantA() -> SIMDFloat.Lane {
-    SIMDFloat.smallestOrNaN(SIMDFloat.repeating(1.5))
+public func portSmallestOrNaNF32ConstantA() -> Float {
+    SIMD<Float>.smallestOrNaN(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwaySmallestOrNaNF32ConstantA() -> Float {
-    HighwayReference.Nothrow.smallestOrNaNF32(HighwayReference.Nothrow.repeatingF32(1.5))
+    HighwayReference.Nothrow.smallestOrNaNF32(
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portLargestF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Lane {
-    SIMDFloat.largest(a)
+public func portLargestF32(_ a: SIMD<Float>) -> Float {
+    SIMD<Float>.largest(a)
 }
 
 @inline(never)
-public func highwayLargestF32(_ a: SIMDFloat.Vector) -> Float {
-    HighwayReference.Nothrow.largestF32(a)
+public func highwayLargestF32(_ a: SIMD<Float>) -> Float {
+    HighwayReference.Nothrow.largestF32(a.raw)
 }
 
 @inline(never)
-public func portLargestF32ConstantA() -> SIMDFloat.Lane {
-    SIMDFloat.largest(SIMDFloat.repeating(1.5))
+public func portLargestF32ConstantA() -> Float {
+    SIMD<Float>.largest(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayLargestF32ConstantA() -> Float {
-    HighwayReference.Nothrow.largestF32(HighwayReference.Nothrow.repeatingF32(1.5))
+    HighwayReference.Nothrow.largestF32(
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portLargestOrNaNF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Lane {
-    SIMDFloat.largestOrNaN(a)
+public func portLargestOrNaNF32(_ a: SIMD<Float>) -> Float {
+    SIMD<Float>.largestOrNaN(a)
 }
 
 @inline(never)
-public func highwayLargestOrNaNF32(_ a: SIMDFloat.Vector) -> Float {
-    HighwayReference.Nothrow.largestOrNaNF32(a)
+public func highwayLargestOrNaNF32(_ a: SIMD<Float>) -> Float {
+    HighwayReference.Nothrow.largestOrNaNF32(a.raw)
 }
 
 @inline(never)
-public func portLargestOrNaNF32ConstantA() -> SIMDFloat.Lane {
-    SIMDFloat.largestOrNaN(SIMDFloat.repeating(1.5))
+public func portLargestOrNaNF32ConstantA() -> Float {
+    SIMD<Float>.largestOrNaN(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayLargestOrNaNF32ConstantA() -> Float {
-    HighwayReference.Nothrow.largestOrNaNF32(HighwayReference.Nothrow.repeatingF32(1.5))
+    HighwayReference.Nothrow.largestOrNaNF32(
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portRepeatingSumF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.repeatingSum(a)
+public func portRepeatingSumF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.repeatingSum(a)
 }
 
 @inline(never)
-public func highwayRepeatingSumF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.repeatingSumF32(a)
+public func highwayRepeatingSumF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.repeatingSumF32(a.raw))
 }
 
 @inline(never)
-public func portRepeatingSumF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.repeatingSum(SIMDFloat.repeating(1.5))
+public func portRepeatingSumF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.repeatingSum(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRepeatingSumF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.repeatingSumF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayRepeatingSumF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.repeatingSumF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
-public func portRepeatingSmallestF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.repeatingSmallest(a)
+public func portRepeatingSmallestF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.repeatingSmallest(a)
 }
 
 @inline(never)
-public func highwayRepeatingSmallestF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.repeatingSmallestF32(a)
+public func highwayRepeatingSmallestF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.repeatingSmallestF32(a.raw))
 }
 
 @inline(never)
-public func portRepeatingSmallestF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.repeatingSmallest(SIMDFloat.repeating(1.5))
+public func portRepeatingSmallestF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.repeatingSmallest(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRepeatingSmallestF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.repeatingSmallestF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayRepeatingSmallestF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.repeatingSmallestF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
-public func portRepeatingLargestF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.repeatingLargest(a)
+public func portRepeatingLargestF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.repeatingLargest(a)
 }
 
 @inline(never)
-public func highwayRepeatingLargestF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.repeatingLargestF32(a)
+public func highwayRepeatingLargestF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.repeatingLargestF32(a.raw))
 }
 
 @inline(never)
-public func portRepeatingLargestF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.repeatingLargest(SIMDFloat.repeating(1.5))
+public func portRepeatingLargestF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.repeatingLargest(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRepeatingLargestF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.repeatingLargestF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayRepeatingLargestF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.repeatingLargestF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }

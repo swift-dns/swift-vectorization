@@ -7,21 +7,19 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkMultiplyAddingConstantA(_ value: H.Lane) {
+    private func checkMultiplyAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x70B3_6A2B_D87E_F527)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x70B3_6B2B_D87E_F6DA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x70B3_6A2B_D87E_F527)
+        let cInputs = Inputs.vectors(H.self, seed: 0x70B3_6B2B_D87E_F6DA)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.multiplyAdding(H.repeating(value), b, c),
-                H.Vector(
-                    raw: HighwayReference.multiplyAddingI64(H.repeating(value).raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.multiplyAddingI64(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -29,21 +27,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingConstantB(_ value: H.Lane) {
+    private func checkMultiplyAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7A22_002B_DE0E_6969)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7A21_FE2B_DE0E_6603)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7A22_002B_DE0E_6969)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7A21_FE2B_DE0E_6603)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.multiplyAdding(a, H.repeating(value), c),
-                H.Vector(
-                    raw: HighwayReference.multiplyAddingI64(a.raw, H.repeating(value).raw, c.raw)
-                ),
+                H(raw: HighwayReference.multiplyAddingI64(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -51,21 +47,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingConstantC(_ value: H.Lane) {
+    private func checkMultiplyAddingConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplyAdding with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8323_B72B_E341_43DE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8323_B82B_E341_4591)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8323_B72B_E341_43DE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8323_B82B_E341_4591)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyAdding(a, b, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.multiplyAddingI64(a.raw, b.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.multiplyAddingI64(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -175,31 +169,31 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func multiplyAddingConstantSplatMax() {
-        checkMultiplyAddingConstantA(H.Lane.max)
-        checkMultiplyAddingConstantB(H.Lane.max)
-        checkMultiplyAddingConstantC(H.Lane.max)
+        checkMultiplyAddingConstantA(Lane.max)
+        checkMultiplyAddingConstantB(Lane.max)
+        checkMultiplyAddingConstantC(Lane.max)
     }
 
     @Test func multiplyAddingConstantSplatMin() {
-        checkMultiplyAddingConstantA(H.Lane.min)
-        checkMultiplyAddingConstantB(H.Lane.min)
-        checkMultiplyAddingConstantC(H.Lane.min)
+        checkMultiplyAddingConstantA(Lane.min)
+        checkMultiplyAddingConstantB(Lane.min)
+        checkMultiplyAddingConstantC(Lane.min)
     }
 
     @inline(__always)
-    private func checkNegatedMultiplyAddingConstantA(_ value: H.Lane) {
+    private func checkNegatedMultiplyAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplyAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEB10_6894_51E2_E06F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xEB10_6994_51E2_E222)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEB10_6894_51E2_E06F)
+        let cInputs = Inputs.vectors(H.self, seed: 0xEB10_6994_51E2_E222)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.negatedMultiplyAdding(H.repeating(value), b, c),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplyAddingI64(
                         H.repeating(value).raw,
                         b.raw,
@@ -213,19 +207,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplyAddingConstantB(_ value: H.Lane) {
+    private func checkNegatedMultiplyAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplyAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF47F_1E94_5772_8B11)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF47F_1C94_5772_87AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF47F_1E94_5772_8B11)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF47F_1C94_5772_87AB)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, H.repeating(value), c),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplyAddingI64(
                         a.raw,
                         H.repeating(value).raw,
@@ -239,19 +233,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplyAddingConstantC(_ value: H.Lane) {
+    private func checkNegatedMultiplyAddingConstantC(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplyAdding with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFD14_3594_5C49_36C6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFD14_3694_5C49_3879)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFD14_3594_5C49_36C6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFD14_3694_5C49_3879)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplyAddingI64(
                         a.raw,
                         b.raw,
@@ -367,31 +361,31 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func negatedMultiplyAddingConstantSplatMax() {
-        checkNegatedMultiplyAddingConstantA(H.Lane.max)
-        checkNegatedMultiplyAddingConstantB(H.Lane.max)
-        checkNegatedMultiplyAddingConstantC(H.Lane.max)
+        checkNegatedMultiplyAddingConstantA(Lane.max)
+        checkNegatedMultiplyAddingConstantB(Lane.max)
+        checkNegatedMultiplyAddingConstantC(Lane.max)
     }
 
     @Test func negatedMultiplyAddingConstantSplatMin() {
-        checkNegatedMultiplyAddingConstantA(H.Lane.min)
-        checkNegatedMultiplyAddingConstantB(H.Lane.min)
-        checkNegatedMultiplyAddingConstantC(H.Lane.min)
+        checkNegatedMultiplyAddingConstantA(Lane.min)
+        checkNegatedMultiplyAddingConstantB(Lane.min)
+        checkNegatedMultiplyAddingConstantC(Lane.min)
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingConstantA(_ value: H.Lane) {
+    private func checkMultiplySubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEBE0_35A4_56C3_A85E)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xEBE0_34A4_56C3_A6AB)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEBE0_35A4_56C3_A85E)
+        let cInputs = Inputs.vectors(H.self, seed: 0xEBE0_34A4_56C3_A6AB)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.multiplySubtracting(H.repeating(value), b, c),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingI64(
                         H.repeating(value).raw,
                         b.raw,
@@ -405,19 +399,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingConstantB(_ value: H.Lane) {
+    private func checkMultiplySubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE271_7FA4_5133_FDBC)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE271_81A4_5134_0122)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE271_7FA4_5133_FDBC)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE271_81A4_5134_0122)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.multiplySubtracting(a, H.repeating(value), c),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingI64(
                         a.raw,
                         H.repeating(value).raw,
@@ -431,19 +425,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingConstantC(_ value: H.Lane) {
+    private func checkMultiplySubtractingConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtracting with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD9DC_68A4_4C5D_5207)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD9DC_67A4_4C5D_5054)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD9DC_68A4_4C5D_5207)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD9DC_67A4_4C5D_5054)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplySubtracting(a, b, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingI64(
                         a.raw,
                         b.raw,
@@ -559,31 +553,31 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func multiplySubtractingConstantSplatMax() {
-        checkMultiplySubtractingConstantA(H.Lane.max)
-        checkMultiplySubtractingConstantB(H.Lane.max)
-        checkMultiplySubtractingConstantC(H.Lane.max)
+        checkMultiplySubtractingConstantA(Lane.max)
+        checkMultiplySubtractingConstantB(Lane.max)
+        checkMultiplySubtractingConstantC(Lane.max)
     }
 
     @Test func multiplySubtractingConstantSplatMin() {
-        checkMultiplySubtractingConstantA(H.Lane.min)
-        checkMultiplySubtractingConstantB(H.Lane.min)
-        checkMultiplySubtractingConstantC(H.Lane.min)
+        checkMultiplySubtractingConstantA(Lane.min)
+        checkMultiplySubtractingConstantB(Lane.min)
+        checkMultiplySubtractingConstantC(Lane.min)
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingConstantA(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplySubtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE2DA_E9A4_13CC_5D96)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE2DA_E8A4_13CC_5BE3)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE2DA_E9A4_13CC_5D96)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE2DA_E8A4_13CC_5BE3)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.negatedMultiplySubtracting(H.repeating(value), b, c),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingI64(
                         H.repeating(value).raw,
                         b.raw,
@@ -597,19 +591,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingConstantB(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplySubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDB1F_53A4_0FAE_7DD4)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDB1F_55A4_0FAE_813A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDB1F_53A4_0FAE_7DD4)
+        let cInputs = Inputs.vectors(H.self, seed: 0xDB1F_55A4_0FAE_813A)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, H.repeating(value), c),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingI64(
                         a.raw,
                         H.repeating(value).raw,
@@ -623,19 +617,19 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingConstantC(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingConstantC(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplySubtracting with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD28A_1CA4_0AD7_9BBF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD28A_1BA4_0AD7_9A0C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD28A_1CA4_0AD7_9BBF)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD28A_1BA4_0AD7_9A0C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingI64(
                         a.raw,
                         b.raw,
@@ -751,14 +745,14 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func negatedMultiplySubtractingConstantSplatMax() {
-        checkNegatedMultiplySubtractingConstantA(H.Lane.max)
-        checkNegatedMultiplySubtractingConstantB(H.Lane.max)
-        checkNegatedMultiplySubtractingConstantC(H.Lane.max)
+        checkNegatedMultiplySubtractingConstantA(Lane.max)
+        checkNegatedMultiplySubtractingConstantB(Lane.max)
+        checkNegatedMultiplySubtractingConstantC(Lane.max)
     }
 
     @Test func negatedMultiplySubtractingConstantSplatMin() {
-        checkNegatedMultiplySubtractingConstantA(H.Lane.min)
-        checkNegatedMultiplySubtractingConstantB(H.Lane.min)
-        checkNegatedMultiplySubtractingConstantC(H.Lane.min)
+        checkNegatedMultiplySubtractingConstantA(Lane.min)
+        checkNegatedMultiplySubtractingConstantB(Lane.min)
+        checkNegatedMultiplySubtractingConstantC(Lane.min)
     }
 }

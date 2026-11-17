@@ -7,23 +7,23 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseOrWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD2C0_A91A_4F85_4010)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD2C0_AC1A_4F85_4529)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD2C0_AB1A_4F85_4376)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD2C0_AC1A_4F85_4529)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD2C0_AB1A_4F85_4376)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x8F15_F93B_DD02_D8C5)
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseOrWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -86,27 +86,27 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func bitwiseOrWhereOtherwiseConstantSplatMax() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkBitwiseOrWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseXorWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8194_F18B_5056_9A00)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8194_F48B_5056_9F19)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8194_F38B_5056_9D66)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8194_F48B_5056_9F19)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8194_F38B_5056_9D66)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x63DF_026A_553B_5175)
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseXorWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -169,15 +169,15 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func bitwiseXorWhereOtherwiseConstantSplatMax() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkBitwiseXorWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkAllBitsSetConstantA(_ value: H.Lane) {
+    private func checkAllBitsSetConstantA(_ value: Lane) {
         let mismatches = Mismatches("allBitsSet with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
@@ -237,15 +237,15 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func allBitsSetConstantSplatMax() {
-        checkAllBitsSetConstantA(H.Lane.max)
+        checkAllBitsSetConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkAllBitsClearConstantA(_ value: H.Lane) {
+    private func checkAllBitsClearConstantA(_ value: Lane) {
         let mismatches = Mismatches("allBitsClear with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
@@ -305,20 +305,20 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func allBitsClearConstantSplatMax() {
-        checkAllBitsClearConstantA(H.Lane.max)
+        checkAllBitsClearConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkNonzeroBitCountConstantA(_ value: H.Lane) {
+    private func checkNonzeroBitCountConstantA(_ value: Lane) {
         let mismatches = Mismatches("nonzeroBitCount with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
             H.nonzeroBitCount(H.repeating(value)),
-            H.Vector(raw: HighwayReference.nonzeroBitCountU64(H.repeating(value).raw)),
+            H(raw: HighwayReference.nonzeroBitCountU64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -373,20 +373,20 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func nonzeroBitCountConstantSplatMax() {
-        checkNonzeroBitCountConstantA(H.Lane.max)
+        checkNonzeroBitCountConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkLeadingZeroBitCountConstantA(_ value: H.Lane) {
+    private func checkLeadingZeroBitCountConstantA(_ value: Lane) {
         let mismatches = Mismatches("leadingZeroBitCount with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
             H.leadingZeroBitCount(H.repeating(value)),
-            H.Vector(raw: HighwayReference.leadingZeroBitCountU64(H.repeating(value).raw)),
+            H(raw: HighwayReference.leadingZeroBitCountU64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -441,20 +441,20 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func leadingZeroBitCountConstantSplatMax() {
-        checkLeadingZeroBitCountConstantA(H.Lane.max)
+        checkLeadingZeroBitCountConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkTrailingZeroBitCountConstantA(_ value: H.Lane) {
+    private func checkTrailingZeroBitCountConstantA(_ value: Lane) {
         let mismatches = Mismatches("trailingZeroBitCount with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
             H.trailingZeroBitCount(H.repeating(value)),
-            H.Vector(raw: HighwayReference.trailingZeroBitCountU64(H.repeating(value).raw)),
+            H(raw: HighwayReference.trailingZeroBitCountU64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -509,20 +509,20 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func trailingZeroBitCountConstantSplatMax() {
-        checkTrailingZeroBitCountConstantA(H.Lane.max)
+        checkTrailingZeroBitCountConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkHighestSetBitIndexConstantA(_ value: H.Lane) {
+    private func checkHighestSetBitIndexConstantA(_ value: Lane) {
         let mismatches = Mismatches("highestSetBitIndex with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
             H.highestSetBitIndex(H.repeating(value)),
-            H.Vector(raw: HighwayReference.highestSetBitIndexU64(H.repeating(value).raw)),
+            H(raw: HighwayReference.highestSetBitIndexU64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -577,6 +577,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func highestSetBitIndexConstantSplatMax() {
-        checkHighestSetBitIndexConstantA(H.Lane.max)
+        checkHighestSetBitIndexConstantA(Lane.max)
     }
 }

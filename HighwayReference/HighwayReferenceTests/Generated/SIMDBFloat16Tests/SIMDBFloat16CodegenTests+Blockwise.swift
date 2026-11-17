@@ -9,9 +9,9 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func tableLookupBytes() {
         let mismatches = Mismatches("portTableLookupBytesBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x07B2_2B70_A5C1_B345)
+        let aInputs = Inputs.vectors(H.self, seed: 0x07B2_2B70_A5C1_B345)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0x07B2_2A70_A5C1_B192,
@@ -30,7 +30,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func tableLookupBytesConstantA() {
         let mismatches = Mismatches("portTableLookupBytesBF16ConstantA")
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0x8662_57F4_7EC2_3B29,
@@ -48,7 +48,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func tableLookupBytesConstantIndices() {
         let mismatches = Mismatches("portTableLookupBytesBF16ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9CC8_AECC_F94B_B1F8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9CC8_AECC_F94B_B1F8)
         for a in aInputs {
             mismatches.check(
                 portTableLookupBytesBF16ConstantIndices(a),
@@ -61,9 +61,9 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func tableLookupBytesOrZero() {
         let mismatches = Mismatches("portTableLookupBytesOrZeroBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2426_3074_EC4A_568E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2426_3074_EC4A_568E)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -83,7 +83,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func tableLookupBytesOrZeroConstantA() {
         let mismatches = Mismatches("portTableLookupBytesOrZeroBF16ConstantA")
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -102,7 +102,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func tableLookupBytesOrZeroConstantIndices() {
         let mismatches = Mismatches("portTableLookupBytesOrZeroBF16ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7466_8693_91CE_F791)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7466_8693_91CE_F791)
         for a in aInputs {
             mismatches.check(
                 portTableLookupBytesOrZeroBF16ConstantIndices(a),

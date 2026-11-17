@@ -8,16 +8,20 @@ import Vectorization
 extension SIMDFloatConstantTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkVectorWideningLowerFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkVectorWideningLowerFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("vectorWideningLowerFromFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningLower: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorWideningLowerF16ToF32(SIMDFloat16.repeating(value)),
+            H.vector(wideningLower: SIMD<Float16>.repeating(value)),
+            H(
+                raw: HighwayReference.vectorWideningLowerF16ToF32(
+                    SIMD<Float16>.repeating(value).raw
+                )
+            ),
             ""
         )
         mismatches.record()
@@ -110,7 +114,7 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningLowerFromFloat16ConstantSplatPayloadNaN() {
-        checkVectorWideningLowerFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkVectorWideningLowerFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -140,16 +144,20 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkVectorWideningUpperFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkVectorWideningUpperFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("vectorWideningUpperFromFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningUpper: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorWideningUpperF16ToF32(SIMDFloat16.repeating(value)),
+            H.vector(wideningUpper: SIMD<Float16>.repeating(value)),
+            H(
+                raw: HighwayReference.vectorWideningUpperF16ToF32(
+                    SIMD<Float16>.repeating(value).raw
+                )
+            ),
             ""
         )
         mismatches.record()
@@ -242,7 +250,7 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningUpperFromFloat16ConstantSplatPayloadNaN() {
-        checkVectorWideningUpperFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkVectorWideningUpperFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -272,16 +280,16 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkVectorWideningEvenFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkVectorWideningEvenFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("vectorWideningEvenFromFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningEven: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorWideningEvenF16ToF32(SIMDFloat16.repeating(value)),
+            H.vector(wideningEven: SIMD<Float16>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningEvenF16ToF32(SIMD<Float16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -374,7 +382,7 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningEvenFromFloat16ConstantSplatPayloadNaN() {
-        checkVectorWideningEvenFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkVectorWideningEvenFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -404,16 +412,16 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkVectorWideningOddFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkVectorWideningOddFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("vectorWideningOddFromFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningOdd: SIMDFloat16.repeating(value)),
-            HighwayReference.vectorWideningOddF16ToF32(SIMDFloat16.repeating(value)),
+            H.vector(wideningOdd: SIMD<Float16>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningOddF16ToF32(SIMD<Float16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -506,7 +514,7 @@ extension SIMDFloatConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorWideningOddFromFloat16ConstantSplatPayloadNaN() {
-        checkVectorWideningOddFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkVectorWideningOddFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -535,374 +543,390 @@ extension SIMDFloatConstantTests {
     #endif
 
     @inline(__always)
-    private func checkVectorWideningLowerFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkVectorWideningLowerFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches(
             "vectorWideningLowerFromBFloat16 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningLower: SIMDBFloat16.repeating(value)),
-            HighwayReference.vectorWideningLowerBF16ToF32(SIMDBFloat16.repeating(value).raw),
+            H.vector(wideningLower: SIMD<BFloat16>.repeating(value)),
+            H(
+                raw: HighwayReference.vectorWideningLowerBF16ToF32(
+                    SIMD<BFloat16>.repeating(value).raw
+                )
+            ),
             ""
         )
         mismatches.record()
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatZero() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatNegativeZero() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatOne() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatMinusOne() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatTwo() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatHalf() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatFour() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatQuarter() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatOnePointFive() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatInfinity() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatMinusInfinity() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatNaN() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatMinusNaN() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatPayloadNaN() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatSignalingNaN() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatLeastNonzero() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func vectorWideningLowerFromBFloat16ConstantSplatGreatest() {
-        checkVectorWideningLowerFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkVectorWideningLowerFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkVectorWideningUpperFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkVectorWideningUpperFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches(
             "vectorWideningUpperFromBFloat16 with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningUpper: SIMDBFloat16.repeating(value)),
-            HighwayReference.vectorWideningUpperBF16ToF32(SIMDBFloat16.repeating(value).raw),
+            H.vector(wideningUpper: SIMD<BFloat16>.repeating(value)),
+            H(
+                raw: HighwayReference.vectorWideningUpperBF16ToF32(
+                    SIMD<BFloat16>.repeating(value).raw
+                )
+            ),
             ""
         )
         mismatches.record()
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatZero() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatNegativeZero() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatOne() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatMinusOne() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatTwo() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatHalf() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatFour() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatQuarter() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatOnePointFive() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatInfinity() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatMinusInfinity() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatNaN() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatMinusNaN() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatPayloadNaN() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatSignalingNaN() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatLeastNonzero() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func vectorWideningUpperFromBFloat16ConstantSplatGreatest() {
-        checkVectorWideningUpperFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkVectorWideningUpperFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkVectorWideningEvenFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkVectorWideningEvenFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches("vectorWideningEvenFromBFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningEven: SIMDBFloat16.repeating(value)),
-            HighwayReference.vectorWideningEvenBF16ToF32(SIMDBFloat16.repeating(value).raw),
+            H.vector(wideningEven: SIMD<BFloat16>.repeating(value)),
+            H(
+                raw: HighwayReference.vectorWideningEvenBF16ToF32(
+                    SIMD<BFloat16>.repeating(value).raw
+                )
+            ),
             ""
         )
         mismatches.record()
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatZero() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatNegativeZero() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatOne() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatMinusOne() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatTwo() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatHalf() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatFour() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatQuarter() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatOnePointFive() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatInfinity() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatMinusInfinity() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatNaN() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatMinusNaN() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatPayloadNaN() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatSignalingNaN() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatLeastNonzero() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func vectorWideningEvenFromBFloat16ConstantSplatGreatest() {
-        checkVectorWideningEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkVectorWideningEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkVectorWideningOddFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkVectorWideningOddFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches("vectorWideningOddFromBFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningOdd: SIMDBFloat16.repeating(value)),
-            HighwayReference.vectorWideningOddBF16ToF32(SIMDBFloat16.repeating(value).raw),
+            H.vector(wideningOdd: SIMD<BFloat16>.repeating(value)),
+            H(
+                raw: HighwayReference.vectorWideningOddBF16ToF32(
+                    SIMD<BFloat16>.repeating(value).raw
+                )
+            ),
             ""
         )
         mismatches.record()
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatZero() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatNegativeZero() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatOne() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatMinusOne() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatTwo() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatHalf() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatFour() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatQuarter() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatOnePointFive() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatInfinity() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatMinusInfinity() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatNaN() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatMinusNaN() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatPayloadNaN() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatSignalingNaN() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatLeastNonzero() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func vectorWideningOddFromBFloat16ConstantSplatGreatest() {
-        checkVectorWideningOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkVectorWideningOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 }

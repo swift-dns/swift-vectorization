@@ -4,68 +4,70 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSumWhereF64(_ a: SIMDDouble.Vector, where mask: SIMDDouble.Mask) -> SIMDDouble.Lane
-{
-    SIMDDouble.sum(a, where: mask)
+public func portSumWhereF64(_ a: SIMD<Double>, where mask: SIMD<Double>.Mask) -> Double {
+    SIMD<Double>.sum(a, where: mask)
 }
 
 @inline(never)
-public func highwaySumWhereF64(_ a: SIMDDouble.Vector, where mask: SIMDDouble.Mask) -> Double {
-    HighwayReference.Nothrow.sumWhereF64(mask.raw, a)
+public func highwaySumWhereF64(_ a: SIMD<Double>, where mask: SIMD<Double>.Mask) -> Double {
+    HighwayReference.Nothrow.sumWhereF64(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portSumWhereF64ConstantA(where mask: SIMDDouble.Mask) -> SIMDDouble.Lane {
-    SIMDDouble.sum(SIMDDouble.repeating(1.5), where: mask)
+public func portSumWhereF64ConstantA(where mask: SIMD<Double>.Mask) -> Double {
+    SIMD<Double>.sum(SIMD<Double>.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwaySumWhereF64ConstantA(where mask: SIMDDouble.Mask) -> Double {
-    HighwayReference.Nothrow.sumWhereF64(mask.raw, HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwaySumWhereF64ConstantA(where mask: SIMD<Double>.Mask) -> Double {
+    HighwayReference.Nothrow.sumWhereF64(
+        mask.raw,
+        SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portSmallestWhereF64(
-    _ a: SIMDDouble.Vector,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Lane {
-    SIMDDouble.smallest(a, where: mask)
+public func portSmallestWhereF64(_ a: SIMD<Double>, where mask: SIMD<Double>.Mask) -> Double {
+    SIMD<Double>.smallest(a, where: mask)
 }
 
 @inline(never)
-public func highwaySmallestWhereF64(_ a: SIMDDouble.Vector, where mask: SIMDDouble.Mask) -> Double {
-    HighwayReference.Nothrow.smallestWhereF64(mask.raw, a)
+public func highwaySmallestWhereF64(_ a: SIMD<Double>, where mask: SIMD<Double>.Mask) -> Double {
+    HighwayReference.Nothrow.smallestWhereF64(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portSmallestWhereF64ConstantA(where mask: SIMDDouble.Mask) -> SIMDDouble.Lane {
-    SIMDDouble.smallest(SIMDDouble.repeating(1.5), where: mask)
+public func portSmallestWhereF64ConstantA(where mask: SIMD<Double>.Mask) -> Double {
+    SIMD<Double>.smallest(SIMD<Double>.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwaySmallestWhereF64ConstantA(where mask: SIMDDouble.Mask) -> Double {
-    HighwayReference.Nothrow.smallestWhereF64(mask.raw, HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwaySmallestWhereF64ConstantA(where mask: SIMD<Double>.Mask) -> Double {
+    HighwayReference.Nothrow.smallestWhereF64(
+        mask.raw,
+        SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portLargestWhereF64(
-    _ a: SIMDDouble.Vector,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Lane {
-    SIMDDouble.largest(a, where: mask)
+public func portLargestWhereF64(_ a: SIMD<Double>, where mask: SIMD<Double>.Mask) -> Double {
+    SIMD<Double>.largest(a, where: mask)
 }
 
 @inline(never)
-public func highwayLargestWhereF64(_ a: SIMDDouble.Vector, where mask: SIMDDouble.Mask) -> Double {
-    HighwayReference.Nothrow.largestWhereF64(mask.raw, a)
+public func highwayLargestWhereF64(_ a: SIMD<Double>, where mask: SIMD<Double>.Mask) -> Double {
+    HighwayReference.Nothrow.largestWhereF64(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portLargestWhereF64ConstantA(where mask: SIMDDouble.Mask) -> SIMDDouble.Lane {
-    SIMDDouble.largest(SIMDDouble.repeating(1.5), where: mask)
+public func portLargestWhereF64ConstantA(where mask: SIMD<Double>.Mask) -> Double {
+    SIMD<Double>.largest(SIMD<Double>.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwayLargestWhereF64ConstantA(where mask: SIMDDouble.Mask) -> Double {
-    HighwayReference.Nothrow.largestWhereF64(mask.raw, HighwayReference.Nothrow.repeatingF64(1.5))
+public func highwayLargestWhereF64ConstantA(where mask: SIMD<Double>.Mask) -> Double {
+    HighwayReference.Nothrow.largestWhereF64(
+        mask.raw,
+        SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+    )
 }

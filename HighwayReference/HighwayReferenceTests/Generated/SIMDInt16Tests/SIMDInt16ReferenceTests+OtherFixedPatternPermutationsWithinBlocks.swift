@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDInt16ReferenceTests {
     @Test func oddEven() {
         let mismatches = Mismatches("oddEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x298D_A632_B4FF_B22A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x298D_A732_B4FF_B3DD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x298D_A632_B4FF_B22A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x298D_A732_B4FF_B3DD)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEven(a, b),
-                H.Vector(raw: HighwayReference.oddEvenI16(a.raw, b.raw)),
+                H(raw: HighwayReference.oddEvenI16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,11 +22,11 @@ extension SIMDInt16ReferenceTests {
 
     @Test func duplicatingEven() {
         let mismatches = Mismatches("duplicatingEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFCA8_D9DE_2144_6D75)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFCA8_D9DE_2144_6D75)
         for a in aInputs {
             mismatches.check(
                 H.duplicatingEven(a),
-                H.Vector(raw: HighwayReference.duplicatingEvenI16(a.raw)),
+                H(raw: HighwayReference.duplicatingEvenI16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -35,11 +35,11 @@ extension SIMDInt16ReferenceTests {
 
     @Test func duplicatingOdd() {
         let mismatches = Mismatches("duplicatingOdd")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3F9F_5A0F_3387_EA04)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3F9F_5A0F_3387_EA04)
         for a in aInputs {
             mismatches.check(
                 H.duplicatingOdd(a),
-                H.Vector(raw: HighwayReference.duplicatingOddI16(a.raw)),
+                H(raw: HighwayReference.duplicatingOddI16(a.raw)),
                 "a: \(describe(a))"
             )
         }

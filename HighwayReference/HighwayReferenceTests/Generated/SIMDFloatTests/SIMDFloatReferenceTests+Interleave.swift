@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func interleavingLower() {
         let mismatches = Mismatches("interleavingLower")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x110F_4470_E88E_DD3F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x110F_4370_E88E_DB8C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x110F_4470_E88E_DD3F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x110F_4370_E88E_DB8C)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingLower(a, b),
-                HighwayReference.interleavingLowerF32(a, b),
+                H(raw: HighwayReference.interleavingLowerF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func interleavingUpper() {
         let mismatches = Mismatches("interleavingUpper")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5B6E_729C_D9F3_3F22)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5B6E_739C_D9F3_40D5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5B6E_729C_D9F3_3F22)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5B6E_739C_D9F3_40D5)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingUpper(a, b),
-                HighwayReference.interleavingUpperF32(a, b),
+                H(raw: HighwayReference.interleavingUpperF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func interleavingEven() {
         let mismatches = Mismatches("interleavingEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF281_0634_662A_6278)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF281_0734_662A_642B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF281_0634_662A_6278)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF281_0734_662A_642B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingEven(a, b),
-                HighwayReference.interleavingEvenF32(a, b),
+                H(raw: HighwayReference.interleavingEvenF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func interleavingOdd() {
         let mismatches = Mismatches("interleavingOdd")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1CBA_4A1D_564C_8D73)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1CBA_491D_564C_8BC0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1CBA_4A1D_564C_8D73)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1CBA_491D_564C_8BC0)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.interleavingOdd(a, b),
-                HighwayReference.interleavingOddF32(a, b),
+                H(raw: HighwayReference.interleavingOddF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

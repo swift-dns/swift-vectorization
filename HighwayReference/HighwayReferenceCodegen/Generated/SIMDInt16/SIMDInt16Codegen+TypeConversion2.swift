@@ -4,378 +4,377 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portVectorResizingI64ToI16(resizing a: SIMDInt64.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingI64ToI16(resizing a: SIMD<Int64>) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
-public func highwayVectorResizingI64ToI16(resizing a: SIMDInt64.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingI64ToI16(a.raw))
+public func highwayVectorResizingI64ToI16(resizing a: SIMD<Int64>) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingI64ToI16(a.raw))
 }
 
 @inline(never)
-public func portVectorResizingI64ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: SIMDInt64.repeating(26))
+public func portVectorResizingI64ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayVectorResizingI64ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorResizingI64ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorResizingI64ToI16(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portHalfVectorResizingI64ToI16(resizing a: SIMDInt64.Vector) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+public func portHalfVectorResizingI64ToI16(resizing a: SIMD<Int64>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @inline(never)
-public func highwayHalfVectorResizingI64ToI16(resizing a: SIMDInt64.Vector) -> SIMDInt16.HalfVector
-{
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingI64ToI16(a.raw))
+public func highwayHalfVectorResizingI64ToI16(resizing a: SIMD<Int64>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingI64ToI16(a.raw))
 }
 
 @inline(never)
-public func portHalfVectorResizingI64ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: SIMDInt64.repeating(26))
+public func portHalfVectorResizingI64ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayHalfVectorResizingI64ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorResizingI64ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorResizingI64ToI16(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portQuarterVectorResizingI64ToI16(
-    resizing a: SIMDInt64.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+public func portQuarterVectorResizingI64ToI16(resizing a: SIMD<Int64>) -> SIMD<Int16>.QuarterVector
+{
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingI64ToI16(
-    resizing a: SIMDInt64.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingI64ToI16(a.raw))
+    resizing a: SIMD<Int64>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingI64ToI16(a.raw))
 }
 
 @inline(never)
-public func portQuarterVectorResizingI64ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: SIMDInt64.repeating(26))
+public func portQuarterVectorResizingI64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayQuarterVectorResizingI64ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+public func highwayQuarterVectorResizingI64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorResizingI64ToI16(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portVectorResizingHalfI64ToI16(resizing a: SIMDInt64.HalfVector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingHalfI64ToI16(resizing a: SIMD<Int64>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
-public func highwayVectorResizingHalfI64ToI16(resizing a: SIMDInt64.HalfVector) -> SIMDInt16.Vector
-{
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingHalfI64ToI16(a.raw))
+public func highwayVectorResizingHalfI64ToI16(resizing a: SIMD<Int64>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingHalfI64ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorResizingHalfI64ToI16(
-    resizing a: SIMDInt64.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+    resizing a: SIMD<Int64>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorResizingHalfI64ToI16(
-    resizing a: SIMDInt64.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfI64ToI16(a.raw))
+    resizing a: SIMD<Int64>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfI64ToI16(a.raw))
 }
 
 @inline(never)
 public func portQuarterVectorResizingHalfI64ToI16(
-    resizing a: SIMDInt64.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<Int64>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingHalfI64ToI16(
-    resizing a: SIMDInt64.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingHalfI64ToI16(a.raw))
+    resizing a: SIMD<Int64>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
+        raw: HighwayReference.Nothrow.quarterVectorResizingHalfI64ToI16(a.raw)
+    )
 }
 
 @inline(never)
-public func portVectorResizingF32ToI16(resizing a: SIMDFloat.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingF32ToI16(resizing a: SIMD<Float>) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
-public func highwayVectorResizingF32ToI16(resizing a: SIMDFloat.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingF32ToI16(a))
+public func highwayVectorResizingF32ToI16(resizing a: SIMD<Float>) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingF32ToI16(a.raw))
 }
 
 @inline(never)
-public func portVectorResizingF32ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: SIMDFloat.repeating(1.5))
+public func portVectorResizingF32ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayVectorResizingF32ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorResizingF32ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorResizingF32ToI16(
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
         )
     )
 }
 
 @inline(never)
-public func portHalfVectorResizingF32ToI16(resizing a: SIMDFloat.Vector) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+public func portHalfVectorResizingF32ToI16(resizing a: SIMD<Float>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @inline(never)
-public func highwayHalfVectorResizingF32ToI16(resizing a: SIMDFloat.Vector) -> SIMDInt16.HalfVector
-{
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingF32ToI16(a))
+public func highwayHalfVectorResizingF32ToI16(resizing a: SIMD<Float>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingF32ToI16(a.raw))
 }
 
 @inline(never)
-public func portHalfVectorResizingF32ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: SIMDFloat.repeating(1.5))
+public func portHalfVectorResizingF32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayHalfVectorResizingF32ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorResizingF32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorResizingF32ToI16(
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
         )
     )
 }
 
 @inline(never)
-public func portQuarterVectorResizingF32ToI16(
-    resizing a: SIMDFloat.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+public func portQuarterVectorResizingF32ToI16(resizing a: SIMD<Float>) -> SIMD<Int16>.QuarterVector
+{
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingF32ToI16(
-    resizing a: SIMDFloat.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingF32ToI16(a))
+    resizing a: SIMD<Float>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingF32ToI16(a.raw))
 }
 
 @inline(never)
-public func portQuarterVectorResizingF32ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: SIMDFloat.repeating(1.5))
+public func portQuarterVectorResizingF32ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayQuarterVectorResizingF32ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+public func highwayQuarterVectorResizingF32ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorResizingF32ToI16(
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
         )
     )
 }
 
 @inline(never)
-public func portVectorResizingHalfF32ToI16(resizing a: SIMDFloat.HalfVector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingHalfF32ToI16(resizing a: SIMD<Float>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
-public func highwayVectorResizingHalfF32ToI16(resizing a: SIMDFloat.HalfVector) -> SIMDInt16.Vector
-{
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingHalfF32ToI16(a.raw))
+public func highwayVectorResizingHalfF32ToI16(resizing a: SIMD<Float>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingHalfF32ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorResizingHalfF32ToI16(
-    resizing a: SIMDFloat.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+    resizing a: SIMD<Float>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorResizingHalfF32ToI16(
-    resizing a: SIMDFloat.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfF32ToI16(a.raw))
+    resizing a: SIMD<Float>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfF32ToI16(a.raw))
 }
 
 @inline(never)
 public func portQuarterVectorResizingHalfF32ToI16(
-    resizing a: SIMDFloat.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<Float>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingHalfF32ToI16(
-    resizing a: SIMDFloat.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingHalfF32ToI16(a.raw))
+    resizing a: SIMD<Float>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
+        raw: HighwayReference.Nothrow.quarterVectorResizingHalfF32ToI16(a.raw)
+    )
 }
 
 @inline(never)
-public func portVectorResizingF64ToI16(resizing a: SIMDDouble.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingF64ToI16(resizing a: SIMD<Double>) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
-public func highwayVectorResizingF64ToI16(resizing a: SIMDDouble.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingF64ToI16(a))
+public func highwayVectorResizingF64ToI16(resizing a: SIMD<Double>) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingF64ToI16(a.raw))
 }
 
 @inline(never)
-public func portVectorResizingF64ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: SIMDDouble.repeating(1.5))
+public func portVectorResizingF64ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayVectorResizingF64ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorResizingF64ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorResizingF64ToI16(
-            HighwayReference.Nothrow.repeatingF64(1.5)
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
 
 @inline(never)
-public func portHalfVectorResizingF64ToI16(resizing a: SIMDDouble.Vector) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+public func portHalfVectorResizingF64ToI16(resizing a: SIMD<Double>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @inline(never)
-public func highwayHalfVectorResizingF64ToI16(resizing a: SIMDDouble.Vector) -> SIMDInt16.HalfVector
-{
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingF64ToI16(a))
+public func highwayHalfVectorResizingF64ToI16(resizing a: SIMD<Double>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingF64ToI16(a.raw))
 }
 
 @inline(never)
-public func portHalfVectorResizingF64ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: SIMDDouble.repeating(1.5))
+public func portHalfVectorResizingF64ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayHalfVectorResizingF64ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorResizingF64ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorResizingF64ToI16(
-            HighwayReference.Nothrow.repeatingF64(1.5)
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
 
 @inline(never)
-public func portQuarterVectorResizingF64ToI16(
-    resizing a: SIMDDouble.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+public func portQuarterVectorResizingF64ToI16(resizing a: SIMD<Double>) -> SIMD<Int16>.QuarterVector
+{
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingF64ToI16(
-    resizing a: SIMDDouble.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingF64ToI16(a))
+    resizing a: SIMD<Double>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingF64ToI16(a.raw))
 }
 
 @inline(never)
-public func portQuarterVectorResizingF64ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: SIMDDouble.repeating(1.5))
+public func portQuarterVectorResizingF64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayQuarterVectorResizingF64ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+public func highwayQuarterVectorResizingF64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorResizingF64ToI16(
-            HighwayReference.Nothrow.repeatingF64(1.5)
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
         )
     )
 }
 
 @inline(never)
-public func portVectorResizingHalfF64ToI16(resizing a: SIMDDouble.HalfVector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingHalfF64ToI16(resizing a: SIMD<Double>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
-public func highwayVectorResizingHalfF64ToI16(resizing a: SIMDDouble.HalfVector) -> SIMDInt16.Vector
-{
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingHalfF64ToI16(a.raw))
+public func highwayVectorResizingHalfF64ToI16(resizing a: SIMD<Double>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingHalfF64ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorResizingHalfF64ToI16(
-    resizing a: SIMDDouble.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+    resizing a: SIMD<Double>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorResizingHalfF64ToI16(
-    resizing a: SIMDDouble.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfF64ToI16(a.raw))
+    resizing a: SIMD<Double>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfF64ToI16(a.raw))
 }
 
 @inline(never)
 public func portQuarterVectorResizingHalfF64ToI16(
-    resizing a: SIMDDouble.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<Double>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingHalfF64ToI16(
-    resizing a: SIMDDouble.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingHalfF64ToI16(a.raw))
+    resizing a: SIMD<Double>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
+        raw: HighwayReference.Nothrow.quarterVectorResizingHalfF64ToI16(a.raw)
+    )
 }
 
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorResizingF16ToI16(resizing a: SIMDFloat16.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingF16ToI16(resizing a: SIMD<Float16>) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorResizingF16ToI16(resizing a: SIMDFloat16.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingF16ToI16(a))
+public func highwayVectorResizingF16ToI16(resizing a: SIMD<Float16>) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingF16ToI16(a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorResizingF16ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portVectorResizingF16ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorResizingF16ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorResizingF16ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorResizingF16ToI16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
@@ -384,30 +383,30 @@ public func highwayVectorResizingF16ToI16ConstantA() -> SIMDInt16.Vector {
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portHalfVectorResizingF16ToI16(resizing a: SIMDFloat16.Vector) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+public func portHalfVectorResizingF16ToI16(resizing a: SIMD<Float16>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayHalfVectorResizingF16ToI16(
-    resizing a: SIMDFloat16.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingF16ToI16(a))
+public func highwayHalfVectorResizingF16ToI16(resizing a: SIMD<Float16>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingF16ToI16(a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portHalfVectorResizingF16ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portHalfVectorResizingF16ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayHalfVectorResizingF16ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorResizingF16ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorResizingF16ToI16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
@@ -417,31 +416,33 @@ public func highwayHalfVectorResizingF16ToI16ConstantA() -> SIMDInt16.HalfVector
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portQuarterVectorResizingF16ToI16(
-    resizing a: SIMDFloat16.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<Float16>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayQuarterVectorResizingF16ToI16(
-    resizing a: SIMDFloat16.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingF16ToI16(a))
+    resizing a: SIMD<Float16>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingF16ToI16(a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portQuarterVectorResizingF16ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portQuarterVectorResizingF16ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayQuarterVectorResizingF16ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+public func highwayQuarterVectorResizingF16ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorResizingF16ToI16(
-            HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
         )
     )
 }
@@ -450,16 +451,14 @@ public func highwayQuarterVectorResizingF16ToI16ConstantA() -> SIMDInt16.Quarter
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorResizingHalfF16ToI16(resizing a: SIMDFloat16.HalfVector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingHalfF16ToI16(resizing a: SIMD<Float16>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorResizingHalfF16ToI16(
-    resizing a: SIMDFloat16.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingHalfF16ToI16(a.raw))
+public func highwayVectorResizingHalfF16ToI16(resizing a: SIMD<Float16>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingHalfF16ToI16(a.raw))
 }
 #endif
 
@@ -467,17 +466,17 @@ public func highwayVectorResizingHalfF16ToI16(
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portHalfVectorResizingHalfF16ToI16(
-    resizing a: SIMDFloat16.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+    resizing a: SIMD<Float16>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayHalfVectorResizingHalfF16ToI16(
-    resizing a: SIMDFloat16.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfF16ToI16(a.raw))
+    resizing a: SIMD<Float16>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfF16ToI16(a.raw))
 }
 #endif
 
@@ -485,17 +484,19 @@ public func highwayHalfVectorResizingHalfF16ToI16(
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portQuarterVectorResizingHalfF16ToI16(
-    resizing a: SIMDFloat16.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<Float16>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayQuarterVectorResizingHalfF16ToI16(
-    resizing a: SIMDFloat16.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingHalfF16ToI16(a.raw))
+    resizing a: SIMD<Float16>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
+        raw: HighwayReference.Nothrow.quarterVectorResizingHalfF16ToI16(a.raw)
+    )
 }
 #endif
 
@@ -503,17 +504,17 @@ public func highwayQuarterVectorResizingHalfF16ToI16(
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portVectorResizingQuarterF16ToI16(
-    resizing a: SIMDFloat16.QuarterVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+    resizing a: SIMD<Float16>.QuarterVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayVectorResizingQuarterF16ToI16(
-    resizing a: SIMDFloat16.QuarterVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingQuarterF16ToI16(a.raw))
+    resizing a: SIMD<Float16>.QuarterVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingQuarterF16ToI16(a.raw))
 }
 #endif
 
@@ -521,17 +522,17 @@ public func highwayVectorResizingQuarterF16ToI16(
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portHalfVectorResizingQuarterF16ToI16(
-    resizing a: SIMDFloat16.QuarterVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+    resizing a: SIMD<Float16>.QuarterVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayHalfVectorResizingQuarterF16ToI16(
-    resizing a: SIMDFloat16.QuarterVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingQuarterF16ToI16(a.raw))
+    resizing a: SIMD<Float16>.QuarterVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingQuarterF16ToI16(a.raw))
 }
 #endif
 
@@ -539,42 +540,42 @@ public func highwayHalfVectorResizingQuarterF16ToI16(
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func portQuarterVectorResizingQuarterF16ToI16(
-    resizing a: SIMDFloat16.QuarterVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<Float16>.QuarterVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
 public func highwayQuarterVectorResizingQuarterF16ToI16(
-    resizing a: SIMDFloat16.QuarterVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    resizing a: SIMD<Float16>.QuarterVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorResizingQuarterF16ToI16(a.raw)
     )
 }
 #endif
 
 @inline(never)
-public func portVectorResizingBF16ToI16(resizing a: SIMDBFloat16.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingBF16ToI16(resizing a: SIMD<BFloat16>) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
-public func highwayVectorResizingBF16ToI16(resizing a: SIMDBFloat16.Vector) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingBF16ToI16(a.raw))
+public func highwayVectorResizingBF16ToI16(resizing a: SIMD<BFloat16>) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingBF16ToI16(a.raw))
 }
 
 @inline(never)
-public func portVectorResizingBF16ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portVectorResizingBF16ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayVectorResizingBF16ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorResizingBF16ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorResizingBF16ToI16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -582,28 +583,26 @@ public func highwayVectorResizingBF16ToI16ConstantA() -> SIMDInt16.Vector {
 }
 
 @inline(never)
-public func portHalfVectorResizingBF16ToI16(resizing a: SIMDBFloat16.Vector) -> SIMDInt16.HalfVector
+public func portHalfVectorResizingBF16ToI16(resizing a: SIMD<BFloat16>) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
+}
+
+@inline(never)
+public func highwayHalfVectorResizingBF16ToI16(resizing a: SIMD<BFloat16>) -> SIMD<Int16>.HalfVector
 {
-    SIMDInt16.halfVector(resizing: a)
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingBF16ToI16(a.raw))
 }
 
 @inline(never)
-public func highwayHalfVectorResizingBF16ToI16(
-    resizing a: SIMDBFloat16.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingBF16ToI16(a.raw))
+public func portHalfVectorResizingBF16ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func portHalfVectorResizingBF16ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
-}
-
-@inline(never)
-public func highwayHalfVectorResizingBF16ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorResizingBF16ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorResizingBF16ToI16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -612,28 +611,28 @@ public func highwayHalfVectorResizingBF16ToI16ConstantA() -> SIMDInt16.HalfVecto
 
 @inline(never)
 public func portQuarterVectorResizingBF16ToI16(
-    resizing a: SIMDBFloat16.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<BFloat16>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingBF16ToI16(
-    resizing a: SIMDBFloat16.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingBF16ToI16(a.raw))
+    resizing a: SIMD<BFloat16>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingBF16ToI16(a.raw))
 }
 
 @inline(never)
-public func portQuarterVectorResizingBF16ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portQuarterVectorResizingBF16ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayQuarterVectorResizingBF16ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+public func highwayQuarterVectorResizingBF16ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorResizingBF16ToI16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -641,749 +640,751 @@ public func highwayQuarterVectorResizingBF16ToI16ConstantA() -> SIMDInt16.Quarte
 }
 
 @inline(never)
-public func portVectorResizingHalfBF16ToI16(resizing a: SIMDBFloat16.HalfVector) -> SIMDInt16.Vector
-{
-    SIMDInt16.vector(resizing: a)
+public func portVectorResizingHalfBF16ToI16(resizing a: SIMD<BFloat16>.HalfVector) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
-public func highwayVectorResizingHalfBF16ToI16(
-    resizing a: SIMDBFloat16.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingHalfBF16ToI16(a.raw))
+public func highwayVectorResizingHalfBF16ToI16(resizing a: SIMD<BFloat16>.HalfVector) -> SIMD<Int16>
+{
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingHalfBF16ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorResizingHalfBF16ToI16(
-    resizing a: SIMDBFloat16.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+    resizing a: SIMD<BFloat16>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorResizingHalfBF16ToI16(
-    resizing a: SIMDBFloat16.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfBF16ToI16(a.raw))
+    resizing a: SIMD<BFloat16>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingHalfBF16ToI16(a.raw))
 }
 
 @inline(never)
 public func portQuarterVectorResizingHalfBF16ToI16(
-    resizing a: SIMDBFloat16.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<BFloat16>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingHalfBF16ToI16(
-    resizing a: SIMDBFloat16.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(raw: HighwayReference.Nothrow.quarterVectorResizingHalfBF16ToI16(a.raw))
+    resizing a: SIMD<BFloat16>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
+        raw: HighwayReference.Nothrow.quarterVectorResizingHalfBF16ToI16(a.raw)
+    )
 }
 
 @inline(never)
 public func portVectorResizingQuarterBF16ToI16(
-    resizing a: SIMDBFloat16.QuarterVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(resizing: a)
+    resizing a: SIMD<BFloat16>.QuarterVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(resizing: a)
 }
 
 @inline(never)
 public func highwayVectorResizingQuarterBF16ToI16(
-    resizing a: SIMDBFloat16.QuarterVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorResizingQuarterBF16ToI16(a.raw))
+    resizing a: SIMD<BFloat16>.QuarterVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorResizingQuarterBF16ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorResizingQuarterBF16ToI16(
-    resizing a: SIMDBFloat16.QuarterVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(resizing: a)
+    resizing a: SIMD<BFloat16>.QuarterVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(resizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorResizingQuarterBF16ToI16(
-    resizing a: SIMDBFloat16.QuarterVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingQuarterBF16ToI16(a.raw))
+    resizing a: SIMD<BFloat16>.QuarterVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(raw: HighwayReference.Nothrow.halfVectorResizingQuarterBF16ToI16(a.raw))
 }
 
 @inline(never)
 public func portQuarterVectorResizingQuarterBF16ToI16(
-    resizing a: SIMDBFloat16.QuarterVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(resizing: a)
+    resizing a: SIMD<BFloat16>.QuarterVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(resizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorResizingQuarterBF16ToI16(
-    resizing a: SIMDBFloat16.QuarterVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    resizing a: SIMD<BFloat16>.QuarterVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorResizingQuarterBF16ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU8ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt8>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU8ToI16(a.raw))
 }
 
 @inline(never)
-public func portVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: SIMDUInt8.repeating(26))
+public func portVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU8ToI16(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt8>
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingU8ToI16(a.raw)
     )
 }
 
 @inline(never)
-public func portHalfVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: SIMDUInt8.repeating(26))
+public func portHalfVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayHalfVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingU8ToI16(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt8>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingU8ToI16(a.raw)
     )
 }
 
 @inline(never)
-public func portQuarterVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: SIMDUInt8.repeating(26))
+public func portQuarterVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayQuarterVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+public func highwayQuarterVectorZeroExtendingResizingU8ToI16ConstantA() -> SIMD<Int16>.QuarterVector
+{
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingU8ToI16(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingHalfU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.HalfVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingHalfU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingHalfU8ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt8>.HalfVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingHalfU8ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingHalfU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingHalfU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt8>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingHalfU8ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingHalfU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingHalfU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt8>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingHalfU8ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingQuarterU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.QuarterVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.QuarterVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingQuarterU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.QuarterVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingQuarterU8ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt8>.QuarterVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingQuarterU8ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingQuarterU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.QuarterVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.QuarterVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingQuarterU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.QuarterVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt8>.QuarterVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingQuarterU8ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingQuarterU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.QuarterVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.QuarterVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingQuarterU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.QuarterVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt8>.QuarterVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingQuarterU8ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingEighthU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.EighthVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.EighthVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingEighthU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.EighthVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingEighthU8ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt8>.EighthVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingEighthU8ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingEighthU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.EighthVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.EighthVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingEighthU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.EighthVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt8>.EighthVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingEighthU8ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingEighthU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.EighthVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt8>.EighthVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingEighthU8ToI16(
-    zeroExtendingResizing a: SIMDUInt8.EighthVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt8>.EighthVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingEighthU8ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU16ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU16ToI16(a.raw))
 }
 
 @inline(never)
-public func portVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: SIMDUInt16.repeating(26))
+public func portVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
-public func highwayVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU16ToI16(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt16>
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingU16ToI16(a.raw)
     )
 }
 
 @inline(never)
-public func portHalfVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: SIMDUInt16.repeating(26))
+public func portHalfVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
-public func highwayHalfVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingU16ToI16(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt16>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingU16ToI16(a.raw)
     )
 }
 
 @inline(never)
-public func portQuarterVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: SIMDUInt16.repeating(26))
+public func portQuarterVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
-public func highwayQuarterVectorZeroExtendingResizingU16ToI16ConstantA() -> SIMDInt16.QuarterVector
+public func highwayQuarterVectorZeroExtendingResizingU16ToI16ConstantA()
+    -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingU16ToI16(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingHalfU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>.HalfVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingHalfU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingHalfU16ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt16>.HalfVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingHalfU16ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingHalfU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingHalfU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt16>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingHalfU16ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingHalfU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingHalfU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt16>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingHalfU16ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingQuarterU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.QuarterVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>.QuarterVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingQuarterU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.QuarterVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
-        raw: HighwayReference.Nothrow.vectorZeroExtendingResizingQuarterU16ToI16(a.raw)
-    )
+    zeroExtendingResizing a: SIMD<UInt16>.QuarterVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingQuarterU16ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingQuarterU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.QuarterVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>.QuarterVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingQuarterU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.QuarterVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt16>.QuarterVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingQuarterU16ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingQuarterU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.QuarterVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt16>.QuarterVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingQuarterU16ToI16(
-    zeroExtendingResizing a: SIMDUInt16.QuarterVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt16>.QuarterVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingQuarterU16ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt32>
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU32ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt32>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU32ToI16(a.raw))
 }
 
 @inline(never)
-public func portVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: SIMDUInt32.repeating(26))
+public func portVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
-public func highwayVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU32ToI16(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt32>
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt32>
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingU32ToI16(a.raw)
     )
 }
 
 @inline(never)
-public func portHalfVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: SIMDUInt32.repeating(26))
+public func portHalfVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
-public func highwayHalfVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingU32ToI16(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt32>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt32>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingU32ToI16(a.raw)
     )
 }
 
 @inline(never)
-public func portQuarterVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: SIMDUInt32.repeating(26))
+public func portQuarterVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
-public func highwayQuarterVectorZeroExtendingResizingU32ToI16ConstantA() -> SIMDInt16.QuarterVector
+public func highwayQuarterVectorZeroExtendingResizingU32ToI16ConstantA()
+    -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingU32ToI16(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingHalfU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt32>.HalfVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingHalfU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingHalfU32ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt32>.HalfVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingHalfU32ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingHalfU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt32>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingHalfU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt32>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingHalfU32ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingHalfU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt32>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingHalfU32ToI16(
-    zeroExtendingResizing a: SIMDUInt32.HalfVector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt32>.HalfVector
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingHalfU32ToI16(a.raw)
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt64>
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU64ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt64>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU64ToI16(a.raw))
 }
 
 @inline(never)
-public func portVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: SIMDUInt64.repeating(26))
+public func portVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
-public func highwayVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.vectorZeroExtendingResizingU64ToI16(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt64>
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.Vector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt64>
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingU64ToI16(a.raw)
     )
 }
 
 @inline(never)
-public func portHalfVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: SIMDUInt64.repeating(26))
+public func portHalfVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
-public func highwayHalfVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+public func highwayHalfVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingU64ToI16(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portQuarterVectorZeroExtendingResizingU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt64>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayQuarterVectorZeroExtendingResizingU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.Vector
-) -> SIMDInt16.QuarterVector {
-    SIMDInt16.QuarterVector(
+    zeroExtendingResizing a: SIMD<UInt64>
+) -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingU64ToI16(a.raw)
     )
 }
 
 @inline(never)
-public func portQuarterVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMDInt16.QuarterVector {
-    SIMDInt16.quarterVector(zeroExtendingResizing: SIMDUInt64.repeating(26))
+public func portQuarterVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMD<Int16>.QuarterVector {
+    SIMD<Int16>.quarterVector(zeroExtendingResizing: SIMD<UInt64>.repeating(26))
 }
 
 @inline(never)
-public func highwayQuarterVectorZeroExtendingResizingU64ToI16ConstantA() -> SIMDInt16.QuarterVector
+public func highwayQuarterVectorZeroExtendingResizingU64ToI16ConstantA()
+    -> SIMD<Int16>.QuarterVector
 {
-    SIMDInt16.QuarterVector(
+    SIMD<Int16>.QuarterVector(
         raw: HighwayReference.Nothrow.quarterVectorZeroExtendingResizingU64ToI16(
-            SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+            SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portVectorZeroExtendingResizingHalfU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.vector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt64>.HalfVector
+) -> SIMD<Int16> {
+    SIMD<Int16>.vector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayVectorZeroExtendingResizingHalfU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.HalfVector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingHalfU64ToI16(a.raw))
+    zeroExtendingResizing a: SIMD<UInt64>.HalfVector
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.vectorZeroExtendingResizingHalfU64ToI16(a.raw))
 }
 
 @inline(never)
 public func portHalfVectorZeroExtendingResizingHalfU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.halfVector(zeroExtendingResizing: a)
+    zeroExtendingResizing a: SIMD<UInt64>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.halfVector(zeroExtendingResizing: a)
 }
 
 @inline(never)
 public func highwayHalfVectorZeroExtendingResizingHalfU64ToI16(
-    zeroExtendingResizing a: SIMDUInt64.HalfVector
-) -> SIMDInt16.HalfVector {
-    SIMDInt16.HalfVector(
+    zeroExtendingResizing a: SIMD<UInt64>.HalfVector
+) -> SIMD<Int16>.HalfVector {
+    SIMD<Int16>.HalfVector(
         raw: HighwayReference.Nothrow.halfVectorZeroExtendingResizingHalfU64ToI16(a.raw)
     )
 }

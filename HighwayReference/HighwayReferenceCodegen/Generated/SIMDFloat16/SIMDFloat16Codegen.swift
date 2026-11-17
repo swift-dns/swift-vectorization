@@ -7,8 +7,8 @@ public import Vectorization
 @available(SwiftStdlib 5.3, *)
 public enum HighwayReferenceFloat16 {
     public typealias Lane = Float16
-    public typealias Vector = SIMDFloat16.Vector
-    public typealias Mask = SIMDFloat16.Mask
+    public typealias SIMD = Vectorization.SIMD<Float16>
+    public typealias Mask = SIMD.Mask
 
     @export(implementation) @inline(always)
     public static var laneCount: Int {

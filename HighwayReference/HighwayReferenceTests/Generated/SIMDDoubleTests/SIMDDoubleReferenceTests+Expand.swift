@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDDoubleReferenceTests {
     @Test func expanded() {
         let mismatches = Mismatches("expanded")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x16D6_D4D4_3E2B_4972)
+        let aInputs = Inputs.vectors(H.self, seed: 0x16D6_D4D4_3E2B_4972)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x16D6_D5D4_3E2B_4B25)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.expanded(a, where: mask),
-                HighwayReference.expandedF64(a, mask.raw),
+                H(raw: HighwayReference.expandedF64(a.raw, mask.raw)),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDDoubleReferenceTests {
 
     @Test func expandedNonCanonical() {
         let mismatches = Mismatches("expanded with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE079_4A40_F4F2_05E9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE079_4A40_F4F2_05E9)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xE079_4940_F4F2_0436)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
                 H.expanded(a, where: mask),
-                HighwayReference.expandedF64(a, mask.raw),
+                H(raw: HighwayReference.expandedF64(a.raw, mask.raw)),
                 "a: \(describe(a)), mask: \(describe(mask))"
             )
         }
@@ -37,16 +37,14 @@ extension SIMDDoubleReferenceTests {
     @Test func loadExpandedWhere() {
         let mismatches = Mismatches("loadExpandedWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2D92_D24E_421C_2FCB)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x2D92_D14E_421C_2E18
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x2D92_D14E_421C_2E18)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadExpanded(from: source.baseAddress!, where: mask),
-                    unsafe HighwayReference.loadExpandedWhereF64(mask.raw, source.baseAddress!)
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereF64(mask.raw, source.baseAddress!)
+                    )
                 )
             }
             mismatches.check(
@@ -61,16 +59,12 @@ extension SIMDDoubleReferenceTests {
     @Test func loadExpandedWhereBeforeGuardPage() {
         let mismatches = Mismatches("loadExpandedWhere before a guard page")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x33A4_74DF_1902_C190)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x33A4_75DF_1902_C343
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x33A4_75DF_1902_C343)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.loadExpanded(from: source, where: mask),
-                    unsafe HighwayReference.loadExpandedWhereF64(mask.raw, source)
+                    unsafe H(raw: HighwayReference.loadExpandedWhereF64(mask.raw, source))
                 )
             }.result
             mismatches.check(
@@ -85,16 +79,14 @@ extension SIMDDoubleReferenceTests {
     @Test func loadExpandedWhereNonCanonical() {
         let mismatches = Mismatches("loadExpandedWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0390_3C83_54D8_54E0)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x0390_3D83_54D8_5693
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x0390_3D83_54D8_5693)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadExpanded(from: source.baseAddress!, where: mask),
-                    unsafe HighwayReference.loadExpandedWhereF64(mask.raw, source.baseAddress!)
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereF64(mask.raw, source.baseAddress!)
+                    )
                 )
             }
             mismatches.check(
@@ -109,11 +101,7 @@ extension SIMDDoubleReferenceTests {
     @Test func loadExpandedWhereUncheckedSpan() {
         let mismatches = Mismatches("loadExpandedWhere unchecked span")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x83F1_F299_660F_A5CF)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x83F1_F199_660F_A41C
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x83F1_F199_660F_A41C)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -138,13 +126,9 @@ extension SIMDDoubleReferenceTests {
 
     @Test func loadExpandedWhereOtherwise() {
         let mismatches = Mismatches("loadExpandedWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x1F76_09A6_0A7A_DE89)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x1F76_09A6_0A7A_DE89)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1F76_08A6_0A7A_DCD6)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x1F76_07A6_0A7A_DB23
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1F76_07A6_0A7A_DB23)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -158,10 +142,12 @@ extension SIMDDoubleReferenceTests {
                         where: mask,
                         otherwise: otherwise
                     ),
-                    unsafe HighwayReference.loadExpandedWhereOtherwiseF64(
-                        otherwise,
-                        mask.raw,
-                        source.baseAddress!
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereOtherwiseF64(
+                            otherwise.raw,
+                            mask.raw,
+                            source.baseAddress!
+                        )
                     )
                 )
             }
@@ -176,13 +162,9 @@ extension SIMDDoubleReferenceTests {
 
     @Test func loadExpandedWhereOtherwiseBeforeGuardPage() {
         let mismatches = Mismatches("loadExpandedWhereOtherwise before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x1ABF_5356_3E74_0C26)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x1ABF_5356_3E74_0C26)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1ABF_5456_3E74_0DD9)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x1ABF_5156_3E74_08C0
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1ABF_5156_3E74_08C0)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -192,10 +174,12 @@ extension SIMDDoubleReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.loadExpanded(from: source, where: mask, otherwise: otherwise),
-                    unsafe HighwayReference.loadExpandedWhereOtherwiseF64(
-                        otherwise,
-                        mask.raw,
-                        source
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereOtherwiseF64(
+                            otherwise.raw,
+                            mask.raw,
+                            source
+                        )
                     )
                 )
             }.result
@@ -210,13 +194,9 @@ extension SIMDDoubleReferenceTests {
 
     @Test func loadExpandedWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("loadExpandedWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5D44_3991_CB3A_580E)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x5D44_3991_CB3A_580E)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5D44_3A91_CB3A_59C1)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x5D44_3791_CB3A_54A8
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x5D44_3791_CB3A_54A8)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -230,10 +210,12 @@ extension SIMDDoubleReferenceTests {
                         where: mask,
                         otherwise: otherwise
                     ),
-                    unsafe HighwayReference.loadExpandedWhereOtherwiseF64(
-                        otherwise,
-                        mask.raw,
-                        source.baseAddress!
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereOtherwiseF64(
+                            otherwise.raw,
+                            mask.raw,
+                            source.baseAddress!
+                        )
                     )
                 )
             }
@@ -248,13 +230,9 @@ extension SIMDDoubleReferenceTests {
 
     @Test func loadExpandedWhereOtherwiseUncheckedSpan() {
         let mismatches = Mismatches("loadExpandedWhereOtherwise unchecked span")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x915B_87B3_B691_E081)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x915B_87B3_B691_E081)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x915B_86B3_B691_DECE)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x915B_85B3_B691_DD1B
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x915B_85B3_B691_DD1B)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,

@@ -8,16 +8,16 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkMaskFromVectorConstantA(_ value: H.Lane) {
+    private func checkMaskFromVectorConstantA(_ value: Lane) {
         let mismatches = Mismatches("maskFromVector with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.mask(from: H.repeating(value)),
-            H.Mask(raw: HighwayReference.maskFromVectorF16(H.repeating(value))),
+            H.Mask(raw: HighwayReference.maskFromVectorF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -80,7 +80,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func maskFromVectorConstantSplatPayloadNaN() {
-        checkMaskFromVectorConstantA(H.Lane(nan: 1, signaling: false))
+        checkMaskFromVectorConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func maskFromVectorConstantSplatSignalingNaN() {

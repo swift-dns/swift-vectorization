@@ -4,17 +4,17 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portNoneAboveU64(_ v: SIMDUInt64.Vector) -> Bool {
-    SIMDUInt64.allFalse(SIMDUInt64.greaterThan(v, SIMDUInt64.repeating(26)))
+public func portNoneAboveU64(_ v: SIMD<UInt64>) -> Bool {
+    SIMD<UInt64>.allFalse(SIMD<UInt64>.greaterThan(v, SIMD<UInt64>.repeating(26)))
 }
 
 @inline(never)
-public func highwayNoneAboveU64(_ v: SIMDUInt64.Vector) -> Bool {
+public func highwayNoneAboveU64(_ v: SIMD<UInt64>) -> Bool {
     HighwayReference.Nothrow.allFalseU64(
-        SIMDUInt64.Mask(
+        SIMD<UInt64>.Mask(
             raw: HighwayReference.Nothrow.greaterThanU64(
                 v.raw,
-                SIMDUInt64.Vector(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
+                SIMD<UInt64>(raw: HighwayReference.Nothrow.repeatingU64(26)).raw
             )
         ).raw
     )
@@ -22,17 +22,14 @@ public func highwayNoneAboveU64(_ v: SIMDUInt64.Vector) -> Bool {
 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
-public func portSumAboveSpanU64(
-    above t: SIMDUInt64.Lane,
-    in values: Span<SIMDUInt64.Lane>
-) -> SIMDUInt64.Lane {
-    let laneCount = SIMDUInt64.laneCount
-    let threshold = SIMDUInt64.repeating(t)
-    var total: SIMDUInt64.Lane = 0
+public func portSumAboveSpanU64(above t: UInt64, in values: Span<UInt64>) -> UInt64 {
+    let laneCount = SIMD<UInt64>.laneCount
+    let threshold = SIMD<UInt64>.repeating(t)
+    var total: UInt64 = 0
     var remainingValuesSpan = values
     while remainingValuesSpan.count >= laneCount {
-        let loaded = SIMDUInt64.load(from: remainingValuesSpan)
-        total &+= SIMDUInt64.sum(loaded, where: SIMDUInt64.greaterThan(loaded, threshold))
+        let loaded = SIMD<UInt64>.load(from: remainingValuesSpan)
+        total &+= SIMD<UInt64>.sum(loaded, where: SIMD<UInt64>.greaterThan(loaded, threshold))
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
         )
@@ -65,20 +62,20 @@ public func highwaySumAboveSpanU64(above t: UInt64, in values: Span<UInt64>) -> 
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portCountEqualAboveSpanU64(
-    above t: SIMDUInt64.Lane,
-    in values: Span<SIMDUInt64.Lane>,
-    matching others: Span<SIMDUInt64.Lane>
+    above t: UInt64,
+    in values: Span<UInt64>,
+    matching others: Span<UInt64>
 ) -> Int {
-    let laneCount = SIMDUInt64.laneCount
-    let threshold = SIMDUInt64.repeating(t)
+    let laneCount = SIMD<UInt64>.laneCount
+    let threshold = SIMD<UInt64>.repeating(t)
     var count = 0
     var remainingValuesSpan = values
     var remainingOthersSpan = others
     while remainingValuesSpan.count >= laneCount && remainingOthersSpan.count >= laneCount {
-        let loaded = SIMDUInt64.load(from: remainingValuesSpan)
-        let other = SIMDUInt64.load(from: remainingOthersSpan)
-        count &+= SIMDUInt64.trueCount(
-            SIMDUInt64.equalTo(loaded, other, where: SIMDUInt64.greaterThan(loaded, threshold))
+        let loaded = SIMD<UInt64>.load(from: remainingValuesSpan)
+        let other = SIMD<UInt64>.load(from: remainingOthersSpan)
+        count &+= SIMD<UInt64>.trueCount(
+            SIMD<UInt64>.equalTo(loaded, other, where: SIMD<UInt64>.greaterThan(loaded, threshold))
         )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
@@ -128,20 +125,20 @@ public func highwayCountEqualAboveSpanU64(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portClampAboveSpanU64(
-    atMost t: SIMDUInt64.Lane,
-    in values: Span<SIMDUInt64.Lane>,
-    into output: inout MutableSpan<SIMDUInt64.Lane>
+    atMost t: UInt64,
+    in values: Span<UInt64>,
+    into output: inout MutableSpan<UInt64>
 ) -> Int {
-    let laneCount = SIMDUInt64.laneCount
-    let limit = SIMDUInt64.repeating(t)
+    let laneCount = SIMD<UInt64>.laneCount
+    let limit = SIMD<UInt64>.repeating(t)
     var remainingValuesSpan = values
     var remainingOutputSpan = output._mutatingExtracting(...)
     while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
-        let loaded = SIMDUInt64.load(from: remainingValuesSpan)
-        SIMDUInt64.store(
+        let loaded = SIMD<UInt64>.load(from: remainingValuesSpan)
+        SIMD<UInt64>.store(
             limit,
             to: &remainingOutputSpan,
-            where: SIMDUInt64.greaterThan(loaded, limit)
+            where: SIMD<UInt64>.greaterThan(loaded, limit)
         )
         let remainingValuesRange = unsafe Range<Int>(
             uncheckedBounds: (laneCount, remainingValuesSpan.count)
@@ -194,18 +191,18 @@ public func highwayClampAboveSpanU64(
 @available(SwiftStdlib 5.1, *)
 @inline(never)
 public func portSelectBelowSpanU64(
-    below t: SIMDUInt64.Lane,
-    in values: Span<SIMDUInt64.Lane>,
-    into output: inout MutableSpan<SIMDUInt64.Lane>
+    below t: UInt64,
+    in values: Span<UInt64>,
+    into output: inout MutableSpan<UInt64>
 ) -> Int {
-    let laneCount = SIMDUInt64.laneCount
-    let threshold = SIMDUInt64.repeating(t)
+    let laneCount = SIMD<UInt64>.laneCount
+    let threshold = SIMD<UInt64>.repeating(t)
     var remainingValuesSpan = values
     var remainingOutputSpan = output._mutatingExtracting(...)
     while remainingValuesSpan.count >= laneCount && remainingOutputSpan.count >= laneCount {
-        let loaded = SIMDUInt64.load(from: remainingValuesSpan)
-        SIMDUInt64.store(
-            SIMDUInt64.selectingOrZero(SIMDUInt64.lessThan(loaded, threshold), loaded),
+        let loaded = SIMD<UInt64>.load(from: remainingValuesSpan)
+        SIMD<UInt64>.store(
+            SIMD<UInt64>.selectingOrZero(SIMD<UInt64>.lessThan(loaded, threshold), loaded),
             to: &remainingOutputSpan
         )
         let remainingValuesRange = unsafe Range<Int>(

@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
-    private func checkMinimumConstantA(_ value: H.Lane) {
+    private func checkMinimumConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimum with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x249F_A4C1_49C7_93BD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x249F_A4C1_49C7_93BD)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.minimum(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.minimumU32(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.minimumU32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkMinimumConstantB(_ value: H.Lane) {
+    private func checkMinimumConstantB(_ value: Lane) {
         let mismatches = Mismatches("minimum with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0B4D_1EC1_3B9F_F40B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0B4D_1EC1_3B9F_F40B)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.minimum(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.minimumU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.minimumU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -105,23 +105,23 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func minimumConstantSplatMax() {
-        checkMinimumConstantA(H.Lane.max)
-        checkMinimumConstantB(H.Lane.max)
+        checkMinimumConstantA(Lane.max)
+        checkMinimumConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkMaximumConstantA(_ value: H.Lane) {
+    private func checkMaximumConstantA(_ value: Lane) {
         let mismatches = Mismatches("maximum with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5D2F_7141_2285_1827)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5D2F_7141_2285_1827)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.maximum(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.maximumU32(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.maximumU32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -129,18 +129,18 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumConstantB(_ value: H.Lane) {
+    private func checkMaximumConstantB(_ value: Lane) {
         let mismatches = Mismatches("maximum with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x669E_0741_2814_8C69)
+        let aInputs = Inputs.vectors(H.self, seed: 0x669E_0741_2814_8C69)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.maximum(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.maximumU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.maximumU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -208,7 +208,7 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func maximumConstantSplatMax() {
-        checkMaximumConstantA(H.Lane.max)
-        checkMaximumConstantB(H.Lane.max)
+        checkMaximumConstantA(Lane.max)
+        checkMaximumConstantB(Lane.max)
     }
 }

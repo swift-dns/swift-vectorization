@@ -4,35 +4,36 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portIndicesBF16(fromUnchecked vector: SIMDBFloat16.Indices) -> SIMDBFloat16.Indices {
-    unsafe SIMDBFloat16.indices(fromUnchecked: vector)
+public func portIndicesBF16(fromUnchecked vector: SIMD<BFloat16>.Indices) -> SIMD<BFloat16>.Indices
+{
+    unsafe SIMD<BFloat16>.indices(fromUnchecked: vector)
 }
 
 @inline(never)
-public func highwayIndicesBF16(fromUnchecked vector: SIMDInt16.Vector) -> SIMDInt16.Vector {
-    SIMDBFloat16.Indices(raw: HighwayReference.Nothrow.indicesBF16(vector.raw))
+public func highwayIndicesBF16(fromUnchecked vector: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<BFloat16>.Indices(raw: HighwayReference.Nothrow.indicesBF16(vector.raw))
 }
 
 @inline(never)
-public func portIndicesBF16ConstantVector() -> SIMDBFloat16.Indices {
-    unsafe SIMDBFloat16.indices(fromUnchecked: SIMDInt16.repeating(1))
+public func portIndicesBF16ConstantVector() -> SIMD<BFloat16>.Indices {
+    unsafe SIMD<BFloat16>.indices(fromUnchecked: SIMD<Int16>.repeating(1))
 }
 
 @inline(never)
-public func highwayIndicesBF16ConstantVector() -> SIMDInt16.Vector {
-    SIMDBFloat16.Indices(
+public func highwayIndicesBF16ConstantVector() -> SIMD<Int16> {
+    SIMD<BFloat16>.Indices(
         raw: HighwayReference.Nothrow.indicesBF16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(1)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(1)).raw
         )
     )
 }
 
 @inline(never)
-public func portLoadIndicesBF16(from: UnsafePointer<Int16>) -> SIMDBFloat16.Indices {
-    unsafe SIMDBFloat16.loadIndices(from: from)
+public func portLoadIndicesBF16(from: UnsafePointer<Int16>) -> SIMD<BFloat16>.Indices {
+    unsafe SIMD<BFloat16>.loadIndices(from: from)
 }
 
 @inline(never)
-public func highwayLoadIndicesBF16(from: UnsafePointer<Int16>) -> SIMDInt16.Vector {
-    unsafe SIMDBFloat16.Indices(raw: HighwayReference.Nothrow.loadIndicesBF16(from))
+public func highwayLoadIndicesBF16(from: UnsafePointer<Int16>) -> SIMD<Int16> {
+    unsafe SIMD<BFloat16>.Indices(raw: HighwayReference.Nothrow.loadIndicesBF16(from))
 }

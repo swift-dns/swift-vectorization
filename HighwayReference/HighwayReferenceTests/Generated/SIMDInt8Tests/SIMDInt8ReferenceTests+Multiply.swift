@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDInt8ReferenceTests {
     @Test func multiplying() {
         let mismatches = Mismatches("multiplying")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x354A_9AAB_4DE3_E8A8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x354A_9BAB_4DE3_EA5B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x354A_9AAB_4DE3_E8A8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x354A_9BAB_4DE3_EA5B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                H.Vector(raw: HighwayReference.multiplyingI8(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDInt8ReferenceTests {
 
     @Test func multiplyingHigh() {
         let mismatches = Mismatches("multiplyingHigh")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC5E9_5F2A_0BA9_6BA4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC5E9_602A_0BA9_6D57)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC5E9_5F2A_0BA9_6BA4)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC5E9_602A_0BA9_6D57)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingHigh(a, b),
-                H.Vector(raw: HighwayReference.multiplyingHighI8(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingHighI8(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

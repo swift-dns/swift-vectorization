@@ -5,38 +5,38 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portLowerHalfOfMaskF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.HalfMask {
-    SIMDFloat16.lowerHalf(mask)
+public func portLowerHalfOfMaskF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.HalfMask {
+    SIMD<Float16>.lowerHalf(mask)
 }
 
 @inline(never)
-public func highwayLowerHalfOfMaskF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.HalfMask {
-    SIMDFloat16.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskF16(mask.raw))
+public func highwayLowerHalfOfMaskF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.HalfMask {
+    SIMD<Float16>.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskF16(mask.raw))
 }
 
 @inline(never)
-public func portUpperHalfOfMaskF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.HalfMask {
-    SIMDFloat16.upperHalf(mask)
+public func portUpperHalfOfMaskF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.HalfMask {
+    SIMD<Float16>.upperHalf(mask)
 }
 
 @inline(never)
-public func highwayUpperHalfOfMaskF16(_ mask: SIMDFloat16.Mask) -> SIMDFloat16.HalfMask {
-    SIMDFloat16.HalfMask(raw: HighwayReference.Nothrow.upperHalfOfMaskF16(mask.raw))
+public func highwayUpperHalfOfMaskF16(_ mask: SIMD<Float16>.Mask) -> SIMD<Float16>.HalfMask {
+    SIMD<Float16>.HalfMask(raw: HighwayReference.Nothrow.upperHalfOfMaskF16(mask.raw))
 }
 
 @inline(never)
 public func portCombiningMasksF16(
-    _ a: SIMDFloat16.HalfMask,
-    _ b: SIMDFloat16.HalfMask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.combining(a, b)
+    _ a: SIMD<Float16>.HalfMask,
+    _ b: SIMD<Float16>.HalfMask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.combining(a, b)
 }
 
 @inline(never)
 public func highwayCombiningMasksF16(
-    _ a: SIMDFloat16.HalfMask,
-    _ b: SIMDFloat16.HalfMask
-) -> SIMDFloat16.Mask {
-    SIMDFloat16.Mask(raw: HighwayReference.Nothrow.combiningMasksF16(a.raw, b.raw))
+    _ a: SIMD<Float16>.HalfMask,
+    _ b: SIMD<Float16>.HalfMask
+) -> SIMD<Float16>.Mask {
+    SIMD<Float16>.Mask(raw: HighwayReference.Nothrow.combiningMasksF16(a.raw, b.raw))
 }
 #endif

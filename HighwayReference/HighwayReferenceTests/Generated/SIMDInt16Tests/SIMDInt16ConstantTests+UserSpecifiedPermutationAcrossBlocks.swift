@@ -14,11 +14,11 @@ extension SIMDInt16ConstantTests {
         _ i0: Int
     ) {
         let mismatches = Mismatches("shuffledPer4Lanes with i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x258F_ABC8_C552_5A48)
+        let aInputs = Inputs.vectors(H.self, seed: 0x258F_ABC8_C552_5A48)
         for a in aInputs {
             mismatches.check(
                 H.shuffledPer4Lanes(a, i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.shuffledPer4LanesI16(
                         a.raw,
                         Int32(truncatingIfNeeded: i3),
@@ -1067,11 +1067,11 @@ extension SIMDInt16ConstantTests {
         let mismatches = Mismatches(
             "shuffledPer4Lanes unchecked with i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)"
         )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x21A1_3543_2647_4492)
+        let aInputs = Inputs.vectors(H.self, seed: 0x21A1_3543_2647_4492)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.shuffledPer4LanesI16(
                         a.raw,
                         Int32(truncatingIfNeeded: i3),

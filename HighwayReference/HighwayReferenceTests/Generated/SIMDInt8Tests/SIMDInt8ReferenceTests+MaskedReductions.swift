@@ -9,7 +9,7 @@ extension SIMDInt8ReferenceTests {
     @Test func sumWhere() {
         let mismatches = Mismatches("sumWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x829C_D1BF_A192_D7D8)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x829C_D2BF_A192_D98B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x829C_D2BF_A192_D98B)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.sum(a, where: mask),
@@ -23,7 +23,7 @@ extension SIMDInt8ReferenceTests {
     @Test func sumWhereNonCanonical() {
         let mismatches = Mismatches("sumWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0BD5_E3BA_8C12_2DD7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0BD5_E2BA_8C12_2C24)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0BD5_E2BA_8C12_2C24)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.sum(a, where: mask),
@@ -37,7 +37,7 @@ extension SIMDInt8ReferenceTests {
     @Test func smallestWhere() {
         let mismatches = Mismatches("smallestWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD94C_09C4_C6BA_3AAC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD94C_0AC4_C6BA_3C5F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD94C_0AC4_C6BA_3C5F)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.smallest(a, where: mask),
@@ -51,7 +51,7 @@ extension SIMDInt8ReferenceTests {
     @Test func smallestWhereNonCanonical() {
         let mismatches = Mismatches("smallestWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x16A3_03BD_2DFC_7723)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x16A3_02BD_2DFC_7570)
+        let aInputs = Inputs.vectors(H.self, seed: 0x16A3_02BD_2DFC_7570)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.smallest(a, where: mask),
@@ -65,7 +65,7 @@ extension SIMDInt8ReferenceTests {
     @Test func largestWhere() {
         let mismatches = Mismatches("largestWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3F62_3161_A85D_D949)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3F62_3061_A85D_D796)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3F62_3061_A85D_D796)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),
@@ -79,7 +79,7 @@ extension SIMDInt8ReferenceTests {
     @Test func largestWhereNonCanonical() {
         let mismatches = Mismatches("largestWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x0E87_07C1_69ED_4BCE)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E87_08C1_69ED_4D81)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0E87_08C1_69ED_4D81)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 H.largest(a, where: mask),

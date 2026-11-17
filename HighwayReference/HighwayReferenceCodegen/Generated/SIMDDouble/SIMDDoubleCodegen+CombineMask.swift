@@ -4,37 +4,37 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portLowerHalfOfMaskF64(_ mask: SIMDDouble.Mask) -> SIMDDouble.HalfMask {
-    SIMDDouble.lowerHalf(mask)
+public func portLowerHalfOfMaskF64(_ mask: SIMD<Double>.Mask) -> SIMD<Double>.HalfMask {
+    SIMD<Double>.lowerHalf(mask)
 }
 
 @inline(never)
-public func highwayLowerHalfOfMaskF64(_ mask: SIMDDouble.Mask) -> SIMDDouble.HalfMask {
-    SIMDDouble.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskF64(mask.raw))
+public func highwayLowerHalfOfMaskF64(_ mask: SIMD<Double>.Mask) -> SIMD<Double>.HalfMask {
+    SIMD<Double>.HalfMask(raw: HighwayReference.Nothrow.lowerHalfOfMaskF64(mask.raw))
 }
 
 @inline(never)
-public func portUpperHalfOfMaskF64(_ mask: SIMDDouble.Mask) -> SIMDDouble.HalfMask {
-    SIMDDouble.upperHalf(mask)
+public func portUpperHalfOfMaskF64(_ mask: SIMD<Double>.Mask) -> SIMD<Double>.HalfMask {
+    SIMD<Double>.upperHalf(mask)
 }
 
 @inline(never)
-public func highwayUpperHalfOfMaskF64(_ mask: SIMDDouble.Mask) -> SIMDDouble.HalfMask {
-    SIMDDouble.HalfMask(raw: HighwayReference.Nothrow.upperHalfOfMaskF64(mask.raw))
+public func highwayUpperHalfOfMaskF64(_ mask: SIMD<Double>.Mask) -> SIMD<Double>.HalfMask {
+    SIMD<Double>.HalfMask(raw: HighwayReference.Nothrow.upperHalfOfMaskF64(mask.raw))
 }
 
 @inline(never)
 public func portCombiningMasksF64(
-    _ a: SIMDDouble.HalfMask,
-    _ b: SIMDDouble.HalfMask
-) -> SIMDDouble.Mask {
-    SIMDDouble.combining(a, b)
+    _ a: SIMD<Double>.HalfMask,
+    _ b: SIMD<Double>.HalfMask
+) -> SIMD<Double>.Mask {
+    SIMD<Double>.combining(a, b)
 }
 
 @inline(never)
 public func highwayCombiningMasksF64(
-    _ a: SIMDDouble.HalfMask,
-    _ b: SIMDDouble.HalfMask
-) -> SIMDDouble.Mask {
-    SIMDDouble.Mask(raw: HighwayReference.Nothrow.combiningMasksF64(a.raw, b.raw))
+    _ a: SIMD<Double>.HalfMask,
+    _ b: SIMD<Double>.HalfMask
+) -> SIMD<Double>.Mask {
+    SIMD<Double>.Mask(raw: HighwayReference.Nothrow.combiningMasksF64(a.raw, b.raw))
 }

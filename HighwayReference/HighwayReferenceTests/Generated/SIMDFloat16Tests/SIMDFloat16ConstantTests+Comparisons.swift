@@ -8,16 +8,16 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkIsNegativeConstantA(_ value: H.Lane) {
+    private func checkIsNegativeConstantA(_ value: Lane) {
         let mismatches = Mismatches("isNegative with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.isNegative(H.repeating(value)),
-            H.Mask(raw: HighwayReference.isNegativeF16(H.repeating(value))),
+            H.Mask(raw: HighwayReference.isNegativeF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -80,7 +80,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func isNegativeConstantSplatPayloadNaN() {
-        checkIsNegativeConstantA(H.Lane(nan: 1, signaling: false))
+        checkIsNegativeConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func isNegativeConstantSplatSignalingNaN() {
@@ -100,18 +100,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkEqualToConstantA(_ value: H.Lane) {
+    private func checkEqualToConstantA(_ value: Lane) {
         let mismatches = Mismatches("equalTo with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB19B_BFEF_B5D3_A855)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB19B_BFEF_B5D3_A855)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.equalTo(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.equalToF16(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.equalToF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -119,18 +119,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkEqualToConstantB(_ value: H.Lane) {
+    private func checkEqualToConstantB(_ value: Lane) {
         let mismatches = Mismatches("equalTo with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x98B6_39EF_A808_DA83)
+        let aInputs = Inputs.vectors(H.self, seed: 0x98B6_39EF_A808_DA83)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.equalTo(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.equalToF16(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.equalToF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -208,8 +208,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func equalToConstantSplatPayloadNaN() {
-        checkEqualToConstantA(H.Lane(nan: 1, signaling: false))
-        checkEqualToConstantB(H.Lane(nan: 1, signaling: false))
+        checkEqualToConstantA(Lane(nan: 1, signaling: false))
+        checkEqualToConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func equalToConstantSplatSignalingNaN() {
@@ -233,18 +233,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkNotEqualToConstantA(_ value: H.Lane) {
+    private func checkNotEqualToConstantA(_ value: Lane) {
         let mismatches = Mismatches("notEqualTo with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8CCF_B82B_69A4_03D6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8CCF_B82B_69A4_03D6)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.notEqualTo(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.notEqualToF16(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.notEqualToF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -252,18 +252,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkNotEqualToConstantB(_ value: H.Lane) {
+    private func checkNotEqualToConstantB(_ value: Lane) {
         let mismatches = Mismatches("notEqualTo with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8514_222B_6586_2414)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8514_222B_6586_2414)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.notEqualTo(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.notEqualToF16(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.notEqualToF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -341,8 +341,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func notEqualToConstantSplatPayloadNaN() {
-        checkNotEqualToConstantA(H.Lane(nan: 1, signaling: false))
-        checkNotEqualToConstantB(H.Lane(nan: 1, signaling: false))
+        checkNotEqualToConstantA(Lane(nan: 1, signaling: false))
+        checkNotEqualToConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func notEqualToConstantSplatSignalingNaN() {
@@ -366,18 +366,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLessThanConstantA(_ value: H.Lane) {
+    private func checkLessThanConstantA(_ value: Lane) {
         let mismatches = Mismatches("lessThan with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDD33_6EBB_BE5D_8AE6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDD33_6EBB_BE5D_8AE6)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.lessThan(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.lessThanF16(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.lessThanF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -385,18 +385,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLessThanConstantB(_ value: H.Lane) {
+    private func checkLessThanConstantB(_ value: Lane) {
         let mismatches = Mismatches("lessThan with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD49E_58BB_B986_E0E4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD49E_58BB_B986_E0E4)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.lessThan(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.lessThanF16(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.lessThanF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -474,8 +474,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func lessThanConstantSplatPayloadNaN() {
-        checkLessThanConstantA(H.Lane(nan: 1, signaling: false))
-        checkLessThanConstantB(H.Lane(nan: 1, signaling: false))
+        checkLessThanConstantA(Lane(nan: 1, signaling: false))
+        checkLessThanConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func lessThanConstantSplatSignalingNaN() {
@@ -499,18 +499,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkGreaterThanConstantA(_ value: H.Lane) {
+    private func checkGreaterThanConstantA(_ value: Lane) {
         let mismatches = Mismatches("greaterThan with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x008E_679B_D5CE_3829)
+        let bInputs = Inputs.vectors(H.self, seed: 0x008E_679B_D5CE_3829)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.greaterThan(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.greaterThanF16(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.greaterThanF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -518,18 +518,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkGreaterThanConstantB(_ value: H.Lane) {
+    private func checkGreaterThanConstantB(_ value: Lane) {
         let mismatches = Mismatches("greaterThan with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE6CF_019B_C749_FCF7)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE6CF_019B_C749_FCF7)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.greaterThan(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.greaterThanF16(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.greaterThanF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -607,8 +607,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func greaterThanConstantSplatPayloadNaN() {
-        checkGreaterThanConstantA(H.Lane(nan: 1, signaling: false))
-        checkGreaterThanConstantB(H.Lane(nan: 1, signaling: false))
+        checkGreaterThanConstantA(Lane(nan: 1, signaling: false))
+        checkGreaterThanConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func greaterThanConstantSplatSignalingNaN() {
@@ -632,18 +632,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLessThanOrEqualToConstantA(_ value: H.Lane) {
+    private func checkLessThanOrEqualToConstantA(_ value: Lane) {
         let mismatches = Mismatches("lessThanOrEqualTo with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7E8B_3DA4_8131_67F6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7E8B_3DA4_8131_67F6)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.lessThanOrEqualTo(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToF16(H.repeating(value), b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -651,18 +651,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLessThanOrEqualToConstantB(_ value: H.Lane) {
+    private func checkLessThanOrEqualToConstantB(_ value: Lane) {
         let mismatches = Mismatches("lessThanOrEqualTo with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x751C_A7A4_7BA1_F3B4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x751C_A7A4_7BA1_F3B4)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.lessThanOrEqualTo(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToF16(a, H.repeating(value))),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -740,8 +740,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func lessThanOrEqualToConstantSplatPayloadNaN() {
-        checkLessThanOrEqualToConstantA(H.Lane(nan: 1, signaling: false))
-        checkLessThanOrEqualToConstantB(H.Lane(nan: 1, signaling: false))
+        checkLessThanOrEqualToConstantA(Lane(nan: 1, signaling: false))
+        checkLessThanOrEqualToConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func lessThanOrEqualToConstantSplatSignalingNaN() {
@@ -765,18 +765,20 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkGreaterThanOrEqualToConstantA(_ value: H.Lane) {
+    private func checkGreaterThanOrEqualToConstantA(_ value: Lane) {
         let mismatches = Mismatches("greaterThanOrEqualTo with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1A3B_CB09_EE64_D06F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1A3B_CB09_EE64_D06F)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.greaterThanOrEqualTo(H.repeating(value), b),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToF16(H.repeating(value), b)),
+                H.Mask(
+                    raw: HighwayReference.greaterThanOrEqualToF16(H.repeating(value).raw, b.raw)
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -784,18 +786,20 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkGreaterThanOrEqualToConstantB(_ value: H.Lane) {
+    private func checkGreaterThanOrEqualToConstantB(_ value: Lane) {
         let mismatches = Mismatches("greaterThanOrEqualTo with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x23AA_8109_F3F4_7B11)
+        let aInputs = Inputs.vectors(H.self, seed: 0x23AA_8109_F3F4_7B11)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, H.repeating(value)),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToF16(a, H.repeating(value))),
+                H.Mask(
+                    raw: HighwayReference.greaterThanOrEqualToF16(a.raw, H.repeating(value).raw)
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -873,8 +877,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func greaterThanOrEqualToConstantSplatPayloadNaN() {
-        checkGreaterThanOrEqualToConstantA(H.Lane(nan: 1, signaling: false))
-        checkGreaterThanOrEqualToConstantB(H.Lane(nan: 1, signaling: false))
+        checkGreaterThanOrEqualToConstantA(Lane(nan: 1, signaling: false))
+        checkGreaterThanOrEqualToConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func greaterThanOrEqualToConstantSplatSignalingNaN() {

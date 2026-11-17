@@ -8,16 +8,16 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkFirstLaneConstantA(_ value: H.Lane) {
+    private func checkFirstLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("firstLane with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.firstLane(H.repeating(value)),
-            Float16(bitPattern: HighwayReference.firstLaneF16(H.repeating(value))),
+            Float16(bitPattern: HighwayReference.firstLaneF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -80,7 +80,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func firstLaneConstantSplatPayloadNaN() {
-        checkFirstLaneConstantA(H.Lane(nan: 1, signaling: false))
+        checkFirstLaneConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func firstLaneConstantSplatSignalingNaN() {
@@ -102,11 +102,11 @@ extension SIMDFloat16ConstantTests {
     @inline(__always)
     private func checkLaneConstantIndex(_ index: Int) {
         let mismatches = Mismatches("lane with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4C46_F957_B989_0422)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4C46_F957_B989_0422)
         for a in aInputs {
             mismatches.check(
                 H.lane(a, at: index),
-                Float16(bitPattern: HighwayReference.laneF16(a, index)),
+                Float16(bitPattern: HighwayReference.laneF16(a.raw, index)),
                 "a: \(describe(a))"
             )
         }
@@ -242,18 +242,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLaneConstantA(_ value: H.Lane) {
+    private func checkLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("lane with a repeating \(hex(value))")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for index in indexInputs {
             mismatches.check(
                 H.lane(H.repeating(value), at: index),
-                Float16(bitPattern: HighwayReference.laneF16(H.repeating(value), index)),
+                Float16(bitPattern: HighwayReference.laneF16(H.repeating(value).raw, index)),
                 "index: \(index)"
             )
         }
@@ -317,7 +317,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func laneConstantSplatPayloadNaN() {
-        checkLaneConstantA(H.Lane(nan: 1, signaling: false))
+        checkLaneConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func laneConstantSplatSignalingNaN() {
@@ -337,19 +337,25 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkReplacingLaneConstantA(_ value: H.Lane) {
+    private func checkReplacingLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("replacingLane with a repeating \(hex(value))")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x623F_F5D9_6CFE_EB48)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x623F_F5D9_6CFE_EB48)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (index, value) in everyPair(indexInputs, valueInputs) {
             mismatches.check(
                 H.replacingLane(H.repeating(value), at: index, with: value),
-                HighwayReference.replacingLaneF16(H.repeating(value), index, value.bitPattern),
+                H(
+                    raw: HighwayReference.replacingLaneF16(
+                        H.repeating(value).raw,
+                        index,
+                        value.bitPattern
+                    )
+                ),
                 "index: \(index), value: \(hex(value))"
             )
         }
@@ -413,7 +419,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func replacingLaneConstantSplatPayloadNaN() {
-        checkReplacingLaneConstantA(H.Lane(nan: 1, signaling: false))
+        checkReplacingLaneConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func replacingLaneConstantSplatSignalingNaN() {

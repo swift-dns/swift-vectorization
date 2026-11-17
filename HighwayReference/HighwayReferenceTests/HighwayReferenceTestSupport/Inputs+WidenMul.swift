@@ -6,13 +6,13 @@ extension Inputs {
         if !lanes.contains(~0) {
             lanes.append(~0)
         }
-        let splats = lanes.map { V(V.Simd(repeating: $0)) }
+        let splats = lanes.map { V(referenceSimd: V.Simd(repeating: $0)) }
         let extremes: [(Lane, Lane)] = [
             (Lane.min, Lane.max), (Lane.max, Lane.min), (Lane.min, Lane.min + 1),
             (Lane.max, Lane.max - 1),
         ]
         let alternating = extremes.map { first, second in
-            V(V.Simd((0..<V.Simd.scalarCount).map { $0 % 2 == 0 ? first : second }))
+            V(referenceSimd: V.Simd((0..<V.Simd.scalarCount).map { $0 % 2 == 0 ? first : second }))
         }
         return splats + alternating
     }
@@ -34,9 +34,13 @@ extension Inputs {
                 unique.append(lane)
             }
         }
-        let splats = unique.map { V(V.Simd(repeating: $0)) }
+        let splats = unique.map { V(referenceSimd: V.Simd(repeating: $0)) }
         let rotations = unique.indices.map { offset in
-            V(V.Simd((0..<V.Simd.scalarCount).map { unique[($0 + offset) % unique.count] }))
+            V(
+                referenceSimd: V.Simd(
+                    (0..<V.Simd.scalarCount).map { unique[($0 + offset) % unique.count] }
+                )
+            )
         }
         return splats + rotations
     }

@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDUInt32CodegenTests {
     @Test func vectorClampingFromUInt64() {
         let mismatches = Mismatches("portVectorClampingU64ToU32")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xEFC8_F799_8B31_4E6D)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xEFC8_F699_8B31_4CBA)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xEFC8_F799_8B31_4E6D)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xEFC8_F699_8B31_4CBA)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingU64ToU32(clamping: a, b),
@@ -23,7 +23,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingFromUInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingU64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xD69E_174F_4A9A_2771)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xD69E_174F_4A9A_2771)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingU64ToU32ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingFromUInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingU64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xBD4B_914F_3C72_87BF)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xBD4B_914F_3C72_87BF)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingU64ToU32ConstantB(clamping: a),
@@ -49,8 +49,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingFromInt64() {
         let mismatches = Mismatches("portVectorClampingI64ToU32")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x0D10_8D61_B949_B754)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x0D10_8E61_B949_B907)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x0D10_8D61_B949_B754)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x0D10_8E61_B949_B907)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingI64ToU32(clamping: a, b),
@@ -63,7 +63,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingFromInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingI64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xE1ED_7448_EF78_227A)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xE1ED_7448_EF78_227A)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingI64ToU32ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingFromInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingI64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xDA31_BE48_EB5A_0C58)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xDA31_BE48_EB5A_0C58)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingI64ToU32ConstantB(clamping: a),
@@ -89,8 +89,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderFromUInt64() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderU64ToU32")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xD97B_4876_B117_DF18)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xD97B_4976_B117_E0CB)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xD97B_4876_B117_DF18)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xD97B_4976_B117_E0CB)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderU64ToU32(clampingInAnyOrder: a, b),
@@ -103,7 +103,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderFromUInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderU64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x5E07_AEC3_F652_906E)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x5E07_AEC3_F652_906E)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderU64ToU32ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderFromUInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderU64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x5572_78C3_F17B_B00C)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x5572_78C3_F17B_B00C)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderU64ToU32ConstantB(clampingInAnyOrder: a),
@@ -129,8 +129,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderFromInt64() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderI64ToU32")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x513C_DAA5_E3DE_541F)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x513C_D9A5_E3DE_526C)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x513C_DAA5_E3DE_541F)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x513C_D9A5_E3DE_526C)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderI64ToU32(clampingInAnyOrder: a, b),
@@ -143,7 +143,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderFromInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderI64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x4504_09CD_55D5_08EB)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x4504_09CD_55D5_08EB)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderI64ToU32ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderFromInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderI64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x4E72_BFCD_5B64_B38D)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x4E72_BFCD_5B64_B38D)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderI64ToU32ConstantB(clampingInAnyOrder: a),
@@ -169,7 +169,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingShiftedRightByFromUInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingShiftedRightByU64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xB2EE_ABB6_B980_9F8D)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xB2EE_ABB6_B980_9F8D)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingShiftedRightByU64ToU32ConstantA(b),
@@ -182,7 +182,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingShiftedRightByFromUInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingShiftedRightByU64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x97E9_25B6_A9E7_6B5B)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x97E9_25B6_A9E7_6B5B)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingShiftedRightByU64ToU32ConstantB(clamping: a),
@@ -195,8 +195,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingShiftedRightByFromUInt64ConstantBits() {
         let mismatches = Mismatches("portVectorClampingShiftedRightByU64ToU32ConstantBits")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xACEB_ECAB_A3F0_3211)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xACEB_EBAB_A3F0_305E)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xACEB_ECAB_A3F0_3211)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xACEB_EBAB_A3F0_305E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingShiftedRightByU64ToU32ConstantBits(clamping: a, b),
@@ -211,8 +211,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingShiftedRightByU64ToU32ConstantBitsWidthDifference"
         )
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xA083_2DBA_D118_67F6)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xA083_2EBA_D118_69A9)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xA083_2DBA_D118_67F6)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xA083_2EBA_D118_69A9)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingShiftedRightByU64ToU32ConstantBitsWidthDifference(clamping: a, b),
@@ -228,7 +228,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingShiftedRightByFromInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingShiftedRightByI64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x7964_79B5_6879_4596)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x7964_79B5_6879_4596)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingShiftedRightByI64ToU32ConstantA(b),
@@ -241,7 +241,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingShiftedRightByFromInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingShiftedRightByI64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x71A8_E3B5_645B_65D4)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x71A8_E3B5_645B_65D4)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingShiftedRightByI64ToU32ConstantB(clamping: a),
@@ -254,8 +254,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingShiftedRightByFromInt64ConstantBits() {
         let mismatches = Mismatches("portVectorClampingShiftedRightByI64ToU32ConstantBits")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xF66D_75B5_1821_8D40)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xF66D_76B5_1821_8EF3)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xF66D_75B5_1821_8D40)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xF66D_76B5_1821_8EF3)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingShiftedRightByI64ToU32ConstantBits(clamping: a, b),
@@ -270,8 +270,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingShiftedRightByI64ToU32ConstantBitsWidthDifference"
         )
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xCB8D_FA8E_099D_4D91)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xCB8D_F98E_099D_4BDE)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xCB8D_FA8E_099D_4D91)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xCB8D_F98E_099D_4BDE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingShiftedRightByI64ToU32ConstantBitsWidthDifference(clamping: a, b),
@@ -287,7 +287,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromUInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingRoundingShiftedRightByU64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xFCCE_2194_CC4F_10DD)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xFCCE_2194_CC4F_10DD)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingRoundingShiftedRightByU64ToU32ConstantA(b),
@@ -300,7 +300,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromUInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingRoundingShiftedRightByU64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xE1C8_9B94_BCB5_DCAB)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xE1C8_9B94_BCB5_DCAB)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingRoundingShiftedRightByU64ToU32ConstantB(clamping: a),
@@ -313,8 +313,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromUInt64ConstantBits() {
         let mismatches = Mismatches("portVectorClampingRoundingShiftedRightByU64ToU32ConstantBits")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xFABC_F5F4_1D70_B541)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xFABC_F4F4_1D70_B38E)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xFABC_F5F4_1D70_B541)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xFABC_F4F4_1D70_B38E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingRoundingShiftedRightByU64ToU32ConstantBits(clamping: a, b),
@@ -329,8 +329,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingRoundingShiftedRightByU64ToU32ConstantBitsWidthDifference"
         )
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x4213_C54B_0597_A2E6)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x4213_C64B_0597_A499)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x4213_C54B_0597_A2E6)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x4213_C64B_0597_A499)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingRoundingShiftedRightByU64ToU32ConstantBitsWidthDifference(
@@ -349,7 +349,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingRoundingShiftedRightByI64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x169F_AC5F_F2F8_D1A6)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x169F_AC5F_F2F8_D1A6)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingRoundingShiftedRightByI64ToU32ConstantA(b),
@@ -362,7 +362,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingRoundingShiftedRightByI64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x0E0A_965F_EE22_27A4)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x0E0A_965F_EE22_27A4)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingRoundingShiftedRightByI64ToU32ConstantB(clamping: a),
@@ -375,8 +375,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingRoundingShiftedRightByFromInt64ConstantBits() {
         let mismatches = Mismatches("portVectorClampingRoundingShiftedRightByI64ToU32ConstantBits")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xC646_B4F2_F64F_1570)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xC646_B5F2_F64F_1723)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xC646_B4F2_F64F_1570)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xC646_B5F2_F64F_1723)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingRoundingShiftedRightByI64ToU32ConstantBits(clamping: a, b),
@@ -391,8 +391,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingRoundingShiftedRightByI64ToU32ConstantBitsWidthDifference"
         )
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x6B0F_FB2E_6228_C501)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x6B0F_FA2E_6228_C34E)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x6B0F_FB2E_6228_C501)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x6B0F_FA2E_6228_C34E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingRoundingShiftedRightByI64ToU32ConstantBitsWidthDifference(
@@ -411,7 +411,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderShiftedRightByFromUInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderShiftedRightByU64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xF894_F4CD_485A_06FA)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xF894_F4CD_485A_06FA)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderShiftedRightByU64ToU32ConstantA(b),
@@ -424,7 +424,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderShiftedRightByFromUInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderShiftedRightByU64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xF0D9_3ECD_443B_F0D8)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xF0D9_3ECD_443B_F0D8)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderShiftedRightByU64ToU32ConstantB(clampingInAnyOrder: a),
@@ -441,8 +441,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderShiftedRightByU64ToU32ConstantBits"
         )
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xFEF2_CE5C_6B9F_51D4)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xFEF2_CF5C_6B9F_5387)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xFEF2_CE5C_6B9F_51D4)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xFEF2_CF5C_6B9F_5387)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderShiftedRightByU64ToU32ConstantBits(
@@ -463,8 +463,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderShiftedRightByU64ToU32ConstantBitsWidthDifference"
         )
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x6BEE_2895_AB1B_DAFD)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x6BEE_2795_AB1B_D94A)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x6BEE_2895_AB1B_DAFD)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x6BEE_2795_AB1B_D94A)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderShiftedRightByU64ToU32ConstantBitsWidthDifference(
@@ -483,7 +483,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderShiftedRightByFromInt64ConstantA() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderShiftedRightByI64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x5293_FB94_A68C_8EE7)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x5293_FB94_A68C_8EE7)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderShiftedRightByI64ToU32ConstantA(b),
@@ -496,7 +496,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorClampingInAnyOrderShiftedRightByFromInt64ConstantB() {
         let mismatches = Mismatches("portVectorClampingInAnyOrderShiftedRightByI64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x5C02_9194_AC1C_0329)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x5C02_9194_AC1C_0329)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderShiftedRightByI64ToU32ConstantB(clampingInAnyOrder: a),
@@ -513,8 +513,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderShiftedRightByI64ToU32ConstantBits"
         )
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x9A9B_8D6E_E1BC_A177)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x9A9B_8C6E_E1BC_9FC4)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x9A9B_8D6E_E1BC_A177)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x9A9B_8C6E_E1BC_9FC4)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderShiftedRightByI64ToU32ConstantBits(
@@ -535,8 +535,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderShiftedRightByI64ToU32ConstantBitsWidthDifference"
         )
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xBB76_F632_91AB_1158)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xBB76_F732_91AB_130B)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xBB76_F632_91AB_1158)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xBB76_F732_91AB_130B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderShiftedRightByI64ToU32ConstantBitsWidthDifference(
@@ -557,7 +557,7 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderRoundingShiftedRightByU64ToU32ConstantA"
         )
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xA052_E2E9_3BC2_FB62)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xA052_E2E9_3BC2_FB62)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderRoundingShiftedRightByU64ToU32ConstantA(b),
@@ -572,7 +572,7 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderRoundingShiftedRightByU64ToU32ConstantB"
         )
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x9751_2CE9_3690_22A0)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x9751_2CE9_3690_22A0)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderRoundingShiftedRightByU64ToU32ConstantB(
@@ -591,8 +591,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderRoundingShiftedRightByU64ToU32ConstantBits"
         )
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xF395_D2FA_0E31_F05C)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xF395_D3FA_0E31_F20F)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xF395_D2FA_0E31_F05C)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xF395_D3FA_0E31_F20F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderRoundingShiftedRightByU64ToU32ConstantBits(
@@ -614,8 +614,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderRoundingShiftedRightByU64ToU32ConstantBitsWidthDifference"
         )
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x9118_3B37_87B3_1655)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x9118_3A37_87B3_14A2)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x9118_3B37_87B3_1655)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x9118_3A37_87B3_14A2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderRoundingShiftedRightByU64ToU32ConstantBitsWidthDifference(
@@ -636,7 +636,7 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderRoundingShiftedRightByI64ToU32ConstantA"
         )
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xDED1_755E_C280_70FF)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xDED1_755E_C280_70FF)
         for b in bInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderRoundingShiftedRightByI64ToU32ConstantA(b),
@@ -651,7 +651,7 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderRoundingShiftedRightByI64ToU32ConstantB"
         )
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xE766_AB5E_C757_5161)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xE766_AB5E_C757_5161)
         for a in aInputs {
             mismatches.check(
                 portVectorClampingInAnyOrderRoundingShiftedRightByI64ToU32ConstantB(
@@ -670,8 +670,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderRoundingShiftedRightByI64ToU32ConstantBits"
         )
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x69C0_F3C3_64C1_B70F)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0x69C0_F2C3_64C1_B55C)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x69C0_F3C3_64C1_B70F)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0x69C0_F2C3_64C1_B55C)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderRoundingShiftedRightByI64ToU32ConstantBits(
@@ -693,8 +693,8 @@ extension SIMDUInt32CodegenTests {
         let mismatches = Mismatches(
             "portVectorClampingInAnyOrderRoundingShiftedRightByI64ToU32ConstantBitsWidthDifference"
         )
-        let aInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xB4DE_2986_8A26_0600)
-        let bInputs = Inputs.conversions(SIMDInt64.Vector.self, seed: 0xB4DE_2A86_8A26_07B3)
+        let aInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xB4DE_2986_8A26_0600)
+        let bInputs = Inputs.conversions(SIMD<Int64>.self, seed: 0xB4DE_2A86_8A26_07B3)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorClampingInAnyOrderRoundingShiftedRightByI64ToU32ConstantBitsWidthDifference(
@@ -713,8 +713,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorTruncatingIfNeededFromUInt64() {
         let mismatches = Mismatches("portVectorTruncatingIfNeededU64ToU32")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xDDF0_FA45_2118_A03B)
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0xDDF0_F945_2118_9E88)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xDDF0_FA45_2118_A03B)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0xDDF0_F945_2118_9E88)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portVectorTruncatingIfNeededU64ToU32(truncatingIfNeeded: a, b),
@@ -727,7 +727,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorTruncatingIfNeededFromUInt64ConstantA() {
         let mismatches = Mismatches("portVectorTruncatingIfNeededU64ToU32ConstantA")
-        let bInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x71E4_D672_92CF_9C37)
+        let bInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x71E4_D672_92CF_9C37)
         for b in bInputs {
             mismatches.check(
                 portVectorTruncatingIfNeededU64ToU32ConstantA(b),
@@ -740,7 +740,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func vectorTruncatingIfNeededFromUInt64ConstantB() {
         let mismatches = Mismatches("portVectorTruncatingIfNeededU64ToU32ConstantB")
-        let aInputs = Inputs.conversions(SIMDUInt64.Vector.self, seed: 0x7A79_EC72_97A6_4639)
+        let aInputs = Inputs.conversions(SIMD<UInt64>.self, seed: 0x7A79_EC72_97A6_4639)
         for a in aInputs {
             mismatches.check(
                 portVectorTruncatingIfNeededU64ToU32ConstantB(truncatingIfNeeded: a),

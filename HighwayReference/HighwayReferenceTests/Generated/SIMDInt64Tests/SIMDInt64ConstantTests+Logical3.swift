@@ -7,16 +7,16 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkHighestSetBitIndexConstantA(_ value: H.Lane) {
+    private func checkHighestSetBitIndexConstantA(_ value: Lane) {
         let mismatches = Mismatches("highestSetBitIndex with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         mismatches.check(
             H.highestSetBitIndex(H.repeating(value)),
-            H.Vector(raw: HighwayReference.highestSetBitIndexI64(H.repeating(value).raw)),
+            H(raw: HighwayReference.highestSetBitIndexI64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -91,26 +91,26 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func highestSetBitIndexConstantSplatMax() {
-        checkHighestSetBitIndexConstantA(H.Lane.max)
+        checkHighestSetBitIndexConstantA(Lane.max)
     }
 
     @Test func highestSetBitIndexConstantSplatMin() {
-        checkHighestSetBitIndexConstantA(H.Lane.min)
+        checkHighestSetBitIndexConstantA(Lane.min)
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeOrZeroConstantB(_ value: H.Lane) {
+    private func checkSelectingIfNegativeOrZeroConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegativeOrZero with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3DF0_F187_0030_6F21)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3DF0_F187_0030_6F21)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(a, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.selectingIfNegativeOrZeroI64(
                         a.raw,
                         H.repeating(value).raw
@@ -191,28 +191,26 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatMax() {
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane.max)
+        checkSelectingIfNegativeOrZeroConstantB(Lane.max)
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatMin() {
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane.min)
+        checkSelectingIfNegativeOrZeroConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkNegatingIfNegativeConstantB(_ value: H.Lane) {
+    private func checkNegatingIfNegativeConstantB(_ value: Lane) {
         let mismatches = Mismatches("negatingIfNegative with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0770_C2BE_3598_3669)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0770_C2BE_3598_3669)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.negatingIfNegative(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.negatingIfNegativeI64(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.negatingIfNegativeI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -288,10 +286,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func negatingIfNegativeConstantSplatMax() {
-        checkNegatingIfNegativeConstantB(H.Lane.max)
+        checkNegatingIfNegativeConstantB(Lane.max)
     }
 
     @Test func negatingIfNegativeConstantSplatMin() {
-        checkNegatingIfNegativeConstantB(H.Lane.min)
+        checkNegatingIfNegativeConstantB(Lane.min)
     }
 }

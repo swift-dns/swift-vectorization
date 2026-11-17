@@ -4,31 +4,31 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portAllFalseBF16(_ mask: SIMDBFloat16.Mask) -> Bool {
-    SIMDBFloat16.allFalse(mask)
+public func portAllFalseBF16(_ mask: SIMD<BFloat16>.Mask) -> Bool {
+    SIMD<BFloat16>.allFalse(mask)
 }
 
 @inline(never)
-public func highwayAllFalseBF16(_ mask: SIMDBFloat16.Mask) -> Bool {
+public func highwayAllFalseBF16(_ mask: SIMD<BFloat16>.Mask) -> Bool {
     HighwayReference.Nothrow.allFalseBF16(mask.raw)
 }
 
 @inline(never)
-public func portLastTrueIndexBF16(_ mask: SIMDBFloat16.Mask) -> Int {
-    SIMDBFloat16.lastTrueIndex(mask)
+public func portLastTrueIndexBF16(_ mask: SIMD<BFloat16>.Mask) -> Int {
+    SIMD<BFloat16>.lastTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayLastTrueIndexBF16(_ mask: SIMDBFloat16.Mask) -> Int {
+public func highwayLastTrueIndexBF16(_ mask: SIMD<BFloat16>.Mask) -> Int {
     HighwayReference.Nothrow.lastTrueIndexBF16(mask.raw)
 }
 
 @inline(never)
-public func portKnownLastTrueIndexBF16(_ mask: SIMDBFloat16.Mask) -> Int {
-    SIMDBFloat16.knownLastTrueIndex(mask)
+public func portKnownLastTrueIndexBF16(_ mask: SIMD<BFloat16>.Mask) -> Int {
+    SIMD<BFloat16>.knownLastTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayKnownLastTrueIndexBF16(_ mask: SIMDBFloat16.Mask) -> Int {
+public func highwayKnownLastTrueIndexBF16(_ mask: SIMD<BFloat16>.Mask) -> Int {
     HighwayReference.Nothrow.knownLastTrueIndexBF16(mask.raw)
 }

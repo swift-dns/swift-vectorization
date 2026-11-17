@@ -9,11 +9,11 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedLeftBytesConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedLeftBytes with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x657B_99BF_A440_C265)
+        let aInputs = Inputs.vectors(H.self, seed: 0x657B_99BF_A440_C265)
         for a in aInputs {
             mismatches.check(
                 H.shiftedLeftBytes(a, by: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftBytesU16(
                         a.raw,
                         Int32(truncatingIfNeeded: bytes)
@@ -96,11 +96,11 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedLeftBytesUncheckedConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedLeftBytes unchecked with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x464E_BAC4_1652_C4BB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x464E_BAC4_1652_C4BB)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedLeftBytes(a, byUnchecked: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftBytesU16(
                         a.raw,
                         Int32(truncatingIfNeeded: bytes)
@@ -183,11 +183,11 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedRightBytesConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedRightBytes with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x089A_DC44_B547_FA7C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x089A_DC44_B547_FA7C)
         for a in aInputs {
             mismatches.check(
                 H.shiftedRightBytes(a, by: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightBytesU16(
                         a.raw,
                         Int32(truncatingIfNeeded: bytes)
@@ -270,11 +270,11 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedRightBytesUncheckedConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("shiftedRightBytes unchecked with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC510_A289_B221_EF10)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC510_A289_B221_EF10)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedRightBytes(a, byUnchecked: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightBytesU16(
                         a.raw,
                         Int32(truncatingIfNeeded: bytes)
@@ -357,11 +357,11 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedLeftLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedLeftLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD23C_7511_6199_0505)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD23C_7511_6199_0505)
         for a in aInputs {
             mismatches.check(
                 H.shiftedLeftLanes(a, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftLanesU16(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
@@ -412,11 +412,11 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedLeftLanesUncheckedConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedLeftLanes unchecked with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF6F0_1413_209B_E4E3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF6F0_1413_209B_E4E3)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedLeftLanes(a, byUnchecked: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftLanesU16(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
@@ -467,11 +467,11 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedRightLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedRightLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE2EB_5D8E_3812_B124)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE2EB_5D8E_3812_B124)
         for a in aInputs {
             mismatches.check(
                 H.shiftedRightLanes(a, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightLanesU16(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
@@ -522,11 +522,11 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkShiftedRightLanesUncheckedConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("shiftedRightLanes unchecked with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFCB5_0DA9_D345_DE70)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFCB5_0DA9_D345_DE70)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shiftedRightLanes(a, byUnchecked: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightLanesU16(
                         a.raw,
                         Int32(truncatingIfNeeded: lanes)
@@ -577,12 +577,12 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkCombinedShiftedRightBytesConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("combinedShiftedRightBytes with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A30_1E77_A68F_16CB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1A30_1D77_A68F_1518)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1A30_1E77_A68F_16CB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1A30_1D77_A68F_1518)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, b, by: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightBytesU16(
                         a.raw,
                         b.raw,
@@ -658,12 +658,12 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkCombinedShiftedRightBytesUncheckedConstantBytes(_ bytes: Int) {
         let mismatches = Mismatches("combinedShiftedRightBytes unchecked with bytes \(bytes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4B58_F98A_73E6_A7C5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4B58_F88A_73E6_A612)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4B58_F98A_73E6_A7C5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4B58_F88A_73E6_A612)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.combinedShiftedRightBytes(a, b, byUnchecked: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightBytesU16(
                         a.raw,
                         b.raw,
@@ -739,12 +739,12 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkCombinedShiftedRightLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("combinedShiftedRightLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF0E7_32EA_D7F7_FFB3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF0E7_31EA_D7F7_FE00)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF0E7_32EA_D7F7_FFB3)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF0E7_31EA_D7F7_FE00)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, b, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesU16(
                         a.raw,
                         b.raw,
@@ -788,12 +788,12 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkCombinedShiftedRightLanesUncheckedConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("combinedShiftedRightLanes unchecked with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x853C_E06C_45C7_CF65)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x853C_DF6C_45C7_CDB2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x853C_E06C_45C7_CF65)
+        let bInputs = Inputs.vectors(H.self, seed: 0x853C_DF6C_45C7_CDB2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.combinedShiftedRightLanes(a, b, byUnchecked: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesU16(
                         a.raw,
                         b.raw,

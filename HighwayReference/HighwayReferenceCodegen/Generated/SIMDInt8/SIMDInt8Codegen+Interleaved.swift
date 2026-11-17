@@ -6,11 +6,7 @@ public import Vectorization
 extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadInterleaved2(
-        from span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector
-    ) {
+    public static func loadInterleaved2(from span: Span<Lane>, _ v0: inout SIMD, _ v1: inout SIMD) {
         precondition(
             span.count >= 2 * laneCount,
             "Span has fewer elements than 2 vectors have lanes"
@@ -22,8 +18,8 @@ extension HighwayReferenceInt8 {
     @unsafe @export(implementation) @inline(always)
     public static func loadInterleaved2(
         fromUnchecked span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
         span.withUnsafeBufferPointer {
@@ -39,9 +35,9 @@ extension HighwayReferenceInt8 {
     @export(implementation) @inline(always)
     public static func loadInterleaved3(
         from span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector,
-        _ v2: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD,
+        _ v2: inout SIMD
     ) {
         precondition(
             span.count >= 3 * laneCount,
@@ -54,9 +50,9 @@ extension HighwayReferenceInt8 {
     @unsafe @export(implementation) @inline(always)
     public static func loadInterleaved3(
         fromUnchecked span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector,
-        _ v2: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD,
+        _ v2: inout SIMD
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
         span.withUnsafeBufferPointer {
@@ -73,10 +69,10 @@ extension HighwayReferenceInt8 {
     @export(implementation) @inline(always)
     public static func loadInterleaved4(
         from span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector,
-        _ v2: inout Vector,
-        _ v3: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD,
+        _ v2: inout SIMD,
+        _ v3: inout SIMD
     ) {
         precondition(
             span.count >= 4 * laneCount,
@@ -89,10 +85,10 @@ extension HighwayReferenceInt8 {
     @unsafe @export(implementation) @inline(always)
     public static func loadInterleaved4(
         fromUnchecked span: Span<Lane>,
-        _ v0: inout Vector,
-        _ v1: inout Vector,
-        _ v2: inout Vector,
-        _ v3: inout Vector
+        _ v0: inout SIMD,
+        _ v1: inout SIMD,
+        _ v2: inout SIMD,
+        _ v3: inout SIMD
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
         span.withUnsafeBufferPointer {
@@ -108,8 +104,7 @@ extension HighwayReferenceInt8 {
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func storeInterleaved2(_ a: Vector, _ b: Vector, to span: inout MutableSpan<Lane>)
-    {
+    public static func storeInterleaved2(_ a: SIMD, _ b: SIMD, to span: inout MutableSpan<Lane>) {
         precondition(
             span.count >= 2 * laneCount,
             "Span has fewer elements than 2 vectors have lanes"
@@ -120,8 +115,8 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func storeInterleaved2(
-        _ a: Vector,
-        _ b: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
         toUnchecked span: inout MutableSpan<Lane>
     ) {
         assert(span.count >= 2 * laneCount, "Span has fewer elements than 2 vectors have lanes")
@@ -136,11 +131,7 @@ extension HighwayReferenceInt8 {
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func appendInterleaved2(
-        _ a: Vector,
-        _ b: Vector,
-        to output: inout OutputSpan<Lane>
-    ) {
+    public static func appendInterleaved2(_ a: SIMD, _ b: SIMD, to output: inout OutputSpan<Lane>) {
         precondition(
             output.freeCapacity >= 2 * laneCount,
             "OutputSpan has less free capacity than 2 vectors have lanes"
@@ -151,8 +142,8 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func appendInterleaved2(
-        _ a: Vector,
-        _ b: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
         toUnchecked output: inout OutputSpan<Lane>
     ) {
         assert(
@@ -172,9 +163,9 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
     public static func storeInterleaved3(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
         to span: inout MutableSpan<Lane>
     ) {
         precondition(
@@ -187,9 +178,9 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func storeInterleaved3(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
         toUnchecked span: inout MutableSpan<Lane>
     ) {
         assert(span.count >= 3 * laneCount, "Span has fewer elements than 3 vectors have lanes")
@@ -206,9 +197,9 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
     public static func appendInterleaved3(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
         to output: inout OutputSpan<Lane>
     ) {
         precondition(
@@ -221,9 +212,9 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func appendInterleaved3(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
         toUnchecked output: inout OutputSpan<Lane>
     ) {
         assert(
@@ -244,10 +235,10 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
     public static func storeInterleaved4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
+        _ d: SIMD,
         to span: inout MutableSpan<Lane>
     ) {
         precondition(
@@ -260,10 +251,10 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func storeInterleaved4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
+        _ d: SIMD,
         toUnchecked span: inout MutableSpan<Lane>
     ) {
         assert(span.count >= 4 * laneCount, "Span has fewer elements than 4 vectors have lanes")
@@ -281,10 +272,10 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
     public static func appendInterleaved4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
+        _ d: SIMD,
         to output: inout OutputSpan<Lane>
     ) {
         precondition(
@@ -297,10 +288,10 @@ extension HighwayReferenceInt8 {
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
     public static func appendInterleaved4(
-        _ a: Vector,
-        _ b: Vector,
-        _ c: Vector,
-        _ d: Vector,
+        _ a: SIMD,
+        _ b: SIMD,
+        _ c: SIMD,
+        _ d: SIMD,
         toUnchecked output: inout OutputSpan<Lane>
     ) {
         assert(
@@ -323,137 +314,125 @@ extension HighwayReferenceInt8 {
 
 @inline(never)
 public func portLoadInterleaved2I8(
-    from: UnsafePointer<SIMDInt8.Lane>,
-    _ v0: inout SIMDInt8.Vector,
-    _ v1: inout SIMDInt8.Vector
+    from: UnsafePointer<Int8>,
+    _ v0: inout SIMD<Int8>,
+    _ v1: inout SIMD<Int8>
 ) {
-    unsafe SIMDInt8.loadInterleaved2(from: from, &v0, &v1)
+    unsafe SIMD<Int8>.loadInterleaved2(from: from, &v0, &v1)
 }
 
 @inline(never)
 public func highwayLoadInterleaved2I8(
     from: UnsafePointer<Int8>,
-    _ v0: inout SIMDInt8.Vector,
-    _ v1: inout SIMDInt8.Vector
+    _ v0: inout SIMD<Int8>,
+    _ v1: inout SIMD<Int8>
 ) {
     unsafe HighwayReference.Nothrow.loadInterleaved2I8(from, &v0.raw, &v1.raw)
 }
 
 @inline(never)
 public func portLoadInterleaved3I8(
-    from: UnsafePointer<SIMDInt8.Lane>,
-    _ v0: inout SIMDInt8.Vector,
-    _ v1: inout SIMDInt8.Vector,
-    _ v2: inout SIMDInt8.Vector
+    from: UnsafePointer<Int8>,
+    _ v0: inout SIMD<Int8>,
+    _ v1: inout SIMD<Int8>,
+    _ v2: inout SIMD<Int8>
 ) {
-    unsafe SIMDInt8.loadInterleaved3(from: from, &v0, &v1, &v2)
+    unsafe SIMD<Int8>.loadInterleaved3(from: from, &v0, &v1, &v2)
 }
 
 @inline(never)
 public func highwayLoadInterleaved3I8(
     from: UnsafePointer<Int8>,
-    _ v0: inout SIMDInt8.Vector,
-    _ v1: inout SIMDInt8.Vector,
-    _ v2: inout SIMDInt8.Vector
+    _ v0: inout SIMD<Int8>,
+    _ v1: inout SIMD<Int8>,
+    _ v2: inout SIMD<Int8>
 ) {
     unsafe HighwayReference.Nothrow.loadInterleaved3I8(from, &v0.raw, &v1.raw, &v2.raw)
 }
 
 @inline(never)
 public func portLoadInterleaved4I8(
-    from: UnsafePointer<SIMDInt8.Lane>,
-    _ v0: inout SIMDInt8.Vector,
-    _ v1: inout SIMDInt8.Vector,
-    _ v2: inout SIMDInt8.Vector,
-    _ v3: inout SIMDInt8.Vector
+    from: UnsafePointer<Int8>,
+    _ v0: inout SIMD<Int8>,
+    _ v1: inout SIMD<Int8>,
+    _ v2: inout SIMD<Int8>,
+    _ v3: inout SIMD<Int8>
 ) {
-    unsafe SIMDInt8.loadInterleaved4(from: from, &v0, &v1, &v2, &v3)
+    unsafe SIMD<Int8>.loadInterleaved4(from: from, &v0, &v1, &v2, &v3)
 }
 
 @inline(never)
 public func highwayLoadInterleaved4I8(
     from: UnsafePointer<Int8>,
-    _ v0: inout SIMDInt8.Vector,
-    _ v1: inout SIMDInt8.Vector,
-    _ v2: inout SIMDInt8.Vector,
-    _ v3: inout SIMDInt8.Vector
+    _ v0: inout SIMD<Int8>,
+    _ v1: inout SIMD<Int8>,
+    _ v2: inout SIMD<Int8>,
+    _ v3: inout SIMD<Int8>
 ) {
     unsafe HighwayReference.Nothrow.loadInterleaved4I8(from, &v0.raw, &v1.raw, &v2.raw, &v3.raw)
 }
 
 @inline(never)
 public func portStoreInterleaved2I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved2(a, b, to: to)
+    unsafe SIMD<Int8>.storeInterleaved2(a, b, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved2I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved2I8(a.raw, b.raw, to)
 }
 
 @inline(never)
-public func portStoreInterleaved2I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
-) {
-    unsafe SIMDInt8.storeInterleaved2(SIMDInt8.repeating(26), b, to: to)
+public func portStoreInterleaved2I8ConstantA(_ b: SIMD<Int8>, to: UnsafeMutablePointer<Int8>) {
+    unsafe SIMD<Int8>.storeInterleaved2(SIMD<Int8>.repeating(26), b, to: to)
 }
 
 @inline(never)
-public func highwayStoreInterleaved2I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<Int8>
-) {
+public func highwayStoreInterleaved2I8ConstantA(_ b: SIMD<Int8>, to: UnsafeMutablePointer<Int8>) {
     unsafe HighwayReference.Nothrow.storeInterleaved2I8(
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         b.raw,
         to
     )
 }
 
 @inline(never)
-public func portStoreInterleaved2I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
-) {
-    unsafe SIMDInt8.storeInterleaved2(a, SIMDInt8.repeating(26), to: to)
+public func portStoreInterleaved2I8ConstantB(_ a: SIMD<Int8>, to: UnsafeMutablePointer<Int8>) {
+    unsafe SIMD<Int8>.storeInterleaved2(a, SIMD<Int8>.repeating(26), to: to)
 }
 
 @inline(never)
-public func highwayStoreInterleaved2I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<Int8>
-) {
+public func highwayStoreInterleaved2I8ConstantB(_ a: SIMD<Int8>, to: UnsafeMutablePointer<Int8>) {
     unsafe HighwayReference.Nothrow.storeInterleaved2I8(
         a.raw,
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved3I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved3(a, b, c, to: to)
+    unsafe SIMD<Int8>.storeInterleaved3(a, b, c, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved3I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3I8(a.raw, b.raw, c.raw, to)
@@ -461,21 +440,21 @@ public func highwayStoreInterleaved3I8(
 
 @inline(never)
 public func portStoreInterleaved3I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved3(SIMDInt8.repeating(26), b, c, to: to)
+    unsafe SIMD<Int8>.storeInterleaved3(SIMD<Int8>.repeating(26), b, c, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved3I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3I8(
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         b.raw,
         c.raw,
         to
@@ -484,22 +463,22 @@ public func highwayStoreInterleaved3I8ConstantA(
 
 @inline(never)
 public func portStoreInterleaved3I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ a: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved3(a, SIMDInt8.repeating(26), c, to: to)
+    unsafe SIMD<Int8>.storeInterleaved3(a, SIMD<Int8>.repeating(26), c, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved3I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
+    _ c: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3I8(
         a.raw,
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         c.raw,
         to
     )
@@ -507,44 +486,44 @@ public func highwayStoreInterleaved3I8ConstantB(
 
 @inline(never)
 public func portStoreInterleaved3I8ConstantC(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved3(a, b, SIMDInt8.repeating(26), to: to)
+    unsafe SIMD<Int8>.storeInterleaved3(a, b, SIMD<Int8>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved3I8ConstantC(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved3I8(
         a.raw,
         b.raw,
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         to
     )
 }
 
 @inline(never)
 public func portStoreInterleaved4I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved4(a, b, c, d, to: to)
+    unsafe SIMD<Int8>.storeInterleaved4(a, b, c, d, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved4I8(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4I8(a.raw, b.raw, c.raw, d.raw, to)
@@ -552,23 +531,23 @@ public func highwayStoreInterleaved4I8(
 
 @inline(never)
 public func portStoreInterleaved4I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved4(SIMDInt8.repeating(26), b, c, d, to: to)
+    unsafe SIMD<Int8>.storeInterleaved4(SIMD<Int8>.repeating(26), b, c, d, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved4I8ConstantA(
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4I8(
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         b.raw,
         c.raw,
         d.raw,
@@ -578,24 +557,24 @@ public func highwayStoreInterleaved4I8ConstantA(
 
 @inline(never)
 public func portStoreInterleaved4I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ a: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved4(a, SIMDInt8.repeating(26), c, d, to: to)
+    unsafe SIMD<Int8>.storeInterleaved4(a, SIMD<Int8>.repeating(26), c, d, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved4I8ConstantB(
-    _ a: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    _ d: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4I8(
         a.raw,
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         c.raw,
         d.raw,
         to
@@ -604,25 +583,25 @@ public func highwayStoreInterleaved4I8ConstantB(
 
 @inline(never)
 public func portStoreInterleaved4I8ConstantC(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ d: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved4(a, b, SIMDInt8.repeating(26), d, to: to)
+    unsafe SIMD<Int8>.storeInterleaved4(a, b, SIMD<Int8>.repeating(26), d, to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved4I8ConstantC(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ d: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ d: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4I8(
         a.raw,
         b.raw,
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         d.raw,
         to
     )
@@ -630,26 +609,26 @@ public func highwayStoreInterleaved4I8ConstantC(
 
 @inline(never)
 public func portStoreInterleaved4I8ConstantD(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
-    to: UnsafeMutablePointer<SIMDInt8.Lane>
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
+    to: UnsafeMutablePointer<Int8>
 ) {
-    unsafe SIMDInt8.storeInterleaved4(a, b, c, SIMDInt8.repeating(26), to: to)
+    unsafe SIMD<Int8>.storeInterleaved4(a, b, c, SIMD<Int8>.repeating(26), to: to)
 }
 
 @inline(never)
 public func highwayStoreInterleaved4I8ConstantD(
-    _ a: SIMDInt8.Vector,
-    _ b: SIMDInt8.Vector,
-    _ c: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
+    _ b: SIMD<Int8>,
+    _ c: SIMD<Int8>,
     to: UnsafeMutablePointer<Int8>
 ) {
     unsafe HighwayReference.Nothrow.storeInterleaved4I8(
         a.raw,
         b.raw,
         c.raw,
-        SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+        SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
         to
     )
 }

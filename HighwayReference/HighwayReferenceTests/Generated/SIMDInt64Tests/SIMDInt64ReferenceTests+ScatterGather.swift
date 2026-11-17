@@ -8,13 +8,9 @@ import Vectorization
 extension SIMDInt64ReferenceTests {
     @Test func gather() {
         let mismatches = Mismatches("gather")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x9B23_36E5_ECA3_EDDF
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x9B23_36E5_ECA3_EDDF)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x9B23_35E5_ECA3_EC2C,
             inContract: true
@@ -23,9 +19,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(from: source.baseAddress!, indices: indices),
-                    unsafe H.Vector(
-                        raw: HighwayReference.gatherI64(source.baseAddress!, indices.raw)
-                    )
+                    unsafe H(raw: HighwayReference.gatherI64(source.baseAddress!, indices.raw))
                 )
             }
             mismatches.check(
@@ -39,13 +33,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherBeforeGuardPage() {
         let mismatches = Mismatches("gather before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x5E08_90D8_BEEC_AAE4
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x5E08_90D8_BEEC_AAE4)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x5E08_91D8_BEEC_AC97,
             inContract: true
@@ -54,7 +44,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.gather(from: source, indices: indices),
-                    unsafe H.Vector(raw: HighwayReference.gatherI64(source, indices.raw))
+                    unsafe H(raw: HighwayReference.gatherI64(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -68,13 +58,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherUncheckedSpan() {
         let mismatches = Mismatches("gather unchecked span")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x5489_75FE_2E1E_2BEB
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x5489_75FE_2E1E_2BEB)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x5489_74FE_2E1E_2A38,
             inContract: true
@@ -103,14 +89,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherByteOffsets() {
         let mismatches = Mismatches("gatherByteOffsets")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x114D_32F8_C113_B105
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x114D_32F8_C113_B105)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int64>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0x114D_31F8_C113_AF52,
             inContract: true
         )
@@ -118,7 +100,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(from: source.baseAddress!, byteOffsets: byteOffsets),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherByteOffsetsI64(
                             source.baseAddress!,
                             byteOffsets.raw
@@ -137,14 +119,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherByteOffsetsBeforeGuardPage() {
         let mismatches = Mismatches("gatherByteOffsets before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xB12F_F53B_A80C_5592
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xB12F_F53B_A80C_5592)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int64>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0xB12F_F63B_A80C_5745,
             inContract: true
         )
@@ -152,9 +130,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.gather(from: source, byteOffsets: byteOffsets),
-                    unsafe H.Vector(
-                        raw: HighwayReference.gatherByteOffsetsI64(source, byteOffsets.raw)
-                    )
+                    unsafe H(raw: HighwayReference.gatherByteOffsetsI64(source, byteOffsets.raw))
                 )
             }.result
             mismatches.check(
@@ -168,14 +144,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherByteOffsetsUncheckedSpan() {
         let mismatches = Mismatches("gatherByteOffsets unchecked span")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x45BE_5FAC_F01D_AB45
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x45BE_5FAC_F01D_AB45)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int64>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0x45BE_5EAC_F01D_A992,
             inContract: true
         )
@@ -203,13 +175,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherFirst() {
         let mismatches = Mismatches("gatherFirst")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xBB72_A3E2_215C_A2E1
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xBB72_A3E2_215C_A2E1)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xBB72_A2E2_215C_A12E,
             inContract: true
@@ -225,7 +193,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(from: source.baseAddress!, indices: indices, count: count),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstI64(
                             source.baseAddress!,
                             indices.raw,
@@ -245,13 +213,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherFirstBeforeGuardPage() {
         let mismatches = Mismatches("gatherFirst before a guard page")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xECCF_72DE_CB61_57DE
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xECCF_72DE_CB61_57DE)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xECCF_73DE_CB61_5991,
             inContract: true
@@ -267,9 +231,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.gather(from: source, indices: indices, count: count),
-                    unsafe H.Vector(
-                        raw: HighwayReference.gatherFirstI64(source, indices.raw, count)
-                    )
+                    unsafe H(raw: HighwayReference.gatherFirstI64(source, indices.raw, count))
                 )
             }.result
             mismatches.check(
@@ -283,13 +245,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherFirstUncheckedSpan() {
         let mismatches = Mismatches("gatherFirst unchecked span")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x55BD_ADA3_606E_26C9
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x55BD_ADA3_606E_26C9)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x55BD_ACA3_606E_2516,
             inContract: true
@@ -325,14 +283,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherFirstOtherwise() {
         let mismatches = Mismatches("gatherFirstOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xEEDF_04B0_4398_20C3)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xEEDF_03B0_4398_1F10
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xEEDF_04B0_4398_20C3)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xEEDF_03B0_4398_1F10)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xEEDF_06B0_4398_2429,
             inContract: true
@@ -354,7 +308,7 @@ extension SIMDInt64ReferenceTests {
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstOtherwiseI64(
                             otherwise.raw,
                             source.baseAddress!,
@@ -375,14 +329,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherFirstOtherwiseBeforeGuardPage() {
         let mismatches = Mismatches("gatherFirstOtherwise before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x7B7E_D54E_1C7E_3448)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x7B7E_D64E_1C7E_35FB
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7B7E_D54E_1C7E_3448)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x7B7E_D64E_1C7E_35FB)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x7B7E_D74E_1C7E_37AE,
             inContract: true
@@ -404,7 +354,7 @@ extension SIMDInt64ReferenceTests {
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstOtherwiseI64(
                             otherwise.raw,
                             source,
@@ -425,14 +375,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherFirstOtherwiseUncheckedSpan() {
         let mismatches = Mismatches("gatherFirstOtherwise unchecked span")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8E16_8F9B_05B1_2E57)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x8E16_8E9B_05B1_2CA4
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8E16_8F9B_05B1_2E57)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x8E16_8E9B_05B1_2CA4)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x8E16_919B_05B1_31BD,
             inContract: true
@@ -480,13 +426,9 @@ extension SIMDInt64ReferenceTests {
     @Test func gatherWhere() {
         let mismatches = Mismatches("gatherWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB506_D052_1D49_988C)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xB506_D152_1D49_9A3F
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xB506_D152_1D49_9A3F)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xB506_D252_1D49_9BF2,
             inContract: true
@@ -501,7 +443,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(from: source.baseAddress!, indices: indices, where: mask),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherWhereI64(
                             mask.raw,
                             source.baseAddress!,
@@ -522,13 +464,9 @@ extension SIMDInt64ReferenceTests {
     @Test func gatherWhereBeforeGuardPage() {
         let mismatches = Mismatches("gatherWhere before a guard page")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xACAF_13F4_F704_D8C5)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xACAF_12F4_F704_D712
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xACAF_12F4_F704_D712)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xACAF_11F4_F704_D55F,
             inContract: true
@@ -543,9 +481,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.gather(from: source, indices: indices, where: mask),
-                    unsafe H.Vector(
-                        raw: HighwayReference.gatherWhereI64(mask.raw, source, indices.raw)
-                    )
+                    unsafe H(raw: HighwayReference.gatherWhereI64(mask.raw, source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -560,13 +496,9 @@ extension SIMDInt64ReferenceTests {
     @Test func gatherWhereNonCanonical() {
         let mismatches = Mismatches("gatherWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xD06C_FD7B_2ACC_8183)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xD06C_FC7B_2ACC_7FD0
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD06C_FC7B_2ACC_7FD0)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xD06C_FF7B_2ACC_84E9,
             inContract: true
@@ -581,7 +513,7 @@ extension SIMDInt64ReferenceTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(from: source.baseAddress!, indices: indices, where: mask),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherWhereI64(
                             mask.raw,
                             source.baseAddress!,
@@ -602,13 +534,9 @@ extension SIMDInt64ReferenceTests {
     @Test func gatherWhereUncheckedSpan() {
         let mismatches = Mismatches("gatherWhere unchecked span")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9456_E6C3_57CB_C1F6)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x9456_E7C3_57CB_C3A9
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x9456_E7C3_57CB_C3A9)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x9456_E4C3_57CB_BE90,
             inContract: true
@@ -643,15 +571,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherWhereOtherwise() {
         let mismatches = Mismatches("gatherWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x3D02_E3E0_7737_4EC0)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3D02_E3E0_7737_4EC0)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3D02_E4E0_7737_5073)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x3D02_E5E0_7737_5226
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x3D02_E5E0_7737_5226)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x3D02_E6E0_7737_53D9,
             inContract: true
@@ -672,7 +596,7 @@ extension SIMDInt64ReferenceTests {
                         where: mask,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherWhereOtherwiseI64(
                             otherwise.raw,
                             mask.raw,
@@ -693,15 +617,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherWhereOtherwiseBeforeGuardPage() {
         let mismatches = Mismatches("gatherWhereOtherwise before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8B5A_C460_FD48_AB79)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8B5A_C460_FD48_AB79)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8B5A_C360_FD48_A9C6)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x8B5A_C260_FD48_A813
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x8B5A_C260_FD48_A813)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x8B5A_C160_FD48_A660,
             inContract: true
@@ -722,7 +642,7 @@ extension SIMDInt64ReferenceTests {
                         where: mask,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherWhereOtherwiseI64(
                             otherwise.raw,
                             mask.raw,
@@ -743,15 +663,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("gatherWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xBC1B_F1B3_0825_88BF)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xBC1B_F1B3_0825_88BF)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xBC1B_F0B3_0825_870C)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xBC1B_F3B3_0825_8C25
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xBC1B_F3B3_0825_8C25)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xBC1B_F2B3_0825_8A72,
             inContract: true
@@ -772,7 +688,7 @@ extension SIMDInt64ReferenceTests {
                         where: mask,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherWhereOtherwiseI64(
                             otherwise.raw,
                             mask.raw,
@@ -793,15 +709,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func gatherWhereOtherwiseUncheckedSpan() {
         let mismatches = Mismatches("gatherWhereOtherwise unchecked span")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x051F_21BD_2221_7312)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x051F_21BD_2221_7312)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x051F_22BD_2221_74C5)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x051F_1FBD_2221_6FAC
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x051F_1FBD_2221_6FAC)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x051F_20BD_2221_715F,
             inContract: true
@@ -847,14 +759,14 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatter() {
         let mismatches = Mismatches("scatter")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xACB9_1662_0CDC_6860)
+        let aInputs = Inputs.vectors(H.self, seed: 0xACB9_1662_0CDC_6860)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xACB9_1762_0CDC_6A13,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -875,14 +787,14 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterBeforeGuardPage() {
         let mismatches = Mismatches("scatter before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x94CE_748F_16D3_CCD9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x94CE_748F_16D3_CCD9)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x94CE_738F_16D3_CB26,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.scatter(a, to: destination, indices: indices)
@@ -901,14 +813,14 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterUncheckedSpan() {
         let mismatches = Mismatches("scatter unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x34DA_AF54_0D6A_0BB2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x34DA_AF54_0D6A_0BB2)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x34DA_B054_0D6A_0D65,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -935,14 +847,14 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterByteOffsets() {
         let mismatches = Mismatches("scatterByteOffsets")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1132_887C_08C9_1A6C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1132_887C_08C9_1A6C)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int64>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0x1132_897C_08C9_1C1F,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -967,14 +879,14 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterByteOffsetsBeforeGuardPage() {
         let mismatches = Mismatches("scatterByteOffsets before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6885_5327_2C1B_32E5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6885_5327_2C1B_32E5)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int64>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0x6885_5227_2C1B_3132,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.scatter(a, to: destination, byteOffsets: byteOffsets)
@@ -993,14 +905,14 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterByteOffsetsUncheckedSpan() {
         let mismatches = Mismatches("scatterByteOffsets unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4840_5999_16FC_C856)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4840_5999_16FC_C856)
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int64>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0x4840_5A99_16FC_CA09,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -1027,15 +939,15 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterFirst() {
         let mismatches = Mismatches("scatterFirst")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6451_6FE0_053E_9A64)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6451_6FE0_053E_9A64)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x6451_70E0_053E_9C17,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices, count) in mixedTriples(
             aInputs,
             indicesInputs,
@@ -1067,15 +979,15 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterFirstBeforeGuardPage() {
         let mismatches = Mismatches("scatterFirst before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA20B_1883_CDBC_623D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA20B_1883_CDBC_623D)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xA20B_1783_CDBC_608A,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, indices, count) in mixedTriples(
             aInputs,
             indicesInputs,
@@ -1100,15 +1012,15 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterFirstUncheckedSpan() {
         let mismatches = Mismatches("scatterFirst unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFB1B_1326_0FBC_4C3E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFB1B_1326_0FBC_4C3E)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xFB1B_1426_0FBC_4DF1,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, indices, count) in mixedTriples(
             aInputs,
             indicesInputs,
@@ -1141,15 +1053,15 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterWhere() {
         let mismatches = Mismatches("scatterWhere")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1F0A_E3FA_D5BE_AE01)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1F0A_E3FA_D5BE_AE01)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1F0A_E2FA_D5BE_AC4E)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x1F0A_E1FA_D5BE_AA9B,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask, indices) in mixedTriples(
             aInputs,
             maskInputs,
@@ -1181,15 +1093,15 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterWhereBeforeGuardPage() {
         let mismatches = Mismatches("scatterWhere before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD04C_2B26_96B0_F43E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD04C_2B26_96B0_F43E)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD04C_2C26_96B0_F5F1)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xD04C_2926_96B0_F0D8,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask, indices) in mixedTriples(
             aInputs,
             maskInputs,
@@ -1214,15 +1126,15 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterWhereNonCanonical() {
         let mismatches = Mismatches("scatterWhere with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5A32_33F4_CAA7_7786)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5A32_33F4_CAA7_7786)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5A32_34F4_CAA7_7939)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x5A32_31F4_CAA7_7420,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask, indices) in mixedTriples(
             aInputs,
             maskInputs,
@@ -1254,15 +1166,15 @@ extension SIMDInt64ReferenceTests {
 
     @Test func scatterWhereUncheckedSpan() {
         let mismatches = Mismatches("scatterWhere unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5A88_D4BB_F953_6569)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5A88_D4BB_F953_6569)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5A88_D3BB_F953_63B6)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x5A88_D2BB_F953_6203,
             inContract: true
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask, indices) in mixedTriples(
             aInputs,
             maskInputs,

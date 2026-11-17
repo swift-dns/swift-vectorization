@@ -9,7 +9,7 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkExtractingBlockConstantIndex(_ index: Int) {
         let mismatches = Mismatches("extractingBlock with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x39E5_3BB6_E24F_C1FA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x39E5_3BB6_E24F_C1FA)
         for a in aInputs {
             mismatches.check(
                 H.block(a, at: index),
@@ -44,7 +44,7 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkExtractingBlockUncheckedConstantIndex(_ index: Int) {
         let mismatches = Mismatches("extractingBlock unchecked with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x885F_9701_2192_6E24)
+        let aInputs = Inputs.vectors(H.self, seed: 0x885F_9701_2192_6E24)
         for a in aInputs {
             mismatches.check(
                 unsafe H.block(a, atUnchecked: index),
@@ -79,14 +79,14 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkReplacingBlockConstantIndex(_ index: Int) {
         let mismatches = Mismatches("replacingBlock with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3F9F_387D_2331_4770)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3F9F_387D_2331_4770)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x3F9F_3A7D_2331_4AD6).map(
             poisoningUpperBytes
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.replacingBlock(a, at: index, with: b),
-                H.Vector(
+                H(
                     raw: HighwayReference.replacingBlockU64(
                         a.raw,
                         Int32(truncatingIfNeeded: index),
@@ -118,14 +118,14 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkReplacingBlockUncheckedConstantIndex(_ index: Int) {
         let mismatches = Mismatches("replacingBlock unchecked with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1FB5_3819_FA94_C726)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1FB5_3819_FA94_C726)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x1FB5_3619_FA94_C3C0).map(
             poisoningUpperBytes
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 unsafe H.replacingBlock(a, atUnchecked: index, with: b),
-                H.Vector(
+                H(
                     raw: HighwayReference.replacingBlockU64(
                         a.raw,
                         Int32(truncatingIfNeeded: index),

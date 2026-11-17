@@ -10,7 +10,7 @@ extension SIMDFloatCodegenTests {
     @Test func isNaNWhere() {
         let mismatches = Mismatches("portIsNaNWhereF32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE61F_1DA3_F2C4_81CA)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE61F_1EA3_F2C4_837D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE61F_1EA3_F2C4_837D)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portIsNaNWhereF32(a, where: mask),

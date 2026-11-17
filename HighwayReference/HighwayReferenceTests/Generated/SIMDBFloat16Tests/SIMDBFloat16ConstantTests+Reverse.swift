@@ -7,554 +7,554 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkReversedConstantA(_ value: H.Lane) {
+    private func checkReversedConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.reversed(H.repeating(value)),
-            H.Vector(raw: HighwayReference.reversedBF16(H.repeating(value).raw)),
+            H(raw: HighwayReference.reversedBF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
     @Test func reversedConstantSplatZero() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x0000))
+        checkReversedConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func reversedConstantSplatNegativeZero() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x8000))
+        checkReversedConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func reversedConstantSplatOne() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x3F80))
+        checkReversedConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func reversedConstantSplatMinusOne() {
-        checkReversedConstantA(H.Lane(bitPattern: 0xBF80))
+        checkReversedConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func reversedConstantSplatTwo() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x4000))
+        checkReversedConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func reversedConstantSplatHalf() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x3F00))
+        checkReversedConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func reversedConstantSplatFour() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x4080))
+        checkReversedConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func reversedConstantSplatQuarter() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x3E80))
+        checkReversedConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func reversedConstantSplatOnePointFive() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkReversedConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func reversedConstantSplatMinusTwoPointFive() {
-        checkReversedConstantA(H.Lane(bitPattern: 0xC020))
+        checkReversedConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func reversedConstantSplatInfinity() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x7F80))
+        checkReversedConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func reversedConstantSplatMinusInfinity() {
-        checkReversedConstantA(H.Lane(bitPattern: 0xFF80))
+        checkReversedConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func reversedConstantSplatNaN() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkReversedConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func reversedConstantSplatMinusNaN() {
-        checkReversedConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkReversedConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func reversedConstantSplatPayloadNaN() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkReversedConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func reversedConstantSplatSignalingNaN() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x7F81))
+        checkReversedConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func reversedConstantSplatMinusSignalingNaN() {
-        checkReversedConstantA(H.Lane(bitPattern: 0xFF81))
+        checkReversedConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func reversedConstantSplatLeastNonzero() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x0001))
+        checkReversedConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func reversedConstantSplatGreatest() {
-        checkReversedConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkReversedConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkByteSwappedConstantA(_ value: H.Lane) {
+    private func checkByteSwappedConstantA(_ value: Lane) {
         let mismatches = Mismatches("byteSwapped with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.byteSwapped(H.repeating(value)),
-            H.Vector(raw: HighwayReference.byteSwappedBF16(H.repeating(value).raw)),
+            H(raw: HighwayReference.byteSwappedBF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
     @Test func byteSwappedConstantSplatZero() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x0000))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func byteSwappedConstantSplatNegativeZero() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x8000))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func byteSwappedConstantSplatOne() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x3F80))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func byteSwappedConstantSplatMinusOne() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0xBF80))
+        checkByteSwappedConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func byteSwappedConstantSplatTwo() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x4000))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func byteSwappedConstantSplatHalf() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x3F00))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func byteSwappedConstantSplatFour() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x4080))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func byteSwappedConstantSplatQuarter() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x3E80))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func byteSwappedConstantSplatOnePointFive() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func byteSwappedConstantSplatMinusTwoPointFive() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0xC020))
+        checkByteSwappedConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func byteSwappedConstantSplatInfinity() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x7F80))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func byteSwappedConstantSplatMinusInfinity() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0xFF80))
+        checkByteSwappedConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func byteSwappedConstantSplatNaN() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func byteSwappedConstantSplatMinusNaN() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkByteSwappedConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func byteSwappedConstantSplatPayloadNaN() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func byteSwappedConstantSplatSignalingNaN() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x7F81))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func byteSwappedConstantSplatMinusSignalingNaN() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0xFF81))
+        checkByteSwappedConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func byteSwappedConstantSplatLeastNonzero() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x0001))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func byteSwappedConstantSplatGreatest() {
-        checkByteSwappedConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkByteSwappedConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkReversedBlocksConstantA(_ value: H.Lane) {
+    private func checkReversedBlocksConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversedBlocks with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.reversedBlocks(H.repeating(value)),
-            H.Vector(raw: HighwayReference.reversedBlocksBF16(H.repeating(value).raw)),
+            H(raw: HighwayReference.reversedBlocksBF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
     @Test func reversedBlocksConstantSplatZero() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x0000))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func reversedBlocksConstantSplatNegativeZero() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x8000))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func reversedBlocksConstantSplatOne() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x3F80))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func reversedBlocksConstantSplatMinusOne() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0xBF80))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func reversedBlocksConstantSplatTwo() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x4000))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func reversedBlocksConstantSplatHalf() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x3F00))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func reversedBlocksConstantSplatFour() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x4080))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func reversedBlocksConstantSplatQuarter() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x3E80))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func reversedBlocksConstantSplatOnePointFive() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func reversedBlocksConstantSplatMinusTwoPointFive() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0xC020))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func reversedBlocksConstantSplatInfinity() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x7F80))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func reversedBlocksConstantSplatMinusInfinity() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0xFF80))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func reversedBlocksConstantSplatNaN() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func reversedBlocksConstantSplatMinusNaN() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func reversedBlocksConstantSplatPayloadNaN() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func reversedBlocksConstantSplatSignalingNaN() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x7F81))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func reversedBlocksConstantSplatMinusSignalingNaN() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0xFF81))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func reversedBlocksConstantSplatLeastNonzero() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x0001))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func reversedBlocksConstantSplatGreatest() {
-        checkReversedBlocksConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkReversedBlocksConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkReversed2ConstantA(_ value: H.Lane) {
+    private func checkReversed2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed2 with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.reversed2(H.repeating(value)),
-            H.Vector(raw: HighwayReference.reversed2BF16(H.repeating(value).raw)),
+            H(raw: HighwayReference.reversed2BF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
     @Test func reversed2ConstantSplatZero() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x0000))
+        checkReversed2ConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func reversed2ConstantSplatNegativeZero() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x8000))
+        checkReversed2ConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func reversed2ConstantSplatOne() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x3F80))
+        checkReversed2ConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func reversed2ConstantSplatMinusOne() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0xBF80))
+        checkReversed2ConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func reversed2ConstantSplatTwo() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x4000))
+        checkReversed2ConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func reversed2ConstantSplatHalf() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x3F00))
+        checkReversed2ConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func reversed2ConstantSplatFour() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x4080))
+        checkReversed2ConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func reversed2ConstantSplatQuarter() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x3E80))
+        checkReversed2ConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func reversed2ConstantSplatOnePointFive() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkReversed2ConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func reversed2ConstantSplatMinusTwoPointFive() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0xC020))
+        checkReversed2ConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func reversed2ConstantSplatInfinity() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x7F80))
+        checkReversed2ConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func reversed2ConstantSplatMinusInfinity() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0xFF80))
+        checkReversed2ConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func reversed2ConstantSplatNaN() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkReversed2ConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func reversed2ConstantSplatMinusNaN() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkReversed2ConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func reversed2ConstantSplatPayloadNaN() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkReversed2ConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func reversed2ConstantSplatSignalingNaN() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x7F81))
+        checkReversed2ConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func reversed2ConstantSplatMinusSignalingNaN() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0xFF81))
+        checkReversed2ConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func reversed2ConstantSplatLeastNonzero() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x0001))
+        checkReversed2ConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func reversed2ConstantSplatGreatest() {
-        checkReversed2ConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkReversed2ConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkReversed4ConstantA(_ value: H.Lane) {
+    private func checkReversed4ConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed4 with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.reversed4(H.repeating(value)),
-            H.Vector(raw: HighwayReference.reversed4BF16(H.repeating(value).raw)),
+            H(raw: HighwayReference.reversed4BF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
     @Test func reversed4ConstantSplatZero() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x0000))
+        checkReversed4ConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func reversed4ConstantSplatNegativeZero() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x8000))
+        checkReversed4ConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func reversed4ConstantSplatOne() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x3F80))
+        checkReversed4ConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func reversed4ConstantSplatMinusOne() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0xBF80))
+        checkReversed4ConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func reversed4ConstantSplatTwo() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x4000))
+        checkReversed4ConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func reversed4ConstantSplatHalf() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x3F00))
+        checkReversed4ConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func reversed4ConstantSplatFour() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x4080))
+        checkReversed4ConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func reversed4ConstantSplatQuarter() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x3E80))
+        checkReversed4ConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func reversed4ConstantSplatOnePointFive() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkReversed4ConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func reversed4ConstantSplatMinusTwoPointFive() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0xC020))
+        checkReversed4ConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func reversed4ConstantSplatInfinity() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x7F80))
+        checkReversed4ConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func reversed4ConstantSplatMinusInfinity() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0xFF80))
+        checkReversed4ConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func reversed4ConstantSplatNaN() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkReversed4ConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func reversed4ConstantSplatMinusNaN() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkReversed4ConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func reversed4ConstantSplatPayloadNaN() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkReversed4ConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func reversed4ConstantSplatSignalingNaN() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x7F81))
+        checkReversed4ConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func reversed4ConstantSplatMinusSignalingNaN() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0xFF81))
+        checkReversed4ConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func reversed4ConstantSplatLeastNonzero() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x0001))
+        checkReversed4ConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func reversed4ConstantSplatGreatest() {
-        checkReversed4ConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkReversed4ConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkReversed8ConstantA(_ value: H.Lane) {
+    private func checkReversed8ConstantA(_ value: Lane) {
         let mismatches = Mismatches("reversed8 with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.reversed8(H.repeating(value)),
-            H.Vector(raw: HighwayReference.reversed8BF16(H.repeating(value).raw)),
+            H(raw: HighwayReference.reversed8BF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
     @Test func reversed8ConstantSplatZero() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x0000))
+        checkReversed8ConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func reversed8ConstantSplatNegativeZero() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x8000))
+        checkReversed8ConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func reversed8ConstantSplatOne() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x3F80))
+        checkReversed8ConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func reversed8ConstantSplatMinusOne() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0xBF80))
+        checkReversed8ConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func reversed8ConstantSplatTwo() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x4000))
+        checkReversed8ConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func reversed8ConstantSplatHalf() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x3F00))
+        checkReversed8ConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func reversed8ConstantSplatFour() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x4080))
+        checkReversed8ConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func reversed8ConstantSplatQuarter() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x3E80))
+        checkReversed8ConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func reversed8ConstantSplatOnePointFive() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkReversed8ConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func reversed8ConstantSplatMinusTwoPointFive() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0xC020))
+        checkReversed8ConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func reversed8ConstantSplatInfinity() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x7F80))
+        checkReversed8ConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func reversed8ConstantSplatMinusInfinity() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0xFF80))
+        checkReversed8ConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func reversed8ConstantSplatNaN() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkReversed8ConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func reversed8ConstantSplatMinusNaN() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkReversed8ConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func reversed8ConstantSplatPayloadNaN() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkReversed8ConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func reversed8ConstantSplatSignalingNaN() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x7F81))
+        checkReversed8ConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func reversed8ConstantSplatMinusSignalingNaN() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0xFF81))
+        checkReversed8ConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func reversed8ConstantSplatLeastNonzero() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x0001))
+        checkReversed8ConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func reversed8ConstantSplatGreatest() {
-        checkReversed8ConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkReversed8ConstantA(Lane(bitPattern: 0x7F7F))
     }
 }

@@ -7,17 +7,27 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "repeatingWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB4E3_1199_CAA9_2347)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xB4E3_1299_CAA9_24FA)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xB4E3_1299_CAA9_24FA)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: H.repeating(value)),
-                HighwayReference.repeatingWhereOtherwiseF32(H.repeating(value), mask.raw, value),
+                H(
+                    raw: HighwayReference.repeatingWhereOtherwiseF32(
+                        H.repeating(value).raw,
+                        mask.raw,
+                        value
+                    )
+                ),
                 "mask: \(describe(mask)), value: \(hex(value))"
             )
         }
@@ -81,7 +91,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatPayloadNaN() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatSignalingNaN() {

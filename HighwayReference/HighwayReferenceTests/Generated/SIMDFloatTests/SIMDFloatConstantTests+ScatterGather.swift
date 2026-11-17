@@ -9,24 +9,22 @@ extension SIMDFloatConstantTests {
     @inline(__always)
     private func checkGatherFirstConstantIndices(_ value: Int32) {
         let mismatches = Mismatches("gatherFirst with indices repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x03FA_91A3_ACD1_7274
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x03FA_91A3_ACD1_7274)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        indices: SIMDInt32.repeating(value),
+                        indices: SIMD<Int32>.repeating(value),
                         count: count
                     ),
-                    unsafe HighwayReference.gatherFirstF32(
-                        source.baseAddress!,
-                        SIMDInt32.repeating(value).raw,
-                        count
+                    unsafe H(
+                        raw: HighwayReference.gatherFirstF32(
+                            source.baseAddress!,
+                            SIMD<Int32>.repeating(value).raw,
+                            count
+                        )
                     )
                 )
             }
@@ -48,21 +46,21 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkGatherFirstOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkGatherFirstOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("gatherFirstOtherwise with otherwise repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x73A4_CE64_9728_72BA
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x73A4_CE64_9728_72BA)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x73A4_CD64_9728_7107,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (from, indices, count) in mixedTriples(
             fromInputs,
             indicesInputs,
@@ -78,11 +76,13 @@ extension SIMDFloatConstantTests {
                         count: count,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe HighwayReference.gatherFirstOtherwiseF32(
-                        H.repeating(value),
-                        source.baseAddress!,
-                        indices.raw,
-                        count
+                    unsafe H(
+                        raw: HighwayReference.gatherFirstOtherwiseF32(
+                            H.repeating(value).raw,
+                            source.baseAddress!,
+                            indices.raw,
+                            count
+                        )
                     )
                 )
             }
@@ -152,7 +152,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func gatherFirstOtherwiseConstantSplatPayloadNaN() {
-        checkGatherFirstOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
+        checkGatherFirstOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
     }
 
     @Test func gatherFirstOtherwiseConstantSplatSignalingNaN() {
@@ -174,12 +174,8 @@ extension SIMDFloatConstantTests {
     @inline(__always)
     private func checkGatherFirstOtherwiseConstantIndices(_ value: Int32) {
         let mismatches = Mismatches("gatherFirstOtherwise with indices repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5714_CF64_B6F3_E35A)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x5714_D064_B6F3_E50D
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x5714_CF64_B6F3_E35A)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x5714_D064_B6F3_E50D)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (otherwise, from, count) in mixedTriples(
             otherwiseInputs,
@@ -191,15 +187,17 @@ extension SIMDFloatConstantTests {
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        indices: SIMDInt32.repeating(value),
+                        indices: SIMD<Int32>.repeating(value),
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe HighwayReference.gatherFirstOtherwiseF32(
-                        otherwise,
-                        source.baseAddress!,
-                        SIMDInt32.repeating(value).raw,
-                        count
+                    unsafe H(
+                        raw: HighwayReference.gatherFirstOtherwiseF32(
+                            otherwise.raw,
+                            source.baseAddress!,
+                            SIMD<Int32>.repeating(value).raw,
+                            count
+                        )
                     )
                 )
             }
@@ -221,21 +219,21 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkGatherWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkGatherWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("gatherWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8D22_F835_2E27_33B3)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x8D22_F935_2E27_3566
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x8D22_F935_2E27_3566)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x8D22_FA35_2E27_3719,
             inContract: true
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (mask, from, indices) in mixedTriples(
             maskInputs,
             fromInputs,
@@ -251,11 +249,13 @@ extension SIMDFloatConstantTests {
                         where: mask,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe HighwayReference.gatherWhereOtherwiseF32(
-                        H.repeating(value),
-                        mask.raw,
-                        source.baseAddress!,
-                        indices.raw
+                    unsafe H(
+                        raw: HighwayReference.gatherWhereOtherwiseF32(
+                            H.repeating(value).raw,
+                            mask.raw,
+                            source.baseAddress!,
+                            indices.raw
+                        )
                     )
                 )
             }
@@ -325,7 +325,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func gatherWhereOtherwiseConstantSplatPayloadNaN() {
-        checkGatherWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
+        checkGatherWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
     }
 
     @Test func gatherWhereOtherwiseConstantSplatSignalingNaN() {
@@ -345,16 +345,20 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkScatterConstantA(_ value: H.Lane) {
+    private func checkScatterConstantA(_ value: Lane) {
         let mismatches = Mismatches("scatter with a repeating \(hex(value))")
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xB270_4BB0_6441_115E,
             inContract: true
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for indices in indicesInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -363,7 +367,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     destination.baseAddress!,
                     indices.raw
                 )
@@ -430,7 +434,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func scatterConstantSplatPayloadNaN() {
-        checkScatterConstantA(H.Lane(nan: 1, signaling: false))
+        checkScatterConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func scatterConstantSplatSignalingNaN() {
@@ -450,16 +454,20 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkScatterByteOffsetsConstantA(_ value: H.Lane) {
+    private func checkScatterByteOffsetsConstantA(_ value: Lane) {
         let mismatches = Mismatches("scatterByteOffsets with a repeating \(hex(value))")
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0x18B9_394D_58C7_908A,
             inContract: true
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for byteOffsets in byteOffsetsInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -472,7 +480,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterByteOffsetsF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     destination.baseAddress!,
                     byteOffsets.raw
                 )
@@ -539,7 +547,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func scatterByteOffsetsConstantSplatPayloadNaN() {
-        checkScatterByteOffsetsConstantA(H.Lane(nan: 1, signaling: false))
+        checkScatterByteOffsetsConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func scatterByteOffsetsConstantSplatSignalingNaN() {
@@ -559,17 +567,21 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkScatterFirstConstantA(_ value: H.Lane) {
+    private func checkScatterFirstConstantA(_ value: Lane) {
         let mismatches = Mismatches("scatterFirst with a repeating \(hex(value))")
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0xE585_56E4_98A4_36D2,
             inContract: true
         )
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (indices, count) in everyPair(indicesInputs, countInputs) {
             let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
             var portLanes = sentinel
@@ -584,7 +596,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterFirstF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     destination.baseAddress!,
                     indices.raw,
                     count
@@ -656,7 +668,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func scatterFirstConstantSplatPayloadNaN() {
-        checkScatterFirstConstantA(H.Lane(nan: 1, signaling: false))
+        checkScatterFirstConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func scatterFirstConstantSplatSignalingNaN() {
@@ -676,17 +688,21 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkScatterWhereConstantA(_ value: H.Lane) {
+    private func checkScatterWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("scatterWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x99D3_DC98_089E_505D)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt32.Vector.self,
+            SIMD<Int32>.self,
             count: H.laneCount,
             seed: 0x99D3_D998_089E_4B44,
             inContract: true
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (mask, indices) in everyPair(maskInputs, indicesInputs) {
             let indices = poisoned(indices, where: mask, with: H.laneCount)
             var portLanes = sentinel
@@ -701,7 +717,7 @@ extension SIMDFloatConstantTests {
             var referenceLanes = sentinel
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe HighwayReference.scatterWhereF32(
-                    H.repeating(value),
+                    H.repeating(value).raw,
                     mask.raw,
                     destination.baseAddress!,
                     indices.raw
@@ -773,7 +789,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func scatterWhereConstantSplatPayloadNaN() {
-        checkScatterWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkScatterWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func scatterWhereConstantSplatSignalingNaN() {

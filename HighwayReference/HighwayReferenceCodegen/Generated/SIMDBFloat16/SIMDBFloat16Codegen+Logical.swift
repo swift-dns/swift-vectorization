@@ -4,49 +4,49 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portAllBitsSetBF16(_ a: SIMDBFloat16.Vector) -> Bool {
-    SIMDBFloat16.allBitsSet(a)
+public func portAllBitsSetBF16(_ a: SIMD<BFloat16>) -> Bool {
+    SIMD<BFloat16>.allBitsSet(a)
 }
 
 @inline(never)
-public func highwayAllBitsSetBF16(_ a: SIMDBFloat16.Vector) -> Bool {
+public func highwayAllBitsSetBF16(_ a: SIMD<BFloat16>) -> Bool {
     HighwayReference.Nothrow.allBitsSetBF16(a.raw)
 }
 
 @inline(never)
 public func portAllBitsSetBF16ConstantA() -> Bool {
-    SIMDBFloat16.allBitsSet(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    SIMD<BFloat16>.allBitsSet(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayAllBitsSetBF16ConstantA() -> Bool {
     HighwayReference.Nothrow.allBitsSetBF16(
-        SIMDBFloat16.Vector(
+        SIMD<BFloat16>(
             raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
         ).raw
     )
 }
 
 @inline(never)
-public func portZeroingNegativeBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.zeroingNegative(a)
+public func portZeroingNegativeBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.zeroingNegative(a)
 }
 
 @inline(never)
-public func highwayZeroingNegativeBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.zeroingNegativeBF16(a.raw))
+public func highwayZeroingNegativeBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.zeroingNegativeBF16(a.raw))
 }
 
 @inline(never)
-public func portZeroingNegativeBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.zeroingNegative(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portZeroingNegativeBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.zeroingNegative(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayZeroingNegativeBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayZeroingNegativeBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.zeroingNegativeBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -55,38 +55,38 @@ public func highwayZeroingNegativeBF16ConstantA() -> SIMDBFloat16.Vector {
 
 @inline(never)
 public func portSelectingIfNegativeBF16(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.selectingIfNegative(a, b, c)
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.selectingIfNegative(a, b, c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeBF16(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.selectingIfNegativeBF16(a.raw, b.raw, c.raw))
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.selectingIfNegativeBF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portSelectingIfNegativeBF16ConstantA(
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.selectingIfNegative(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b, c)
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.selectingIfNegative(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeBF16ConstantA(
-    _ b: SIMDBFloat16.Vector,
-    _ c: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+    _ b: SIMD<BFloat16>,
+    _ c: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.selectingIfNegativeBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw,
@@ -97,21 +97,21 @@ public func highwaySelectingIfNegativeBF16ConstantA(
 
 @inline(never)
 public func portSelectingIfNegativeBF16ConstantB(
-    _ a: SIMDBFloat16.Vector,
-    _ c: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.selectingIfNegative(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), c)
+    _ a: SIMD<BFloat16>,
+    _ c: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.selectingIfNegative(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeBF16ConstantB(
-    _ a: SIMDBFloat16.Vector,
-    _ c: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+    _ a: SIMD<BFloat16>,
+    _ c: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.selectingIfNegativeBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             c.raw
@@ -121,22 +121,22 @@ public func highwaySelectingIfNegativeBF16ConstantB(
 
 @inline(never)
 public func portSelectingIfNegativeBF16ConstantC(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.selectingIfNegative(a, b, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.selectingIfNegative(a, b, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeBF16ConstantC(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.selectingIfNegativeBF16(
             a.raw,
             b.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -145,34 +145,30 @@ public func highwaySelectingIfNegativeBF16ConstantC(
 
 @inline(never)
 public func portSelectingIfNegativeOrZeroBF16(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.selectingIfNegativeOrZero(a, b)
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.selectingIfNegativeOrZero(a, b)
 }
 
 @inline(never)
 public func highwaySelectingIfNegativeOrZeroBF16(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.selectingIfNegativeOrZeroBF16(a.raw, b.raw))
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.selectingIfNegativeOrZeroBF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portSelectingIfNegativeOrZeroBF16ConstantA(
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.selectingIfNegativeOrZero(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
+public func portSelectingIfNegativeOrZeroBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.selectingIfNegativeOrZero(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwaySelectingIfNegativeOrZeroBF16ConstantA(
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySelectingIfNegativeOrZeroBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.selectingIfNegativeOrZeroBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw
@@ -181,20 +177,16 @@ public func highwaySelectingIfNegativeOrZeroBF16ConstantA(
 }
 
 @inline(never)
-public func portSelectingIfNegativeOrZeroBF16ConstantB(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.selectingIfNegativeOrZero(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portSelectingIfNegativeOrZeroBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.selectingIfNegativeOrZero(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwaySelectingIfNegativeOrZeroBF16ConstantB(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySelectingIfNegativeOrZeroBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.selectingIfNegativeOrZeroBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -202,31 +194,26 @@ public func highwaySelectingIfNegativeOrZeroBF16ConstantB(
 }
 
 @inline(never)
-public func portZeroingIfNegativeBF16(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.zeroingIfNegative(a, b)
+public func portZeroingIfNegativeBF16(_ a: SIMD<BFloat16>, _ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.zeroingIfNegative(a, b)
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeBF16(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.zeroingIfNegativeBF16(a.raw, b.raw))
+public func highwayZeroingIfNegativeBF16(_ a: SIMD<BFloat16>, _ b: SIMD<BFloat16>) -> SIMD<BFloat16>
+{
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.zeroingIfNegativeBF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portZeroingIfNegativeBF16ConstantA(_ b: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.zeroingIfNegative(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), b)
+public func portZeroingIfNegativeBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.zeroingIfNegative(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeBF16ConstantA(_ b: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayZeroingIfNegativeBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.zeroingIfNegativeBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw
@@ -235,16 +222,16 @@ public func highwayZeroingIfNegativeBF16ConstantA(_ b: SIMDBFloat16.Vector) -> S
 }
 
 @inline(never)
-public func portZeroingIfNegativeBF16ConstantB(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.zeroingIfNegative(a, SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portZeroingIfNegativeBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.zeroingIfNegative(a, SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayZeroingIfNegativeBF16ConstantB(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayZeroingIfNegativeBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.zeroingIfNegativeBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )

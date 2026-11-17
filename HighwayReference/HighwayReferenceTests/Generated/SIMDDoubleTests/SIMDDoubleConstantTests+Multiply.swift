@@ -7,14 +7,18 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkMultiplyingConstantA(_ value: H.Lane) {
+    private func checkMultiplyingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplying with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4D63_B251_A848_62F7)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x4D63_B251_A848_62F7)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplying(H.repeating(value), b),
-                HighwayReference.multiplyingF64(H.repeating(value), b),
+                H(raw: HighwayReference.multiplyingF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -22,14 +26,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingConstantB(_ value: H.Lane) {
+    private func checkMultiplyingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplying with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x55F8_C851_AD1F_0CF9)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x55F8_C851_AD1F_0CF9)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplying(a, H.repeating(value)),
-                HighwayReference.multiplyingF64(a, H.repeating(value)),
+                H(raw: HighwayReference.multiplyingF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -107,8 +115,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingConstantSplatPayloadNaN() {
-        checkMultiplyingConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingConstantSplatSignalingNaN() {
@@ -132,14 +140,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingRoundedConstantA(_ value: H.Lane) {
+    private func checkMultiplyingRoundedConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingRounded with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2F07_7228_0452_FFD0)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x2F07_7228_0452_FFD0)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplyingRounded(H.repeating(value), b),
-                HighwayReference.multiplyingRoundedF64(H.repeating(value), b),
+                H(raw: HighwayReference.multiplyingRoundedF64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -147,14 +159,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingRoundedConstantB(_ value: H.Lane) {
+    private func checkMultiplyingRoundedConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingRounded with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x47EC_F828_121D_CDA2)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x47EC_F828_121D_CDA2)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyingRounded(a, H.repeating(value)),
-                HighwayReference.multiplyingRoundedF64(a, H.repeating(value)),
+                H(raw: HighwayReference.multiplyingRoundedF64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -232,8 +248,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingRoundedConstantSplatPayloadNaN() {
-        checkMultiplyingRoundedConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingRoundedConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingRoundedConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingRoundedConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingRoundedConstantSplatSignalingNaN() {
@@ -257,14 +273,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByFloorPowerOf2ConstantA(_ value: H.Lane) {
+    private func checkMultiplyingByFloorPowerOf2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByFloorPowerOf2 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB595_08D0_14D8_E71A)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xB595_08D0_14D8_E71A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(H.repeating(value), b),
-                HighwayReference.multiplyingByFloorPowerOf2F64(H.repeating(value), b),
+                H(
+                    raw: HighwayReference.multiplyingByFloorPowerOf2F64(
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -272,14 +297,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByFloorPowerOf2ConstantB(_ value: H.Lane) {
+    private func checkMultiplyingByFloorPowerOf2ConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByFloorPowerOf2 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAC26_52D0_0F49_3C78)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xAC26_52D0_0F49_3C78)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, H.repeating(value)),
-                HighwayReference.multiplyingByFloorPowerOf2F64(a, H.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyingByFloorPowerOf2F64(
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -357,8 +391,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingByFloorPowerOf2ConstantSplatPayloadNaN() {
-        checkMultiplyingByFloorPowerOf2ConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingByFloorPowerOf2ConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingByFloorPowerOf2ConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingByFloorPowerOf2ConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingByFloorPowerOf2ConstantSplatSignalingNaN() {
@@ -382,14 +416,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByPowerOf2FromInt64ConstantA(_ value: H.Lane) {
+    private func checkMultiplyingByPowerOf2FromInt64ConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByPowerOf2FromInt64 with a repeating \(hex(value))")
-        let bInputs = Inputs.exponents(SIMDInt64.Vector.self, seed: 0x4373_D11D_FFDF_8131)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let bInputs = Inputs.exponents(SIMD<Int64>.self, seed: 0x4373_D11D_FFDF_8131)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.multiplyingByPowerOf2(H.repeating(value), b),
-                HighwayReference.multiplyingByPowerOf2I64ToF64(H.repeating(value), b.raw),
+                H(
+                    raw: HighwayReference.multiplyingByPowerOf2I64ToF64(
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -397,18 +440,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByPowerOf2FromInt64ConstantB(_ value: SIMDInt64.Lane) {
+    private func checkMultiplyingByPowerOf2FromInt64ConstantB(_ value: Int64) {
         let mismatches = Mismatches("multiplyingByPowerOf2FromInt64 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2A21_4B1D_F1B7_E17F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2A21_4B1D_F1B7_E17F)
         mismatches.check(
-            SIMDInt64.repeating(value),
-            SIMDInt64.Vector(raw: HighwayReference.repeatingI64(value)),
+            SIMD<Int64>.repeating(value),
+            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.multiplyingByPowerOf2(a, SIMDInt64.repeating(value)),
-                HighwayReference.multiplyingByPowerOf2I64ToF64(a, SIMDInt64.repeating(value).raw),
+                H.multiplyingByPowerOf2(a, SIMD<Int64>.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyingByPowerOf2I64ToF64(
+                        a.raw,
+                        SIMD<Int64>.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -477,7 +525,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingByPowerOf2FromInt64ConstantSplatPayloadNaN() {
-        checkMultiplyingByPowerOf2FromInt64ConstantA(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingByPowerOf2FromInt64ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingByPowerOf2FromInt64ConstantSplatSignalingNaN() {
@@ -565,10 +613,10 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func multiplyingByPowerOf2FromInt64ConstantSIMDInt64SplatMax() {
-        checkMultiplyingByPowerOf2FromInt64ConstantB(SIMDInt64.Lane.max)
+        checkMultiplyingByPowerOf2FromInt64ConstantB(Int64.max)
     }
 
     @Test func multiplyingByPowerOf2FromInt64ConstantSIMDInt64SplatMin() {
-        checkMultiplyingByPowerOf2FromInt64ConstantB(SIMDInt64.Lane.min)
+        checkMultiplyingByPowerOf2FromInt64ConstantB(Int64.min)
     }
 }

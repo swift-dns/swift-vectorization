@@ -4,227 +4,205 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portMultiplyingU16(_ a: SIMDUInt16.Vector, _ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector
-{
-    SIMDUInt16.multiplying(a, b)
+public func portMultiplyingU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplying(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(raw: HighwayReference.Nothrow.multiplyingU16(a.raw, b.raw))
+public func highwayMultiplyingU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>(raw: HighwayReference.Nothrow.multiplyingU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplying(SIMDUInt16.repeating(26), b)
+public func portMultiplyingU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplying(SIMD<UInt16>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+public func highwayMultiplyingU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyingU16(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplying(a, SIMDUInt16.repeating(26))
+public func portMultiplyingU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplying(a, SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+public func highwayMultiplyingU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyingU16(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingHighU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingHigh(a, b)
+public func portMultiplyingHighU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingHigh(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingHighU16(
-    _ a: SIMDUInt16.Vector,
-    _ b: SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(raw: HighwayReference.Nothrow.multiplyingHighU16(a.raw, b.raw))
+public func highwayMultiplyingHighU16(_ a: SIMD<UInt16>, _ b: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>(raw: HighwayReference.Nothrow.multiplyingHighU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingHighU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingHigh(SIMDUInt16.repeating(26), b)
+public func portMultiplyingHighU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingHigh(SIMD<UInt16>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingHighU16ConstantA(_ b: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+public func highwayMultiplyingHighU16ConstantA(_ b: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyingHighU16(
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingHighU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingHigh(a, SIMDUInt16.repeating(26))
+public func portMultiplyingHighU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingHigh(a, SIMD<UInt16>.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingHighU16ConstantB(_ a: SIMDUInt16.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+public func highwayMultiplyingHighU16ConstantB(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyingHighU16(
             a.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingEvenU8ToU16(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingEven(a, b)
+public func portMultiplyingEvenU8ToU16(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingEven(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingEvenU8ToU16(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(raw: HighwayReference.Nothrow.multiplyingEvenU8ToU16(a.raw, b.raw))
+public func highwayMultiplyingEvenU8ToU16(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>(raw: HighwayReference.Nothrow.multiplyingEvenU8ToU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingEvenU8ToU16ConstantA(_ b: SIMDUInt8.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingEven(SIMDUInt8.repeating(26), b)
+public func portMultiplyingEvenU8ToU16ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingEven(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingEvenU8ToU16ConstantA(_ b: SIMDUInt8.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+public func highwayMultiplyingEvenU8ToU16ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyingEvenU8ToU16(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingEvenU8ToU16ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingEven(a, SIMDUInt8.repeating(26))
+public func portMultiplyingEvenU8ToU16ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingEven(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingEvenU8ToU16ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+public func highwayMultiplyingEvenU8ToU16ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyingEvenU8ToU16(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingOddU8ToU16(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingOdd(a, b)
+public func portMultiplyingOddU8ToU16(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingOdd(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingOddU8ToU16(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(raw: HighwayReference.Nothrow.multiplyingOddU8ToU16(a.raw, b.raw))
+public func highwayMultiplyingOddU8ToU16(_ a: SIMD<UInt8>, _ b: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>(raw: HighwayReference.Nothrow.multiplyingOddU8ToU16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingOddU8ToU16ConstantA(_ b: SIMDUInt8.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingOdd(SIMDUInt8.repeating(26), b)
+public func portMultiplyingOddU8ToU16ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingOdd(SIMD<UInt8>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingOddU8ToU16ConstantA(_ b: SIMDUInt8.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+public func highwayMultiplyingOddU8ToU16ConstantA(_ b: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyingOddU8ToU16(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingOddU8ToU16ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyingOdd(a, SIMDUInt8.repeating(26))
+public func portMultiplyingOddU8ToU16ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyingOdd(a, SIMD<UInt8>.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingOddU8ToU16ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+public func highwayMultiplyingOddU8ToU16ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyingOddU8ToU16(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplyAccumulatingU8ToU16(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector,
-    _ c: SIMDUInt16.Vector,
-    _ v0: inout SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyAccumulating(a, b, c, &v0)
+    _ a: SIMD<UInt8>,
+    _ b: SIMD<UInt8>,
+    _ c: SIMD<UInt16>,
+    _ v0: inout SIMD<UInt16>
+) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyAccumulating(a, b, c, &v0)
 }
 
 @inline(never)
 public func highwayMultiplyAccumulatingU8ToU16(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector,
-    _ c: SIMDUInt16.Vector,
-    _ v0: inout SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+    _ a: SIMD<UInt8>,
+    _ b: SIMD<UInt8>,
+    _ c: SIMD<UInt16>,
+    _ v0: inout SIMD<UInt16>
+) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyAccumulatingU8ToU16(a.raw, b.raw, c.raw, &v0.raw)
     )
 }
 
 @inline(never)
 public func portMultiplyAccumulatingU8ToU16ConstantA(
-    _ b: SIMDUInt8.Vector,
-    _ c: SIMDUInt16.Vector,
-    _ v0: inout SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyAccumulating(SIMDUInt8.repeating(26), b, c, &v0)
+    _ b: SIMD<UInt8>,
+    _ c: SIMD<UInt16>,
+    _ v0: inout SIMD<UInt16>
+) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyAccumulating(SIMD<UInt8>.repeating(26), b, c, &v0)
 }
 
 @inline(never)
 public func highwayMultiplyAccumulatingU8ToU16ConstantA(
-    _ b: SIMDUInt8.Vector,
-    _ c: SIMDUInt16.Vector,
-    _ v0: inout SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+    _ b: SIMD<UInt8>,
+    _ c: SIMD<UInt16>,
+    _ v0: inout SIMD<UInt16>
+) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyAccumulatingU8ToU16(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw,
             c.raw,
             &v0.raw
@@ -234,23 +212,23 @@ public func highwayMultiplyAccumulatingU8ToU16ConstantA(
 
 @inline(never)
 public func portMultiplyAccumulatingU8ToU16ConstantB(
-    _ a: SIMDUInt8.Vector,
-    _ c: SIMDUInt16.Vector,
-    _ v0: inout SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyAccumulating(a, SIMDUInt8.repeating(26), c, &v0)
+    _ a: SIMD<UInt8>,
+    _ c: SIMD<UInt16>,
+    _ v0: inout SIMD<UInt16>
+) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyAccumulating(a, SIMD<UInt8>.repeating(26), c, &v0)
 }
 
 @inline(never)
 public func highwayMultiplyAccumulatingU8ToU16ConstantB(
-    _ a: SIMDUInt8.Vector,
-    _ c: SIMDUInt16.Vector,
-    _ v0: inout SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+    _ a: SIMD<UInt8>,
+    _ c: SIMD<UInt16>,
+    _ v0: inout SIMD<UInt16>
+) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyAccumulatingU8ToU16(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             c.raw,
             &v0.raw
         )
@@ -259,24 +237,24 @@ public func highwayMultiplyAccumulatingU8ToU16ConstantB(
 
 @inline(never)
 public func portMultiplyAccumulatingU8ToU16ConstantC(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector,
-    _ v0: inout SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.multiplyAccumulating(a, b, SIMDUInt16.repeating(26), &v0)
+    _ a: SIMD<UInt8>,
+    _ b: SIMD<UInt8>,
+    _ v0: inout SIMD<UInt16>
+) -> SIMD<UInt16> {
+    SIMD<UInt16>.multiplyAccumulating(a, b, SIMD<UInt16>.repeating(26), &v0)
 }
 
 @inline(never)
 public func highwayMultiplyAccumulatingU8ToU16ConstantC(
-    _ a: SIMDUInt8.Vector,
-    _ b: SIMDUInt8.Vector,
-    _ v0: inout SIMDUInt16.Vector
-) -> SIMDUInt16.Vector {
-    SIMDUInt16.Vector(
+    _ a: SIMD<UInt8>,
+    _ b: SIMD<UInt8>,
+    _ v0: inout SIMD<UInt16>
+) -> SIMD<UInt16> {
+    SIMD<UInt16>(
         raw: HighwayReference.Nothrow.multiplyAccumulatingU8ToU16(
             a.raw,
             b.raw,
-            SIMDUInt16.Vector(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
+            SIMD<UInt16>(raw: HighwayReference.Nothrow.repeatingU16(26)).raw,
             &v0.raw
         )
     )

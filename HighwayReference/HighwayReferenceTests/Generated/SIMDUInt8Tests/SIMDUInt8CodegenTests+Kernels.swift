@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDUInt8CodegenTests {
     @Test func maskedLowercase() {
         let mismatches = Mismatches("portMaskedLowercaseU8")
-        let vInputs = Inputs.vectors(H.Vector.self, seed: 0xA12C_45A1_94A0_BA8E)
+        let vInputs = Inputs.vectors(H.self, seed: 0xA12C_45A1_94A0_BA8E)
         for v in vInputs {
             mismatches.check(
                 portMaskedLowercaseU8(v),
@@ -22,7 +22,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func digitValues() {
         let mismatches = Mismatches("portDigitValuesU8")
-        let vInputs = Inputs.vectors(H.Vector.self, seed: 0x5F7D_6928_99AE_E2BB)
+        let vInputs = Inputs.vectors(H.self, seed: 0x5F7D_6928_99AE_E2BB)
         for v in vInputs {
             mismatches.check(portDigitValuesU8(v), highwayDigitValuesU8(v), "v: \(describe(v))")
         }
@@ -31,7 +31,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func noneAbove() {
         let mismatches = Mismatches("portNoneAboveU8")
-        let vInputs = Inputs.vectors(H.Vector.self, seed: 0xC6D0_AB53_692F_A0A7)
+        let vInputs = Inputs.vectors(H.self, seed: 0xC6D0_AB53_692F_A0A7)
         for v in vInputs {
             mismatches.check(portNoneAboveU8(v), highwayNoneAboveU8(v), "v: \(describe(v))")
         }
@@ -81,7 +81,7 @@ extension SIMDUInt8CodegenTests {
 
     @Test func utf8LookupStep() {
         let mismatches = Mismatches("portUTF8LookupStepU8")
-        let inputInputs = Inputs.vectors(H.Vector.self, seed: 0xB2E0_EDF3_5159_82D1)
+        let inputInputs = Inputs.vectors(H.self, seed: 0xB2E0_EDF3_5159_82D1)
         for input in inputInputs {
             mismatches.check(
                 portUTF8LookupStepU8(input),
@@ -165,7 +165,7 @@ extension SIMDUInt8CodegenTests {
             seed: 0x4A38_6039_D410_763D
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x4A38_5F39_D410_748A)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0x4A38_5F39_D410_748A)
         for (values, valuesCount, t) in mixedTriples(
             valuesInputs,
             valuesCountInputs,
@@ -194,7 +194,7 @@ extension SIMDUInt8CodegenTests {
             seed: 0xA64A_B493_4263_1E8B
         )
         let othersCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0xA64A_B593_4263_203E)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0xA64A_B593_4263_203E)
         for (values, valuesCount, others, othersCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,
@@ -234,7 +234,7 @@ extension SIMDUInt8CodegenTests {
             seed: 0xA5E7_A64D_85F2_6B5B
         )
         let outputCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0xA5E7_A74D_85F2_6D0E)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0xA5E7_A74D_85F2_6D0E)
         for (values, valuesCount, output, outputCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,
@@ -279,7 +279,7 @@ extension SIMDUInt8CodegenTests {
             seed: 0x0EAA_E1FE_6FA2_0A84
         )
         let outputCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x0EAA_E4FE_6FA2_0F9D)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0x0EAA_E4FE_6FA2_0F9D)
         for (values, valuesCount, output, outputCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,

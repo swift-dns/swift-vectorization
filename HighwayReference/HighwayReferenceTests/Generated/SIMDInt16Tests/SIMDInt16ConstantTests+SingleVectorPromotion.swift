@@ -7,18 +7,16 @@ import Vectorization
 
 extension SIMDInt16ConstantTests {
     @inline(__always)
-    private func checkVectorWideningLowerFromUInt8ConstantA(_ value: SIMDUInt8.Lane) {
+    private func checkVectorWideningLowerFromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches("vectorWideningLowerFromUInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningLower: SIMDUInt8.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningLowerU8ToI16(SIMDUInt8.repeating(value).raw)
-            ),
+            H.vector(wideningLower: SIMD<UInt8>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningLowerU8ToI16(SIMD<UInt8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -57,18 +55,16 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningLowerFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkVectorWideningLowerFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("vectorWideningLowerFromInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningLower: SIMDInt8.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningLowerI8ToI16(SIMDInt8.repeating(value).raw)
-            ),
+            H.vector(wideningLower: SIMD<Int8>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningLowerI8ToI16(SIMD<Int8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -115,18 +111,16 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningUpperFromUInt8ConstantA(_ value: SIMDUInt8.Lane) {
+    private func checkVectorWideningUpperFromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches("vectorWideningUpperFromUInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningUpper: SIMDUInt8.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningUpperU8ToI16(SIMDUInt8.repeating(value).raw)
-            ),
+            H.vector(wideningUpper: SIMD<UInt8>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningUpperU8ToI16(SIMD<UInt8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -165,18 +159,16 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningUpperFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkVectorWideningUpperFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("vectorWideningUpperFromInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningUpper: SIMDInt8.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningUpperI8ToI16(SIMDInt8.repeating(value).raw)
-            ),
+            H.vector(wideningUpper: SIMD<Int8>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningUpperI8ToI16(SIMD<Int8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -223,18 +215,16 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningEvenFromUInt8ConstantA(_ value: SIMDUInt8.Lane) {
+    private func checkVectorWideningEvenFromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches("vectorWideningEvenFromUInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningEven: SIMDUInt8.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningEvenU8ToI16(SIMDUInt8.repeating(value).raw)
-            ),
+            H.vector(wideningEven: SIMD<UInt8>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningEvenU8ToI16(SIMD<UInt8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -273,18 +263,16 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningEvenFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkVectorWideningEvenFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("vectorWideningEvenFromInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningEven: SIMDInt8.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningEvenI8ToI16(SIMDInt8.repeating(value).raw)
-            ),
+            H.vector(wideningEven: SIMD<Int8>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningEvenI8ToI16(SIMD<Int8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -331,18 +319,16 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningOddFromUInt8ConstantA(_ value: SIMDUInt8.Lane) {
+    private func checkVectorWideningOddFromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches("vectorWideningOddFromUInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningOdd: SIMDUInt8.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorWideningOddU8ToI16(SIMDUInt8.repeating(value).raw)
-            ),
+            H.vector(wideningOdd: SIMD<UInt8>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningOddU8ToI16(SIMD<UInt8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -381,16 +367,16 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorWideningOddFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkVectorWideningOddFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("vectorWideningOddFromInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(wideningOdd: SIMDInt8.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorWideningOddI8ToI16(SIMDInt8.repeating(value).raw)),
+            H.vector(wideningOdd: SIMD<Int8>.repeating(value)),
+            H(raw: HighwayReference.vectorWideningOddI8ToI16(SIMD<Int8>.repeating(value).raw)),
             ""
         )
         mismatches.record()

@@ -7,16 +7,20 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkStoreStreamingConstantA(_ value: H.Lane) {
+    private func checkStoreStreamingConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeStreaming with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in unsafe H.storeStreaming(H.repeating(value), to: destination)
         }
         let (_, referenceLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in
-            unsafe HighwayReference.storeStreamingF32(H.repeating(value), destination)
+            unsafe HighwayReference.storeStreamingF32(H.repeating(value).raw, destination)
         }
         mismatches.check(portLanes, referenceLanes, "")
         mismatches.record()
@@ -79,7 +83,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func storeStreamingConstantSplatPayloadNaN() {
-        checkStoreStreamingConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreStreamingConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeStreamingConstantSplatSignalingNaN() {

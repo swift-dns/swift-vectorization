@@ -5,39 +5,39 @@ public import Vectorization
 
 @inline(never)
 public func portShiftedLeftByWhereI8(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: b, where: mask)
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: b, where: mask)
 }
 
 @inline(never)
 public func highwayShiftedLeftByWhereI8(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedLeftByWhereI8(mask.raw, a.raw, b.raw))
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.shiftedLeftByWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portShiftedLeftByWhereI8ConstantA(
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(SIMDInt8.repeating(26), by: b, where: mask)
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(SIMD<Int8>.repeating(26), by: b, where: mask)
 }
 
 @inline(never)
 public func highwayShiftedLeftByWhereI8ConstantA(
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftByWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -45,44 +45,44 @@ public func highwayShiftedLeftByWhereI8ConstantA(
 
 @inline(never)
 public func portShiftedLeftByWhereI8ConstantB(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: SIMDInt8.repeating(3), where: mask)
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: SIMD<Int8>.repeating(3), where: mask)
 }
 
 @inline(never)
 public func highwayShiftedLeftByWhereI8ConstantB(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftByWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
         )
     )
 }
 
 @inline(never)
 public func portShiftedLeftByWhereOtherwiseI8(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedLeftByWhereOtherwiseI8(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftByWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
@@ -94,24 +94,24 @@ public func highwayShiftedLeftByWhereOtherwiseI8(
 
 @inline(never)
 public func portShiftedLeftByWhereOtherwiseI8ConstantA(
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(SIMDInt8.repeating(26), by: b, where: mask, otherwise: otherwise)
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(SIMD<Int8>.repeating(26), by: b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedLeftByWhereOtherwiseI8ConstantA(
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftByWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -119,47 +119,47 @@ public func highwayShiftedLeftByWhereOtherwiseI8ConstantA(
 
 @inline(never)
 public func portShiftedLeftByWhereOtherwiseI8ConstantB(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: SIMDInt8.repeating(3), where: mask, otherwise: otherwise)
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: SIMD<Int8>.repeating(3), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedLeftByWhereOtherwiseI8ConstantB(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftByWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
         )
     )
 }
 
 @inline(never)
 public func portShiftedLeftByWhereOtherwiseI8ConstantOtherwise(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: b, where: mask, otherwise: SIMDInt8.repeating(26))
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: b, where: mask, otherwise: SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
 public func highwayShiftedLeftByWhereOtherwiseI8ConstantOtherwise(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftByWhereOtherwiseI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             mask.raw,
             a.raw,
             b.raw
@@ -169,39 +169,39 @@ public func highwayShiftedLeftByWhereOtherwiseI8ConstantOtherwise(
 
 @inline(never)
 public func portShiftedRightByWhereI8(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: b, where: mask)
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: b, where: mask)
 }
 
 @inline(never)
 public func highwayShiftedRightByWhereI8(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightByWhereI8(mask.raw, a.raw, b.raw))
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.shiftedRightByWhereI8(mask.raw, a.raw, b.raw))
 }
 
 @inline(never)
 public func portShiftedRightByWhereI8ConstantA(
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(SIMDInt8.repeating(26), by: b, where: mask)
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(SIMD<Int8>.repeating(26), by: b, where: mask)
 }
 
 @inline(never)
 public func highwayShiftedRightByWhereI8ConstantA(
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightByWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -209,44 +209,44 @@ public func highwayShiftedRightByWhereI8ConstantA(
 
 @inline(never)
 public func portShiftedRightByWhereI8ConstantB(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: SIMDInt8.repeating(3), where: mask)
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: SIMD<Int8>.repeating(3), where: mask)
 }
 
 @inline(never)
 public func highwayShiftedRightByWhereI8ConstantB(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightByWhereI8(
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
         )
     )
 }
 
 @inline(never)
 public func portShiftedRightByWhereOtherwiseI8(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedRightByWhereOtherwiseI8(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightByWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
@@ -258,24 +258,24 @@ public func highwayShiftedRightByWhereOtherwiseI8(
 
 @inline(never)
 public func portShiftedRightByWhereOtherwiseI8ConstantA(
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(SIMDInt8.repeating(26), by: b, where: mask, otherwise: otherwise)
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(SIMD<Int8>.repeating(26), by: b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedRightByWhereOtherwiseI8ConstantA(
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightByWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             b.raw
         )
     )
@@ -283,47 +283,47 @@ public func highwayShiftedRightByWhereOtherwiseI8ConstantA(
 
 @inline(never)
 public func portShiftedRightByWhereOtherwiseI8ConstantB(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: SIMDInt8.repeating(3), where: mask, otherwise: otherwise)
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: SIMD<Int8>.repeating(3), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedRightByWhereOtherwiseI8ConstantB(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightByWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
             a.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(3)).raw
         )
     )
 }
 
 @inline(never)
 public func portShiftedRightByWhereOtherwiseI8ConstantOtherwise(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: b, where: mask, otherwise: SIMDInt8.repeating(26))
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: b, where: mask, otherwise: SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
 public func highwayShiftedRightByWhereOtherwiseI8ConstantOtherwise(
-    _ a: SIMDInt8.Vector,
-    by b: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    by b: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightByWhereOtherwiseI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             mask.raw,
             a.raw,
             b.raw
@@ -333,39 +333,39 @@ public func highwayShiftedRightByWhereOtherwiseI8ConstantOtherwise(
 
 @inline(never)
 public func portShiftedLeftWhereI8(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: Int(bits), where: mask)
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: Int(bits), where: mask)
 }
 
 @inline(never)
 public func highwayShiftedLeftWhereI8(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedLeftWhereI8(mask.raw, a.raw, bits))
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.shiftedLeftWhereI8(mask.raw, a.raw, bits))
 }
 
 @inline(never)
 public func portShiftedLeftWhereI8ConstantA(
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(SIMDInt8.repeating(26), by: Int(bits), where: mask)
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(SIMD<Int8>.repeating(26), by: Int(bits), where: mask)
 }
 
 @inline(never)
 public func highwayShiftedLeftWhereI8ConstantA(
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             bits
         )
     )
@@ -373,38 +373,38 @@ public func highwayShiftedLeftWhereI8ConstantA(
 
 @inline(never)
 public func portShiftedLeftWhereI8ConstantBits(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: 3, where: mask)
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: 3, where: mask)
 }
 
 @inline(never)
 public func highwayShiftedLeftWhereI8ConstantBits(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedLeftWhereTemplateI8(mask.raw, a.raw, 3))
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.shiftedLeftWhereTemplateI8(mask.raw, a.raw, 3))
 }
 
 @inline(never)
 public func portShiftedLeftWhereOtherwiseI8(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: Int(bits), where: mask, otherwise: otherwise)
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: Int(bits), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedLeftWhereOtherwiseI8(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
@@ -417,23 +417,28 @@ public func highwayShiftedLeftWhereOtherwiseI8(
 @inline(never)
 public func portShiftedLeftWhereOtherwiseI8ConstantA(
     by bits: Int32,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(SIMDInt8.repeating(26), by: Int(bits), where: mask, otherwise: otherwise)
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(
+        SIMD<Int8>.repeating(26),
+        by: Int(bits),
+        where: mask,
+        otherwise: otherwise
+    )
 }
 
 @inline(never)
 public func highwayShiftedLeftWhereOtherwiseI8ConstantA(
     by bits: Int32,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             bits
         )
     )
@@ -441,20 +446,20 @@ public func highwayShiftedLeftWhereOtherwiseI8ConstantA(
 
 @inline(never)
 public func portShiftedLeftWhereOtherwiseI8ConstantBits(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: 3, where: mask, otherwise: otherwise)
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: 3, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedLeftWhereOtherwiseI8ConstantBits(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftWhereOtherwiseTemplateI8(
             otherwise.raw,
             mask.raw,
@@ -466,22 +471,22 @@ public func highwayShiftedLeftWhereOtherwiseI8ConstantBits(
 
 @inline(never)
 public func portShiftedLeftWhereOtherwiseI8ConstantOtherwise(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedLeft(a, by: Int(bits), where: mask, otherwise: SIMDInt8.repeating(26))
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedLeft(a, by: Int(bits), where: mask, otherwise: SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
 public func highwayShiftedLeftWhereOtherwiseI8ConstantOtherwise(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedLeftWhereOtherwiseI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             mask.raw,
             a.raw,
             bits
@@ -491,39 +496,39 @@ public func highwayShiftedLeftWhereOtherwiseI8ConstantOtherwise(
 
 @inline(never)
 public func portShiftedRightWhereI8(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: Int(bits), where: mask)
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: Int(bits), where: mask)
 }
 
 @inline(never)
 public func highwayShiftedRightWhereI8(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightWhereI8(mask.raw, a.raw, bits))
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.shiftedRightWhereI8(mask.raw, a.raw, bits))
 }
 
 @inline(never)
 public func portShiftedRightWhereI8ConstantA(
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(SIMDInt8.repeating(26), by: Int(bits), where: mask)
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(SIMD<Int8>.repeating(26), by: Int(bits), where: mask)
 }
 
 @inline(never)
 public func highwayShiftedRightWhereI8ConstantA(
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightWhereI8(
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             bits
         )
     )
@@ -531,38 +536,38 @@ public func highwayShiftedRightWhereI8ConstantA(
 
 @inline(never)
 public func portShiftedRightWhereI8ConstantBits(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: 3, where: mask)
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: 3, where: mask)
 }
 
 @inline(never)
 public func highwayShiftedRightWhereI8ConstantBits(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightWhereTemplateI8(mask.raw, a.raw, 3))
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(raw: HighwayReference.Nothrow.shiftedRightWhereTemplateI8(mask.raw, a.raw, 3))
 }
 
 @inline(never)
 public func portShiftedRightWhereOtherwiseI8(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: Int(bits), where: mask, otherwise: otherwise)
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: Int(bits), where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedRightWhereOtherwiseI8(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
@@ -575,23 +580,28 @@ public func highwayShiftedRightWhereOtherwiseI8(
 @inline(never)
 public func portShiftedRightWhereOtherwiseI8ConstantA(
     by bits: Int32,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(SIMDInt8.repeating(26), by: Int(bits), where: mask, otherwise: otherwise)
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(
+        SIMD<Int8>.repeating(26),
+        by: Int(bits),
+        where: mask,
+        otherwise: otherwise
+    )
 }
 
 @inline(never)
 public func highwayShiftedRightWhereOtherwiseI8ConstantA(
     by bits: Int32,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightWhereOtherwiseI8(
             otherwise.raw,
             mask.raw,
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             bits
         )
     )
@@ -599,20 +609,20 @@ public func highwayShiftedRightWhereOtherwiseI8ConstantA(
 
 @inline(never)
 public func portShiftedRightWhereOtherwiseI8ConstantBits(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: 3, where: mask, otherwise: otherwise)
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: 3, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayShiftedRightWhereOtherwiseI8ConstantBits(
-    _ a: SIMDInt8.Vector,
-    where mask: SIMDInt8.Mask,
-    otherwise: SIMDInt8.Vector
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    _ a: SIMD<Int8>,
+    where mask: SIMD<Int8>.Mask,
+    otherwise: SIMD<Int8>
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightWhereOtherwiseTemplateI8(
             otherwise.raw,
             mask.raw,
@@ -624,22 +634,22 @@ public func highwayShiftedRightWhereOtherwiseI8ConstantBits(
 
 @inline(never)
 public func portShiftedRightWhereOtherwiseI8ConstantOtherwise(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.shiftedRight(a, by: Int(bits), where: mask, otherwise: SIMDInt8.repeating(26))
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>.shiftedRight(a, by: Int(bits), where: mask, otherwise: SIMD<Int8>.repeating(26))
 }
 
 @inline(never)
 public func highwayShiftedRightWhereOtherwiseI8ConstantOtherwise(
-    _ a: SIMDInt8.Vector,
+    _ a: SIMD<Int8>,
     by bits: Int32,
-    where mask: SIMDInt8.Mask
-) -> SIMDInt8.Vector {
-    SIMDInt8.Vector(
+    where mask: SIMD<Int8>.Mask
+) -> SIMD<Int8> {
+    SIMD<Int8>(
         raw: HighwayReference.Nothrow.shiftedRightWhereOtherwiseI8(
-            SIMDInt8.Vector(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
+            SIMD<Int8>(raw: HighwayReference.Nothrow.repeatingI8(26)).raw,
             mask.raw,
             a.raw,
             bits

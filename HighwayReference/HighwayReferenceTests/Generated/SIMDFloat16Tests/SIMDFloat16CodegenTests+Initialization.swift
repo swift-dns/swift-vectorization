@@ -16,7 +16,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func repeating() {
         let mismatches = Mismatches("portRepeatingF16")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x2E60_AABD_3DD9_3F27)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x2E60_AABD_3DD9_3F27)
         for value in valueInputs {
             mismatches.check(
                 portRepeatingF16(value),
@@ -61,7 +61,7 @@ extension SIMDFloat16CodegenTests {
     @Test func repeatingWhere() {
         let mismatches = Mismatches("portRepeatingWhereF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9A1C_9CF1_59B2_8334)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x9A1C_9DF1_59B2_84E7)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x9A1C_9DF1_59B2_84E7)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 portRepeatingWhereF16(value, where: mask),
@@ -87,9 +87,9 @@ extension SIMDFloat16CodegenTests {
 
     @Test func repeatingWhereOtherwise() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseF16")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x89A0_D6E9_40FB_9948)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x89A0_D6E9_40FB_9948)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x89A0_D7E9_40FB_9AFB)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x89A0_D8E9_40FB_9CAE)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x89A0_D8E9_40FB_9CAE)
         for (otherwise, mask, value) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -107,7 +107,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func repeatingWhereOtherwiseConstantValue() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseF16ConstantValue")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xBBD4_D8BB_E2D3_02A7)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xBBD4_D8BB_E2D3_02A7)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBBD4_D7BB_E2D3_00F4)
         for (otherwise, mask) in everyPair(otherwiseInputs, maskInputs) {
             mismatches.check(
@@ -122,7 +122,7 @@ extension SIMDFloat16CodegenTests {
     @Test func repeatingWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseF16ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7B6A_04DD_649E_9373)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x7B6A_05DD_649E_9526)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x7B6A_05DD_649E_9526)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 portRepeatingWhereOtherwiseF16ConstantOtherwise(value, where: mask),
@@ -135,7 +135,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func iota() {
         let mismatches = Mismatches("portIotaF16")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x2AB1_EB00_9686_0DCF)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x2AB1_EB00_9686_0DCF)
         for value in valueInputs {
             mismatches.check(portIotaF16(value), highwayIotaF16(value), "value: \(hex(value))")
         }
@@ -150,28 +150,28 @@ extension SIMDFloat16CodegenTests {
 
     @Test func repeatingBlock() {
         let mismatches = Mismatches("portRepeatingBlockF16")
-        let vectorInputs = Inputs.vectors(H.Vector.self, seed: 0x9C2A_52DB_BB04_5A2E)
+        let vectorInputs = Inputs.vectors(H.self, seed: 0x9C2A_52DB_BB04_5A2E)
         for vector in vectorInputs {
             mismatches.check(
                 portRepeatingBlockF16(
-                    vector[0],
-                    vector[1],
-                    vector[2],
-                    vector[3],
-                    vector[4],
-                    vector[5],
-                    vector[6],
-                    vector[7]
+                    vector.simd[0],
+                    vector.simd[1],
+                    vector.simd[2],
+                    vector.simd[3],
+                    vector.simd[4],
+                    vector.simd[5],
+                    vector.simd[6],
+                    vector.simd[7]
                 ),
                 highwayRepeatingBlockF16(
-                    vector[0],
-                    vector[1],
-                    vector[2],
-                    vector[3],
-                    vector[4],
-                    vector[5],
-                    vector[6],
-                    vector[7]
+                    vector.simd[0],
+                    vector.simd[1],
+                    vector.simd[2],
+                    vector.simd[3],
+                    vector.simd[4],
+                    vector.simd[5],
+                    vector.simd[6],
+                    vector.simd[7]
                 ),
                 "lanes: \(describe(vector))"
             )

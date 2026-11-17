@@ -8,8 +8,8 @@ import Vectorization
 extension SIMDInt64ReferenceTests {
     @Test func store() {
         let mismatches = Mismatches("store")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA114_46C0_5C43_5FB3)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA114_46C0_5C43_5FB3)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -26,8 +26,8 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeBeforeGuardPage() {
         let mismatches = Mismatches("store before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x71C5_FB6F_0874_20D8)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x71C5_FB6F_0874_20D8)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination)
@@ -42,8 +42,8 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeUncheckedSpan() {
         let mismatches = Mismatches("store unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE8A7_0B14_D064_E087)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE8A7_0B14_D064_E087)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -66,7 +66,7 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeUncheckedOutputSpan() {
         let mismatches = Mismatches("store unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x00C8_412B_68CB_8226)
+        let aInputs = Inputs.vectors(H.self, seed: 0x00C8_412B_68CB_8226)
         for a in aInputs {
             let (_, portLanes) = withOutputSpan(capacity: H.laneCount) { output in
                 unsafe H.append(a, toUnchecked: &output)
@@ -81,8 +81,8 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeAligned() {
         let mismatches = Mismatches("storeAligned")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7224_12D9_3C7D_886F)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7224_12D9_3C7D_886F)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
                 destination in unsafe H.storeAligned(a, to: destination)
@@ -97,8 +97,8 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeAlignedBeforeGuardPage() {
         let mismatches = Mismatches("storeAligned before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E9F_4EBB_CAFF_1754)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E9F_4EBB_CAFF_1754)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeAligned(a, to: destination)
@@ -113,8 +113,8 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeAlignedUncheckedSpan() {
         let mismatches = Mismatches("storeAligned unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB54D_4A7F_CE4B_3C7B)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB54D_4A7F_CE4B_3C7B)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
                 destination in
@@ -147,17 +147,17 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeAlignedUncheckedOutputSpan() {
         let mismatches = Mismatches("storeAligned unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7F08_8E34_0B8F_FC52)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7F08_8E34_0B8F_FC52)
         for a in aInputs {
             let (_, portLanes) = withOutputSpan(
                 capacity: H.laneCount,
-                alignment: H.laneCount * MemoryLayout<H.Lane>.stride
+                alignment: H.laneCount * MemoryLayout<Lane>.stride
             ) { output in
                 unsafe H.appendAligned(a, toUnchecked: &output)
             }
             let (_, referenceLanes) = withOutputSpan(
                 capacity: H.laneCount,
-                alignment: H.laneCount * MemoryLayout<H.Lane>.stride
+                alignment: H.laneCount * MemoryLayout<Lane>.stride
             ) { output in
                 H.appendAligned(a, to: &output)
             }
@@ -168,9 +168,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeFirst() {
         let mismatches = Mismatches("storeFirst")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC390_8C2A_7C8D_736D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC390_8C2A_7C8D_736D)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, count) in everyPair(aInputs, countInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -187,9 +187,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeFirstBeforeGuardPage() {
         let mismatches = Mismatches("storeFirst before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1BA9_7E93_DE14_ECBA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1BA9_7E93_DE14_ECBA)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, count) in everyPair(aInputs, countInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe H.storeFirst(a, to: destination, count: count)
@@ -204,7 +204,7 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeFirstUncheckedOutputSpan() {
         let mismatches = Mismatches("storeFirst unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9910_3532_9B65_2A40)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9910_3532_9B65_2A40)
         let countInputs = Inputs.counts(through: H.laneCount)
         for (a, count) in everyPair(aInputs, countInputs) {
             let (_, portLanes) = withOutputSpan(capacity: count) { output in
@@ -220,9 +220,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeWhere() {
         let mismatches = Mismatches("storeWhere")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x11D1_C7D4_9499_F090)
+        let aInputs = Inputs.vectors(H.self, seed: 0x11D1_C7D4_9499_F090)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x11D1_C8D4_9499_F243)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -243,9 +243,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeWhereBeforeGuardPage() {
         let mismatches = Mismatches("storeWhere before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x113C_BDAF_2125_80A9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x113C_BDAF_2125_80A9)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x113C_BCAF_2125_7EF6)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination, where: mask)
@@ -272,9 +272,9 @@ extension SIMDInt64ReferenceTests {
         let mismatches = Mismatches(
             "storeWhere with the lanes the mask leaves out past a guard page"
         )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x87A5_362C_68F6_046C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x87A5_362C_68F6_046C)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x87A5_372C_68F6_061F)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(
                 Array(sentinel.prefix(lanesThroughLastTrue(of: mask)))
@@ -293,9 +293,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeWhereNonCanonical() {
         let mismatches = Mismatches("storeWhere with masks from arbitrary vectors")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8DA7_3B69_065D_444F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8DA7_3B69_065D_444F)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8DA7_3A69_065D_429C)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -316,9 +316,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeWhereUncheckedSpan() {
         let mismatches = Mismatches("storeWhere unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7ECA_D7BB_2398_3622)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7ECA_D7BB_2398_3622)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7ECA_D8BB_2398_37D5)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -346,8 +346,8 @@ extension SIMDInt64ReferenceTests {
     @Test func storeRepeating() {
         let mismatches = Mismatches("storeRepeating")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x7170_867F_DA34_B0A5)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x7170_867F_DA34_B0A5)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (count, value) in everyPair(countInputs, valueInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -365,8 +365,8 @@ extension SIMDInt64ReferenceTests {
     @Test func storeRepeatingBeforeGuardPage() {
         let mismatches = Mismatches("storeRepeating before a guard page")
         let countInputs = Inputs.counts(through: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x84B9_F8BA_6EC1_09A0)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x84B9_F8BA_6EC1_09A0)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (count, value) in everyPair(countInputs, valueInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe H.storeRepeating(value, count: count, to: destination)
@@ -383,11 +383,11 @@ extension SIMDInt64ReferenceTests {
         let mismatches = Mismatches("copy")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0x8687_44A1_0CE7_E822
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (count, from) in everyPair(countInputs, fromInputs) {
             var portLanes = sentinel
             var referenceLanes = sentinel
@@ -415,12 +415,8 @@ extension SIMDInt64ReferenceTests {
     @Test func copyBeforeGuardPage() {
         let mismatches = Mismatches("copy before a guard page")
         let countInputs = Inputs.counts(through: H.laneCount)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xDA98_D3A5_F4A9_71F5
-        )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDA98_D3A5_F4A9_71F5)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for (count, from) in everyPair(countInputs, fromInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in
@@ -444,7 +440,7 @@ extension SIMDInt64ReferenceTests {
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x639C_197E_60AD_50D2).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 2 + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2 + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -464,7 +460,7 @@ extension SIMDInt64ReferenceTests {
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0xA2E4_917B_92A1_4B73).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 2)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination)
@@ -482,7 +478,7 @@ extension SIMDInt64ReferenceTests {
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0xA120_2FB9_BFB8_C8A8).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount / 2 + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2 + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -525,7 +521,7 @@ extension SIMDInt64ReferenceTests {
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0xEFCB_EE1C_E1E7_A4F2).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 / MemoryLayout<H.Lane>.size + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -545,7 +541,7 @@ extension SIMDInt64ReferenceTests {
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x12B5_B80A_C827_BD53).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 / MemoryLayout<H.Lane>.size)
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.store(a, to: destination)
@@ -563,7 +559,7 @@ extension SIMDInt64ReferenceTests {
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0xBC2E_5E91_6102_0848).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 16 / MemoryLayout<H.Lane>.size + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -590,11 +586,10 @@ extension SIMDInt64ReferenceTests {
             poisoningUpperBytes
         )
         for a in aInputs {
-            let (_, portLanes) = withOutputSpan(capacity: 16 / MemoryLayout<H.Lane>.size) {
-                output in
+            let (_, portLanes) = withOutputSpan(capacity: 16 / MemoryLayout<Lane>.size) { output in
                 unsafe H.append(a, toUnchecked: &output)
             }
-            let (_, referenceLanes) = withOutputSpan(capacity: 16 / MemoryLayout<H.Lane>.size) {
+            let (_, referenceLanes) = withOutputSpan(capacity: 16 / MemoryLayout<Lane>.size) {
                 output in
                 H.append(a, to: &output)
             }

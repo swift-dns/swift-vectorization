@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDUInt16CodegenTests {
     @Test func firstLane() {
         let mismatches = Mismatches("portFirstLaneU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB38A_0F84_30ED_1E6B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB38A_0F84_30ED_1E6B)
         for a in aInputs {
             mismatches.check(portFirstLaneU16(a), highwayFirstLaneU16(a), "a: \(describe(a))")
         }
@@ -24,7 +24,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func lane() {
         let mismatches = Mismatches("portLaneU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD78B_B73E_D540_23C5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD78B_B73E_D540_23C5)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -51,7 +51,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func laneConstantIndex() {
         let mismatches = Mismatches("portLaneU16ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0CE2_414D_76DF_C4D1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0CE2_414D_76DF_C4D1)
         for a in aInputs {
             mismatches.check(
                 portLaneU16ConstantIndex(a),
@@ -64,9 +64,9 @@ extension SIMDUInt16CodegenTests {
 
     @Test func replacingLane() {
         let mismatches = Mismatches("portReplacingLaneU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3987_26D7_348E_31DE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3987_26D7_348E_31DE)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x3987_24D7_348E_2E78)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x3987_24D7_348E_2E78)
         for (a, index, value) in mixedTriples(
             aInputs,
             indexInputs,
@@ -85,7 +85,7 @@ extension SIMDUInt16CodegenTests {
     @Test func replacingLaneConstantA() {
         let mismatches = Mismatches("portReplacingLaneU16ConstantA")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x0637_6A96_3C5E_FF65)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x0637_6A96_3C5E_FF65)
         for (index, value) in everyPair(indexInputs, valueInputs) {
             mismatches.check(
                 portReplacingLaneU16ConstantA(atUnchecked: index, with: value),
@@ -98,8 +98,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func replacingLaneConstantIndex() {
         let mismatches = Mismatches("portReplacingLaneU16ConstantIndex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD5AF_FAE2_3174_9660)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xD5AF_FCE2_3174_99C6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD5AF_FAE2_3174_9660)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xD5AF_FCE2_3174_99C6)
         for (a, value) in everyPair(aInputs, valueInputs) {
             mismatches.check(
                 portReplacingLaneU16ConstantIndex(a, with: value),
@@ -112,7 +112,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func replacingLaneConstantValue() {
         let mismatches = Mismatches("portReplacingLaneU16ConstantValue")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCB9A_3C25_C4DA_2D91)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCB9A_3C25_C4DA_2D91)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(

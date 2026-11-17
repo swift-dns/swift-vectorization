@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDBFloat16CodegenTests {
     @Test func negated() {
         let mismatches = Mismatches("portNegatedBF16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC8F8_D438_A013_3C14)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC8F8_D438_A013_3C14)
         for a in aInputs {
             mismatches.check(portNegatedBF16(a), highwayNegatedBF16(a), "a: \(describe(a))")
         }

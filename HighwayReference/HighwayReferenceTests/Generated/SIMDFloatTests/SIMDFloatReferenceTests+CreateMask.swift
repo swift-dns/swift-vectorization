@@ -21,11 +21,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func maskFromVector() {
         let mismatches = Mismatches("maskFromVector")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB2CD_76AF_85D0_437D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB2CD_76AF_85D0_437D)
         for a in aInputs {
             mismatches.check(
                 H.mask(from: a),
-                H.Mask(raw: HighwayReference.maskFromVectorF32(a)),
+                H.Mask(raw: HighwayReference.maskFromVectorF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -48,7 +48,7 @@ extension SIMDFloatReferenceTests {
     @Test func repeatingBlockMask() {
         let mismatches = Mismatches("repeatingBlockMask")
         let bitsInputs = Inputs.maskBits(
-            lanes: 16 / MemoryLayout<H.Lane>.size,
+            lanes: 16 / MemoryLayout<Lane>.size,
             seed: 0x4559_C2EE_AFDE_BFEC
         )
         for bits in bitsInputs {

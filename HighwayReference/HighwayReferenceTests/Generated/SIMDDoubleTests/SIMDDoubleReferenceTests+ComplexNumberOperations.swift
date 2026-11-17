@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDDoubleReferenceTests {
     @Test func complexConjugate() {
         let mismatches = Mismatches("complexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7BB2_63CF_5F8E_029D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7BB2_63CF_5F8E_029D)
         for a in aInputs {
             mismatches.check(
                 H.complexConjugate(a),
-                HighwayReference.complexConjugateF64(a),
+                H(raw: HighwayReference.complexConjugateF64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -21,12 +21,13 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplyingComplex() {
         let mismatches = Mismatches("multiplyingComplex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x83D8_D967_2BD0_CA5F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x83D8_D867_2BD0_C8AC)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x83D8_D967_2BD0_CA5F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x83D8_D867_2BD0_C8AC)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(a, b),
-                HighwayReference.multiplyingComplexF64(a, b),
+                H(raw: HighwayReference.multiplyingComplexF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -35,12 +36,13 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplyingComplexConjugate() {
         let mismatches = Mismatches("multiplyingComplexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x21BD_D07E_BB97_EE55)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x21BD_CF7E_BB97_ECA2)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x21BD_D07E_BB97_EE55)
+        let bInputs = Inputs.vectors(H.self, seed: 0x21BD_CF7E_BB97_ECA2)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b),
-                HighwayReference.multiplyingComplexConjugateF64(a, b),
+                H(raw: HighwayReference.multiplyingComplexConjugateF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -49,14 +51,14 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplyAddingComplex() {
         let mismatches = Mismatches("multiplyAddingComplex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1F70_9467_90D4_D8AC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1F70_9567_90D4_DA5F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x1F70_9667_90D4_DC12)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1F70_9467_90D4_D8AC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1F70_9567_90D4_DA5F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x1F70_9667_90D4_DC12)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5BD5_E1AD_45A0_6E00)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplex(a, b, c),
-                HighwayReference.multiplyAddingComplexF64(a, b, c),
+                H(raw: HighwayReference.multiplyAddingComplexF64(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -65,14 +67,14 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplyAddingComplexConjugate() {
         let mismatches = Mismatches("multiplyAddingComplexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x72DA_84B1_697E_49EC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x72DA_85B1_697E_4B9F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x72DA_86B1_697E_4D52)
+        let aInputs = Inputs.vectors(H.self, seed: 0x72DA_84B1_697E_49EC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x72DA_85B1_697E_4B9F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x72DA_86B1_697E_4D52)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xF6A2_D51B_51A4_02C0)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c),
-                HighwayReference.multiplyAddingComplexConjugateF64(a, b, c),
+                H(raw: HighwayReference.multiplyAddingComplexConjugateF64(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -81,20 +83,27 @@ extension SIMDDoubleReferenceTests {
 
     @Test func multiplyingComplexWhereOtherwise() {
         let mismatches = Mismatches("multiplyingComplexWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF4C7_0193_86D7_7740)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF4C7_0193_86D7_7740)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF4C7_0293_86D7_78F3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF4C7_0393_86D7_7AA6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF4C7_0493_86D7_7C59)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF4C7_0393_86D7_7AA6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF4C7_0493_86D7_7C59)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
             aInputs,
             bInputs,
             seed: 0xBEEF_E502_0DEF_E13C
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                H(
+                    raw: HighwayReference.multiplyingComplexWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -105,20 +114,27 @@ extension SIMDDoubleReferenceTests {
         let mismatches = Mismatches(
             "multiplyingComplexWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x5D1B_5709_75BD_893F)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x5D1B_5709_75BD_893F)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x5D1B_5609_75BD_878C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5D1B_5909_75BD_8CA5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5D1B_5809_75BD_8AF2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5D1B_5909_75BD_8CA5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5D1B_5809_75BD_8AF2)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
             aInputs,
             bInputs,
             seed: 0x12F8_A1B9_D6D0_98D9
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                HighwayReference.multiplyingComplexWhereOtherwiseF64(otherwise, mask.raw, a, b),
+                H(
+                    raw: HighwayReference.multiplyingComplexWhereOtherwiseF64(
+                        otherwise.raw,
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -128,13 +144,19 @@ extension SIMDDoubleReferenceTests {
     @Test func multiplyingComplexConjugateWhere() {
         let mismatches = Mismatches("multiplyingComplexConjugateWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x979A_5025_BCBA_5696)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x979A_5125_BCBA_5849)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x979A_4E25_BCBA_5330)
+        let aInputs = Inputs.vectors(H.self, seed: 0x979A_5125_BCBA_5849)
+        let bInputs = Inputs.vectors(H.self, seed: 0x979A_4E25_BCBA_5330)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xA2E1_B711_6B72_C192)
-        where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF64(mask.raw, a, b),
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateWhereF64(
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -146,13 +168,19 @@ extension SIMDDoubleReferenceTests {
             "multiplyingComplexConjugateWhere with masks from arbitrary vectors"
         )
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x51F2_5074_DBE7_D405)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x51F2_4F74_DBE7_D252)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x51F2_4E74_DBE7_D09F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x51F2_4F74_DBE7_D252)
+        let bInputs = Inputs.vectors(H.self, seed: 0x51F2_4E74_DBE7_D09F)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xCC39_5678_BD8A_EDF7)
-        where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                HighwayReference.multiplyingComplexConjugateWhereF64(mask.raw, a, b),
+                H(
+                    raw: HighwayReference.multiplyingComplexConjugateWhereF64(
+                        mask.raw,
+                        a.raw,
+                        b.raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -162,19 +190,26 @@ extension SIMDDoubleReferenceTests {
     @Test func multiplyAddingComplexConjugateWhere() {
         let mismatches = Mismatches("multiplyAddingComplexConjugateWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0337_6D2A_CB6F_2B6D)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0337_6C2A_CB6F_29BA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0337_6B2A_CB6F_2807)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x0337_6A2A_CB6F_2654)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0337_6C2A_CB6F_29BA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0337_6B2A_CB6F_2807)
+        let cInputs = Inputs.vectors(H.self, seed: 0x0337_6A2A_CB6F_2654)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
             bInputs,
             cInputs,
             seed: 0x7D5D_CA40_086A_EABF
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF64(mask.raw, a, b, c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateWhereF64(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -186,19 +221,26 @@ extension SIMDDoubleReferenceTests {
             "multiplyAddingComplexConjugateWhere with masks from arbitrary vectors"
         )
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2BC2_A2D2_86C5_848A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2BC2_A3D2_86C5_863D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2BC2_A0D2_86C5_8124)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x2BC2_A1D2_86C5_82D7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2BC2_A3D2_86C5_863D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2BC2_A0D2_86C5_8124)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2BC2_A1D2_86C5_82D7)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
             bInputs,
             cInputs,
             seed: 0xFA7D_1965_318B_DB4E
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                HighwayReference.multiplyAddingComplexConjugateWhereF64(mask.raw, a, b, c),
+                H(
+                    raw: HighwayReference.multiplyAddingComplexConjugateWhereF64(
+                        mask.raw,
+                        a.raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }

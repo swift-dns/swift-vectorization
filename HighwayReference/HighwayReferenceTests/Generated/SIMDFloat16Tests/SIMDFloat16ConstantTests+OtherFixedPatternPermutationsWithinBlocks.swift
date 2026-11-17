@@ -8,18 +8,18 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkOddEvenConstantA(_ value: H.Lane) {
+    private func checkOddEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("oddEven with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC5F6_B9BE_B858_0735)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC5F6_B9BE_B858_0735)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.oddEven(H.repeating(value), b),
-                HighwayReference.oddEvenF16(H.repeating(value), b),
+                H(raw: HighwayReference.oddEvenF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -27,18 +27,18 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkOddEvenConstantB(_ value: H.Lane) {
+    private func checkOddEvenConstantB(_ value: Lane) {
         let mismatches = Mismatches("oddEven with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAB5D_B3BE_A91A_CB63)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAB5D_B3BE_A91A_CB63)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.oddEven(a, H.repeating(value)),
-                HighwayReference.oddEvenF16(a, H.repeating(value)),
+                H(raw: HighwayReference.oddEvenF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -116,8 +116,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func oddEvenConstantSplatPayloadNaN() {
-        checkOddEvenConstantA(H.Lane(nan: 1, signaling: false))
-        checkOddEvenConstantB(H.Lane(nan: 1, signaling: false))
+        checkOddEvenConstantA(Lane(nan: 1, signaling: false))
+        checkOddEvenConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func oddEvenConstantSplatSignalingNaN() {
@@ -141,16 +141,16 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkDuplicatingEvenConstantA(_ value: H.Lane) {
+    private func checkDuplicatingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingEven with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.duplicatingEven(H.repeating(value)),
-            HighwayReference.duplicatingEvenF16(H.repeating(value)),
+            H(raw: HighwayReference.duplicatingEvenF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -213,7 +213,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func duplicatingEvenConstantSplatPayloadNaN() {
-        checkDuplicatingEvenConstantA(H.Lane(nan: 1, signaling: false))
+        checkDuplicatingEvenConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func duplicatingEvenConstantSplatSignalingNaN() {
@@ -233,16 +233,16 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkDuplicatingOddConstantA(_ value: H.Lane) {
+    private func checkDuplicatingOddConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingOdd with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.duplicatingOdd(H.repeating(value)),
-            HighwayReference.duplicatingOddF16(H.repeating(value)),
+            H(raw: HighwayReference.duplicatingOddF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -305,7 +305,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func duplicatingOddConstantSplatPayloadNaN() {
-        checkDuplicatingOddConstantA(H.Lane(nan: 1, signaling: false))
+        checkDuplicatingOddConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func duplicatingOddConstantSplatSignalingNaN() {

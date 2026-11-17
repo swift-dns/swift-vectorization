@@ -7,16 +7,16 @@ import Vectorization
 
 extension SIMDInt32ConstantTests {
     @inline(__always)
-    private func checkBroadcastingSignBitConstantA(_ value: H.Lane) {
+    private func checkBroadcastingSignBitConstantA(_ value: Lane) {
         let mismatches = Mismatches("broadcastingSignBit with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         mismatches.check(
             H.broadcastingSignBit(H.repeating(value)),
-            H.Vector(raw: HighwayReference.broadcastingSignBitI32(H.repeating(value).raw)),
+            H(raw: HighwayReference.broadcastingSignBitI32(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -91,31 +91,31 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func broadcastingSignBitConstantSplatMax() {
-        checkBroadcastingSignBitConstantA(H.Lane.max)
+        checkBroadcastingSignBitConstantA(Lane.max)
     }
 
     @Test func broadcastingSignBitConstantSplatMin() {
-        checkBroadcastingSignBitConstantA(H.Lane.min)
+        checkBroadcastingSignBitConstantA(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseAndWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x27C5_F337_A00C_EA79)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x27C5_F037_A00C_E560)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x27C5_F137_A00C_E713)
+        let aInputs = Inputs.vectors(H.self, seed: 0x27C5_F037_A00C_E560)
+        let bInputs = Inputs.vectors(H.self, seed: 0x27C5_F137_A00C_E713)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x6D9D_5A7F_955D_DEC2)
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseAndWhereOtherwiseI32(
                         H.repeating(value).raw,
                         mask.raw,
@@ -198,31 +198,31 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func bitwiseAndWhereOtherwiseConstantSplatMax() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @Test func bitwiseAndWhereOtherwiseConstantSplatMin() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(H.Lane.min)
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseOrWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x67C7_802B_EDA9_52CB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x67C7_812B_EDA9_547E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x67C7_822B_EDA9_5631)
+        let aInputs = Inputs.vectors(H.self, seed: 0x67C7_812B_EDA9_547E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x67C7_822B_EDA9_5631)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x487B_A6BB_E6E3_0654)
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseOrWhereOtherwiseI32(
                         H.repeating(value).raw,
                         mask.raw,
@@ -305,31 +305,31 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func bitwiseOrWhereOtherwiseConstantSplatMax() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkBitwiseOrWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @Test func bitwiseOrWhereOtherwiseConstantSplatMin() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(H.Lane.min)
+        checkBitwiseOrWhereOtherwiseConstantOtherwise(Lane.min)
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseXorWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6482_7049_9997_F779)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6482_6D49_9997_F260)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6482_6E49_9997_F413)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6482_6D49_9997_F260)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6482_6E49_9997_F413)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4BB4_D218_49B1_6DC2)
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseXorWhereOtherwiseI32(
                         H.repeating(value).raw,
                         mask.raw,
@@ -412,28 +412,26 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func bitwiseXorWhereOtherwiseConstantSplatMax() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkBitwiseXorWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @Test func bitwiseXorWhereOtherwiseConstantSplatMin() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(H.Lane.min)
+        checkBitwiseXorWhereOtherwiseConstantOtherwise(Lane.min)
     }
 
     @inline(__always)
-    private func checkNegatingIfNegativeConstantB(_ value: H.Lane) {
+    private func checkNegatingIfNegativeConstantB(_ value: Lane) {
         let mismatches = Mismatches("negatingIfNegative with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x12EF_BAC2_0822_612C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x12EF_BAC2_0822_612C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.negatingIfNegative(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.negatingIfNegativeI32(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.negatingIfNegativeI32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -509,10 +507,10 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func negatingIfNegativeConstantSplatMax() {
-        checkNegatingIfNegativeConstantB(H.Lane.max)
+        checkNegatingIfNegativeConstantB(Lane.max)
     }
 
     @Test func negatingIfNegativeConstantSplatMin() {
-        checkNegatingIfNegativeConstantB(H.Lane.min)
+        checkNegatingIfNegativeConstantB(Lane.min)
     }
 }

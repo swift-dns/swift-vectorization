@@ -4,81 +4,97 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portRoundedToNearestOrEvenF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.roundedToNearestOrEven(a)
+public func portRoundedToNearestOrEvenF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.roundedToNearestOrEven(a)
 }
 
 @inline(never)
-public func highwayRoundedToNearestOrEvenF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.roundedToNearestOrEvenF32(a)
+public func highwayRoundedToNearestOrEvenF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.roundedToNearestOrEvenF32(a.raw))
 }
 
 @inline(never)
-public func portRoundedToNearestOrEvenF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.roundedToNearestOrEven(SIMDFloat.repeating(1.5))
+public func portRoundedToNearestOrEvenF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.roundedToNearestOrEven(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRoundedToNearestOrEvenF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.roundedToNearestOrEvenF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayRoundedToNearestOrEvenF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.roundedToNearestOrEvenF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
-public func portRoundedTowardZeroF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.roundedTowardZero(a)
+public func portRoundedTowardZeroF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.roundedTowardZero(a)
 }
 
 @inline(never)
-public func highwayRoundedTowardZeroF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.roundedTowardZeroF32(a)
+public func highwayRoundedTowardZeroF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.roundedTowardZeroF32(a.raw))
 }
 
 @inline(never)
-public func portRoundedTowardZeroF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.roundedTowardZero(SIMDFloat.repeating(1.5))
+public func portRoundedTowardZeroF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.roundedTowardZero(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRoundedTowardZeroF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.roundedTowardZeroF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayRoundedTowardZeroF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.roundedTowardZeroF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
-public func portRoundedUpF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.roundedUp(a)
+public func portRoundedUpF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.roundedUp(a)
 }
 
 @inline(never)
-public func highwayRoundedUpF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.roundedUpF32(a)
+public func highwayRoundedUpF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.roundedUpF32(a.raw))
 }
 
 @inline(never)
-public func portRoundedUpF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.roundedUp(SIMDFloat.repeating(1.5))
+public func portRoundedUpF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.roundedUp(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRoundedUpF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.roundedUpF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayRoundedUpF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.roundedUpF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }
 
 @inline(never)
-public func portRoundedDownF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.roundedDown(a)
+public func portRoundedDownF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>.roundedDown(a)
 }
 
 @inline(never)
-public func highwayRoundedDownF32(_ a: SIMDFloat.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.roundedDownF32(a)
+public func highwayRoundedDownF32(_ a: SIMD<Float>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.roundedDownF32(a.raw))
 }
 
 @inline(never)
-public func portRoundedDownF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.roundedDown(SIMDFloat.repeating(1.5))
+public func portRoundedDownF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.roundedDown(SIMD<Float>.repeating(1.5))
 }
 
 @inline(never)
-public func highwayRoundedDownF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.roundedDownF32(HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayRoundedDownF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.roundedDownF32(
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+        )
+    )
 }

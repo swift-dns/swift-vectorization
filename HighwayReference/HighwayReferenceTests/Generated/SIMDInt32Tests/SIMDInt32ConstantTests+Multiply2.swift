@@ -7,25 +7,25 @@ import Vectorization
 
 extension SIMDInt32ConstantTests {
     @inline(__always)
-    private func checkMultiplyAccumulatingInAnyOrderFromInt16ConstantA(_ value: SIMDInt16.Lane) {
+    private func checkMultiplyAccumulatingInAnyOrderFromInt16ConstantA(_ value: Int16) {
         let mismatches = Mismatches(
             "multiplyAccumulatingInAnyOrderFromInt16 with a repeating \(hex(value))"
         )
-        let bInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0xD87E_3C27_F268_27C3)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0xD87E_3D27_F268_2976)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0xD87E_3E27_F268_2B29)
+        let bInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0xD87E_3C27_F268_27C3)
+        let cInputs = Inputs.accumulators(H.self, seed: 0xD87E_3D27_F268_2976)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0xD87E_3E27_F268_2B29)
         mismatches.check(
-            SIMDInt16.repeating(value),
-            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            SIMD<Int16>.repeating(value),
+            SIMD<Int16>(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for (b, c, v0) in mixedTriples(bInputs, cInputs, v0Inputs, seed: 0xDD20_0319_71CA_774C) {
             var p0 = v0
             var r0 = v0
-            let port = H.multiplyAccumulatingInAnyOrder(SIMDInt16.repeating(value), b, c, &p0)
-            let reference = H.Vector(
+            let port = H.multiplyAccumulatingInAnyOrder(SIMD<Int16>.repeating(value), b, c, &p0)
+            let reference = H(
                 raw: HighwayReference.multiplyAccumulatingInAnyOrderI16ToI32(
-                    SIMDInt16.repeating(value).raw,
+                    SIMD<Int16>.repeating(value).raw,
                     b.raw,
                     c.raw,
                     &r0.raw
@@ -46,26 +46,26 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAccumulatingInAnyOrderFromInt16ConstantB(_ value: SIMDInt16.Lane) {
+    private func checkMultiplyAccumulatingInAnyOrderFromInt16ConstantB(_ value: Int16) {
         let mismatches = Mismatches(
             "multiplyAccumulatingInAnyOrderFromInt16 with b repeating \(hex(value))"
         )
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0xE17F_F227_F79B_0085)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0xE17F_F027_F79A_FD1F)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0xE17F_EF27_F79A_FB6C)
+        let aInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0xE17F_F227_F79B_0085)
+        let cInputs = Inputs.accumulators(H.self, seed: 0xE17F_F027_F79A_FD1F)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0xE17F_EF27_F79A_FB6C)
         mismatches.check(
-            SIMDInt16.repeating(value),
-            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            SIMD<Int16>.repeating(value),
+            SIMD<Int16>(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for (a, c, v0) in mixedTriples(aInputs, cInputs, v0Inputs, seed: 0xFAE3_B670_ECB6_D777) {
             var p0 = v0
             var r0 = v0
-            let port = H.multiplyAccumulatingInAnyOrder(a, SIMDInt16.repeating(value), c, &p0)
-            let reference = H.Vector(
+            let port = H.multiplyAccumulatingInAnyOrder(a, SIMD<Int16>.repeating(value), c, &p0)
+            let reference = H(
                 raw: HighwayReference.multiplyAccumulatingInAnyOrderI16ToI32(
                     a.raw,
-                    SIMDInt16.repeating(value).raw,
+                    SIMD<Int16>.repeating(value).raw,
                     c.raw,
                     &r0.raw
                 )
@@ -85,23 +85,23 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAccumulatingInAnyOrderFromInt16ConstantC(_ value: H.Lane) {
+    private func checkMultiplyAccumulatingInAnyOrderFromInt16ConstantC(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyAccumulatingInAnyOrderFromInt16 with c repeating \(hex(value))"
         )
-        let aInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0xEAEE_A927_FD2A_ACDA)
-        let bInputs = Inputs.conversions(SIMDInt16.Vector.self, seed: 0xEAEE_AA27_FD2A_AE8D)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0xEAEE_A827_FD2A_AB27)
+        let aInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0xEAEE_A927_FD2A_ACDA)
+        let bInputs = Inputs.conversions(SIMD<Int16>.self, seed: 0xEAEE_AA27_FD2A_AE8D)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0xEAEE_A827_FD2A_AB27)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for (a, b, v0) in mixedTriples(aInputs, bInputs, v0Inputs, seed: 0xE717_245D_5D3E_209E) {
             var p0 = v0
             var r0 = v0
             let port = H.multiplyAccumulatingInAnyOrder(a, b, H.repeating(value), &p0)
-            let reference = H.Vector(
+            let reference = H(
                 raw: HighwayReference.multiplyAccumulatingInAnyOrderI16ToI32(
                     a.raw,
                     b.raw,
@@ -199,13 +199,13 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromInt16ConstantSplatMax() {
-        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantA(SIMDInt16.Lane.max)
-        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantB(SIMDInt16.Lane.max)
+        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantA(Int16.max)
+        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantB(Int16.max)
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromInt16ConstantSplatMin() {
-        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantA(SIMDInt16.Lane.min)
-        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantB(SIMDInt16.Lane.min)
+        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantA(Int16.min)
+        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantB(Int16.min)
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromInt16ConstantSIMDInt32Splat0() {
@@ -277,28 +277,26 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromInt16ConstantSIMDInt32SplatMax() {
-        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantC(H.Lane.max)
+        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantC(Lane.max)
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromInt16ConstantSIMDInt32SplatMin() {
-        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantC(H.Lane.min)
+        checkMultiplyAccumulatingInAnyOrderFromInt16ConstantC(Lane.min)
     }
 
     @inline(__always)
-    private func checkRearrangedToOddPlusEvenConstantA(_ value: H.Lane) {
+    private func checkRearrangedToOddPlusEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("rearrangedToOddPlusEven with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5611_44E4_618B_8466)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5611_44E4_618B_8466)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.rearrangedToOddPlusEven(H.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.rearrangedToOddPlusEvenI32(H.repeating(value).raw, b.raw)
-                ),
+                H(raw: HighwayReference.rearrangedToOddPlusEvenI32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -306,20 +304,18 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkRearrangedToOddPlusEvenConstantB(_ value: H.Lane) {
+    private func checkRearrangedToOddPlusEvenConstantB(_ value: Lane) {
         let mismatches = Mismatches("rearrangedToOddPlusEven with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4D7C_2EE4_5CB4_DA64)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4D7C_2EE4_5CB4_DA64)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.rearrangedToOddPlusEven(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.rearrangedToOddPlusEvenI32(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.rearrangedToOddPlusEvenI32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -412,12 +408,12 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func rearrangedToOddPlusEvenConstantSplatMax() {
-        checkRearrangedToOddPlusEvenConstantA(H.Lane.max)
-        checkRearrangedToOddPlusEvenConstantB(H.Lane.max)
+        checkRearrangedToOddPlusEvenConstantA(Lane.max)
+        checkRearrangedToOddPlusEvenConstantB(Lane.max)
     }
 
     @Test func rearrangedToOddPlusEvenConstantSplatMin() {
-        checkRearrangedToOddPlusEvenConstantA(H.Lane.min)
-        checkRearrangedToOddPlusEvenConstantB(H.Lane.min)
+        checkRearrangedToOddPlusEvenConstantA(Lane.min)
+        checkRearrangedToOddPlusEvenConstantB(Lane.min)
     }
 }

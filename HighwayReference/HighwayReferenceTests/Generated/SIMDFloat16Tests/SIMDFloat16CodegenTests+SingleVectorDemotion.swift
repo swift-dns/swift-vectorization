@@ -10,7 +10,7 @@ import Vectorization
 extension SIMDFloat16CodegenTests {
     @Test func halfVectorConvertingFromFloat() {
         let mismatches = Mismatches("portHalfVectorConvertingF32ToF16")
-        let aInputs = Inputs.float16Demotions(SIMDFloat.Vector.self, seed: 0xD126_D909_CBFC_CC01)
+        let aInputs = Inputs.float16Demotions(SIMD<Float>.self, seed: 0xD126_D909_CBFC_CC01)
         for a in aInputs {
             mismatches.check(
                 portHalfVectorConvertingF32ToF16(converting: a),
@@ -33,7 +33,7 @@ extension SIMDFloat16CodegenTests {
 
     @Test func quarterVectorConvertingFromDouble() {
         let mismatches = Mismatches("portQuarterVectorConvertingF64ToF16")
-        let aInputs = Inputs.float16Demotions(SIMDDouble.Vector.self, seed: 0x8367_8996_8330_2329)
+        let aInputs = Inputs.float16Demotions(SIMD<Double>.self, seed: 0x8367_8996_8330_2329)
         for a in aInputs {
             mismatches.check(
                 portQuarterVectorConvertingF64ToF16(converting: a),

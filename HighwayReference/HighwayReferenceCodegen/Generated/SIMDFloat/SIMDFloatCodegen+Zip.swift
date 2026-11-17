@@ -7,49 +7,51 @@ public import Vectorization
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portZippingLowerF16ToF32(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.zippingLower(a, b)
+public func portZippingLowerF16ToF32(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>.zippingLower(a, b)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayZippingLowerF16ToF32(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zippingLowerF16ToF32(a, b)
+public func highwayZippingLowerF16ToF32(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.zippingLowerF16ToF32(a.raw, b.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portZippingLowerF16ToF32ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.zippingLower(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+public func portZippingLowerF16ToF32ConstantA(_ b: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>.zippingLower(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayZippingLowerF16ToF32ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zippingLowerF16ToF32(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+public func highwayZippingLowerF16ToF32ConstantA(_ b: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.zippingLowerF16ToF32(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portZippingLowerF16ToF32ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.zippingLower(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portZippingLowerF16ToF32ConstantB(_ a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>.zippingLower(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayZippingLowerF16ToF32ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.zippingLowerF16ToF32(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayZippingLowerF16ToF32ConstantB(_ a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.zippingLowerF16ToF32(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif

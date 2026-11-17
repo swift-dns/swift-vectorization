@@ -7,16 +7,16 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkVectorBitPatternFromUInt8ConstantA(_ value: SIMDUInt8.Lane) {
+    private func checkVectorBitPatternFromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches("vectorBitPatternFromUInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDUInt8.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternU8ToI64(SIMDUInt8.repeating(value).raw)),
+            H.vector(bitPattern: SIMD<UInt8>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternU8ToI64(SIMD<UInt8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -55,18 +55,16 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorBitPatternFromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkVectorBitPatternFromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches("vectorBitPatternFromUInt16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDUInt16.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorBitPatternU16ToI64(SIMDUInt16.repeating(value).raw)
-            ),
+            H.vector(bitPattern: SIMD<UInt16>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternU16ToI64(SIMD<UInt16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -121,22 +119,20 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorBitPatternFromUInt16ConstantSplatMax() {
-        checkVectorBitPatternFromUInt16ConstantA(SIMDUInt16.Lane.max)
+        checkVectorBitPatternFromUInt16ConstantA(UInt16.max)
     }
 
     @inline(__always)
-    private func checkVectorBitPatternFromUInt32ConstantA(_ value: SIMDUInt32.Lane) {
+    private func checkVectorBitPatternFromUInt32ConstantA(_ value: UInt32) {
         let mismatches = Mismatches("vectorBitPatternFromUInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt32.repeating(value),
-            SIMDUInt32.Vector(raw: HighwayReference.repeatingU32(value)),
+            SIMD<UInt32>.repeating(value),
+            SIMD<UInt32>(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDUInt32.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorBitPatternU32ToI64(SIMDUInt32.repeating(value).raw)
-            ),
+            H.vector(bitPattern: SIMD<UInt32>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternU32ToI64(SIMD<UInt32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -191,22 +187,20 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorBitPatternFromUInt32ConstantSplatMax() {
-        checkVectorBitPatternFromUInt32ConstantA(SIMDUInt32.Lane.max)
+        checkVectorBitPatternFromUInt32ConstantA(UInt32.max)
     }
 
     @inline(__always)
-    private func checkVectorBitPatternFromUInt64ConstantA(_ value: SIMDUInt64.Lane) {
+    private func checkVectorBitPatternFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches("vectorBitPatternFromUInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDUInt64.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorBitPatternU64ToI64(SIMDUInt64.repeating(value).raw)
-            ),
+            H.vector(bitPattern: SIMD<UInt64>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternU64ToI64(SIMD<UInt64>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -261,20 +255,20 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorBitPatternFromUInt64ConstantSplatMax() {
-        checkVectorBitPatternFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkVectorBitPatternFromUInt64ConstantA(UInt64.max)
     }
 
     @inline(__always)
-    private func checkVectorBitPatternFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkVectorBitPatternFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("vectorBitPatternFromInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDInt8.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternI8ToI64(SIMDInt8.repeating(value).raw)),
+            H.vector(bitPattern: SIMD<Int8>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternI8ToI64(SIMD<Int8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -321,18 +315,16 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorBitPatternFromInt16ConstantA(_ value: SIMDInt16.Lane) {
+    private func checkVectorBitPatternFromInt16ConstantA(_ value: Int16) {
         let mismatches = Mismatches("vectorBitPatternFromInt16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt16.repeating(value),
-            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            SIMD<Int16>.repeating(value),
+            SIMD<Int16>(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDInt16.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorBitPatternI16ToI64(SIMDInt16.repeating(value).raw)
-            ),
+            H.vector(bitPattern: SIMD<Int16>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternI16ToI64(SIMD<Int16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -399,26 +391,24 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorBitPatternFromInt16ConstantSplatMax() {
-        checkVectorBitPatternFromInt16ConstantA(SIMDInt16.Lane.max)
+        checkVectorBitPatternFromInt16ConstantA(Int16.max)
     }
 
     @Test func vectorBitPatternFromInt16ConstantSplatMin() {
-        checkVectorBitPatternFromInt16ConstantA(SIMDInt16.Lane.min)
+        checkVectorBitPatternFromInt16ConstantA(Int16.min)
     }
 
     @inline(__always)
-    private func checkVectorBitPatternFromInt32ConstantA(_ value: SIMDInt32.Lane) {
+    private func checkVectorBitPatternFromInt32ConstantA(_ value: Int32) {
         let mismatches = Mismatches("vectorBitPatternFromInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt32.repeating(value),
-            SIMDInt32.Vector(raw: HighwayReference.repeatingI32(value)),
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDInt32.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorBitPatternI32ToI64(SIMDInt32.repeating(value).raw)
-            ),
+            H.vector(bitPattern: SIMD<Int32>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternI32ToI64(SIMD<Int32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -493,24 +483,24 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorBitPatternFromInt32ConstantSplatMax() {
-        checkVectorBitPatternFromInt32ConstantA(SIMDInt32.Lane.max)
+        checkVectorBitPatternFromInt32ConstantA(Int32.max)
     }
 
     @Test func vectorBitPatternFromInt32ConstantSplatMin() {
-        checkVectorBitPatternFromInt32ConstantA(SIMDInt32.Lane.min)
+        checkVectorBitPatternFromInt32ConstantA(Int32.min)
     }
 
     @inline(__always)
-    private func checkVectorBitPatternFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorBitPatternFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorBitPatternFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF32ToI64(SIMDFloat.repeating(value))),
+            H.vector(bitPattern: SIMD<Float>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternF32ToI64(SIMD<Float>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -573,7 +563,7 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorBitPatternFromFloatConstantSplatPayloadNaN() {
-        checkVectorBitPatternFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorBitPatternFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorBitPatternFromFloatConstantSplatSignalingNaN() {
@@ -593,16 +583,16 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorBitPatternFromDoubleConstantA(_ value: SIMDDouble.Lane) {
+    private func checkVectorBitPatternFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches("vectorBitPatternFromDouble with a repeating \(hex(value))")
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF64ToI64(SIMDDouble.repeating(value))),
+            H.vector(bitPattern: SIMD<Double>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternF64ToI64(SIMD<Double>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -665,7 +655,7 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorBitPatternFromDoubleConstantSplatPayloadNaN() {
-        checkVectorBitPatternFromDoubleConstantA(SIMDDouble.Lane(nan: 1, signaling: false))
+        checkVectorBitPatternFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func vectorBitPatternFromDoubleConstantSplatSignalingNaN() {
@@ -686,16 +676,16 @@ extension SIMDInt64ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @inline(__always)
-    private func checkVectorBitPatternFromFloat16ConstantA(_ value: SIMDFloat16.Lane) {
+    private func checkVectorBitPatternFromFloat16ConstantA(_ value: Float16) {
         let mismatches = Mismatches("vectorBitPatternFromFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat16.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            SIMD<Float16>.repeating(value),
+            SIMD<Float16>(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDFloat16.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorBitPatternF16ToI64(SIMDFloat16.repeating(value))),
+            H.vector(bitPattern: SIMD<Float16>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternF16ToI64(SIMD<Float16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -788,7 +778,7 @@ extension SIMDInt64ConstantTests {
 
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func vectorBitPatternFromFloat16ConstantSplatPayloadNaN() {
-        checkVectorBitPatternFromFloat16ConstantA(SIMDFloat16.Lane(nan: 1, signaling: false))
+        checkVectorBitPatternFromFloat16ConstantA(Float16(nan: 1, signaling: false))
     }
     #endif
 
@@ -817,110 +807,108 @@ extension SIMDInt64ConstantTests {
     #endif
 
     @inline(__always)
-    private func checkVectorBitPatternFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkVectorBitPatternFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches("vectorBitPatternFromBFloat16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
-            H.vector(bitPattern: SIMDBFloat16.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorBitPatternBF16ToI64(SIMDBFloat16.repeating(value).raw)
-            ),
+            H.vector(bitPattern: SIMD<BFloat16>.repeating(value)),
+            H(raw: HighwayReference.vectorBitPatternBF16ToI64(SIMD<BFloat16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatZero() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatNegativeZero() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatOne() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatMinusOne() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatTwo() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatHalf() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatFour() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatQuarter() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatOnePointFive() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatInfinity() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatMinusInfinity() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatNaN() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatMinusNaN() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatPayloadNaN() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatSignalingNaN() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatLeastNonzero() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func vectorBitPatternFromBFloat16ConstantSplatGreatest() {
-        checkVectorBitPatternFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkVectorBitPatternFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkVectorConvertingFromDoubleConstantA(_ value: SIMDDouble.Lane) {
+    private func checkVectorConvertingFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches("vectorConvertingFromDouble with a repeating \(hex(value))")
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(converting: SIMDDouble.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorConvertingF64ToI64(SIMDDouble.repeating(value))),
+            H.vector(converting: SIMD<Double>.repeating(value)),
+            H(raw: HighwayReference.vectorConvertingF64ToI64(SIMD<Double>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -983,7 +971,7 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorConvertingFromDoubleConstantSplatPayloadNaN() {
-        checkVectorConvertingFromDoubleConstantA(SIMDDouble.Lane(nan: 1, signaling: false))
+        checkVectorConvertingFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func vectorConvertingFromDoubleConstantSplatSignalingNaN() {
@@ -1003,19 +991,21 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorConvertingInRangeFromDoubleConstantA(_ value: SIMDDouble.Lane) {
+    private func checkVectorConvertingInRangeFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches(
             "vectorConvertingInRangeFromDouble with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(convertingInRange: SIMDDouble.repeating(value)),
-            H.Vector(
-                raw: HighwayReference.vectorConvertingInRangeF64ToI64(SIMDDouble.repeating(value))
+            H.vector(convertingInRange: SIMD<Double>.repeating(value)),
+            H(
+                raw: HighwayReference.vectorConvertingInRangeF64ToI64(
+                    SIMD<Double>.repeating(value).raw
+                )
             ),
             ""
         )
@@ -1079,7 +1069,7 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func vectorConvertingInRangeFromDoubleConstantSplatPayloadNaN() {
-        checkVectorConvertingInRangeFromDoubleConstantA(SIMDDouble.Lane(nan: 1, signaling: false))
+        checkVectorConvertingInRangeFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func vectorConvertingInRangeFromDoubleConstantSplatSignalingNaN() {

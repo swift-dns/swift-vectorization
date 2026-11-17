@@ -6,77 +6,45 @@ public import Vectorization
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorWideningHalfF16ToF32(widening a: SIMDFloat16.HalfVector) -> SIMDFloat.Vector {
-    SIMDFloat.vector(widening: a)
+public func portVectorWideningHalfF16ToF32(widening a: SIMD<Float16>.HalfVector) -> SIMD<Float> {
+    SIMD<Float>.vector(widening: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorWideningHalfF16ToF32(
-    widening a: SIMDFloat16.HalfVector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningHalfF16ToF32(a.raw)
+public func highwayVectorWideningHalfF16ToF32(widening a: SIMD<Float16>.HalfVector) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningHalfF16ToF32(a.raw))
 }
 #endif
 
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorWideningLowerF16ToF32(wideningLower a: SIMDFloat16.Vector) -> SIMDFloat.Vector
-{
-    SIMDFloat.vector(wideningLower: a)
+public func portVectorWideningLowerF16ToF32(wideningLower a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>.vector(wideningLower: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorWideningLowerF16ToF32(
-    wideningLower a: SIMDFloat16.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningLowerF16ToF32(a)
+public func highwayVectorWideningLowerF16ToF32(wideningLower a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningLowerF16ToF32(a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorWideningLowerF16ToF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningLower: SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portVectorWideningLowerF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.vector(wideningLower: SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorWideningLowerF16ToF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningLowerF16ToF32(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
-    )
-}
-#endif
-
-#if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
-@available(SwiftStdlib 5.3, *)
-@inline(never)
-public func portVectorWideningUpperF16ToF32(wideningUpper a: SIMDFloat16.Vector) -> SIMDFloat.Vector
-{
-    SIMDFloat.vector(wideningUpper: a)
-}
-
-@available(SwiftStdlib 5.3, *)
-@inline(never)
-public func highwayVectorWideningUpperF16ToF32(
-    wideningUpper a: SIMDFloat16.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningUpperF16ToF32(a)
-}
-
-@available(SwiftStdlib 5.3, *)
-@inline(never)
-public func portVectorWideningUpperF16ToF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningUpper: SIMDFloat16.repeating(Float16(bitPattern: 26)))
-}
-
-@available(SwiftStdlib 5.3, *)
-@inline(never)
-public func highwayVectorWideningUpperF16ToF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningUpperF16ToF32(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayVectorWideningLowerF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.vectorWideningLowerF16ToF32(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif
@@ -84,29 +52,31 @@ public func highwayVectorWideningUpperF16ToF32ConstantA() -> SIMDFloat.Vector {
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorWideningEvenF16ToF32(wideningEven a: SIMDFloat16.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningEven: a)
+public func portVectorWideningUpperF16ToF32(wideningUpper a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>.vector(wideningUpper: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorWideningEvenF16ToF32(
-    wideningEven a: SIMDFloat16.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningEvenF16ToF32(a)
+public func highwayVectorWideningUpperF16ToF32(wideningUpper a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningUpperF16ToF32(a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorWideningEvenF16ToF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningEven: SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portVectorWideningUpperF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.vector(wideningUpper: SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorWideningEvenF16ToF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningEvenF16ToF32(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayVectorWideningUpperF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.vectorWideningUpperF16ToF32(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif
@@ -114,150 +84,178 @@ public func highwayVectorWideningEvenF16ToF32ConstantA() -> SIMDFloat.Vector {
 #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorWideningOddF16ToF32(wideningOdd a: SIMDFloat16.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningOdd: a)
+public func portVectorWideningEvenF16ToF32(wideningEven a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>.vector(wideningEven: a)
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorWideningOddF16ToF32(wideningOdd a: SIMDFloat16.Vector) -> SIMDFloat.Vector
-{
-    HighwayReference.Nothrow.vectorWideningOddF16ToF32(a)
+public func highwayVectorWideningEvenF16ToF32(wideningEven a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningEvenF16ToF32(a.raw))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func portVectorWideningOddF16ToF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningOdd: SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portVectorWideningEvenF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.vector(wideningEven: SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @available(SwiftStdlib 5.3, *)
 @inline(never)
-public func highwayVectorWideningOddF16ToF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningOddF16ToF32(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayVectorWideningEvenF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.vectorWideningEvenF16ToF32(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
+    )
+}
+#endif
+
+#if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portVectorWideningOddF16ToF32(wideningOdd a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>.vector(wideningOdd: a)
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwayVectorWideningOddF16ToF32(wideningOdd a: SIMD<Float16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningOddF16ToF32(a.raw))
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func portVectorWideningOddF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.vector(wideningOdd: SIMD<Float16>.repeating(Float16(bitPattern: 26)))
+}
+
+@available(SwiftStdlib 5.3, *)
+@inline(never)
+public func highwayVectorWideningOddF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.vectorWideningOddF16ToF32(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif
 
 @inline(never)
-public func portVectorWideningHalfBF16ToF32(widening a: SIMDBFloat16.HalfVector) -> SIMDFloat.Vector
+public func portVectorWideningHalfBF16ToF32(widening a: SIMD<BFloat16>.HalfVector) -> SIMD<Float> {
+    SIMD<Float>.vector(widening: a)
+}
+
+@inline(never)
+public func highwayVectorWideningHalfBF16ToF32(widening a: SIMD<BFloat16>.HalfVector) -> SIMD<Float>
 {
-    SIMDFloat.vector(widening: a)
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningHalfBF16ToF32(a.raw))
 }
 
 @inline(never)
-public func highwayVectorWideningHalfBF16ToF32(
-    widening a: SIMDBFloat16.HalfVector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningHalfBF16ToF32(a.raw)
+public func portVectorWideningLowerBF16ToF32(wideningLower a: SIMD<BFloat16>) -> SIMD<Float> {
+    SIMD<Float>.vector(wideningLower: a)
 }
 
 @inline(never)
-public func portVectorWideningLowerBF16ToF32(
-    wideningLower a: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningLower: a)
+public func highwayVectorWideningLowerBF16ToF32(wideningLower a: SIMD<BFloat16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningLowerBF16ToF32(a.raw))
 }
 
 @inline(never)
-public func highwayVectorWideningLowerBF16ToF32(
-    wideningLower a: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningLowerBF16ToF32(a.raw)
+public func portVectorWideningLowerBF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.vector(wideningLower: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func portVectorWideningLowerBF16ToF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningLower: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
-}
-
-@inline(never)
-public func highwayVectorWideningLowerBF16ToF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningLowerBF16ToF32(
-        SIMDBFloat16.Vector(
-            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
-        ).raw
+public func highwayVectorWideningLowerBF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.vectorWideningLowerBF16ToF32(
+            SIMD<BFloat16>(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
-public func portVectorWideningUpperBF16ToF32(
-    wideningUpper a: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningUpper: a)
+public func portVectorWideningUpperBF16ToF32(wideningUpper a: SIMD<BFloat16>) -> SIMD<Float> {
+    SIMD<Float>.vector(wideningUpper: a)
 }
 
 @inline(never)
-public func highwayVectorWideningUpperBF16ToF32(
-    wideningUpper a: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningUpperBF16ToF32(a.raw)
+public func highwayVectorWideningUpperBF16ToF32(wideningUpper a: SIMD<BFloat16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningUpperBF16ToF32(a.raw))
 }
 
 @inline(never)
-public func portVectorWideningUpperBF16ToF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningUpper: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portVectorWideningUpperBF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.vector(wideningUpper: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayVectorWideningUpperBF16ToF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningUpperBF16ToF32(
-        SIMDBFloat16.Vector(
-            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
-        ).raw
+public func highwayVectorWideningUpperBF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.vectorWideningUpperBF16ToF32(
+            SIMD<BFloat16>(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
-public func portVectorWideningEvenBF16ToF32(wideningEven a: SIMDBFloat16.Vector) -> SIMDFloat.Vector
-{
-    SIMDFloat.vector(wideningEven: a)
+public func portVectorWideningEvenBF16ToF32(wideningEven a: SIMD<BFloat16>) -> SIMD<Float> {
+    SIMD<Float>.vector(wideningEven: a)
 }
 
 @inline(never)
-public func highwayVectorWideningEvenBF16ToF32(
-    wideningEven a: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningEvenBF16ToF32(a.raw)
+public func highwayVectorWideningEvenBF16ToF32(wideningEven a: SIMD<BFloat16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningEvenBF16ToF32(a.raw))
 }
 
 @inline(never)
-public func portVectorWideningEvenBF16ToF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningEven: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portVectorWideningEvenBF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.vector(wideningEven: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayVectorWideningEvenBF16ToF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningEvenBF16ToF32(
-        SIMDBFloat16.Vector(
-            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
-        ).raw
+public func highwayVectorWideningEvenBF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.vectorWideningEvenBF16ToF32(
+            SIMD<BFloat16>(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
-public func portVectorWideningOddBF16ToF32(wideningOdd a: SIMDBFloat16.Vector) -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningOdd: a)
+public func portVectorWideningOddBF16ToF32(wideningOdd a: SIMD<BFloat16>) -> SIMD<Float> {
+    SIMD<Float>.vector(wideningOdd: a)
 }
 
 @inline(never)
-public func highwayVectorWideningOddBF16ToF32(
-    wideningOdd a: SIMDBFloat16.Vector
-) -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningOddBF16ToF32(a.raw)
+public func highwayVectorWideningOddBF16ToF32(wideningOdd a: SIMD<BFloat16>) -> SIMD<Float> {
+    SIMD<Float>(raw: HighwayReference.Nothrow.vectorWideningOddBF16ToF32(a.raw))
 }
 
 @inline(never)
-public func portVectorWideningOddBF16ToF32ConstantA() -> SIMDFloat.Vector {
-    SIMDFloat.vector(wideningOdd: SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portVectorWideningOddBF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>.vector(wideningOdd: SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayVectorWideningOddBF16ToF32ConstantA() -> SIMDFloat.Vector {
-    HighwayReference.Nothrow.vectorWideningOddBF16ToF32(
-        SIMDBFloat16.Vector(
-            raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
-        ).raw
+public func highwayVectorWideningOddBF16ToF32ConstantA() -> SIMD<Float> {
+    SIMD<Float>(
+        raw: HighwayReference.Nothrow.vectorWideningOddBF16ToF32(
+            SIMD<BFloat16>(
+                raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }

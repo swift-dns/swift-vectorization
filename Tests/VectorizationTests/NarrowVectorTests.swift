@@ -3,11 +3,11 @@ import Vectorization
 
 @Suite("Narrow vectors")
 struct NarrowVectorTests {
-    typealias H = SIMDUInt8
+    typealias H = SIMD<UInt8>
 
     var lanes: Int { H.laneCount }
 
-    func stored(_ vector: H.Vector) -> [UInt8] {
+    func stored(_ vector: H) -> [UInt8] {
         var output = ContiguousArray<UInt8>(repeating: 0xFF, count: lanes)
         var destination = output.mutableSpan
         H.store(vector, to: &destination)
@@ -93,20 +93,20 @@ struct NarrowVectorTests {
 
     @Test("A half vector of 64-bit lanes splits and combines, however many lanes it has")
     func splitsAndCombinesWideLanes() {
-        let source = ContiguousArray((0..<SIMDUInt64.laneCount).map { UInt64($0) + 1 })
-        let vector = SIMDUInt64.load(from: source.span)
-        let lower = SIMDUInt64.lowerHalf(vector)
-        let upper = SIMDUInt64.upperHalf(vector)
-        let half = SIMDUInt64.laneCount / 2
+        let source = ContiguousArray((0..<SIMD<UInt64>.laneCount).map { UInt64($0) + 1 })
+        let vector = SIMD<UInt64>.load(from: source.span)
+        let lower = SIMD<UInt64>.lowerHalf(vector)
+        let upper = SIMD<UInt64>.upperHalf(vector)
+        let half = SIMD<UInt64>.laneCount / 2
 
         var output = ContiguousArray<UInt64>(repeating: 0, count: half)
         var destination = output.mutableSpan
-        SIMDUInt64.store(upper, to: &destination)
+        SIMD<UInt64>.store(upper, to: &destination)
         #expect(Array(output) == Array(source.suffix(half)))
 
         output = ContiguousArray(repeating: 0, count: half)
         destination = output.mutableSpan
-        SIMDUInt64.store(SIMDUInt64.HalfVector(lower.simd), to: &destination)
+        SIMD<UInt64>.store(SIMD<UInt64>.HalfVector(lower.simd), to: &destination)
         #expect(Array(output) == Array(source.prefix(half)))
     }
 
@@ -114,26 +114,26 @@ struct NarrowVectorTests {
     @Test("Checked loads and stores of narrow vectors trap on a span that is too short")
     func checkedSpanOpsTrap() async {
         await #expect(processExitsWith: .failure) {
-            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt8.laneCount / 2 - 1)
-            _ = SIMDUInt8.loadHalf(from: input.span)
+            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt8>.laneCount / 2 - 1)
+            _ = SIMD<UInt8>.loadHalf(from: input.span)
         }
         await #expect(processExitsWith: .failure) {
-            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt8.laneCount / 4 - 1)
-            _ = SIMDUInt8.loadQuarter(from: input.span)
+            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt8>.laneCount / 4 - 1)
+            _ = SIMD<UInt8>.loadQuarter(from: input.span)
         }
         await #expect(processExitsWith: .failure) {
-            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt8.laneCount / 8 - 1)
-            _ = SIMDUInt8.loadEighth(from: input.span)
+            let input = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt8>.laneCount / 8 - 1)
+            _ = SIMD<UInt8>.loadEighth(from: input.span)
         }
         await #expect(processExitsWith: .failure) {
             let input = ContiguousArray<UInt8>(repeating: 0, count: 15)
-            _ = SIMDUInt8.loadBlock(from: input.span)
+            _ = SIMD<UInt8>.loadBlock(from: input.span)
         }
         await #expect(processExitsWith: .failure) {
-            let half = SIMDUInt8.lowerHalf(SIMDUInt8.zero())
-            var output = ContiguousArray<UInt8>(repeating: 0, count: SIMDUInt8.laneCount / 2 - 1)
+            let half = SIMD<UInt8>.lowerHalf(SIMD<UInt8>.zero())
+            var output = ContiguousArray<UInt8>(repeating: 0, count: SIMD<UInt8>.laneCount / 2 - 1)
             var destination = output.mutableSpan
-            SIMDUInt8.store(half, to: &destination)
+            SIMD<UInt8>.store(half, to: &destination)
         }
     }
     #endif

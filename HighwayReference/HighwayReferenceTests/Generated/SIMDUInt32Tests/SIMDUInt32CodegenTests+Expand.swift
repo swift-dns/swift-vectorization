@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDUInt32CodegenTests {
     @Test func expanded() {
         let mismatches = Mismatches("portExpandedU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF07C_2ADA_C226_C750)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF07C_2ADA_C226_C750)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF07C_2BDA_C226_C903)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             mismatches.check(
@@ -37,11 +37,7 @@ extension SIMDUInt32CodegenTests {
     @Test func loadExpandedWhere() {
         let mismatches = Mismatches("portLoadExpandedWhereU32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC5EF_7E14_E8AB_C319)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xC5EF_7D14_E8AB_C166
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC5EF_7D14_E8AB_C166)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -61,11 +57,7 @@ extension SIMDUInt32CodegenTests {
     @Test func loadExpandedWhereBeforeGuardPage() {
         let mismatches = Mismatches("portLoadExpandedWhereU32 before a guard page")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3772_4480_B5AB_DB16)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x3772_4580_B5AB_DCC9
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x3772_4580_B5AB_DCC9)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
@@ -84,13 +76,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func loadExpandedWhereOtherwise() {
         let mismatches = Mismatches("portLoadExpandedWhereOtherwiseU32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xDFDD_860D_DB42_9EBB)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xDFDD_860D_DB42_9EBB)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDFDD_850D_DB42_9D08)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xDFDD_880D_DB42_A221
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDFDD_880D_DB42_A221)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -122,13 +110,9 @@ extension SIMDUInt32CodegenTests {
 
     @Test func loadExpandedWhereOtherwiseBeforeGuardPage() {
         let mismatches = Mismatches("portLoadExpandedWhereOtherwiseU32 before a guard page")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA700_B82A_1E78_FBA0)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA700_B82A_1E78_FBA0)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA700_B92A_1E78_FD53)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xA700_BA2A_1E78_FF06
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xA700_BA2A_1E78_FF06)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -161,11 +145,7 @@ extension SIMDUInt32CodegenTests {
     @Test func loadExpandedWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portLoadExpandedWhereOtherwiseU32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x986E_3E8C_D1D0_A50A)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x986E_3D8C_D1D0_A357
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x986E_3D8C_D1D0_A357)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -193,11 +173,7 @@ extension SIMDUInt32CodegenTests {
             "portLoadExpandedWhereOtherwiseU32ConstantOtherwise before a guard page"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF694_46DB_4707_0B1D)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xF694_43DB_4707_0604
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xF694_43DB_4707_0604)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (

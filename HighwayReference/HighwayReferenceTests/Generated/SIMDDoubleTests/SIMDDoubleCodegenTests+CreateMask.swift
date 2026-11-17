@@ -58,7 +58,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func maskFromVector() {
         let mismatches = Mismatches("portMaskFromVectorF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB469_9FAB_E5C7_7EBC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB469_9FAB_E5C7_7EBC)
         for a in aInputs {
             mismatches.check(
                 portMaskFromVectorF64(from: a),
@@ -101,7 +101,7 @@ extension SIMDDoubleCodegenTests {
     @Test func repeatingBlockMask() {
         let mismatches = Mismatches("portRepeatingBlockMaskF64")
         let bitsInputs = Inputs.maskBits(
-            lanes: 16 / MemoryLayout<H.Lane>.size,
+            lanes: 16 / MemoryLayout<Lane>.size,
             seed: 0x8709_C0A6_376D_3CED
         )
         for bits in bitsInputs {

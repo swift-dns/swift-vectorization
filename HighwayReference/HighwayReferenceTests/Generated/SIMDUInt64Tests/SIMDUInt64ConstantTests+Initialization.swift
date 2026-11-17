@@ -7,21 +7,21 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkRepeatingWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "repeatingWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2786_F101_40E8_83C9)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x2786_EE01_40E8_7EB0)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x2786_EE01_40E8_7EB0)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 H.repeating(value, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.repeatingWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -83,6 +83,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func repeatingWhereOtherwiseConstantSplatMax() {
-        checkRepeatingWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkRepeatingWhereOtherwiseConstantOtherwise(Lane.max)
     }
 }

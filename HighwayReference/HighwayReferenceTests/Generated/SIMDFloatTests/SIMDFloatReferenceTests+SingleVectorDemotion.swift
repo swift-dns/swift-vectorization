@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func halfVectorConvertingFromUInt64() {
         let mismatches = Mismatches("halfVectorConvertingFromUInt64")
-        let aInputs = Inputs.floatDemotions(SIMDUInt64.Vector.self, seed: 0x965B_52AC_5399_ED33)
+        let aInputs = Inputs.floatDemotions(SIMD<UInt64>.self, seed: 0x965B_52AC_5399_ED33)
         for a in aInputs {
             mismatches.check(
                 H.halfVector(converting: a),
@@ -23,14 +23,14 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches(
             "halfVectorConvertingFromUInt64 resized with its unspecified lanes zeroed"
         )
-        let aInputs = Inputs.floatDemotions(SIMDUInt64.Vector.self, seed: 0xC4A7_04A8_1DFE_632F)
+        let aInputs = Inputs.floatDemotions(SIMD<UInt64>.self, seed: 0xC4A7_04A8_1DFE_632F)
         for a in aInputs {
             mismatches.check(
                 H.selectingOrZero(
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(converting: a))
                 ),
-                HighwayReference.resizedHalfVectorConvertingU64ToF32(a.raw),
+                H(raw: HighwayReference.resizedHalfVectorConvertingU64ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -39,7 +39,7 @@ extension SIMDFloatReferenceTests {
 
     @Test func halfVectorConvertingFromInt64() {
         let mismatches = Mismatches("halfVectorConvertingFromInt64")
-        let aInputs = Inputs.floatDemotions(SIMDInt64.Vector.self, seed: 0x54FB_7DE5_5438_6B06)
+        let aInputs = Inputs.floatDemotions(SIMD<Int64>.self, seed: 0x54FB_7DE5_5438_6B06)
         for a in aInputs {
             mismatches.check(
                 H.halfVector(converting: a),
@@ -54,14 +54,14 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches(
             "halfVectorConvertingFromInt64 resized with its unspecified lanes zeroed"
         )
-        let aInputs = Inputs.floatDemotions(SIMDInt64.Vector.self, seed: 0xC977_12A4_4B76_EDAC)
+        let aInputs = Inputs.floatDemotions(SIMD<Int64>.self, seed: 0xC977_12A4_4B76_EDAC)
         for a in aInputs {
             mismatches.check(
                 H.selectingOrZero(
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(converting: a))
                 ),
-                HighwayReference.resizedHalfVectorConvertingI64ToF32(a.raw),
+                H(raw: HighwayReference.resizedHalfVectorConvertingI64ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -70,11 +70,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func halfVectorConvertingFromDouble() {
         let mismatches = Mismatches("halfVectorConvertingFromDouble")
-        let aInputs = Inputs.floatDemotions(SIMDDouble.Vector.self, seed: 0xA36E_114E_CCEC_72A0)
+        let aInputs = Inputs.floatDemotions(SIMD<Double>.self, seed: 0xA36E_114E_CCEC_72A0)
         for a in aInputs {
             mismatches.check(
                 H.halfVector(converting: a),
-                H.HalfVector(raw: HighwayReference.halfVectorConvertingF64ToF32(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorConvertingF64ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -85,14 +85,14 @@ extension SIMDFloatReferenceTests {
         let mismatches = Mismatches(
             "halfVectorConvertingFromDouble resized with its unspecified lanes zeroed"
         )
-        let aInputs = Inputs.floatDemotions(SIMDDouble.Vector.self, seed: 0x6655_3A4F_4224_8EC6)
+        let aInputs = Inputs.floatDemotions(SIMD<Double>.self, seed: 0x6655_3A4F_4224_8EC6)
         for a in aInputs {
             mismatches.check(
                 H.selectingOrZero(
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(converting: a))
                 ),
-                HighwayReference.resizedHalfVectorConvertingF64ToF32(a),
+                H(raw: HighwayReference.resizedHalfVectorConvertingF64ToF32(a.raw)),
                 "a: \(describe(a))"
             )
         }

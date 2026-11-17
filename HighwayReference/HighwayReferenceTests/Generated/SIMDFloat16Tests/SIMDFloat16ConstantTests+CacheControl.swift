@@ -8,20 +8,20 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkStoreStreamingConstantA(_ value: H.Lane) {
+    private func checkStoreStreamingConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeStreaming with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in unsafe H.storeStreaming(H.repeating(value), to: destination)
         }
         let (_, referenceLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in
-            unsafe HighwayReference.storeStreamingF16(H.repeating(value), destination)
+            unsafe HighwayReference.storeStreamingF16(H.repeating(value).raw, destination)
         }
         mismatches.check(portLanes, referenceLanes, "")
         mismatches.record()
@@ -84,7 +84,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func storeStreamingConstantSplatPayloadNaN() {
-        checkStoreStreamingConstantA(H.Lane(nan: 1, signaling: false))
+        checkStoreStreamingConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func storeStreamingConstantSplatSignalingNaN() {

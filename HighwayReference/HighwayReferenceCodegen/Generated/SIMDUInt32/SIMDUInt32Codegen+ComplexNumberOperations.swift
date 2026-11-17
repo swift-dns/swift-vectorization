@@ -4,137 +4,123 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portMultiplyingComplexU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplex(a, b)
+public func portMultiplyingComplexU32(_ a: SIMD<UInt32>, _ b: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplex(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(raw: HighwayReference.Nothrow.multiplyingComplexU32(a.raw, b.raw))
+public func highwayMultiplyingComplexU32(_ a: SIMD<UInt32>, _ b: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>(raw: HighwayReference.Nothrow.multiplyingComplexU32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingComplexU32ConstantA(_ b: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplex(SIMDUInt32.repeating(26), b)
+public func portMultiplyingComplexU32ConstantA(_ b: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplex(SIMD<UInt32>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexU32ConstantA(_ b: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+public func highwayMultiplyingComplexU32ConstantA(_ b: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexU32(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingComplexU32ConstantB(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplex(a, SIMDUInt32.repeating(26))
+public func portMultiplyingComplexU32ConstantB(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplex(a, SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingComplexU32ConstantB(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+public func highwayMultiplyingComplexU32ConstantB(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexU32(
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplexConjugate(a, b)
+public func portMultiplyingComplexConjugateU32(_ a: SIMD<UInt32>, _ b: SIMD<UInt32>) -> SIMD<UInt32>
+{
+    SIMD<UInt32>.multiplyingComplexConjugate(a, b)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(raw: HighwayReference.Nothrow.multiplyingComplexConjugateU32(a.raw, b.raw))
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(raw: HighwayReference.Nothrow.multiplyingComplexConjugateU32(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateU32ConstantA(_ b: SIMDUInt32.Vector) -> SIMDUInt32.Vector
-{
-    SIMDUInt32.multiplyingComplexConjugate(SIMDUInt32.repeating(26), b)
+public func portMultiplyingComplexConjugateU32ConstantA(_ b: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplexConjugate(SIMD<UInt32>.repeating(26), b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateU32ConstantA(
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+public func highwayMultiplyingComplexConjugateU32ConstantA(_ b: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateU32(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateU32ConstantB(_ a: SIMDUInt32.Vector) -> SIMDUInt32.Vector
-{
-    SIMDUInt32.multiplyingComplexConjugate(a, SIMDUInt32.repeating(26))
+public func portMultiplyingComplexConjugateU32ConstantB(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplexConjugate(a, SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateU32ConstantB(
-    _ a: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+public func highwayMultiplyingComplexConjugateU32ConstantB(_ a: SIMD<UInt32>) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateU32(
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplex(a, b, c)
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplex(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(raw: HighwayReference.Nothrow.multiplyAddingComplexU32(a.raw, b.raw, c.raw))
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(raw: HighwayReference.Nothrow.multiplyAddingComplexU32(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplyAddingComplexU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplex(SIMDUInt32.repeating(26), b, c)
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplex(SIMD<UInt32>.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexU32(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw,
             c.raw
         )
@@ -143,21 +129,21 @@ public func highwayMultiplyAddingComplexU32ConstantA(
 
 @inline(never)
 public func portMultiplyAddingComplexU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplex(a, SIMDUInt32.repeating(26), c)
+    _ a: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplex(a, SIMD<UInt32>.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexU32(
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             c.raw
         )
     )
@@ -165,62 +151,62 @@ public func highwayMultiplyAddingComplexU32ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexU32ConstantC(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplex(a, b, SIMDUInt32.repeating(26))
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplex(a, b, SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexU32ConstantC(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexU32(
             a.raw,
             b.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplexConjugate(a, b, c)
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplexConjugate(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateU32(a.raw, b.raw, c.raw)
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplexConjugate(SIMDUInt32.repeating(26), b, c)
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplexConjugate(SIMD<UInt32>.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateU32(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw,
             c.raw
         )
@@ -229,21 +215,21 @@ public func highwayMultiplyAddingComplexConjugateU32ConstantA(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplexConjugate(a, SIMDUInt32.repeating(26), c)
+    _ a: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplexConjugate(a, SIMD<UInt32>.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ c: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateU32(
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             c.raw
         )
     )
@@ -251,44 +237,44 @@ public func highwayMultiplyAddingComplexConjugateU32ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateU32ConstantC(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplexConjugate(a, b, SIMDUInt32.repeating(26))
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplexConjugate(a, b, SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateU32ConstantC(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateU32(
             a.raw,
             b.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask,
-    otherwise: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask,
+    otherwise: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask,
-    otherwise: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask,
+    otherwise: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseU32(
             otherwise.raw,
             mask.raw,
@@ -300,24 +286,29 @@ public func highwayMultiplyingComplexWhereOtherwiseU32(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask,
-    otherwise: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplex(SIMDUInt32.repeating(26), b, where: mask, otherwise: otherwise)
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask,
+    otherwise: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplex(
+        SIMD<UInt32>.repeating(26),
+        b,
+        where: mask,
+        otherwise: otherwise
+    )
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask,
-    otherwise: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask,
+    otherwise: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseU32(
             otherwise.raw,
             mask.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw
         )
     )
@@ -325,47 +316,52 @@ public func highwayMultiplyingComplexWhereOtherwiseU32ConstantA(
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask,
-    otherwise: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplex(a, SIMDUInt32.repeating(26), where: mask, otherwise: otherwise)
+    _ a: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask,
+    otherwise: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplex(
+        a,
+        SIMD<UInt32>.repeating(26),
+        where: mask,
+        otherwise: otherwise
+    )
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask,
-    otherwise: SIMDUInt32.Vector
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask,
+    otherwise: SIMD<UInt32>
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseU32(
             otherwise.raw,
             mask.raw,
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseU32ConstantOtherwise(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplex(a, b, where: mask, otherwise: SIMDUInt32.repeating(26))
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplex(a, b, where: mask, otherwise: SIMD<UInt32>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseU32ConstantOtherwise(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseU32(
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             mask.raw,
             a.raw,
             b.raw
@@ -375,41 +371,41 @@ public func highwayMultiplyingComplexWhereOtherwiseU32ConstantOtherwise(
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplexConjugate(a, b, where: mask)
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplexConjugate(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereU32(mask.raw, a.raw, b.raw)
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplexConjugate(SIMDUInt32.repeating(26), b, where: mask)
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplexConjugate(SIMD<UInt32>.repeating(26), b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereU32(
             mask.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw
         )
     )
@@ -417,44 +413,44 @@ public func highwayMultiplyingComplexConjugateWhereU32ConstantA(
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyingComplexConjugate(a, SIMDUInt32.repeating(26), where: mask)
+    _ a: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyingComplexConjugate(a, SIMD<UInt32>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereU32(
             mask.raw,
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplexConjugate(a, b, c, where: mask)
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplexConjugate(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereU32(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereU32(
             mask.raw,
             a.raw,
@@ -466,23 +462,23 @@ public func highwayMultiplyAddingComplexConjugateWhereU32(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplexConjugate(SIMDUInt32.repeating(26), b, c, where: mask)
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplexConjugate(SIMD<UInt32>.repeating(26), b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereU32ConstantA(
-    _ b: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ b: SIMD<UInt32>,
+    _ c: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereU32(
             mask.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             b.raw,
             c.raw
         )
@@ -491,24 +487,24 @@ public func highwayMultiplyAddingComplexConjugateWhereU32ConstantA(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplexConjugate(a, SIMDUInt32.repeating(26), c, where: mask)
+    _ a: SIMD<UInt32>,
+    _ c: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplexConjugate(a, SIMD<UInt32>.repeating(26), c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereU32ConstantB(
-    _ a: SIMDUInt32.Vector,
-    _ c: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ c: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereU32(
             mask.raw,
             a.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw,
             c.raw
         )
     )
@@ -516,25 +512,25 @@ public func highwayMultiplyAddingComplexConjugateWhereU32ConstantB(
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereU32ConstantC(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.multiplyAddingComplexConjugate(a, b, SIMDUInt32.repeating(26), where: mask)
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>.multiplyAddingComplexConjugate(a, b, SIMD<UInt32>.repeating(26), where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereU32ConstantC(
-    _ a: SIMDUInt32.Vector,
-    _ b: SIMDUInt32.Vector,
-    where mask: SIMDUInt32.Mask
-) -> SIMDUInt32.Vector {
-    SIMDUInt32.Vector(
+    _ a: SIMD<UInt32>,
+    _ b: SIMD<UInt32>,
+    where mask: SIMD<UInt32>.Mask
+) -> SIMD<UInt32> {
+    SIMD<UInt32>(
         raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereU32(
             mask.raw,
             a.raw,
             b.raw,
-            SIMDUInt32.Vector(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
+            SIMD<UInt32>(raw: HighwayReference.Nothrow.repeatingU32(26)).raw
         )
     )
 }

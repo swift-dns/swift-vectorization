@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDFloatCodegenTests {
     @Test func roundedToNearestOrEven() {
         let mismatches = Mismatches("portRoundedToNearestOrEvenF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF505_C5C0_E215_BFAD)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF505_C5C0_E215_BFAD)
         for a in aInputs {
             mismatches.check(
                 portRoundedToNearestOrEvenF32(a),
@@ -32,7 +32,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func roundedTowardZero() {
         let mismatches = Mismatches("portRoundedTowardZeroF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAD05_1CCE_9943_A540)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAD05_1CCE_9943_A540)
         for a in aInputs {
             mismatches.check(
                 portRoundedTowardZeroF32(a),
@@ -55,7 +55,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func roundedUp() {
         let mismatches = Mismatches("portRoundedUpF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD657_8134_8E59_1A8C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD657_8134_8E59_1A8C)
         for a in aInputs {
             mismatches.check(portRoundedUpF32(a), highwayRoundedUpF32(a), "a: \(describe(a))")
         }
@@ -70,7 +70,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func roundedDown() {
         let mismatches = Mismatches("portRoundedDownF32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD975_5E1D_C882_9AC1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD975_5E1D_C882_9AC1)
         for a in aInputs {
             mismatches.check(portRoundedDownF32(a), highwayRoundedDownF32(a), "a: \(describe(a))")
         }

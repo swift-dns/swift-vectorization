@@ -8,20 +8,22 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkShiftedLeftBytesConstantA(_ value: H.Lane) {
+    private func checkShiftedLeftBytesConstantA(_ value: Lane) {
         let mismatches = Mismatches("shiftedLeftBytes with a repeating \(hex(value))")
         let bytesInputs = Array(0...16)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for bytes in bytesInputs {
             mismatches.check(
                 H.shiftedLeftBytes(H.repeating(value), by: bytes),
-                HighwayReference.shiftedLeftBytesF16(
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: bytes)
+                H(
+                    raw: HighwayReference.shiftedLeftBytesF16(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
                 ),
                 "bytes: \(bytes)"
             )
@@ -86,7 +88,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func shiftedLeftBytesConstantSplatPayloadNaN() {
-        checkShiftedLeftBytesConstantA(H.Lane(nan: 1, signaling: false))
+        checkShiftedLeftBytesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shiftedLeftBytesConstantSplatSignalingNaN() {
@@ -106,20 +108,22 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkShiftedRightBytesConstantA(_ value: H.Lane) {
+    private func checkShiftedRightBytesConstantA(_ value: Lane) {
         let mismatches = Mismatches("shiftedRightBytes with a repeating \(hex(value))")
         let bytesInputs = Array(0...16)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for bytes in bytesInputs {
             mismatches.check(
                 H.shiftedRightBytes(H.repeating(value), by: bytes),
-                HighwayReference.shiftedRightBytesF16(
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: bytes)
+                H(
+                    raw: HighwayReference.shiftedRightBytesF16(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
                 ),
                 "bytes: \(bytes)"
             )
@@ -184,7 +188,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func shiftedRightBytesConstantSplatPayloadNaN() {
-        checkShiftedRightBytesConstantA(H.Lane(nan: 1, signaling: false))
+        checkShiftedRightBytesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shiftedRightBytesConstantSplatSignalingNaN() {
@@ -204,20 +208,22 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkShiftedLeftLanesConstantA(_ value: H.Lane) {
+    private func checkShiftedLeftLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("shiftedLeftLanes with a repeating \(hex(value))")
         let lanesInputs = Array(0...8)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for lanes in lanesInputs {
             mismatches.check(
                 H.shiftedLeftLanes(H.repeating(value), by: lanes),
-                HighwayReference.shiftedLeftLanesF16(
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: lanes)
+                H(
+                    raw: HighwayReference.shiftedLeftLanesF16(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
                 ),
                 "lanes: \(lanes)"
             )
@@ -282,7 +288,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func shiftedLeftLanesConstantSplatPayloadNaN() {
-        checkShiftedLeftLanesConstantA(H.Lane(nan: 1, signaling: false))
+        checkShiftedLeftLanesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shiftedLeftLanesConstantSplatSignalingNaN() {
@@ -302,20 +308,22 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkShiftedRightLanesConstantA(_ value: H.Lane) {
+    private func checkShiftedRightLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("shiftedRightLanes with a repeating \(hex(value))")
         let lanesInputs = Array(0...8)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for lanes in lanesInputs {
             mismatches.check(
                 H.shiftedRightLanes(H.repeating(value), by: lanes),
-                HighwayReference.shiftedRightLanesF16(
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: lanes)
+                H(
+                    raw: HighwayReference.shiftedRightLanesF16(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
                 ),
                 "lanes: \(lanes)"
             )
@@ -380,7 +388,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func shiftedRightLanesConstantSplatPayloadNaN() {
-        checkShiftedRightLanesConstantA(H.Lane(nan: 1, signaling: false))
+        checkShiftedRightLanesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shiftedRightLanesConstantSplatSignalingNaN() {
@@ -400,22 +408,24 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightBytesConstantA(_ value: H.Lane) {
+    private func checkCombinedShiftedRightBytesConstantA(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightBytes with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8C1F_DC49_AA41_E27D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8C1F_DC49_AA41_E27D)
         let bytesInputs = Array(1...15)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (b, bytes) in everyPair(bInputs, bytesInputs) {
             mismatches.check(
                 H.combinedShiftedRightBytes(H.repeating(value), b, by: bytes),
-                HighwayReference.combinedShiftedRightBytesF16(
-                    H.repeating(value),
-                    b,
-                    Int32(truncatingIfNeeded: bytes)
+                H(
+                    raw: HighwayReference.combinedShiftedRightBytesF16(
+                        H.repeating(value).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
                 ),
                 "b: \(describe(b)), bytes: \(bytes)"
             )
@@ -424,22 +434,24 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightBytesConstantB(_ value: H.Lane) {
+    private func checkCombinedShiftedRightBytesConstantB(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightBytes with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x72CD_5649_9C1A_42CB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x72CD_5649_9C1A_42CB)
         let bytesInputs = Array(1...15)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, H.repeating(value), by: bytes),
-                HighwayReference.combinedShiftedRightBytesF16(
-                    a,
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: bytes)
+                H(
+                    raw: HighwayReference.combinedShiftedRightBytesF16(
+                        a.raw,
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
                 ),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
@@ -518,8 +530,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func combinedShiftedRightBytesConstantSplatPayloadNaN() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(nan: 1, signaling: false))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(nan: 1, signaling: false))
+        checkCombinedShiftedRightBytesConstantA(Lane(nan: 1, signaling: false))
+        checkCombinedShiftedRightBytesConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatSignalingNaN() {
@@ -543,22 +555,24 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightLanesConstantA(_ value: H.Lane) {
+    private func checkCombinedShiftedRightLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightLanes with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDEE0_A6C2_EEE9_3BDD)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDEE0_A6C2_EEE9_3BDD)
         let lanesInputs = Array(1...7)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (b, lanes) in everyPair(bInputs, lanesInputs) {
             mismatches.check(
                 H.combinedShiftedRightLanes(H.repeating(value), b, by: lanes),
-                HighwayReference.combinedShiftedRightLanesF16(
-                    H.repeating(value),
-                    b,
-                    Int32(truncatingIfNeeded: lanes)
+                H(
+                    raw: HighwayReference.combinedShiftedRightLanesF16(
+                        H.repeating(value).raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
                 ),
                 "b: \(describe(b)), lanes: \(lanes)"
             )
@@ -567,22 +581,24 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightLanesConstantB(_ value: H.Lane) {
+    private func checkCombinedShiftedRightLanesConstantB(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightLanes with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC3DB_20C2_DF50_07AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC3DB_20C2_DF50_07AB)
         let lanesInputs = Array(1...7)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, H.repeating(value), by: lanes),
-                HighwayReference.combinedShiftedRightLanesF16(
-                    a,
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: lanes)
+                H(
+                    raw: HighwayReference.combinedShiftedRightLanesF16(
+                        a.raw,
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
                 ),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
@@ -661,8 +677,8 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func combinedShiftedRightLanesConstantSplatPayloadNaN() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(nan: 1, signaling: false))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(nan: 1, signaling: false))
+        checkCombinedShiftedRightLanesConstantA(Lane(nan: 1, signaling: false))
+        checkCombinedShiftedRightLanesConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatSignalingNaN() {

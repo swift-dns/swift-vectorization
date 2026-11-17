@@ -7,14 +7,18 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkMultiplyingConstantA(_ value: H.Lane) {
+    private func checkMultiplyingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplying with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE850_611B_F486_2980)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0xE850_611B_F486_2980)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplying(H.repeating(value), b),
-                HighwayReference.multiplyingF32(H.repeating(value), b),
+                H(raw: HighwayReference.multiplyingF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -22,14 +26,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingConstantB(_ value: H.Lane) {
+    private func checkMultiplyingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplying with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x020F_E71C_030A_9B12)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x020F_E71C_030A_9B12)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplying(a, H.repeating(value)),
-                HighwayReference.multiplyingF32(a, H.repeating(value)),
+                H(raw: HighwayReference.multiplyingF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -107,8 +115,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyingConstantSplatPayloadNaN() {
-        checkMultiplyingConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingConstantSplatSignalingNaN() {
@@ -132,14 +140,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingRoundedConstantA(_ value: H.Lane) {
+    private func checkMultiplyingRoundedConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingRounded with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF21A_969E_C543_EB89)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0xF21A_969E_C543_EB89)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.multiplyingRounded(H.repeating(value), b),
-                HighwayReference.multiplyingRoundedF32(H.repeating(value), b),
+                H(raw: HighwayReference.multiplyingRoundedF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -147,14 +159,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingRoundedConstantB(_ value: H.Lane) {
+    private func checkMultiplyingRoundedConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingRounded with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD85B_309E_B6BF_B057)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xD85B_309E_B6BF_B057)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyingRounded(a, H.repeating(value)),
-                HighwayReference.multiplyingRoundedF32(a, H.repeating(value)),
+                H(raw: HighwayReference.multiplyingRoundedF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -232,8 +248,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyingRoundedConstantSplatPayloadNaN() {
-        checkMultiplyingRoundedConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingRoundedConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingRoundedConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingRoundedConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingRoundedConstantSplatSignalingNaN() {
@@ -257,14 +273,23 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByFloorPowerOf2ConstantA(_ value: H.Lane) {
+    private func checkMultiplyingByFloorPowerOf2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByFloorPowerOf2 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2F7B_5D6C_401B_D9CF)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x2F7B_5D6C_401B_D9CF)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(H.repeating(value), b),
-                HighwayReference.multiplyingByFloorPowerOf2F32(H.repeating(value), b),
+                H(
+                    raw: HighwayReference.multiplyingByFloorPowerOf2F32(
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -272,14 +297,23 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByFloorPowerOf2ConstantB(_ value: H.Lane) {
+    private func checkMultiplyingByFloorPowerOf2ConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByFloorPowerOf2 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3736_936C_4439_1671)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x3736_936C_4439_1671)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.multiplyingByFloorPowerOf2(a, H.repeating(value)),
-                HighwayReference.multiplyingByFloorPowerOf2F32(a, H.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyingByFloorPowerOf2F32(
+                        a.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -357,8 +391,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyingByFloorPowerOf2ConstantSplatPayloadNaN() {
-        checkMultiplyingByFloorPowerOf2ConstantA(H.Lane(nan: 1, signaling: false))
-        checkMultiplyingByFloorPowerOf2ConstantB(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingByFloorPowerOf2ConstantA(Lane(nan: 1, signaling: false))
+        checkMultiplyingByFloorPowerOf2ConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingByFloorPowerOf2ConstantSplatSignalingNaN() {
@@ -382,14 +416,23 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByPowerOf2FromInt32ConstantA(_ value: H.Lane) {
+    private func checkMultiplyingByPowerOf2FromInt32ConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplyingByPowerOf2FromInt32 with a repeating \(hex(value))")
-        let bInputs = Inputs.exponents(SIMDInt32.Vector.self, seed: 0xAEE8_B616_988D_3DE5)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.exponents(SIMD<Int32>.self, seed: 0xAEE8_B616_988D_3DE5)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.multiplyingByPowerOf2(H.repeating(value), b),
-                HighwayReference.multiplyingByPowerOf2I32ToF32(H.repeating(value), b.raw),
+                H(
+                    raw: HighwayReference.multiplyingByPowerOf2I32ToF32(
+                        H.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -397,18 +440,23 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingByPowerOf2FromInt32ConstantB(_ value: SIMDInt32.Lane) {
+    private func checkMultiplyingByPowerOf2FromInt32ConstantB(_ value: Int32) {
         let mismatches = Mismatches("multiplyingByPowerOf2FromInt32 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9529_B016_8A09_A5D3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9529_B016_8A09_A5D3)
         mismatches.check(
-            SIMDInt32.repeating(value),
-            SIMDInt32.Vector(raw: HighwayReference.repeatingI32(value)),
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.multiplyingByPowerOf2(a, SIMDInt32.repeating(value)),
-                HighwayReference.multiplyingByPowerOf2I32ToF32(a, SIMDInt32.repeating(value).raw),
+                H.multiplyingByPowerOf2(a, SIMD<Int32>.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyingByPowerOf2I32ToF32(
+                        a.raw,
+                        SIMD<Int32>.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -477,7 +525,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyingByPowerOf2FromInt32ConstantSplatPayloadNaN() {
-        checkMultiplyingByPowerOf2FromInt32ConstantA(H.Lane(nan: 1, signaling: false))
+        checkMultiplyingByPowerOf2FromInt32ConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyingByPowerOf2FromInt32ConstantSplatSignalingNaN() {
@@ -565,22 +613,26 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyingByPowerOf2FromInt32ConstantSIMDInt32SplatMax() {
-        checkMultiplyingByPowerOf2FromInt32ConstantB(SIMDInt32.Lane.max)
+        checkMultiplyingByPowerOf2FromInt32ConstantB(Int32.max)
     }
 
     @Test func multiplyingByPowerOf2FromInt32ConstantSIMDInt32SplatMin() {
-        checkMultiplyingByPowerOf2FromInt32ConstantB(SIMDInt32.Lane.min)
+        checkMultiplyingByPowerOf2FromInt32ConstantB(Int32.min)
     }
 
     @inline(__always)
-    private func checkRearrangedToOddPlusEvenConstantA(_ value: H.Lane) {
+    private func checkRearrangedToOddPlusEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("rearrangedToOddPlusEven with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8302_6B81_515B_440B)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for b in bInputs where !hasUnorderedNaNs(H.repeating(value), b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x8302_6B81_515B_440B)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for b in bInputs where !hasUnorderedNaNs(H.repeating(value).simd, b.simd) {
             mismatches.check(
                 H.rearrangedToOddPlusEven(H.repeating(value), b),
-                HighwayReference.rearrangedToOddPlusEvenF32(H.repeating(value), b),
+                H(raw: HighwayReference.rearrangedToOddPlusEvenF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -588,14 +640,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkRearrangedToOddPlusEvenConstantB(_ value: H.Lane) {
+    private func checkRearrangedToOddPlusEvenConstantB(_ value: Lane) {
         let mismatches = Mismatches("rearrangedToOddPlusEven with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8ABE_2181_5579_5A2D)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
-        for a in aInputs where !hasUnorderedNaNs(a, H.repeating(value)) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x8ABE_2181_5579_5A2D)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
+        for a in aInputs where !hasUnorderedNaNs(a.simd, H.repeating(value).simd) {
             mismatches.check(
                 H.rearrangedToOddPlusEven(a, H.repeating(value)),
-                HighwayReference.rearrangedToOddPlusEvenF32(a, H.repeating(value)),
+                H(raw: HighwayReference.rearrangedToOddPlusEvenF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -673,8 +729,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func rearrangedToOddPlusEvenConstantSplatPayloadNaN() {
-        checkRearrangedToOddPlusEvenConstantA(H.Lane(nan: 1, signaling: false))
-        checkRearrangedToOddPlusEvenConstantB(H.Lane(nan: 1, signaling: false))
+        checkRearrangedToOddPlusEvenConstantA(Lane(nan: 1, signaling: false))
+        checkRearrangedToOddPlusEvenConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func rearrangedToOddPlusEvenConstantSplatSignalingNaN() {
@@ -698,25 +754,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyPairwiseAddingFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkMultiplyPairwiseAddingFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches(
             "multiplyPairwiseAddingFromBFloat16 with a repeating \(hex(value))"
         )
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x87F2_EA88_F940_4ABC)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x87F2_EA88_F940_4ABC)
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs
-        where !hasUnorderedNaNs(widening: SIMDBFloat16.repeating(value), b)
+        where !hasUnorderedNaNs(widening: SIMD<BFloat16>.repeating(value), b)
             && !hasFoldedNaNs(multiplier: value, b)
         {
             mismatches.check(
-                H.multiplyPairwiseAdding(SIMDBFloat16.repeating(value), b),
-                HighwayReference.multiplyPairwiseAddingBF16ToF32(
-                    SIMDBFloat16.repeating(value).raw,
-                    b.raw
+                H.multiplyPairwiseAdding(SIMD<BFloat16>.repeating(value), b),
+                H(
+                    raw: HighwayReference.multiplyPairwiseAddingBF16ToF32(
+                        SIMD<BFloat16>.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "b: \(describe(b))"
             )
@@ -725,25 +783,27 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyPairwiseAddingFromBFloat16ConstantB(_ value: SIMDBFloat16.Lane) {
+    private func checkMultiplyPairwiseAddingFromBFloat16ConstantB(_ value: BFloat16) {
         let mismatches = Mismatches(
             "multiplyPairwiseAddingFromBFloat16 with b repeating \(hex(value))"
         )
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0xA2F8_7089_08D9_7EEE)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0xA2F8_7089_08D9_7EEE)
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs
-        where !hasUnorderedNaNs(widening: a, SIMDBFloat16.repeating(value))
+        where !hasUnorderedNaNs(widening: a, SIMD<BFloat16>.repeating(value))
             && !hasFoldedNaNs(multiplier: value, a)
         {
             mismatches.check(
-                H.multiplyPairwiseAdding(a, SIMDBFloat16.repeating(value)),
-                HighwayReference.multiplyPairwiseAddingBF16ToF32(
-                    a.raw,
-                    SIMDBFloat16.repeating(value).raw
+                H.multiplyPairwiseAdding(a, SIMD<BFloat16>.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyPairwiseAddingBF16ToF32(
+                        a.raw,
+                        SIMD<BFloat16>.repeating(value).raw
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -752,127 +812,130 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatZero() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatNegativeZero() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatOne() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatMinusOne() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatTwo() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatHalf() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatFour() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatQuarter() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatOnePointFive() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatInfinity() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatMinusInfinity() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatNaN() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatMinusNaN() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatPayloadNaN() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatSignalingNaN() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatLeastNonzero() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func multiplyPairwiseAddingFromBFloat16ConstantSplatGreatest() {
-        checkMultiplyPairwiseAddingFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
-        checkMultiplyPairwiseAddingFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
+        checkMultiplyPairwiseAddingFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-        _ value: SIMDBFloat16.Lane
-    ) {
+    private func checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches(
             "multiplyAccumulatingInAnyOrderFromBFloat16 with a repeating \(hex(value))"
         )
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0xFFEB_13A1_159D_3A6F)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0xFFEB_14A1_159D_3C22)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0xFFEB_15A1_159D_3DD5)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0xFFEB_13A1_159D_3A6F)
+        let cInputs = Inputs.accumulators(H.self, seed: 0xFFEB_14A1_159D_3C22)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0xFFEB_15A1_159D_3DD5)
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (b, c, v0) in mixedTriples(bInputs, cInputs, v0Inputs, seed: 0xC0CC_C576_7321_C510)
-        where !hasUnorderedNaNs(widening: SIMDBFloat16.repeating(value), b, accumulating: c, v0)
-            && !hasFoldedNaNs(multiplier: value, b)
-        {
+        where !hasUnorderedNaNs(
+            widening: SIMD<BFloat16>.repeating(value),
+            b,
+            accumulating: c.simd,
+            v0.simd
+        ) && !hasFoldedNaNs(multiplier: value, b) {
             var p0 = v0
             var r0 = v0
-            let port = H.multiplyAccumulatingInAnyOrder(SIMDBFloat16.repeating(value), b, c, &p0)
-            let reference = HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
-                SIMDBFloat16.repeating(value).raw,
-                b.raw,
-                c,
-                &r0
+            let port = H.multiplyAccumulatingInAnyOrder(SIMD<BFloat16>.repeating(value), b, c, &p0)
+            let reference = H(
+                raw: HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
+                    SIMD<BFloat16>.repeating(value).raw,
+                    b.raw,
+                    c.raw,
+                    &r0.raw
+                )
             )
             mismatches.check(
                 port,
@@ -889,32 +952,35 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-        _ value: SIMDBFloat16.Lane
-    ) {
+    private func checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(_ value: BFloat16) {
         let mismatches = Mismatches(
             "multiplyAccumulatingInAnyOrderFromBFloat16 with b repeating \(hex(value))"
         )
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x0959_C9A1_1B2C_E511)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0x0959_C7A1_1B2C_E1AB)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0x0959_C6A1_1B2C_DFF8)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x0959_C9A1_1B2C_E511)
+        let cInputs = Inputs.accumulators(H.self, seed: 0x0959_C7A1_1B2C_E1AB)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0x0959_C6A1_1B2C_DFF8)
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (a, c, v0) in mixedTriples(aInputs, cInputs, v0Inputs, seed: 0x5BF1_1309_F8D4_60CB)
-        where !hasUnorderedNaNs(widening: a, SIMDBFloat16.repeating(value), accumulating: c, v0)
-            && !hasFoldedNaNs(multiplier: value, a)
-        {
+        where !hasUnorderedNaNs(
+            widening: a,
+            SIMD<BFloat16>.repeating(value),
+            accumulating: c.simd,
+            v0.simd
+        ) && !hasFoldedNaNs(multiplier: value, a) {
             var p0 = v0
             var r0 = v0
-            let port = H.multiplyAccumulatingInAnyOrder(a, SIMDBFloat16.repeating(value), c, &p0)
-            let reference = HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
-                a.raw,
-                SIMDBFloat16.repeating(value).raw,
-                c,
-                &r0
+            let port = H.multiplyAccumulatingInAnyOrder(a, SIMD<BFloat16>.repeating(value), c, &p0)
+            let reference = H(
+                raw: HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
+                    a.raw,
+                    SIMD<BFloat16>.repeating(value).raw,
+                    c.raw,
+                    &r0.raw
+                )
             )
             mismatches.check(
                 port,
@@ -931,24 +997,30 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantC(_ value: H.Lane) {
+    private func checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantC(_ value: Lane) {
         let mismatches = Mismatches(
             "multiplyAccumulatingInAnyOrderFromBFloat16 with c repeating \(hex(value))"
         )
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x11EE_E0A1_2003_90C6)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x11EE_E1A1_2003_9279)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0x11EE_DFA1_2003_8F13)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x11EE_E0A1_2003_90C6)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x11EE_E1A1_2003_9279)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0x11EE_DFA1_2003_8F13)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (a, b, v0) in mixedTriples(aInputs, bInputs, v0Inputs, seed: 0x963F_5625_3C47_16C2)
-        where !hasUnorderedNaNs(widening: a, b, accumulating: H.repeating(value), v0) {
+        where !hasUnorderedNaNs(widening: a, b, accumulating: H.repeating(value).simd, v0.simd) {
             var p0 = v0
             var r0 = v0
             let port = H.multiplyAccumulatingInAnyOrder(a, b, H.repeating(value), &p0)
-            let reference = HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
-                a.raw,
-                b.raw,
-                H.repeating(value),
-                &r0
+            let reference = H(
+                raw: HighwayReference.multiplyAccumulatingInAnyOrderBF16ToF32(
+                    a.raw,
+                    b.raw,
+                    H.repeating(value).raw,
+                    &r0.raw
+                )
             )
             mismatches.check(
                 port,
@@ -965,174 +1037,98 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatZero() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x0000)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x0000)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatNegativeZero() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x8000)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x8000)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatOne() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x3F80)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x3F80)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatMinusOne() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0xBF80)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0xBF80)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatTwo() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x4000)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x4000)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatHalf() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x3F00)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x3F00)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatFour() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x4080)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x4080)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatQuarter() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x3E80)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x3E80)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatOnePointFive() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x3FC0)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x3FC0)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0xC020)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0xC020)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatInfinity() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x7F80)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x7F80)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatMinusInfinity() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0xFF80)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0xFF80)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatNaN() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x7FC0)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x7FC0)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatMinusNaN() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0xFFC0)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0xFFC0)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatPayloadNaN() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x7FC1)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x7FC1)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatSignalingNaN() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x7F81)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x7F81)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0xFF81)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0xFF81)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatLeastNonzero() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x0001)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x0001)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSplatGreatest() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(
-            SIMDBFloat16.Lane(bitPattern: 0x7F7F)
-        )
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(
-            SIMDBFloat16.Lane(bitPattern: 0x7F7F)
-        )
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F7F))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSIMDFloatSplatZero() {
@@ -1192,7 +1188,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSIMDFloatSplatPayloadNaN() {
-        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantC(H.Lane(nan: 1, signaling: false))
+        checkMultiplyAccumulatingInAnyOrderFromBFloat16ConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyAccumulatingInAnyOrderFromBFloat16ConstantSIMDFloatSplatSignalingNaN() {

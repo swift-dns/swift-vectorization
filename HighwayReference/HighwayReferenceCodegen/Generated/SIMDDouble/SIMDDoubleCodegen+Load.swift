@@ -6,23 +6,23 @@ public import Vectorization
 extension HighwayReferenceDouble {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func load(from span: Span<Lane>) -> Vector {
+    public static func load(from span: Span<Lane>) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe load(fromUnchecked: span)
     }
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func load(fromUnchecked span: Span<Lane>) -> Vector {
+    public static func load(fromUnchecked span: Span<Lane>) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadF64($0.baseAddress.unsafelyUnwrapped)
+            unsafe SIMD(raw: HighwayReference.Nothrow.loadF64($0.baseAddress.unsafelyUnwrapped))
         }
     }
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadAligned(from span: Span<Lane>) -> Vector {
+    public static func loadAligned(from span: Span<Lane>) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         precondition(
             span.withUnsafeBufferPointer {
@@ -35,7 +35,7 @@ extension HighwayReferenceDouble {
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func loadAligned(fromUnchecked span: Span<Lane>) -> Vector {
+    public static func loadAligned(fromUnchecked span: Span<Lane>) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         assert(
             span.withUnsafeBufferPointer {
@@ -44,24 +44,28 @@ extension HighwayReferenceDouble {
             "Span does not start at an address aligned to the vector size"
         )
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadAlignedF64($0.baseAddress.unsafelyUnwrapped)
-        }
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func loadFirst(from span: Span<Lane>) -> Vector {
-        span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadFirstF64(
-                $0.baseAddress,
-                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadAlignedF64($0.baseAddress.unsafelyUnwrapped)
             )
         }
     }
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadRepeatingBlock(from span: Span<Lane>) -> Vector {
+    public static func loadFirst(from span: Span<Lane>) -> SIMD {
+        span.withUnsafeBufferPointer {
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadFirstF64(
+                    $0.baseAddress,
+                    HighwayReference.Nothrow.spanCount($0.count, laneCount)
+                )
+            )
+        }
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func loadRepeatingBlock(from span: Span<Lane>) -> SIMD {
         precondition(
             span.count >= 16 / MemoryLayout<Lane>.stride,
             "Span has fewer elements than a block has lanes"
@@ -71,35 +75,44 @@ extension HighwayReferenceDouble {
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func loadRepeatingBlock(fromUnchecked span: Span<Lane>) -> Vector {
+    public static func loadRepeatingBlock(fromUnchecked span: Span<Lane>) -> SIMD {
         assert(
             span.count >= 16 / MemoryLayout<Lane>.stride,
             "Span has fewer elements than a block has lanes"
         )
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadRepeatingBlockF64($0.baseAddress.unsafelyUnwrapped)
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadRepeatingBlockF64(
+                    $0.baseAddress.unsafelyUnwrapped
+                )
+            )
         }
     }
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func load(from span: Span<Lane>, where mask: Mask) -> Vector {
+    public static func load(from span: Span<Lane>, where mask: Mask) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe load(fromUnchecked: span, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func load(fromUnchecked span: Span<Lane>, where mask: Mask) -> Vector {
+    public static func load(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadWhereF64(mask.raw, $0.baseAddress.unsafelyUnwrapped)
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadWhereF64(
+                    mask.raw,
+                    $0.baseAddress.unsafelyUnwrapped
+                )
+            )
         }
     }
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func load(from span: Span<Lane>, where mask: Mask, otherwise: Vector) -> Vector {
+    public static func load(from span: Span<Lane>, where mask: Mask, otherwise: SIMD) -> SIMD {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return unsafe load(fromUnchecked: span, where: mask, otherwise: otherwise)
     }
@@ -109,33 +122,37 @@ extension HighwayReferenceDouble {
     public static func load(
         fromUnchecked span: Span<Lane>,
         where mask: Mask,
-        otherwise: Vector
-    ) -> Vector {
+        otherwise: SIMD
+    ) -> SIMD {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadWhereOtherwiseF64(
-                otherwise,
-                mask.raw,
-                $0.baseAddress.unsafelyUnwrapped
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadWhereOtherwiseF64(
+                    otherwise.raw,
+                    mask.raw,
+                    $0.baseAddress.unsafelyUnwrapped
+                )
             )
         }
     }
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadFirst(from span: Span<Lane>, otherwise: Vector) -> Vector {
+    public static func loadFirst(from span: Span<Lane>, otherwise: SIMD) -> SIMD {
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadFirstOtherwiseF64(
-                otherwise,
-                $0.baseAddress,
-                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadFirstOtherwiseF64(
+                    otherwise.raw,
+                    $0.baseAddress,
+                    HighwayReference.Nothrow.spanCount($0.count, laneCount)
+                )
             )
         }
     }
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadingUpperHalf(_ a: Vector, from span: Span<Lane>) -> Vector {
+    public static func loadingUpperHalf(_ a: SIMD, from span: Span<Lane>) -> SIMD {
         precondition(
             span.count >= laneCount / 2,
             "Span has fewer elements than half a vector has lanes"
@@ -145,90 +162,107 @@ extension HighwayReferenceDouble {
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func loadingUpperHalf(_ a: Vector, fromUnchecked span: Span<Lane>) -> Vector {
+    public static func loadingUpperHalf(_ a: SIMD, fromUnchecked span: Span<Lane>) -> SIMD {
         assert(span.count >= laneCount / 2, "Span has fewer elements than half a vector has lanes")
         return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadingUpperHalfF64($0.baseAddress.unsafelyUnwrapped, a)
-        }
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func loadWidening(from span: Span<UInt32>) -> Vector {
-        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        return unsafe loadWidening(fromUnchecked: span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func loadWidening(fromUnchecked span: Span<UInt32>) -> Vector {
-        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadWideningU32ToF64($0.baseAddress.unsafelyUnwrapped)
-        }
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func loadWidening(from span: Span<Int32>) -> Vector {
-        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        return unsafe loadWidening(fromUnchecked: span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func loadWidening(fromUnchecked span: Span<Int32>) -> Vector {
-        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadWideningI32ToF64($0.baseAddress.unsafelyUnwrapped)
-        }
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func loadWidening(from span: Span<Float>) -> Vector {
-        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        return unsafe loadWidening(fromUnchecked: span)
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
-    public static func loadWidening(fromUnchecked span: Span<Float>) -> Vector {
-        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
-        return span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadWideningF32ToF64($0.baseAddress.unsafelyUnwrapped)
-        }
-    }
-
-    @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
-    public static func loadFirstWidening(from span: Span<UInt32>) -> Vector {
-        span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadFirstWideningU32ToF64(
-                $0.baseAddress,
-                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadingUpperHalfF64(
+                    $0.baseAddress.unsafelyUnwrapped,
+                    a.raw
+                )
             )
         }
     }
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadFirstWidening(from span: Span<Int32>) -> Vector {
-        span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadFirstWideningI32ToF64(
-                $0.baseAddress,
-                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+    public static func loadWidening(from span: Span<UInt32>) -> SIMD {
+        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        return unsafe loadWidening(fromUnchecked: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func loadWidening(fromUnchecked span: Span<UInt32>) -> SIMD {
+        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        return span.withUnsafeBufferPointer {
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadWideningU32ToF64($0.baseAddress.unsafelyUnwrapped)
             )
         }
     }
 
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func loadFirstWidening(from span: Span<Float>) -> Vector {
+    public static func loadWidening(from span: Span<Int32>) -> SIMD {
+        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        return unsafe loadWidening(fromUnchecked: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func loadWidening(fromUnchecked span: Span<Int32>) -> SIMD {
+        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        return span.withUnsafeBufferPointer {
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadWideningI32ToF64($0.baseAddress.unsafelyUnwrapped)
+            )
+        }
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func loadWidening(from span: Span<Float>) -> SIMD {
+        precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        return unsafe loadWidening(fromUnchecked: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func loadWidening(fromUnchecked span: Span<Float>) -> SIMD {
+        assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
+        return span.withUnsafeBufferPointer {
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadWideningF32ToF64($0.baseAddress.unsafelyUnwrapped)
+            )
+        }
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func loadFirstWidening(from span: Span<UInt32>) -> SIMD {
         span.withUnsafeBufferPointer {
-            unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(
-                $0.baseAddress,
-                HighwayReference.Nothrow.spanCount($0.count, laneCount)
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadFirstWideningU32ToF64(
+                    $0.baseAddress,
+                    HighwayReference.Nothrow.spanCount($0.count, laneCount)
+                )
+            )
+        }
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func loadFirstWidening(from span: Span<Int32>) -> SIMD {
+        span.withUnsafeBufferPointer {
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadFirstWideningI32ToF64(
+                    $0.baseAddress,
+                    HighwayReference.Nothrow.spanCount($0.count, laneCount)
+                )
+            )
+        }
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func loadFirstWidening(from span: Span<Float>) -> SIMD {
+        span.withUnsafeBufferPointer {
+            unsafe SIMD(
+                raw: HighwayReference.Nothrow.loadFirstWideningF32ToF64(
+                    $0.baseAddress,
+                    HighwayReference.Nothrow.spanCount($0.count, laneCount)
+                )
             )
         }
     }
@@ -236,572 +270,578 @@ extension HighwayReferenceDouble {
 }
 
 @inline(never)
-public func portLoadF64(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.load(from: from)
+public func portLoadF64(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.load(from: from)
 }
 
 @inline(never)
-public func highwayLoadF64(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadF64(from)
+public func highwayLoadF64(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadF64(from))
 }
 
 @inline(never)
-public func portLoadAlignedF64(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadAligned(from: from)
+public func portLoadAlignedF64(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadAligned(from: from)
 }
 
 @inline(never)
-public func highwayLoadAlignedF64(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadAlignedF64(from)
+public func highwayLoadAlignedF64(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadAlignedF64(from))
 }
 
 @inline(never)
-public func portLoadFirstF64(from: UnsafePointer<SIMDDouble.Lane>, count: Int) -> SIMDDouble.Vector
+public func portLoadFirstF64(from: UnsafePointer<Double>, count: Int) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: count)
+}
+
+@inline(never)
+public func highwayLoadFirstF64(from: UnsafePointer<Double>, count: Int) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstF64(from, count))
+}
+
+@inline(never)
+public func portLoadFirstF64ConstantCount(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: 1)
+}
+
+@inline(never)
+public func highwayLoadFirstF64ConstantCount(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstF64(from, 1))
+}
+
+@inline(never)
+public func portLoadFirstF64ConstantCountTwo(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: 2)
+}
+
+@inline(never)
+public func highwayLoadFirstF64ConstantCountTwo(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstF64(from, 2))
+}
+
+@inline(never)
+public func portLoadFirstF64ConstantCountLaneCount(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: SIMD<Double>.laneCount)
+}
+
+@inline(never)
+public func highwayLoadFirstF64ConstantCountLaneCount(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstF64(from, HighwayReference.Nothrow.laneCountF64())
+    )
+}
+
+@inline(never)
+public func portLoadFirstF64ConstantCountTwiceLaneCount(from: UnsafePointer<Double>) -> SIMD<Double>
 {
-    unsafe SIMDDouble.loadFirst(from: from, count: count)
-}
-
-@inline(never)
-public func highwayLoadFirstF64(from: UnsafePointer<Double>, count: Int) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstF64(from, count)
-}
-
-@inline(never)
-public func portLoadFirstF64ConstantCount(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDouble.Vector
-{
-    unsafe SIMDDouble.loadFirst(from: from, count: 1)
-}
-
-@inline(never)
-public func highwayLoadFirstF64ConstantCount(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstF64(from, 1)
-}
-
-@inline(never)
-public func portLoadFirstF64ConstantCountTwo(
-    from: UnsafePointer<SIMDDouble.Lane>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: 2)
-}
-
-@inline(never)
-public func highwayLoadFirstF64ConstantCountTwo(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstF64(from, 2)
-}
-
-@inline(never)
-public func portLoadFirstF64ConstantCountLaneCount(
-    from: UnsafePointer<SIMDDouble.Lane>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: SIMDDouble.laneCount)
-}
-
-@inline(never)
-public func highwayLoadFirstF64ConstantCountLaneCount(
-    from: UnsafePointer<Double>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstF64(from, HighwayReference.Nothrow.laneCountF64())
-}
-
-@inline(never)
-public func portLoadFirstF64ConstantCountTwiceLaneCount(
-    from: UnsafePointer<SIMDDouble.Lane>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: 2 * SIMDDouble.laneCount)
+    unsafe SIMD<Double>.loadFirst(from: from, count: 2 * SIMD<Double>.laneCount)
 }
 
 @inline(never)
 public func highwayLoadFirstF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Double>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstF64(from, 2 * HighwayReference.Nothrow.laneCountF64())
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstF64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountF64()
+        )
+    )
 }
 
 @inline(never)
-public func portLoadRepeatingBlockF64(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadRepeatingBlock(from: from)
+public func portLoadRepeatingBlockF64(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadRepeatingBlock(from: from)
 }
 
 @inline(never)
-public func highwayLoadRepeatingBlockF64(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadRepeatingBlockF64(from)
+public func highwayLoadRepeatingBlockF64(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadRepeatingBlockF64(from))
 }
 
 @inline(never)
 public func portLoadWhereF64(
-    from: UnsafePointer<SIMDDouble.Lane>,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.load(from: from, where: mask)
+    from: UnsafePointer<Double>,
+    where mask: SIMD<Double>.Mask
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.load(from: from, where: mask)
 }
 
 @inline(never)
 public func highwayLoadWhereF64(
     from: UnsafePointer<Double>,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadWhereF64(mask.raw, from)
+    where mask: SIMD<Double>.Mask
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadWhereF64(mask.raw, from))
 }
 
 @inline(never)
 public func portLoadWhereOtherwiseF64(
-    from: UnsafePointer<SIMDDouble.Lane>,
-    where mask: SIMDDouble.Mask,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.load(from: from, where: mask, otherwise: otherwise)
+    from: UnsafePointer<Double>,
+    where mask: SIMD<Double>.Mask,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.load(from: from, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayLoadWhereOtherwiseF64(
     from: UnsafePointer<Double>,
-    where mask: SIMDDouble.Mask,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadWhereOtherwiseF64(otherwise, mask.raw, from)
+    where mask: SIMD<Double>.Mask,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadWhereOtherwiseF64(otherwise.raw, mask.raw, from)
+    )
 }
 
 @inline(never)
 public func portLoadWhereOtherwiseF64ConstantOtherwise(
-    from: UnsafePointer<SIMDDouble.Lane>,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.load(from: from, where: mask, otherwise: SIMDDouble.repeating(1.5))
+    from: UnsafePointer<Double>,
+    where mask: SIMD<Double>.Mask
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.load(from: from, where: mask, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayLoadWhereOtherwiseF64ConstantOtherwise(
     from: UnsafePointer<Double>,
-    where mask: SIMDDouble.Mask
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadWhereOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5),
-        mask.raw,
-        from
+    where mask: SIMD<Double>.Mask
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadWhereOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            mask.raw,
+            from
+        )
     )
 }
 
 @inline(never)
 public func portLoadFirstOtherwiseF64(
-    from: UnsafePointer<SIMDDouble.Lane>,
+    from: UnsafePointer<Double>,
     count: Int,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: count, otherwise: otherwise)
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: count, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayLoadFirstOtherwiseF64(
     from: UnsafePointer<Double>,
     count: Int,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF64(otherwise, from, count)
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstOtherwiseF64(otherwise.raw, from, count)
+    )
 }
 
 @inline(never)
 public func portLoadFirstOtherwiseF64ConstantCount(
-    from: UnsafePointer<SIMDDouble.Lane>,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: 1, otherwise: otherwise)
+    from: UnsafePointer<Double>,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: 1, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayLoadFirstOtherwiseF64ConstantCount(
     from: UnsafePointer<Double>,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF64(otherwise, from, 1)
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstOtherwiseF64(otherwise.raw, from, 1))
 }
 
 @inline(never)
 public func portLoadFirstOtherwiseF64ConstantOtherwise(
-    from: UnsafePointer<SIMDDouble.Lane>,
+    from: UnsafePointer<Double>,
     count: Int
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: count, otherwise: SIMDDouble.repeating(1.5))
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: count, otherwise: SIMD<Double>.repeating(1.5))
 }
 
 @inline(never)
 public func highwayLoadFirstOtherwiseF64ConstantOtherwise(
     from: UnsafePointer<Double>,
     count: Int
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF64(
-        HighwayReference.Nothrow.repeatingF64(1.5),
-        from,
-        count
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstOtherwiseF64(
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
+            from,
+            count
+        )
     )
 }
 
 @inline(never)
 public func portLoadFirstOtherwiseF64ConstantCountTwo(
-    from: UnsafePointer<SIMDDouble.Lane>,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: 2, otherwise: otherwise)
+    from: UnsafePointer<Double>,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: 2, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayLoadFirstOtherwiseF64ConstantCountTwo(
     from: UnsafePointer<Double>,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF64(otherwise, from, 2)
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstOtherwiseF64(otherwise.raw, from, 2))
 }
 
 @inline(never)
 public func portLoadFirstOtherwiseF64ConstantCountLaneCount(
-    from: UnsafePointer<SIMDDouble.Lane>,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: SIMDDouble.laneCount, otherwise: otherwise)
+    from: UnsafePointer<Double>,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(from: from, count: SIMD<Double>.laneCount, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayLoadFirstOtherwiseF64ConstantCountLaneCount(
     from: UnsafePointer<Double>,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF64(
-        otherwise,
-        from,
-        HighwayReference.Nothrow.laneCountF64()
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstOtherwiseF64(
+            otherwise.raw,
+            from,
+            HighwayReference.Nothrow.laneCountF64()
+        )
     )
 }
 
 @inline(never)
 public func portLoadFirstOtherwiseF64ConstantCountTwiceLaneCount(
-    from: UnsafePointer<SIMDDouble.Lane>,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirst(from: from, count: 2 * SIMDDouble.laneCount, otherwise: otherwise)
+    from: UnsafePointer<Double>,
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirst(
+        from: from,
+        count: 2 * SIMD<Double>.laneCount,
+        otherwise: otherwise
+    )
 }
 
 @inline(never)
 public func highwayLoadFirstOtherwiseF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Double>,
-    otherwise: SIMDDouble.Vector
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstOtherwiseF64(
-        otherwise,
-        from,
-        2 * HighwayReference.Nothrow.laneCountF64()
+    otherwise: SIMD<Double>
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstOtherwiseF64(
+            otherwise.raw,
+            from,
+            2 * HighwayReference.Nothrow.laneCountF64()
+        )
     )
 }
 
 @inline(never)
-public func portLoadingUpperHalfF64(
-    _ a: SIMDDouble.Vector,
-    from: UnsafePointer<SIMDDouble.Lane>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadingUpperHalf(a, from: from)
+public func portLoadingUpperHalfF64(_ a: SIMD<Double>, from: UnsafePointer<Double>) -> SIMD<Double>
+{
+    unsafe SIMD<Double>.loadingUpperHalf(a, from: from)
 }
 
 @inline(never)
 public func highwayLoadingUpperHalfF64(
-    _ a: SIMDDouble.Vector,
+    _ a: SIMD<Double>,
     from: UnsafePointer<Double>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadingUpperHalfF64(from, a)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadingUpperHalfF64(from, a.raw))
 }
 
 @inline(never)
-public func portLoadingUpperHalfF64ConstantA(
-    from: UnsafePointer<SIMDDouble.Lane>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadingUpperHalf(SIMDDouble.repeating(1.5), from: from)
+public func portLoadingUpperHalfF64ConstantA(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadingUpperHalf(SIMD<Double>.repeating(1.5), from: from)
 }
 
 @inline(never)
-public func highwayLoadingUpperHalfF64ConstantA(from: UnsafePointer<Double>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadingUpperHalfF64(
-        from,
-        HighwayReference.Nothrow.repeatingF64(1.5)
+public func highwayLoadingUpperHalfF64ConstantA(from: UnsafePointer<Double>) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadingUpperHalfF64(
+            from,
+            SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw
+        )
     )
 }
 
 @inline(never)
-public func portLoadHalfF64(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDouble.HalfVector {
-    unsafe SIMDDouble.loadHalf(from: from)
+public func portLoadHalfF64(from: UnsafePointer<Double>) -> SIMD<Double>.HalfVector {
+    unsafe SIMD<Double>.loadHalf(from: from)
 }
 
 @inline(never)
-public func highwayLoadHalfF64(from: UnsafePointer<Double>) -> SIMDDouble.HalfVector {
-    unsafe SIMDDouble.HalfVector(raw: HighwayReference.Nothrow.loadHalfF64(from))
+public func highwayLoadHalfF64(from: UnsafePointer<Double>) -> SIMD<Double>.HalfVector {
+    unsafe SIMD<Double>.HalfVector(raw: HighwayReference.Nothrow.loadHalfF64(from))
 }
 
 @inline(never)
-public func portLoadBlockF64(from: UnsafePointer<SIMDDouble.Lane>) -> SIMDDouble.BlockVector {
-    unsafe SIMDDouble.loadBlock(from: from)
+public func portLoadBlockF64(from: UnsafePointer<Double>) -> SIMD<Double>.BlockVector {
+    unsafe SIMD<Double>.loadBlock(from: from)
 }
 
 @inline(never)
-public func highwayLoadBlockF64(from: UnsafePointer<Double>) -> SIMDDouble.BlockVector {
-    unsafe SIMDDouble.BlockVector(raw: HighwayReference.Nothrow.loadBlockF64(from))
+public func highwayLoadBlockF64(from: UnsafePointer<Double>) -> SIMD<Double>.BlockVector {
+    unsafe SIMD<Double>.BlockVector(raw: HighwayReference.Nothrow.loadBlockF64(from))
 }
 
 @inline(never)
-public func portLoadWideningU32ToF64(from: UnsafePointer<UInt32>) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadWidening(from: from)
+public func portLoadWideningU32ToF64(from: UnsafePointer<UInt32>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadWidening(from: from)
 }
 
 @inline(never)
-public func highwayLoadWideningU32ToF64(from: UnsafePointer<UInt32>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadWideningU32ToF64(from)
+public func highwayLoadWideningU32ToF64(from: UnsafePointer<UInt32>) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadWideningU32ToF64(from))
 }
 
 @inline(never)
-public func portLoadWideningI32ToF64(from: UnsafePointer<Int32>) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadWidening(from: from)
+public func portLoadWideningI32ToF64(from: UnsafePointer<Int32>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadWidening(from: from)
 }
 
 @inline(never)
-public func highwayLoadWideningI32ToF64(from: UnsafePointer<Int32>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadWideningI32ToF64(from)
+public func highwayLoadWideningI32ToF64(from: UnsafePointer<Int32>) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadWideningI32ToF64(from))
 }
 
 @inline(never)
-public func portLoadWideningF32ToF64(from: UnsafePointer<Float>) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadWidening(from: from)
+public func portLoadWideningF32ToF64(from: UnsafePointer<Float>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadWidening(from: from)
 }
 
 @inline(never)
-public func highwayLoadWideningF32ToF64(from: UnsafePointer<Float>) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadWideningF32ToF64(from)
+public func highwayLoadWideningF32ToF64(from: UnsafePointer<Float>) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadWideningF32ToF64(from))
 }
 
 @inline(never)
-public func portLoadFirstWideningU32ToF64(
-    from: UnsafePointer<UInt32>,
-    count: Int
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: count)
+public func portLoadFirstWideningU32ToF64(from: UnsafePointer<UInt32>, count: Int) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: count)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningU32ToF64(
     from: UnsafePointer<UInt32>,
     count: Int
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningU32ToF64(from, count)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningU32ToF64(from, count))
 }
 
 @inline(never)
-public func portLoadFirstWideningU32ToF64ConstantCount(
-    from: UnsafePointer<UInt32>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 1)
+public func portLoadFirstWideningU32ToF64ConstantCount(from: UnsafePointer<UInt32>) -> SIMD<Double>
+{
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 1)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningU32ToF64ConstantCount(
     from: UnsafePointer<UInt32>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningU32ToF64(from, 1)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningU32ToF64(from, 1))
 }
 
 @inline(never)
 public func portLoadFirstWideningU32ToF64ConstantCountTwo(
     from: UnsafePointer<UInt32>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 2)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 2)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningU32ToF64ConstantCountTwo(
     from: UnsafePointer<UInt32>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningU32ToF64(from, 2)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningU32ToF64(from, 2))
 }
 
 @inline(never)
 public func portLoadFirstWideningU32ToF64ConstantCountLaneCount(
     from: UnsafePointer<UInt32>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: SIMDDouble.laneCount)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: SIMD<Double>.laneCount)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningU32ToF64ConstantCountLaneCount(
     from: UnsafePointer<UInt32>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningU32ToF64(
-        from,
-        HighwayReference.Nothrow.laneCountF64()
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstWideningU32ToF64(
+            from,
+            HighwayReference.Nothrow.laneCountF64()
+        )
     )
 }
 
 @inline(never)
 public func portLoadFirstWideningU32ToF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt32>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 2 * SIMDDouble.laneCount)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 2 * SIMD<Double>.laneCount)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningU32ToF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<UInt32>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningU32ToF64(
-        from,
-        2 * HighwayReference.Nothrow.laneCountF64()
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstWideningU32ToF64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountF64()
+        )
     )
 }
 
 @inline(never)
-public func portLoadFirstWideningI32ToF64(
-    from: UnsafePointer<Int32>,
-    count: Int
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: count)
+public func portLoadFirstWideningI32ToF64(from: UnsafePointer<Int32>, count: Int) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: count)
 }
 
 @inline(never)
-public func highwayLoadFirstWideningI32ToF64(
-    from: UnsafePointer<Int32>,
-    count: Int
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningI32ToF64(from, count)
+public func highwayLoadFirstWideningI32ToF64(from: UnsafePointer<Int32>, count: Int) -> SIMD<Double>
+{
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningI32ToF64(from, count))
 }
 
 @inline(never)
-public func portLoadFirstWideningI32ToF64ConstantCount(
-    from: UnsafePointer<Int32>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 1)
+public func portLoadFirstWideningI32ToF64ConstantCount(from: UnsafePointer<Int32>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 1)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningI32ToF64ConstantCount(
     from: UnsafePointer<Int32>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningI32ToF64(from, 1)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningI32ToF64(from, 1))
 }
 
 @inline(never)
 public func portLoadFirstWideningI32ToF64ConstantCountTwo(
     from: UnsafePointer<Int32>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 2)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 2)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningI32ToF64ConstantCountTwo(
     from: UnsafePointer<Int32>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningI32ToF64(from, 2)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningI32ToF64(from, 2))
 }
 
 @inline(never)
 public func portLoadFirstWideningI32ToF64ConstantCountLaneCount(
     from: UnsafePointer<Int32>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: SIMDDouble.laneCount)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: SIMD<Double>.laneCount)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningI32ToF64ConstantCountLaneCount(
     from: UnsafePointer<Int32>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningI32ToF64(
-        from,
-        HighwayReference.Nothrow.laneCountF64()
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstWideningI32ToF64(
+            from,
+            HighwayReference.Nothrow.laneCountF64()
+        )
     )
 }
 
 @inline(never)
 public func portLoadFirstWideningI32ToF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int32>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 2 * SIMDDouble.laneCount)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 2 * SIMD<Double>.laneCount)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningI32ToF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Int32>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningI32ToF64(
-        from,
-        2 * HighwayReference.Nothrow.laneCountF64()
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstWideningI32ToF64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountF64()
+        )
     )
 }
 
 @inline(never)
-public func portLoadFirstWideningF32ToF64(
-    from: UnsafePointer<Float>,
-    count: Int
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: count)
+public func portLoadFirstWideningF32ToF64(from: UnsafePointer<Float>, count: Int) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: count)
 }
 
 @inline(never)
-public func highwayLoadFirstWideningF32ToF64(
-    from: UnsafePointer<Float>,
-    count: Int
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(from, count)
+public func highwayLoadFirstWideningF32ToF64(from: UnsafePointer<Float>, count: Int) -> SIMD<Double>
+{
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningF32ToF64(from, count))
 }
 
 @inline(never)
-public func portLoadFirstWideningF32ToF64ConstantCount(
-    from: UnsafePointer<Float>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 1)
+public func portLoadFirstWideningF32ToF64ConstantCount(from: UnsafePointer<Float>) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 1)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningF32ToF64ConstantCount(
     from: UnsafePointer<Float>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(from, 1)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningF32ToF64(from, 1))
 }
 
 @inline(never)
 public func portLoadFirstWideningF32ToF64ConstantCountTwo(
     from: UnsafePointer<Float>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 2)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 2)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningF32ToF64ConstantCountTwo(
     from: UnsafePointer<Float>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(from, 2)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(raw: HighwayReference.Nothrow.loadFirstWideningF32ToF64(from, 2))
 }
 
 @inline(never)
 public func portLoadFirstWideningF32ToF64ConstantCountLaneCount(
     from: UnsafePointer<Float>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: SIMDDouble.laneCount)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: SIMD<Double>.laneCount)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningF32ToF64ConstantCountLaneCount(
     from: UnsafePointer<Float>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(
-        from,
-        HighwayReference.Nothrow.laneCountF64()
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstWideningF32ToF64(
+            from,
+            HighwayReference.Nothrow.laneCountF64()
+        )
     )
 }
 
 @inline(never)
 public func portLoadFirstWideningF32ToF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Float>
-) -> SIMDDouble.Vector {
-    unsafe SIMDDouble.loadFirstWidening(from: from, count: 2 * SIMDDouble.laneCount)
+) -> SIMD<Double> {
+    unsafe SIMD<Double>.loadFirstWidening(from: from, count: 2 * SIMD<Double>.laneCount)
 }
 
 @inline(never)
 public func highwayLoadFirstWideningF32ToF64ConstantCountTwiceLaneCount(
     from: UnsafePointer<Float>
-) -> SIMDDouble.Vector {
-    unsafe HighwayReference.Nothrow.loadFirstWideningF32ToF64(
-        from,
-        2 * HighwayReference.Nothrow.laneCountF64()
+) -> SIMD<Double> {
+    unsafe SIMD<Double>(
+        raw: HighwayReference.Nothrow.loadFirstWideningF32ToF64(
+            from,
+            2 * HighwayReference.Nothrow.laneCountF64()
+        )
     )
 }

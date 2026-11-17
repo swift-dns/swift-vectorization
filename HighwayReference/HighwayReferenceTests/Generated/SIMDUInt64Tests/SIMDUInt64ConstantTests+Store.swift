@@ -9,8 +9,8 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkStoreFirstConstantCount(_ count: Int) {
         let mismatches = Mismatches("storeFirst with count \(count)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4D30_86EE_320C_E8AC)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4D30_86EE_320C_E8AC)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -96,8 +96,8 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkStoreFirstConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("storeFirst with count \(count) before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x37C7_8BCD_3F5E_1E25)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x37C7_8BCD_3F5E_1E25)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe H.storeFirst(a, to: destination, count: count)
@@ -179,15 +179,15 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreWhereConstantA(_ value: H.Lane) {
+    private func checkStoreWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xED30_C8B4_4848_E794)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for mask in maskInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -255,15 +255,15 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func storeWhereConstantSplatMax() {
-        checkStoreWhereConstantA(H.Lane.max)
+        checkStoreWhereConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkStoreTruncatingU8ConstantA(_ value: H.Lane) {
+    private func checkStoreTruncatingU8ConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeTruncatingU8 with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         let sentinel = Inputs.sentinel(UInt8.self, count: H.laneCount + 4)
@@ -331,15 +331,15 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func storeTruncatingU8ConstantSplatMax() {
-        checkStoreTruncatingU8ConstantA(H.Lane.max)
+        checkStoreTruncatingU8ConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkStoreTruncatingU16ConstantA(_ value: H.Lane) {
+    private func checkStoreTruncatingU16ConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeTruncatingU16 with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         let sentinel = Inputs.sentinel(UInt16.self, count: H.laneCount + 4)
@@ -407,15 +407,15 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func storeTruncatingU16ConstantSplatMax() {
-        checkStoreTruncatingU16ConstantA(H.Lane.max)
+        checkStoreTruncatingU16ConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkStoreTruncatingU32ConstantA(_ value: H.Lane) {
+    private func checkStoreTruncatingU32ConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeTruncatingU32 with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         let sentinel = Inputs.sentinel(UInt32.self, count: H.laneCount + 4)
@@ -483,6 +483,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func storeTruncatingU32ConstantSplatMax() {
-        checkStoreTruncatingU32ConstantA(H.Lane.max)
+        checkStoreTruncatingU32ConstantA(Lane.max)
     }
 }

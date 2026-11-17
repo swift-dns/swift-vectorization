@@ -7,17 +7,17 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkCompressedConstantA(_ value: H.Lane) {
+    private func checkCompressedConstantA(_ value: Lane) {
         let mismatches = Mismatches("compressed with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8FCA_E3ED_325C_D76B)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
             let port = H.compressed(H.repeating(value), where: mask)
-            let reference = H.Vector(
+            let reference = H(
                 raw: HighwayReference.compressedBF16(H.repeating(value).raw, mask.raw)
             )
             let checkedLanes =
@@ -33,93 +33,93 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func compressedConstantSplatZero() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x0000))
+        checkCompressedConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func compressedConstantSplatNegativeZero() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x8000))
+        checkCompressedConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func compressedConstantSplatOne() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x3F80))
+        checkCompressedConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func compressedConstantSplatMinusOne() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0xBF80))
+        checkCompressedConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func compressedConstantSplatTwo() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x4000))
+        checkCompressedConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func compressedConstantSplatHalf() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x3F00))
+        checkCompressedConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func compressedConstantSplatFour() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x4080))
+        checkCompressedConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func compressedConstantSplatQuarter() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x3E80))
+        checkCompressedConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func compressedConstantSplatOnePointFive() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkCompressedConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func compressedConstantSplatMinusTwoPointFive() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0xC020))
+        checkCompressedConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func compressedConstantSplatInfinity() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x7F80))
+        checkCompressedConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func compressedConstantSplatMinusInfinity() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0xFF80))
+        checkCompressedConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func compressedConstantSplatNaN() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkCompressedConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func compressedConstantSplatMinusNaN() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkCompressedConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func compressedConstantSplatPayloadNaN() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkCompressedConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func compressedConstantSplatSignalingNaN() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x7F81))
+        checkCompressedConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func compressedConstantSplatMinusSignalingNaN() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0xFF81))
+        checkCompressedConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func compressedConstantSplatLeastNonzero() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x0001))
+        checkCompressedConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func compressedConstantSplatGreatest() {
-        checkCompressedConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkCompressedConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkCompressedNotConstantA(_ value: H.Lane) {
+    private func checkCompressedNotConstantA(_ value: Lane) {
         let mismatches = Mismatches("compressedNot with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7EC7_9F0A_BE3A_1B64)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
             let port = H.compressedNot(H.repeating(value), where: mask)
-            let reference = H.Vector(
+            let reference = H(
                 raw: HighwayReference.compressedNotBF16(H.repeating(value).raw, mask.raw)
             )
             let checkedLanes =
@@ -135,83 +135,83 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func compressedNotConstantSplatZero() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x0000))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func compressedNotConstantSplatNegativeZero() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x8000))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func compressedNotConstantSplatOne() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x3F80))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func compressedNotConstantSplatMinusOne() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0xBF80))
+        checkCompressedNotConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func compressedNotConstantSplatTwo() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x4000))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func compressedNotConstantSplatHalf() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x3F00))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func compressedNotConstantSplatFour() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x4080))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func compressedNotConstantSplatQuarter() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x3E80))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func compressedNotConstantSplatOnePointFive() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func compressedNotConstantSplatMinusTwoPointFive() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0xC020))
+        checkCompressedNotConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func compressedNotConstantSplatInfinity() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x7F80))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func compressedNotConstantSplatMinusInfinity() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0xFF80))
+        checkCompressedNotConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func compressedNotConstantSplatNaN() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func compressedNotConstantSplatMinusNaN() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkCompressedNotConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func compressedNotConstantSplatPayloadNaN() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func compressedNotConstantSplatSignalingNaN() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x7F81))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func compressedNotConstantSplatMinusSignalingNaN() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0xFF81))
+        checkCompressedNotConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func compressedNotConstantSplatLeastNonzero() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x0001))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func compressedNotConstantSplatGreatest() {
-        checkCompressedNotConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkCompressedNotConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkCompressedBitsConstantA(_ value: H.Lane) {
+    private func checkCompressedBitsConstantA(_ value: Lane) {
         let mismatches = Mismatches("compressedBits with a repeating \(hex(value))")
         let bitsInputs = Inputs.buffers(
             UInt8.self,
@@ -220,7 +220,7 @@ extension SIMDBFloat16ConstantTests {
         )
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for bits in bitsInputs {
@@ -228,7 +228,7 @@ extension SIMDBFloat16ConstantTests {
                 (
                     unsafe H.compressed(H.repeating(value), bits: source.baseAddress!),
                     (bits + [UInt8](repeating: 0, count: 8)).withUnsafeBufferPointer { padded in
-                        unsafe H.Vector(
+                        unsafe H(
                             raw: HighwayReference.compressedBitsBF16(
                                 H.repeating(value).raw,
                                 source.baseAddress!
@@ -252,78 +252,78 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func compressedBitsConstantSplatZero() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x0000))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func compressedBitsConstantSplatNegativeZero() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x8000))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func compressedBitsConstantSplatOne() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x3F80))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func compressedBitsConstantSplatMinusOne() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0xBF80))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func compressedBitsConstantSplatTwo() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x4000))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func compressedBitsConstantSplatHalf() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x3F00))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func compressedBitsConstantSplatFour() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x4080))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func compressedBitsConstantSplatQuarter() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x3E80))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func compressedBitsConstantSplatOnePointFive() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func compressedBitsConstantSplatMinusTwoPointFive() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0xC020))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func compressedBitsConstantSplatInfinity() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x7F80))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func compressedBitsConstantSplatMinusInfinity() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0xFF80))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func compressedBitsConstantSplatNaN() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func compressedBitsConstantSplatMinusNaN() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func compressedBitsConstantSplatPayloadNaN() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func compressedBitsConstantSplatSignalingNaN() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x7F81))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func compressedBitsConstantSplatMinusSignalingNaN() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0xFF81))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func compressedBitsConstantSplatLeastNonzero() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x0001))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func compressedBitsConstantSplatGreatest() {
-        checkCompressedBitsConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkCompressedBitsConstantA(Lane(bitPattern: 0x7F7F))
     }
 }

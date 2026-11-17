@@ -4,139 +4,137 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSumI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Lane {
-    SIMDInt64.sum(a)
+public func portSumI64(_ a: SIMD<Int64>) -> Int64 {
+    SIMD<Int64>.sum(a)
 }
 
 @inline(never)
-public func highwaySumI64(_ a: SIMDInt64.Vector) -> Int64 {
+public func highwaySumI64(_ a: SIMD<Int64>) -> Int64 {
     HighwayReference.Nothrow.sumI64(a.raw)
 }
 
 @inline(never)
-public func portSumI64ConstantA() -> SIMDInt64.Lane {
-    SIMDInt64.sum(SIMDInt64.repeating(26))
+public func portSumI64ConstantA() -> Int64 {
+    SIMD<Int64>.sum(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
 public func highwaySumI64ConstantA() -> Int64 {
-    HighwayReference.Nothrow.sumI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
-    )
+    HighwayReference.Nothrow.sumI64(SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw)
 }
 
 @inline(never)
-public func portSmallestI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Lane {
-    SIMDInt64.smallest(a)
+public func portSmallestI64(_ a: SIMD<Int64>) -> Int64 {
+    SIMD<Int64>.smallest(a)
 }
 
 @inline(never)
-public func highwaySmallestI64(_ a: SIMDInt64.Vector) -> Int64 {
+public func highwaySmallestI64(_ a: SIMD<Int64>) -> Int64 {
     HighwayReference.Nothrow.smallestI64(a.raw)
 }
 
 @inline(never)
-public func portSmallestI64ConstantA() -> SIMDInt64.Lane {
-    SIMDInt64.smallest(SIMDInt64.repeating(26))
+public func portSmallestI64ConstantA() -> Int64 {
+    SIMD<Int64>.smallest(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
 public func highwaySmallestI64ConstantA() -> Int64 {
     HighwayReference.Nothrow.smallestI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
     )
 }
 
 @inline(never)
-public func portLargestI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Lane {
-    SIMDInt64.largest(a)
+public func portLargestI64(_ a: SIMD<Int64>) -> Int64 {
+    SIMD<Int64>.largest(a)
 }
 
 @inline(never)
-public func highwayLargestI64(_ a: SIMDInt64.Vector) -> Int64 {
+public func highwayLargestI64(_ a: SIMD<Int64>) -> Int64 {
     HighwayReference.Nothrow.largestI64(a.raw)
 }
 
 @inline(never)
-public func portLargestI64ConstantA() -> SIMDInt64.Lane {
-    SIMDInt64.largest(SIMDInt64.repeating(26))
+public func portLargestI64ConstantA() -> Int64 {
+    SIMD<Int64>.largest(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
 public func highwayLargestI64ConstantA() -> Int64 {
     HighwayReference.Nothrow.largestI64(
-        SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+        SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
     )
 }
 
 @inline(never)
-public func portRepeatingSumI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
-    SIMDInt64.repeatingSum(a)
+public func portRepeatingSumI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
+    SIMD<Int64>.repeatingSum(a)
 }
 
 @inline(never)
-public func highwayRepeatingSumI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingSumI64(a.raw))
+public func highwayRepeatingSumI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
+    SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingSumI64(a.raw))
 }
 
 @inline(never)
-public func portRepeatingSumI64ConstantA() -> SIMDInt64.Vector {
-    SIMDInt64.repeatingSum(SIMDInt64.repeating(26))
+public func portRepeatingSumI64ConstantA() -> SIMD<Int64> {
+    SIMD<Int64>.repeatingSum(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayRepeatingSumI64ConstantA() -> SIMDInt64.Vector {
-    SIMDInt64.Vector(
+public func highwayRepeatingSumI64ConstantA() -> SIMD<Int64> {
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.repeatingSumI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portRepeatingSmallestI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
-    SIMDInt64.repeatingSmallest(a)
+public func portRepeatingSmallestI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
+    SIMD<Int64>.repeatingSmallest(a)
 }
 
 @inline(never)
-public func highwayRepeatingSmallestI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingSmallestI64(a.raw))
+public func highwayRepeatingSmallestI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
+    SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingSmallestI64(a.raw))
 }
 
 @inline(never)
-public func portRepeatingSmallestI64ConstantA() -> SIMDInt64.Vector {
-    SIMDInt64.repeatingSmallest(SIMDInt64.repeating(26))
+public func portRepeatingSmallestI64ConstantA() -> SIMD<Int64> {
+    SIMD<Int64>.repeatingSmallest(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayRepeatingSmallestI64ConstantA() -> SIMDInt64.Vector {
-    SIMDInt64.Vector(
+public func highwayRepeatingSmallestI64ConstantA() -> SIMD<Int64> {
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.repeatingSmallestI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }
 
 @inline(never)
-public func portRepeatingLargestI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
-    SIMDInt64.repeatingLargest(a)
+public func portRepeatingLargestI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
+    SIMD<Int64>.repeatingLargest(a)
 }
 
 @inline(never)
-public func highwayRepeatingLargestI64(_ a: SIMDInt64.Vector) -> SIMDInt64.Vector {
-    SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingLargestI64(a.raw))
+public func highwayRepeatingLargestI64(_ a: SIMD<Int64>) -> SIMD<Int64> {
+    SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingLargestI64(a.raw))
 }
 
 @inline(never)
-public func portRepeatingLargestI64ConstantA() -> SIMDInt64.Vector {
-    SIMDInt64.repeatingLargest(SIMDInt64.repeating(26))
+public func portRepeatingLargestI64ConstantA() -> SIMD<Int64> {
+    SIMD<Int64>.repeatingLargest(SIMD<Int64>.repeating(26))
 }
 
 @inline(never)
-public func highwayRepeatingLargestI64ConstantA() -> SIMDInt64.Vector {
-    SIMDInt64.Vector(
+public func highwayRepeatingLargestI64ConstantA() -> SIMD<Int64> {
+    SIMD<Int64>(
         raw: HighwayReference.Nothrow.repeatingLargestI64(
-            SIMDInt64.Vector(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
+            SIMD<Int64>(raw: HighwayReference.Nothrow.repeatingI64(26)).raw
         )
     )
 }

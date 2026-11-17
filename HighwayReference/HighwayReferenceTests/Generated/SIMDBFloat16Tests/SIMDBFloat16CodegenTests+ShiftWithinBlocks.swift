@@ -19,7 +19,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func shiftedLeftLanesConstantLanes() {
         let mismatches = Mismatches("portShiftedLeftLanesBF16ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCF41_9C6E_307F_04B4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCF41_9C6E_307F_04B4)
         for a in aInputs {
             mismatches.check(
                 portShiftedLeftLanesBF16ConstantLanes(a),
@@ -32,7 +32,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedShiftedRightBytesConstantA() {
         let mismatches = Mismatches("portCombinedShiftedRightBytesBF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCECD_F9FE_FC80_9343)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCECD_F9FE_FC80_9343)
         for b in bInputs {
             mismatches.check(
                 portCombinedShiftedRightBytesBF16ConstantA(b),
@@ -45,7 +45,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedShiftedRightBytesConstantB() {
         let mismatches = Mismatches("portCombinedShiftedRightBytesBF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD7CF_AFFF_01B3_6C05)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD7CF_AFFF_01B3_6C05)
         for a in aInputs {
             mismatches.check(
                 portCombinedShiftedRightBytesBF16ConstantB(a),
@@ -58,8 +58,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedShiftedRightBytesConstantBytes() {
         let mismatches = Mismatches("portCombinedShiftedRightBytesBF16ConstantBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCBE5_8BF0_A4DB_E488)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCBE5_8CF0_A4DB_E63B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCBE5_8BF0_A4DB_E488)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCBE5_8CF0_A4DB_E63B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portCombinedShiftedRightBytesBF16ConstantBytes(a, b),
@@ -72,7 +72,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedShiftedRightLanesConstantA() {
         let mismatches = Mismatches("portCombinedShiftedRightLanesBF16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1BFA_5082_1C80_CB6B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1BFA_5082_1C80_CB6B)
         for b in bInputs {
             mismatches.check(
                 portCombinedShiftedRightLanesBF16ConstantA(b),
@@ -85,7 +85,7 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedShiftedRightLanesConstantB() {
         let mismatches = Mismatches("portCombinedShiftedRightLanesBF16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2569_0682_2210_760D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2569_0682_2210_760D)
         for a in aInputs {
             mismatches.check(
                 portCombinedShiftedRightLanesBF16ConstantB(a),
@@ -98,8 +98,8 @@ extension SIMDBFloat16CodegenTests {
 
     @Test func combinedShiftedRightLanesConstantLanes() {
         let mismatches = Mismatches("portCombinedShiftedRightLanesBF16ConstantLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F66_9B31_0B37_43E0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2F66_9C31_0B37_4593)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2F66_9B31_0B37_43E0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2F66_9C31_0B37_4593)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portCombinedShiftedRightLanesBF16ConstantLanes(a, b),

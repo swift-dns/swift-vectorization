@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func complexConjugate() {
         let mismatches = Mismatches("portComplexConjugateF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7BB2_63CF_5F8E_029D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7BB2_63CF_5F8E_029D)
         for a in aInputs {
             mismatches.check(
                 portComplexConjugateF64(a),
@@ -32,9 +32,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplex() {
         let mismatches = Mismatches("portMultiplyingComplexF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x83D8_D967_2BD0_CA5F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x83D8_D867_2BD0_C8AC)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x83D8_D967_2BD0_CA5F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x83D8_D867_2BD0_C8AC)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portMultiplyingComplexF64(a, b),
                 highwayMultiplyingComplexF64(a, b),
@@ -46,8 +47,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplexConstantA() {
         let mismatches = Mismatches("portMultiplyingComplexF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0DB9_6676_F141_1A2B)
-        for b in bInputs where !hasUnorderedNaNs(complexLanesOf: b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x0DB9_6676_F141_1A2B)
+        for b in bInputs where !hasUnorderedNaNs(complexLanesOf: b.simd) {
             mismatches.check(
                 portMultiplyingComplexF64ConstantA(b),
                 highwayMultiplyingComplexF64ConstantA(b),
@@ -59,8 +60,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplexConstantB() {
         let mismatches = Mismatches("portMultiplyingComplexF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1728_1C76_F6D0_C4CD)
-        for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x1728_1C76_F6D0_C4CD)
+        for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a.simd) {
             mismatches.check(
                 portMultiplyingComplexF64ConstantB(a),
                 highwayMultiplyingComplexF64ConstantB(a),
@@ -72,9 +73,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplexConjugate() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x21BD_D07E_BB97_EE55)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x21BD_CF7E_BB97_ECA2)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x21BD_D07E_BB97_EE55)
+        let bInputs = Inputs.vectors(H.self, seed: 0x21BD_CF7E_BB97_ECA2)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portMultiplyingComplexConjugateF64(a, b),
                 highwayMultiplyingComplexConjugateF64(a, b),
@@ -86,8 +88,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplexConjugateConstantA() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x71D0_E597_7F98_8779)
-        for b in bInputs where !hasUnorderedNaNs(complexLanesOf: b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x71D0_E597_7F98_8779)
+        for b in bInputs where !hasUnorderedNaNs(complexLanesOf: b.simd) {
             mismatches.check(
                 portMultiplyingComplexConjugateF64ConstantA(b),
                 highwayMultiplyingComplexConjugateF64ConstantA(b),
@@ -99,8 +101,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplexConjugateConstantB() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5737_FF97_705B_8207)
-        for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x5737_FF97_705B_8207)
+        for a in aInputs where !hasUnorderedNaNs(complexLanesOf: a.simd) {
             mismatches.check(
                 portMultiplyingComplexConjugateF64ConstantB(a),
                 highwayMultiplyingComplexConjugateF64ConstantB(a),
@@ -112,11 +114,11 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyAddingComplex() {
         let mismatches = Mismatches("portMultiplyAddingComplexF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1F70_9467_90D4_D8AC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1F70_9567_90D4_DA5F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x1F70_9667_90D4_DC12)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1F70_9467_90D4_D8AC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1F70_9567_90D4_DA5F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x1F70_9667_90D4_DC12)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5BD5_E1AD_45A0_6E00)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexF64(a, b, c),
                 highwayMultiplyAddingComplexF64(a, b, c),
@@ -128,9 +130,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyAddingComplexConstantA() {
         let mismatches = Mismatches("portMultiplyAddingComplexF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE1C3_9FD8_C860_F672)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE1C3_9ED8_C860_F4BF)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasUnorderedNaNs(complexLanesOf: b, c) {
+        let bInputs = Inputs.vectors(H.self, seed: 0xE1C3_9FD8_C860_F672)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE1C3_9ED8_C860_F4BF)
+        for (b, c) in everyPair(bInputs, cInputs)
+        where !hasUnorderedNaNs(complexLanesOf: b.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexF64ConstantA(b, c),
                 highwayMultiplyAddingComplexF64ConstantA(b, c),
@@ -142,9 +145,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyAddingComplexConstantB() {
         let mismatches = Mismatches("portMultiplyAddingComplexF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD8C1_E9D8_C32E_1DB0)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD8C1_EBD8_C32E_2116)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasUnorderedNaNs(complexLanesOf: a, c) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xD8C1_E9D8_C32E_1DB0)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD8C1_EBD8_C32E_2116)
+        for (a, c) in everyPair(aInputs, cInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexF64ConstantB(a, c),
                 highwayMultiplyAddingComplexF64ConstantB(a, c),
@@ -156,9 +160,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyAddingComplexConstantC() {
         let mismatches = Mismatches("portMultiplyAddingComplexF64ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD02C_D2D8_BE57_71FB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD02C_D1D8_BE57_7048)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0xD02C_D2D8_BE57_71FB)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD02C_D1D8_BE57_7048)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portMultiplyAddingComplexF64ConstantC(a, b),
                 highwayMultiplyAddingComplexF64ConstantC(a, b),
@@ -170,11 +175,11 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyAddingComplexConjugate() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x72DA_84B1_697E_49EC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x72DA_85B1_697E_4B9F)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x72DA_86B1_697E_4D52)
+        let aInputs = Inputs.vectors(H.self, seed: 0x72DA_84B1_697E_49EC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x72DA_85B1_697E_4B9F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x72DA_86B1_697E_4D52)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xF6A2_D51B_51A4_02C0)
-        where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateF64(a, b, c),
                 highwayMultiplyAddingComplexConjugateF64(a, b, c),
@@ -186,9 +191,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyAddingComplexConjugateConstantA() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8E1D_A000_5422_ECB2)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8E1D_9F00_5422_EAFF)
-        for (b, c) in everyPair(bInputs, cInputs) where !hasUnorderedNaNs(complexLanesOf: b, c) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x8E1D_A000_5422_ECB2)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8E1D_9F00_5422_EAFF)
+        for (b, c) in everyPair(bInputs, cInputs)
+        where !hasUnorderedNaNs(complexLanesOf: b.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateF64ConstantA(b, c),
                 highwayMultiplyAddingComplexConjugateF64ConstantA(b, c),
@@ -200,9 +206,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyAddingComplexConjugateConstantB() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x851B_EA00_4EF0_13F0)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x851B_EC00_4EF0_1756)
-        for (a, c) in everyPair(aInputs, cInputs) where !hasUnorderedNaNs(complexLanesOf: a, c) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x851B_EA00_4EF0_13F0)
+        let cInputs = Inputs.vectors(H.self, seed: 0x851B_EC00_4EF0_1756)
+        for (a, c) in everyPair(aInputs, cInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateF64ConstantB(a, c),
                 highwayMultiplyAddingComplexConjugateF64ConstantB(a, c),
@@ -214,9 +221,10 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyAddingComplexConjugateConstantC() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateF64ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7C86_D300_4A19_683B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7C86_D200_4A19_6688)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x7C86_D300_4A19_683B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7C86_D200_4A19_6688)
+        for (a, b) in everyPair(aInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateF64ConstantC(a, b),
                 highwayMultiplyAddingComplexConjugateF64ConstantC(a, b),
@@ -228,17 +236,17 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplexWhereOtherwise() {
         let mismatches = Mismatches("portMultiplyingComplexWhereOtherwiseF64")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF4C7_0193_86D7_7740)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF4C7_0193_86D7_7740)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF4C7_0293_86D7_78F3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF4C7_0393_86D7_7AA6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF4C7_0493_86D7_7C59)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF4C7_0393_86D7_7AA6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF4C7_0493_86D7_7C59)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
             aInputs,
             bInputs,
             seed: 0xBEEF_E502_0DEF_E13C
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portMultiplyingComplexWhereOtherwiseF64(a, b, where: mask, otherwise: otherwise),
                 highwayMultiplyingComplexWhereOtherwiseF64(a, b, where: mask, otherwise: otherwise),
@@ -250,15 +258,15 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplexWhereOtherwiseConstantA() {
         let mismatches = Mismatches("portMultiplyingComplexWhereOtherwiseF64ConstantA")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xAB4C_BC29_1128_EAE9)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xAB4C_BC29_1128_EAE9)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xAB4C_BB29_1128_E936)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAB4C_B929_1128_E5D0)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAB4C_B929_1128_E5D0)
         for (otherwise, mask, b) in mixedTriples(
             otherwiseInputs,
             maskInputs,
             bInputs,
             seed: 0xE673_34C0_858C_FBA3
-        ) where !hasUnorderedNaNs(complexLanesOf: b) {
+        ) where !hasUnorderedNaNs(complexLanesOf: b.simd) {
             mismatches.check(
                 portMultiplyingComplexWhereOtherwiseF64ConstantA(
                     b,
@@ -278,15 +286,15 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingComplexWhereOtherwiseConstantB() {
         let mismatches = Mismatches("portMultiplyingComplexWhereOtherwiseF64ConstantB")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA1DE_2529_0B99_74F4)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA1DE_2529_0B99_74F4)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA1DE_2629_0B99_76A7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA1DE_2729_0B99_785A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA1DE_2729_0B99_785A)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
             aInputs,
             seed: 0x9799_E9DC_1BA4_8AA8
-        ) where !hasUnorderedNaNs(complexLanesOf: a) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd) {
             mismatches.check(
                 portMultiplyingComplexWhereOtherwiseF64ConstantB(
                     a,
@@ -307,10 +315,10 @@ extension SIMDDoubleCodegenTests {
     @Test func multiplyingComplexWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portMultiplyingComplexWhereOtherwiseF64ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x027C_017C_5143_F67B)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x027C_027C_5143_F82E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x027C_037C_5143_F9E1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x027C_027C_5143_F82E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x027C_037C_5143_F9E1)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4679_0B85_F7EE_8EC4)
-        where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portMultiplyingComplexWhereOtherwiseF64ConstantOtherwise(a, b, where: mask),
                 highwayMultiplyingComplexWhereOtherwiseF64ConstantOtherwise(a, b, where: mask),
@@ -323,10 +331,10 @@ extension SIMDDoubleCodegenTests {
     @Test func multiplyingComplexConjugateWhere() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateWhereF64")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x979A_5025_BCBA_5696)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x979A_5125_BCBA_5849)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x979A_4E25_BCBA_5330)
+        let aInputs = Inputs.vectors(H.self, seed: 0x979A_5125_BCBA_5849)
+        let bInputs = Inputs.vectors(H.self, seed: 0x979A_4E25_BCBA_5330)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xA2E1_B711_6B72_C192)
-        where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portMultiplyingComplexConjugateWhereF64(a, b, where: mask),
                 highwayMultiplyingComplexConjugateWhereF64(a, b, where: mask),
@@ -339,8 +347,9 @@ extension SIMDDoubleCodegenTests {
     @Test func multiplyingComplexConjugateWhereConstantA() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateWhereF64ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3E23_0119_2D89_9BF7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3E23_0319_2D89_9F5D)
-        for (mask, b) in everyPair(maskInputs, bInputs) where !hasUnorderedNaNs(complexLanesOf: b) {
+        let bInputs = Inputs.vectors(H.self, seed: 0x3E23_0319_2D89_9F5D)
+        for (mask, b) in everyPair(maskInputs, bInputs)
+        where !hasUnorderedNaNs(complexLanesOf: b.simd) {
             mismatches.check(
                 portMultiplyingComplexConjugateWhereF64ConstantA(b, where: mask),
                 highwayMultiplyingComplexConjugateWhereF64ConstantA(b, where: mask),
@@ -353,8 +362,9 @@ extension SIMDDoubleCodegenTests {
     @Test func multiplyingComplexConjugateWhereConstantB() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateWhereF64ConstantB")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x57E2_6619_3C0D_D576)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x57E2_6719_3C0D_D729)
-        for (mask, a) in everyPair(maskInputs, aInputs) where !hasUnorderedNaNs(complexLanesOf: a) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x57E2_6719_3C0D_D729)
+        for (mask, a) in everyPair(maskInputs, aInputs)
+        where !hasUnorderedNaNs(complexLanesOf: a.simd) {
             mismatches.check(
                 portMultiplyingComplexConjugateWhereF64ConstantB(a, where: mask),
                 highwayMultiplyingComplexConjugateWhereF64ConstantB(a, where: mask),
@@ -367,16 +377,16 @@ extension SIMDDoubleCodegenTests {
     @Test func multiplyAddingComplexConjugateWhere() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateWhereF64")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0337_6D2A_CB6F_2B6D)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0337_6C2A_CB6F_29BA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0337_6B2A_CB6F_2807)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x0337_6A2A_CB6F_2654)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0337_6C2A_CB6F_29BA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0337_6B2A_CB6F_2807)
+        let cInputs = Inputs.vectors(H.self, seed: 0x0337_6A2A_CB6F_2654)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
             bInputs,
             cInputs,
             seed: 0x7D5D_CA40_086A_EABF
-        ) where !hasUnorderedNaNs(complexLanesOf: a, b, c) {
+        ) where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateWhereF64(a, b, c, where: mask),
                 highwayMultiplyAddingComplexConjugateWhereF64(a, b, c, where: mask),
@@ -389,10 +399,10 @@ extension SIMDDoubleCodegenTests {
     @Test func multiplyAddingComplexConjugateWhereConstantA() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateWhereF64ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8229_15CD_738F_8CBE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8229_13CD_738F_8958)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8229_14CD_738F_8B0B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8229_13CD_738F_8958)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8229_14CD_738F_8B0B)
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0x8291_BBAE_4B11_D0DA)
-        where !hasUnorderedNaNs(complexLanesOf: b, c) {
+        where !hasUnorderedNaNs(complexLanesOf: b.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateWhereF64ConstantA(b, c, where: mask),
                 highwayMultiplyAddingComplexConjugateWhereF64ConstantA(b, c, where: mask),
@@ -405,10 +415,10 @@ extension SIMDDoubleCodegenTests {
     @Test func multiplyAddingComplexConjugateWhereConstantB() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateWhereF64ConstantB")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x68D6_90CD_6567_EEBF)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x68D6_8FCD_6567_ED0C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x68D6_91CD_6567_F072)
+        let aInputs = Inputs.vectors(H.self, seed: 0x68D6_8FCD_6567_ED0C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x68D6_91CD_6567_F072)
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0xABFA_BDF9_384D_F559)
-        where !hasUnorderedNaNs(complexLanesOf: a, c) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, c.simd) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateWhereF64ConstantB(a, c, where: mask),
                 highwayMultiplyAddingComplexConjugateWhereF64ConstantB(a, c, where: mask),
@@ -421,10 +431,10 @@ extension SIMDDoubleCodegenTests {
     @Test func multiplyAddingComplexConjugateWhereConstantC() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateWhereF64ConstantC")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x716B_C7CD_6A3E_D0D4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x716B_C8CD_6A3E_D287)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x716B_C9CD_6A3E_D43A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x716B_C8CD_6A3E_D287)
+        let bInputs = Inputs.vectors(H.self, seed: 0x716B_C9CD_6A3E_D43A)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xC704_64D2_4160_BD88)
-        where !hasUnorderedNaNs(complexLanesOf: a, b) {
+        where !hasUnorderedNaNs(complexLanesOf: a.simd, b.simd) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateWhereF64ConstantC(a, b, where: mask),
                 highwayMultiplyAddingComplexConjugateWhereF64ConstantC(a, b, where: mask),

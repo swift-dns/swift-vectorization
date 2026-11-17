@@ -11,8 +11,8 @@ extension SIMDFloatCodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func zippingLowerFromFloat16() {
         let mismatches = Mismatches("portZippingLowerF16ToF32")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x0FD2_59BA_19F8_2BD9)
-        let bInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x0FD2_58BA_19F8_2A26)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x0FD2_59BA_19F8_2BD9)
+        let bInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x0FD2_58BA_19F8_2A26)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portZippingLowerF16ToF32(a, b),
@@ -27,7 +27,7 @@ extension SIMDFloatCodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func zippingLowerFromFloat16ConstantA() {
         let mismatches = Mismatches("portZippingLowerF16ToF32ConstantA")
-        let bInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x3A2A_8A4F_D127_C30D)
+        let bInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x3A2A_8A4F_D127_C30D)
         for b in bInputs {
             mismatches.check(
                 portZippingLowerF16ToF32ConstantA(b),
@@ -42,7 +42,7 @@ extension SIMDFloatCodegenTests {
     #if !((os(macOS) || targetEnvironment(macCatalyst)) && arch(x86_64))
     @Test func zippingLowerFromFloat16ConstantB() {
         let mismatches = Mismatches("portZippingLowerF16ToF32ConstantB")
-        let aInputs = Inputs.conversions(SIMDFloat16.Vector.self, seed: 0x1F25_044F_C18E_8EDB)
+        let aInputs = Inputs.conversions(SIMD<Float16>.self, seed: 0x1F25_044F_C18E_8EDB)
         for a in aInputs {
             mismatches.check(
                 portZippingLowerF16ToF32ConstantB(a),

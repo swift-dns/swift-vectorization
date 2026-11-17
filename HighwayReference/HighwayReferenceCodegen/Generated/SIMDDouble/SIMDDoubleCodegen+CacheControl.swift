@@ -6,7 +6,7 @@ public import Vectorization
 extension HighwayReferenceDouble {
     @available(SwiftStdlib 5.1, *)
     @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         precondition(
             span.withUnsafeBufferPointer {
@@ -19,7 +19,7 @@ extension HighwayReferenceDouble {
 
     @available(SwiftStdlib 5.1, *)
     @unsafe @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         assert(
             span.withUnsafeBufferPointer {
@@ -28,32 +28,34 @@ extension HighwayReferenceDouble {
             "Span does not start at an address aligned to the vector size"
         )
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.Nothrow.storeStreamingF64(a, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeStreamingF64(
+                a.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 
 }
 
 @inline(never)
-public func portStoreStreamingF64(_ a: SIMDDouble.Vector, to: UnsafeMutablePointer<SIMDDouble.Lane>)
-{
-    unsafe SIMDDouble.storeStreaming(a, to: to)
+public func portStoreStreamingF64(_ a: SIMD<Double>, to: UnsafeMutablePointer<Double>) {
+    unsafe SIMD<Double>.storeStreaming(a, to: to)
 }
 
 @inline(never)
-public func highwayStoreStreamingF64(_ a: SIMDDouble.Vector, to: UnsafeMutablePointer<Double>) {
-    unsafe HighwayReference.Nothrow.storeStreamingF64(a, to)
+public func highwayStoreStreamingF64(_ a: SIMD<Double>, to: UnsafeMutablePointer<Double>) {
+    unsafe HighwayReference.Nothrow.storeStreamingF64(a.raw, to)
 }
 
 @inline(never)
-public func portStoreStreamingF64ConstantA(to: UnsafeMutablePointer<SIMDDouble.Lane>) {
-    unsafe SIMDDouble.storeStreaming(SIMDDouble.repeating(1.5), to: to)
+public func portStoreStreamingF64ConstantA(to: UnsafeMutablePointer<Double>) {
+    unsafe SIMD<Double>.storeStreaming(SIMD<Double>.repeating(1.5), to: to)
 }
 
 @inline(never)
 public func highwayStoreStreamingF64ConstantA(to: UnsafeMutablePointer<Double>) {
     unsafe HighwayReference.Nothrow.storeStreamingF64(
-        HighwayReference.Nothrow.repeatingF64(1.5),
+        SIMD<Double>(raw: HighwayReference.Nothrow.repeatingF64(1.5)).raw,
         to
     )
 }

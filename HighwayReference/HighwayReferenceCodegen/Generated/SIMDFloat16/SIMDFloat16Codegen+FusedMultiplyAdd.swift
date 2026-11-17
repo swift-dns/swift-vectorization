@@ -6,469 +6,535 @@ public import Vectorization
 
 @inline(never)
 public func portMultiplyAddingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingF16(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.multiplyAddingF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portMultiplyAddingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+public func portMultiplyAddingF16ConstantA(_ b: SIMD<Float16>, _ c: SIMD<Float16>) -> SIMD<Float16>
+{
+    SIMD<Float16>.multiplyAdding(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
-public func portMultiplyAddingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
+public func portMultiplyAddingF16ConstantB(_ a: SIMD<Float16>, _ c: SIMD<Float16>) -> SIMD<Float16>
+{
+    SIMD<Float16>.multiplyAdding(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
-public func portMultiplyAddingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAdding(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portMultiplyAddingF16ConstantC(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16>
+{
+    SIMD<Float16>.multiplyAdding(a, b, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMultiplyAddingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingF16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingF16(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.negatedMultiplyAddingF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplyAdding(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplyAdding(a, b, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplyAddingF16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplyAddingF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingF16(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.multiplySubtractingF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplySubtractingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtracting(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtracting(a, b, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMultiplySubtractingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingF16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingF16(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.negatedMultiplySubtractingF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.negatedMultiplySubtracting(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.negatedMultiplySubtracting(a, b, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.negatedMultiplySubtractingF16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.negatedMultiplySubtractingF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingSubtracting(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingSubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingSubtractingF16(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.multiplyAddingSubtractingF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingSubtracting(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingSubtracting(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingSubtractingF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingSubtractingF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingSubtracting(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingSubtracting(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingSubtractingF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingSubtractingF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingSubtracting(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingSubtracting(a, b, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingSubtractingF16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingSubtractingF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtractingAdding(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtractingAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingAddingF16(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.multiplySubtractingAddingF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtractingAdding(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtractingAdding(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingAddingF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingAddingF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtractingAdding(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtractingAdding(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingAddingF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingAddingF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplySubtractingAdding(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplySubtractingAdding(a, b, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplySubtractingAddingF16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplySubtractingAddingF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif

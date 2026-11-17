@@ -7,16 +7,26 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkMultiplySubtractingAddingConstantA(_ value: H.Lane) {
+    private func checkMultiplySubtractingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3544_049B_9FBE_7AAB)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x3544_059B_9FBE_7C5E)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x3544_049B_9FBE_7AAB)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3544_059B_9FBE_7C5E)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (b, c) in everyPair(bInputs, cInputs)
-        where !hasUnorderedNaNs(multiplying: H.repeating(value), b, adding: c) {
+        where !hasUnorderedNaNs(multiplying: H.repeating(value).simd, b.simd, adding: c.simd) {
             mismatches.check(
                 H.multiplySubtractingAdding(H.repeating(value), b, c),
-                HighwayReference.multiplySubtractingAddingF32(H.repeating(value), b, c),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingF32(
+                        H.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
+                ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -24,16 +34,26 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingAddingConstantB(_ value: H.Lane) {
+    private func checkMultiplySubtractingAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3EB2_BA9B_A54E_254D)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x3EB2_B89B_A54E_21E7)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x3EB2_BA9B_A54E_254D)
+        let cInputs = Inputs.vectors(H.self, seed: 0x3EB2_B89B_A54E_21E7)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (a, c) in everyPair(aInputs, cInputs)
-        where !hasUnorderedNaNs(multiplying: a, H.repeating(value), adding: c) {
+        where !hasUnorderedNaNs(multiplying: a.simd, H.repeating(value).simd, adding: c.simd) {
             mismatches.check(
                 H.multiplySubtractingAdding(a, H.repeating(value), c),
-                HighwayReference.multiplySubtractingAddingF32(a, H.repeating(value), c),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingF32(
+                        a.raw,
+                        H.repeating(value).raw,
+                        c.raw
+                    )
+                ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -41,16 +61,26 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingAddingConstantC(_ value: H.Lane) {
+    private func checkMultiplySubtractingAddingConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtractingAdding with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4747_D19B_AA24_D102)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4747_D29B_AA24_D2B5)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x4747_D19B_AA24_D102)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4747_D29B_AA24_D2B5)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (a, b) in everyPair(aInputs, bInputs)
-        where !hasUnorderedNaNs(multiplying: a, b, adding: H.repeating(value)) {
+        where !hasUnorderedNaNs(multiplying: a.simd, b.simd, adding: H.repeating(value).simd) {
             mismatches.check(
                 H.multiplySubtractingAdding(a, b, H.repeating(value)),
-                HighwayReference.multiplySubtractingAddingF32(a, b, H.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplySubtractingAddingF32(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -272,9 +302,9 @@ extension SIMDFloatConstantTests {
             "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
             isIntermittent: true
         ) {
-            checkMultiplySubtractingAddingConstantA(H.Lane(nan: 1, signaling: false))
-            checkMultiplySubtractingAddingConstantB(H.Lane(nan: 1, signaling: false))
-            checkMultiplySubtractingAddingConstantC(H.Lane(nan: 1, signaling: false))
+            checkMultiplySubtractingAddingConstantA(Lane(nan: 1, signaling: false))
+            checkMultiplySubtractingAddingConstantB(Lane(nan: 1, signaling: false))
+            checkMultiplySubtractingAddingConstantC(Lane(nan: 1, signaling: false))
         } when: {
             isAmd64 && !isDarwin
                 && (SIMDTarget.targetName == "AVX2" || SIMDTarget.targetName.hasPrefix("AVX3"))
@@ -343,25 +373,30 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingEvenFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkMultiplyAddingEvenFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches("multiplyAddingEvenFromBFloat16 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0xE93F_5781_2C20_1DA0)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xE93F_5A81_2C20_22B9)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0xE93F_5781_2C20_1DA0)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE93F_5A81_2C20_22B9)
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs)
-        where !hasUnorderedNaNs(widening: SIMDBFloat16.repeating(value), b, parity: 0, adding: c)
-            && !hasFoldedNaNs(multiplier: value, b, parity: 0)
-        {
+        where !hasUnorderedNaNs(
+            widening: SIMD<BFloat16>.repeating(value),
+            b,
+            parity: 0,
+            adding: c.simd
+        ) && !hasFoldedNaNs(multiplier: value, b, parity: 0) {
             mismatches.check(
-                H.multiplyAddingEven(SIMDBFloat16.repeating(value), b, c),
-                HighwayReference.multiplyAddingEvenBF16ToF32(
-                    SIMDBFloat16.repeating(value).raw,
-                    b.raw,
-                    c
+                H.multiplyAddingEven(SIMD<BFloat16>.repeating(value), b, c),
+                H(
+                    raw: HighwayReference.multiplyAddingEvenBF16ToF32(
+                        SIMD<BFloat16>.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
@@ -370,25 +405,30 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingEvenFromBFloat16ConstantB(_ value: SIMDBFloat16.Lane) {
+    private func checkMultiplyAddingEvenFromBFloat16ConstantB(_ value: BFloat16) {
         let mismatches = Mismatches("multiplyAddingEvenFromBFloat16 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x02FE_5D81_3AA3_B5B2)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x02FE_5B81_3AA3_B24C)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x02FE_5D81_3AA3_B5B2)
+        let cInputs = Inputs.vectors(H.self, seed: 0x02FE_5B81_3AA3_B24C)
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs)
-        where !hasUnorderedNaNs(widening: a, SIMDBFloat16.repeating(value), parity: 0, adding: c)
-            && !hasFoldedNaNs(multiplier: value, a, parity: 0)
-        {
+        where !hasUnorderedNaNs(
+            widening: a,
+            SIMD<BFloat16>.repeating(value),
+            parity: 0,
+            adding: c.simd
+        ) && !hasFoldedNaNs(multiplier: value, a, parity: 0) {
             mismatches.check(
-                H.multiplyAddingEven(a, SIMDBFloat16.repeating(value), c),
-                HighwayReference.multiplyAddingEvenBF16ToF32(
-                    a.raw,
-                    SIMDBFloat16.repeating(value).raw,
-                    c
+                H.multiplyAddingEven(a, SIMD<BFloat16>.repeating(value), c),
+                H(
+                    raw: HighwayReference.multiplyAddingEvenBF16ToF32(
+                        a.raw,
+                        SIMD<BFloat16>.repeating(value).raw,
+                        c.raw
+                    )
                 ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
@@ -397,16 +437,26 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingEvenFromBFloat16ConstantC(_ value: H.Lane) {
+    private func checkMultiplyAddingEvenFromBFloat16ConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingEvenFromBFloat16 with c repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0xF98F_C681_3514_3FBD)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0xF98F_C581_3514_3E0A)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0xF98F_C681_3514_3FBD)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0xF98F_C581_3514_3E0A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (a, b) in everyPair(aInputs, bInputs)
-        where !hasUnorderedNaNs(widening: a, b, parity: 0, adding: H.repeating(value)) {
+        where !hasUnorderedNaNs(widening: a, b, parity: 0, adding: H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyAddingEven(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingEvenBF16ToF32(a.raw, b.raw, H.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyAddingEvenBF16ToF32(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -414,98 +464,98 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatZero() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatNegativeZero() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatOne() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatMinusOne() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatTwo() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatHalf() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatFour() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatQuarter() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatOnePointFive() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatInfinity() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatMinusInfinity() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatNaN() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatMinusNaN() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatPayloadNaN() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatSignalingNaN() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatLeastNonzero() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSplatGreatest() {
-        checkMultiplyAddingEvenFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
-        checkMultiplyAddingEvenFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkMultiplyAddingEvenFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
+        checkMultiplyAddingEvenFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F7F))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSIMDFloatSplatZero() {
@@ -565,7 +615,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSIMDFloatSplatPayloadNaN() {
-        checkMultiplyAddingEvenFromBFloat16ConstantC(H.Lane(nan: 1, signaling: false))
+        checkMultiplyAddingEvenFromBFloat16ConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyAddingEvenFromBFloat16ConstantSIMDFloatSplatSignalingNaN() {
@@ -585,25 +635,30 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingOddFromBFloat16ConstantA(_ value: SIMDBFloat16.Lane) {
+    private func checkMultiplyAddingOddFromBFloat16ConstantA(_ value: BFloat16) {
         let mismatches = Mismatches("multiplyAddingOddFromBFloat16 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x7268_4385_0BC4_AAFF)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7268_4485_0BC4_ACB2)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x7268_4385_0BC4_AAFF)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7268_4485_0BC4_ACB2)
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs)
-        where !hasUnorderedNaNs(widening: SIMDBFloat16.repeating(value), b, parity: 1, adding: c)
-            && !hasFoldedNaNs(multiplier: value, b, parity: 1)
-        {
+        where !hasUnorderedNaNs(
+            widening: SIMD<BFloat16>.repeating(value),
+            b,
+            parity: 1,
+            adding: c.simd
+        ) && !hasFoldedNaNs(multiplier: value, b, parity: 1) {
             mismatches.check(
-                H.multiplyAddingOdd(SIMDBFloat16.repeating(value), b, c),
-                HighwayReference.multiplyAddingOddBF16ToF32(
-                    SIMDBFloat16.repeating(value).raw,
-                    b.raw,
-                    c
+                H.multiplyAddingOdd(SIMD<BFloat16>.repeating(value), b, c),
+                H(
+                    raw: HighwayReference.multiplyAddingOddBF16ToF32(
+                        SIMD<BFloat16>.repeating(value).raw,
+                        b.raw,
+                        c.raw
+                    )
                 ),
                 "b: \(describe(b)), c: \(describe(c))"
             )
@@ -612,25 +667,30 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingOddFromBFloat16ConstantB(_ value: SIMDBFloat16.Lane) {
+    private func checkMultiplyAddingOddFromBFloat16ConstantB(_ value: BFloat16) {
         let mismatches = Mismatches("multiplyAddingOddFromBFloat16 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x7AFD_7985_109B_8B61)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7AFD_7785_109B_87FB)
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x7AFD_7985_109B_8B61)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7AFD_7785_109B_87FB)
         mismatches.check(
-            SIMDBFloat16.repeating(value),
-            SIMDBFloat16.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            SIMD<BFloat16>.repeating(value),
+            SIMD<BFloat16>(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs)
-        where !hasUnorderedNaNs(widening: a, SIMDBFloat16.repeating(value), parity: 1, adding: c)
-            && !hasFoldedNaNs(multiplier: value, a, parity: 1)
-        {
+        where !hasUnorderedNaNs(
+            widening: a,
+            SIMD<BFloat16>.repeating(value),
+            parity: 1,
+            adding: c.simd
+        ) && !hasFoldedNaNs(multiplier: value, a, parity: 1) {
             mismatches.check(
-                H.multiplyAddingOdd(a, SIMDBFloat16.repeating(value), c),
-                HighwayReference.multiplyAddingOddBF16ToF32(
-                    a.raw,
-                    SIMDBFloat16.repeating(value).raw,
-                    c
+                H.multiplyAddingOdd(a, SIMD<BFloat16>.repeating(value), c),
+                H(
+                    raw: HighwayReference.multiplyAddingOddBF16ToF32(
+                        a.raw,
+                        SIMD<BFloat16>.repeating(value).raw,
+                        c.raw
+                    )
                 ),
                 "a: \(describe(a)), c: \(describe(c))"
             )
@@ -639,16 +699,26 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyAddingOddFromBFloat16ConstantC(_ value: H.Lane) {
+    private func checkMultiplyAddingOddFromBFloat16ConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplyAddingOddFromBFloat16 with c repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x82B9_1085_14B9_6CD6)
-        let bInputs = Inputs.conversions(SIMDBFloat16.Vector.self, seed: 0x82B9_1185_14B9_6E89)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x82B9_1085_14B9_6CD6)
+        let bInputs = Inputs.conversions(SIMD<BFloat16>.self, seed: 0x82B9_1185_14B9_6E89)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (a, b) in everyPair(aInputs, bInputs)
-        where !hasUnorderedNaNs(widening: a, b, parity: 1, adding: H.repeating(value)) {
+        where !hasUnorderedNaNs(widening: a, b, parity: 1, adding: H.repeating(value).simd) {
             mismatches.check(
                 H.multiplyAddingOdd(a, b, H.repeating(value)),
-                HighwayReference.multiplyAddingOddBF16ToF32(a.raw, b.raw, H.repeating(value)),
+                H(
+                    raw: HighwayReference.multiplyAddingOddBF16ToF32(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -656,98 +726,98 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatZero() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0000))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x0000))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x0000))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x0000))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatNegativeZero() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x8000))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x8000))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x8000))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x8000))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatOne() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F80))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3F80))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F80))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x3F80))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatMinusOne() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xBF80))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xBF80))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xBF80))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0xBF80))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatTwo() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4000))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x4000))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x4000))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x4000))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatHalf() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3F00))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3F00))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x3F00))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x3F00))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatFour() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x4080))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x4080))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x4080))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x4080))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatQuarter() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3E80))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3E80))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x3E80))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x3E80))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatOnePointFive() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x3FC0))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x3FC0))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x3FC0))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatMinusTwoPointFive() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xC020))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xC020))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xC020))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0xC020))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatInfinity() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F80))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F80))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F80))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F80))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatMinusInfinity() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF80))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFF80))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF80))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0xFF80))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatNaN() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7FC0))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC0))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x7FC0))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatMinusNaN() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFFC0))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xFFC0))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0xFFC0))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatPayloadNaN() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7FC1))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7FC1))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x7FC1))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatSignalingNaN() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F81))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F81))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F81))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F81))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatMinusSignalingNaN() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0xFF81))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0xFF81))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0xFF81))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0xFF81))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatLeastNonzero() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x0001))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x0001))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x0001))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x0001))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSplatGreatest() {
-        checkMultiplyAddingOddFromBFloat16ConstantA(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
-        checkMultiplyAddingOddFromBFloat16ConstantB(SIMDBFloat16.Lane(bitPattern: 0x7F7F))
+        checkMultiplyAddingOddFromBFloat16ConstantA(BFloat16(bitPattern: 0x7F7F))
+        checkMultiplyAddingOddFromBFloat16ConstantB(BFloat16(bitPattern: 0x7F7F))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSIMDFloatSplatZero() {
@@ -807,7 +877,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSIMDFloatSplatPayloadNaN() {
-        checkMultiplyAddingOddFromBFloat16ConstantC(H.Lane(nan: 1, signaling: false))
+        checkMultiplyAddingOddFromBFloat16ConstantC(Lane(nan: 1, signaling: false))
     }
 
     @Test func multiplyAddingOddFromBFloat16ConstantSIMDFloatSplatSignalingNaN() {

@@ -8,18 +8,18 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkExpandedConstantA(_ value: H.Lane) {
+    private func checkExpandedConstantA(_ value: Lane) {
         let mismatches = Mismatches("expanded with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF8A7_EED5_CA01_1B77)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
                 H.expanded(H.repeating(value), where: mask),
-                HighwayReference.expandedF16(H.repeating(value), mask.raw),
+                H(raw: HighwayReference.expandedF16(H.repeating(value).raw, mask.raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func expandedConstantSplatPayloadNaN() {
-        checkExpandedConstantA(H.Lane(nan: 1, signaling: false))
+        checkExpandedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func expandedConstantSplatSignalingNaN() {
@@ -103,19 +103,15 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLoadExpandedWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkLoadExpandedWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "loadExpandedWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC947_6DE8_E1FC_FAA3)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xC947_6EE8_E1FC_FC56
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC947_6EE8_E1FC_FC56)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, from) in everyPair(maskInputs, fromInputs) {
@@ -126,10 +122,12 @@ extension SIMDFloat16ConstantTests {
                         where: mask,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe HighwayReference.loadExpandedWhereOtherwiseF16(
-                        H.repeating(value),
-                        mask.raw,
-                        source.baseAddress!
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereOtherwiseF16(
+                            H.repeating(value).raw,
+                            mask.raw,
+                            source.baseAddress!
+                        )
                     )
                 )
             }
@@ -199,7 +197,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func loadExpandedWhereOtherwiseConstantSplatPayloadNaN() {
-        checkLoadExpandedWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
+        checkLoadExpandedWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
     }
 
     @Test func loadExpandedWhereOtherwiseConstantSplatSignalingNaN() {

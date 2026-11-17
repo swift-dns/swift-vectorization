@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDUInt32CodegenTests {
     @Test func noneAbove() {
         let mismatches = Mismatches("portNoneAboveU32")
-        let vInputs = Inputs.vectors(H.Vector.self, seed: 0xEFE1_8B50_3235_FEC6)
+        let vInputs = Inputs.vectors(H.self, seed: 0xEFE1_8B50_3235_FEC6)
         for v in vInputs {
             mismatches.check(portNoneAboveU32(v), highwayNoneAboveU32(v), "v: \(describe(v))")
         }
@@ -19,12 +19,12 @@ extension SIMDUInt32CodegenTests {
     @Test func smallestAtLeast() {
         let mismatches = Mismatches("portSmallestAtLeastU32")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x0CA1_8659_45D7_86B8
         )
         let countInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let nInputs = Inputs.lanes(H.Lane.self, seed: 0x0CA1_8859_45D7_8A1E)
+        let nInputs = Inputs.lanes(Lane.self, seed: 0x0CA1_8859_45D7_8A1E)
         for (from, count, n) in mixedTriples(
             fromInputs,
             countInputs,
@@ -57,12 +57,12 @@ extension SIMDUInt32CodegenTests {
     @Test func smallestAtLeastBeforeGuardPage() {
         let mismatches = Mismatches("portSmallestAtLeastU32 before a guard page")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x0024_98ED_5DAA_BFD1
         )
         let countInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let nInputs = Inputs.lanes(H.Lane.self, seed: 0x0024_96ED_5DAA_BC6B)
+        let nInputs = Inputs.lanes(Lane.self, seed: 0x0024_96ED_5DAA_BC6B)
         for (from, count, n) in mixedTriples(
             fromInputs,
             countInputs,
@@ -88,12 +88,12 @@ extension SIMDUInt32CodegenTests {
     @Test func smallestAtLeastSpan() {
         let mismatches = Mismatches("portSmallestAtLeastSpanU32")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x144C_53DE_4DA1_758F
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let nInputs = Inputs.lanes(H.Lane.self, seed: 0x144C_52DE_4DA1_73DC)
+        let nInputs = Inputs.lanes(Lane.self, seed: 0x144C_52DE_4DA1_73DC)
         for (values, valuesCount, n) in mixedTriples(
             valuesInputs,
             valuesCountInputs,
@@ -131,12 +131,12 @@ extension SIMDUInt32CodegenTests {
     @Test func sumAboveSpan() {
         let mismatches = Mismatches("portSumAboveSpanU32")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x9C39_67EF_8602_806A
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x9C39_68EF_8602_821D)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0x9C39_68EF_8602_821D)
         for (values, valuesCount, t) in mixedTriples(
             valuesInputs,
             valuesCountInputs,
@@ -156,18 +156,18 @@ extension SIMDUInt32CodegenTests {
     @Test func countEqualAboveSpan() {
         let mismatches = Mismatches("portCountEqualAboveSpanU32")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x5F2B_687F_FE4A_0F54
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
         let othersInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x5F2B_6A7F_FE4A_12BA
         )
         let othersCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x5F2B_697F_FE4A_1107)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0x5F2B_697F_FE4A_1107)
         for (values, valuesCount, others, othersCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,
@@ -198,18 +198,18 @@ extension SIMDUInt32CodegenTests {
     @Test func clampAboveSpan() {
         let mismatches = Mismatches("portClampAboveSpanU32")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0xCFE8_4CE0_1AE7_CCBE
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
         let outputInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0xCFE8_4AE0_1AE7_C958
         )
         let outputCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0xCFE8_4DE0_1AE7_CE71)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0xCFE8_4DE0_1AE7_CE71)
         for (values, valuesCount, output, outputCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,
@@ -245,18 +245,18 @@ extension SIMDUInt32CodegenTests {
     @Test func selectBelowSpan() {
         let mismatches = Mismatches("portSelectBelowSpanU32")
         let valuesInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x4E20_AA24_8DBE_B3C7
         )
         let valuesCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
         let outputInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount + 1,
             seed: 0x4E20_AC24_8DBE_B72D
         )
         let outputCountInputs = Inputs.counts(through: 3 * H.laneCount + 1)
-        let tInputs = Inputs.lanes(H.Lane.self, seed: 0x4E20_A924_8DBE_B214)
+        let tInputs = Inputs.lanes(Lane.self, seed: 0x4E20_A924_8DBE_B214)
         for (values, valuesCount, output, outputCount, t) in mixedQuintuples(
             valuesInputs,
             valuesCountInputs,

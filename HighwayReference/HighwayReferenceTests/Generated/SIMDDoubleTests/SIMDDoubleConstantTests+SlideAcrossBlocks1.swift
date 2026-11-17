@@ -9,11 +9,11 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkSlideUpLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE1BA_CBA0_80C0_0819)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE1BA_CBA0_80C0_0819)
         for a in aInputs {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes),
-                HighwayReference.slideUpLanesF64(a, lanes),
+                H(raw: HighwayReference.slideUpLanesF64(a.raw, lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -53,14 +53,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideUpLanesConstantA(_ value: H.Lane) {
+    private func checkSlideUpLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("slideUpLanes with a repeating \(hex(value))")
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for lanes in lanesInputs {
             mismatches.check(
                 H.slideUpLanes(H.repeating(value), by: lanes),
-                HighwayReference.slideUpLanesF64(H.repeating(value), lanes),
+                H(raw: HighwayReference.slideUpLanesF64(H.repeating(value).raw, lanes)),
                 "lanes: \(lanes)"
             )
         }
@@ -124,7 +128,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func slideUpLanesConstantSplatPayloadNaN() {
-        checkSlideUpLanesConstantA(H.Lane(nan: 1, signaling: false))
+        checkSlideUpLanesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func slideUpLanesConstantSplatSignalingNaN() {
@@ -146,12 +150,12 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkSlideUpLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideUpLanesFillingWith with lanes \(lanes)")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xFDFD_5269_8EC7_27C2)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFDFD_5369_8EC7_2975)
+        let fillInputs = Inputs.vectors(H.self, seed: 0xFDFD_5269_8EC7_27C2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFDFD_5369_8EC7_2975)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: fill),
-                HighwayReference.slideUpLanesFillingWithF64(fill, a, lanes),
+                H(raw: HighwayReference.slideUpLanesFillingWithF64(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a))"
             )
         }
@@ -191,15 +195,25 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideUpLanesFillingWithConstantFill(_ value: H.Lane) {
+    private func checkSlideUpLanesFillingWithConstantFill(_ value: Lane) {
         let mismatches = Mismatches("slideUpLanesFillingWith with fill repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7D5E_8332_65FE_003F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7D5E_8332_65FE_003F)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(a, by: lanes, fillingWith: H.repeating(value)),
-                HighwayReference.slideUpLanesFillingWithF64(H.repeating(value), a, lanes),
+                H(
+                    raw: HighwayReference.slideUpLanesFillingWithF64(
+                        H.repeating(value).raw,
+                        a.raw,
+                        lanes
+                    )
+                ),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -207,15 +221,25 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideUpLanesFillingWithConstantA(_ value: H.Lane) {
+    private func checkSlideUpLanesFillingWithConstantA(_ value: Lane) {
         let mismatches = Mismatches("slideUpLanesFillingWith with a repeating \(hex(value))")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0xB8DF_5CF3_C269_E722)
+        let fillInputs = Inputs.vectors(H.self, seed: 0xB8DF_5CF3_C269_E722)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
                 H.slideUpLanes(H.repeating(value), by: lanes, fillingWith: fill),
-                HighwayReference.slideUpLanesFillingWithF64(fill, H.repeating(value), lanes),
+                H(
+                    raw: HighwayReference.slideUpLanesFillingWithF64(
+                        fill.raw,
+                        H.repeating(value).raw,
+                        lanes
+                    )
+                ),
                 "fill: \(describe(fill)), lanes: \(lanes)"
             )
         }
@@ -293,8 +317,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func slideUpLanesFillingWithConstantSplatPayloadNaN() {
-        checkSlideUpLanesFillingWithConstantFill(H.Lane(nan: 1, signaling: false))
-        checkSlideUpLanesFillingWithConstantA(H.Lane(nan: 1, signaling: false))
+        checkSlideUpLanesFillingWithConstantFill(Lane(nan: 1, signaling: false))
+        checkSlideUpLanesFillingWithConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func slideUpLanesFillingWithConstantSplatSignalingNaN() {
@@ -320,11 +344,11 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkSlideDownLanesConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideDownLanes with lanes \(lanes)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE378_592D_79D2_F530)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE378_592D_79D2_F530)
         for a in aInputs {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes),
-                HighwayReference.slideDownLanesF64(a, lanes),
+                H(raw: HighwayReference.slideDownLanesF64(a.raw, lanes)),
                 "a: \(describe(a))"
             )
         }
@@ -364,14 +388,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideDownLanesConstantA(_ value: H.Lane) {
+    private func checkSlideDownLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("slideDownLanes with a repeating \(hex(value))")
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for lanes in lanesInputs {
             mismatches.check(
                 H.slideDownLanes(H.repeating(value), by: lanes),
-                HighwayReference.slideDownLanesF64(H.repeating(value), lanes),
+                H(raw: HighwayReference.slideDownLanesF64(H.repeating(value).raw, lanes)),
                 "lanes: \(lanes)"
             )
         }
@@ -435,7 +463,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func slideDownLanesConstantSplatPayloadNaN() {
-        checkSlideDownLanesConstantA(H.Lane(nan: 1, signaling: false))
+        checkSlideDownLanesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func slideDownLanesConstantSplatSignalingNaN() {
@@ -457,12 +485,12 @@ extension SIMDDoubleConstantTests {
     @inline(__always)
     private func checkSlideDownLanesFillingWithConstantLanes(_ lanes: Int) {
         let mismatches = Mismatches("slideDownLanesFillingWith with lanes \(lanes)")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x3AAB_C72C_35AE_74F9)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3AAB_C62C_35AE_7346)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x3AAB_C72C_35AE_74F9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3AAB_C62C_35AE_7346)
         for (fill, a) in everyPair(fillInputs, aInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: fill),
-                HighwayReference.slideDownLanesFillingWithF64(fill, a, lanes),
+                H(raw: HighwayReference.slideDownLanesFillingWithF64(fill.raw, a.raw, lanes)),
                 "fill: \(describe(fill)), a: \(describe(a))"
             )
         }
@@ -502,15 +530,25 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideDownLanesFillingWithConstantFill(_ value: H.Lane) {
+    private func checkSlideDownLanesFillingWithConstantFill(_ value: Lane) {
         let mismatches = Mismatches("slideDownLanesFillingWith with fill repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF365_B099_4E33_107A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF365_B099_4E33_107A)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(a, by: lanes, fillingWith: H.repeating(value)),
-                HighwayReference.slideDownLanesFillingWithF64(H.repeating(value), a, lanes),
+                H(
+                    raw: HighwayReference.slideDownLanesFillingWithF64(
+                        H.repeating(value).raw,
+                        a.raw,
+                        lanes
+                    )
+                ),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -518,15 +556,25 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlideDownLanesFillingWithConstantA(_ value: H.Lane) {
+    private func checkSlideDownLanesFillingWithConstantA(_ value: Lane) {
         let mismatches = Mismatches("slideDownLanesFillingWith with a repeating \(hex(value))")
-        let fillInputs = Inputs.vectors(H.Vector.self, seed: 0x1654_C3A1_9DE2_8759)
+        let fillInputs = Inputs.vectors(H.self, seed: 0x1654_C3A1_9DE2_8759)
         let lanesInputs = Inputs.laneAmounts(lanes: H.laneCount, inContract: true)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for (fill, lanes) in everyPair(fillInputs, lanesInputs) {
             mismatches.check(
                 H.slideDownLanes(H.repeating(value), by: lanes, fillingWith: fill),
-                HighwayReference.slideDownLanesFillingWithF64(fill, H.repeating(value), lanes),
+                H(
+                    raw: HighwayReference.slideDownLanesFillingWithF64(
+                        fill.raw,
+                        H.repeating(value).raw,
+                        lanes
+                    )
+                ),
                 "fill: \(describe(fill)), lanes: \(lanes)"
             )
         }
@@ -604,8 +652,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func slideDownLanesFillingWithConstantSplatPayloadNaN() {
-        checkSlideDownLanesFillingWithConstantFill(H.Lane(nan: 1, signaling: false))
-        checkSlideDownLanesFillingWithConstantA(H.Lane(nan: 1, signaling: false))
+        checkSlideDownLanesFillingWithConstantFill(Lane(nan: 1, signaling: false))
+        checkSlideDownLanesFillingWithConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func slideDownLanesFillingWithConstantSplatSignalingNaN() {
@@ -629,12 +677,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlide1UpConstantA(_ value: H.Lane) {
+    private func checkSlide1UpConstantA(_ value: Lane) {
         let mismatches = Mismatches("slide1Up with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.slide1Up(H.repeating(value)),
-            HighwayReference.slide1UpF64(H.repeating(value)),
+            H(raw: HighwayReference.slide1UpF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -697,7 +749,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func slide1UpConstantSplatPayloadNaN() {
-        checkSlide1UpConstantA(H.Lane(nan: 1, signaling: false))
+        checkSlide1UpConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func slide1UpConstantSplatSignalingNaN() {
@@ -717,14 +769,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlide1UpFillingWithConstantA(_ value: H.Lane) {
+    private func checkSlide1UpFillingWithConstantA(_ value: Lane) {
         let mismatches = Mismatches("slide1UpFillingWith with a repeating \(hex(value))")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0x4922_AA5D_0668_B128)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0x4922_AA5D_0668_B128)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for fill in fillInputs {
             mismatches.check(
                 H.slide1Up(H.repeating(value), fillingWith: fill),
-                HighwayReference.slide1UpFillingWithF64(fill, H.repeating(value)),
+                H(raw: HighwayReference.slide1UpFillingWithF64(fill, H.repeating(value).raw)),
                 "fill: \(hex(fill))"
             )
         }
@@ -788,7 +844,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func slide1UpFillingWithConstantSplatPayloadNaN() {
-        checkSlide1UpFillingWithConstantA(H.Lane(nan: 1, signaling: false))
+        checkSlide1UpFillingWithConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func slide1UpFillingWithConstantSplatSignalingNaN() {
@@ -808,12 +864,16 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlide1DownConstantA(_ value: H.Lane) {
+    private func checkSlide1DownConstantA(_ value: Lane) {
         let mismatches = Mismatches("slide1Down with a repeating \(hex(value))")
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         mismatches.check(
             H.slide1Down(H.repeating(value)),
-            HighwayReference.slide1DownF64(H.repeating(value)),
+            H(raw: HighwayReference.slide1DownF64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -876,7 +936,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func slide1DownConstantSplatPayloadNaN() {
-        checkSlide1DownConstantA(H.Lane(nan: 1, signaling: false))
+        checkSlide1DownConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func slide1DownConstantSplatSignalingNaN() {
@@ -896,14 +956,18 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkSlide1DownFillingWithConstantA(_ value: H.Lane) {
+    private func checkSlide1DownFillingWithConstantA(_ value: Lane) {
         let mismatches = Mismatches("slide1DownFillingWith with a repeating \(hex(value))")
-        let fillInputs = Inputs.lanes(H.Lane.self, seed: 0xB8EE_2C84_E00F_D17D)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        let fillInputs = Inputs.lanes(Lane.self, seed: 0xB8EE_2C84_E00F_D17D)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for fill in fillInputs {
             mismatches.check(
                 H.slide1Down(H.repeating(value), fillingWith: fill),
-                HighwayReference.slide1DownFillingWithF64(fill, H.repeating(value)),
+                H(raw: HighwayReference.slide1DownFillingWithF64(fill, H.repeating(value).raw)),
                 "fill: \(hex(fill))"
             )
         }
@@ -967,7 +1031,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func slide1DownFillingWithConstantSplatPayloadNaN() {
-        checkSlide1DownFillingWithConstantA(H.Lane(nan: 1, signaling: false))
+        checkSlide1DownFillingWithConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func slide1DownFillingWithConstantSplatSignalingNaN() {

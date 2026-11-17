@@ -18,7 +18,9 @@ extension SIMDDoubleConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe HighwayReference.loadFirstWideningU32ToF64(source.baseAddress!, count)
+                    unsafe H(
+                        raw: HighwayReference.loadFirstWideningU32ToF64(source.baseAddress!, count)
+                    )
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -109,9 +111,11 @@ extension SIMDDoubleConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe HighwayReference.loadFirstWideningU32ToF64(
-                        source,
-                        min(count, H.laneCount)
+                    unsafe H(
+                        raw: HighwayReference.loadFirstWideningU32ToF64(
+                            source,
+                            min(count, H.laneCount)
+                        )
                     )
                 )
             }.result
@@ -196,7 +200,9 @@ extension SIMDDoubleConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe HighwayReference.loadFirstWideningI32ToF64(source.baseAddress!, count)
+                    unsafe H(
+                        raw: HighwayReference.loadFirstWideningI32ToF64(source.baseAddress!, count)
+                    )
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -283,9 +289,11 @@ extension SIMDDoubleConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe HighwayReference.loadFirstWideningI32ToF64(
-                        source,
-                        min(count, H.laneCount)
+                    unsafe H(
+                        raw: HighwayReference.loadFirstWideningI32ToF64(
+                            source,
+                            min(count, H.laneCount)
+                        )
                     )
                 )
             }.result
@@ -370,7 +378,9 @@ extension SIMDDoubleConstantTests {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.loadFirstWidening(from: source.baseAddress!, count: count),
-                    unsafe HighwayReference.loadFirstWideningF32ToF64(source.baseAddress!, count)
+                    unsafe H(
+                        raw: HighwayReference.loadFirstWideningF32ToF64(source.baseAddress!, count)
+                    )
                 )
             }
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
@@ -457,9 +467,11 @@ extension SIMDDoubleConstantTests {
                 source in
                 (
                     unsafe H.loadFirstWidening(from: source, count: count),
-                    unsafe HighwayReference.loadFirstWideningF32ToF64(
-                        source,
-                        min(count, H.laneCount)
+                    unsafe H(
+                        raw: HighwayReference.loadFirstWideningF32ToF64(
+                            source,
+                            min(count, H.laneCount)
+                        )
                     )
                 )
             }.result

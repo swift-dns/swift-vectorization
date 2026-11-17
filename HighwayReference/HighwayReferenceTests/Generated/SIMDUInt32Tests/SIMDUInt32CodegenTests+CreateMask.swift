@@ -58,7 +58,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func maskFromVector() {
         let mismatches = Mismatches("portMaskFromVectorU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2C7A_999D_BE3C_2722)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2C7A_999D_BE3C_2722)
         for a in aInputs {
             mismatches.check(
                 portMaskFromVectorU32(from: a),
@@ -101,7 +101,7 @@ extension SIMDUInt32CodegenTests {
     @Test func repeatingBlockMask() {
         let mismatches = Mismatches("portRepeatingBlockMaskU32")
         let bitsInputs = Inputs.maskBits(
-            lanes: 16 / MemoryLayout<H.Lane>.size,
+            lanes: 16 / MemoryLayout<Lane>.size,
             seed: 0x15AC_A091_A72F_6083
         )
         for bits in bitsInputs {

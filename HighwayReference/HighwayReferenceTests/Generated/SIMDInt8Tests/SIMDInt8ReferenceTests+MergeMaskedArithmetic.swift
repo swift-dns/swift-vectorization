@@ -8,10 +8,10 @@ import Vectorization
 extension SIMDInt8ReferenceTests {
     @Test func minimumWhereOtherwise() {
         let mismatches = Mismatches("minimumWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x909D_40BB_0BC2_C1AF)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x909D_40BB_0BC2_C1AF)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x909D_3FBB_0BC2_BFFC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x909D_42BB_0BC2_C515)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x909D_41BB_0BC2_C362)
+        let aInputs = Inputs.vectors(H.self, seed: 0x909D_42BB_0BC2_C515)
+        let bInputs = Inputs.vectors(H.self, seed: 0x909D_41BB_0BC2_C362)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -21,7 +21,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.minimum(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.minimumWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -37,10 +37,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func minimumWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("minimumWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xD61E_810B_6644_3C3C)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xD61E_810B_6644_3C3C)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xD61E_820B_6644_3DEF)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD61E_830B_6644_3FA2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD61E_840B_6644_4155)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD61E_830B_6644_3FA2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD61E_840B_6644_4155)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -50,7 +50,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.minimum(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.minimumWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -66,10 +66,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func maximumWhereOtherwise() {
         let mismatches = Mismatches("maximumWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF5B5_DAEF_B83A_B24D)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF5B5_DAEF_B83A_B24D)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF5B5_D9EF_B83A_B09A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF5B5_D8EF_B83A_AEE7)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF5B5_D7EF_B83A_AD34)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF5B5_D8EF_B83A_AEE7)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF5B5_D7EF_B83A_AD34)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -79,7 +79,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.maximum(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.maximumWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -95,10 +95,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func maximumWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("maximumWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x6E82_E243_27E4_DEEA)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x6E82_E243_27E4_DEEA)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6E82_E343_27E4_E09D)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6E82_E043_27E4_DB84)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6E82_E143_27E4_DD37)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6E82_E043_27E4_DB84)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6E82_E143_27E4_DD37)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -108,7 +108,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.maximum(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.maximumWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -124,10 +124,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func addingWhereOtherwise() {
         let mismatches = Mismatches("addingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xE820_4F47_F829_ED68)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xE820_4F47_F829_ED68)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE820_5047_F829_EF1B)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE820_5147_F829_F0CE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE820_5247_F829_F281)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE820_5147_F829_F0CE)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE820_5247_F829_F281)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -137,7 +137,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.adding(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.addingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -153,10 +153,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func addingWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("addingWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x6027_8D8B_ACF1_94E7)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x6027_8D8B_ACF1_94E7)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6027_8C8B_ACF1_9334)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6027_8F8B_ACF1_984D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6027_8E8B_ACF1_969A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6027_8F8B_ACF1_984D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6027_8E8B_ACF1_969A)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -166,7 +166,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.adding(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.addingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -182,10 +182,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func subtractingWhereOtherwise() {
         let mismatches = Mismatches("subtractingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x04F5_A256_9488_66E7)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x04F5_A256_9488_66E7)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x04F5_A156_9488_6534)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x04F5_A456_9488_6A4D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x04F5_A356_9488_689A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x04F5_A456_9488_6A4D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x04F5_A356_9488_689A)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -195,7 +195,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.subtracting(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.subtractingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -211,10 +211,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func subtractingWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("subtractingWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x2F75_0D5D_E3CE_7434)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x2F75_0D5D_E3CE_7434)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x2F75_0E5D_E3CE_75E7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2F75_0F5D_E3CE_779A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2F75_105D_E3CE_794D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2F75_0F5D_E3CE_779A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2F75_105D_E3CE_794D)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -224,7 +224,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.subtracting(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.subtractingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -240,10 +240,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func multiplyingWhereOtherwise() {
         let mismatches = Mismatches("multiplyingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x2906_523B_AC21_408B)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x2906_523B_AC21_408B)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2906_513B_AC21_3ED8)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2906_543B_AC21_43F1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2906_533B_AC21_423E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2906_543B_AC21_43F1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2906_533B_AC21_423E)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -253,7 +253,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplying(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -269,10 +269,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func multiplyingWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("multiplyingWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xC41E_EE04_9684_6CA0)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xC41E_EE04_9684_6CA0)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xC41E_EF04_9684_6E53)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC41E_F004_9684_7006)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC41E_F104_9684_71B9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC41E_F004_9684_7006)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC41E_F104_9684_71B9)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -282,7 +282,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplying(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -298,19 +298,14 @@ extension SIMDInt8ReferenceTests {
 
     @Test func dividingWhereOtherwise() {
         let mismatches = Mismatches("dividingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB96A_7EE1_7B69_3A73)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xB96A_7EE1_7B69_3A73)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB96A_7DE1_7B69_38C0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB96A_80E1_7B69_3DD9)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB96A_80E1_7B69_3DD9)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xB96A_7FE1_7B69_3C26) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0x29CE_6899_F2B2_8F2D).enumerated().map {
+            Inputs.vectors(H.self, seed: 0xB96A_7FE1_7B69_3C26) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0x29CE_6899_F2B2_8F2D).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
@@ -321,7 +316,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.dividing(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.dividingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -337,19 +332,14 @@ extension SIMDInt8ReferenceTests {
 
     @Test func dividingWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("dividingWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xA6D2_269D_1424_3EC8)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA6D2_269D_1424_3EC8)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xA6D2_279D_1424_407B)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA6D2_289D_1424_422E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA6D2_289D_1424_422E)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xA6D2_299D_1424_43E1) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0x4E34_D5FE_6C5B_2F5A).enumerated().map {
+            Inputs.vectors(H.self, seed: 0xA6D2_299D_1424_43E1) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0x4E34_D5FE_6C5B_2F5A).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
@@ -360,7 +350,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.dividing(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.dividingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -376,19 +366,14 @@ extension SIMDInt8ReferenceTests {
 
     @Test func remainderWhereOtherwise() {
         let mismatches = Mismatches("remainderWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x7D38_5F8B_8C02_4C34)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7D38_5F8B_8C02_4C34)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7D38_608B_8C02_4DE7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7D38_618B_8C02_4F9A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7D38_618B_8C02_4F9A)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x7D38_628B_8C02_514D) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0xE035_092F_FE74_8876).enumerated().map {
+            Inputs.vectors(H.self, seed: 0x7D38_628B_8C02_514D) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0xE035_092F_FE74_8876).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
@@ -399,7 +384,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.remainder(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.remainderWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -415,19 +400,14 @@ extension SIMDInt8ReferenceTests {
 
     @Test func remainderWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("remainderWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xDECC_280C_6BB0_08AB)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xDECC_280C_6BB0_08AB)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xDECC_270C_6BB0_06F8)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDECC_2A0C_6BB0_0C11)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDECC_2A0C_6BB0_0C11)
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0xDECC_290C_6BB0_0A5E) + [
-                H.Vector(H.Vector.Simd(repeating: -1))
-            ]
-            + Inputs.vectors(H.Vector.self, seed: 0xA069_7F9D_B159_75E5).enumerated().map {
+            Inputs.vectors(H.self, seed: 0xDECC_290C_6BB0_0A5E) + [H(H.SIMDType(repeating: -1))]
+            + Inputs.vectors(H.self, seed: 0xA069_7F9D_B159_75E5).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
@@ -438,7 +418,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.remainder(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.remainderWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -454,10 +434,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func saturatingAddingWhereOtherwise() {
         let mismatches = Mismatches("saturatingAddingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x6CF8_C60C_730E_D40E)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x6CF8_C60C_730E_D40E)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6CF8_C70C_730E_D5C1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6CF8_C40C_730E_D0A8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6CF8_C50C_730E_D25B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6CF8_C40C_730E_D0A8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6CF8_C50C_730E_D25B)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -467,7 +447,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.saturatingAdding(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.saturatingAddingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -485,10 +465,10 @@ extension SIMDInt8ReferenceTests {
         let mismatches = Mismatches(
             "saturatingAddingWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xDB61_7D55_66E3_A1BD)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xDB61_7D55_66E3_A1BD)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xDB61_7C55_66E3_A00A)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDB61_7B55_66E3_9E57)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDB61_7A55_66E3_9CA4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDB61_7B55_66E3_9E57)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDB61_7A55_66E3_9CA4)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -498,7 +478,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.saturatingAdding(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.saturatingAddingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -514,10 +494,10 @@ extension SIMDInt8ReferenceTests {
 
     @Test func saturatingSubtractingWhereOtherwise() {
         let mismatches = Mismatches("saturatingSubtractingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x36F7_45F1_499C_3429)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x36F7_45F1_499C_3429)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x36F7_44F1_499C_3276)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x36F7_43F1_499C_30C3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x36F7_42F1_499C_2F10)
+        let aInputs = Inputs.vectors(H.self, seed: 0x36F7_43F1_499C_30C3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x36F7_42F1_499C_2F10)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -527,7 +507,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.saturatingSubtracting(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.saturatingSubtractingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -545,10 +525,10 @@ extension SIMDInt8ReferenceTests {
         let mismatches = Mismatches(
             "saturatingSubtractingWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xFA7A_1273_8E3D_7EAE)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xFA7A_1273_8E3D_7EAE)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xFA7A_1373_8E3D_8061)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFA7A_1073_8E3D_7B48)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFA7A_1173_8E3D_7CFB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFA7A_1073_8E3D_7B48)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFA7A_1173_8E3D_7CFB)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -558,7 +538,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.saturatingSubtracting(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.saturatingSubtractingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -574,9 +554,9 @@ extension SIMDInt8ReferenceTests {
 
     @Test func magnitudeWhereOtherwise() {
         let mismatches = Mismatches("magnitudeWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x12B3_D988_5C38_A011)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x12B3_D988_5C38_A011)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x12B3_D888_5C38_9E5E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x12B3_D788_5C38_9CAB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x12B3_D788_5C38_9CAB)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -585,9 +565,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.magnitude(a, where: mask, otherwise: otherwise),
-                H.Vector(
-                    raw: HighwayReference.magnitudeWhereOtherwiseI8(otherwise.raw, mask.raw, a.raw)
-                ),
+                H(raw: HighwayReference.magnitudeWhereOtherwiseI8(otherwise.raw, mask.raw, a.raw)),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -596,9 +574,9 @@ extension SIMDInt8ReferenceTests {
 
     @Test func magnitudeWhereOtherwiseNonCanonical() {
         let mismatches = Mismatches("magnitudeWhereOtherwise with masks from arbitrary vectors")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB333_A177_29F5_5F56)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xB333_A177_29F5_5F56)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB333_A277_29F5_6109)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB333_9F77_29F5_5BF0)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB333_9F77_29F5_5BF0)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -607,9 +585,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.magnitude(a, where: mask, otherwise: otherwise),
-                H.Vector(
-                    raw: HighwayReference.magnitudeWhereOtherwiseI8(otherwise.raw, mask.raw, a.raw)
-                ),
+                H(raw: HighwayReference.magnitudeWhereOtherwiseI8(otherwise.raw, mask.raw, a.raw)),
                 "otherwise: \(describe(otherwise)), mask: \(describe(mask)), a: \(describe(a))"
             )
         }
@@ -618,11 +594,11 @@ extension SIMDInt8ReferenceTests {
 
     @Test func multiplyAddingWhereOtherwise() {
         let mismatches = Mismatches("multiplyAddingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF4EF_9CC6_8151_FB60)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF4EF_9CC6_8151_FB60)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF4EF_9DC6_8151_FD13)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF4EF_9EC6_8151_FEC6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF4EF_9FC6_8152_0079)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF4EF_A0C6_8152_022C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF4EF_9EC6_8151_FEC6)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF4EF_9FC6_8152_0079)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF4EF_A0C6_8152_022C)
         for (otherwise, mask, a, b, c) in mixedQuintuples(
             otherwiseInputs,
             maskInputs,
@@ -633,7 +609,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyAddingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -652,11 +628,11 @@ extension SIMDInt8ReferenceTests {
         let mismatches = Mismatches(
             "multiplyAddingWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB87B_6B06_D105_7DDF)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xB87B_6B06_D105_7DDF)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB87B_6A06_D105_7C2C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB87B_6D06_D105_8145)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB87B_6C06_D105_7F92)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xB87B_6706_D105_7713)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB87B_6D06_D105_8145)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB87B_6C06_D105_7F92)
+        let cInputs = Inputs.vectors(H.self, seed: 0xB87B_6706_D105_7713)
         for (otherwise, mask, a, b, c) in mixedQuintuples(
             otherwiseInputs,
             maskInputs,
@@ -667,7 +643,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplyAdding(a, b, c, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyAddingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -684,11 +660,11 @@ extension SIMDInt8ReferenceTests {
 
     @Test func multiplySubtractingWhereOtherwise() {
         let mismatches = Mismatches("multiplySubtractingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x17A8_05A8_CBBE_97CF)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x17A8_05A8_CBBE_97CF)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x17A8_04A8_CBBE_961C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x17A8_07A8_CBBE_9B35)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x17A8_06A8_CBBE_9982)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x17A8_01A8_CBBE_9103)
+        let aInputs = Inputs.vectors(H.self, seed: 0x17A8_07A8_CBBE_9B35)
+        let bInputs = Inputs.vectors(H.self, seed: 0x17A8_06A8_CBBE_9982)
+        let cInputs = Inputs.vectors(H.self, seed: 0x17A8_01A8_CBBE_9103)
         for (otherwise, mask, a, b, c) in mixedQuintuples(
             otherwiseInputs,
             maskInputs,
@@ -699,7 +675,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -718,11 +694,11 @@ extension SIMDInt8ReferenceTests {
         let mismatches = Mismatches(
             "multiplySubtractingWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xAC12_216B_3284_B65C)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xAC12_216B_3284_B65C)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xAC12_226B_3284_B80F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAC12_236B_3284_B9C2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAC12_246B_3284_BB75)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xAC12_1D6B_3284_AF90)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAC12_236B_3284_B9C2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAC12_246B_3284_BB75)
+        let cInputs = Inputs.vectors(H.self, seed: 0xAC12_1D6B_3284_AF90)
         for (otherwise, mask, a, b, c) in mixedQuintuples(
             otherwiseInputs,
             maskInputs,
@@ -733,7 +709,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -750,11 +726,11 @@ extension SIMDInt8ReferenceTests {
 
     @Test func negatedMultiplyAddingWhereOtherwise() {
         let mismatches = Mismatches("negatedMultiplyAddingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB0B5_8B2C_4B25_1520)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xB0B5_8B2C_4B25_1520)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB0B5_8C2C_4B25_16D3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB0B5_8D2C_4B25_1886)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB0B5_8E2C_4B25_1A39)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xB0B5_8F2C_4B25_1BEC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB0B5_8D2C_4B25_1886)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB0B5_8E2C_4B25_1A39)
+        let cInputs = Inputs.vectors(H.self, seed: 0xB0B5_8F2C_4B25_1BEC)
         for (otherwise, mask, a, b, c) in mixedQuintuples(
             otherwiseInputs,
             maskInputs,
@@ -765,7 +741,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplyAddingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -784,11 +760,11 @@ extension SIMDInt8ReferenceTests {
         let mismatches = Mismatches(
             "negatedMultiplyAddingWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x836C_5057_0790_289F)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x836C_5057_0790_289F)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x836C_4F57_0790_26EC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x836C_5257_0790_2C05)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x836C_5157_0790_2A52)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x836C_4C57_0790_21D3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x836C_5257_0790_2C05)
+        let bInputs = Inputs.vectors(H.self, seed: 0x836C_5157_0790_2A52)
+        let cInputs = Inputs.vectors(H.self, seed: 0x836C_4C57_0790_21D3)
         for (otherwise, mask, a, b, c) in mixedQuintuples(
             otherwiseInputs,
             maskInputs,
@@ -799,7 +775,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.negatedMultiplyAdding(a, b, c, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplyAddingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -816,11 +792,11 @@ extension SIMDInt8ReferenceTests {
 
     @Test func negatedMultiplySubtractingWhereOtherwise() {
         let mismatches = Mismatches("negatedMultiplySubtractingWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x4D5D_5988_9C66_BA8F)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x4D5D_5988_9C66_BA8F)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4D5D_5888_9C66_B8DC)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4D5D_5B88_9C66_BDF5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4D5D_5A88_9C66_BC42)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x4D5D_5588_9C66_B3C3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4D5D_5B88_9C66_BDF5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4D5D_5A88_9C66_BC42)
+        let cInputs = Inputs.vectors(H.self, seed: 0x4D5D_5588_9C66_B3C3)
         for (otherwise, mask, a, b, c) in mixedQuintuples(
             otherwiseInputs,
             maskInputs,
@@ -831,7 +807,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,
@@ -850,11 +826,11 @@ extension SIMDInt8ReferenceTests {
         let mismatches = Mismatches(
             "negatedMultiplySubtractingWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x8899_50DF_DD3B_C31C)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x8899_50DF_DD3B_C31C)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x8899_51DF_DD3B_C4CF)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8899_52DF_DD3B_C682)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8899_53DF_DD3B_C835)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8899_4CDF_DD3B_BC50)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8899_52DF_DD3B_C682)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8899_53DF_DD3B_C835)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8899_4CDF_DD3B_BC50)
         for (otherwise, mask, a, b, c) in mixedQuintuples(
             otherwiseInputs,
             maskInputs,
@@ -865,7 +841,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, c, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingWhereOtherwiseI8(
                         otherwise.raw,
                         mask.raw,

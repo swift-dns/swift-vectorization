@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDBFloat16ReferenceTests {
     @Test func halfVectorConvertingFromFloat() {
         let mismatches = Mismatches("halfVectorConvertingFromFloat")
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x3B08_A66B_E962_BF21)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x3B08_A66B_E962_BF21)
         for a in aInputs {
             mismatches.check(
                 H.halfVector(converting: a),
-                H.HalfVector(raw: HighwayReference.halfVectorConvertingF32ToBF16(a)),
+                H.HalfVector(raw: HighwayReference.halfVectorConvertingF32ToBF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -23,14 +23,14 @@ extension SIMDBFloat16ReferenceTests {
         let mismatches = Mismatches(
             "halfVectorConvertingFromFloat resized with its unspecified lanes zeroed"
         )
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0xEF12_12CC_B9A3_BF0D)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0xEF12_12CC_B9A3_BF0D)
         for a in aInputs {
             mismatches.check(
                 H.selectingOrZero(
                     H.firstLanes(count: H.laneCount / 2),
                     H.vector(resizing: H.halfVector(converting: a))
                 ),
-                H.Vector(raw: HighwayReference.resizedHalfVectorConvertingF32ToBF16(a)),
+                H(raw: HighwayReference.resizedHalfVectorConvertingF32ToBF16(a.raw)),
                 "a: \(describe(a))"
             )
         }

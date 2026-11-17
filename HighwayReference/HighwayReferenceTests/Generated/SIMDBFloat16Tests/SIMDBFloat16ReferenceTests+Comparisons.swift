@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDBFloat16ReferenceTests {
     @Test func isNegative() {
         let mismatches = Mismatches("isNegative")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x96C9_FDAB_E965_D5AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x96C9_FDAB_E965_D5AB)
         for a in aInputs {
             mismatches.check(
                 H.isNegative(a),

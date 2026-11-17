@@ -4,18 +4,18 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portShiftedLeftLanesBF16ConstantA() -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.shiftedLeftLanes(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+public func portShiftedLeftLanesBF16ConstantA() -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.shiftedLeftLanes(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         byUnchecked: 1
     )
 }
 
 @inline(never)
-public func highwayShiftedLeftLanesBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayShiftedLeftLanesBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.shiftedLeftLanesBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             1
@@ -24,35 +24,29 @@ public func highwayShiftedLeftLanesBF16ConstantA() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
-public func portShiftedLeftLanesBF16ConstantLanes(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.shiftedLeftLanes(a, byUnchecked: 1)
+public func portShiftedLeftLanesBF16ConstantLanes(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.shiftedLeftLanes(a, byUnchecked: 1)
 }
 
 @inline(never)
-public func highwayShiftedLeftLanesBF16ConstantLanes(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.shiftedLeftLanesBF16(a.raw, 1))
+public func highwayShiftedLeftLanesBF16ConstantLanes(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.shiftedLeftLanesBF16(a.raw, 1))
 }
 
 @inline(never)
-public func portCombinedShiftedRightBytesBF16ConstantA(
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.combinedShiftedRightBytes(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+public func portCombinedShiftedRightBytesBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedShiftedRightBytes(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         b,
         byUnchecked: 1
     )
 }
 
 @inline(never)
-public func highwayCombinedShiftedRightBytesBF16ConstantA(
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayCombinedShiftedRightBytesBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.combinedShiftedRightBytesBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw,
@@ -62,24 +56,20 @@ public func highwayCombinedShiftedRightBytesBF16ConstantA(
 }
 
 @inline(never)
-public func portCombinedShiftedRightBytesBF16ConstantB(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.combinedShiftedRightBytes(
+public func portCombinedShiftedRightBytesBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedShiftedRightBytes(
         a,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         byUnchecked: 1
     )
 }
 
 @inline(never)
-public func highwayCombinedShiftedRightBytesBF16ConstantB(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayCombinedShiftedRightBytesBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.combinedShiftedRightBytesBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             1
@@ -89,40 +79,34 @@ public func highwayCombinedShiftedRightBytesBF16ConstantB(
 
 @inline(never)
 public func portCombinedShiftedRightBytesBF16ConstantBytes(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.combinedShiftedRightBytes(a, b, byUnchecked: 1)
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedShiftedRightBytes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedShiftedRightBytesBF16ConstantBytes(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.combinedShiftedRightBytesBF16(a.raw, b.raw, 1)
-    )
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.combinedShiftedRightBytesBF16(a.raw, b.raw, 1))
 }
 
 @inline(never)
-public func portCombinedShiftedRightLanesBF16ConstantA(
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.combinedShiftedRightLanes(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+public func portCombinedShiftedRightLanesBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedShiftedRightLanes(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         b,
         byUnchecked: 1
     )
 }
 
 @inline(never)
-public func highwayCombinedShiftedRightLanesBF16ConstantA(
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayCombinedShiftedRightLanesBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.combinedShiftedRightLanesBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw,
@@ -132,24 +116,20 @@ public func highwayCombinedShiftedRightLanesBF16ConstantA(
 }
 
 @inline(never)
-public func portCombinedShiftedRightLanesBF16ConstantB(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.combinedShiftedRightLanes(
+public func portCombinedShiftedRightLanesBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedShiftedRightLanes(
         a,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         byUnchecked: 1
     )
 }
 
 @inline(never)
-public func highwayCombinedShiftedRightLanesBF16ConstantB(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayCombinedShiftedRightLanesBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.combinedShiftedRightLanesBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             1
@@ -159,18 +139,16 @@ public func highwayCombinedShiftedRightLanesBF16ConstantB(
 
 @inline(never)
 public func portCombinedShiftedRightLanesBF16ConstantLanes(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.combinedShiftedRightLanes(a, b, byUnchecked: 1)
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedShiftedRightLanes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedShiftedRightLanesBF16ConstantLanes(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.combinedShiftedRightLanesBF16(a.raw, b.raw, 1)
-    )
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.combinedShiftedRightLanesBF16(a.raw, b.raw, 1))
 }

@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDDoubleReferenceTests {
     @Test func oddEven() {
         let mismatches = Mismatches("oddEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E72_5343_90A5_D01A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7E72_5443_90A5_D1CD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E72_5343_90A5_D01A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7E72_5443_90A5_D1CD)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.oddEven(a, b),
-                HighwayReference.oddEvenF64(a, b),
+                H(raw: HighwayReference.oddEvenF64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,11 +22,11 @@ extension SIMDDoubleReferenceTests {
 
     @Test func duplicatingEven() {
         let mismatches = Mismatches("duplicatingEven")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0EBF_0013_4C05_4105)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0EBF_0013_4C05_4105)
         for a in aInputs {
             mismatches.check(
                 H.duplicatingEven(a),
-                HighwayReference.duplicatingEvenF64(a),
+                H(raw: HighwayReference.duplicatingEvenF64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -35,11 +35,11 @@ extension SIMDDoubleReferenceTests {
 
     @Test func duplicatingOdd() {
         let mismatches = Mismatches("duplicatingOdd")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0B16_8C08_9A1D_BF54)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0B16_8C08_9A1D_BF54)
         for a in aInputs {
             mismatches.check(
                 H.duplicatingOdd(a),
-                HighwayReference.duplicatingOddF64(a),
+                H(raw: HighwayReference.duplicatingOddF64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -48,11 +48,11 @@ extension SIMDDoubleReferenceTests {
 
     @Test func shuffled01() {
         let mismatches = Mismatches("shuffled01")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEFF8_CAAE_253B_FE8F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEFF8_CAAE_253B_FE8F)
         for a in aInputs {
             mismatches.check(
                 H.shuffled01(a),
-                HighwayReference.shuffled01F64(a),
+                H(raw: HighwayReference.shuffled01F64(a.raw)),
                 "a: \(describe(a))"
             )
         }

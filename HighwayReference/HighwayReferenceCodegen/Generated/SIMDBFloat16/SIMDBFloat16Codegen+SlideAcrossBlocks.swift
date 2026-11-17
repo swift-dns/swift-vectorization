@@ -4,25 +4,25 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSlide1UpBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.slide1Up(a)
+public func portSlide1UpBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.slide1Up(a)
 }
 
 @inline(never)
-public func highwaySlide1UpBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.slide1UpBF16(a.raw))
+public func highwaySlide1UpBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.slide1UpBF16(a.raw))
 }
 
 @inline(never)
-public func portSlide1UpBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.slide1Up(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portSlide1UpBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.slide1Up(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwaySlide1UpBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySlide1UpBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.slide1UpBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -31,37 +31,31 @@ public func highwaySlide1UpBF16ConstantA() -> SIMDBFloat16.Vector {
 
 @inline(never)
 public func portSlide1UpFillingWithBF16(
-    _ a: SIMDBFloat16.Vector,
-    fillingWith fill: SIMDBFloat16.Lane
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.slide1Up(a, fillingWith: fill)
+    _ a: SIMD<BFloat16>,
+    fillingWith fill: BFloat16
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.slide1Up(a, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1UpFillingWithBF16(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     fillingWith fill: BFloat16
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.slide1UpFillingWithBF16(fill.bitPattern, a.raw)
-    )
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.slide1UpFillingWithBF16(fill.bitPattern, a.raw))
 }
 
 @inline(never)
-public func portSlide1UpFillingWithBF16ConstantA(
-    fillingWith fill: SIMDBFloat16.Lane
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.slide1Up(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), fillingWith: fill)
+public func portSlide1UpFillingWithBF16ConstantA(fillingWith fill: BFloat16) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.slide1Up(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), fillingWith: fill)
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithBF16ConstantA(
-    fillingWith fill: BFloat16
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySlide1UpFillingWithBF16ConstantA(fillingWith fill: BFloat16) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.slide1UpFillingWithBF16(
             fill.bitPattern,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -69,16 +63,13 @@ public func highwaySlide1UpFillingWithBF16ConstantA(
 }
 
 @inline(never)
-public func portSlide1UpFillingWithBF16ConstantFill(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector
-{
-    SIMDBFloat16.slide1Up(a, fillingWith: BFloat16(bitPattern: 26))
+public func portSlide1UpFillingWithBF16ConstantFill(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.slide1Up(a, fillingWith: BFloat16(bitPattern: 26))
 }
 
 @inline(never)
-public func highwaySlide1UpFillingWithBF16ConstantFill(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySlide1UpFillingWithBF16ConstantFill(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.slide1UpFillingWithBF16(
             BFloat16(bitPattern: 26).bitPattern,
             a.raw
@@ -88,37 +79,32 @@ public func highwaySlide1UpFillingWithBF16ConstantFill(
 
 @inline(never)
 public func portSlide1DownFillingWithBF16(
-    _ a: SIMDBFloat16.Vector,
-    fillingWith fill: SIMDBFloat16.Lane
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.slide1Down(a, fillingWith: fill)
+    _ a: SIMD<BFloat16>,
+    fillingWith fill: BFloat16
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.slide1Down(a, fillingWith: fill)
 }
 
 @inline(never)
 public func highwaySlide1DownFillingWithBF16(
-    _ a: SIMDBFloat16.Vector,
+    _ a: SIMD<BFloat16>,
     fillingWith fill: BFloat16
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
-        raw: HighwayReference.Nothrow.slide1DownFillingWithBF16(fill.bitPattern, a.raw)
-    )
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.slide1DownFillingWithBF16(fill.bitPattern, a.raw))
 }
 
 @inline(never)
-public func portSlide1DownFillingWithBF16ConstantA(
-    fillingWith fill: SIMDBFloat16.Lane
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.slide1Down(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)), fillingWith: fill)
+public func portSlide1DownFillingWithBF16ConstantA(fillingWith fill: BFloat16) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.slide1Down(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)), fillingWith: fill)
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithBF16ConstantA(
-    fillingWith fill: BFloat16
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySlide1DownFillingWithBF16ConstantA(fillingWith fill: BFloat16) -> SIMD<BFloat16>
+{
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.slide1DownFillingWithBF16(
             fill.bitPattern,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -126,17 +112,13 @@ public func highwaySlide1DownFillingWithBF16ConstantA(
 }
 
 @inline(never)
-public func portSlide1DownFillingWithBF16ConstantFill(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.slide1Down(a, fillingWith: BFloat16(bitPattern: 26))
+public func portSlide1DownFillingWithBF16ConstantFill(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.slide1Down(a, fillingWith: BFloat16(bitPattern: 26))
 }
 
 @inline(never)
-public func highwaySlide1DownFillingWithBF16ConstantFill(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySlide1DownFillingWithBF16ConstantFill(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.slide1DownFillingWithBF16(
             BFloat16(bitPattern: 26).bitPattern,
             a.raw
@@ -145,18 +127,18 @@ public func highwaySlide1DownFillingWithBF16ConstantFill(
 }
 
 @inline(never)
-public func portSlideUpBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.slideUpBlocks(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+public func portSlideUpBlocksBF16ConstantA() -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.slideUpBlocks(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         byUnchecked: 0
     )
 }
 
 @inline(never)
-public func highwaySlideUpBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySlideUpBlocksBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.slideUpBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             0
@@ -165,29 +147,28 @@ public func highwaySlideUpBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
-public func portSlideUpBlocksBF16ConstantBlocks(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.slideUpBlocks(a, byUnchecked: 0)
+public func portSlideUpBlocksBF16ConstantBlocks(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.slideUpBlocks(a, byUnchecked: 0)
 }
 
 @inline(never)
-public func highwaySlideUpBlocksBF16ConstantBlocks(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector
-{
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.slideUpBlocksBF16(a.raw, 0))
+public func highwaySlideUpBlocksBF16ConstantBlocks(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.slideUpBlocksBF16(a.raw, 0))
 }
 
 @inline(never)
-public func portSlideDownBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.slideDownBlocks(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+public func portSlideDownBlocksBF16ConstantA() -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.slideDownBlocks(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         byUnchecked: 0
     )
 }
 
 @inline(never)
-public func highwaySlideDownBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwaySlideDownBlocksBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.slideDownBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             0
@@ -196,34 +177,29 @@ public func highwaySlideDownBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
-public func portSlideDownBlocksBF16ConstantBlocks(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.slideDownBlocks(a, byUnchecked: 0)
+public func portSlideDownBlocksBF16ConstantBlocks(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.slideDownBlocks(a, byUnchecked: 0)
 }
 
 @inline(never)
-public func highwaySlideDownBlocksBF16ConstantBlocks(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.slideDownBlocksBF16(a.raw, 0))
+public func highwaySlideDownBlocksBF16ConstantBlocks(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.slideDownBlocksBF16(a.raw, 0))
 }
 
 @inline(never)
-public func portCombinedSlideDownLanesBF16ConstantA(_ b: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector
-{
-    unsafe SIMDBFloat16.combinedSlideDownLanes(
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+public func portCombinedSlideDownLanesBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedSlideDownLanes(
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         b,
         byUnchecked: 1
     )
 }
 
 @inline(never)
-public func highwayCombinedSlideDownLanesBF16ConstantA(
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayCombinedSlideDownLanesBF16ConstantA(_ b: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.combinedSlideDownLanesBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             b.raw,
@@ -233,23 +209,20 @@ public func highwayCombinedSlideDownLanesBF16ConstantA(
 }
 
 @inline(never)
-public func portCombinedSlideDownLanesBF16ConstantB(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector
-{
-    unsafe SIMDBFloat16.combinedSlideDownLanes(
+public func portCombinedSlideDownLanesBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedSlideDownLanes(
         a,
-        SIMDBFloat16.repeating(BFloat16(bitPattern: 26)),
+        SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)),
         byUnchecked: 1
     )
 }
 
 @inline(never)
-public func highwayCombinedSlideDownLanesBF16ConstantB(
-    _ a: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayCombinedSlideDownLanesBF16ConstantB(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.combinedSlideDownLanesBF16(
             a.raw,
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw,
             1
@@ -259,16 +232,16 @@ public func highwayCombinedSlideDownLanesBF16ConstantB(
 
 @inline(never)
 public func portCombinedSlideDownLanesBF16ConstantLanes(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    unsafe SIMDBFloat16.combinedSlideDownLanes(a, b, byUnchecked: 1)
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    unsafe SIMD<BFloat16>.combinedSlideDownLanes(a, b, byUnchecked: 1)
 }
 
 @inline(never)
 public func highwayCombinedSlideDownLanesBF16ConstantLanes(
-    _ a: SIMDBFloat16.Vector,
-    _ b: SIMDBFloat16.Vector
-) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.combinedSlideDownLanesBF16(a.raw, b.raw, 1))
+    _ a: SIMD<BFloat16>,
+    _ b: SIMD<BFloat16>
+) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.combinedSlideDownLanesBF16(a.raw, b.raw, 1))
 }

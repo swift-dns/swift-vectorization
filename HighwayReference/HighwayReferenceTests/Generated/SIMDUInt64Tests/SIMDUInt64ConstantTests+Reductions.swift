@@ -7,11 +7,11 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkSmallestConstantA(_ value: H.Lane) {
+    private func checkSmallestConstantA(_ value: Lane) {
         let mismatches = Mismatches("smallest with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
@@ -71,15 +71,15 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func smallestConstantSplatMax() {
-        checkSmallestConstantA(H.Lane.max)
+        checkSmallestConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkLargestConstantA(_ value: H.Lane) {
+    private func checkLargestConstantA(_ value: Lane) {
         let mismatches = Mismatches("largest with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
@@ -139,6 +139,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func largestConstantSplatMax() {
-        checkLargestConstantA(H.Lane.max)
+        checkLargestConstantA(Lane.max)
     }
 }

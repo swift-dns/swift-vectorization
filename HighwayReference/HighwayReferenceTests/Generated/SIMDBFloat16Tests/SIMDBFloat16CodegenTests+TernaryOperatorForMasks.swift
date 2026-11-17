@@ -10,8 +10,8 @@ extension SIMDBFloat16CodegenTests {
     @Test func selecting() {
         let mismatches = Mismatches("portSelectingBF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x41D0_4348_2DEB_DEE6)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x41D0_4448_2DEB_E099)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x41D0_4148_2DEB_DB80)
+        let aInputs = Inputs.vectors(H.self, seed: 0x41D0_4448_2DEB_E099)
+        let bInputs = Inputs.vectors(H.self, seed: 0x41D0_4148_2DEB_DB80)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xFF5E_5CDB_95F6_9762)
         {
             mismatches.check(
@@ -26,7 +26,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func selectingConstantA() {
         let mismatches = Mismatches("portSelectingBF16ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF948_012E_ACB9_5687)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF948_032E_ACB9_59ED)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF948_032E_ACB9_59ED)
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 portSelectingBF16ConstantA(mask, b),
@@ -40,7 +40,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func selectingConstantB() {
         let mismatches = Mismatches("portSelectingBF16ConstantB")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x13E0_E62E_BBF6_5A46)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x13E0_E72E_BBF6_5BF9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x13E0_E72E_BBF6_5BF9)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSelectingBF16ConstantB(mask, a),
@@ -54,7 +54,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func selectingOrZero() {
         let mismatches = Mismatches("portSelectingOrZeroBF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1A85_5298_B2DF_0005)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A85_5198_B2DE_FE52)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1A85_5198_B2DE_FE52)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSelectingOrZeroBF16(mask, a),
@@ -81,7 +81,7 @@ extension SIMDBFloat16CodegenTests {
     @Test func zeroingSelected() {
         let mismatches = Mismatches("portZeroingSelectedBF16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x59AB_9F46_9EBB_2D39)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x59AB_9E46_9EBB_2B86)
+        let aInputs = Inputs.vectors(H.self, seed: 0x59AB_9E46_9EBB_2B86)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portZeroingSelectedBF16(mask, a),

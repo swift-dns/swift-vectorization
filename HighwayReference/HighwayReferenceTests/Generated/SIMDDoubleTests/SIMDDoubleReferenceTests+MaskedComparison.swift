@@ -9,13 +9,13 @@ extension SIMDDoubleReferenceTests {
     @Test func equalToWhere() {
         let mismatches = Mismatches("equalToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD979_A7ED_9AE5_4657)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD979_A6ED_9AE5_44A4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD979_A9ED_9AE5_49BD)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD979_A6ED_9AE5_44A4)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD979_A9ED_9AE5_49BD)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xFE8A_FB99_DAAE_04D1)
         {
             mismatches.check(
                 H.equalTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.equalToWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.equalToWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -25,13 +25,13 @@ extension SIMDDoubleReferenceTests {
     @Test func equalToWhereNonCanonical() {
         let mismatches = Mismatches("equalToWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x6585_D4F7_ABC9_3FA4)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6585_D5F7_ABC9_4157)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6585_D6F7_ABC9_430A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6585_D5F7_ABC9_4157)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6585_D6F7_ABC9_430A)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xBC40_AD33_B614_57D8)
         {
             mismatches.check(
                 H.equalTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.equalToWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.equalToWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -41,13 +41,13 @@ extension SIMDDoubleReferenceTests {
     @Test func notEqualToWhere() {
         let mismatches = Mismatches("notEqualToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC81E_5294_D293_4486)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC81E_5394_D293_4639)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC81E_5094_D293_4120)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC81E_5394_D293_4639)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC81E_5094_D293_4120)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x96EF_20C2_6DEE_AF02)
         {
             mismatches.check(
                 H.notEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.notEqualToWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.notEqualToWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -57,13 +57,13 @@ extension SIMDDoubleReferenceTests {
     @Test func notEqualToWhereNonCanonical() {
         let mismatches = Mismatches("notEqualToWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xB142_8075_EB51_16B5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB142_7F75_EB51_1502)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB142_7E75_EB51_134F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB142_7F75_EB51_1502)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB142_7E75_EB51_134F)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x9473_97B5_EB9F_4967)
         {
             mismatches.check(
                 H.notEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.notEqualToWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.notEqualToWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -73,13 +73,13 @@ extension SIMDDoubleReferenceTests {
     @Test func lessThanWhere() {
         let mismatches = Mismatches("lessThanWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x11ED_0EBC_9E4E_A57E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x11ED_0FBC_9E4E_A731)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x11ED_0CBC_9E4E_A218)
+        let aInputs = Inputs.vectors(H.self, seed: 0x11ED_0FBC_9E4E_A731)
+        let bInputs = Inputs.vectors(H.self, seed: 0x11ED_0CBC_9E4E_A218)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x24D4_33E7_D576_421A)
         {
             mismatches.check(
                 H.lessThan(a, b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.lessThanWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -89,13 +89,13 @@ extension SIMDDoubleReferenceTests {
     @Test func lessThanWhereNonCanonical() {
         let mismatches = Mismatches("lessThanWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xEF66_82B1_F879_90AD)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEF66_81B1_F879_8EFA)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEF66_80B1_F879_8D47)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEF66_81B1_F879_8EFA)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEF66_80B1_F879_8D47)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xFDAB_0498_C222_EC7F)
         {
             mismatches.check(
                 H.lessThan(a, b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.lessThanWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -105,13 +105,13 @@ extension SIMDDoubleReferenceTests {
     @Test func greaterThanWhere() {
         let mismatches = Mismatches("greaterThanWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x227A_E17C_E8A6_FEA3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x227A_E07C_E8A6_FCF0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x227A_E37C_E8A7_0209)
+        let aInputs = Inputs.vectors(H.self, seed: 0x227A_E07C_E8A6_FCF0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x227A_E37C_E8A7_0209)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x2571_3149_F8F4_64A5)
         {
             mismatches.check(
                 H.greaterThan(a, b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.greaterThanWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -121,13 +121,13 @@ extension SIMDDoubleReferenceTests {
     @Test func greaterThanWhereNonCanonical() {
         let mismatches = Mismatches("greaterThanWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x07FE_4C81_421D_3978)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x07FE_4D81_421D_3B2B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x07FE_4E81_421D_3CDE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x07FE_4D81_421D_3B2B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x07FE_4E81_421D_3CDE)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x71FD_AF59_581D_3734)
         {
             mismatches.check(
                 H.greaterThan(a, b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.greaterThanWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -137,13 +137,13 @@ extension SIMDDoubleReferenceTests {
     @Test func lessThanOrEqualToWhere() {
         let mismatches = Mismatches("lessThanOrEqualToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xAB29_0E2D_48FB_0788)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAB29_0F2D_48FB_093B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAB29_102D_48FB_0AEE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAB29_0F2D_48FB_093B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAB29_102D_48FB_0AEE)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4BEE_FE67_8DB8_C004)
         {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -153,13 +153,13 @@ extension SIMDDoubleReferenceTests {
     @Test func lessThanOrEqualToWhereNonCanonical() {
         let mismatches = Mismatches("lessThanOrEqualToWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x7363_F5DA_4A0A_1C07)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7363_F4DA_4A0A_1A54)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7363_F7DA_4A0A_1F6D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7363_F4DA_4A0A_1A54)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7363_F7DA_4A0A_1F6D)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xEB86_4F8F_E3B2_0D01)
         {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -169,13 +169,13 @@ extension SIMDDoubleReferenceTests {
     @Test func greaterThanOrEqualToWhere() {
         let mismatches = Mismatches("greaterThanOrEqualToWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE108_3CF7_ED85_03DB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE108_3BF7_ED85_0228)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE108_3EF7_ED85_0741)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE108_3BF7_ED85_0228)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE108_3EF7_ED85_0741)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4833_ADB1_A787_1C7D)
         {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -185,13 +185,13 @@ extension SIMDDoubleReferenceTests {
     @Test func greaterThanOrEqualToWhereNonCanonical() {
         let mismatches = Mismatches("greaterThanOrEqualToWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xC30E_A31A_DC45_6AF0)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC30E_A41A_DC45_6CA3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC30E_A51A_DC45_6E56)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC30E_A41A_DC45_6CA3)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC30E_A51A_DC45_6E56)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xD46E_DC6C_5E43_DA2C)
         {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b, where: mask),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereF64(mask.raw, a, b)),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToWhereF64(mask.raw, a.raw, b.raw)),
                 "mask: \(describe(mask)), a: \(describe(a)), b: \(describe(b))"
             )
         }

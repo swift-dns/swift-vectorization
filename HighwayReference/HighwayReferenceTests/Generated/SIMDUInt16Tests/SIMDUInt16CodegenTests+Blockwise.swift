@@ -9,9 +9,9 @@ import Vectorization
 extension SIMDUInt16CodegenTests {
     @Test func tableLookupBytes() {
         let mismatches = Mismatches("portTableLookupBytesU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCF57_E25D_8964_4EB6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCF57_E25D_8964_4EB6)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0xCF57_E35D_8964_5069,
@@ -30,7 +30,7 @@ extension SIMDUInt16CodegenTests {
     @Test func tableLookupBytesConstantA() {
         let mismatches = Mismatches("portTableLookupBytesU16ConstantA")
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             perByte: true,
             count: 16,
             seed: 0x20D2_A613_7B0E_EFE4,
@@ -48,7 +48,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func tableLookupBytesConstantIndices() {
         let mismatches = Mismatches("portTableLookupBytesU16ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x231E_9299_6EB9_D1A9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x231E_9299_6EB9_D1A9)
         for a in aInputs {
             mismatches.check(
                 portTableLookupBytesU16ConstantIndices(a),
@@ -61,9 +61,9 @@ extension SIMDUInt16CodegenTests {
 
     @Test func tableLookupBytesOrZero() {
         let mismatches = Mismatches("portTableLookupBytesOrZeroU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE3C2_38CC_22F1_6275)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE3C2_38CC_22F1_6275)
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -83,7 +83,7 @@ extension SIMDUInt16CodegenTests {
     @Test func tableLookupBytesOrZeroConstantA() {
         let mismatches = Mismatches("portTableLookupBytesOrZeroU16ConstantA")
         let indicesInputs = Inputs.tableIndices(
-            H.Vector.self,
+            H.self,
             offset: 128,
             perByte: true,
             count: 144,
@@ -102,7 +102,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func tableLookupBytesOrZeroConstantIndices() {
         let mismatches = Mismatches("portTableLookupBytesOrZeroU16ConstantIndices")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF2BE_2F79_5AFD_7A88)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF2BE_2F79_5AFD_7A88)
         for a in aInputs {
             mismatches.check(
                 portTableLookupBytesOrZeroU16ConstantIndices(a),
@@ -115,8 +115,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func pairwiseAddingBlocks() {
         let mismatches = Mismatches("portPairwiseAddingBlocksU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFE95_38F6_F4E5_9208)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFE95_39F6_F4E5_93BB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFE95_38F6_F4E5_9208)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFE95_39F6_F4E5_93BB)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portPairwiseAddingBlocksU16(a, b),
@@ -129,7 +129,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func pairwiseAddingBlocksConstantA() {
         let mismatches = Mismatches("portPairwiseAddingBlocksU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1056_7F89_FF0B_A51E)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1056_7F89_FF0B_A51E)
         for b in bInputs {
             mismatches.check(
                 portPairwiseAddingBlocksU16ConstantA(b),
@@ -142,7 +142,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func pairwiseAddingBlocksConstantB() {
         let mismatches = Mismatches("portPairwiseAddingBlocksU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x06E7_C989_F97B_FA7C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x06E7_C989_F97B_FA7C)
         for a in aInputs {
             mismatches.check(
                 portPairwiseAddingBlocksU16ConstantB(a),
@@ -155,8 +155,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func pairwiseSubtractingBlocks() {
         let mismatches = Mismatches("portPairwiseSubtractingBlocksU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x16A8_9711_5299_0D61)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x16A8_9611_5299_0BAE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x16A8_9711_5299_0D61)
+        let bInputs = Inputs.vectors(H.self, seed: 0x16A8_9611_5299_0BAE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portPairwiseSubtractingBlocksU16(a, b),
@@ -169,7 +169,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func pairwiseSubtractingBlocksConstantA() {
         let mismatches = Mismatches("portPairwiseSubtractingBlocksU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9B5E_E226_B010_C195)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9B5E_E226_B010_C195)
         for b in bInputs {
             mismatches.check(
                 portPairwiseSubtractingBlocksU16ConstantA(b),
@@ -182,7 +182,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func pairwiseSubtractingBlocksConstantB() {
         let mismatches = Mismatches("portPairwiseSubtractingBlocksU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8279_5C26_A245_F3C3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8279_5C26_A245_F3C3)
         for a in aInputs {
             mismatches.check(
                 portPairwiseSubtractingBlocksU16ConstantB(a),
@@ -205,7 +205,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func broadcastingInBlocksConstantLane() {
         let mismatches = Mismatches("portBroadcastingInBlocksU16ConstantLane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1623_79D4_12C8_3119)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1623_79D4_12C8_3119)
         for a in aInputs {
             mismatches.check(
                 portBroadcastingInBlocksU16ConstantLane(a),

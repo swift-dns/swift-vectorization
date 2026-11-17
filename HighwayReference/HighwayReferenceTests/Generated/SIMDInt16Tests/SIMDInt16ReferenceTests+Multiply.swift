@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDInt16ReferenceTests {
     @Test func multiplying() {
         let mismatches = Mismatches("multiplying")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF154_2062_84D5_5F23)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF154_1F62_84D5_5D70)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF154_2062_84D5_5F23)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF154_1F62_84D5_5D70)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplying(a, b),
-                H.Vector(raw: HighwayReference.multiplyingI16(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingI16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDInt16ReferenceTests {
 
     @Test func multiplyingFixedPoint15() {
         let mismatches = Mismatches("multiplyingFixedPoint15")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3522_E09D_4A39_42A5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3522_DF9D_4A39_40F2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3522_E09D_4A39_42A5)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3522_DF9D_4A39_40F2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingFixedPoint15(a, b),
-                H.Vector(raw: HighwayReference.multiplyingFixedPoint15I16(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingFixedPoint15I16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDInt16ReferenceTests {
 
     @Test func multiplyingHigh() {
         let mismatches = Mismatches("multiplyingHigh")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCE2F_193D_2F89_EBFF)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCE2F_183D_2F89_EA4C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCE2F_193D_2F89_EBFF)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCE2F_183D_2F89_EA4C)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingHigh(a, b),
-                H.Vector(raw: HighwayReference.multiplyingHighI16(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingHighI16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDInt16ReferenceTests {
 
     @Test func multiplyingEvenFromInt8() {
         let mismatches = Mismatches("multiplyingEvenFromInt8")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x0B44_5A99_55FD_93B4)
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x0B44_5B99_55FD_9567)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x0B44_5A99_55FD_93B4)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x0B44_5B99_55FD_9567)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingEven(a, b),
-                H.Vector(raw: HighwayReference.multiplyingEvenI8ToI16(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingEvenI8ToI16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -64,12 +64,12 @@ extension SIMDInt16ReferenceTests {
 
     @Test func multiplyingOddFromInt8() {
         let mismatches = Mismatches("multiplyingOddFromInt8")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x8361_7C14_89FB_EED1)
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x8361_7B14_89FB_ED1E)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x8361_7C14_89FB_EED1)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x8361_7B14_89FB_ED1E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingOdd(a, b),
-                H.Vector(raw: HighwayReference.multiplyingOddI8ToI16(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingOddI8ToI16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -78,14 +78,12 @@ extension SIMDInt16ReferenceTests {
 
     @Test func saturatingMultiplyPairwiseAddingFromUInt8() {
         let mismatches = Mismatches("saturatingMultiplyPairwiseAddingFromUInt8")
-        let aInputs = Inputs.conversions(SIMDUInt8.Vector.self, seed: 0x991E_BC7F_1E2F_E632)
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x991E_BD7F_1E2F_E7E5)
+        let aInputs = Inputs.conversions(SIMD<UInt8>.self, seed: 0x991E_BC7F_1E2F_E632)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x991E_BD7F_1E2F_E7E5)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.saturatingMultiplyPairwiseAdding(a, b),
-                H.Vector(
-                    raw: HighwayReference.saturatingMultiplyPairwiseAddingU8ToI16(a.raw, b.raw)
-                ),
+                H(raw: HighwayReference.saturatingMultiplyPairwiseAddingU8ToI16(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -94,10 +92,10 @@ extension SIMDInt16ReferenceTests {
 
     @Test func multiplyAccumulatingFromInt8() {
         let mismatches = Mismatches("multiplyAccumulatingFromInt8")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x8777_F9CE_7811_82DD)
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x8777_F8CE_7811_812A)
-        let cInputs = Inputs.accumulators(H.Vector.self, seed: 0x8777_F7CE_7811_7F77)
-        let v0Inputs = Inputs.accumulators(H.Vector.self, seed: 0x8777_F6CE_7811_7DC4)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x8777_F9CE_7811_82DD)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x8777_F8CE_7811_812A)
+        let cInputs = Inputs.accumulators(H.self, seed: 0x8777_F7CE_7811_7F77)
+        let v0Inputs = Inputs.accumulators(H.self, seed: 0x8777_F6CE_7811_7DC4)
         for (a, b, c, v0) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -108,7 +106,7 @@ extension SIMDInt16ReferenceTests {
             var p0 = v0
             var r0 = v0
             let port = H.multiplyAccumulating(a, b, c, &p0)
-            let reference = H.Vector(
+            let reference = H(
                 raw: HighwayReference.multiplyAccumulatingI8ToI16(a.raw, b.raw, c.raw, &r0.raw)
             )
             mismatches.check(

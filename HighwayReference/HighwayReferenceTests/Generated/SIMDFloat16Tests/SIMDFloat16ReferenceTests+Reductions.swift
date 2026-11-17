@@ -9,12 +9,12 @@ import Vectorization
 extension SIMDFloat16ReferenceTests {
     @Test func sum() {
         let mismatches = Mismatches("sum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4E5F_60E3_CFBA_9EDD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4E5F_60E3_CFBA_9EDD)
         for a in aInputs
-        where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
+        where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a.simd) {
             mismatches.check(
                 H.sum(a),
-                Float16(bitPattern: HighwayReference.sumF16(a)),
+                Float16(bitPattern: HighwayReference.sumF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -23,11 +23,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func smallest() {
         let mismatches = Mismatches("smallest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF6B3_11C9_3F22_18D1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF6B3_11C9_3F22_18D1)
         for a in aInputs {
             mismatches.check(
                 H.smallest(a),
-                Float16(bitPattern: HighwayReference.smallestF16(a)),
+                Float16(bitPattern: HighwayReference.smallestF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -36,11 +36,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func largest() {
         let mismatches = Mismatches("largest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x665F_8013_705A_4402)
+        let aInputs = Inputs.vectors(H.self, seed: 0x665F_8013_705A_4402)
         for a in aInputs {
             mismatches.check(
                 H.largest(a),
-                Float16(bitPattern: HighwayReference.largestF16(a)),
+                Float16(bitPattern: HighwayReference.largestF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -49,11 +49,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func smallestOrNaN() {
         let mismatches = Mismatches("smallestOrNaN")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB603_A96D_8DDD_E1FB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB603_A96D_8DDD_E1FB)
         for a in aInputs {
             mismatches.check(
                 H.smallestOrNaN(a),
-                Float16(bitPattern: HighwayReference.smallestOrNaNF16(a)),
+                Float16(bitPattern: HighwayReference.smallestOrNaNF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -62,11 +62,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func largestOrNaN() {
         let mismatches = Mismatches("largestOrNaN")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x36FB_C25A_972D_720E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x36FB_C25A_972D_720E)
         for a in aInputs {
             mismatches.check(
                 H.largestOrNaN(a),
-                Float16(bitPattern: HighwayReference.largestOrNaNF16(a)),
+                Float16(bitPattern: HighwayReference.largestOrNaNF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -75,12 +75,12 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func repeatingSum() {
         let mismatches = Mismatches("repeatingSum")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5E11_7B6C_93C6_E434)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5E11_7B6C_93C6_E434)
         for a in aInputs
-        where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a) {
+        where HighwayReference.hasNativeFloat16Arithmetic() || !hasUnorderedNaNs(lanesOf: a.simd) {
             mismatches.check(
                 H.repeatingSum(a),
-                HighwayReference.repeatingSumF16(a),
+                H(raw: HighwayReference.repeatingSumF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -89,11 +89,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func repeatingSmallest() {
         let mismatches = Mismatches("repeatingSmallest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x430D_8ADF_4E48_3E2E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x430D_8ADF_4E48_3E2E)
         for a in aInputs {
             mismatches.check(
                 H.repeatingSmallest(a),
-                HighwayReference.repeatingSmallestF16(a),
+                H(raw: HighwayReference.repeatingSmallestF16(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -102,11 +102,11 @@ extension SIMDFloat16ReferenceTests {
 
     @Test func repeatingLargest() {
         let mismatches = Mismatches("repeatingLargest")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7D5A_FCB8_D626_0467)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7D5A_FCB8_D626_0467)
         for a in aInputs {
             mismatches.check(
                 H.repeatingLargest(a),
-                HighwayReference.repeatingLargestF16(a),
+                H(raw: HighwayReference.repeatingLargestF16(a.raw)),
                 "a: \(describe(a))"
             )
         }

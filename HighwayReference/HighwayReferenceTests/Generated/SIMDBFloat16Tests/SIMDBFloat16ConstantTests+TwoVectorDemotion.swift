@@ -7,19 +7,22 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkVectorConvertingFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorConvertingFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorConvertingFromFloat with a repeating \(hex(value))")
-        let bInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x9A9D_2F00_A2A1_01BA)
+        let bInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x9A9D_2F00_A2A1_01BA)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.vector(converting: SIMDFloat.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.vectorConvertingF32ToBF16(SIMDFloat.repeating(value), b)
+                H.vector(converting: SIMD<Float>.repeating(value), b),
+                H(
+                    raw: HighwayReference.vectorConvertingF32ToBF16(
+                        SIMD<Float>.repeating(value).raw,
+                        b.raw
+                    )
                 ),
                 "b: \(describe(b))"
             )
@@ -28,19 +31,22 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorConvertingFromFloatConstantB(_ value: SIMDFloat.Lane) {
+    private func checkVectorConvertingFromFloatConstantB(_ value: Float) {
         let mismatches = Mismatches("vectorConvertingFromFloat with b repeating \(hex(value))")
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0x92E1_7900_9E82_EB98)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0x92E1_7900_9E82_EB98)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.vector(converting: a, SIMDFloat.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.vectorConvertingF32ToBF16(a, SIMDFloat.repeating(value))
+                H.vector(converting: a, SIMD<Float>.repeating(value)),
+                H(
+                    raw: HighwayReference.vectorConvertingF32ToBF16(
+                        a.raw,
+                        SIMD<Float>.repeating(value).raw
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -119,8 +125,8 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func vectorConvertingFromFloatConstantSplatPayloadNaN() {
-        checkVectorConvertingFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
-        checkVectorConvertingFromFloatConstantB(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorConvertingFromFloatConstantA(Float(nan: 1, signaling: false))
+        checkVectorConvertingFromFloatConstantB(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorConvertingFromFloatConstantSplatSignalingNaN() {
@@ -144,23 +150,23 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorConvertingInAnyOrderFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorConvertingInAnyOrderFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches(
             "vectorConvertingInAnyOrderFromFloat with a repeating \(hex(value))"
         )
-        let bInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0xC212_CE06_68C2_DAC7)
+        let bInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0xC212_CE06_68C2_DAC7)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.vector(convertingInAnyOrder: SIMDFloat.repeating(value), b),
-                H.Vector(
+                H.vector(convertingInAnyOrder: SIMD<Float>.repeating(value), b),
+                H(
                     raw: HighwayReference.vectorConvertingInAnyOrderF32ToBF16(
-                        SIMDFloat.repeating(value),
-                        b
+                        SIMD<Float>.repeating(value).raw,
+                        b.raw
                     )
                 ),
                 "b: \(describe(b))"
@@ -170,23 +176,23 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorConvertingInAnyOrderFromFloatConstantB(_ value: SIMDFloat.Lane) {
+    private func checkVectorConvertingInAnyOrderFromFloatConstantB(_ value: Float) {
         let mismatches = Mismatches(
             "vectorConvertingInAnyOrderFromFloat with b repeating \(hex(value))"
         )
-        let aInputs = Inputs.bfloat16Demotions(SIMDFloat.Vector.self, seed: 0xC9CE_6406_6CE0_BA89)
+        let aInputs = Inputs.bfloat16Demotions(SIMD<Float>.self, seed: 0xC9CE_6406_6CE0_BA89)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.vector(convertingInAnyOrder: a, SIMDFloat.repeating(value)),
-                H.Vector(
+                H.vector(convertingInAnyOrder: a, SIMD<Float>.repeating(value)),
+                H(
                     raw: HighwayReference.vectorConvertingInAnyOrderF32ToBF16(
-                        a,
-                        SIMDFloat.repeating(value)
+                        a.raw,
+                        SIMD<Float>.repeating(value).raw
                     )
                 ),
                 "a: \(describe(a))"
@@ -266,8 +272,8 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func vectorConvertingInAnyOrderFromFloatConstantSplatPayloadNaN() {
-        checkVectorConvertingInAnyOrderFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
-        checkVectorConvertingInAnyOrderFromFloatConstantB(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorConvertingInAnyOrderFromFloatConstantA(Float(nan: 1, signaling: false))
+        checkVectorConvertingInAnyOrderFromFloatConstantB(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorConvertingInAnyOrderFromFloatConstantSplatSignalingNaN() {

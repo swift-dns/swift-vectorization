@@ -4,71 +4,71 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portAllTrueI8(_ mask: SIMDInt8.Mask) -> Bool {
-    SIMDInt8.allTrue(mask)
+public func portAllTrueI8(_ mask: SIMD<Int8>.Mask) -> Bool {
+    SIMD<Int8>.allTrue(mask)
 }
 
 @inline(never)
-public func highwayAllTrueI8(_ mask: SIMDInt8.Mask) -> Bool {
+public func highwayAllTrueI8(_ mask: SIMD<Int8>.Mask) -> Bool {
     HighwayReference.Nothrow.allTrueI8(mask.raw)
 }
 
 @inline(never)
-public func portAllFalseI8(_ mask: SIMDInt8.Mask) -> Bool {
-    SIMDInt8.allFalse(mask)
+public func portAllFalseI8(_ mask: SIMD<Int8>.Mask) -> Bool {
+    SIMD<Int8>.allFalse(mask)
 }
 
 @inline(never)
-public func highwayAllFalseI8(_ mask: SIMDInt8.Mask) -> Bool {
+public func highwayAllFalseI8(_ mask: SIMD<Int8>.Mask) -> Bool {
     HighwayReference.Nothrow.allFalseI8(mask.raw)
 }
 
 @inline(never)
-public func portTrueCountI8(_ mask: SIMDInt8.Mask) -> Int {
-    SIMDInt8.trueCount(mask)
+public func portTrueCountI8(_ mask: SIMD<Int8>.Mask) -> Int {
+    SIMD<Int8>.trueCount(mask)
 }
 
 @inline(never)
-public func highwayTrueCountI8(_ mask: SIMDInt8.Mask) -> Int {
+public func highwayTrueCountI8(_ mask: SIMD<Int8>.Mask) -> Int {
     HighwayReference.Nothrow.trueCountI8(mask.raw)
 }
 
 @inline(never)
-public func portFirstTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
-    SIMDInt8.firstTrueIndex(mask)
+public func portFirstTrueIndexI8(_ mask: SIMD<Int8>.Mask) -> Int {
+    SIMD<Int8>.firstTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayFirstTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
+public func highwayFirstTrueIndexI8(_ mask: SIMD<Int8>.Mask) -> Int {
     HighwayReference.Nothrow.firstTrueIndexI8(mask.raw)
 }
 
 @inline(never)
-public func portLastTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
-    SIMDInt8.lastTrueIndex(mask)
+public func portLastTrueIndexI8(_ mask: SIMD<Int8>.Mask) -> Int {
+    SIMD<Int8>.lastTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayLastTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
+public func highwayLastTrueIndexI8(_ mask: SIMD<Int8>.Mask) -> Int {
     HighwayReference.Nothrow.lastTrueIndexI8(mask.raw)
 }
 
 @inline(never)
-public func portKnownFirstTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
-    SIMDInt8.knownFirstTrueIndex(mask)
+public func portKnownFirstTrueIndexI8(_ mask: SIMD<Int8>.Mask) -> Int {
+    SIMD<Int8>.knownFirstTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayKnownFirstTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
+public func highwayKnownFirstTrueIndexI8(_ mask: SIMD<Int8>.Mask) -> Int {
     HighwayReference.Nothrow.knownFirstTrueIndexI8(mask.raw)
 }
 
 @inline(never)
-public func portKnownLastTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
-    SIMDInt8.knownLastTrueIndex(mask)
+public func portKnownLastTrueIndexI8(_ mask: SIMD<Int8>.Mask) -> Int {
+    SIMD<Int8>.knownLastTrueIndex(mask)
 }
 
 @inline(never)
-public func highwayKnownLastTrueIndexI8(_ mask: SIMDInt8.Mask) -> Int {
+public func highwayKnownLastTrueIndexI8(_ mask: SIMD<Int8>.Mask) -> Int {
     HighwayReference.Nothrow.knownLastTrueIndexI8(mask.raw)
 }

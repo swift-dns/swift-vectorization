@@ -4,397 +4,376 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portShiftedLeftU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedLeft(a, by: Int(bits))
+public func portShiftedLeftU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedLeft(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedLeftU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.shiftedLeftU8(a.raw, bits))
+public func highwayShiftedLeftU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedLeftU8(a.raw, bits))
 }
 
 @inline(never)
-public func portShiftedLeftU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedLeft(SIMDUInt8.repeating(26), by: Int(bits))
+public func portShiftedLeftU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedLeft(SIMD<UInt8>.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedLeftU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayShiftedLeftU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.shiftedLeftU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             bits
         )
     )
 }
 
 @inline(never)
-public func portShiftedLeftU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedLeft(a, by: 3)
+public func portShiftedLeftU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedLeft(a, by: 3)
 }
 
 @inline(never)
-public func highwayShiftedLeftU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.shiftedLeftTemplateU8(a.raw, 3))
+public func highwayShiftedLeftU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedLeftTemplateU8(a.raw, 3))
 }
 
 @inline(never)
-public func portShiftedRightU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedRight(a, by: Int(bits))
+public func portShiftedRightU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedRightU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightU8(a.raw, bits))
+public func highwayShiftedRightU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedRightU8(a.raw, bits))
 }
 
 @inline(never)
-public func portShiftedRightU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedRight(SIMDUInt8.repeating(26), by: Int(bits))
+public func portShiftedRightU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedRight(SIMD<UInt8>.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayShiftedRightU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayShiftedRightU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.shiftedRightU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             bits
         )
     )
 }
 
 @inline(never)
-public func portShiftedRightU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedRight(a, by: 3)
+public func portShiftedRightU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayShiftedRightU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightTemplateU8(a.raw, 3))
+public func highwayShiftedRightU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedRightTemplateU8(a.raw, 3))
 }
 
 @inline(never)
-public func portShiftedLeftByU8(_ a: SIMDUInt8.Vector, by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedLeft(a, by: b)
+public func portShiftedLeftByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedLeft(a, by: b)
 }
 
 @inline(never)
-public func highwayShiftedLeftByU8(
-    _ a: SIMDUInt8.Vector,
-    by b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.shiftedLeftByU8(a.raw, b.raw))
+public func highwayShiftedLeftByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedLeftByU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portShiftedLeftByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedLeft(SIMDUInt8.repeating(26), by: b)
+public func portShiftedLeftByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedLeft(SIMD<UInt8>.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayShiftedLeftByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayShiftedLeftByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.shiftedLeftByU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portShiftedLeftByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedLeft(a, by: SIMDUInt8.repeating(3))
+public func portShiftedLeftByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedLeft(a, by: SIMD<UInt8>.repeating(3))
 }
 
 @inline(never)
-public func highwayShiftedLeftByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayShiftedLeftByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.shiftedLeftByU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
         )
     )
 }
 
 @inline(never)
-public func portShiftedRightByU8(_ a: SIMDUInt8.Vector, by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector
-{
-    SIMDUInt8.shiftedRight(a, by: b)
+public func portShiftedRightByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayShiftedRightByU8(
-    _ a: SIMDUInt8.Vector,
-    by b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.shiftedRightByU8(a.raw, b.raw))
+public func highwayShiftedRightByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.shiftedRightByU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portShiftedRightByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedRight(SIMDUInt8.repeating(26), by: b)
+public func portShiftedRightByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedRight(SIMD<UInt8>.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayShiftedRightByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayShiftedRightByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.shiftedRightByU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portShiftedRightByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.shiftedRight(a, by: SIMDUInt8.repeating(3))
+public func portShiftedRightByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.shiftedRight(a, by: SIMD<UInt8>.repeating(3))
 }
 
 @inline(never)
-public func highwayShiftedRightByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayShiftedRightByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.shiftedRightByU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
         )
     )
 }
 
 @inline(never)
-public func portRoundingShiftedRightByU8(
-    _ a: SIMDUInt8.Vector,
-    by b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.roundingShiftedRight(a, by: b)
+public func portRoundingShiftedRightByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.roundingShiftedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByU8(
-    _ a: SIMDUInt8.Vector,
-    by b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightByU8(a.raw, b.raw))
+public func highwayRoundingShiftedRightByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.roundingShiftedRightByU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRoundingShiftedRightByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.roundingShiftedRight(SIMDUInt8.repeating(26), by: b)
+public func portRoundingShiftedRightByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.roundingShiftedRight(SIMD<UInt8>.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRoundingShiftedRightByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.roundingShiftedRightByU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portRoundingShiftedRightByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.roundingShiftedRight(a, by: SIMDUInt8.repeating(3))
+public func portRoundingShiftedRightByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.roundingShiftedRight(a, by: SIMD<UInt8>.repeating(3))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRoundingShiftedRightByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.roundingShiftedRightByU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
         )
     )
 }
 
 @inline(never)
-public func portRoundingShiftedRightU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.roundingShiftedRight(a, by: Int(bits))
+public func portRoundingShiftedRightU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.roundingShiftedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector
-{
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightU8(a.raw, bits))
+public func highwayRoundingShiftedRightU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.roundingShiftedRightU8(a.raw, bits))
 }
 
 @inline(never)
-public func portRoundingShiftedRightU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.roundingShiftedRight(SIMDUInt8.repeating(26), by: Int(bits))
+public func portRoundingShiftedRightU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.roundingShiftedRight(SIMD<UInt8>.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRoundingShiftedRightU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.roundingShiftedRightU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             bits
         )
     )
 }
 
 @inline(never)
-public func portRoundingShiftedRightU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.roundingShiftedRight(a, by: 3)
+public func portRoundingShiftedRightU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.roundingShiftedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayRoundingShiftedRightU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.roundingShiftedRightTemplateU8(a.raw, 3))
+public func highwayRoundingShiftedRightU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.roundingShiftedRightTemplateU8(a.raw, 3))
 }
 
 @inline(never)
-public func portRotatedLeftByU8(_ a: SIMDUInt8.Vector, by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedLeft(a, by: b)
+public func portRotatedLeftByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedLeft(a, by: b)
 }
 
 @inline(never)
-public func highwayRotatedLeftByU8(
-    _ a: SIMDUInt8.Vector,
-    by b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.rotatedLeftByU8(a.raw, b.raw))
+public func highwayRotatedLeftByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.rotatedLeftByU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRotatedLeftByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedLeft(SIMDUInt8.repeating(26), by: b)
+public func portRotatedLeftByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedLeft(SIMD<UInt8>.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRotatedLeftByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRotatedLeftByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.rotatedLeftByU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portRotatedLeftByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedLeft(a, by: SIMDUInt8.repeating(3))
+public func portRotatedLeftByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedLeft(a, by: SIMD<UInt8>.repeating(3))
 }
 
 @inline(never)
-public func highwayRotatedLeftByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRotatedLeftByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.rotatedLeftByU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
         )
     )
 }
 
 @inline(never)
-public func portRotatedRightByU8(_ a: SIMDUInt8.Vector, by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector
-{
-    SIMDUInt8.rotatedRight(a, by: b)
+public func portRotatedRightByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedRight(a, by: b)
 }
 
 @inline(never)
-public func highwayRotatedRightByU8(
-    _ a: SIMDUInt8.Vector,
-    by b: SIMDUInt8.Vector
-) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.rotatedRightByU8(a.raw, b.raw))
+public func highwayRotatedRightByU8(_ a: SIMD<UInt8>, by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.rotatedRightByU8(a.raw, b.raw))
 }
 
 @inline(never)
-public func portRotatedRightByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedRight(SIMDUInt8.repeating(26), by: b)
+public func portRotatedRightByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedRight(SIMD<UInt8>.repeating(26), by: b)
 }
 
 @inline(never)
-public func highwayRotatedRightByU8ConstantA(by b: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRotatedRightByU8ConstantA(by b: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.rotatedRightByU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             b.raw
         )
     )
 }
 
 @inline(never)
-public func portRotatedRightByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedRight(a, by: SIMDUInt8.repeating(3))
+public func portRotatedRightByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedRight(a, by: SIMD<UInt8>.repeating(3))
 }
 
 @inline(never)
-public func highwayRotatedRightByU8ConstantB(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRotatedRightByU8ConstantB(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.rotatedRightByU8(
             a.raw,
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(3)).raw
         )
     )
 }
 
 @inline(never)
-public func portRotatedLeftU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedLeft(a, by: Int(bits))
+public func portRotatedLeftU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedLeft(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedLeftU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.rotatedLeftU8(a.raw, bits))
+public func highwayRotatedLeftU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.rotatedLeftU8(a.raw, bits))
 }
 
 @inline(never)
-public func portRotatedLeftU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedLeft(SIMDUInt8.repeating(26), by: Int(bits))
+public func portRotatedLeftU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedLeft(SIMD<UInt8>.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedLeftU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRotatedLeftU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.rotatedLeftU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             bits
         )
     )
 }
 
 @inline(never)
-public func portRotatedLeftU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedLeft(a, by: 3)
+public func portRotatedLeftU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedLeft(a, by: 3)
 }
 
 @inline(never)
-public func highwayRotatedLeftU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.rotatedLeftTemplateU8(a.raw, 3))
+public func highwayRotatedLeftU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.rotatedLeftTemplateU8(a.raw, 3))
 }
 
 @inline(never)
-public func portRotatedRightU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedRight(a, by: Int(bits))
+public func portRotatedRightU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedRight(a, by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedRightU8(_ a: SIMDUInt8.Vector, by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.rotatedRightU8(a.raw, bits))
+public func highwayRotatedRightU8(_ a: SIMD<UInt8>, by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.rotatedRightU8(a.raw, bits))
 }
 
 @inline(never)
-public func portRotatedRightU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedRight(SIMDUInt8.repeating(26), by: Int(bits))
+public func portRotatedRightU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedRight(SIMD<UInt8>.repeating(26), by: Int(bits))
 }
 
 @inline(never)
-public func highwayRotatedRightU8ConstantA(by bits: Int32) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(
+public func highwayRotatedRightU8ConstantA(by bits: Int32) -> SIMD<UInt8> {
+    SIMD<UInt8>(
         raw: HighwayReference.Nothrow.rotatedRightU8(
-            SIMDUInt8.Vector(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
+            SIMD<UInt8>(raw: HighwayReference.Nothrow.repeatingU8(26)).raw,
             bits
         )
     )
 }
 
 @inline(never)
-public func portRotatedRightU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.rotatedRight(a, by: 3)
+public func portRotatedRightU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>.rotatedRight(a, by: 3)
 }
 
 @inline(never)
-public func highwayRotatedRightU8ConstantBits(_ a: SIMDUInt8.Vector) -> SIMDUInt8.Vector {
-    SIMDUInt8.Vector(raw: HighwayReference.Nothrow.rotatedRightTemplateU8(a.raw, 3))
+public func highwayRotatedRightU8ConstantBits(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+    SIMD<UInt8>(raw: HighwayReference.Nothrow.rotatedRightTemplateU8(a.raw, 3))
 }

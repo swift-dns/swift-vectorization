@@ -10,7 +10,7 @@ extension SIMDInt16CodegenTests {
     @Test func sumWhere() {
         let mismatches = Mismatches("portSumWhereI16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7A7A_8FF1_EC31_C4D1)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7A7A_8EF1_EC31_C31E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7A7A_8EF1_EC31_C31E)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSumWhereI16(a, where: mask),
@@ -37,7 +37,7 @@ extension SIMDInt16CodegenTests {
     @Test func smallestWhere() {
         let mismatches = Mismatches("portSmallestWhereI16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDEE8_4D72_43E6_C65F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDEE8_4C72_43E6_C4AC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDEE8_4C72_43E6_C4AC)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portSmallestWhereI16(a, where: mask),
@@ -64,7 +64,7 @@ extension SIMDInt16CodegenTests {
     @Test func largestWhere() {
         let mismatches = Mismatches("portLargestWhereI16")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1752_A369_E05F_E900)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1752_A469_E05F_EAB3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1752_A469_E05F_EAB3)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portLargestWhereI16(a, where: mask),

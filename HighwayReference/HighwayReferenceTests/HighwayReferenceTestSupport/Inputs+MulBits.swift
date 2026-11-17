@@ -1,5 +1,5 @@
 extension Inputs {
-    package static func exponents<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func exponents<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane & FixedWidthInteger & SignedInteger {
         var generator = SplitMix64(seed: seed)
         let (bias, mantissaBits) =
@@ -45,10 +45,10 @@ extension Inputs {
 
     package static func exponents<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Simd.Scalar: FixedWidthInteger & SignedInteger {
-        exponents(V.Simd.self, seed: seed).map(V.init)
+        exponents(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
     }
 
-    package static func byteIndices<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func byteIndices<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane & FixedWidthInteger {
         let sweeps = (0..<256).map { start in
             V((0..<V.scalarCount).map { V.Scalar(truncatingIfNeeded: start + $0) })
@@ -59,6 +59,6 @@ extension Inputs {
 
     package static func byteIndices<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Simd.Scalar: FixedWidthInteger {
-        byteIndices(V.Simd.self, seed: seed).map(V.init)
+        byteIndices(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
     }
 }

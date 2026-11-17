@@ -8,11 +8,11 @@ import Vectorization
 extension SIMDInt64ReferenceTests {
     @Test func complexConjugate() {
         let mismatches = Mismatches("complexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2740_7FA6_FE0E_6BA6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2740_7FA6_FE0E_6BA6)
         for a in aInputs {
             mismatches.check(
                 H.complexConjugate(a),
-                H.Vector(raw: HighwayReference.complexConjugateI64(a.raw)),
+                H(raw: HighwayReference.complexConjugateI64(a.raw)),
                 "a: \(describe(a))"
             )
         }
@@ -21,12 +21,12 @@ extension SIMDInt64ReferenceTests {
 
     @Test func multiplyingComplex() {
         let mismatches = Mismatches("multiplyingComplex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4F08_C652_EF8E_96D8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4F08_C752_EF8E_988B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4F08_C652_EF8E_96D8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4F08_C752_EF8E_988B)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingComplex(a, b),
-                H.Vector(raw: HighwayReference.multiplyingComplexI64(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingComplexI64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -35,12 +35,12 @@ extension SIMDInt64ReferenceTests {
 
     @Test func multiplyingComplexConjugate() {
         let mismatches = Mismatches("multiplyingComplexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x126A_2979_104A_3300)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x126A_2A79_104A_34B3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x126A_2979_104A_3300)
+        let bInputs = Inputs.vectors(H.self, seed: 0x126A_2A79_104A_34B3)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b),
-                H.Vector(raw: HighwayReference.multiplyingComplexConjugateI64(a.raw, b.raw)),
+                H(raw: HighwayReference.multiplyingComplexConjugateI64(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -49,13 +49,13 @@ extension SIMDInt64ReferenceTests {
 
     @Test func multiplyAddingComplex() {
         let mismatches = Mismatches("multiplyAddingComplex")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCA49_D734_DEFF_E675)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCA49_D634_DEFF_E4C2)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xCA49_D534_DEFF_E30F)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCA49_D734_DEFF_E675)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCA49_D634_DEFF_E4C2)
+        let cInputs = Inputs.vectors(H.self, seed: 0xCA49_D534_DEFF_E30F)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xFD49_2BAB_A82C_3AA7) {
             mismatches.check(
                 H.multiplyAddingComplex(a, b, c),
-                H.Vector(raw: HighwayReference.multiplyAddingComplexI64(a.raw, b.raw, c.raw)),
+                H(raw: HighwayReference.multiplyAddingComplexI64(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -64,15 +64,13 @@ extension SIMDInt64ReferenceTests {
 
     @Test func multiplyAddingComplexConjugate() {
         let mismatches = Mismatches("multiplyAddingComplexConjugate")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D77_F026_8154_0A5B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6D77_EF26_8154_08A8)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x6D77_F226_8154_0DC1)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D77_F026_8154_0A5B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6D77_EF26_8154_08A8)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6D77_F226_8154_0DC1)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xD869_1E9A_F219_63FD) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c),
-                H.Vector(
-                    raw: HighwayReference.multiplyAddingComplexConjugateI64(a.raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.multiplyAddingComplexConjugateI64(a.raw, b.raw, c.raw)),
                 "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -81,10 +79,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func multiplyingComplexWhereOtherwise() {
         let mismatches = Mismatches("multiplyingComplexWhereOtherwise")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x2E99_0C3B_0BC4_EB3B)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x2E99_0C3B_0BC4_EB3B)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2E99_0B3B_0BC4_E988)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2E99_0E3B_0BC4_EEA1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2E99_0D3B_0BC4_ECEE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2E99_0E3B_0BC4_EEA1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2E99_0D3B_0BC4_ECEE)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -94,7 +92,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyingComplexWhereOtherwiseI64(
                         otherwise.raw,
                         mask.raw,
@@ -112,10 +110,10 @@ extension SIMDInt64ReferenceTests {
         let mismatches = Mismatches(
             "multiplyingComplexWhereOtherwise with masks from arbitrary vectors"
         )
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x441F_9B9A_9742_2DD0)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x441F_9B9A_9742_2DD0)
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x441F_9C9A_9742_2F83)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x441F_9D9A_9742_3136)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x441F_9E9A_9742_32E9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x441F_9D9A_9742_3136)
+        let bInputs = Inputs.vectors(H.self, seed: 0x441F_9E9A_9742_32E9)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -125,7 +123,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplyingComplex(a, b, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyingComplexWhereOtherwiseI64(
                         otherwise.raw,
                         mask.raw,
@@ -142,13 +140,13 @@ extension SIMDInt64ReferenceTests {
     @Test func multiplyingComplexConjugateWhere() {
         let mismatches = Mismatches("multiplyingComplexConjugateWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4F2C_34A2_80E9_7F61)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4F2C_33A2_80E9_7DAE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4F2C_32A2_80E9_7BFB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4F2C_33A2_80E9_7DAE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4F2C_32A2_80E9_7BFB)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xADD5_C5B7_F6EF_3E5B)
         {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyingComplexConjugateWhereI64(
                         mask.raw,
                         a.raw,
@@ -166,13 +164,13 @@ extension SIMDInt64ReferenceTests {
             "multiplyingComplexConjugateWhere with masks from arbitrary vectors"
         )
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x376E_65E5_9FCE_4D66)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x376E_66E5_9FCE_4F19)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x376E_63E5_9FCE_4A00)
+        let aInputs = Inputs.vectors(H.self, seed: 0x376E_66E5_9FCE_4F19)
+        let bInputs = Inputs.vectors(H.self, seed: 0x376E_63E5_9FCE_4A00)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4552_DC60_7C2E_56E2)
         {
             mismatches.check(
                 H.multiplyingComplexConjugate(a, b, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyingComplexConjugateWhereI64(
                         mask.raw,
                         a.raw,
@@ -188,9 +186,9 @@ extension SIMDInt64ReferenceTests {
     @Test func multiplyAddingComplexConjugateWhere() {
         let mismatches = Mismatches("multiplyAddingComplexConjugateWhere")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x459F_C4DD_24A5_7758)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x459F_C5DD_24A5_790B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x459F_C6DD_24A5_7ABE)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x459F_C7DD_24A5_7C71)
+        let aInputs = Inputs.vectors(H.self, seed: 0x459F_C5DD_24A5_790B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x459F_C6DD_24A5_7ABE)
+        let cInputs = Inputs.vectors(H.self, seed: 0x459F_C7DD_24A5_7C71)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -200,7 +198,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyAddingComplexConjugateWhereI64(
                         mask.raw,
                         a.raw,
@@ -219,9 +217,9 @@ extension SIMDInt64ReferenceTests {
             "multiplyAddingComplexConjugateWhere with masks from arbitrary vectors"
         )
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x39A4_A4DD_97D6_7557)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x39A4_A3DD_97D6_73A4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x39A4_A6DD_97D6_78BD)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x39A4_A5DD_97D6_770A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x39A4_A3DD_97D6_73A4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x39A4_A6DD_97D6_78BD)
+        let cInputs = Inputs.vectors(H.self, seed: 0x39A4_A5DD_97D6_770A)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -231,7 +229,7 @@ extension SIMDInt64ReferenceTests {
         ) {
             mismatches.check(
                 H.multiplyAddingComplexConjugate(a, b, c, where: mask),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplyAddingComplexConjugateWhereI64(
                         mask.raw,
                         a.raw,

@@ -7,16 +7,16 @@ import Vectorization
 
 extension SIMDUInt64ConstantTests {
     @inline(__always)
-    private func checkDuplicatingEvenConstantA(_ value: H.Lane) {
+    private func checkDuplicatingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingEven with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
             H.duplicatingEven(H.repeating(value)),
-            H.Vector(raw: HighwayReference.duplicatingEvenU64(H.repeating(value).raw)),
+            H(raw: HighwayReference.duplicatingEvenU64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -71,20 +71,20 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func duplicatingEvenConstantSplatMax() {
-        checkDuplicatingEvenConstantA(H.Lane.max)
+        checkDuplicatingEvenConstantA(Lane.max)
     }
 
     @inline(__always)
-    private func checkDuplicatingOddConstantA(_ value: H.Lane) {
+    private func checkDuplicatingOddConstantA(_ value: Lane) {
         let mismatches = Mismatches("duplicatingOdd with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
             H.duplicatingOdd(H.repeating(value)),
-            H.Vector(raw: HighwayReference.duplicatingOddU64(H.repeating(value).raw)),
+            H(raw: HighwayReference.duplicatingOddU64(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -139,6 +139,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func duplicatingOddConstantSplatMax() {
-        checkDuplicatingOddConstantA(H.Lane.max)
+        checkDuplicatingOddConstantA(Lane.max)
     }
 }

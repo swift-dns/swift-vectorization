@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDInt8ReferenceTests {
     @Test func tableLookupLanes() {
         let mismatches = Mismatches("tableLookupLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1663_3C49_5A23_E153)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1663_3C49_5A23_E153)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: H.laneCount,
@@ -18,7 +18,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 H.tableLookupLanes(a, at: indices),
-                H.Vector(raw: HighwayReference.tableLookupLanesI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupLanesI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -27,7 +27,7 @@ extension SIMDInt8ReferenceTests {
 
     @Test func tableLookupLanesUnchecked() {
         let mismatches = Mismatches("tableLookupLanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3177_FAC0_114B_B387)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3177_FAC0_114B_B387)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: H.laneCount,
@@ -37,7 +37,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupLanes(a, atUnchecked: indices),
-                H.Vector(raw: HighwayReference.tableLookupLanesI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupLanesI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -53,7 +53,7 @@ extension SIMDInt8ReferenceTests {
     )
     func tableLookupLanesOutOfContract() {
         let mismatches = Mismatches("tableLookupLanes out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFF72_C63A_30BF_BF28)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFF72_C63A_30BF_BF28)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: H.laneCount,
@@ -63,7 +63,7 @@ extension SIMDInt8ReferenceTests {
         for (a, indices) in everyPair(aInputs, indicesInputs) {
             mismatches.check(
                 unsafe H.tableLookupLanes(a, atUnchecked: indices),
-                H.Vector(raw: HighwayReference.tableLookupLanesI8(a.raw, indices.raw)),
+                H(raw: HighwayReference.tableLookupLanesI8(a.raw, indices.raw)),
                 "a: \(describe(a)), indices: \(describe(indices))"
             )
         }
@@ -72,8 +72,8 @@ extension SIMDInt8ReferenceTests {
 
     @Test func twoTablesLookupLanes() {
         let mismatches = Mismatches("twoTablesLookupLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA7A0_76E8_890B_4A66)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA7A0_77E8_890B_4C19)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA7A0_76E8_890B_4A66)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA7A0_77E8_890B_4C19)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
@@ -88,7 +88,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.twoTablesLookupLanes(a, b, at: indices),
-                H.Vector(raw: HighwayReference.twoTablesLookupLanesI8(a.raw, b.raw, indices.raw)),
+                H(raw: HighwayReference.twoTablesLookupLanesI8(a.raw, b.raw, indices.raw)),
                 "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
             )
         }
@@ -97,8 +97,8 @@ extension SIMDInt8ReferenceTests {
 
     @Test func twoTablesLookupLanesUnchecked() {
         let mismatches = Mismatches("twoTablesLookupLanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x085F_CC69_5276_43C0)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x085F_CD69_5276_4573)
+        let aInputs = Inputs.vectors(H.self, seed: 0x085F_CC69_5276_43C0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x085F_CD69_5276_4573)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
@@ -113,7 +113,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.twoTablesLookupLanes(a, b, atUnchecked: indices),
-                H.Vector(raw: HighwayReference.twoTablesLookupLanesI8(a.raw, b.raw, indices.raw)),
+                H(raw: HighwayReference.twoTablesLookupLanesI8(a.raw, b.raw, indices.raw)),
                 "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
             )
         }
@@ -123,8 +123,8 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: assertionsAreEnabled, "Assertions abort the test run on these indices"))
     func twoTablesLookupLanesOutOfContract() {
         let mismatches = Mismatches("twoTablesLookupLanes out of contract")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3A6E_1E28_9668_DE53)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3A6E_1D28_9668_DCA0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3A6E_1E28_9668_DE53)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3A6E_1D28_9668_DCA0)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 2 * H.laneCount,
@@ -139,7 +139,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.twoTablesLookupLanes(a, b, atUnchecked: indices),
-                H.Vector(raw: HighwayReference.twoTablesLookupLanesI8(a.raw, b.raw, indices.raw)),
+                H(raw: HighwayReference.twoTablesLookupLanesI8(a.raw, b.raw, indices.raw)),
                 "a: \(describe(a)), b: \(describe(b)), indices: \(describe(indices))"
             )
         }
@@ -185,7 +185,7 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
     func lookup8() {
         let mismatches = Mismatches("lookup8")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0xEFEF_030D_B0E8_6DA2)
+        let fromInputs = Inputs.buffers(Lane.self, count: 8, seed: 0xEFEF_030D_B0E8_6DA2)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 8,
@@ -197,7 +197,7 @@ extension SIMDInt8ReferenceTests {
                 source in
                 (
                     unsafe H.lookup8(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup8I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup8I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -219,7 +219,7 @@ extension SIMDInt8ReferenceTests {
     )
     func lookup8OutOfContract() {
         let mismatches = Mismatches("lookup8 out of contract")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0xBF91_D9E7_7562_A32F)
+        let fromInputs = Inputs.buffers(Lane.self, count: 8, seed: 0xBF91_D9E7_7562_A32F)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 8,
@@ -231,7 +231,7 @@ extension SIMDInt8ReferenceTests {
                 source in
                 (
                     unsafe H.lookup8(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup8I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup8I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -246,7 +246,7 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: !H.canLookup8, "Highway's lookup needs more lanes than this target has"))
     func lookup8BeforeGuardPage() {
         let mismatches = Mismatches("lookup8 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 8, seed: 0x43C3_5FF8_EAEF_A063)
+        let fromInputs = Inputs.buffers(Lane.self, count: 8, seed: 0x43C3_5FF8_EAEF_A063)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 8,
@@ -257,7 +257,7 @@ extension SIMDInt8ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.lookup8(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup8I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup8I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -272,7 +272,7 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
     func lookup16() {
         let mismatches = Mismatches("lookup16")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0xF69D_EEF9_210E_A51B)
+        let fromInputs = Inputs.buffers(Lane.self, count: 16, seed: 0xF69D_EEF9_210E_A51B)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 16,
@@ -284,7 +284,7 @@ extension SIMDInt8ReferenceTests {
                 source in
                 (
                     unsafe H.lookup16(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup16I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup16I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -306,7 +306,7 @@ extension SIMDInt8ReferenceTests {
     )
     func lookup16OutOfContract() {
         let mismatches = Mismatches("lookup16 out of contract")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0x7A7C_B0A8_BEED_0060)
+        let fromInputs = Inputs.buffers(Lane.self, count: 16, seed: 0x7A7C_B0A8_BEED_0060)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 16,
@@ -318,7 +318,7 @@ extension SIMDInt8ReferenceTests {
                 source in
                 (
                     unsafe H.lookup16(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup16I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup16I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -333,7 +333,7 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: !H.canLookup16, "Highway's lookup needs more lanes than this target has"))
     func lookup16BeforeGuardPage() {
         let mismatches = Mismatches("lookup16 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 16, seed: 0x775C_954B_4303_6040)
+        let fromInputs = Inputs.buffers(Lane.self, count: 16, seed: 0x775C_954B_4303_6040)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 16,
@@ -344,7 +344,7 @@ extension SIMDInt8ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.lookup16(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup16I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup16I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -359,7 +359,7 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: !H.canLookup32, "Highway's lookup needs more lanes than this target has"))
     func lookup32() {
         let mismatches = Mismatches("lookup32")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 32, seed: 0xA260_2EE7_D867_771D)
+        let fromInputs = Inputs.buffers(Lane.self, count: 32, seed: 0xA260_2EE7_D867_771D)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 32,
@@ -371,7 +371,7 @@ extension SIMDInt8ReferenceTests {
                 source in
                 (
                     unsafe H.lookup32(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup32I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup32I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -393,7 +393,7 @@ extension SIMDInt8ReferenceTests {
     )
     func lookup32OutOfContract() {
         let mismatches = Mismatches("lookup32 out of contract")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 32, seed: 0x2532_15FE_ECD8_C556)
+        let fromInputs = Inputs.buffers(Lane.self, count: 32, seed: 0x2532_15FE_ECD8_C556)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 32,
@@ -405,7 +405,7 @@ extension SIMDInt8ReferenceTests {
                 source in
                 (
                     unsafe H.lookup32(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup32I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup32I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -420,7 +420,7 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: !H.canLookup32, "Highway's lookup needs more lanes than this target has"))
     func lookup32BeforeGuardPage() {
         let mismatches = Mismatches("lookup32 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 32, seed: 0x723F_96EC_286F_BD0A)
+        let fromInputs = Inputs.buffers(Lane.self, count: 32, seed: 0x723F_96EC_286F_BD0A)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 32,
@@ -431,7 +431,7 @@ extension SIMDInt8ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.lookup32(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup32I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup32I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -446,7 +446,7 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
     func lookup64() {
         let mismatches = Mismatches("lookup64")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 64, seed: 0xE914_9CCF_7CB3_2A1A)
+        let fromInputs = Inputs.buffers(Lane.self, count: 64, seed: 0xE914_9CCF_7CB3_2A1A)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 64,
@@ -458,7 +458,7 @@ extension SIMDInt8ReferenceTests {
                 source in
                 (
                     unsafe H.lookup64(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup64I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup64I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -480,7 +480,7 @@ extension SIMDInt8ReferenceTests {
     )
     func lookup64OutOfContract() {
         let mismatches = Mismatches("lookup64 out of contract")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 64, seed: 0x17DA_5157_C7DF_E3F7)
+        let fromInputs = Inputs.buffers(Lane.self, count: 64, seed: 0x17DA_5157_C7DF_E3F7)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 64,
@@ -492,7 +492,7 @@ extension SIMDInt8ReferenceTests {
                 source in
                 (
                     unsafe H.lookup64(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup64I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup64I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -507,7 +507,7 @@ extension SIMDInt8ReferenceTests {
     @Test(.disabled(if: !H.canLookup64, "Highway's lookup needs more lanes than this target has"))
     func lookup64BeforeGuardPage() {
         let mismatches = Mismatches("lookup64 before a guard page")
-        let fromInputs = Inputs.buffers(H.Lane.self, count: 64, seed: 0xE6FE_6031_BA9B_85DB)
+        let fromInputs = Inputs.buffers(Lane.self, count: 64, seed: 0xE6FE_6031_BA9B_85DB)
         let indicesInputs = Inputs.tableIndices(
             H.Indices.self,
             count: 64,
@@ -518,7 +518,7 @@ extension SIMDInt8ReferenceTests {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
                 (
                     unsafe H.lookup64(at: indices, from: source),
-                    unsafe H.Vector(raw: HighwayReference.lookup64I8(source, indices.raw))
+                    unsafe H(raw: HighwayReference.lookup64I8(source, indices.raw))
                 )
             }.result
             mismatches.check(
@@ -532,7 +532,7 @@ extension SIMDInt8ReferenceTests {
 
     @Test func shuffledPer4Lanes() {
         let mismatches = Mismatches("shuffledPer4Lanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1AAF_480D_6CDE_40DD)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1AAF_480D_6CDE_40DD)
         let i3Inputs = Array(0...3)
         let i2Inputs = Array(0...3)
         let i1Inputs = Array(0...3)
@@ -547,7 +547,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.shuffledPer4Lanes(a, i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.shuffledPer4LanesI8(
                         a.raw,
                         Int32(truncatingIfNeeded: i3),
@@ -564,7 +564,7 @@ extension SIMDInt8ReferenceTests {
 
     @Test func shuffledPer4LanesUnchecked() {
         let mismatches = Mismatches("shuffledPer4Lanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB20A_ADE7_A3C1_579D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB20A_ADE7_A3C1_579D)
         let i3Inputs = Array(0...3)
         let i2Inputs = Array(0...3)
         let i1Inputs = Array(0...3)
@@ -579,7 +579,7 @@ extension SIMDInt8ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0),
-                H.Vector(
+                H(
                     raw: HighwayReference.shuffledPer4LanesI8(
                         a.raw,
                         Int32(truncatingIfNeeded: i3),

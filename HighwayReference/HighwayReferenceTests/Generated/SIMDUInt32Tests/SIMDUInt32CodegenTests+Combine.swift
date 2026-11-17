@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDUInt32CodegenTests {
     @Test func concatenatingLowerLower() {
         let mismatches = Mismatches("portConcatenatingLowerLowerU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5B6F_9ABC_9CCB_C139)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5B6F_99BC_9CCB_BF86)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5B6F_9ABC_9CCB_C139)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5B6F_99BC_9CCB_BF86)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portConcatenatingLowerLowerU32(a, b),
@@ -23,7 +23,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingLowerLowerConstantA() {
         let mismatches = Mismatches("portConcatenatingLowerLowerU32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2925_5EC6_DBAD_74ED)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2925_5EC6_DBAD_74ED)
         for b in bInputs {
             mismatches.check(
                 portConcatenatingLowerLowerU32ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingLowerLowerConstantB() {
         let mismatches = Mismatches("portConcatenatingLowerLowerU32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0FD2_D8C6_CD85_D53B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0FD2_D8C6_CD85_D53B)
         for a in aInputs {
             mismatches.check(
                 portConcatenatingLowerLowerU32ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingUpperUpper() {
         let mismatches = Mismatches("portConcatenatingUpperUpperU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x07C8_2BBE_8ED4_DAB3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x07C8_2ABE_8ED4_D900)
+        let aInputs = Inputs.vectors(H.self, seed: 0x07C8_2BBE_8ED4_DAB3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x07C8_2ABE_8ED4_D900)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portConcatenatingUpperUpperU32(a, b),
@@ -63,7 +63,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingUpperUpperConstantA() {
         let mismatches = Mismatches("portConcatenatingUpperUpperU32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2A08_3628_0997_BEAF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2A08_3628_0997_BEAF)
         for b in bInputs {
             mismatches.check(
                 portConcatenatingUpperUpperU32ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingUpperUpperConstantB() {
         let mismatches = Mismatches("portConcatenatingUpperUpperU32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3376_EC28_0F27_6951)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3376_EC28_0F27_6951)
         for a in aInputs {
             mismatches.check(
                 portConcatenatingUpperUpperU32ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingLowerUpper() {
         let mismatches = Mismatches("portConcatenatingLowerUpperU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4682_052F_9AAE_9CE4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x4682_062F_9AAE_9E97)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4682_052F_9AAE_9CE4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x4682_062F_9AAE_9E97)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portConcatenatingLowerUpperU32(a, b),
@@ -103,7 +103,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingLowerUpperConstantA() {
         let mismatches = Mismatches("portConcatenatingLowerUpperU32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9BA1_9990_D9B7_AD0A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9BA1_9990_D9B7_AD0A)
         for b in bInputs {
             mismatches.check(
                 portConcatenatingLowerUpperU32ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingLowerUpperConstantB() {
         let mismatches = Mismatches("portConcatenatingLowerUpperU32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x930C_E390_D4E1_A628)
+        let aInputs = Inputs.vectors(H.self, seed: 0x930C_E390_D4E1_A628)
         for a in aInputs {
             mismatches.check(
                 portConcatenatingLowerUpperU32ConstantB(a),
@@ -129,8 +129,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingUpperLower() {
         let mismatches = Mismatches("portConcatenatingUpperLowerU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5440_D40B_7E75_F3A2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5440_D50B_7E75_F555)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5440_D40B_7E75_F3A2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5440_D50B_7E75_F555)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portConcatenatingUpperLowerU32(a, b),
@@ -143,7 +143,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingUpperLowerConstantA() {
         let mismatches = Mismatches("portConcatenatingUpperLowerU32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0E6A_F8CE_1317_47F0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0E6A_F8CE_1317_47F0)
         for b in bInputs {
             mismatches.check(
                 portConcatenatingUpperLowerU32ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingUpperLowerConstantB() {
         let mismatches = Mismatches("portConcatenatingUpperLowerU32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2903_FECE_2254_83C2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2903_FECE_2254_83C2)
         for a in aInputs {
             mismatches.check(
                 portConcatenatingUpperLowerU32ConstantB(a),
@@ -169,8 +169,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingOdd() {
         let mismatches = Mismatches("portConcatenatingOddU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D66_AB02_9FFB_3CBE)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6D66_AC02_9FFB_3E71)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D66_AB02_9FFB_3CBE)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6D66_AC02_9FFB_3E71)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portConcatenatingOddU32(a, b),
@@ -183,7 +183,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingOddConstantA() {
         let mismatches = Mismatches("portConcatenatingOddU32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3FCB_DC0A_0635_FFAC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3FCB_DC0A_0635_FFAC)
         for b in bInputs {
             mismatches.check(
                 portConcatenatingOddU32ConstantA(b),
@@ -196,7 +196,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingOddConstantB() {
         let mismatches = Mismatches("portConcatenatingOddU32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5AD1_620A_15CF_33DE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5AD1_620A_15CF_33DE)
         for a in aInputs {
             mismatches.check(
                 portConcatenatingOddU32ConstantB(a),
@@ -209,8 +209,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingEven() {
         let mismatches = Mismatches("portConcatenatingEvenU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA8E4_F99C_C424_6A37)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA8E4_F89C_C424_6884)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA8E4_F99C_C424_6A37)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA8E4_F89C_C424_6884)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portConcatenatingEvenU32(a, b),
@@ -223,7 +223,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingEvenConstantA() {
         let mismatches = Mismatches("portConcatenatingEvenU32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1777_5DCA_B301_6543)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1777_5DCA_B301_6543)
         for b in bInputs {
             mismatches.check(
                 portConcatenatingEvenU32ConstantA(b),
@@ -236,7 +236,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func concatenatingEvenConstantB() {
         let mismatches = Mismatches("portConcatenatingEvenU32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2079_13CA_B834_3E05)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2079_13CA_B834_3E05)
         for a in aInputs {
             mismatches.check(
                 portConcatenatingEvenU32ConstantB(a),
@@ -249,8 +249,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func interleavingWholeLower() {
         let mismatches = Mismatches("portInterleavingWholeLowerU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA963_8756_9238_E687)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA963_8656_9238_E4D4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA963_8756_9238_E687)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA963_8656_9238_E4D4)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingWholeLowerU32(a, b),
@@ -263,7 +263,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func interleavingWholeLowerConstantA() {
         let mismatches = Mismatches("portInterleavingWholeLowerU32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCC4F_411F_0815_B613)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCC4F_411F_0815_B613)
         for b in bInputs {
             mismatches.check(
                 portInterleavingWholeLowerU32ConstantA(b),
@@ -276,7 +276,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func interleavingWholeLowerConstantB() {
         let mismatches = Mismatches("portInterleavingWholeLowerU32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD550_F71F_0D48_8ED5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD550_F71F_0D48_8ED5)
         for a in aInputs {
             mismatches.check(
                 portInterleavingWholeLowerU32ConstantB(a),
@@ -289,8 +289,8 @@ extension SIMDUInt32CodegenTests {
 
     @Test func interleavingWholeUpper() {
         let mismatches = Mismatches("portInterleavingWholeUpperU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB5B0_B161_43B8_BB2A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB5B0_B261_43B8_BCDD)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB5B0_B161_43B8_BB2A)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB5B0_B261_43B8_BCDD)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portInterleavingWholeUpperU32(a, b),
@@ -303,7 +303,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func interleavingWholeUpperConstantA() {
         let mismatches = Mismatches("portInterleavingWholeUpperU32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCF90_614D_B568_C6F8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCF90_614D_B568_C6F8)
         for b in bInputs {
             mismatches.check(
                 portInterleavingWholeUpperU32ConstantA(b),
@@ -316,7 +316,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func interleavingWholeUpperConstantB() {
         let mismatches = Mismatches("portInterleavingWholeUpperU32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEA95_E74D_C501_FB2A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEA95_E74D_C501_FB2A)
         for a in aInputs {
             mismatches.check(
                 portInterleavingWholeUpperU32ConstantB(a),
@@ -329,7 +329,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func lowerHalf() {
         let mismatches = Mismatches("portLowerHalfU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2467_0F51_FB6F_354D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2467_0F51_FB6F_354D)
         for a in aInputs {
             mismatches.check(portLowerHalfU32(a), highwayLowerHalfU32(a), "a: \(describe(a))")
         }
@@ -344,7 +344,7 @@ extension SIMDUInt32CodegenTests {
 
     @Test func upperHalf() {
         let mismatches = Mismatches("portUpperHalfU32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x37B9_7445_3D54_DE9C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x37B9_7445_3D54_DE9C)
         for a in aInputs {
             mismatches.check(portUpperHalfU32(a), highwayUpperHalfU32(a), "a: \(describe(a))")
         }

@@ -62,7 +62,7 @@ extension Float16DemotionLane {
 }
 
 extension Inputs {
-    package static func float16Demotions<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func float16Demotions<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: Float16DemotionLane {
         let edges = V.Scalar.float16DemotionEdges
         let splats = edges.map { V(repeating: $0) }
@@ -70,5 +70,10 @@ extension Inputs {
             V((0..<V.scalarCount).map { edges[($0 + offset) % edges.count] })
         }
         return conversions(type, seed: seed) + splats + windows
+    }
+
+    package static func float16Demotions<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V]
+    where V.Simd.Scalar: Float16DemotionLane {
+        float16Demotions(V.Simd.self, seed: seed).map { V(referenceSimd: $0) }
     }
 }

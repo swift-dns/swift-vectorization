@@ -5,90 +5,106 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portRoundedToNearestOrEvenF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    SIMDFloat16.roundedToNearestOrEven(a)
+public func portRoundedToNearestOrEvenF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.roundedToNearestOrEven(a)
 }
 
 @inline(never)
-public func highwayRoundedToNearestOrEvenF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.roundedToNearestOrEvenF16(a)
+public func highwayRoundedToNearestOrEvenF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.roundedToNearestOrEvenF16(a.raw))
 }
 
 @inline(never)
-public func portRoundedToNearestOrEvenF16ConstantA() -> SIMDFloat16.Vector {
-    SIMDFloat16.roundedToNearestOrEven(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portRoundedToNearestOrEvenF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>.roundedToNearestOrEven(SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayRoundedToNearestOrEvenF16ConstantA() -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.roundedToNearestOrEvenF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayRoundedToNearestOrEvenF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.roundedToNearestOrEvenF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
-public func portRoundedTowardZeroF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    SIMDFloat16.roundedTowardZero(a)
+public func portRoundedTowardZeroF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.roundedTowardZero(a)
 }
 
 @inline(never)
-public func highwayRoundedTowardZeroF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.roundedTowardZeroF16(a)
+public func highwayRoundedTowardZeroF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.roundedTowardZeroF16(a.raw))
 }
 
 @inline(never)
-public func portRoundedTowardZeroF16ConstantA() -> SIMDFloat16.Vector {
-    SIMDFloat16.roundedTowardZero(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portRoundedTowardZeroF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>.roundedTowardZero(SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayRoundedTowardZeroF16ConstantA() -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.roundedTowardZeroF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayRoundedTowardZeroF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.roundedTowardZeroF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
-public func portRoundedUpF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    SIMDFloat16.roundedUp(a)
+public func portRoundedUpF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.roundedUp(a)
 }
 
 @inline(never)
-public func highwayRoundedUpF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.roundedUpF16(a)
+public func highwayRoundedUpF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.roundedUpF16(a.raw))
 }
 
 @inline(never)
-public func portRoundedUpF16ConstantA() -> SIMDFloat16.Vector {
-    SIMDFloat16.roundedUp(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portRoundedUpF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>.roundedUp(SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayRoundedUpF16ConstantA() -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.roundedUpF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayRoundedUpF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.roundedUpF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
-public func portRoundedDownF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    SIMDFloat16.roundedDown(a)
+public func portRoundedDownF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.roundedDown(a)
 }
 
 @inline(never)
-public func highwayRoundedDownF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.roundedDownF16(a)
+public func highwayRoundedDownF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.roundedDownF16(a.raw))
 }
 
 @inline(never)
-public func portRoundedDownF16ConstantA() -> SIMDFloat16.Vector {
-    SIMDFloat16.roundedDown(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portRoundedDownF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>.roundedDown(SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayRoundedDownF16ConstantA() -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.roundedDownF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayRoundedDownF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.roundedDownF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif

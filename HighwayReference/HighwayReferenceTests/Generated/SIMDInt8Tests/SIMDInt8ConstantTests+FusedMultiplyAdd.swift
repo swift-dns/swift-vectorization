@@ -7,19 +7,19 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
-    private func checkMultiplySubtractingConstantA(_ value: H.Lane) {
+    private func checkMultiplySubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD123_D4CD_1BBD_4C44)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD123_D7CD_1BBD_515D)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD123_D4CD_1BBD_4C44)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD123_D7CD_1BBD_515D)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.multiplySubtracting(H.repeating(value), b, c),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingI8(
                         H.repeating(value).raw,
                         b.raw,
@@ -33,19 +33,19 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingConstantB(_ value: H.Lane) {
+    private func checkMultiplySubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEAE3_3ACD_2A41_8776)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xEAE3_38CD_2A41_8410)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEAE3_3ACD_2A41_8776)
+        let cInputs = Inputs.vectors(H.self, seed: 0xEAE3_38CD_2A41_8410)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.multiplySubtracting(a, H.repeating(value), c),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingI8(
                         a.raw,
                         H.repeating(value).raw,
@@ -59,19 +59,19 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplySubtractingConstantC(_ value: H.Lane) {
+    private func checkMultiplySubtractingConstantC(_ value: Lane) {
         let mismatches = Mismatches("multiplySubtracting with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE174_A3CD_24B2_1181)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xE174_A2CD_24B2_0FCE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE174_A3CD_24B2_1181)
+        let bInputs = Inputs.vectors(H.self, seed: 0xE174_A2CD_24B2_0FCE)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.multiplySubtracting(a, b, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.multiplySubtractingI8(
                         a.raw,
                         b.raw,
@@ -145,19 +145,19 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingConstantA(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplySubtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x07EA_80EF_F31D_6348)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x07EA_83EF_F31D_6861)
+        let bInputs = Inputs.vectors(H.self, seed: 0x07EA_80EF_F31D_6348)
+        let cInputs = Inputs.vectors(H.self, seed: 0x07EA_83EF_F31D_6861)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.negatedMultiplySubtracting(H.repeating(value), b, c),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingI8(
                         H.repeating(value).raw,
                         b.raw,
@@ -171,19 +171,19 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingConstantB(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplySubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x213D_06F0_0145_02FA)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x213D_04F0_0144_FF94)
+        let aInputs = Inputs.vectors(H.self, seed: 0x213D_06F0_0145_02FA)
+        let cInputs = Inputs.vectors(H.self, seed: 0x213D_04F0_0144_FF94)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, H.repeating(value), c),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingI8(
                         a.raw,
                         H.repeating(value).raw,
@@ -197,19 +197,19 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkNegatedMultiplySubtractingConstantC(_ value: H.Lane) {
+    private func checkNegatedMultiplySubtractingConstantC(_ value: Lane) {
         let mismatches = Mismatches("negatedMultiplySubtracting with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1981_4FEF_FD26_EB25)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1981_4EEF_FD26_E972)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1981_4FEF_FD26_EB25)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1981_4EEF_FD26_E972)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.negatedMultiplySubtracting(a, b, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.negatedMultiplySubtractingI8(
                         a.raw,
                         b.raw,

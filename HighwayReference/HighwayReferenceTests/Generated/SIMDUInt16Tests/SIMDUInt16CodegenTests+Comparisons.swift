@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDUInt16CodegenTests {
     @Test func equalTo() {
         let mismatches = Mismatches("portEqualToU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF6B0_5D9B_7791_442E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF6B0_5E9B_7791_45E1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF6B0_5D9B_7791_442E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF6B0_5E9B_7791_45E1)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portEqualToU16(a, b),
@@ -23,7 +23,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func equalToConstantA() {
         let mismatches = Mismatches("portEqualToU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3C6D_B76A_710A_EA9C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3C6D_B76A_710A_EA9C)
         for b in bInputs {
             mismatches.check(
                 portEqualToU16ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func equalToConstantB() {
         let mismatches = Mismatches("portEqualToU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x55C0_3D6A_7F32_8A4E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x55C0_3D6A_7F32_8A4E)
         for a in aInputs {
             mismatches.check(
                 portEqualToU16ConstantB(a),
@@ -49,8 +49,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func notEqualTo() {
         let mismatches = Mismatches("portNotEqualToU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x594A_BD65_6C88_71B1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x594A_BC65_6C88_6FFE)
+        let aInputs = Inputs.vectors(H.self, seed: 0x594A_BD65_6C88_71B1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x594A_BC65_6C88_6FFE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portNotEqualToU16(a, b),
@@ -63,7 +63,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func notEqualToConstantA() {
         let mismatches = Mismatches("portNotEqualToU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x24C8_AA67_8C69_8525)
+        let bInputs = Inputs.vectors(H.self, seed: 0x24C8_AA67_8C69_8525)
         for b in bInputs {
             mismatches.check(
                 portNotEqualToU16ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func notEqualToConstantB() {
         let mismatches = Mismatches("portNotEqualToU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0B09_A467_7DE5_ED13)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0B09_A467_7DE5_ED13)
         for a in aInputs {
             mismatches.check(
                 portNotEqualToU16ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func lessThan() {
         let mismatches = Mismatches("portLessThanU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFAEA_79D6_F6D1_E369)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFAEA_78D6_F6D1_E1B6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFAEA_79D6_F6D1_E369)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFAEA_78D6_F6D1_E1B6)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portLessThanU16(a, b),
@@ -103,7 +103,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func lessThanConstantA() {
         let mismatches = Mismatches("portLessThanU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5191_1ABB_E3C4_C9DD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5191_1ABB_E3C4_C9DD)
         for b in bInputs {
             mismatches.check(
                 portLessThanU16ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func lessThanConstantB() {
         let mismatches = Mismatches("portLessThanU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x368B_94BB_D42B_95AB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x368B_94BB_D42B_95AB)
         for a in aInputs {
             mismatches.check(
                 portLessThanU16ConstantB(a),
@@ -129,8 +129,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func greaterThan() {
         let mismatches = Mismatches("portGreaterThanU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF968_CBE3_9832_7DC2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF968_CCE3_9832_7F75)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF968_CBE3_9832_7DC2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF968_CCE3_9832_7F75)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portGreaterThanU16(a, b),
@@ -143,7 +143,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func greaterThanConstantA() {
         let mismatches = Mismatches("portGreaterThanU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6156_381E_A491_CD10)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6156_381E_A491_CD10)
         for b in bInputs {
             mismatches.check(
                 portGreaterThanU16ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func greaterThanConstantB() {
         let mismatches = Mismatches("portGreaterThanU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7A3B_BE1E_B25C_9AE2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7A3B_BE1E_B25C_9AE2)
         for a in aInputs {
             mismatches.check(
                 portGreaterThanU16ConstantB(a),
@@ -169,8 +169,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func lessThanOrEqualTo() {
         let mismatches = Mismatches("portLessThanOrEqualToU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x56A3_86AD_196E_E99F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x56A3_85AD_196E_E7EC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x56A3_86AD_196E_E99F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x56A3_85AD_196E_E7EC)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portLessThanOrEqualToU16(a, b),
@@ -183,7 +183,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func lessThanOrEqualToConstantA() {
         let mismatches = Mismatches("portLessThanOrEqualToU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDA69_5AB7_2E39_216B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDA69_5AB7_2E39_216B)
         for b in bInputs {
             mismatches.check(
                 portLessThanOrEqualToU16ConstantA(b),
@@ -196,7 +196,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func lessThanOrEqualToConstantB() {
         let mismatches = Mismatches("portLessThanOrEqualToU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE3D8_10B7_33C8_CC0D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE3D8_10B7_33C8_CC0D)
         for a in aInputs {
             mismatches.check(
                 portLessThanOrEqualToU16ConstantB(a),
@@ -209,8 +209,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func greaterThanOrEqualTo() {
         let mismatches = Mismatches("portGreaterThanOrEqualToU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFE18_20EC_E231_BA52)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFE18_21EC_E231_BC05)
+        let aInputs = Inputs.vectors(H.self, seed: 0xFE18_20EC_E231_BA52)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFE18_21EC_E231_BC05)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portGreaterThanOrEqualToU16(a, b),
@@ -223,7 +223,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func greaterThanOrEqualToConstantA() {
         let mismatches = Mismatches("portGreaterThanOrEqualToU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3A9F_D72A_B2AC_24A0)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3A9F_D72A_B2AC_24A0)
         for b in bInputs {
             mismatches.check(
                 portGreaterThanOrEqualToU16ConstantA(b),
@@ -236,7 +236,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func greaterThanOrEqualToConstantB() {
         let mismatches = Mismatches("portGreaterThanOrEqualToU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x545E_DD2A_C12F_BCB2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x545E_DD2A_C12F_BCB2)
         for a in aInputs {
             mismatches.check(
                 portGreaterThanOrEqualToU16ConstantB(a),
@@ -249,8 +249,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func testingBit() {
         let mismatches = Mismatches("portTestingBitU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAAF8_2A74_7380_3310)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAAF8_2B74_7380_34C3)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAAF8_2A74_7380_3310)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAAF8_2B74_7380_34C3)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portTestingBitU16(a, b),
@@ -263,7 +263,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func testingBitConstantA() {
         let mismatches = Mismatches("portTestingBitU16ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x83BE_E94F_D8B5_FAC6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x83BE_E94F_D8B5_FAC6)
         for b in bInputs {
             mismatches.check(
                 portTestingBitU16ConstantA(b),
@@ -276,7 +276,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func testingBitConstantB() {
         let mismatches = Mismatches("portTestingBitU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7B29_D34F_D3DF_50C4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7B29_D34F_D3DF_50C4)
         for a in aInputs {
             mismatches.check(
                 portTestingBitU16ConstantB(a),

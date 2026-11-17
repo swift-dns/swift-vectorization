@@ -35,8 +35,8 @@ private func expectedVectorBytes() -> Int? {
     environmentValue("SIMD_EXPECTED_VECTOR_BYTES").flatMap { Int($0) }
 }
 
-private func vectorBytes<E: SIMDElement>(of type: E.Type) -> Int {
-    E.laneCount * MemoryLayout<E.Lane>.size
+private func vectorBytes<Lane: SIMDElement>(of type: Lane.Type) -> Int {
+    SIMD<Lane>.laneCount * MemoryLayout<Lane>.size
 }
 
 @Suite("Target")
@@ -106,16 +106,16 @@ struct TargetTests {
             Self.vectorBytesOfTarget[SIMDTarget.targetName] ?? expectedVectorBytes(),
             "\(SIMDTarget.targetName) has no vector width in this test or SIMD_EXPECTED_VECTOR_BYTES"
         )
-        #expect(vectorBytes(of: SIMDUInt8.self) == bytes)
-        #expect(vectorBytes(of: SIMDUInt16.self) == bytes)
-        #expect(vectorBytes(of: SIMDUInt32.self) == bytes)
-        #expect(vectorBytes(of: SIMDUInt64.self) == bytes)
-        #expect(vectorBytes(of: SIMDInt8.self) == bytes)
-        #expect(vectorBytes(of: SIMDInt16.self) == bytes)
-        #expect(vectorBytes(of: SIMDInt32.self) == bytes)
-        #expect(vectorBytes(of: SIMDInt64.self) == bytes)
-        #expect(vectorBytes(of: SIMDFloat.self) == bytes)
-        #expect(vectorBytes(of: SIMDDouble.self) == bytes)
+        #expect(vectorBytes(of: UInt8.self) == bytes)
+        #expect(vectorBytes(of: UInt16.self) == bytes)
+        #expect(vectorBytes(of: UInt32.self) == bytes)
+        #expect(vectorBytes(of: UInt64.self) == bytes)
+        #expect(vectorBytes(of: Int8.self) == bytes)
+        #expect(vectorBytes(of: Int16.self) == bytes)
+        #expect(vectorBytes(of: Int32.self) == bytes)
+        #expect(vectorBytes(of: Int64.self) == bytes)
+        #expect(vectorBytes(of: Float.self) == bytes)
+        #expect(vectorBytes(of: Double.self) == bytes)
     }
 
     @Test(
@@ -133,6 +133,6 @@ struct TargetTests {
     )
     func matchesExpectedVectorBytes() throws {
         let expected = try #require(expectedVectorBytes())
-        #expect(vectorBytes(of: SIMDUInt8.self) == expected)
+        #expect(vectorBytes(of: UInt8.self) == expected)
     }
 }

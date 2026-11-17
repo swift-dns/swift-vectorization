@@ -7,15 +7,15 @@ import Vectorization
 
 extension SIMDInt32ConstantTests {
     @inline(__always)
-    private func checkStoreInterleaved2ConstantA(_ value: H.Lane) {
+    private func checkStoreInterleaved2ConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved2 with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x689D_943E_8EF2_C973)
+        let bInputs = Inputs.vectors(H.self, seed: 0x689D_943E_8EF2_C973)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for b in bInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -35,15 +35,15 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreInterleaved2ConstantB(_ value: H.Lane) {
+    private func checkStoreInterleaved2ConstantB(_ value: Lane) {
         let mismatches = Mismatches("storeInterleaved2 with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x719F_CA3E_9426_7BB5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x719F_CA3E_9426_7BB5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI32(value)),
+            H(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -148,12 +148,12 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func storeInterleaved2ConstantSplatMax() {
-        checkStoreInterleaved2ConstantA(H.Lane.max)
-        checkStoreInterleaved2ConstantB(H.Lane.max)
+        checkStoreInterleaved2ConstantA(Lane.max)
+        checkStoreInterleaved2ConstantB(Lane.max)
     }
 
     @Test func storeInterleaved2ConstantSplatMin() {
-        checkStoreInterleaved2ConstantA(H.Lane.min)
-        checkStoreInterleaved2ConstantB(H.Lane.min)
+        checkStoreInterleaved2ConstantA(Lane.min)
+        checkStoreInterleaved2ConstantB(Lane.min)
     }
 }

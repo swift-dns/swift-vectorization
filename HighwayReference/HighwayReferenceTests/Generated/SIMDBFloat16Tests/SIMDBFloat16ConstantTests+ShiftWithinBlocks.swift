@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkShiftedLeftLanesConstantA(_ value: H.Lane) {
+    private func checkShiftedLeftLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("shiftedLeftLanes with a repeating \(hex(value))")
         let lanesInputs = Array(0...8)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for lanes in lanesInputs {
             mismatches.check(
                 H.shiftedLeftLanes(H.repeating(value), by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedLeftLanesBF16(
                         H.repeating(value).raw,
                         Int32(truncatingIfNeeded: lanes)
@@ -31,95 +31,95 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func shiftedLeftLanesConstantSplatZero() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x0000))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func shiftedLeftLanesConstantSplatNegativeZero() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x8000))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func shiftedLeftLanesConstantSplatOne() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x3F80))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func shiftedLeftLanesConstantSplatMinusOne() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0xBF80))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func shiftedLeftLanesConstantSplatTwo() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x4000))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func shiftedLeftLanesConstantSplatHalf() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x3F00))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func shiftedLeftLanesConstantSplatFour() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x4080))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func shiftedLeftLanesConstantSplatQuarter() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x3E80))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func shiftedLeftLanesConstantSplatOnePointFive() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func shiftedLeftLanesConstantSplatMinusTwoPointFive() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0xC020))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func shiftedLeftLanesConstantSplatInfinity() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x7F80))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func shiftedLeftLanesConstantSplatMinusInfinity() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0xFF80))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func shiftedLeftLanesConstantSplatNaN() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func shiftedLeftLanesConstantSplatMinusNaN() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func shiftedLeftLanesConstantSplatPayloadNaN() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func shiftedLeftLanesConstantSplatSignalingNaN() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x7F81))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func shiftedLeftLanesConstantSplatMinusSignalingNaN() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0xFF81))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func shiftedLeftLanesConstantSplatLeastNonzero() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x0001))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func shiftedLeftLanesConstantSplatGreatest() {
-        checkShiftedLeftLanesConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkShiftedLeftLanesConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightBytesConstantA(_ value: H.Lane) {
+    private func checkCombinedShiftedRightBytesConstantA(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightBytes with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBAD7_8AB6_AAC1_841D)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBAD7_8AB6_AAC1_841D)
         let bytesInputs = Array(1...15)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (b, bytes) in everyPair(bInputs, bytesInputs) {
             mismatches.check(
                 H.combinedShiftedRightBytes(H.repeating(value), b, by: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightBytesBF16(
                         H.repeating(value).raw,
                         b.raw,
@@ -133,19 +133,19 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightBytesConstantB(_ value: H.Lane) {
+    private func checkCombinedShiftedRightBytesConstantB(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightBytes with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9FD2_04B6_9B28_4FEB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9FD2_04B6_9B28_4FEB)
         let bytesInputs = Array(1...15)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, H.repeating(value), by: bytes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightBytesBF16(
                         a.raw,
                         H.repeating(value).raw,
@@ -159,114 +159,114 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func combinedShiftedRightBytesConstantSplatZero() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x0000))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x0000))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x0000))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x0000))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatNegativeZero() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x8000))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x8000))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x8000))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x8000))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatOne() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x3F80))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x3F80))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x3F80))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x3F80))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatMinusOne() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0xBF80))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0xBF80))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0xBF80))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0xBF80))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatTwo() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x4000))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x4000))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x4000))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x4000))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatHalf() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x3F00))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x3F00))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x3F00))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x3F00))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatFour() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x4080))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x4080))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x4080))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x4080))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatQuarter() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x3E80))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x3E80))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x3E80))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x3E80))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatOnePointFive() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x3FC0))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x3FC0))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x3FC0))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatMinusTwoPointFive() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0xC020))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0xC020))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0xC020))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0xC020))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatInfinity() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x7F80))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x7F80))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x7F80))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x7F80))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatMinusInfinity() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0xFF80))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0xFF80))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0xFF80))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0xFF80))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatNaN() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x7FC0))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x7FC0))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x7FC0))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatMinusNaN() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0xFFC0))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0xFFC0))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0xFFC0))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatPayloadNaN() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x7FC1))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x7FC1))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x7FC1))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatSignalingNaN() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x7F81))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x7F81))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x7F81))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x7F81))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatMinusSignalingNaN() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0xFF81))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0xFF81))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0xFF81))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0xFF81))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatLeastNonzero() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x0001))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x0001))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x0001))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x0001))
     }
 
     @Test func combinedShiftedRightBytesConstantSplatGreatest() {
-        checkCombinedShiftedRightBytesConstantA(H.Lane(bitPattern: 0x7F7F))
-        checkCombinedShiftedRightBytesConstantB(H.Lane(bitPattern: 0x7F7F))
+        checkCombinedShiftedRightBytesConstantA(Lane(bitPattern: 0x7F7F))
+        checkCombinedShiftedRightBytesConstantB(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightLanesConstantA(_ value: H.Lane) {
+    private func checkCombinedShiftedRightLanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightLanes with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA3F0_5BA1_7EE8_C67D)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA3F0_5BA1_7EE8_C67D)
         let lanesInputs = Array(1...7)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (b, lanes) in everyPair(bInputs, lanesInputs) {
             mismatches.check(
                 H.combinedShiftedRightLanes(H.repeating(value), b, by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesBF16(
                         H.repeating(value).raw,
                         b.raw,
@@ -280,19 +280,19 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkCombinedShiftedRightLanesConstantB(_ value: H.Lane) {
+    private func checkCombinedShiftedRightLanesConstantB(_ value: Lane) {
         let mismatches = Mismatches("combinedShiftedRightLanes with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8A9D_D5A1_70C1_26CB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8A9D_D5A1_70C1_26CB)
         let lanesInputs = Array(1...7)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, H.repeating(value), by: lanes),
-                H.Vector(
+                H(
                     raw: HighwayReference.combinedShiftedRightLanesBF16(
                         a.raw,
                         H.repeating(value).raw,
@@ -306,97 +306,97 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func combinedShiftedRightLanesConstantSplatZero() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x0000))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x0000))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x0000))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x0000))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatNegativeZero() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x8000))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x8000))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x8000))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x8000))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatOne() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x3F80))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x3F80))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x3F80))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x3F80))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatMinusOne() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0xBF80))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0xBF80))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0xBF80))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0xBF80))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatTwo() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x4000))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x4000))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x4000))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x4000))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatHalf() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x3F00))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x3F00))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x3F00))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x3F00))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatFour() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x4080))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x4080))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x4080))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x4080))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatQuarter() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x3E80))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x3E80))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x3E80))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x3E80))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatOnePointFive() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x3FC0))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x3FC0))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x3FC0))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatMinusTwoPointFive() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0xC020))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0xC020))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0xC020))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0xC020))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatInfinity() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x7F80))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x7F80))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x7F80))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x7F80))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatMinusInfinity() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0xFF80))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0xFF80))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0xFF80))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0xFF80))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatNaN() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x7FC0))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x7FC0))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x7FC0))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatMinusNaN() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0xFFC0))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0xFFC0))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0xFFC0))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatPayloadNaN() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x7FC1))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x7FC1))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x7FC1))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatSignalingNaN() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x7F81))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x7F81))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x7F81))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x7F81))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatMinusSignalingNaN() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0xFF81))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0xFF81))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0xFF81))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0xFF81))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatLeastNonzero() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x0001))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x0001))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x0001))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x0001))
     }
 
     @Test func combinedShiftedRightLanesConstantSplatGreatest() {
-        checkCombinedShiftedRightLanesConstantA(H.Lane(bitPattern: 0x7F7F))
-        checkCombinedShiftedRightLanesConstantB(H.Lane(bitPattern: 0x7F7F))
+        checkCombinedShiftedRightLanesConstantA(Lane(bitPattern: 0x7F7F))
+        checkCombinedShiftedRightLanesConstantB(Lane(bitPattern: 0x7F7F))
     }
 }

@@ -179,11 +179,11 @@ extension Double: ReferenceLane {
 }
 
 package protocol ReferenceVector {
-    associatedtype Simd: SIMD where Simd.Scalar: ReferenceLane
+    associatedtype Simd: Swift.SIMD where Simd.Scalar: ReferenceLane
     associatedtype InputLane: ReferenceLane = Simd.Scalar
 
-    init(_ simd: Simd)
-    var simd: Simd { get }
+    init(referenceSimd: Simd)
+    var referenceSimd: Simd { get }
 
     static func simdLane(_ lane: InputLane) -> Simd.Scalar
 }
@@ -205,7 +205,7 @@ package protocol ReferenceNarrowVector {
 }
 
 package protocol ReferenceNarrowMask {
-    associatedtype Lane: ReferenceLane & FixedWidthInteger & SignedInteger
+    associatedtype MaskLane: ReferenceLane & FixedWidthInteger & SignedInteger
     associatedtype Raw: BitwiseCopyable
 
     static var laneCount: Int { get }
@@ -215,18 +215,18 @@ package protocol ReferenceNarrowMask {
 }
 
 extension ReferenceNarrowMask {
-    package init(lanes: [Lane], padding: Lane) {
-        let registerLanes = MemoryLayout<Raw>.size / MemoryLayout<Lane>.size
-        let register = lanes + [Lane](repeating: padding, count: registerLanes - lanes.count)
+    package init(lanes: [MaskLane], padding: MaskLane) {
+        let registerLanes = MemoryLayout<Raw>.size / MemoryLayout<MaskLane>.size
+        let register = lanes + [MaskLane](repeating: padding, count: registerLanes - lanes.count)
         self.init(raw: register.withUnsafeBytes { unsafe $0.loadUnaligned(as: Raw.self) })
     }
 
-    package var lanes: [Lane] {
+    package var lanes: [MaskLane] {
         withUnsafeBytes(of: raw) { bytes in
             (0..<Self.laneCount).map {
                 unsafe bytes.loadUnaligned(
-                    fromByteOffset: $0 * MemoryLayout<Lane>.size,
-                    as: Lane.self
+                    fromByteOffset: $0 * MemoryLayout<MaskLane>.size,
+                    as: MaskLane.self
                 )
             }
         }
@@ -234,11 +234,11 @@ extension ReferenceNarrowMask {
 }
 
 package protocol ReferenceMask {
-    associatedtype Storage: SIMD
+    associatedtype Storage: Swift.SIMD
     where Storage.Scalar: ReferenceLane & FixedWidthInteger & SignedInteger
 
-    init(_ simd: SIMDMask<Storage>)
-    var simd: SIMDMask<Storage> { get }
+    init(referenceSimd: SIMDMask<Storage>)
+    var referenceSimd: SIMDMask<Storage> { get }
 }
 
 package enum Inputs {
@@ -334,17 +334,17 @@ package enum Inputs {
             resultBits: Result.bitWidth,
             resultIsSigned: Result.isSigned,
             seed: seed
-        ).map { V(V.Simd($0)) }
+        ).map { V(referenceSimd: V.Simd($0)) }
     }
 
-    package static func vectors<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func vectors<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane {
         vectorLanes(V.Scalar.self, count: V.scalarCount, seed: seed).map { V($0) }
     }
 
     package static func vectors<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V] {
         vectorLanes(V.InputLane.self, count: V.Simd.scalarCount, seed: seed).map {
-            V(V.Simd($0.map(V.simdLane)))
+            V(referenceSimd: V.Simd($0.map(V.simdLane)))
         }
     }
 
@@ -352,14 +352,14 @@ package enum Inputs {
         vectorLanes(V.Lane.self, count: V.laneCount, seed: seed).map { V(lanes: $0) }
     }
 
-    package static func conversions<V: SIMD>(_ type: V.Type, seed: UInt64) -> [V]
+    package static func conversions<V: Swift.SIMD>(_ type: V.Type, seed: UInt64) -> [V]
     where V.Scalar: ReferenceLane {
         conversionLanes(V.Scalar.self, count: V.scalarCount, seed: seed).map { V($0) }
     }
 
     package static func conversions<V: ReferenceVector>(_ type: V.Type, seed: UInt64) -> [V] {
         conversionLanes(V.InputLane.self, count: V.Simd.scalarCount, seed: seed).map {
-            V(V.Simd($0.map(V.simdLane)))
+            V(referenceSimd: V.Simd($0.map(V.simdLane)))
         }
     }
 
@@ -368,27 +368,29 @@ package enum Inputs {
     }
 
     package static func masks<M: ReferenceMask>(_ type: M.Type, seed: UInt64) -> [M] {
-        masks(SIMDMask<M.Storage>.self, seed: seed).map(M.init)
+        masks(SIMDMask<M.Storage>.self, seed: seed).map { M(referenceSimd: $0) }
     }
 
     package static func masksAndComplements<M: ReferenceMask>(_ type: M.Type, seed: UInt64) -> [M] {
-        masks(SIMDMask<M.Storage>.self, seed: seed).flatMap { [M($0), M(.!$0)] }
+        masks(SIMDMask<M.Storage>.self, seed: seed).flatMap {
+            [M(referenceSimd: $0), M(referenceSimd: .!$0)]
+        }
     }
 
     package static func masks<M: ReferenceNarrowMask>(_ type: M.Type, seed: UInt64) -> [M] {
         var generator = SplitMix64(seed: seed)
         let lanes = M.laneCount
         let single = (0..<lanes).map { lane in
-            (0..<lanes).map { $0 == lane ? M.Lane(-1) : 0 }
+            (0..<lanes).map { $0 == lane ? M.MaskLane(-1) : 0 }
         }
         let random = (0..<randomCount).map { _ in
-            (0..<lanes).map { _ in generator.next() & 1 == 1 ? M.Lane(-1) : 0 }
+            (0..<lanes).map { _ in generator.next() & 1 == 1 ? M.MaskLane(-1) : 0 }
         }
         let patterns =
-            [[M.Lane](repeating: 0, count: lanes), [M.Lane](repeating: -1, count: lanes)]
+            [[M.MaskLane](repeating: 0, count: lanes), [M.MaskLane](repeating: -1, count: lanes)]
             + single + random
         return patterns.flatMap { pattern in
-            [M.Lane(0), M.Lane(-1)].map { M(lanes: pattern, padding: $0) }
+            [M.MaskLane(0), M.MaskLane(-1)].map { M(lanes: pattern, padding: $0) }
         }
     }
 
@@ -415,7 +417,7 @@ package enum Inputs {
 
     package static func nonCanonicalMasks<M: ReferenceMask>(_ type: M.Type, seed: UInt64) -> [M] {
         nonCanonicalMaskLanes(M.Storage.Scalar.self, count: M.Storage.scalarCount, seed: seed).map {
-            M(SIMDMask(M.Storage($0)))
+            M(referenceSimd: SIMDMask(M.Storage($0)))
         }
     }
 
@@ -423,8 +425,8 @@ package enum Inputs {
         _ type: M.Type,
         seed: UInt64
     ) -> [M] {
-        nonCanonicalMaskLanes(M.Lane.self, count: M.laneCount, seed: seed).flatMap { lanes in
-            [M.Lane(0), M.Lane(-1)].map { M(lanes: lanes, padding: $0) }
+        nonCanonicalMaskLanes(M.MaskLane.self, count: M.laneCount, seed: seed).flatMap { lanes in
+            [M.MaskLane(0), M.MaskLane(-1)].map { M(lanes: lanes, padding: $0) }
         }
     }
 
@@ -563,7 +565,7 @@ package enum Inputs {
         return [identity] + splats + random
     }
 
-    package static func tableIndices<V: SIMD>(
+    package static func tableIndices<V: Swift.SIMD>(
         _ type: V.Type,
         offset: Int = 0,
         perByte: Bool = false,
@@ -584,7 +586,7 @@ package enum Inputs {
         return byteIndices(V.self, offset: offset, count: count, seed: seed, inContract: inContract)
     }
 
-    package static func tableIndices<V: SIMD>(
+    package static func tableIndices<V: Swift.SIMD>(
         _ type: V.Type,
         offset: Int = 0,
         perByte: Bool,
@@ -596,7 +598,7 @@ package enum Inputs {
         return byteIndices(V.self, offset: offset, count: count, seed: seed, inContract: inContract)
     }
 
-    private static func byteIndices<V: SIMD>(
+    private static func byteIndices<V: Swift.SIMD>(
         _ type: V.Type,
         offset: Int,
         count: Int,
@@ -637,7 +639,25 @@ package enum Inputs {
             count: count,
             seed: seed,
             inContract: inContract
-        ).map(V.init)
+        ).map { V(referenceSimd: $0) }
+    }
+
+    package static func tableIndices<V: ReferenceVector>(
+        _ type: V.Type,
+        offset: Int = 0,
+        perByte: Bool,
+        count: Int,
+        seed: UInt64,
+        inContract: Bool
+    ) -> [V] where V.Simd.Scalar: BinaryFloatingPoint {
+        tableIndices(
+            V.Simd.self,
+            offset: offset,
+            perByte: perByte,
+            count: count,
+            seed: seed,
+            inContract: inContract
+        ).map { V(referenceSimd: $0) }
     }
 
     package static func shiftAmounts(bits: Int, inContract: Bool) -> [Int] {
@@ -654,7 +674,7 @@ package enum Inputs {
         }
     }
 
-    package static func shiftCounts<V: SIMD>(
+    package static func shiftCounts<V: Swift.SIMD>(
         _ type: V.Type,
         seed: UInt64,
         inContract: Bool
@@ -691,7 +711,7 @@ package enum Inputs {
         seed: UInt64,
         inContract: Bool
     ) -> [V] where V.Simd.Scalar: FixedWidthInteger {
-        shiftCounts(V.Simd.self, seed: seed, inContract: inContract).map(V.init)
+        shiftCounts(V.Simd.self, seed: seed, inContract: inContract).map { V(referenceSimd: $0) }
     }
 
     package static func counts(through limit: Int) -> [Int] {
@@ -803,15 +823,15 @@ package func poisoned<Indices: ReferenceVector, Mask: ReferenceMask>(
     where mask: Mask,
     with poison: Int
 ) -> Indices where Indices.Simd.Scalar: FixedWidthInteger {
-    var lanes = indices.simd
-    for lane in 0..<Indices.Simd.scalarCount where mask.simd._storage[lane] == 0 {
+    var lanes = indices.referenceSimd
+    for lane in 0..<Indices.Simd.scalarCount where mask.referenceSimd._storage[lane] == 0 {
         lanes[lane] = Indices.Simd.Scalar(truncatingIfNeeded: poison)
     }
-    return Indices(lanes)
+    return Indices(referenceSimd: lanes)
 }
 
 package func hasAllOnesLane<M: ReferenceMask>(_ mask: M) -> Bool {
-    (0..<M.Storage.scalarCount).contains { mask.simd._storage[$0] == -1 }
+    (0..<M.Storage.scalarCount).contains { mask.referenceSimd._storage[$0] == -1 }
 }
 
 package func poisoned<Indices: ReferenceVector>(
@@ -819,15 +839,15 @@ package func poisoned<Indices: ReferenceVector>(
     firstLanes count: Int,
     with poison: Int
 ) -> Indices where Indices.Simd.Scalar: FixedWidthInteger {
-    var lanes = indices.simd
+    var lanes = indices.referenceSimd
     for lane in 0..<Indices.Simd.scalarCount where lane >= count {
         lanes[lane] = Indices.Simd.Scalar(truncatingIfNeeded: poison)
     }
-    return Indices(lanes)
+    return Indices(referenceSimd: lanes)
 }
 
 package func lanesThroughLastTrue<Mask: ReferenceMask>(of mask: Mask) -> Int {
-    let lanes = mask.simd
+    let lanes = mask.referenceSimd
     return (0..<lanes.scalarCount).last { lanes[$0] }.map { $0 + 1 } ?? 0
 }
 
@@ -907,7 +927,7 @@ package func withGuardedLanes<Lane: ReferenceLane, Result>(
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(_ operands: V...) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(_ operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
         operands.contains { first in
@@ -918,7 +938,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(multiplying a: V, _ b: V, adding c: V) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(multiplying a: V, _ b: V, adding c: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
         let (first, second, addend) = (a[lane], b[lane], c[lane])
@@ -932,25 +952,25 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasNaNs<V: SIMD>(negating operands: V...) -> Bool
+package func hasNaNs<V: Swift.SIMD>(negating operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     operands.contains { operand in (0..<V.scalarCount).contains { operand[$0].isNaN } }
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(negating a: V, _ b: V, adding c: V) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(negating a: V, _ b: V, adding c: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     hasNaNs(negating: a, b) || hasUnorderedNaNs(multiplying: a, b, adding: c)
 }
 
 @inlinable
-package func negatedLanes<V: SIMD>(of vector: V) -> V
+package func negatedLanes<V: Swift.SIMD>(of vector: V) -> V
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     V((0..<V.scalarCount).map { -vector[$0] })
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(alternatingNegation a: V, _ b: V) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(alternatingNegation a: V, _ b: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     (0..<V.scalarCount).contains { lane in
         let second = lane.isMultiple(of: 2) ? -b[lane] : b[lane]
@@ -959,7 +979,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(adjacentLanesOf operands: V...) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(adjacentLanesOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     operands.contains { operand in
         stride(from: 0, to: V.scalarCount, by: 2).contains { lane in
@@ -970,7 +990,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(adjacentQuadsOf operands: V...) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(adjacentQuadsOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint & SIMDScalar {
     operands.contains { operand in
         stride(from: 0, to: V.scalarCount, by: 4).contains { lane in
@@ -980,7 +1000,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint & SIMDScalar {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(complexLanesOf operands: V...) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(complexLanesOf operands: V...) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     let large = V.Scalar.greatestFiniteMagnitude.squareRoot() / 4
     return stride(from: 0, to: V.scalarCount, by: 2).contains { lane in
@@ -997,7 +1017,7 @@ where V.Scalar: ReferenceLane & BinaryFloatingPoint {
 }
 
 @inlinable
-package func hasUnorderedNaNs<V: SIMD>(lanesOf vector: V) -> Bool
+package func hasUnorderedNaNs<V: Swift.SIMD>(lanesOf vector: V) -> Bool
 where V.Scalar: ReferenceLane & BinaryFloatingPoint {
     let lanes = (0..<V.scalarCount).map { vector[$0] }
     let payloads = Set(lanes.filter { $0.isNaN }.map { $0.bits })
@@ -1009,7 +1029,7 @@ package func hex<Lane: ReferenceLane>(_ lane: Lane) -> String {
     "0x" + String(lane.bits, radix: 16)
 }
 
-package func describe<V: SIMD>(_ vector: V) -> String where V.Scalar: ReferenceLane {
+package func describe<V: Swift.SIMD>(_ vector: V) -> String where V.Scalar: ReferenceLane {
     "[" + (0..<V.scalarCount).map { hex(vector[$0]) }.joined(separator: ", ") + "]"
 }
 
@@ -1019,11 +1039,11 @@ where Storage.Scalar: ReferenceLane {
 }
 
 package func describe<V: ReferenceVector>(_ vector: V) -> String {
-    describe(vector.simd)
+    describe(vector.referenceSimd)
 }
 
 package func describe<M: ReferenceMask>(_ mask: M) -> String {
-    describe(mask.simd)
+    describe(mask.referenceSimd)
 }
 
 package func describe<V: ReferenceNarrowVector>(_ vector: V) -> String {
@@ -1044,19 +1064,19 @@ package func bytes<Lane: ReferenceLane>(of lanes: [Lane]) -> [UInt8] {
     }
 }
 
-package func bytes<V: SIMD>(of vector: V) -> [UInt8] where V.Scalar: ReferenceLane {
+package func bytes<V: Swift.SIMD>(of vector: V) -> [UInt8] where V.Scalar: ReferenceLane {
     bytes(of: (0..<V.scalarCount).map { vector[$0] })
 }
 
 package func bytes<V: ReferenceVector>(of vector: V) -> [UInt8] {
-    bytes(of: vector.simd)
+    bytes(of: vector.referenceSimd)
 }
 
 package func bytes<V: ReferenceNarrowVector>(of vector: V) -> [UInt8] {
     bytes(of: vector.lanes)
 }
 
-package func registerBytes<V: SIMD>(of vector: V) -> [UInt8] where V.Scalar: ReferenceLane {
+package func registerBytes<V: Swift.SIMD>(of vector: V) -> [UInt8] where V.Scalar: ReferenceLane {
     bytes(of: vector)
 }
 
@@ -1089,7 +1109,7 @@ package final class Mismatches {
         self.operation = operation
     }
 
-    package func check<V: SIMD>(
+    package func check<V: Swift.SIMD>(
         _ port: V,
         _ reference: V,
         _ inputs: @autoclosure () -> String
@@ -1111,7 +1131,7 @@ package final class Mismatches {
         _ reference: V,
         _ inputs: @autoclosure () -> String
     ) {
-        check(port.simd, reference.simd, inputs())
+        check(port.referenceSimd, reference.referenceSimd, inputs())
     }
 
     package func check<M: ReferenceMask>(
@@ -1119,7 +1139,7 @@ package final class Mismatches {
         _ reference: M,
         _ inputs: @autoclosure () -> String
     ) {
-        check(port.simd, reference.simd, inputs())
+        check(port.referenceSimd, reference.referenceSimd, inputs())
     }
 
     package func check<V: ReferenceNarrowVector>(

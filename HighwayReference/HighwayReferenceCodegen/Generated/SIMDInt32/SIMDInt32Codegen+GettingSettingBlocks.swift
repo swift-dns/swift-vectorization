@@ -4,40 +4,40 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portExtractingBlockI32ConstantA() -> SIMDInt32.BlockVector {
-    unsafe SIMDInt32.block(SIMDInt32.repeating(26), atUnchecked: 0)
+public func portExtractingBlockI32ConstantA() -> SIMD<Int32>.BlockVector {
+    unsafe SIMD<Int32>.block(SIMD<Int32>.repeating(26), atUnchecked: 0)
 }
 
 @inline(never)
-public func highwayExtractingBlockI32ConstantA() -> SIMDInt32.BlockVector {
-    SIMDInt32.BlockVector(
+public func highwayExtractingBlockI32ConstantA() -> SIMD<Int32>.BlockVector {
+    SIMD<Int32>.BlockVector(
         raw: HighwayReference.Nothrow.extractingBlockI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             0
         )
     )
 }
 
 @inline(never)
-public func portExtractingBlockI32ConstantIndex(_ a: SIMDInt32.Vector) -> SIMDInt32.BlockVector {
-    unsafe SIMDInt32.block(a, atUnchecked: 0)
+public func portExtractingBlockI32ConstantIndex(_ a: SIMD<Int32>) -> SIMD<Int32>.BlockVector {
+    unsafe SIMD<Int32>.block(a, atUnchecked: 0)
 }
 
 @inline(never)
-public func highwayExtractingBlockI32ConstantIndex(_ a: SIMDInt32.Vector) -> SIMDInt32.BlockVector {
-    SIMDInt32.BlockVector(raw: HighwayReference.Nothrow.extractingBlockI32(a.raw, 0))
+public func highwayExtractingBlockI32ConstantIndex(_ a: SIMD<Int32>) -> SIMD<Int32>.BlockVector {
+    SIMD<Int32>.BlockVector(raw: HighwayReference.Nothrow.extractingBlockI32(a.raw, 0))
 }
 
 @inline(never)
-public func portReplacingBlockI32ConstantA(with b: SIMDInt32.BlockVector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.replacingBlock(SIMDInt32.repeating(26), atUnchecked: 0, with: b)
+public func portReplacingBlockI32ConstantA(with b: SIMD<Int32>.BlockVector) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.replacingBlock(SIMD<Int32>.repeating(26), atUnchecked: 0, with: b)
 }
 
 @inline(never)
-public func highwayReplacingBlockI32ConstantA(with b: SIMDInt32.BlockVector) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayReplacingBlockI32ConstantA(with b: SIMD<Int32>.BlockVector) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.replacingBlockI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             0,
             b.raw
         )
@@ -46,16 +46,16 @@ public func highwayReplacingBlockI32ConstantA(with b: SIMDInt32.BlockVector) -> 
 
 @inline(never)
 public func portReplacingBlockI32ConstantIndex(
-    _ a: SIMDInt32.Vector,
-    with b: SIMDInt32.BlockVector
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.replacingBlock(a, atUnchecked: 0, with: b)
+    _ a: SIMD<Int32>,
+    with b: SIMD<Int32>.BlockVector
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.replacingBlock(a, atUnchecked: 0, with: b)
 }
 
 @inline(never)
 public func highwayReplacingBlockI32ConstantIndex(
-    _ a: SIMDInt32.Vector,
-    with b: SIMDInt32.BlockVector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.replacingBlockI32(a.raw, 0, b.raw))
+    _ a: SIMD<Int32>,
+    with b: SIMD<Int32>.BlockVector
+) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.replacingBlockI32(a.raw, 0, b.raw))
 }

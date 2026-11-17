@@ -5,303 +5,354 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portComplexConjugateF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    SIMDFloat16.complexConjugate(a)
+public func portComplexConjugateF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.complexConjugate(a)
 }
 
 @inline(never)
-public func highwayComplexConjugateF16(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.complexConjugateF16(a)
+public func highwayComplexConjugateF16(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.complexConjugateF16(a.raw))
 }
 
 @inline(never)
-public func portComplexConjugateF16ConstantA() -> SIMDFloat16.Vector {
-    SIMDFloat16.complexConjugate(SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portComplexConjugateF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>.complexConjugate(SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayComplexConjugateF16ConstantA() -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.complexConjugateF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayComplexConjugateF16ConstantA() -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.complexConjugateF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
-public func portMultiplyingComplexF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplex(a, b)
+public func portMultiplyingComplexF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplex(a, b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexF16(a, b)
+public func highwayMultiplyingComplexF16(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.multiplyingComplexF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingComplexF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplex(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+public func portMultiplyingComplexF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplex(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexF16ConstantA(_ b: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+public func highwayMultiplyingComplexF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
-public func portMultiplyingComplexF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplex(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portMultiplyingComplexF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplex(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayMultiplyingComplexF16ConstantB(_ a: SIMDFloat16.Vector) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayMultiplyingComplexF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplexConjugate(a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplexConjugate(a, b)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF16(a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.multiplyingComplexConjugateF16(a.raw, b.raw))
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateF16ConstantA(
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplexConjugate(SIMDFloat16.repeating(Float16(bitPattern: 26)), b)
+public func portMultiplyingComplexConjugateF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplexConjugate(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b)
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateF16ConstantA(
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+public func highwayMultiplyingComplexConjugateF16ConstantA(_ b: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
-public func portMultiplyingComplexConjugateF16ConstantB(
-    _ a: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplexConjugate(a, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+public func portMultiplyingComplexConjugateF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplexConjugate(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayMultiplyingComplexConjugateF16ConstantB(
-    _ a: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+public func highwayMultiplyingComplexConjugateF16ConstantB(_ a: SIMD<Float16>) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplex(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplex(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexF16(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(raw: HighwayReference.Nothrow.multiplyAddingComplexF16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplyAddingComplexF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplex(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplex(SIMD<Float16>.repeating(Float16(bitPattern: 26)), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplex(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplex(a, SIMD<Float16>.repeating(Float16(bitPattern: 26)), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexF16(
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplex(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplex(a, b, SIMD<Float16>.repeating(Float16(bitPattern: 26)))
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexF16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplexConjugate(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplexConjugate(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF16(a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF16(a.raw, b.raw, c.raw)
+    )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplexConjugate(SIMDFloat16.repeating(Float16(bitPattern: 26)), b, c)
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplexConjugate(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
+        b,
+        c
+    )
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplexConjugate(a, SIMDFloat16.repeating(Float16(bitPattern: 26)), c)
-}
-
-@inline(never)
-public func highwayMultiplyAddingComplexConjugateF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF16(
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplexConjugate(
         a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         c
     )
 }
 
 @inline(never)
+public func highwayMultiplyAddingComplexConjugateF16ConstantB(
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF16(
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
+    )
+}
+
+@inline(never)
 public func portMultiplyAddingComplexConjugateF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplexConjugate(a, b, SIMDFloat16.repeating(Float16(bitPattern: 26)))
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplexConjugate(
+        a,
+        b,
+        SIMD<Float16>.repeating(Float16(bitPattern: 26))
+    )
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateF16(
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateF16(
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplex(a, b, where: mask, otherwise: otherwise)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(otherwise, mask.raw, a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplex(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplex(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         where: mask,
         otherwise: otherwise
@@ -310,27 +361,31 @@ public func portMultiplyingComplexWhereOtherwiseF16ConstantA(
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplex(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplex(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask,
         otherwise: otherwise
     )
@@ -338,71 +393,81 @@ public func portMultiplyingComplexWhereOtherwiseF16ConstantB(
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask,
-    otherwise: SIMDFloat16.Vector
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
-        otherwise,
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask,
+    otherwise: SIMD<Float16>
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
+            otherwise.raw,
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplex(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplex(
         a,
         b,
         where: mask,
-        otherwise: SIMDFloat16.repeating(Float16(bitPattern: 26))
+        otherwise: SIMD<Float16>.repeating(Float16(bitPattern: 26))
     )
 }
 
 @inline(never)
 public func highwayMultiplyingComplexWhereOtherwiseF16ConstantOtherwise(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        mask.raw,
-        a,
-        b
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexWhereOtherwiseF16(
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            mask.raw,
+            a.raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplexConjugate(a, b, where: mask)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplexConjugate(a, b, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(mask.raw, a, b)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(mask.raw, a.raw, b.raw)
+    )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplexConjugate(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplexConjugate(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         where: mask
     )
@@ -410,68 +475,83 @@ public func portMultiplyingComplexConjugateWhereF16ConstantA(
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyingComplexConjugateWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyingComplexConjugate(
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyingComplexConjugate(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask
     )
 }
 
 @inline(never)
 public func highwayMultiplyingComplexConjugateWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyingComplexConjugateWhereF16(
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplexConjugate(a, b, c, where: mask)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplexConjugate(a, b, c, where: mask)
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereF16(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(mask.raw, a, b, c)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
+            mask.raw,
+            a.raw,
+            b.raw,
+            c.raw
+        )
+    )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplexConjugate(
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplexConjugate(
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         b,
         c,
         where: mask
@@ -480,27 +560,31 @@ public func portMultiplyAddingComplexConjugateWhereF16ConstantA(
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereF16ConstantA(
-    _ b: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
-        mask.raw,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        b,
-        c
+    _ b: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
+            mask.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            b.raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplexConjugate(
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplexConjugate(
         a,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         c,
         where: mask
     )
@@ -508,43 +592,51 @@ public func portMultiplyAddingComplexConjugateWhereF16ConstantB(
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereF16ConstantB(
-    _ a: SIMDFloat16.Vector,
-    _ c: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
-        mask.raw,
-        a,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
-        c
+    _ a: SIMD<Float16>,
+    _ c: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
+            mask.raw,
+            a.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw,
+            c.raw
+        )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingComplexConjugateWhereF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    SIMDFloat16.multiplyAddingComplexConjugate(
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>.multiplyAddingComplexConjugate(
         a,
         b,
-        SIMDFloat16.repeating(Float16(bitPattern: 26)),
+        SIMD<Float16>.repeating(Float16(bitPattern: 26)),
         where: mask
     )
 }
 
 @inline(never)
 public func highwayMultiplyAddingComplexConjugateWhereF16ConstantC(
-    _ a: SIMDFloat16.Vector,
-    _ b: SIMDFloat16.Vector,
-    where mask: SIMDFloat16.Mask
-) -> SIMDFloat16.Vector {
-    HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
-        mask.raw,
-        a,
-        b,
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+    _ a: SIMD<Float16>,
+    _ b: SIMD<Float16>,
+    where mask: SIMD<Float16>.Mask
+) -> SIMD<Float16> {
+    SIMD<Float16>(
+        raw: HighwayReference.Nothrow.multiplyAddingComplexConjugateWhereF16(
+            mask.raw,
+            a.raw,
+            b.raw,
+            SIMD<Float16>(
+                raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+            ).raw
+        )
     )
 }
 #endif

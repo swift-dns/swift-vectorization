@@ -8,13 +8,13 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkGreaterThanOrEqualToWhereConstantA(_ value: H.Lane) {
+    private func checkGreaterThanOrEqualToWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("greaterThanOrEqualToWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA5A9_8B6B_BE85_B2B9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA5A9_896B_BE85_AF53)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA5A9_896B_BE85_AF53)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
@@ -23,8 +23,8 @@ extension SIMDFloat16ConstantTests {
                 H.Mask(
                     raw: HighwayReference.greaterThanOrEqualToWhereF16(
                         mask.raw,
-                        H.repeating(value),
-                        b
+                        H.repeating(value).raw,
+                        b.raw
                     )
                 ),
                 "mask: \(describe(mask)), b: \(describe(b))"
@@ -34,13 +34,13 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkGreaterThanOrEqualToWhereConstantB(_ value: H.Lane) {
+    private func checkGreaterThanOrEqualToWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("greaterThanOrEqualToWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9D14_746B_B9AF_0704)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9D14_756B_B9AF_08B7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9D14_756B_B9AF_08B7)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
@@ -49,8 +49,8 @@ extension SIMDFloat16ConstantTests {
                 H.Mask(
                     raw: HighwayReference.greaterThanOrEqualToWhereF16(
                         mask.raw,
-                        a,
-                        H.repeating(value)
+                        a.raw,
+                        H.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask)), a: \(describe(a))"
@@ -232,8 +232,8 @@ extension SIMDFloat16ConstantTests {
             "Under Linux in release builds on AVX3_SPR in Intel SDE Highway's Float16 masked ordered comparisons with a constant operand sometimes give the result of the reversed comparison, depending on how the compiler inlines them, where the port gives the correct one",
             isIntermittent: true
         ) {
-            checkGreaterThanOrEqualToWhereConstantA(H.Lane(nan: 1, signaling: false))
-            checkGreaterThanOrEqualToWhereConstantB(H.Lane(nan: 1, signaling: false))
+            checkGreaterThanOrEqualToWhereConstantA(Lane(nan: 1, signaling: false))
+            checkGreaterThanOrEqualToWhereConstantB(Lane(nan: 1, signaling: false))
         } when: {
             isAmd64 && !isDarwin && SIMDTarget.targetName == "AVX3_SPR" && !assertionsAreEnabled
         }

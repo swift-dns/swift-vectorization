@@ -8,12 +8,17 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func shiftedLeftBytes() {
         let mismatches = Mismatches("shiftedLeftBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9316_7E06_A719_7F05)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9316_7E06_A719_7F05)
         let bytesInputs = Array(0...16)
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 H.shiftedLeftBytes(a, by: bytes),
-                HighwayReference.shiftedLeftBytesF32(a, Int32(truncatingIfNeeded: bytes)),
+                H(
+                    raw: HighwayReference.shiftedLeftBytesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
         }
@@ -22,12 +27,17 @@ extension SIMDFloatReferenceTests {
 
     @Test func shiftedLeftBytesUnchecked() {
         let mismatches = Mismatches("shiftedLeftBytes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC95F_958A_B711_3CA5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC95F_958A_B711_3CA5)
         let bytesInputs = Array(0...16)
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 unsafe H.shiftedLeftBytes(a, byUnchecked: bytes),
-                HighwayReference.shiftedLeftBytesF32(a, Int32(truncatingIfNeeded: bytes)),
+                H(
+                    raw: HighwayReference.shiftedLeftBytesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
         }
@@ -36,12 +46,17 @@ extension SIMDFloatReferenceTests {
 
     @Test func shiftedRightBytes() {
         let mismatches = Mismatches("shiftedRightBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCA8E_7D06_CC44_A4AC)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCA8E_7D06_CC44_A4AC)
         let bytesInputs = Array(0...16)
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 H.shiftedRightBytes(a, by: bytes),
-                HighwayReference.shiftedRightBytesF32(a, Int32(truncatingIfNeeded: bytes)),
+                H(
+                    raw: HighwayReference.shiftedRightBytesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
         }
@@ -50,12 +65,17 @@ extension SIMDFloatReferenceTests {
 
     @Test func shiftedRightBytesUnchecked() {
         let mismatches = Mismatches("shiftedRightBytes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCA03_FDCB_4006_C1A2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCA03_FDCB_4006_C1A2)
         let bytesInputs = Array(0...16)
         for (a, bytes) in everyPair(aInputs, bytesInputs) {
             mismatches.check(
                 unsafe H.shiftedRightBytes(a, byUnchecked: bytes),
-                HighwayReference.shiftedRightBytesF32(a, Int32(truncatingIfNeeded: bytes)),
+                H(
+                    raw: HighwayReference.shiftedRightBytesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
+                ),
                 "a: \(describe(a)), bytes: \(bytes)"
             )
         }
@@ -64,12 +84,17 @@ extension SIMDFloatReferenceTests {
 
     @Test func shiftedLeftLanes() {
         let mismatches = Mismatches("shiftedLeftLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB6AB_16F1_71CB_D59D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB6AB_16F1_71CB_D59D)
         let lanesInputs = Array(0...4)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.shiftedLeftLanes(a, by: lanes),
-                HighwayReference.shiftedLeftLanesF32(a, Int32(truncatingIfNeeded: lanes)),
+                H(
+                    raw: HighwayReference.shiftedLeftLanesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
+                ),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -78,12 +103,17 @@ extension SIMDFloatReferenceTests {
 
     @Test func shiftedLeftLanesUnchecked() {
         let mismatches = Mismatches("shiftedLeftLanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4122_DCD5_BE1A_6A5D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4122_DCD5_BE1A_6A5D)
         let lanesInputs = Array(0...4)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 unsafe H.shiftedLeftLanes(a, byUnchecked: lanes),
-                HighwayReference.shiftedLeftLanesF32(a, Int32(truncatingIfNeeded: lanes)),
+                H(
+                    raw: HighwayReference.shiftedLeftLanesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
+                ),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -92,12 +122,17 @@ extension SIMDFloatReferenceTests {
 
     @Test func shiftedRightLanes() {
         let mismatches = Mismatches("shiftedRightLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD4DD_A9A4_3BD9_6614)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD4DD_A9A4_3BD9_6614)
         let lanesInputs = Array(0...4)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 H.shiftedRightLanes(a, by: lanes),
-                HighwayReference.shiftedRightLanesF32(a, Int32(truncatingIfNeeded: lanes)),
+                H(
+                    raw: HighwayReference.shiftedRightLanesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
+                ),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -106,12 +141,17 @@ extension SIMDFloatReferenceTests {
 
     @Test func shiftedRightLanesUnchecked() {
         let mismatches = Mismatches("shiftedRightLanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xABC9_008E_75D2_C8CA)
+        let aInputs = Inputs.vectors(H.self, seed: 0xABC9_008E_75D2_C8CA)
         let lanesInputs = Array(0...4)
         for (a, lanes) in everyPair(aInputs, lanesInputs) {
             mismatches.check(
                 unsafe H.shiftedRightLanes(a, byUnchecked: lanes),
-                HighwayReference.shiftedRightLanesF32(a, Int32(truncatingIfNeeded: lanes)),
+                H(
+                    raw: HighwayReference.shiftedRightLanesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
+                ),
                 "a: \(describe(a)), lanes: \(lanes)"
             )
         }
@@ -120,8 +160,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func combinedShiftedRightBytes() {
         let mismatches = Mismatches("combinedShiftedRightBytes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6E2B_CE9F_3EF8_BF09)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6E2B_CD9F_3EF8_BD56)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6E2B_CE9F_3EF8_BF09)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6E2B_CD9F_3EF8_BD56)
         let bytesInputs = Array(1...15)
         for (a, b, bytes) in mixedTriples(
             aInputs,
@@ -131,10 +171,12 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.combinedShiftedRightBytes(a, b, by: bytes),
-                HighwayReference.combinedShiftedRightBytesF32(
-                    a,
-                    b,
-                    Int32(truncatingIfNeeded: bytes)
+                H(
+                    raw: HighwayReference.combinedShiftedRightBytesF32(
+                        a.raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
                 ),
                 "a: \(describe(a)), b: \(describe(b)), bytes: \(bytes)"
             )
@@ -144,8 +186,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func combinedShiftedRightBytesUnchecked() {
         let mismatches = Mismatches("combinedShiftedRightBytes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCFD4_0379_12FA_DFE9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xCFD4_0279_12FA_DE36)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCFD4_0379_12FA_DFE9)
+        let bInputs = Inputs.vectors(H.self, seed: 0xCFD4_0279_12FA_DE36)
         let bytesInputs = Array(1...15)
         for (a, b, bytes) in mixedTriples(
             aInputs,
@@ -155,10 +197,12 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.combinedShiftedRightBytes(a, b, byUnchecked: bytes),
-                HighwayReference.combinedShiftedRightBytesF32(
-                    a,
-                    b,
-                    Int32(truncatingIfNeeded: bytes)
+                H(
+                    raw: HighwayReference.combinedShiftedRightBytesF32(
+                        a.raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: bytes)
+                    )
                 ),
                 "a: \(describe(a)), b: \(describe(b)), bytes: \(bytes)"
             )
@@ -168,8 +212,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func combinedShiftedRightLanes() {
         let mismatches = Mismatches("combinedShiftedRightLanes")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9A80_D5B1_1D0D_64E9)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9A80_D4B1_1D0D_6336)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9A80_D5B1_1D0D_64E9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9A80_D4B1_1D0D_6336)
         let lanesInputs = Array(1...3)
         for (a, b, lanes) in mixedTriples(
             aInputs,
@@ -179,10 +223,12 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.combinedShiftedRightLanes(a, b, by: lanes),
-                HighwayReference.combinedShiftedRightLanesF32(
-                    a,
-                    b,
-                    Int32(truncatingIfNeeded: lanes)
+                H(
+                    raw: HighwayReference.combinedShiftedRightLanesF32(
+                        a.raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
                 ),
                 "a: \(describe(a)), b: \(describe(b)), lanes: \(lanes)"
             )
@@ -192,8 +238,8 @@ extension SIMDFloatReferenceTests {
 
     @Test func combinedShiftedRightLanesUnchecked() {
         let mismatches = Mismatches("combinedShiftedRightLanes unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9EA4_1DCA_8F2A_D389)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9EA4_1CCA_8F2A_D1D6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9EA4_1DCA_8F2A_D389)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9EA4_1CCA_8F2A_D1D6)
         let lanesInputs = Array(1...3)
         for (a, b, lanes) in mixedTriples(
             aInputs,
@@ -203,10 +249,12 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.combinedShiftedRightLanes(a, b, byUnchecked: lanes),
-                HighwayReference.combinedShiftedRightLanesF32(
-                    a,
-                    b,
-                    Int32(truncatingIfNeeded: lanes)
+                H(
+                    raw: HighwayReference.combinedShiftedRightLanesF32(
+                        a.raw,
+                        b.raw,
+                        Int32(truncatingIfNeeded: lanes)
+                    )
                 ),
                 "a: \(describe(a)), b: \(describe(b)), lanes: \(lanes)"
             )

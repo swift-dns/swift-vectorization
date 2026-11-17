@@ -9,8 +9,8 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func storeStreaming() {
         let mismatches = Mismatches("portStoreStreamingF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x057E_2335_C300_A96C)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x057E_2335_C300_A96C)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
                 destination in unsafe portStoreStreamingF64(a, to: destination)
@@ -25,8 +25,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func storeStreamingBeforeGuardPage() {
         let mismatches = Mismatches("portStoreStreamingF64 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAB48_ABE8_AA2D_27E5)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAB48_ABE8_AA2D_27E5)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe portStoreStreamingF64(a, to: destination)
@@ -41,7 +41,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func storeStreamingConstantA() {
         let mismatches = Mismatches("portStoreStreamingF64ConstantA")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         let (_, portLanes) = unsafe withAlignedLanes(sentinel, laneCount: H.laneCount) {
             destination in unsafe portStoreStreamingF64ConstantA(to: destination)
         }
@@ -54,7 +54,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func storeStreamingConstantABeforeGuardPage() {
         let mismatches = Mismatches("portStoreStreamingF64ConstantA before a guard page")
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
             unsafe portStoreStreamingF64ConstantA(to: destination)
         }

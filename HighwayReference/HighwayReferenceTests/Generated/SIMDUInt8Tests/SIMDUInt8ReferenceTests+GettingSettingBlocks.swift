@@ -8,7 +8,7 @@ import Vectorization
 extension SIMDUInt8ReferenceTests {
     @Test func extractingBlock() {
         let mismatches = Mismatches("extractingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBC61_43DF_C2CE_7518)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBC61_43DF_C2CE_7518)
         let indexInputs = Array(0...H.laneCount / 16 - 1)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -24,7 +24,7 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func extractingBlockUnchecked() {
         let mismatches = Mismatches("extractingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x01F4_5114_CEB0_837E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x01F4_5114_CEB0_837E)
         let indexInputs = Array(0...H.laneCount / 16 - 1)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
@@ -40,7 +40,7 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func replacingBlock() {
         let mismatches = Mismatches("replacingBlock")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3905_4CC9_33AD_00E2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3905_4CC9_33AD_00E2)
         let indexInputs = Array(0...H.laneCount / 16 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x3905_4AC9_33AC_FD7C).map(
             poisoningUpperBytes
@@ -53,7 +53,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 H.replacingBlock(a, at: index, with: b),
-                H.Vector(
+                H(
                     raw: HighwayReference.replacingBlockU8(
                         a.raw,
                         Int32(truncatingIfNeeded: index),
@@ -68,7 +68,7 @@ extension SIMDUInt8ReferenceTests {
 
     @Test func replacingBlockUnchecked() {
         let mismatches = Mismatches("replacingBlock unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2629_20A0_9316_5CDC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2629_20A0_9316_5CDC)
         let indexInputs = Array(0...H.laneCount / 16 - 1)
         let bInputs = Inputs.vectors(H.BlockVector.self, seed: 0x2629_22A0_9316_6042).map(
             poisoningUpperBytes
@@ -81,7 +81,7 @@ extension SIMDUInt8ReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingBlock(a, atUnchecked: index, with: b),
-                H.Vector(
+                H(
                     raw: HighwayReference.replacingBlockU8(
                         a.raw,
                         Int32(truncatingIfNeeded: index),

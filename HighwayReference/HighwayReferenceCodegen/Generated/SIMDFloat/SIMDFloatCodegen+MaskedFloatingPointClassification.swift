@@ -4,29 +4,27 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portIsNaNWhereF32(_ a: SIMDFloat.Vector, where mask: SIMDFloat.Mask) -> SIMDFloat.Mask {
-    SIMDFloat.isNaN(a, where: mask)
+public func portIsNaNWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float>.Mask {
+    SIMD<Float>.isNaN(a, where: mask)
 }
 
 @inline(never)
-public func highwayIsNaNWhereF32(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Mask {
-    SIMDFloat.Mask(raw: HighwayReference.Nothrow.isNaNWhereF32(mask.raw, a))
+public func highwayIsNaNWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> SIMD<Float>.Mask
+{
+    SIMD<Float>.Mask(raw: HighwayReference.Nothrow.isNaNWhereF32(mask.raw, a.raw))
 }
 
 @inline(never)
-public func portIsNaNWhereF32ConstantA(where mask: SIMDFloat.Mask) -> SIMDFloat.Mask {
-    SIMDFloat.isNaN(SIMDFloat.repeating(1.5), where: mask)
+public func portIsNaNWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float>.Mask {
+    SIMD<Float>.isNaN(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwayIsNaNWhereF32ConstantA(where mask: SIMDFloat.Mask) -> SIMDFloat.Mask {
-    SIMDFloat.Mask(
+public func highwayIsNaNWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> SIMD<Float>.Mask {
+    SIMD<Float>.Mask(
         raw: HighwayReference.Nothrow.isNaNWhereF32(
             mask.raw,
-            HighwayReference.Nothrow.repeatingF32(1.5)
+            SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
         )
     )
 }

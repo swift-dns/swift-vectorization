@@ -4,51 +4,51 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portBitwiseNotMaskBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.bitwiseNot(mask)
+public func portBitwiseNotMaskBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.bitwiseNot(mask)
 }
 
 @inline(never)
-public func highwayBitwiseNotMaskBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.Mask(raw: HighwayReference.Nothrow.bitwiseNotMaskBF16(mask.raw))
+public func highwayBitwiseNotMaskBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.Mask(raw: HighwayReference.Nothrow.bitwiseNotMaskBF16(mask.raw))
 }
 
 @inline(never)
-public func portOnlyFirstTrueBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.onlyFirstTrue(mask)
+public func portOnlyFirstTrueBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.onlyFirstTrue(mask)
 }
 
 @inline(never)
-public func highwayOnlyFirstTrueBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.Mask(raw: HighwayReference.Nothrow.onlyFirstTrueBF16(mask.raw))
+public func highwayOnlyFirstTrueBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.Mask(raw: HighwayReference.Nothrow.onlyFirstTrueBF16(mask.raw))
 }
 
 @inline(never)
-public func portBeforeFirstTrueBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.beforeFirstTrue(mask)
+public func portBeforeFirstTrueBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.beforeFirstTrue(mask)
 }
 
 @inline(never)
-public func highwayBeforeFirstTrueBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.Mask(raw: HighwayReference.Nothrow.beforeFirstTrueBF16(mask.raw))
+public func highwayBeforeFirstTrueBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.Mask(raw: HighwayReference.Nothrow.beforeFirstTrueBF16(mask.raw))
 }
 
 @inline(never)
-public func portAtOrBeforeFirstTrueBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.atOrBeforeFirstTrue(mask)
+public func portAtOrBeforeFirstTrueBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.atOrBeforeFirstTrue(mask)
 }
 
 @inline(never)
-public func highwayAtOrBeforeFirstTrueBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.Mask(raw: HighwayReference.Nothrow.atOrBeforeFirstTrueBF16(mask.raw))
+public func highwayAtOrBeforeFirstTrueBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.Mask(raw: HighwayReference.Nothrow.atOrBeforeFirstTrueBF16(mask.raw))
 }
 
 @inline(never)
-public func portAtOrAfterFirstTrueBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.atOrAfterFirstTrue(mask)
+public func portAtOrAfterFirstTrueBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.atOrAfterFirstTrue(mask)
 }
 
 @inline(never)
-public func highwayAtOrAfterFirstTrueBF16(_ mask: SIMDBFloat16.Mask) -> SIMDBFloat16.Mask {
-    SIMDBFloat16.Mask(raw: HighwayReference.Nothrow.atOrAfterFirstTrueBF16(mask.raw))
+public func highwayAtOrAfterFirstTrueBF16(_ mask: SIMD<BFloat16>.Mask) -> SIMD<BFloat16>.Mask {
+    SIMD<BFloat16>.Mask(raw: HighwayReference.Nothrow.atOrAfterFirstTrueBF16(mask.raw))
 }

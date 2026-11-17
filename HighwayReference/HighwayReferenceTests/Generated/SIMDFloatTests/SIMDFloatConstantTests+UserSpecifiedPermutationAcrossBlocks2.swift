@@ -14,16 +14,18 @@ extension SIMDFloatConstantTests {
         _ i0: Int
     ) {
         let mismatches = Mismatches("shuffledPer4Lanes with i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3B0E_88A8_B21C_4069)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3B0E_88A8_B21C_4069)
         for a in aInputs {
             mismatches.check(
                 H.shuffledPer4Lanes(a, i3, i2, i1, i0),
-                HighwayReference.shuffledPer4LanesF32(
-                    a,
-                    Int32(truncatingIfNeeded: i3),
-                    Int32(truncatingIfNeeded: i2),
-                    Int32(truncatingIfNeeded: i1),
-                    Int32(truncatingIfNeeded: i0)
+                H(
+                    raw: HighwayReference.shuffledPer4LanesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: i3),
+                        Int32(truncatingIfNeeded: i2),
+                        Int32(truncatingIfNeeded: i1),
+                        Int32(truncatingIfNeeded: i0)
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -1065,16 +1067,18 @@ extension SIMDFloatConstantTests {
         let mismatches = Mismatches(
             "shuffledPer4Lanes unchecked with i3 \(i3), i2 \(i2), i1 \(i1), i0 \(i0)"
         )
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3A50_320E_7D72_D715)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3A50_320E_7D72_D715)
         for a in aInputs {
             mismatches.check(
                 unsafe H.shuffledPer4Lanes(a, unchecked: i3, i2, i1, i0),
-                HighwayReference.shuffledPer4LanesF32(
-                    a,
-                    Int32(truncatingIfNeeded: i3),
-                    Int32(truncatingIfNeeded: i2),
-                    Int32(truncatingIfNeeded: i1),
-                    Int32(truncatingIfNeeded: i0)
+                H(
+                    raw: HighwayReference.shuffledPer4LanesF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: i3),
+                        Int32(truncatingIfNeeded: i2),
+                        Int32(truncatingIfNeeded: i1),
+                        Int32(truncatingIfNeeded: i0)
+                    )
                 ),
                 "a: \(describe(a))"
             )
@@ -2107,13 +2111,17 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkShuffledPer4LanesConstantA(_ value: H.Lane) {
+    private func checkShuffledPer4LanesConstantA(_ value: Lane) {
         let mismatches = Mismatches("shuffledPer4Lanes with a repeating \(hex(value))")
         let i3Inputs = Array(0...3)
         let i2Inputs = Array(0...3)
         let i1Inputs = Array(0...3)
         let i0Inputs = Array(0...3)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for (i3, i2, i1, i0) in mixedQuadruples(
             i3Inputs,
             i2Inputs,
@@ -2123,12 +2131,14 @@ extension SIMDFloatConstantTests {
         ) {
             mismatches.check(
                 H.shuffledPer4Lanes(H.repeating(value), i3, i2, i1, i0),
-                HighwayReference.shuffledPer4LanesF32(
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: i3),
-                    Int32(truncatingIfNeeded: i2),
-                    Int32(truncatingIfNeeded: i1),
-                    Int32(truncatingIfNeeded: i0)
+                H(
+                    raw: HighwayReference.shuffledPer4LanesF32(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: i3),
+                        Int32(truncatingIfNeeded: i2),
+                        Int32(truncatingIfNeeded: i1),
+                        Int32(truncatingIfNeeded: i0)
+                    )
                 ),
                 "i3: \(i3), i2: \(i2), i1: \(i1), i0: \(i0)"
             )
@@ -2193,7 +2203,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func shuffledPer4LanesConstantSplatPayloadNaN() {
-        checkShuffledPer4LanesConstantA(H.Lane(nan: 1, signaling: false))
+        checkShuffledPer4LanesConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func shuffledPer4LanesConstantSplatSignalingNaN() {

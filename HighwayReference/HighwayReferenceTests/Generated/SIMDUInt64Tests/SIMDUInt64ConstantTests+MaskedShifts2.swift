@@ -9,9 +9,9 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkShiftedRightWhereOtherwiseConstantBits(_ bits: Int) {
         let mismatches = Mismatches("shiftedRightWhereOtherwise with bits \(bits)")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x7D50_F96F_14EC_FE18)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7D50_F96F_14EC_FE18)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7D50_FA6F_14EC_FFCB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7D50_FB6F_14ED_017E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7D50_FB6F_14ED_017E)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -20,7 +20,7 @@ extension SIMDUInt64ConstantTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask, otherwise: otherwise),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereOtherwiseTemplateU64(
                         otherwise.raw,
                         mask.raw,
@@ -291,16 +291,16 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkShiftedRightWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkShiftedRightWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "shiftedRightWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x293B_2AAC_74CF_F3A3)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x293B_2BAC_74CF_F556)
+        let aInputs = Inputs.vectors(H.self, seed: 0x293B_2BAC_74CF_F556)
         let bitsInputs = Inputs.shiftAmounts(bits: 64, inContract: true)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, a, bits) in mixedTriples(
@@ -311,7 +311,7 @@ extension SIMDUInt64ConstantTests {
         ) {
             mismatches.check(
                 H.shiftedRight(a, by: bits, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.shiftedRightWhereOtherwiseU64(
                         H.repeating(value).raw,
                         mask.raw,
@@ -374,6 +374,6 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func shiftedRightWhereOtherwiseConstantSplatMax() {
-        checkShiftedRightWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkShiftedRightWhereOtherwiseConstantOtherwise(Lane.max)
     }
 }

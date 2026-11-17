@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
-    private func checkAddingConstantA(_ value: H.Lane) {
+    private func checkAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("adding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3103_B3AF_039E_A9C6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3103_B3AF_039E_A9C6)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.adding(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.addingU32(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.addingU32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkAddingConstantB(_ value: H.Lane) {
+    private func checkAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("adding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x286E_9DAE_FEC7_FFC4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x286E_9DAE_FEC7_FFC4)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.adding(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.addingU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.addingU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -105,23 +105,23 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func addingConstantSplatMax() {
-        checkAddingConstantA(H.Lane.max)
-        checkAddingConstantB(H.Lane.max)
+        checkAddingConstantA(Lane.max)
+        checkAddingConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkSubtractingConstantA(_ value: H.Lane) {
+    private func checkSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("subtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF944_3309_1DAC_EB69)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF944_3309_1DAC_EB69)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.subtracting(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.subtractingU32(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.subtractingU32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -129,18 +129,18 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkSubtractingConstantB(_ value: H.Lane) {
+    private func checkSubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("subtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDF84_CD09_0F28_B037)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDF84_CD09_0F28_B037)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.subtracting(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.subtractingU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.subtractingU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -208,31 +208,28 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func subtractingConstantSplatMax() {
-        checkSubtractingConstantA(H.Lane.max)
-        checkSubtractingConstantB(H.Lane.max)
+        checkSubtractingConstantA(Lane.max)
+        checkSubtractingConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkDividingConstantA(_ value: H.Lane) {
+    private func checkDividingConstantA(_ value: Lane) {
         let mismatches = Mismatches("dividing with a repeating \(hex(value))")
         let bInputs =
-            Inputs.vectors(H.Vector.self, seed: 0x88D0_4AC7_302F_47E3)
-            + Inputs.vectors(H.Vector.self, seed: 0x868D_9BC6_0C9A_AA74).enumerated().map {
+            Inputs.vectors(H.self, seed: 0x88D0_4AC7_302F_47E3)
+            + Inputs.vectors(H.self, seed: 0x868D_9BC6_0C9A_AA74).enumerated().map {
                 index,
-                vector in
-                H.Vector(
-                    vector.simd &>> H.Vector.Simd(repeating: H.Lane(truncatingIfNeeded: index))
-                )
+                vector in H(vector.simd &>> H.SIMDType(repeating: Lane(truncatingIfNeeded: index)))
             }
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.dividing(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.dividingU32(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.dividingU32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -240,18 +237,18 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkDividingConstantB(_ value: H.Lane) {
+    private func checkDividingConstantB(_ value: Lane) {
         let mismatches = Mismatches("dividing with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x91D2_00C7_3562_20A5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x91D2_00C7_3562_20A5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.dividing(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.dividingU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.dividingU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -319,23 +316,23 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func dividingConstantSplatMax() {
-        checkDividingConstantA(H.Lane.max)
-        checkDividingConstantB(H.Lane.max)
+        checkDividingConstantA(Lane.max)
+        checkDividingConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkSaturatingAddingConstantA(_ value: H.Lane) {
+    private func checkSaturatingAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6D99_DACF_264A_6014)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6D99_DACF_264A_6014)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.saturatingAdding(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.saturatingAddingU32(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.saturatingAddingU32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -343,18 +340,18 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkSaturatingAddingConstantB(_ value: H.Lane) {
+    private func checkSaturatingAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("saturatingAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8832_C0CF_3587_6586)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8832_C0CF_3587_6586)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.saturatingAdding(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.saturatingAddingU32(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.saturatingAddingU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -422,25 +419,23 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func saturatingAddingConstantSplatMax() {
-        checkSaturatingAddingConstantA(H.Lane.max)
-        checkSaturatingAddingConstantB(H.Lane.max)
+        checkSaturatingAddingConstantA(Lane.max)
+        checkSaturatingAddingConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkSaturatingSubtractingConstantB(_ value: H.Lane) {
+    private func checkSaturatingSubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("saturatingSubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x35E2_5D66_0E65_31A5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x35E2_5D66_0E65_31A5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.saturatingSubtracting(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.saturatingSubtractingU32(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.saturatingSubtractingU32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -496,20 +491,20 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func saturatingSubtractingConstantSplatMax() {
-        checkSaturatingSubtractingConstantB(H.Lane.max)
+        checkSaturatingSubtractingConstantB(Lane.max)
     }
 
     @inline(__always)
-    private func checkSumsOf2FromUInt16ConstantA(_ value: SIMDUInt16.Lane) {
+    private func checkSumsOf2FromUInt16ConstantA(_ value: UInt16) {
         let mismatches = Mismatches("sumsOf2FromUInt16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt16.repeating(value),
-            SIMDUInt16.Vector(raw: HighwayReference.repeatingU16(value)),
+            SIMD<UInt16>.repeating(value),
+            SIMD<UInt16>(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         mismatches.check(
-            H.sumsOf2(SIMDUInt16.repeating(value)),
-            H.Vector(raw: HighwayReference.sumsOf2U16ToU32(SIMDUInt16.repeating(value).raw)),
+            H.sumsOf2(SIMD<UInt16>.repeating(value)),
+            H(raw: HighwayReference.sumsOf2U16ToU32(SIMD<UInt16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -564,20 +559,20 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func sumsOf2FromUInt16ConstantSplatMax() {
-        checkSumsOf2FromUInt16ConstantA(SIMDUInt16.Lane.max)
+        checkSumsOf2FromUInt16ConstantA(UInt16.max)
     }
 
     @inline(__always)
-    private func checkSumsOf4FromUInt8ConstantA(_ value: SIMDUInt8.Lane) {
+    private func checkSumsOf4FromUInt8ConstantA(_ value: UInt8) {
         let mismatches = Mismatches("sumsOf4FromUInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt8.repeating(value),
-            SIMDUInt8.Vector(raw: HighwayReference.repeatingU8(value)),
+            SIMD<UInt8>.repeating(value),
+            SIMD<UInt8>(raw: HighwayReference.repeatingU8(value)),
             "repeating"
         )
         mismatches.check(
-            H.sumsOf4(SIMDUInt8.repeating(value)),
-            H.Vector(raw: HighwayReference.sumsOf4U8ToU32(SIMDUInt8.repeating(value).raw)),
+            H.sumsOf4(SIMD<UInt8>.repeating(value)),
+            H(raw: HighwayReference.sumsOf4U8ToU32(SIMD<UInt8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -616,16 +611,16 @@ extension SIMDUInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkBiasedExponentFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkBiasedExponentFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("biasedExponentFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.biasedExponent(SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.biasedExponentF32ToU32(SIMDFloat.repeating(value))),
+            H.biasedExponent(SIMD<Float>.repeating(value)),
+            H(raw: HighwayReference.biasedExponentF32ToU32(SIMD<Float>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -688,7 +683,7 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func biasedExponentFromFloatConstantSplatPayloadNaN() {
-        checkBiasedExponentFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkBiasedExponentFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func biasedExponentFromFloatConstantSplatSignalingNaN() {

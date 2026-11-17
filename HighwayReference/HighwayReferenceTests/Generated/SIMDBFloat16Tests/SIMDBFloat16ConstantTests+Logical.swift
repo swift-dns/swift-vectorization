@@ -7,11 +7,11 @@ import Vectorization
 
 extension SIMDBFloat16ConstantTests {
     @inline(__always)
-    private func checkAllBitsSetConstantA(_ value: H.Lane) {
+    private func checkAllBitsSetConstantA(_ value: Lane) {
         let mismatches = Mismatches("allBitsSet with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
@@ -23,187 +23,187 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func allBitsSetConstantSplatZero() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x0000))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func allBitsSetConstantSplatNegativeZero() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x8000))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func allBitsSetConstantSplatOne() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x3F80))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func allBitsSetConstantSplatMinusOne() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0xBF80))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func allBitsSetConstantSplatTwo() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x4000))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func allBitsSetConstantSplatHalf() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x3F00))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func allBitsSetConstantSplatFour() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x4080))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func allBitsSetConstantSplatQuarter() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x3E80))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func allBitsSetConstantSplatOnePointFive() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func allBitsSetConstantSplatMinusTwoPointFive() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0xC020))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func allBitsSetConstantSplatInfinity() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x7F80))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func allBitsSetConstantSplatMinusInfinity() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0xFF80))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func allBitsSetConstantSplatNaN() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func allBitsSetConstantSplatMinusNaN() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func allBitsSetConstantSplatPayloadNaN() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func allBitsSetConstantSplatSignalingNaN() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x7F81))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func allBitsSetConstantSplatMinusSignalingNaN() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0xFF81))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func allBitsSetConstantSplatLeastNonzero() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x0001))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func allBitsSetConstantSplatGreatest() {
-        checkAllBitsSetConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkAllBitsSetConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkZeroingNegativeConstantA(_ value: H.Lane) {
+    private func checkZeroingNegativeConstantA(_ value: Lane) {
         let mismatches = Mismatches("zeroingNegative with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.zeroingNegative(H.repeating(value)),
-            H.Vector(raw: HighwayReference.zeroingNegativeBF16(H.repeating(value).raw)),
+            H(raw: HighwayReference.zeroingNegativeBF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
     }
 
     @Test func zeroingNegativeConstantSplatZero() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x0000))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x0000))
     }
 
     @Test func zeroingNegativeConstantSplatNegativeZero() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x8000))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x8000))
     }
 
     @Test func zeroingNegativeConstantSplatOne() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x3F80))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x3F80))
     }
 
     @Test func zeroingNegativeConstantSplatMinusOne() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0xBF80))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0xBF80))
     }
 
     @Test func zeroingNegativeConstantSplatTwo() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x4000))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x4000))
     }
 
     @Test func zeroingNegativeConstantSplatHalf() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x3F00))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x3F00))
     }
 
     @Test func zeroingNegativeConstantSplatFour() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x4080))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x4080))
     }
 
     @Test func zeroingNegativeConstantSplatQuarter() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x3E80))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x3E80))
     }
 
     @Test func zeroingNegativeConstantSplatOnePointFive() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x3FC0))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func zeroingNegativeConstantSplatMinusTwoPointFive() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0xC020))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0xC020))
     }
 
     @Test func zeroingNegativeConstantSplatInfinity() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x7F80))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x7F80))
     }
 
     @Test func zeroingNegativeConstantSplatMinusInfinity() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0xFF80))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0xFF80))
     }
 
     @Test func zeroingNegativeConstantSplatNaN() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x7FC0))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func zeroingNegativeConstantSplatMinusNaN() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0xFFC0))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func zeroingNegativeConstantSplatPayloadNaN() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x7FC1))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func zeroingNegativeConstantSplatSignalingNaN() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x7F81))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x7F81))
     }
 
     @Test func zeroingNegativeConstantSplatMinusSignalingNaN() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0xFF81))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0xFF81))
     }
 
     @Test func zeroingNegativeConstantSplatLeastNonzero() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x0001))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x0001))
     }
 
     @Test func zeroingNegativeConstantSplatGreatest() {
-        checkZeroingNegativeConstantA(H.Lane(bitPattern: 0x7F7F))
+        checkZeroingNegativeConstantA(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeConstantA(_ value: H.Lane) {
+    private func checkSelectingIfNegativeConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegative with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9022_973F_0FC7_5672)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x9022_963F_0FC7_54BF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9022_973F_0FC7_5672)
+        let cInputs = Inputs.vectors(H.self, seed: 0x9022_963F_0FC7_54BF)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.selectingIfNegative(H.repeating(value), b, c),
-                H.Vector(
+                H(
                     raw: HighwayReference.selectingIfNegativeBF16(
                         H.repeating(value).raw,
                         b.raw,
@@ -217,19 +217,19 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeConstantB(_ value: H.Lane) {
+    private func checkSelectingIfNegativeConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegative with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8720_E13F_0A94_7DB0)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8720_E33F_0A94_8116)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8720_E13F_0A94_7DB0)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8720_E33F_0A94_8116)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.selectingIfNegative(a, H.repeating(value), c),
-                H.Vector(
+                H(
                     raw: HighwayReference.selectingIfNegativeBF16(
                         a.raw,
                         H.repeating(value).raw,
@@ -243,19 +243,19 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeConstantC(_ value: H.Lane) {
+    private func checkSelectingIfNegativeConstantC(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegative with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7E8B_CA3F_05BD_D1FB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7E8B_C93F_05BD_D048)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7E8B_CA3F_05BD_D1FB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7E8B_C93F_05BD_D048)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selectingIfNegative(a, b, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.selectingIfNegativeBF16(
                         a.raw,
                         b.raw,
@@ -269,132 +269,132 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func selectingIfNegativeConstantSplatZero() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x0000))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x0000))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x0000))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x0000))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x0000))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x0000))
     }
 
     @Test func selectingIfNegativeConstantSplatNegativeZero() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x8000))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x8000))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x8000))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x8000))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x8000))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x8000))
     }
 
     @Test func selectingIfNegativeConstantSplatOne() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x3F80))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x3F80))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x3F80))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x3F80))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x3F80))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x3F80))
     }
 
     @Test func selectingIfNegativeConstantSplatMinusOne() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0xBF80))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0xBF80))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0xBF80))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0xBF80))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0xBF80))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0xBF80))
     }
 
     @Test func selectingIfNegativeConstantSplatTwo() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x4000))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x4000))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x4000))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x4000))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x4000))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x4000))
     }
 
     @Test func selectingIfNegativeConstantSplatHalf() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x3F00))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x3F00))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x3F00))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x3F00))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x3F00))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x3F00))
     }
 
     @Test func selectingIfNegativeConstantSplatFour() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x4080))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x4080))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x4080))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x4080))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x4080))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x4080))
     }
 
     @Test func selectingIfNegativeConstantSplatQuarter() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x3E80))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x3E80))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x3E80))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x3E80))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x3E80))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x3E80))
     }
 
     @Test func selectingIfNegativeConstantSplatOnePointFive() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x3FC0))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x3FC0))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x3FC0))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x3FC0))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x3FC0))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func selectingIfNegativeConstantSplatMinusTwoPointFive() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0xC020))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0xC020))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0xC020))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0xC020))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0xC020))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0xC020))
     }
 
     @Test func selectingIfNegativeConstantSplatInfinity() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x7F80))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x7F80))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x7F80))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x7F80))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x7F80))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x7F80))
     }
 
     @Test func selectingIfNegativeConstantSplatMinusInfinity() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0xFF80))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0xFF80))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0xFF80))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0xFF80))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0xFF80))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0xFF80))
     }
 
     @Test func selectingIfNegativeConstantSplatNaN() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x7FC0))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x7FC0))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x7FC0))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x7FC0))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x7FC0))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func selectingIfNegativeConstantSplatMinusNaN() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0xFFC0))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0xFFC0))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0xFFC0))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0xFFC0))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0xFFC0))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func selectingIfNegativeConstantSplatPayloadNaN() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x7FC1))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x7FC1))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x7FC1))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x7FC1))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x7FC1))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func selectingIfNegativeConstantSplatSignalingNaN() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x7F81))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x7F81))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x7F81))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x7F81))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x7F81))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x7F81))
     }
 
     @Test func selectingIfNegativeConstantSplatMinusSignalingNaN() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0xFF81))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0xFF81))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0xFF81))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0xFF81))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0xFF81))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0xFF81))
     }
 
     @Test func selectingIfNegativeConstantSplatLeastNonzero() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x0001))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x0001))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x0001))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x0001))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x0001))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x0001))
     }
 
     @Test func selectingIfNegativeConstantSplatGreatest() {
-        checkSelectingIfNegativeConstantA(H.Lane(bitPattern: 0x7F7F))
-        checkSelectingIfNegativeConstantB(H.Lane(bitPattern: 0x7F7F))
-        checkSelectingIfNegativeConstantC(H.Lane(bitPattern: 0x7F7F))
+        checkSelectingIfNegativeConstantA(Lane(bitPattern: 0x7F7F))
+        checkSelectingIfNegativeConstantB(Lane(bitPattern: 0x7F7F))
+        checkSelectingIfNegativeConstantC(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeOrZeroConstantA(_ value: H.Lane) {
+    private func checkSelectingIfNegativeOrZeroConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegativeOrZero with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6E08_EF3D_CDA7_F1E3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6E08_EF3D_CDA7_F1E3)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(H.repeating(value), b),
-                H.Vector(
+                H(
                     raw: HighwayReference.selectingIfNegativeOrZeroBF16(
                         H.repeating(value).raw,
                         b.raw
@@ -407,18 +407,18 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingIfNegativeOrZeroConstantB(_ value: H.Lane) {
+    private func checkSelectingIfNegativeOrZeroConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingIfNegativeOrZero with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x770A_A53D_D2DA_CAA5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x770A_A53D_D2DA_CAA5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.selectingIfNegativeOrZero(a, H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.selectingIfNegativeOrZeroBF16(
                         a.raw,
                         H.repeating(value).raw
@@ -431,115 +431,113 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatZero() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x0000))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x0000))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x0000))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x0000))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatNegativeZero() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x8000))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x8000))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x8000))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x8000))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatOne() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x3F80))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x3F80))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x3F80))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x3F80))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatMinusOne() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0xBF80))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0xBF80))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0xBF80))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0xBF80))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatTwo() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x4000))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x4000))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x4000))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x4000))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatHalf() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x3F00))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x3F00))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x3F00))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x3F00))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatFour() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x4080))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x4080))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x4080))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x4080))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatQuarter() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x3E80))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x3E80))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x3E80))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x3E80))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatOnePointFive() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x3FC0))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x3FC0))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x3FC0))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatMinusTwoPointFive() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0xC020))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0xC020))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0xC020))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0xC020))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatInfinity() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x7F80))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x7F80))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x7F80))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x7F80))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatMinusInfinity() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0xFF80))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0xFF80))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0xFF80))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0xFF80))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatNaN() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x7FC0))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x7FC0))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x7FC0))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatMinusNaN() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0xFFC0))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0xFFC0))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0xFFC0))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatPayloadNaN() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x7FC1))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x7FC1))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x7FC1))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatSignalingNaN() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x7F81))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x7F81))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x7F81))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x7F81))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatMinusSignalingNaN() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0xFF81))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0xFF81))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0xFF81))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0xFF81))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatLeastNonzero() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x0001))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x0001))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x0001))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x0001))
     }
 
     @Test func selectingIfNegativeOrZeroConstantSplatGreatest() {
-        checkSelectingIfNegativeOrZeroConstantA(H.Lane(bitPattern: 0x7F7F))
-        checkSelectingIfNegativeOrZeroConstantB(H.Lane(bitPattern: 0x7F7F))
+        checkSelectingIfNegativeOrZeroConstantA(Lane(bitPattern: 0x7F7F))
+        checkSelectingIfNegativeOrZeroConstantB(Lane(bitPattern: 0x7F7F))
     }
 
     @inline(__always)
-    private func checkZeroingIfNegativeConstantA(_ value: H.Lane) {
+    private func checkZeroingIfNegativeConstantA(_ value: Lane) {
         let mismatches = Mismatches("zeroingIfNegative with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x940E_075E_840D_88D8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x940E_075E_840D_88D8)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.zeroingIfNegative(H.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.zeroingIfNegativeBF16(H.repeating(value).raw, b.raw)
-                ),
+                H(raw: HighwayReference.zeroingIfNegativeBF16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -547,20 +545,18 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkZeroingIfNegativeConstantB(_ value: H.Lane) {
+    private func checkZeroingIfNegativeConstantB(_ value: Lane) {
         let mismatches = Mismatches("zeroingIfNegative with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAD60_8D5E_9235_288A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAD60_8D5E_9235_288A)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingBF16(value.bitPattern)),
+            H(raw: HighwayReference.repeatingBF16(value.bitPattern)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.zeroingIfNegative(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.zeroingIfNegativeBF16(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.zeroingIfNegativeBF16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -568,97 +564,97 @@ extension SIMDBFloat16ConstantTests {
     }
 
     @Test func zeroingIfNegativeConstantSplatZero() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x0000))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x0000))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x0000))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x0000))
     }
 
     @Test func zeroingIfNegativeConstantSplatNegativeZero() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x8000))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x8000))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x8000))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x8000))
     }
 
     @Test func zeroingIfNegativeConstantSplatOne() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x3F80))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x3F80))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x3F80))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x3F80))
     }
 
     @Test func zeroingIfNegativeConstantSplatMinusOne() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0xBF80))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0xBF80))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0xBF80))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0xBF80))
     }
 
     @Test func zeroingIfNegativeConstantSplatTwo() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x4000))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x4000))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x4000))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x4000))
     }
 
     @Test func zeroingIfNegativeConstantSplatHalf() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x3F00))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x3F00))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x3F00))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x3F00))
     }
 
     @Test func zeroingIfNegativeConstantSplatFour() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x4080))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x4080))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x4080))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x4080))
     }
 
     @Test func zeroingIfNegativeConstantSplatQuarter() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x3E80))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x3E80))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x3E80))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x3E80))
     }
 
     @Test func zeroingIfNegativeConstantSplatOnePointFive() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x3FC0))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x3FC0))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x3FC0))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x3FC0))
     }
 
     @Test func zeroingIfNegativeConstantSplatMinusTwoPointFive() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0xC020))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0xC020))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0xC020))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0xC020))
     }
 
     @Test func zeroingIfNegativeConstantSplatInfinity() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x7F80))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x7F80))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x7F80))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x7F80))
     }
 
     @Test func zeroingIfNegativeConstantSplatMinusInfinity() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0xFF80))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0xFF80))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0xFF80))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0xFF80))
     }
 
     @Test func zeroingIfNegativeConstantSplatNaN() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x7FC0))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x7FC0))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x7FC0))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x7FC0))
     }
 
     @Test func zeroingIfNegativeConstantSplatMinusNaN() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0xFFC0))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0xFFC0))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0xFFC0))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0xFFC0))
     }
 
     @Test func zeroingIfNegativeConstantSplatPayloadNaN() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x7FC1))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x7FC1))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x7FC1))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x7FC1))
     }
 
     @Test func zeroingIfNegativeConstantSplatSignalingNaN() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x7F81))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x7F81))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x7F81))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x7F81))
     }
 
     @Test func zeroingIfNegativeConstantSplatMinusSignalingNaN() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0xFF81))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0xFF81))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0xFF81))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0xFF81))
     }
 
     @Test func zeroingIfNegativeConstantSplatLeastNonzero() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x0001))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x0001))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x0001))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x0001))
     }
 
     @Test func zeroingIfNegativeConstantSplatGreatest() {
-        checkZeroingIfNegativeConstantA(H.Lane(bitPattern: 0x7F7F))
-        checkZeroingIfNegativeConstantB(H.Lane(bitPattern: 0x7F7F))
+        checkZeroingIfNegativeConstantA(Lane(bitPattern: 0x7F7F))
+        checkZeroingIfNegativeConstantB(Lane(bitPattern: 0x7F7F))
     }
 }

@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDInt32CodegenTests {
     @Test func complexConjugate() {
         let mismatches = Mismatches("portComplexConjugateI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5D20_6B49_3F21_D377)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5D20_6B49_3F21_D377)
         for a in aInputs {
             mismatches.check(
                 portComplexConjugateI32(a),
@@ -32,8 +32,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplex() {
         let mismatches = Mismatches("portMultiplyingComplexI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E0E_1C26_F225_9935)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0E0E_1B26_F225_9782)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0E0E_1C26_F225_9935)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0E0E_1B26_F225_9782)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingComplexI32(a, b),
@@ -46,7 +46,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplexConstantA() {
         let mismatches = Mismatches("portMultiplyingComplexI32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2722_1FAF_5519_10D9)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2722_1FAF_5519_10D9)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingComplexI32ConstantA(b),
@@ -59,7 +59,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplexConstantB() {
         let mismatches = Mismatches("portMultiplyingComplexI32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0E3C_B9AF_474E_7967)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0E3C_B9AF_474E_7967)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingComplexI32ConstantB(a),
@@ -72,8 +72,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplexConjugate() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7857_EFB5_5329_3F1B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7857_EEB5_5329_3D68)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7857_EFB5_5329_3F1B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7857_EEB5_5329_3D68)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingComplexConjugateI32(a, b),
@@ -86,7 +86,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplexConjugateConstantA() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateI32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1C5B_91C3_631E_6F17)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1C5B_91C3_631E_6F17)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingComplexConjugateI32ConstantA(b),
@@ -99,7 +99,7 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplexConjugateConstantB() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateI32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x24F0_A7C3_67F5_1919)
+        let aInputs = Inputs.vectors(H.self, seed: 0x24F0_A7C3_67F5_1919)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingComplexConjugateI32ConstantB(a),
@@ -112,9 +112,9 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyAddingComplex() {
         let mismatches = Mismatches("portMultiplyAddingComplexI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8DF8_B189_A35E_2FA6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8DF8_B289_A35E_3159)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8DF8_AF89_A35E_2C40)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8DF8_B189_A35E_2FA6)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8DF8_B289_A35E_3159)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8DF8_AF89_A35E_2C40)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xD7EF_8F1E_5BF3_03A2) {
             mismatches.check(
                 portMultiplyAddingComplexI32(a, b, c),
@@ -127,8 +127,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyAddingComplexConstantA() {
         let mismatches = Mismatches("portMultiplyAddingComplexI32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB487_A5AD_2C89_6294)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xB487_A8AD_2C89_67AD)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB487_A5AD_2C89_6294)
+        let cInputs = Inputs.vectors(H.self, seed: 0xB487_A8AD_2C89_67AD)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portMultiplyAddingComplexI32ConstantA(b, c),
@@ -141,8 +141,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyAddingComplexConstantB() {
         let mismatches = Mismatches("portMultiplyAddingComplexI32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCF20_8BAD_3BC6_6806)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xCF20_89AD_3BC6_64A0)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCF20_8BAD_3BC6_6806)
+        let cInputs = Inputs.vectors(H.self, seed: 0xCF20_89AD_3BC6_64A0)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portMultiplyAddingComplexI32ConstantB(a, c),
@@ -155,8 +155,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyAddingComplexConstantC() {
         let mismatches = Mismatches("portMultiplyAddingComplexI32ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC68B_74AD_36EF_BC51)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC68B_73AD_36EF_BA9E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC68B_74AD_36EF_BC51)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC68B_73AD_36EF_BA9E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyAddingComplexI32ConstantC(a, b),
@@ -169,9 +169,9 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyAddingComplexConjugate() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateI32")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x96EB_511F_FBE8_7A26)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x96EB_521F_FBE8_7BD9)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x96EB_4F1F_FBE8_76C0)
+        let aInputs = Inputs.vectors(H.self, seed: 0x96EB_511F_FBE8_7A26)
+        let bInputs = Inputs.vectors(H.self, seed: 0x96EB_521F_FBE8_7BD9)
+        let cInputs = Inputs.vectors(H.self, seed: 0x96EB_4F1F_FBE8_76C0)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x5A48_33B2_8A19_3722) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateI32(a, b, c),
@@ -184,8 +184,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyAddingComplexConjugateConstantA() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateI32ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDD7E_BDAD_7363_EA14)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xDD7E_C0AD_7363_EF2D)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDD7E_BDAD_7363_EA14)
+        let cInputs = Inputs.vectors(H.self, seed: 0xDD7E_C0AD_7363_EF2D)
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateI32ConstantA(b, c),
@@ -198,8 +198,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyAddingComplexConjugateConstantB() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateI32ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF817_A3AD_82A0_EF86)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF817_A1AD_82A0_EC20)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF817_A3AD_82A0_EF86)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF817_A1AD_82A0_EC20)
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateI32ConstantB(a, c),
@@ -212,8 +212,8 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyAddingComplexConjugateConstantC() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateI32ConstantC")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEF82_8CAD_7DCA_43D1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEF82_8BAD_7DCA_421E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEF82_8CAD_7DCA_43D1)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEF82_8BAD_7DCA_421E)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyAddingComplexConjugateI32ConstantC(a, b),
@@ -226,10 +226,10 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplexWhereOtherwise() {
         let mismatches = Mismatches("portMultiplyingComplexWhereOtherwiseI32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x3343_7C82_1146_2A7E)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3343_7C82_1146_2A7E)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3343_7D82_1146_2C31)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3343_7A82_1146_2718)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3343_7B82_1146_28CB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3343_7A82_1146_2718)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3343_7B82_1146_28CB)
         for (otherwise, mask, a, b) in mixedQuadruples(
             otherwiseInputs,
             maskInputs,
@@ -248,9 +248,9 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplexWhereOtherwiseConstantA() {
         let mismatches = Mismatches("portMultiplyingComplexWhereOtherwiseI32ConstantA")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xB3E4_0A53_CD7B_9E1F)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xB3E4_0A53_CD7B_9E1F)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB3E4_0953_CD7B_9C6C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB3E4_0B53_CD7B_9FD2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB3E4_0B53_CD7B_9FD2)
         for (otherwise, mask, b) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -276,9 +276,9 @@ extension SIMDInt32CodegenTests {
 
     @Test func multiplyingComplexWhereOtherwiseConstantB() {
         let mismatches = Mismatches("portMultiplyingComplexWhereOtherwiseI32ConstantB")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xCEE9_8F53_DD14_D09E)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xCEE9_8F53_DD14_D09E)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCEE9_9053_DD14_D251)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCEE9_8D53_DD14_CD38)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCEE9_8D53_DD14_CD38)
         for (otherwise, mask, a) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -305,8 +305,8 @@ extension SIMDInt32CodegenTests {
     @Test func multiplyingComplexWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portMultiplyingComplexWhereOtherwiseI32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2FE1_F1F8_0926_4041)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2FE1_EEF8_0926_3B28)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x2FE1_EFF8_0926_3CDB)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2FE1_EEF8_0926_3B28)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2FE1_EFF8_0926_3CDB)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xA69A_6130_9665_286A)
         {
             mismatches.check(
@@ -321,8 +321,8 @@ extension SIMDInt32CodegenTests {
     @Test func multiplyingComplexConjugateWhere() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateWhereI32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDD60_114D_53A3_DF18)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDD60_124D_53A3_E0CB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xDD60_134D_53A3_E27E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDD60_124D_53A3_E0CB)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDD60_134D_53A3_E27E)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x4BDE_21DF_2D43_2054)
         {
             mismatches.check(
@@ -337,7 +337,7 @@ extension SIMDInt32CodegenTests {
     @Test func multiplyingComplexConjugateWhereConstantA() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateWhereI32ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF0F3_901C_8EB6_9221)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF0F3_8E1C_8EB6_8EBB)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF0F3_8E1C_8EB6_8EBB)
         for (mask, b) in everyPair(maskInputs, bInputs) {
             mismatches.check(
                 portMultiplyingComplexConjugateWhereI32ConstantA(b, where: mask),
@@ -351,7 +351,7 @@ extension SIMDInt32CodegenTests {
     @Test func multiplyingComplexConjugateWhereConstantB() {
         let mismatches = Mismatches("portMultiplyingComplexConjugateWhereI32ConstantB")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE85E_591C_89DF_B00C)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE85E_5A1C_89DF_B1BF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE85E_5A1C_89DF_B1BF)
         for (mask, a) in everyPair(maskInputs, aInputs) {
             mismatches.check(
                 portMultiplyingComplexConjugateWhereI32ConstantB(a, where: mask),
@@ -365,9 +365,9 @@ extension SIMDInt32CodegenTests {
     @Test func multiplyAddingComplexConjugateWhere() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateWhereI32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD0C8_68AC_12BF_FFAB)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD0C8_67AC_12BF_FDF8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD0C8_6AAC_12C0_0311)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD0C8_69AC_12C0_015E)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD0C8_67AC_12BF_FDF8)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD0C8_6AAC_12C0_0311)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD0C8_69AC_12C0_015E)
         for (mask, a, b, c) in mixedQuadruples(
             maskInputs,
             aInputs,
@@ -387,8 +387,8 @@ extension SIMDInt32CodegenTests {
     @Test func multiplyAddingComplexConjugateWhereConstantA() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateWhereI32ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7406_1F45_E051_C4B4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7406_2145_E051_C81A)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7406_2245_E051_C9CD)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7406_2145_E051_C81A)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7406_2245_E051_C9CD)
         for (mask, b, c) in mixedTriples(maskInputs, bInputs, cInputs, seed: 0x0E18_DA7B_3D4A_A1E8)
         {
             mismatches.check(
@@ -403,8 +403,8 @@ extension SIMDInt32CodegenTests {
     @Test func multiplyAddingComplexConjugateWhereConstantB() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateWhereI32ConstantB")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7D74_B645_E5E1_3AA9)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7D74_B545_E5E1_38F6)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x7D74_B345_E5E1_3590)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7D74_B545_E5E1_38F6)
+        let cInputs = Inputs.vectors(H.self, seed: 0x7D74_B345_E5E1_3590)
         for (mask, a, c) in mixedTriples(maskInputs, aInputs, cInputs, seed: 0x00E5_B908_B72E_AAE3)
         {
             mismatches.check(
@@ -419,8 +419,8 @@ extension SIMDInt32CodegenTests {
     @Test func multiplyAddingComplexConjugateWhereConstantC() {
         let mismatches = Mismatches("portMultiplyAddingComplexConjugateWhereI32ConstantC")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8676_6D45_EB14_151E)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8676_6E45_EB14_16D1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8676_6B45_EB14_11B8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8676_6E45_EB14_16D1)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8676_6B45_EB14_11B8)
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x37FF_9CA7_7295_10BA)
         {
             mismatches.check(

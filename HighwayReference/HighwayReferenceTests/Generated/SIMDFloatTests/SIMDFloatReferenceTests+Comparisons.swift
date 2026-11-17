@@ -8,12 +8,12 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func equalTo() {
         let mismatches = Mismatches("equalTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB255_7BAB_F7FC_1AA1)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB255_7AAB_F7FC_18EE)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB255_7BAB_F7FC_1AA1)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB255_7AAB_F7FC_18EE)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.equalTo(a, b),
-                H.Mask(raw: HighwayReference.equalToF32(a, b)),
+                H.Mask(raw: HighwayReference.equalToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -22,12 +22,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func notEqualTo() {
         let mismatches = Mismatches("notEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF5FE_770D_73DC_6E60)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF5FE_780D_73DC_7013)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF5FE_770D_73DC_6E60)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF5FE_780D_73DC_7013)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.notEqualTo(a, b),
-                H.Mask(raw: HighwayReference.notEqualToF32(a, b)),
+                H.Mask(raw: HighwayReference.notEqualToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -36,12 +36,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func lessThan() {
         let mismatches = Mismatches("lessThan")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x29F4_F489_C092_2130)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x29F4_F589_C092_22E3)
+        let aInputs = Inputs.vectors(H.self, seed: 0x29F4_F489_C092_2130)
+        let bInputs = Inputs.vectors(H.self, seed: 0x29F4_F589_C092_22E3)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThan(a, b),
-                H.Mask(raw: HighwayReference.lessThanF32(a, b)),
+                H.Mask(raw: HighwayReference.lessThanF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -50,12 +50,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func greaterThan() {
         let mismatches = Mismatches("greaterThan")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF5FB_2AA0_CD14_C9C5)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF5FB_29A0_CD14_C812)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF5FB_2AA0_CD14_C9C5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF5FB_29A0_CD14_C812)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThan(a, b),
-                H.Mask(raw: HighwayReference.greaterThanF32(a, b)),
+                H.Mask(raw: HighwayReference.greaterThanF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -64,12 +64,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func lessThanOrEqualTo() {
         let mismatches = Mismatches("lessThanOrEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x14C8_80C8_B9C5_4D80)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x14C8_81C8_B9C5_4F33)
+        let aInputs = Inputs.vectors(H.self, seed: 0x14C8_80C8_B9C5_4D80)
+        let bInputs = Inputs.vectors(H.self, seed: 0x14C8_81C8_B9C5_4F33)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.lessThanOrEqualTo(a, b),
-                H.Mask(raw: HighwayReference.lessThanOrEqualToF32(a, b)),
+                H.Mask(raw: HighwayReference.lessThanOrEqualToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -78,12 +78,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func greaterThanOrEqualTo() {
         let mismatches = Mismatches("greaterThanOrEqualTo")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEB47_E305_9575_67F3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xEB47_E205_9575_6640)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEB47_E305_9575_67F3)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEB47_E205_9575_6640)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.greaterThanOrEqualTo(a, b),
-                H.Mask(raw: HighwayReference.greaterThanOrEqualToF32(a, b)),
+                H.Mask(raw: HighwayReference.greaterThanOrEqualToF32(a.raw, b.raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -92,11 +92,11 @@ extension SIMDFloatReferenceTests {
 
     @Test func isNegative() {
         let mismatches = Mismatches("isNegative")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA071_445A_1DD3_8FE1)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA071_445A_1DD3_8FE1)
         for a in aInputs {
             mismatches.check(
                 H.isNegative(a),
-                H.Mask(raw: HighwayReference.isNegativeF32(a)),
+                H.Mask(raw: HighwayReference.isNegativeF32(a.raw)),
                 "a: \(describe(a))"
             )
         }

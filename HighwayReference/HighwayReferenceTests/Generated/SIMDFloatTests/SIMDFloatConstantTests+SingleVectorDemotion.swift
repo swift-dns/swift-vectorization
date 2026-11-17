@@ -7,17 +7,19 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkHalfVectorConvertingFromUInt64ConstantA(_ value: SIMDUInt64.Lane) {
+    private func checkHalfVectorConvertingFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches("halfVectorConvertingFromUInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(converting: SIMDUInt64.repeating(value)),
+            H.halfVector(converting: SIMD<UInt64>.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingU64ToF32(SIMDUInt64.repeating(value).raw)
+                raw: HighwayReference.halfVectorConvertingU64ToF32(
+                    SIMD<UInt64>.repeating(value).raw
+                )
             ),
             ""
         )
@@ -73,21 +75,21 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func halfVectorConvertingFromUInt64ConstantSplatMax() {
-        checkHalfVectorConvertingFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkHalfVectorConvertingFromUInt64ConstantA(UInt64.max)
     }
 
     @inline(__always)
-    private func checkHalfVectorConvertingFromInt64ConstantA(_ value: SIMDInt64.Lane) {
+    private func checkHalfVectorConvertingFromInt64ConstantA(_ value: Int64) {
         let mismatches = Mismatches("halfVectorConvertingFromInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt64.repeating(value),
-            SIMDInt64.Vector(raw: HighwayReference.repeatingI64(value)),
+            SIMD<Int64>.repeating(value),
+            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(converting: SIMDInt64.repeating(value)),
+            H.halfVector(converting: SIMD<Int64>.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingI64ToF32(SIMDInt64.repeating(value).raw)
+                raw: HighwayReference.halfVectorConvertingI64ToF32(SIMD<Int64>.repeating(value).raw)
             ),
             ""
         )
@@ -163,25 +165,27 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func halfVectorConvertingFromInt64ConstantSplatMax() {
-        checkHalfVectorConvertingFromInt64ConstantA(SIMDInt64.Lane.max)
+        checkHalfVectorConvertingFromInt64ConstantA(Int64.max)
     }
 
     @Test func halfVectorConvertingFromInt64ConstantSplatMin() {
-        checkHalfVectorConvertingFromInt64ConstantA(SIMDInt64.Lane.min)
+        checkHalfVectorConvertingFromInt64ConstantA(Int64.min)
     }
 
     @inline(__always)
-    private func checkHalfVectorConvertingFromDoubleConstantA(_ value: SIMDDouble.Lane) {
+    private func checkHalfVectorConvertingFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches("halfVectorConvertingFromDouble with a repeating \(hex(value))")
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(converting: SIMDDouble.repeating(value)),
+            H.halfVector(converting: SIMD<Double>.repeating(value)),
             H.HalfVector(
-                raw: HighwayReference.halfVectorConvertingF64ToF32(SIMDDouble.repeating(value))
+                raw: HighwayReference.halfVectorConvertingF64ToF32(
+                    SIMD<Double>.repeating(value).raw
+                )
             ),
             ""
         )
@@ -245,7 +249,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func halfVectorConvertingFromDoubleConstantSplatPayloadNaN() {
-        checkHalfVectorConvertingFromDoubleConstantA(SIMDDouble.Lane(nan: 1, signaling: false))
+        checkHalfVectorConvertingFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func halfVectorConvertingFromDoubleConstantSplatSignalingNaN() {

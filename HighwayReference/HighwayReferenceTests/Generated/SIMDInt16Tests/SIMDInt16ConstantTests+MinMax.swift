@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDInt16ConstantTests {
     @inline(__always)
-    private func checkMinimumConstantA(_ value: H.Lane) {
+    private func checkMinimumConstantA(_ value: Lane) {
         let mismatches = Mismatches("minimum with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6816_3F7F_3E79_5793)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6816_3F7F_3E79_5793)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI16(value)),
+            H(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.minimum(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.minimumI16(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.minimumI16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMinimumConstantB(_ value: H.Lane) {
+    private func checkMinimumConstantB(_ value: Lane) {
         let mismatches = Mismatches("minimum with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7117_F57F_43AC_3055)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7117_F57F_43AC_3055)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI16(value)),
+            H(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.minimum(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.minimumI16(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.minimumI16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -120,28 +120,28 @@ extension SIMDInt16ConstantTests {
     }
 
     @Test func minimumConstantSplatMax() {
-        checkMinimumConstantA(H.Lane.max)
-        checkMinimumConstantB(H.Lane.max)
+        checkMinimumConstantA(Lane.max)
+        checkMinimumConstantB(Lane.max)
     }
 
     @Test func minimumConstantSplatMin() {
-        checkMinimumConstantA(H.Lane.min)
-        checkMinimumConstantB(H.Lane.min)
+        checkMinimumConstantA(Lane.min)
+        checkMinimumConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkMaximumConstantA(_ value: H.Lane) {
+    private func checkMaximumConstantA(_ value: Lane) {
         let mismatches = Mismatches("maximum with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5068_6B4B_1D68_8451)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5068_6B4B_1D68_8451)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI16(value)),
+            H(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.maximum(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.maximumI16(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.maximumI16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -149,18 +149,18 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMaximumConstantB(_ value: H.Lane) {
+    private func checkMaximumConstantB(_ value: Lane) {
         let mismatches = Mismatches("maximum with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3562_E54B_0DCF_501F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3562_E54B_0DCF_501F)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI16(value)),
+            H(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.maximum(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.maximumI16(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.maximumI16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -243,12 +243,12 @@ extension SIMDInt16ConstantTests {
     }
 
     @Test func maximumConstantSplatMax() {
-        checkMaximumConstantA(H.Lane.max)
-        checkMaximumConstantB(H.Lane.max)
+        checkMaximumConstantA(Lane.max)
+        checkMaximumConstantB(Lane.max)
     }
 
     @Test func maximumConstantSplatMin() {
-        checkMaximumConstantA(H.Lane.min)
-        checkMaximumConstantB(H.Lane.min)
+        checkMaximumConstantA(Lane.min)
+        checkMaximumConstantB(Lane.min)
     }
 }

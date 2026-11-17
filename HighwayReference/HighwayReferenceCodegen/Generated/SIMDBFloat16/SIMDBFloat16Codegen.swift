@@ -5,8 +5,8 @@ public import Vectorization
 
 public enum HighwayReferenceBFloat16 {
     public typealias Lane = BFloat16
-    public typealias Vector = SIMDBFloat16.Vector
-    public typealias Mask = SIMDBFloat16.Mask
+    public typealias SIMD = Vectorization.SIMD<BFloat16>
+    public typealias Mask = SIMD.Mask
 
     @export(implementation) @inline(always)
     public static var laneCount: Int {

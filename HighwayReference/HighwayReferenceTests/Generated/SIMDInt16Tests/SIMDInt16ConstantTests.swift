@@ -7,5 +7,6 @@ import Vectorization
 
 @Suite("SIMDInt16 constants against Highway")
 struct SIMDInt16ConstantTests {
-    typealias H = SIMDInt16
+    typealias H = SIMD<Int16>
+    typealias Lane = Int16
 }

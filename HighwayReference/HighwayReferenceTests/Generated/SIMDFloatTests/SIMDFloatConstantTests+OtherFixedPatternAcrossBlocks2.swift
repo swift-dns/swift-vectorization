@@ -9,11 +9,16 @@ extension SIMDFloatConstantTests {
     @inline(__always)
     private func checkBroadcastingBlockConstantBlock(_ block: Int) {
         let mismatches = Mismatches("broadcastingBlock with block \(block)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0698_D8F0_0381_2977)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0698_D8F0_0381_2977)
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                HighwayReference.broadcastingBlockF32(a, Int32(truncatingIfNeeded: block)),
+                H(
+                    raw: HighwayReference.broadcastingBlockF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: block)
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -39,11 +44,16 @@ extension SIMDFloatConstantTests {
     @inline(__always)
     private func checkBroadcastingBlockUncheckedConstantBlock(_ block: Int) {
         let mismatches = Mismatches("broadcastingBlock unchecked with block \(block)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x76F3_F588_838D_99D5)
+        let aInputs = Inputs.vectors(H.self, seed: 0x76F3_F588_838D_99D5)
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                HighwayReference.broadcastingBlockF32(a, Int32(truncatingIfNeeded: block)),
+                H(
+                    raw: HighwayReference.broadcastingBlockF32(
+                        a.raw,
+                        Int32(truncatingIfNeeded: block)
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -67,16 +77,22 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkBroadcastingBlockConstantA(_ value: H.Lane) {
+    private func checkBroadcastingBlockConstantA(_ value: Lane) {
         let mismatches = Mismatches("broadcastingBlock with a repeating \(hex(value))")
         let blockInputs = Array(0...H.laneCount / 4 - 1)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for block in blockInputs {
             mismatches.check(
                 H.broadcasting(H.repeating(value), block: block),
-                HighwayReference.broadcastingBlockF32(
-                    H.repeating(value),
-                    Int32(truncatingIfNeeded: block)
+                H(
+                    raw: HighwayReference.broadcastingBlockF32(
+                        H.repeating(value).raw,
+                        Int32(truncatingIfNeeded: block)
+                    )
                 ),
                 "block: \(block)"
             )
@@ -141,7 +157,7 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func broadcastingBlockConstantSplatPayloadNaN() {
-        checkBroadcastingBlockConstantA(H.Lane(nan: 1, signaling: false))
+        checkBroadcastingBlockConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func broadcastingBlockConstantSplatSignalingNaN() {

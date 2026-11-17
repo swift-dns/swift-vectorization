@@ -8,21 +8,25 @@ import Vectorization
 extension SIMDFloatReferenceTests {
     @Test func firstLane() {
         let mismatches = Mismatches("firstLane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1DEB_915F_D5C9_8C10)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1DEB_915F_D5C9_8C10)
         for a in aInputs {
-            mismatches.check(H.firstLane(a), HighwayReference.firstLaneF32(a), "a: \(describe(a))")
+            mismatches.check(
+                H.firstLane(a),
+                HighwayReference.firstLaneF32(a.raw),
+                "a: \(describe(a))"
+            )
         }
         mismatches.record()
     }
 
     @Test func lane() {
         let mismatches = Mismatches("lane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x849E_5BFD_9CEE_55FC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x849E_5BFD_9CEE_55FC)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
                 H.lane(a, at: index),
-                HighwayReference.laneF32(a, index),
+                HighwayReference.laneF32(a.raw, index),
                 "a: \(describe(a)), index: \(index)"
             )
         }
@@ -31,12 +35,12 @@ extension SIMDFloatReferenceTests {
 
     @Test func laneUnchecked() {
         let mismatches = Mismatches("lane unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7154_1C8A_F32A_E3F2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7154_1C8A_F32A_E3F2)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         for (a, index) in everyPair(aInputs, indexInputs) {
             mismatches.check(
                 unsafe H.lane(a, atUnchecked: index),
-                HighwayReference.laneF32(a, index),
+                HighwayReference.laneF32(a.raw, index),
                 "a: \(describe(a)), index: \(index)"
             )
         }
@@ -45,9 +49,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func replacingLane() {
         let mismatches = Mismatches("replacingLane")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF781_5D1B_ADEB_469D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF781_5D1B_ADEB_469D)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xF781_5B1B_ADEB_4337)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xF781_5B1B_ADEB_4337)
         for (a, index, value) in mixedTriples(
             aInputs,
             indexInputs,
@@ -56,7 +60,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 H.replacingLane(a, at: index, with: value),
-                HighwayReference.replacingLaneF32(a, index, value),
+                H(raw: HighwayReference.replacingLaneF32(a.raw, index, value)),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }
@@ -65,9 +69,9 @@ extension SIMDFloatReferenceTests {
 
     @Test func replacingLaneUnchecked() {
         let mismatches = Mismatches("replacingLane unchecked")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAA92_0CFC_6505_CD5D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAA92_0CFC_6505_CD5D)
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xAA92_0AFC_6505_C9F7)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xAA92_0AFC_6505_C9F7)
         for (a, index, value) in mixedTriples(
             aInputs,
             indexInputs,
@@ -76,7 +80,7 @@ extension SIMDFloatReferenceTests {
         ) {
             mismatches.check(
                 unsafe H.replacingLane(a, atUnchecked: index, with: value),
-                HighwayReference.replacingLaneF32(a, index, value),
+                H(raw: HighwayReference.replacingLaneF32(a.raw, index, value)),
                 "a: \(describe(a)), index: \(index), value: \(hex(value))"
             )
         }

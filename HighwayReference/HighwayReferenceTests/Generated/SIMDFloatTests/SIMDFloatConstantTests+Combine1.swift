@@ -7,14 +7,18 @@ import Vectorization
 
 extension SIMDFloatConstantTests {
     @inline(__always)
-    private func checkConcatenatingLowerLowerConstantA(_ value: H.Lane) {
+    private func checkConcatenatingLowerLowerConstantA(_ value: Lane) {
         let mismatches = Mismatches("concatenatingLowerLower with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC1DE_B211_6304_29B4)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xC1DE_B211_6304_29B4)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.concatenatingLowerLower(H.repeating(value), b),
-                HighwayReference.concatenatingLowerLowerF32(H.repeating(value), b),
+                H(raw: HighwayReference.concatenatingLowerLowerF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -22,14 +26,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingLowerLowerConstantB(_ value: H.Lane) {
+    private func checkConcatenatingLowerLowerConstantB(_ value: Lane) {
         let mismatches = Mismatches("concatenatingLowerLower with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDAC4_1811_70CE_C126)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDAC4_1811_70CE_C126)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.concatenatingLowerLower(a, H.repeating(value)),
-                HighwayReference.concatenatingLowerLowerF32(a, H.repeating(value)),
+                H(raw: HighwayReference.concatenatingLowerLowerF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -107,8 +115,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func concatenatingLowerLowerConstantSplatPayloadNaN() {
-        checkConcatenatingLowerLowerConstantA(H.Lane(nan: 1, signaling: false))
-        checkConcatenatingLowerLowerConstantB(H.Lane(nan: 1, signaling: false))
+        checkConcatenatingLowerLowerConstantA(Lane(nan: 1, signaling: false))
+        checkConcatenatingLowerLowerConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func concatenatingLowerLowerConstantSplatSignalingNaN() {
@@ -132,14 +140,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingUpperUpperConstantA(_ value: H.Lane) {
+    private func checkConcatenatingUpperUpperConstantA(_ value: Lane) {
         let mismatches = Mismatches("concatenatingUpperUpper with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x32ED_B1D5_B5D9_328A)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x32ED_B1D5_B5D9_328A)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.concatenatingUpperUpper(H.repeating(value), b),
-                HighwayReference.concatenatingUpperUpperF32(H.repeating(value), b),
+                H(raw: HighwayReference.concatenatingUpperUpperF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -147,14 +159,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingUpperUpperConstantB(_ value: H.Lane) {
+    private func checkConcatenatingUpperUpperConstantB(_ value: Lane) {
         let mismatches = Mismatches("concatenatingUpperUpper with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2A58_FBD5_B103_2BA8)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2A58_FBD5_B103_2BA8)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.concatenatingUpperUpper(a, H.repeating(value)),
-                HighwayReference.concatenatingUpperUpperF32(a, H.repeating(value)),
+                H(raw: HighwayReference.concatenatingUpperUpperF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -232,8 +248,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func concatenatingUpperUpperConstantSplatPayloadNaN() {
-        checkConcatenatingUpperUpperConstantA(H.Lane(nan: 1, signaling: false))
-        checkConcatenatingUpperUpperConstantB(H.Lane(nan: 1, signaling: false))
+        checkConcatenatingUpperUpperConstantA(Lane(nan: 1, signaling: false))
+        checkConcatenatingUpperUpperConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func concatenatingUpperUpperConstantSplatSignalingNaN() {
@@ -257,14 +273,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingLowerUpperConstantA(_ value: H.Lane) {
+    private func checkConcatenatingLowerUpperConstantA(_ value: Lane) {
         let mismatches = Mismatches("concatenatingLowerUpper with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x140E_ACB5_1EBB_60F3)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x140E_ACB5_1EBB_60F3)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.concatenatingLowerUpper(H.repeating(value), b),
-                HighwayReference.concatenatingLowerUpperF32(H.repeating(value), b),
+                H(raw: HighwayReference.concatenatingLowerUpperF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -272,14 +292,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingLowerUpperConstantB(_ value: H.Lane) {
+    private func checkConcatenatingLowerUpperConstantB(_ value: Lane) {
         let mismatches = Mismatches("concatenatingLowerUpper with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1D10_E2B5_23EF_1335)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x1D10_E2B5_23EF_1335)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.concatenatingLowerUpper(a, H.repeating(value)),
-                HighwayReference.concatenatingLowerUpperF32(a, H.repeating(value)),
+                H(raw: HighwayReference.concatenatingLowerUpperF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -357,8 +381,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func concatenatingLowerUpperConstantSplatPayloadNaN() {
-        checkConcatenatingLowerUpperConstantA(H.Lane(nan: 1, signaling: false))
-        checkConcatenatingLowerUpperConstantB(H.Lane(nan: 1, signaling: false))
+        checkConcatenatingLowerUpperConstantA(Lane(nan: 1, signaling: false))
+        checkConcatenatingLowerUpperConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func concatenatingLowerUpperConstantSplatSignalingNaN() {
@@ -382,14 +406,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingUpperLowerConstantA(_ value: H.Lane) {
+    private func checkConcatenatingUpperLowerConstantA(_ value: Lane) {
         let mismatches = Mismatches("concatenatingUpperLower with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC071_770B_B7CE_FA6D)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xC071_770B_B7CE_FA6D)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.concatenatingUpperLower(H.repeating(value), b),
-                HighwayReference.concatenatingUpperLowerF32(H.repeating(value), b),
+                H(raw: HighwayReference.concatenatingUpperLowerF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -397,14 +425,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingUpperLowerConstantB(_ value: H.Lane) {
+    private func checkConcatenatingUpperLowerConstantB(_ value: Lane) {
         let mismatches = Mismatches("concatenatingUpperLower with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA71E_F10B_A9A7_5ABB)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA71E_F10B_A9A7_5ABB)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.concatenatingUpperLower(a, H.repeating(value)),
-                HighwayReference.concatenatingUpperLowerF32(a, H.repeating(value)),
+                H(raw: HighwayReference.concatenatingUpperLowerF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -482,8 +514,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func concatenatingUpperLowerConstantSplatPayloadNaN() {
-        checkConcatenatingUpperLowerConstantA(H.Lane(nan: 1, signaling: false))
-        checkConcatenatingUpperLowerConstantB(H.Lane(nan: 1, signaling: false))
+        checkConcatenatingUpperLowerConstantA(Lane(nan: 1, signaling: false))
+        checkConcatenatingUpperLowerConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func concatenatingUpperLowerConstantSplatSignalingNaN() {
@@ -507,14 +539,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingOddConstantA(_ value: H.Lane) {
+    private func checkConcatenatingOddConstantA(_ value: Lane) {
         let mismatches = Mismatches("concatenatingOdd with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA9BE_DF17_6980_1473)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xA9BE_DF17_6980_1473)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.concatenatingOdd(H.repeating(value), b),
-                HighwayReference.concatenatingOddF32(H.repeating(value), b),
+                H(raw: HighwayReference.concatenatingOddF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -522,14 +558,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingOddConstantB(_ value: H.Lane) {
+    private func checkConcatenatingOddConstantB(_ value: Lane) {
         let mismatches = Mismatches("concatenatingOdd with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB2C1_1517_6EB3_C6B5)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xB2C1_1517_6EB3_C6B5)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.concatenatingOdd(a, H.repeating(value)),
-                HighwayReference.concatenatingOddF32(a, H.repeating(value)),
+                H(raw: HighwayReference.concatenatingOddF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -607,8 +647,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func concatenatingOddConstantSplatPayloadNaN() {
-        checkConcatenatingOddConstantA(H.Lane(nan: 1, signaling: false))
-        checkConcatenatingOddConstantB(H.Lane(nan: 1, signaling: false))
+        checkConcatenatingOddConstantA(Lane(nan: 1, signaling: false))
+        checkConcatenatingOddConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func concatenatingOddConstantSplatSignalingNaN() {
@@ -632,14 +672,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingEvenConstantA(_ value: H.Lane) {
+    private func checkConcatenatingEvenConstantA(_ value: Lane) {
         let mismatches = Mismatches("concatenatingEven with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAB19_901E_1280_2252)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0xAB19_901E_1280_2252)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.concatenatingEven(H.repeating(value), b),
-                HighwayReference.concatenatingEvenF32(H.repeating(value), b),
+                H(raw: HighwayReference.concatenatingEvenF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -647,14 +691,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkConcatenatingEvenConstantB(_ value: H.Lane) {
+    private func checkConcatenatingEvenConstantB(_ value: Lane) {
         let mismatches = Mismatches("concatenatingEven with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA217_DA1E_0D4D_4990)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA217_DA1E_0D4D_4990)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.concatenatingEven(a, H.repeating(value)),
-                HighwayReference.concatenatingEvenF32(a, H.repeating(value)),
+                H(raw: HighwayReference.concatenatingEvenF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -732,8 +780,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func concatenatingEvenConstantSplatPayloadNaN() {
-        checkConcatenatingEvenConstantA(H.Lane(nan: 1, signaling: false))
-        checkConcatenatingEvenConstantB(H.Lane(nan: 1, signaling: false))
+        checkConcatenatingEvenConstantA(Lane(nan: 1, signaling: false))
+        checkConcatenatingEvenConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func concatenatingEvenConstantSplatSignalingNaN() {
@@ -757,14 +805,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingWholeLowerConstantA(_ value: H.Lane) {
+    private func checkInterleavingWholeLowerConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingWholeLower with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8EE4_F68B_9ECF_D0B8)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x8EE4_F68B_9ECF_D0B8)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.interleavingWholeLower(H.repeating(value), b),
-                HighwayReference.interleavingWholeLowerF32(H.repeating(value), b),
+                H(raw: HighwayReference.interleavingWholeLowerF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -772,14 +824,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingWholeLowerConstantB(_ value: H.Lane) {
+    private func checkInterleavingWholeLowerConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingWholeLower with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA9EA_7C8B_AE69_04EA)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA9EA_7C8B_AE69_04EA)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.interleavingWholeLower(a, H.repeating(value)),
-                HighwayReference.interleavingWholeLowerF32(a, H.repeating(value)),
+                H(raw: HighwayReference.interleavingWholeLowerF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -857,8 +913,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func interleavingWholeLowerConstantSplatPayloadNaN() {
-        checkInterleavingWholeLowerConstantA(H.Lane(nan: 1, signaling: false))
-        checkInterleavingWholeLowerConstantB(H.Lane(nan: 1, signaling: false))
+        checkInterleavingWholeLowerConstantA(Lane(nan: 1, signaling: false))
+        checkInterleavingWholeLowerConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func interleavingWholeLowerConstantSplatSignalingNaN() {
@@ -882,14 +938,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingWholeUpperConstantA(_ value: H.Lane) {
+    private func checkInterleavingWholeUpperConstantA(_ value: Lane) {
         let mismatches = Mismatches("interleavingWholeUpper with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6195_B986_89DA_B737)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let bInputs = Inputs.vectors(H.self, seed: 0x6195_B986_89DA_B737)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for b in bInputs {
             mismatches.check(
                 H.interleavingWholeUpper(H.repeating(value), b),
-                HighwayReference.interleavingWholeUpperF32(H.repeating(value), b),
+                H(raw: HighwayReference.interleavingWholeUpperF32(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -897,14 +957,18 @@ extension SIMDFloatConstantTests {
     }
 
     @inline(__always)
-    private func checkInterleavingWholeUpperConstantB(_ value: H.Lane) {
+    private func checkInterleavingWholeUpperConstantB(_ value: Lane) {
         let mismatches = Mismatches("interleavingWholeUpper with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6A2A_CF86_8EB1_6139)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF32(value), "repeating")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6A2A_CF86_8EB1_6139)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF32(value)),
+            "repeating"
+        )
         for a in aInputs {
             mismatches.check(
                 H.interleavingWholeUpper(a, H.repeating(value)),
-                HighwayReference.interleavingWholeUpperF32(a, H.repeating(value)),
+                H(raw: HighwayReference.interleavingWholeUpperF32(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -982,8 +1046,8 @@ extension SIMDFloatConstantTests {
     }
 
     @Test func interleavingWholeUpperConstantSplatPayloadNaN() {
-        checkInterleavingWholeUpperConstantA(H.Lane(nan: 1, signaling: false))
-        checkInterleavingWholeUpperConstantB(H.Lane(nan: 1, signaling: false))
+        checkInterleavingWholeUpperConstantA(Lane(nan: 1, signaling: false))
+        checkInterleavingWholeUpperConstantB(Lane(nan: 1, signaling: false))
     }
 
     @Test func interleavingWholeUpperConstantSplatSignalingNaN() {

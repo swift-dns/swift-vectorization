@@ -9,19 +9,18 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkGatherConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("gather with indices repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xCC8B_478C_8328_38BC
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xCC8B_478C_8328_38BC)
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
-                    unsafe H.gather(from: source.baseAddress!, indices: SIMDInt64.repeating(value)),
-                    unsafe H.Vector(
+                    unsafe H.gather(
+                        from: source.baseAddress!,
+                        indices: SIMD<Int64>.repeating(value)
+                    ),
+                    unsafe H(
                         raw: HighwayReference.gatherU64(
                             source.baseAddress!,
-                            SIMDInt64.repeating(value).raw
+                            SIMD<Int64>.repeating(value).raw
                         )
                     )
                 )
@@ -42,22 +41,18 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkGatherByteOffsetsConstantByteOffsets(_ value: Int64) {
         let mismatches = Mismatches("gatherByteOffsets with byteOffsets repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xDC6F_6533_0F18_6C55
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDC6F_6533_0F18_6C55)
         for from in fromInputs {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        byteOffsets: SIMDInt64.repeating(value)
+                        byteOffsets: SIMD<Int64>.repeating(value)
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherByteOffsetsU64(
                             source.baseAddress!,
-                            SIMDInt64.repeating(value).raw
+                            SIMD<Int64>.repeating(value).raw
                         )
                     )
                 )
@@ -78,24 +73,20 @@ extension SIMDUInt64ConstantTests {
     @inline(__always)
     private func checkGatherFirstConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("gatherFirst with indices repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x7E4A_68CF_AB56_7572
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x7E4A_68CF_AB56_7572)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        indices: SIMDInt64.repeating(value),
+                        indices: SIMD<Int64>.repeating(value),
                         count: count
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstU64(
                             source.baseAddress!,
-                            SIMDInt64.repeating(value).raw,
+                            SIMD<Int64>.repeating(value).raw,
                             count
                         )
                     )
@@ -119,15 +110,11 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkGatherFirstOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkGatherFirstOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("gatherFirstOtherwise with otherwise repeating \(hex(value))")
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xBB7C_AF24_F7A4_AD88
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xBB7C_AF24_F7A4_AD88)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xBB7C_B224_F7A4_B2A1,
             inContract: true
@@ -135,7 +122,7 @@ extension SIMDUInt64ConstantTests {
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (from, indices, count) in mixedTriples(
@@ -153,7 +140,7 @@ extension SIMDUInt64ConstantTests {
                         count: count,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstOtherwiseU64(
                             H.repeating(value).raw,
                             source.baseAddress!,
@@ -221,18 +208,14 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func gatherFirstOtherwiseConstantSplatMax() {
-        checkGatherFirstOtherwiseConstantOtherwise(H.Lane.max)
+        checkGatherFirstOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
     private func checkGatherFirstOtherwiseConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("gatherFirstOtherwise with indices repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0x90BA_E71D_5C9A_E0CC)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x90BA_E81D_5C9A_E27F
-        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x90BA_E71D_5C9A_E0CC)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x90BA_E81D_5C9A_E27F)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (otherwise, from, count) in mixedTriples(
             otherwiseInputs,
@@ -244,15 +227,15 @@ extension SIMDUInt64ConstantTests {
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        indices: SIMDInt64.repeating(value),
+                        indices: SIMD<Int64>.repeating(value),
                         count: count,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherFirstOtherwiseU64(
                             otherwise.raw,
                             source.baseAddress!,
-                            SIMDInt64.repeating(value).raw,
+                            SIMD<Int64>.repeating(value).raw,
                             count
                         )
                     )
@@ -279,24 +262,20 @@ extension SIMDUInt64ConstantTests {
     private func checkGatherWhereConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("gatherWhere with indices repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x18E1_2A32_C9AD_36AD)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x18E1_2932_C9AD_34FA
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x18E1_2932_C9AD_34FA)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        indices: SIMDInt64.repeating(value),
+                        indices: SIMD<Int64>.repeating(value),
                         where: mask
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherWhereU64(
                             mask.raw,
                             source.baseAddress!,
-                            SIMDInt64.repeating(value).raw
+                            SIMD<Int64>.repeating(value).raw
                         )
                     )
                 )
@@ -319,23 +298,19 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkGatherWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkGatherWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches("gatherWhereOtherwise with otherwise repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x137E_F84F_5DB3_F3D5)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x137E_F54F_5DB3_EEBC
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x137E_F54F_5DB3_EEBC)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x137E_F64F_5DB3_F06F,
             inContract: true
         )
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
         for (mask, from, indices) in mixedTriples(
@@ -353,7 +328,7 @@ extension SIMDUInt64ConstantTests {
                         where: mask,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherWhereOtherwiseU64(
                             H.repeating(value).raw,
                             mask.raw,
@@ -421,19 +396,15 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func gatherWhereOtherwiseConstantSplatMax() {
-        checkGatherWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkGatherWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
     private func checkGatherWhereOtherwiseConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("gatherWhereOtherwise with indices repeating \(hex(value))")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xDF83_C4DD_EF6B_C5C5)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xDF83_C4DD_EF6B_C5C5)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDF83_C3DD_EF6B_C412)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0xDF83_C2DD_EF6B_C25F
-        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDF83_C2DD_EF6B_C25F)
         for (otherwise, mask, from) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -444,16 +415,16 @@ extension SIMDUInt64ConstantTests {
                 (
                     unsafe H.gather(
                         from: source.baseAddress!,
-                        indices: SIMDInt64.repeating(value),
+                        indices: SIMD<Int64>.repeating(value),
                         where: mask,
                         otherwise: otherwise
                     ),
-                    unsafe H.Vector(
+                    unsafe H(
                         raw: HighwayReference.gatherWhereOtherwiseU64(
                             otherwise.raw,
                             mask.raw,
                             source.baseAddress!,
-                            SIMDInt64.repeating(value).raw
+                            SIMD<Int64>.repeating(value).raw
                         )
                     )
                 )
@@ -476,20 +447,20 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkScatterConstantA(_ value: H.Lane) {
+    private func checkScatterConstantA(_ value: Lane) {
         let mismatches = Mismatches("scatter with a repeating \(hex(value))")
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0xC182_55E9_59E7_3E08,
             inContract: true
         )
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for indices in indicesInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -557,21 +528,21 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func scatterConstantSplatMax() {
-        checkScatterConstantA(H.Lane.max)
+        checkScatterConstantA(Lane.max)
     }
 
     @inline(__always)
     private func checkScatterConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("scatter with indices repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x284B_F75E_8EAA_88E5)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x284B_F75E_8EAA_88E5)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe H.scatter(
                     a,
                     to: destination.baseAddress!,
-                    indices: SIMDInt64.repeating(value)
+                    indices: SIMD<Int64>.repeating(value)
                 )
             }
             var referenceLanes = sentinel
@@ -579,7 +550,7 @@ extension SIMDUInt64ConstantTests {
                 unsafe HighwayReference.scatterU64(
                     a.raw,
                     destination.baseAddress!,
-                    SIMDInt64.repeating(value).raw
+                    SIMD<Int64>.repeating(value).raw
                 )
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
@@ -596,20 +567,20 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkScatterByteOffsetsConstantA(_ value: H.Lane) {
+    private func checkScatterByteOffsetsConstantA(_ value: Lane) {
         let mismatches = Mismatches("scatterByteOffsets with a repeating \(hex(value))")
         let byteOffsetsInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
-            count: (H.laneCount - 1) * MemoryLayout<H.Lane>.stride + 1,
+            SIMD<Int64>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
             seed: 0xDF95_95D2_42A5_0D98,
             inContract: true
         )
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for byteOffsets in byteOffsetsInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -681,21 +652,21 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func scatterByteOffsetsConstantSplatMax() {
-        checkScatterByteOffsetsConstantA(H.Lane.max)
+        checkScatterByteOffsetsConstantA(Lane.max)
     }
 
     @inline(__always)
     private func checkScatterByteOffsetsConstantByteOffsets(_ value: Int64) {
         let mismatches = Mismatches("scatterByteOffsets with byteOffsets repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x711E_DD00_2B69_96FA)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x711E_DD00_2B69_96FA)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe H.scatter(
                     a,
                     to: destination.baseAddress!,
-                    byteOffsets: SIMDInt64.repeating(value)
+                    byteOffsets: SIMD<Int64>.repeating(value)
                 )
             }
             var referenceLanes = sentinel
@@ -703,7 +674,7 @@ extension SIMDUInt64ConstantTests {
                 unsafe HighwayReference.scatterByteOffsetsU64(
                     a.raw,
                     destination.baseAddress!,
-                    SIMDInt64.repeating(value).raw
+                    SIMD<Int64>.repeating(value).raw
                 )
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
@@ -720,10 +691,10 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkScatterFirstConstantA(_ value: H.Lane) {
+    private func checkScatterFirstConstantA(_ value: Lane) {
         let mismatches = Mismatches("scatterFirst with a repeating \(hex(value))")
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x0A74_196A_6995_47EC,
             inContract: true
@@ -731,10 +702,10 @@ extension SIMDUInt64ConstantTests {
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (indices, count) in everyPair(indicesInputs, countInputs) {
             let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
             var portLanes = sentinel
@@ -813,22 +784,22 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func scatterFirstConstantSplatMax() {
-        checkScatterFirstConstantA(H.Lane.max)
+        checkScatterFirstConstantA(Lane.max)
     }
 
     @inline(__always)
     private func checkScatterFirstConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("scatterFirst with indices repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4EB5_5A88_2921_6C21)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4EB5_5A88_2921_6C21)
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, count) in everyPair(aInputs, countInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe H.scatter(
                     a,
                     to: destination.baseAddress!,
-                    indices: SIMDInt64.repeating(value),
+                    indices: SIMD<Int64>.repeating(value),
                     count: count
                 )
             }
@@ -837,7 +808,7 @@ extension SIMDUInt64ConstantTests {
                 unsafe HighwayReference.scatterFirstU64(
                     a.raw,
                     destination.baseAddress!,
-                    SIMDInt64.repeating(value).raw,
+                    SIMD<Int64>.repeating(value).raw,
                     count
                 )
             }
@@ -855,21 +826,21 @@ extension SIMDUInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkScatterWhereConstantA(_ value: H.Lane) {
+    private func checkScatterWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("scatterWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6F29_BDDD_5E4C_1F1B)
         let indicesInputs = Inputs.tableIndices(
-            SIMDInt64.Vector.self,
+            SIMD<Int64>.self,
             count: H.laneCount,
             seed: 0x6F29_BEDD_5E4C_20CE,
             inContract: true
         )
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU64(value)),
+            H(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (mask, indices) in everyPair(maskInputs, indicesInputs) {
             let indices = poisoned(indices, where: mask, with: H.laneCount)
             var portLanes = sentinel
@@ -948,22 +919,22 @@ extension SIMDUInt64ConstantTests {
     }
 
     @Test func scatterWhereConstantSplatMax() {
-        checkScatterWhereConstantA(H.Lane.max)
+        checkScatterWhereConstantA(Lane.max)
     }
 
     @inline(__always)
     private func checkScatterWhereConstantIndices(_ value: Int64) {
         let mismatches = Mismatches("scatterWhere with indices repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xECE0_9777_740A_5846)
+        let aInputs = Inputs.vectors(H.self, seed: 0xECE0_9777_740A_5846)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xECE0_9877_740A_59F9)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for (a, mask) in everyPair(aInputs, maskInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
                 unsafe H.scatter(
                     a,
                     to: destination.baseAddress!,
-                    indices: SIMDInt64.repeating(value),
+                    indices: SIMD<Int64>.repeating(value),
                     where: mask
                 )
             }
@@ -973,7 +944,7 @@ extension SIMDUInt64ConstantTests {
                     a.raw,
                     mask.raw,
                     destination.baseAddress!,
-                    SIMDInt64.repeating(value).raw
+                    SIMD<Int64>.repeating(value).raw
                 )
             }
             mismatches.check(

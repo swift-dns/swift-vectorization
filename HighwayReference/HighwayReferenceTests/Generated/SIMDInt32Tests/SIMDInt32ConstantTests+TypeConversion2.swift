@@ -7,21 +7,21 @@ import Vectorization
 
 extension SIMDInt32ConstantTests {
     @inline(__always)
-    private func checkVectorConvertingWhereFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorConvertingWhereFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorConvertingWhereFromFloat with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x348D_2874_76F0_9235)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
-                H.vector(converting: SIMDFloat.repeating(value), where: mask),
-                H.Vector(
+                H.vector(converting: SIMD<Float>.repeating(value), where: mask),
+                H(
                     raw: HighwayReference.vectorConvertingWhereF32ToI32(
                         mask.raw,
-                        SIMDFloat.repeating(value)
+                        SIMD<Float>.repeating(value).raw
                     )
                 ),
                 "mask: \(describe(mask))"
@@ -87,7 +87,7 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func vectorConvertingWhereFromFloatConstantSplatPayloadNaN() {
-        checkVectorConvertingWhereFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorConvertingWhereFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorConvertingWhereFromFloatConstantSplatSignalingNaN() {
@@ -107,20 +107,20 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorRoundingToNearestOrEvenFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorRoundingToNearestOrEvenFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches(
             "vectorRoundingToNearestOrEvenFromFloat with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(roundingToNearestOrEven: SIMDFloat.repeating(value)),
-            H.Vector(
+            H.vector(roundingToNearestOrEven: SIMD<Float>.repeating(value)),
+            H(
                 raw: HighwayReference.vectorRoundingToNearestOrEvenF32ToI32(
-                    SIMDFloat.repeating(value)
+                    SIMD<Float>.repeating(value).raw
                 )
             ),
             ""
@@ -185,9 +185,7 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func vectorRoundingToNearestOrEvenFromFloatConstantSplatPayloadNaN() {
-        checkVectorRoundingToNearestOrEvenFromFloatConstantA(
-            SIMDFloat.Lane(nan: 1, signaling: false)
-        )
+        checkVectorRoundingToNearestOrEvenFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorRoundingToNearestOrEvenFromFloatConstantSplatSignalingNaN() {
@@ -207,16 +205,16 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorRoundingUpFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorRoundingUpFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorRoundingUpFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(roundingUp: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorRoundingUpF32ToI32(SIMDFloat.repeating(value))),
+            H.vector(roundingUp: SIMD<Float>.repeating(value)),
+            H(raw: HighwayReference.vectorRoundingUpF32ToI32(SIMD<Float>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -279,7 +277,7 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func vectorRoundingUpFromFloatConstantSplatPayloadNaN() {
-        checkVectorRoundingUpFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorRoundingUpFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorRoundingUpFromFloatConstantSplatSignalingNaN() {
@@ -299,16 +297,16 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorRoundingDownFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorRoundingDownFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorRoundingDownFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         mismatches.check(
-            H.vector(roundingDown: SIMDFloat.repeating(value)),
-            H.Vector(raw: HighwayReference.vectorRoundingDownF32ToI32(SIMDFloat.repeating(value))),
+            H.vector(roundingDown: SIMD<Float>.repeating(value)),
+            H(raw: HighwayReference.vectorRoundingDownF32ToI32(SIMD<Float>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -371,7 +369,7 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func vectorRoundingDownFromFloatConstantSplatPayloadNaN() {
-        checkVectorRoundingDownFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorRoundingDownFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorRoundingDownFromFloatConstantSplatSignalingNaN() {
@@ -391,21 +389,20 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkHalfVectorRoundingToNearestOrEvenFromDoubleConstantA(_ value: SIMDDouble.Lane)
-    {
+    private func checkHalfVectorRoundingToNearestOrEvenFromDoubleConstantA(_ value: Double) {
         let mismatches = Mismatches(
             "halfVectorRoundingToNearestOrEvenFromDouble with a repeating \(hex(value))"
         )
         mismatches.check(
-            SIMDDouble.repeating(value),
-            HighwayReference.repeatingF64(value),
+            SIMD<Double>.repeating(value),
+            SIMD<Double>(raw: HighwayReference.repeatingF64(value)),
             "repeating"
         )
         mismatches.check(
-            H.halfVector(roundingToNearestOrEven: SIMDDouble.repeating(value)),
+            H.halfVector(roundingToNearestOrEven: SIMD<Double>.repeating(value)),
             H.HalfVector(
                 raw: HighwayReference.halfVectorRoundingToNearestOrEvenF64ToI32(
-                    SIMDDouble.repeating(value)
+                    SIMD<Double>.repeating(value).raw
                 )
             ),
             ""
@@ -470,9 +467,7 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func halfVectorRoundingToNearestOrEvenFromDoubleConstantSplatPayloadNaN() {
-        checkHalfVectorRoundingToNearestOrEvenFromDoubleConstantA(
-            SIMDDouble.Lane(nan: 1, signaling: false)
-        )
+        checkHalfVectorRoundingToNearestOrEvenFromDoubleConstantA(Double(nan: 1, signaling: false))
     }
 
     @Test func halfVectorRoundingToNearestOrEvenFromDoubleConstantSplatSignalingNaN() {
@@ -492,19 +487,19 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkVectorResizingFromUInt64ConstantA(_ value: SIMDUInt64.Lane) {
+    private func checkVectorResizingFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches("vectorResizingFromUInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
-        let port = H.vector(resizing: SIMDUInt64.repeating(value))
-        let reference = H.Vector(
-            raw: HighwayReference.vectorResizingU64ToI32(SIMDUInt64.repeating(value).raw)
+        let port = H.vector(resizing: SIMD<UInt64>.repeating(value))
+        let reference = H(
+            raw: HighwayReference.vectorResizingU64ToI32(SIMD<UInt64>.repeating(value).raw)
         )
-        let definedBytes = SIMDUInt64.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -568,23 +563,23 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func vectorResizingFromUInt64ConstantSplatMax() {
-        checkVectorResizingFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkVectorResizingFromUInt64ConstantA(UInt64.max)
     }
 
     @inline(__always)
-    private func checkHalfVectorResizingFromUInt64ConstantA(_ value: SIMDUInt64.Lane) {
+    private func checkHalfVectorResizingFromUInt64ConstantA(_ value: UInt64) {
         let mismatches = Mismatches("halfVectorResizingFromUInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDUInt64.repeating(value),
-            SIMDUInt64.Vector(raw: HighwayReference.repeatingU64(value)),
+            SIMD<UInt64>.repeating(value),
+            SIMD<UInt64>(raw: HighwayReference.repeatingU64(value)),
             "repeating"
         )
-        let port = H.halfVector(resizing: SIMDUInt64.repeating(value))
+        let port = H.halfVector(resizing: SIMD<UInt64>.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingU64ToI32(SIMDUInt64.repeating(value).raw)
+            raw: HighwayReference.halfVectorResizingU64ToI32(SIMD<UInt64>.repeating(value).raw)
         )
-        let definedBytes = SIMDUInt64.laneCount * MemoryLayout<SIMDUInt64.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<UInt64>.laneCount * MemoryLayout<UInt64>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -648,23 +643,23 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func halfVectorResizingFromUInt64ConstantSplatMax() {
-        checkHalfVectorResizingFromUInt64ConstantA(SIMDUInt64.Lane.max)
+        checkHalfVectorResizingFromUInt64ConstantA(UInt64.max)
     }
 
     @inline(__always)
-    private func checkVectorResizingFromInt64ConstantA(_ value: SIMDInt64.Lane) {
+    private func checkVectorResizingFromInt64ConstantA(_ value: Int64) {
         let mismatches = Mismatches("vectorResizingFromInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt64.repeating(value),
-            SIMDInt64.Vector(raw: HighwayReference.repeatingI64(value)),
+            SIMD<Int64>.repeating(value),
+            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
-        let port = H.vector(resizing: SIMDInt64.repeating(value))
-        let reference = H.Vector(
-            raw: HighwayReference.vectorResizingI64ToI32(SIMDInt64.repeating(value).raw)
+        let port = H.vector(resizing: SIMD<Int64>.repeating(value))
+        let reference = H(
+            raw: HighwayReference.vectorResizingI64ToI32(SIMD<Int64>.repeating(value).raw)
         )
-        let definedBytes = SIMDInt64.laneCount * MemoryLayout<SIMDInt64.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Int64>.laneCount * MemoryLayout<Int64>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -748,27 +743,27 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func vectorResizingFromInt64ConstantSplatMax() {
-        checkVectorResizingFromInt64ConstantA(SIMDInt64.Lane.max)
+        checkVectorResizingFromInt64ConstantA(Int64.max)
     }
 
     @Test func vectorResizingFromInt64ConstantSplatMin() {
-        checkVectorResizingFromInt64ConstantA(SIMDInt64.Lane.min)
+        checkVectorResizingFromInt64ConstantA(Int64.min)
     }
 
     @inline(__always)
-    private func checkHalfVectorResizingFromInt64ConstantA(_ value: SIMDInt64.Lane) {
+    private func checkHalfVectorResizingFromInt64ConstantA(_ value: Int64) {
         let mismatches = Mismatches("halfVectorResizingFromInt64 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt64.repeating(value),
-            SIMDInt64.Vector(raw: HighwayReference.repeatingI64(value)),
+            SIMD<Int64>.repeating(value),
+            SIMD<Int64>(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
-        let port = H.halfVector(resizing: SIMDInt64.repeating(value))
+        let port = H.halfVector(resizing: SIMD<Int64>.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingI64ToI32(SIMDInt64.repeating(value).raw)
+            raw: HighwayReference.halfVectorResizingI64ToI32(SIMD<Int64>.repeating(value).raw)
         )
-        let definedBytes = SIMDInt64.laneCount * MemoryLayout<SIMDInt64.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Int64>.laneCount * MemoryLayout<Int64>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -852,27 +847,27 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func halfVectorResizingFromInt64ConstantSplatMax() {
-        checkHalfVectorResizingFromInt64ConstantA(SIMDInt64.Lane.max)
+        checkHalfVectorResizingFromInt64ConstantA(Int64.max)
     }
 
     @Test func halfVectorResizingFromInt64ConstantSplatMin() {
-        checkHalfVectorResizingFromInt64ConstantA(SIMDInt64.Lane.min)
+        checkHalfVectorResizingFromInt64ConstantA(Int64.min)
     }
 
     @inline(__always)
-    private func checkVectorResizingFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkVectorResizingFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("vectorResizingFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
-        let port = H.vector(resizing: SIMDFloat.repeating(value))
-        let reference = H.Vector(
-            raw: HighwayReference.vectorResizingF32ToI32(SIMDFloat.repeating(value))
+        let port = H.vector(resizing: SIMD<Float>.repeating(value))
+        let reference = H(
+            raw: HighwayReference.vectorResizingF32ToI32(SIMD<Float>.repeating(value).raw)
         )
-        let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
-        let grownBytes = H.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Float>.laneCount * MemoryLayout<Float>.stride
+        let grownBytes = H.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -944,7 +939,7 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func vectorResizingFromFloatConstantSplatPayloadNaN() {
-        checkVectorResizingFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkVectorResizingFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func vectorResizingFromFloatConstantSplatSignalingNaN() {
@@ -964,19 +959,19 @@ extension SIMDInt32ConstantTests {
     }
 
     @inline(__always)
-    private func checkHalfVectorResizingFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkHalfVectorResizingFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("halfVectorResizingFromFloat with a repeating \(hex(value))")
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
-        let port = H.halfVector(resizing: SIMDFloat.repeating(value))
+        let port = H.halfVector(resizing: SIMD<Float>.repeating(value))
         let reference = H.HalfVector(
-            raw: HighwayReference.halfVectorResizingF32ToI32(SIMDFloat.repeating(value))
+            raw: HighwayReference.halfVectorResizingF32ToI32(SIMD<Float>.repeating(value).raw)
         )
-        let definedBytes = SIMDFloat.laneCount * MemoryLayout<SIMDFloat.Lane>.stride
-        let grownBytes = H.HalfVector.laneCount * MemoryLayout<H.Lane>.stride
+        let definedBytes = SIMD<Float>.laneCount * MemoryLayout<Float>.stride
+        let grownBytes = H.HalfVector.laneCount * MemoryLayout<Lane>.stride
         let newBytes = HighwayReference.resizedBytesDefined(definedBytes, grownBytes, definedBytes)
         mismatches.check(
             Array(bytes(of: port).prefix(definedBytes)),
@@ -1048,7 +1043,7 @@ extension SIMDInt32ConstantTests {
     }
 
     @Test func halfVectorResizingFromFloatConstantSplatPayloadNaN() {
-        checkHalfVectorResizingFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkHalfVectorResizingFromFloatConstantA(Float(nan: 1, signaling: false))
     }
 
     @Test func halfVectorResizingFromFloatConstantSplatSignalingNaN() {

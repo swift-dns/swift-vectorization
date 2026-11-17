@@ -7,13 +7,13 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkEqualToWhereConstantA(_ value: H.Lane) {
+    private func checkEqualToWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("equalToWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8B17_59B3_59B1_5C17)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8B17_5BB3_59B1_5F7D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8B17_5BB3_59B1_5F7D)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
@@ -29,13 +29,13 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkEqualToWhereConstantB(_ value: H.Lane) {
+    private func checkEqualToWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("equalToWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA4D6_BEB3_6835_9596)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA4D6_BFB3_6835_9749)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA4D6_BFB3_6835_9749)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
@@ -136,23 +136,23 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func equalToWhereConstantSplatMax() {
-        checkEqualToWhereConstantA(H.Lane.max)
-        checkEqualToWhereConstantB(H.Lane.max)
+        checkEqualToWhereConstantA(Lane.max)
+        checkEqualToWhereConstantB(Lane.max)
     }
 
     @Test func equalToWhereConstantSplatMin() {
-        checkEqualToWhereConstantA(H.Lane.min)
-        checkEqualToWhereConstantB(H.Lane.min)
+        checkEqualToWhereConstantA(Lane.min)
+        checkEqualToWhereConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkNotEqualToWhereConstantA(_ value: H.Lane) {
+    private func checkNotEqualToWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("notEqualToWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x51B0_60A7_7515_83F6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x51B0_5EA7_7515_8090)
+        let bInputs = Inputs.vectors(H.self, seed: 0x51B0_5EA7_7515_8090)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
@@ -172,13 +172,13 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkNotEqualToWhereConstantB(_ value: H.Lane) {
+    private func checkNotEqualToWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("notEqualToWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x37F0_FBA7_6691_4A77)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x37F0_FAA7_6691_48C4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x37F0_FAA7_6691_48C4)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
@@ -283,23 +283,23 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func notEqualToWhereConstantSplatMax() {
-        checkNotEqualToWhereConstantA(H.Lane.max)
-        checkNotEqualToWhereConstantB(H.Lane.max)
+        checkNotEqualToWhereConstantA(Lane.max)
+        checkNotEqualToWhereConstantB(Lane.max)
     }
 
     @Test func notEqualToWhereConstantSplatMin() {
-        checkNotEqualToWhereConstantA(H.Lane.min)
-        checkNotEqualToWhereConstantB(H.Lane.min)
+        checkNotEqualToWhereConstantA(Lane.min)
+        checkNotEqualToWhereConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkLessThanWhereConstantA(_ value: H.Lane) {
+    private func checkLessThanWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("lessThanWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x78AA_4E4F_3FEE_CCA6)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x78AA_4C4F_3FEE_C940)
+        let bInputs = Inputs.vectors(H.self, seed: 0x78AA_4C4F_3FEE_C940)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
@@ -315,13 +315,13 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkLessThanWhereConstantB(_ value: H.Lane) {
+    private func checkLessThanWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("lessThanWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5FC4_E94F_3224_36E7)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5FC4_E84F_3224_3534)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5FC4_E84F_3224_3534)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
@@ -422,23 +422,23 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func lessThanWhereConstantSplatMax() {
-        checkLessThanWhereConstantA(H.Lane.max)
-        checkLessThanWhereConstantB(H.Lane.max)
+        checkLessThanWhereConstantA(Lane.max)
+        checkLessThanWhereConstantB(Lane.max)
     }
 
     @Test func lessThanWhereConstantSplatMin() {
-        checkLessThanWhereConstantA(H.Lane.min)
-        checkLessThanWhereConstantB(H.Lane.min)
+        checkLessThanWhereConstantA(Lane.min)
+        checkLessThanWhereConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkGreaterThanWhereConstantA(_ value: H.Lane) {
+    private func checkGreaterThanWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("greaterThanWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFBD9_4B9F_4B08_7913)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xFBD9_4D9F_4B08_7C79)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFBD9_4D9F_4B08_7C79)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
@@ -458,13 +458,13 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkGreaterThanWhereConstantB(_ value: H.Lane) {
+    private func checkGreaterThanWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("greaterThanWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1598_509F_598C_0F72)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1598_519F_598C_1125)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1598_519F_598C_1125)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
@@ -569,23 +569,23 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func greaterThanWhereConstantSplatMax() {
-        checkGreaterThanWhereConstantA(H.Lane.max)
-        checkGreaterThanWhereConstantB(H.Lane.max)
+        checkGreaterThanWhereConstantA(Lane.max)
+        checkGreaterThanWhereConstantB(Lane.max)
     }
 
     @Test func greaterThanWhereConstantSplatMin() {
-        checkGreaterThanWhereConstantA(H.Lane.min)
-        checkGreaterThanWhereConstantB(H.Lane.min)
+        checkGreaterThanWhereConstantA(Lane.min)
+        checkGreaterThanWhereConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkLessThanOrEqualToWhereConstantA(_ value: H.Lane) {
+    private func checkLessThanOrEqualToWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("lessThanOrEqualToWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA624_C4F5_942D_879E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xA624_C2F5_942D_8438)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA624_C2F5_942D_8438)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
@@ -605,13 +605,13 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkLessThanOrEqualToWhereConstantB(_ value: H.Lane) {
+    private func checkLessThanOrEqualToWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("lessThanOrEqualToWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8B1F_3FF5_8494_551F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8B1F_3EF5_8494_536C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8B1F_3EF5_8494_536C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
@@ -716,23 +716,23 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func lessThanOrEqualToWhereConstantSplatMax() {
-        checkLessThanOrEqualToWhereConstantA(H.Lane.max)
-        checkLessThanOrEqualToWhereConstantB(H.Lane.max)
+        checkLessThanOrEqualToWhereConstantA(Lane.max)
+        checkLessThanOrEqualToWhereConstantB(Lane.max)
     }
 
     @Test func lessThanOrEqualToWhereConstantSplatMin() {
-        checkLessThanOrEqualToWhereConstantA(H.Lane.min)
-        checkLessThanOrEqualToWhereConstantB(H.Lane.min)
+        checkLessThanOrEqualToWhereConstantA(Lane.min)
+        checkLessThanOrEqualToWhereConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkGreaterThanOrEqualToWhereConstantA(_ value: H.Lane) {
+    private func checkGreaterThanOrEqualToWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("greaterThanOrEqualToWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9B55_607D_3426_CAFD)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9B55_5E7D_3426_C797)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9B55_5E7D_3426_C797)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, b) in everyPair(maskInputs, bInputs) {
@@ -752,13 +752,13 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkGreaterThanOrEqualToWhereConstantB(_ value: H.Lane) {
+    private func checkGreaterThanOrEqualToWhereConstantB(_ value: Lane) {
         let mismatches = Mismatches("greaterThanOrEqualToWhere with b repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x92C0_A97D_2F50_C268)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x92C0_AA7D_2F50_C41B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x92C0_AA7D_2F50_C41B)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for (mask, a) in everyPair(maskInputs, aInputs) {
@@ -863,12 +863,12 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func greaterThanOrEqualToWhereConstantSplatMax() {
-        checkGreaterThanOrEqualToWhereConstantA(H.Lane.max)
-        checkGreaterThanOrEqualToWhereConstantB(H.Lane.max)
+        checkGreaterThanOrEqualToWhereConstantA(Lane.max)
+        checkGreaterThanOrEqualToWhereConstantB(Lane.max)
     }
 
     @Test func greaterThanOrEqualToWhereConstantSplatMin() {
-        checkGreaterThanOrEqualToWhereConstantA(H.Lane.min)
-        checkGreaterThanOrEqualToWhereConstantB(H.Lane.min)
+        checkGreaterThanOrEqualToWhereConstantA(Lane.min)
+        checkGreaterThanOrEqualToWhereConstantB(Lane.min)
     }
 }

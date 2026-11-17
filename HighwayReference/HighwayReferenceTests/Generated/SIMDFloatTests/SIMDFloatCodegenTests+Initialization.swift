@@ -15,7 +15,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func repeating() {
         let mismatches = Mismatches("portRepeatingF32")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x4782_9570_B936_E395)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x4782_9570_B936_E395)
         for value in valueInputs {
             mismatches.check(
                 portRepeatingF32(value),
@@ -34,7 +34,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func iota() {
         let mismatches = Mismatches("portIotaF32")
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x042E_153E_76F5_AD61)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x042E_153E_76F5_AD61)
         for value in valueInputs {
             mismatches.check(portIotaF32(value), highwayIotaF32(value), "value: \(hex(value))")
         }
@@ -75,7 +75,7 @@ extension SIMDFloatCodegenTests {
     @Test func repeatingWhere() {
         let mismatches = Mismatches("portRepeatingWhereF32")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCBE0_589B_5B74_A4D6)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xCBE0_599B_5B74_A689)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xCBE0_599B_5B74_A689)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 portRepeatingWhereF32(value, where: mask),
@@ -101,9 +101,9 @@ extension SIMDFloatCodegenTests {
 
     @Test func repeatingWhereOtherwise() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseF32")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xF596_DAE1_4904_BD5E)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF596_DAE1_4904_BD5E)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF596_DBE1_4904_BF11)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xF596_D8E1_4904_B9F8)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xF596_D8E1_4904_B9F8)
         for (otherwise, mask, value) in mixedTriples(
             otherwiseInputs,
             maskInputs,
@@ -121,7 +121,7 @@ extension SIMDFloatCodegenTests {
 
     @Test func repeatingWhereOtherwiseConstantValue() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseF32ConstantValue")
-        let otherwiseInputs = Inputs.vectors(H.Vector.self, seed: 0xFDEC_D40A_03EC_7011)
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xFDEC_D40A_03EC_7011)
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xFDEC_D30A_03EC_6E5E)
         for (otherwise, mask) in everyPair(otherwiseInputs, maskInputs) {
             mismatches.check(
@@ -136,7 +136,7 @@ extension SIMDFloatCodegenTests {
     @Test func repeatingWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portRepeatingWhereOtherwiseF32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA8BF_2DA2_2FAE_F6A1)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0xA8BF_2AA2_2FAE_F188)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xA8BF_2AA2_2FAE_F188)
         for (mask, value) in everyPair(maskInputs, valueInputs) {
             mismatches.check(
                 portRepeatingWhereOtherwiseF32ConstantOtherwise(value, where: mask),
@@ -149,11 +149,21 @@ extension SIMDFloatCodegenTests {
 
     @Test func repeatingBlock() {
         let mismatches = Mismatches("portRepeatingBlockF32")
-        let vectorInputs = Inputs.vectors(H.Vector.self, seed: 0xDCFA_57CA_433F_3AE8)
+        let vectorInputs = Inputs.vectors(H.self, seed: 0xDCFA_57CA_433F_3AE8)
         for vector in vectorInputs {
             mismatches.check(
-                portRepeatingBlockF32(vector[0], vector[1], vector[2], vector[3]),
-                highwayRepeatingBlockF32(vector[0], vector[1], vector[2], vector[3]),
+                portRepeatingBlockF32(
+                    vector.simd[0],
+                    vector.simd[1],
+                    vector.simd[2],
+                    vector.simd[3]
+                ),
+                highwayRepeatingBlockF32(
+                    vector.simd[0],
+                    vector.simd[1],
+                    vector.simd[2],
+                    vector.simd[3]
+                ),
                 "lanes: \(describe(vector))"
             )
         }

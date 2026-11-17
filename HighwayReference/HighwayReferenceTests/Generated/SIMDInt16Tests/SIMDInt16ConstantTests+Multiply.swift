@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDInt16ConstantTests {
     @inline(__always)
-    private func checkMultiplyingConstantA(_ value: H.Lane) {
+    private func checkMultiplyingConstantA(_ value: Lane) {
         let mismatches = Mismatches("multiplying with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBF7D_96DF_A38F_BDC7)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBF7D_96DF_A38F_BDC7)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI16(value)),
+            H(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.multiplying(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.multiplyingI16(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.multiplyingI16(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingConstantB(_ value: H.Lane) {
+    private func checkMultiplyingConstantB(_ value: Lane) {
         let mismatches = Mismatches("multiplying with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC739_2CDF_A7AD_9D89)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC739_2CDF_A7AD_9D89)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI16(value)),
+            H(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.multiplying(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.multiplyingI16(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.multiplyingI16(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -120,30 +120,30 @@ extension SIMDInt16ConstantTests {
     }
 
     @Test func multiplyingConstantSplatMax() {
-        checkMultiplyingConstantA(H.Lane.max)
-        checkMultiplyingConstantB(H.Lane.max)
+        checkMultiplyingConstantA(Lane.max)
+        checkMultiplyingConstantB(Lane.max)
     }
 
     @Test func multiplyingConstantSplatMin() {
-        checkMultiplyingConstantA(H.Lane.min)
-        checkMultiplyingConstantB(H.Lane.min)
+        checkMultiplyingConstantA(Lane.min)
+        checkMultiplyingConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkMultiplyingEvenFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkMultiplyingEvenFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("multiplyingEvenFromInt8 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xE0A4_EFC4_601A_5502)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xE0A4_EFC4_601A_5502)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.multiplyingEven(SIMDInt8.repeating(value), b),
-                H.Vector(
+                H.multiplyingEven(SIMD<Int8>.repeating(value), b),
+                H(
                     raw: HighwayReference.multiplyingEvenI8ToI16(
-                        SIMDInt8.repeating(value).raw,
+                        SIMD<Int8>.repeating(value).raw,
                         b.raw
                     )
                 ),
@@ -154,21 +154,21 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingEvenFromInt8ConstantB(_ value: SIMDInt8.Lane) {
+    private func checkMultiplyingEvenFromInt8ConstantB(_ value: Int8) {
         let mismatches = Mismatches("multiplyingEvenFromInt8 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xD7A2_B9C4_5AE6_A2C0)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xD7A2_B9C4_5AE6_A2C0)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.multiplyingEven(a, SIMDInt8.repeating(value)),
-                H.Vector(
+                H.multiplyingEven(a, SIMD<Int8>.repeating(value)),
+                H(
                     raw: HighwayReference.multiplyingEvenI8ToI16(
                         a.raw,
-                        SIMDInt8.repeating(value).raw
+                        SIMD<Int8>.repeating(value).raw
                     )
                 ),
                 "a: \(describe(a))"
@@ -228,20 +228,20 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingOddFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkMultiplyingOddFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("multiplyingOddFromInt8 with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x14CD_1CB3_F392_567D)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x14CD_1CB3_F392_567D)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.multiplyingOdd(SIMDInt8.repeating(value), b),
-                H.Vector(
+                H.multiplyingOdd(SIMD<Int8>.repeating(value), b),
+                H(
                     raw: HighwayReference.multiplyingOddI8ToI16(
-                        SIMDInt8.repeating(value).raw,
+                        SIMD<Int8>.repeating(value).raw,
                         b.raw
                     )
                 ),
@@ -252,21 +252,21 @@ extension SIMDInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkMultiplyingOddFromInt8ConstantB(_ value: SIMDInt8.Lane) {
+    private func checkMultiplyingOddFromInt8ConstantB(_ value: Int8) {
         let mismatches = Mismatches("multiplyingOddFromInt8 with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0xFB7A_96B3_E56A_B6CB)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0xFB7A_96B3_E56A_B6CB)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.multiplyingOdd(a, SIMDInt8.repeating(value)),
-                H.Vector(
+                H.multiplyingOdd(a, SIMD<Int8>.repeating(value)),
+                H(
                     raw: HighwayReference.multiplyingOddI8ToI16(
                         a.raw,
-                        SIMDInt8.repeating(value).raw
+                        SIMD<Int8>.repeating(value).raw
                     )
                 ),
                 "a: \(describe(a))"

@@ -7,21 +7,19 @@ import Vectorization
 
 extension SIMDUInt16ConstantTests {
     @inline(__always)
-    private func checkSelectingByVectorConstantA(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xD726_9DE4_3D0D_5D49)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xD726_9AE4_3D0D_5830)
+        let bInputs = Inputs.vectors(H.self, seed: 0xD726_9DE4_3D0D_5D49)
+        let cInputs = Inputs.vectors(H.self, seed: 0xD726_9AE4_3D0D_5830)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU16(value)),
+            H(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.selecting(H.repeating(value), b, c),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorU16(H.repeating(value).raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorU16(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -29,21 +27,19 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantB(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBD67_37E4_2E89_2217)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xBD67_39E4_2E89_257D)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBD67_37E4_2E89_2217)
+        let cInputs = Inputs.vectors(H.self, seed: 0xBD67_39E4_2E89_257D)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU16(value)),
+            H(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.selecting(a, H.repeating(value), c),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorU16(a.raw, H.repeating(value).raw, c.raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorU16(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -51,21 +47,19 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantC(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantC(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC6D5_CEE4_3418_980C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC6D5_CFE4_3418_99BF)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC6D5_CEE4_3418_980C)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC6D5_CFE4_3418_99BF)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU16(value)),
+            H(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selecting(a, b, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorU16(a.raw, b.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorU16(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }
@@ -145,8 +139,8 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func selectingByVectorConstantSplatMax() {
-        checkSelectingByVectorConstantA(H.Lane.max)
-        checkSelectingByVectorConstantB(H.Lane.max)
-        checkSelectingByVectorConstantC(H.Lane.max)
+        checkSelectingByVectorConstantA(Lane.max)
+        checkSelectingByVectorConstantB(Lane.max)
+        checkSelectingByVectorConstantC(Lane.max)
     }
 }

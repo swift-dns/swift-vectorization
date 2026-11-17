@@ -5,90 +5,86 @@ public import Vectorization
 
 @inline(never)
 public func portTableLookupLanesI32(
-    _ a: SIMDInt32.Vector,
-    atUnchecked indices: SIMDInt32.Indices
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.tableLookupLanes(a, atUnchecked: indices)
+    _ a: SIMD<Int32>,
+    atUnchecked indices: SIMD<Int32>.Indices
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.tableLookupLanes(a, atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTableLookupLanesI32(
-    _ a: SIMDInt32.Vector,
-    atUnchecked indices: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.tableLookupLanesI32(a.raw, indices.raw))
+    _ a: SIMD<Int32>,
+    atUnchecked indices: SIMD<Int32>
+) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.tableLookupLanesI32(a.raw, indices.raw))
 }
 
 @inline(never)
 public func portTableLookupLanesI32ConstantA(
-    atUnchecked indices: SIMDInt32.Indices
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.tableLookupLanes(SIMDInt32.repeating(26), atUnchecked: indices)
+    atUnchecked indices: SIMD<Int32>.Indices
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.tableLookupLanes(SIMD<Int32>.repeating(26), atUnchecked: indices)
 }
 
 @inline(never)
-public func highwayTableLookupLanesI32ConstantA(
-    atUnchecked indices: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayTableLookupLanesI32ConstantA(atUnchecked indices: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.tableLookupLanesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             indices.raw
         )
     )
 }
 
 @inline(never)
-public func portTableLookupLanesI32ConstantIndices(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.tableLookupLanes(a, atUnchecked: SIMDInt32.repeating(1))
+public func portTableLookupLanesI32ConstantIndices(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.tableLookupLanes(a, atUnchecked: SIMD<Int32>.repeating(1))
 }
 
 @inline(never)
-public func highwayTableLookupLanesI32ConstantIndices(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayTableLookupLanesI32ConstantIndices(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.tableLookupLanesI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
 
 @inline(never)
 public func portTwoTablesLookupLanesI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector,
-    atUnchecked indices: SIMDInt32.Indices
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.twoTablesLookupLanes(a, b, atUnchecked: indices)
+    _ a: SIMD<Int32>,
+    _ b: SIMD<Int32>,
+    atUnchecked indices: SIMD<Int32>.Indices
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.twoTablesLookupLanes(a, b, atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTwoTablesLookupLanesI32(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector,
-    atUnchecked indices: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
-        raw: HighwayReference.Nothrow.twoTablesLookupLanesI32(a.raw, b.raw, indices.raw)
-    )
+    _ a: SIMD<Int32>,
+    _ b: SIMD<Int32>,
+    atUnchecked indices: SIMD<Int32>
+) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.twoTablesLookupLanesI32(a.raw, b.raw, indices.raw))
 }
 
 @inline(never)
 public func portTwoTablesLookupLanesI32ConstantA(
-    _ b: SIMDInt32.Vector,
-    atUnchecked indices: SIMDInt32.Indices
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.twoTablesLookupLanes(SIMDInt32.repeating(26), b, atUnchecked: indices)
+    _ b: SIMD<Int32>,
+    atUnchecked indices: SIMD<Int32>.Indices
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.twoTablesLookupLanes(SIMD<Int32>.repeating(26), b, atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTwoTablesLookupLanesI32ConstantA(
-    _ b: SIMDInt32.Vector,
-    atUnchecked indices: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+    _ b: SIMD<Int32>,
+    atUnchecked indices: SIMD<Int32>
+) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.twoTablesLookupLanesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             b.raw,
             indices.raw
         )
@@ -97,21 +93,21 @@ public func highwayTwoTablesLookupLanesI32ConstantA(
 
 @inline(never)
 public func portTwoTablesLookupLanesI32ConstantB(
-    _ a: SIMDInt32.Vector,
-    atUnchecked indices: SIMDInt32.Indices
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.twoTablesLookupLanes(a, SIMDInt32.repeating(26), atUnchecked: indices)
+    _ a: SIMD<Int32>,
+    atUnchecked indices: SIMD<Int32>.Indices
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.twoTablesLookupLanes(a, SIMD<Int32>.repeating(26), atUnchecked: indices)
 }
 
 @inline(never)
 public func highwayTwoTablesLookupLanesI32ConstantB(
-    _ a: SIMDInt32.Vector,
-    atUnchecked indices: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+    _ a: SIMD<Int32>,
+    atUnchecked indices: SIMD<Int32>
+) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.twoTablesLookupLanesI32(
             a.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             indices.raw
         )
     )
@@ -119,123 +115,116 @@ public func highwayTwoTablesLookupLanesI32ConstantB(
 
 @inline(never)
 public func portTwoTablesLookupLanesI32ConstantIndices(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.twoTablesLookupLanes(a, b, atUnchecked: SIMDInt32.repeating(1))
+    _ a: SIMD<Int32>,
+    _ b: SIMD<Int32>
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.twoTablesLookupLanes(a, b, atUnchecked: SIMD<Int32>.repeating(1))
 }
 
 @inline(never)
 public func highwayTwoTablesLookupLanesI32ConstantIndices(
-    _ a: SIMDInt32.Vector,
-    _ b: SIMDInt32.Vector
-) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+    _ a: SIMD<Int32>,
+    _ b: SIMD<Int32>
+) -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.twoTablesLookupLanesI32(
             a.raw,
             b.raw,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
 
 @inline(never)
-public func portIndicesI32(fromUnchecked vector: SIMDInt32.Indices) -> SIMDInt32.Indices {
-    unsafe SIMDInt32.indices(fromUnchecked: vector)
+public func portIndicesI32(fromUnchecked vector: SIMD<Int32>.Indices) -> SIMD<Int32>.Indices {
+    unsafe SIMD<Int32>.indices(fromUnchecked: vector)
 }
 
 @inline(never)
-public func highwayIndicesI32(fromUnchecked vector: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    SIMDInt32.Indices(raw: HighwayReference.Nothrow.indicesI32(vector.raw))
+public func highwayIndicesI32(fromUnchecked vector: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>.Indices(raw: HighwayReference.Nothrow.indicesI32(vector.raw))
 }
 
 @inline(never)
-public func portIndicesI32ConstantVector() -> SIMDInt32.Indices {
-    unsafe SIMDInt32.indices(fromUnchecked: SIMDInt32.repeating(1))
+public func portIndicesI32ConstantVector() -> SIMD<Int32>.Indices {
+    unsafe SIMD<Int32>.indices(fromUnchecked: SIMD<Int32>.repeating(1))
 }
 
 @inline(never)
-public func highwayIndicesI32ConstantVector() -> SIMDInt32.Vector {
-    SIMDInt32.Indices(
+public func highwayIndicesI32ConstantVector() -> SIMD<Int32> {
+    SIMD<Int32>.Indices(
         raw: HighwayReference.Nothrow.indicesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
 
 @inline(never)
 public func portLookup8I32(
-    at indices: SIMDInt32.Indices,
-    from: UnsafePointer<SIMDInt32.Lane>
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.lookup8(at: indices, from: from)
-}
-
-@inline(never)
-public func highwayLookup8I32(
-    at indices: SIMDInt32.Vector,
+    at indices: SIMD<Int32>.Indices,
     from: UnsafePointer<Int32>
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.lookup8I32(from, indices.raw))
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.lookup8(at: indices, from: from)
 }
 
 @inline(never)
-public func portLookup8I32ConstantIndices(from: UnsafePointer<SIMDInt32.Lane>) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.lookup8(at: SIMDInt32.repeating(1), from: from)
+public func highwayLookup8I32(at indices: SIMD<Int32>, from: UnsafePointer<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.lookup8I32(from, indices.raw))
 }
 
 @inline(never)
-public func highwayLookup8I32ConstantIndices(from: UnsafePointer<Int32>) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.Vector(
+public func portLookup8I32ConstantIndices(from: UnsafePointer<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.lookup8(at: SIMD<Int32>.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup8I32ConstantIndices(from: UnsafePointer<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.lookup8I32(
             from,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
 
 @inline(never)
 public func portLookup16I32(
-    at indices: SIMDInt32.Indices,
-    from: UnsafePointer<SIMDInt32.Lane>
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.lookup16(at: indices, from: from)
-}
-
-@inline(never)
-public func highwayLookup16I32(
-    at indices: SIMDInt32.Vector,
+    at indices: SIMD<Int32>.Indices,
     from: UnsafePointer<Int32>
-) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.Vector(raw: HighwayReference.Nothrow.lookup16I32(from, indices.raw))
+) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.lookup16(at: indices, from: from)
 }
 
 @inline(never)
-public func portLookup16I32ConstantIndices(from: UnsafePointer<SIMDInt32.Lane>) -> SIMDInt32.Vector
-{
-    unsafe SIMDInt32.lookup16(at: SIMDInt32.repeating(1), from: from)
+public func highwayLookup16I32(at indices: SIMD<Int32>, from: UnsafePointer<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>(raw: HighwayReference.Nothrow.lookup16I32(from, indices.raw))
 }
 
 @inline(never)
-public func highwayLookup16I32ConstantIndices(from: UnsafePointer<Int32>) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.Vector(
+public func portLookup16I32ConstantIndices(from: UnsafePointer<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.lookup16(at: SIMD<Int32>.repeating(1), from: from)
+}
+
+@inline(never)
+public func highwayLookup16I32ConstantIndices(from: UnsafePointer<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>(
         raw: HighwayReference.Nothrow.lookup16I32(
             from,
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(1)).raw
         )
     )
 }
 
 @inline(never)
-public func portShuffledPer4LanesI32ConstantA() -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shuffledPer4Lanes(SIMDInt32.repeating(26), unchecked: 1, 1, 1, 1)
+public func portShuffledPer4LanesI32ConstantA() -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shuffledPer4Lanes(SIMD<Int32>.repeating(26), unchecked: 1, 1, 1, 1)
 }
 
 @inline(never)
-public func highwayShuffledPer4LanesI32ConstantA() -> SIMDInt32.Vector {
-    SIMDInt32.Vector(
+public func highwayShuffledPer4LanesI32ConstantA() -> SIMD<Int32> {
+    SIMD<Int32>(
         raw: HighwayReference.Nothrow.shuffledPer4LanesI32(
-            SIMDInt32.Vector(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
+            SIMD<Int32>(raw: HighwayReference.Nothrow.repeatingI32(26)).raw,
             1,
             1,
             1,
@@ -245,21 +234,21 @@ public func highwayShuffledPer4LanesI32ConstantA() -> SIMDInt32.Vector {
 }
 
 @inline(never)
-public func portShuffledPer4LanesI32ConstantI3(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.shuffledPer4Lanes(a, unchecked: 1, 1, 1, 1)
+public func portShuffledPer4LanesI32ConstantI3(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.shuffledPer4Lanes(a, unchecked: 1, 1, 1, 1)
 }
 
 @inline(never)
-public func highwayShuffledPer4LanesI32ConstantI3(_ a: SIMDInt32.Vector) -> SIMDInt32.Vector {
-    SIMDInt32.Vector(raw: HighwayReference.Nothrow.shuffledPer4LanesI32(a.raw, 1, 1, 1, 1))
+public func highwayShuffledPer4LanesI32ConstantI3(_ a: SIMD<Int32>) -> SIMD<Int32> {
+    SIMD<Int32>(raw: HighwayReference.Nothrow.shuffledPer4LanesI32(a.raw, 1, 1, 1, 1))
 }
 
 @inline(never)
-public func portLoadIndicesI32(from: UnsafePointer<Int32>) -> SIMDInt32.Indices {
-    unsafe SIMDInt32.loadIndices(from: from)
+public func portLoadIndicesI32(from: UnsafePointer<Int32>) -> SIMD<Int32>.Indices {
+    unsafe SIMD<Int32>.loadIndices(from: from)
 }
 
 @inline(never)
-public func highwayLoadIndicesI32(from: UnsafePointer<Int32>) -> SIMDInt32.Vector {
-    unsafe SIMDInt32.Indices(raw: HighwayReference.Nothrow.loadIndicesI32(from))
+public func highwayLoadIndicesI32(from: UnsafePointer<Int32>) -> SIMD<Int32> {
+    unsafe SIMD<Int32>.Indices(raw: HighwayReference.Nothrow.loadIndicesI32(from))
 }

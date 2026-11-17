@@ -9,15 +9,15 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved2() {
         let mismatches = Mismatches("loadInterleaved2")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0xFCCD_A42C_2609_D44B
         )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved2(from: source.baseAddress!, &p0, &p1)
                 unsafe HighwayReference.loadInterleaved2I64(source.baseAddress!, &r0.raw, &r1.raw)
@@ -31,15 +31,15 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved2BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved2 before a guard page")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0xF2FD_E410_2F75_AB10
         )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved2(from: source, &p0, &p1)
                 unsafe HighwayReference.loadInterleaved2I64(source, &r0.raw, &r1.raw)
@@ -53,15 +53,15 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved2UncheckedSpan() {
         let mismatches = Mismatches("loadInterleaved2 unchecked span")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 2 * H.laneCount,
             seed: 0xF7BC_EFA4_1B0D_F34F
         )
         for from in fromInputs {
             var p0 = H.zero()
             var p1 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
             from.withUnsafeBufferPointer { source in
                 ({
                     let span = unsafe Span(_unsafeElements: source)
@@ -81,7 +81,7 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved3() {
         let mismatches = Mismatches("loadInterleaved3")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount,
             seed: 0x0489_3B2C_2A27_B5C0
         )
@@ -89,9 +89,9 @@ extension SIMDInt64ReferenceTests {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
-            var r2 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
+            var r2 = H(raw: HighwayReference.zeroI64())
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved3(from: source.baseAddress!, &p0, &p1, &p2)
                 unsafe HighwayReference.loadInterleaved3I64(
@@ -111,7 +111,7 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved3BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved3 before a guard page")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount,
             seed: 0x9DDD_0251_E694_6879
         )
@@ -119,9 +119,9 @@ extension SIMDInt64ReferenceTests {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
-            var r2 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
+            var r2 = H(raw: HighwayReference.zeroI64())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved3(from: source, &p0, &p1, &p2)
                 unsafe HighwayReference.loadInterleaved3I64(source, &r0.raw, &r1.raw, &r2.raw)
@@ -136,7 +136,7 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved3UncheckedSpan() {
         let mismatches = Mismatches("loadInterleaved3 unchecked span")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 3 * H.laneCount,
             seed: 0x7557_033B_F70B_E812
         )
@@ -144,9 +144,9 @@ extension SIMDInt64ReferenceTests {
             var p0 = H.zero()
             var p1 = H.zero()
             var p2 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
-            var r2 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
+            var r2 = H(raw: HighwayReference.zeroI64())
             from.withUnsafeBufferPointer { source in
                 ({
                     let span = unsafe Span(_unsafeElements: source)
@@ -167,7 +167,7 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved4() {
         let mismatches = Mismatches("loadInterleaved4")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 4 * H.laneCount,
             seed: 0xEACA_562C_1BA4_55C1
         )
@@ -176,10 +176,10 @@ extension SIMDInt64ReferenceTests {
             var p1 = H.zero()
             var p2 = H.zero()
             var p3 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
-            var r2 = H.Vector(raw: HighwayReference.zeroI64())
-            var r3 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
+            var r2 = H(raw: HighwayReference.zeroI64())
+            var r3 = H(raw: HighwayReference.zeroI64())
             from.withUnsafeBufferPointer { source in
                 unsafe H.loadInterleaved4(from: source.baseAddress!, &p0, &p1, &p2, &p3)
                 unsafe HighwayReference.loadInterleaved4I64(
@@ -201,7 +201,7 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved4BeforeGuardPage() {
         let mismatches = Mismatches("loadInterleaved4 before a guard page")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 4 * H.laneCount,
             seed: 0x6283_1539_9D6A_CCFE
         )
@@ -210,10 +210,10 @@ extension SIMDInt64ReferenceTests {
             var p1 = H.zero()
             var p2 = H.zero()
             var p3 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
-            var r2 = H.Vector(raw: HighwayReference.zeroI64())
-            var r3 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
+            var r2 = H(raw: HighwayReference.zeroI64())
+            var r3 = H(raw: HighwayReference.zeroI64())
             _ = unsafe withGuardedLanes(from) { source in
                 unsafe H.loadInterleaved4(from: source, &p0, &p1, &p2, &p3)
                 unsafe HighwayReference.loadInterleaved4I64(
@@ -235,7 +235,7 @@ extension SIMDInt64ReferenceTests {
     @Test func loadInterleaved4UncheckedSpan() {
         let mismatches = Mismatches("loadInterleaved4 unchecked span")
         let fromInputs = Inputs.buffers(
-            H.Lane.self,
+            Lane.self,
             count: 4 * H.laneCount,
             seed: 0xF00C_20EA_4A91_A829
         )
@@ -244,10 +244,10 @@ extension SIMDInt64ReferenceTests {
             var p1 = H.zero()
             var p2 = H.zero()
             var p3 = H.zero()
-            var r0 = H.Vector(raw: HighwayReference.zeroI64())
-            var r1 = H.Vector(raw: HighwayReference.zeroI64())
-            var r2 = H.Vector(raw: HighwayReference.zeroI64())
-            var r3 = H.Vector(raw: HighwayReference.zeroI64())
+            var r0 = H(raw: HighwayReference.zeroI64())
+            var r1 = H(raw: HighwayReference.zeroI64())
+            var r2 = H(raw: HighwayReference.zeroI64())
+            var r3 = H(raw: HighwayReference.zeroI64())
             from.withUnsafeBufferPointer { source in
                 ({
                     let span = unsafe Span(_unsafeElements: source)
@@ -268,9 +268,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved2() {
         let mismatches = Mismatches("storeInterleaved2")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6248_D3B6_0A9D_98A4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x6248_D4B6_0A9D_9A57)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6248_D3B6_0A9D_98A4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6248_D4B6_0A9D_9A57)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (a, b) in everyPair(aInputs, bInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -287,9 +287,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved2BeforeGuardPage() {
         let mismatches = Mismatches("storeInterleaved2 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7859_FC4D_80C3_827D)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7859_FB4D_80C3_80CA)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7859_FC4D_80C3_827D)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7859_FB4D_80C3_80CA)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount)
         for (a, b) in everyPair(aInputs, bInputs) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeInterleaved2(a, b, to: destination)
@@ -304,9 +304,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved2UncheckedSpan() {
         let mismatches = Mismatches("storeInterleaved2 unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAE1E_2138_20A3_DE7E)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xAE1E_2238_20A3_E031)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 2 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE1E_2138_20A3_DE7E)
+        let bInputs = Inputs.vectors(H.self, seed: 0xAE1E_2238_20A3_E031)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
         for (a, b) in everyPair(aInputs, bInputs) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -329,8 +329,8 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved2UncheckedOutputSpan() {
         let mismatches = Mismatches("storeInterleaved2 unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x90F9_62D2_E50F_BC8B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x90F9_61D2_E50F_BAD8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x90F9_62D2_E50F_BC8B)
+        let bInputs = Inputs.vectors(H.self, seed: 0x90F9_61D2_E50F_BAD8)
         for (a, b) in everyPair(aInputs, bInputs) {
             let (_, portLanes) = withOutputSpan(capacity: 2 * H.laneCount) { output in
                 unsafe H.appendInterleaved2(a, b, toUnchecked: &output)
@@ -345,10 +345,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved3() {
         let mismatches = Mismatches("storeInterleaved3")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5A8D_9CB6_0680_5A4F)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5A8D_9BB6_0680_589C)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5A8D_9EB6_0680_5DB5)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5A8D_9CB6_0680_5A4F)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5A8D_9BB6_0680_589C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5A8D_9EB6_0680_5DB5)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xAA42_C14D_0DF8_2729) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -374,10 +374,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved3BeforeGuardPage() {
         let mismatches = Mismatches("storeInterleaved3 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x907E_15BC_5C3A_3274)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x907E_16BC_5C3A_3427)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x907E_17BC_5C3A_35DA)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x907E_15BC_5C3A_3274)
+        let bInputs = Inputs.vectors(H.self, seed: 0x907E_16BC_5C3A_3427)
+        let cInputs = Inputs.vectors(H.self, seed: 0x907E_17BC_5C3A_35DA)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x7F14_41C6_9A67_AF28) {
             let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe H.storeInterleaved3(a, b, c, to: destination)
@@ -396,10 +396,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved3UncheckedSpan() {
         let mismatches = Mismatches("storeInterleaved3 unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF2A6_BF5C_7D38_9B5B)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF2A6_BE5C_7D38_99A8)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF2A6_C15C_7D38_9EC1)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 3 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF2A6_BF5C_7D38_9B5B)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF2A6_BE5C_7D38_99A8)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF2A6_C15C_7D38_9EC1)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x0089_330E_7C4D_9EFD) {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -426,9 +426,9 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved3UncheckedOutputSpan() {
         let mismatches = Mismatches("storeInterleaved3 unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF9BE_5F94_DD3A_02F2)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xF9BE_6094_DD3A_04A5)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0xF9BE_5D94_DD39_FF8C)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF9BE_5F94_DD3A_02F2)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF9BE_6094_DD3A_04A5)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF9BE_5D94_DD39_FF8C)
         for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xB230_43F7_EAC4_4736) {
             let (_, portLanes) = withOutputSpan(capacity: 3 * H.laneCount) { output in
                 unsafe H.appendInterleaved3(a, b, c, toUnchecked: &output)
@@ -447,11 +447,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved4() {
         let mismatches = Mismatches("storeInterleaved4")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9634_3DB6_2802_3A62)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9634_3EB6_2802_3C15)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x9634_3BB6_2802_36FC)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x9634_3CB6_2802_38AF)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9634_3DB6_2802_3A62)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9634_3EB6_2802_3C15)
+        let cInputs = Inputs.vectors(H.self, seed: 0x9634_3BB6_2802_36FC)
+        let dInputs = Inputs.vectors(H.self, seed: 0x9634_3CB6_2802_38AF)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -484,11 +484,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved4BeforeGuardPage() {
         let mismatches = Mismatches("storeInterleaved4 before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8571_A393_32CD_6223)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8571_A293_32CD_6070)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x8571_A593_32CD_6589)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x8571_A493_32CD_63D6)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x8571_A393_32CD_6223)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8571_A293_32CD_6070)
+        let cInputs = Inputs.vectors(H.self, seed: 0x8571_A593_32CD_6589)
+        let dInputs = Inputs.vectors(H.self, seed: 0x8571_A493_32CD_63D6)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -519,11 +519,11 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved4UncheckedSpan() {
         let mismatches = Mismatches("storeInterleaved4 unchecked span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5522_A013_2A94_A2B8)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5522_A113_2A94_A46B)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5522_A213_2A94_A61E)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x5522_A313_2A94_A7D1)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: 4 * H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5522_A013_2A94_A2B8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5522_A113_2A94_A46B)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5522_A213_2A94_A61E)
+        let dInputs = Inputs.vectors(H.self, seed: 0x5522_A313_2A94_A7D1)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,
@@ -556,10 +556,10 @@ extension SIMDInt64ReferenceTests {
 
     @Test func storeInterleaved4UncheckedOutputSpan() {
         let mismatches = Mismatches("storeInterleaved4 unchecked output span")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x5BAB_9798_C0AF_D201)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5BAB_9698_C0AF_D04E)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x5BAB_9598_C0AF_CE9B)
-        let dInputs = Inputs.vectors(H.Vector.self, seed: 0x5BAB_9498_C0AF_CCE8)
+        let aInputs = Inputs.vectors(H.self, seed: 0x5BAB_9798_C0AF_D201)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5BAB_9698_C0AF_D04E)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5BAB_9598_C0AF_CE9B)
+        let dInputs = Inputs.vectors(H.self, seed: 0x5BAB_9498_C0AF_CCE8)
         for (a, b, c, d) in mixedQuadruples(
             aInputs,
             bInputs,

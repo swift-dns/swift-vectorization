@@ -7,14 +7,18 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkExpandedConstantA(_ value: H.Lane) {
+    private func checkExpandedConstantA(_ value: Lane) {
         let mismatches = Mismatches("expanded with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xCD35_5583_69CC_CB68)
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
+        )
         for mask in maskInputs {
             mismatches.check(
                 H.expanded(H.repeating(value), where: mask),
-                HighwayReference.expandedF64(H.repeating(value), mask.raw),
+                H(raw: HighwayReference.expandedF64(H.repeating(value).raw, mask.raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -78,7 +82,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func expandedConstantSplatPayloadNaN() {
-        checkExpandedConstantA(H.Lane(nan: 1, signaling: false))
+        checkExpandedConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func expandedConstantSplatSignalingNaN() {
@@ -98,17 +102,17 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkLoadExpandedWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkLoadExpandedWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "loadExpandedWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x00CA_D5DA_A7F6_76A8)
-        let fromInputs = Inputs.buffers(
-            H.Lane.self,
-            count: H.laneCount,
-            seed: 0x00CA_D8DA_A7F6_7BC1
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x00CA_D8DA_A7F6_7BC1)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingF64(value)),
+            "repeating"
         )
-        mismatches.check(H.repeating(value), HighwayReference.repeatingF64(value), "repeating")
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = from.withUnsafeBufferPointer { source in
                 (
@@ -117,10 +121,12 @@ extension SIMDDoubleConstantTests {
                         where: mask,
                         otherwise: H.repeating(value)
                     ),
-                    unsafe HighwayReference.loadExpandedWhereOtherwiseF64(
-                        H.repeating(value),
-                        mask.raw,
-                        source.baseAddress!
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereOtherwiseF64(
+                            H.repeating(value).raw,
+                            mask.raw,
+                            source.baseAddress!
+                        )
                     )
                 )
             }
@@ -190,7 +196,7 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func loadExpandedWhereOtherwiseConstantSplatPayloadNaN() {
-        checkLoadExpandedWhereOtherwiseConstantOtherwise(H.Lane(nan: 1, signaling: false))
+        checkLoadExpandedWhereOtherwiseConstantOtherwise(Lane(nan: 1, signaling: false))
     }
 
     @Test func loadExpandedWhereOtherwiseConstantSplatSignalingNaN() {

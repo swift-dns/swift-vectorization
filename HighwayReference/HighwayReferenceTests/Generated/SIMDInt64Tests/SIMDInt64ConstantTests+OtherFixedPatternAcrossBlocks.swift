@@ -9,11 +9,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkBroadcastingLaneConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingLane with lane \(lane)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x425B_4A41_5D90_056B)
+        let aInputs = Inputs.vectors(H.self, seed: 0x425B_4A41_5D90_056B)
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneI64(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -60,11 +60,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkBroadcastingLaneUncheckedConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingLane unchecked with lane \(lane)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB29C_3543_E9E9_886B)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB29C_3543_E9E9_886B)
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, laneUnchecked: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneI64(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -109,18 +109,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkBroadcastingLaneConstantA(_ value: H.Lane) {
+    private func checkBroadcastingLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("broadcastingLane with a repeating \(hex(value))")
         let laneInputs = Array(0...H.laneCount - 1)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for lane in laneInputs {
             mismatches.check(
                 H.broadcasting(H.repeating(value), lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneI64(
                         H.repeating(value).raw,
                         Int32(truncatingIfNeeded: lane)
@@ -201,21 +201,21 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func broadcastingLaneConstantSplatMax() {
-        checkBroadcastingLaneConstantA(H.Lane.max)
+        checkBroadcastingLaneConstantA(Lane.max)
     }
 
     @Test func broadcastingLaneConstantSplatMin() {
-        checkBroadcastingLaneConstantA(H.Lane.min)
+        checkBroadcastingLaneConstantA(Lane.min)
     }
 
     @inline(__always)
     private func checkBroadcastingBlockConstantBlock(_ block: Int) {
         let mismatches = Mismatches("broadcastingBlock with block \(block)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xEF74_858E_74BE_ECA5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xEF74_858E_74BE_ECA5)
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockI64(
                         a.raw,
                         Int32(truncatingIfNeeded: block)
@@ -246,11 +246,11 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkBroadcastingBlockUncheckedConstantBlock(_ block: Int) {
         let mismatches = Mismatches("broadcastingBlock unchecked with block \(block)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6D28_7202_FC30_3CF7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6D28_7202_FC30_3CF7)
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockI64(
                         a.raw,
                         Int32(truncatingIfNeeded: block)

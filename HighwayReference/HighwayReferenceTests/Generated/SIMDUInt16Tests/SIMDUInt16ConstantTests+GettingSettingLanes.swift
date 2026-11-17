@@ -9,7 +9,7 @@ extension SIMDUInt16ConstantTests {
     @inline(__always)
     private func checkLaneConstantIndex(_ index: Int) {
         let mismatches = Mismatches("lane with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0F70_EC2D_9AFC_6DC9)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0F70_EC2D_9AFC_6DC9)
         for a in aInputs {
             mismatches.check(
                 H.lane(a, at: index),
@@ -149,12 +149,12 @@ extension SIMDUInt16ConstantTests {
     }
 
     @inline(__always)
-    private func checkLaneConstantA(_ value: H.Lane) {
+    private func checkLaneConstantA(_ value: Lane) {
         let mismatches = Mismatches("lane with a repeating \(hex(value))")
         let indexInputs = Inputs.laneIndices(lanes: H.laneCount)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU16(value)),
+            H(raw: HighwayReference.repeatingU16(value)),
             "repeating"
         )
         for index in indexInputs {
@@ -216,18 +216,18 @@ extension SIMDUInt16ConstantTests {
     }
 
     @Test func laneConstantSplatMax() {
-        checkLaneConstantA(H.Lane.max)
+        checkLaneConstantA(Lane.max)
     }
 
     @inline(__always)
     private func checkReplacingLaneConstantIndex(_ index: Int) {
         let mismatches = Mismatches("replacingLane with index \(index)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x473C_01F9_55AF_30B8)
-        let valueInputs = Inputs.lanes(H.Lane.self, seed: 0x473C_03F9_55AF_341E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x473C_01F9_55AF_30B8)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x473C_03F9_55AF_341E)
         for (a, value) in everyPair(aInputs, valueInputs) {
             mismatches.check(
                 H.replacingLane(a, at: index, with: value),
-                H.Vector(raw: HighwayReference.replacingLaneU16(a.raw, index, value)),
+                H(raw: HighwayReference.replacingLaneU16(a.raw, index, value)),
                 "a: \(describe(a)), value: \(hex(value))"
             )
         }

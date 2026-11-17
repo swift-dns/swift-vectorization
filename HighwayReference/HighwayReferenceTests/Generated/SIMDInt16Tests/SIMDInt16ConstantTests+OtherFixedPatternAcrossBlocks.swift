@@ -9,11 +9,11 @@ extension SIMDInt16ConstantTests {
     @inline(__always)
     private func checkBroadcastingLaneConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingLane with lane \(lane)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB5A1_51DD_3773_B0BA)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB5A1_51DD_3773_B0BA)
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, lane: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneI16(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -156,11 +156,11 @@ extension SIMDInt16ConstantTests {
     @inline(__always)
     private func checkBroadcastingLaneUncheckedConstantLane(_ lane: Int) {
         let mismatches = Mismatches("broadcastingLane unchecked with lane \(lane)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xF0BE_14D2_F214_D420)
+        let aInputs = Inputs.vectors(H.self, seed: 0xF0BE_14D2_F214_D420)
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, laneUnchecked: lane),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingLaneI16(
                         a.raw,
                         Int32(truncatingIfNeeded: lane)
@@ -303,11 +303,11 @@ extension SIMDInt16ConstantTests {
     @inline(__always)
     private func checkBroadcastingBlockConstantBlock(_ block: Int) {
         let mismatches = Mismatches("broadcastingBlock with block \(block)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x2ADD_14A2_C6AF_73BC)
+        let aInputs = Inputs.vectors(H.self, seed: 0x2ADD_14A2_C6AF_73BC)
         for a in aInputs {
             mismatches.check(
                 H.broadcasting(a, block: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockI16(
                         a.raw,
                         Int32(truncatingIfNeeded: block)
@@ -338,11 +338,11 @@ extension SIMDInt16ConstantTests {
     @inline(__always)
     private func checkBroadcastingBlockUncheckedConstantBlock(_ block: Int) {
         let mismatches = Mismatches("broadcastingBlock unchecked with block \(block)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x6BF1_5535_19F6_571C)
+        let aInputs = Inputs.vectors(H.self, seed: 0x6BF1_5535_19F6_571C)
         for a in aInputs {
             mismatches.check(
                 unsafe H.broadcasting(a, blockUnchecked: block),
-                H.Vector(
+                H(
                     raw: HighwayReference.broadcastingBlockI16(
                         a.raw,
                         Int32(truncatingIfNeeded: block)

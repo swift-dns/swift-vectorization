@@ -9,8 +9,8 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkStoreFirstConstantCount(_ count: Int) {
         let mismatches = Mismatches("storeFirst with count \(count)")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB8E5_E9B4_3084_FF80)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB8E5_E9B4_3084_FF80)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -96,8 +96,8 @@ extension SIMDInt64ConstantTests {
     @inline(__always)
     private func checkStoreFirstConstantCountBeforeGuardPage(_ count: Int) {
         let mismatches = Mismatches("storeFirst with count \(count) before a guard page")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3BED_3CDC_875C_CB39)
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3BED_3CDC_875C_CB39)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
         for a in aInputs {
             let (_, portLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe H.storeFirst(a, to: destination, count: count)
@@ -179,15 +179,15 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkStoreWhereConstantA(_ value: H.Lane) {
+    private func checkStoreWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("storeWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x670F_AAD3_2CA6_5140)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
-        let sentinel = Inputs.sentinel(H.Lane.self, count: H.laneCount + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for mask in maskInputs {
             var portLanes = sentinel
             portLanes.withUnsafeMutableBufferPointer { destination in
@@ -275,10 +275,10 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func storeWhereConstantSplatMax() {
-        checkStoreWhereConstantA(H.Lane.max)
+        checkStoreWhereConstantA(Lane.max)
     }
 
     @Test func storeWhereConstantSplatMin() {
-        checkStoreWhereConstantA(H.Lane.min)
+        checkStoreWhereConstantA(Lane.min)
     }
 }

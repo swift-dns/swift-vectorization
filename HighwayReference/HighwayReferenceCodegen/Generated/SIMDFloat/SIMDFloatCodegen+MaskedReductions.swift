@@ -4,65 +4,70 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portSumWhereF32(_ a: SIMDFloat.Vector, where mask: SIMDFloat.Mask) -> SIMDFloat.Lane {
-    SIMDFloat.sum(a, where: mask)
+public func portSumWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
+    SIMD<Float>.sum(a, where: mask)
 }
 
 @inline(never)
-public func highwaySumWhereF32(_ a: SIMDFloat.Vector, where mask: SIMDFloat.Mask) -> Float {
-    HighwayReference.Nothrow.sumWhereF32(mask.raw, a)
+public func highwaySumWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
+    HighwayReference.Nothrow.sumWhereF32(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portSumWhereF32ConstantA(where mask: SIMDFloat.Mask) -> SIMDFloat.Lane {
-    SIMDFloat.sum(SIMDFloat.repeating(1.5), where: mask)
+public func portSumWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
+    SIMD<Float>.sum(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwaySumWhereF32ConstantA(where mask: SIMDFloat.Mask) -> Float {
-    HighwayReference.Nothrow.sumWhereF32(mask.raw, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwaySumWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
+    HighwayReference.Nothrow.sumWhereF32(
+        mask.raw,
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portSmallestWhereF32(
-    _ a: SIMDFloat.Vector,
-    where mask: SIMDFloat.Mask
-) -> SIMDFloat.Lane {
-    SIMDFloat.smallest(a, where: mask)
+public func portSmallestWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
+    SIMD<Float>.smallest(a, where: mask)
 }
 
 @inline(never)
-public func highwaySmallestWhereF32(_ a: SIMDFloat.Vector, where mask: SIMDFloat.Mask) -> Float {
-    HighwayReference.Nothrow.smallestWhereF32(mask.raw, a)
+public func highwaySmallestWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
+    HighwayReference.Nothrow.smallestWhereF32(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portSmallestWhereF32ConstantA(where mask: SIMDFloat.Mask) -> SIMDFloat.Lane {
-    SIMDFloat.smallest(SIMDFloat.repeating(1.5), where: mask)
+public func portSmallestWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
+    SIMD<Float>.smallest(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwaySmallestWhereF32ConstantA(where mask: SIMDFloat.Mask) -> Float {
-    HighwayReference.Nothrow.smallestWhereF32(mask.raw, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwaySmallestWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
+    HighwayReference.Nothrow.smallestWhereF32(
+        mask.raw,
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }
 
 @inline(never)
-public func portLargestWhereF32(_ a: SIMDFloat.Vector, where mask: SIMDFloat.Mask) -> SIMDFloat.Lane
-{
-    SIMDFloat.largest(a, where: mask)
+public func portLargestWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
+    SIMD<Float>.largest(a, where: mask)
 }
 
 @inline(never)
-public func highwayLargestWhereF32(_ a: SIMDFloat.Vector, where mask: SIMDFloat.Mask) -> Float {
-    HighwayReference.Nothrow.largestWhereF32(mask.raw, a)
+public func highwayLargestWhereF32(_ a: SIMD<Float>, where mask: SIMD<Float>.Mask) -> Float {
+    HighwayReference.Nothrow.largestWhereF32(mask.raw, a.raw)
 }
 
 @inline(never)
-public func portLargestWhereF32ConstantA(where mask: SIMDFloat.Mask) -> SIMDFloat.Lane {
-    SIMDFloat.largest(SIMDFloat.repeating(1.5), where: mask)
+public func portLargestWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
+    SIMD<Float>.largest(SIMD<Float>.repeating(1.5), where: mask)
 }
 
 @inline(never)
-public func highwayLargestWhereF32ConstantA(where mask: SIMDFloat.Mask) -> Float {
-    HighwayReference.Nothrow.largestWhereF32(mask.raw, HighwayReference.Nothrow.repeatingF32(1.5))
+public func highwayLargestWhereF32ConstantA(where mask: SIMD<Float>.Mask) -> Float {
+    HighwayReference.Nothrow.largestWhereF32(
+        mask.raw,
+        SIMD<Float>(raw: HighwayReference.Nothrow.repeatingF32(1.5)).raw
+    )
 }

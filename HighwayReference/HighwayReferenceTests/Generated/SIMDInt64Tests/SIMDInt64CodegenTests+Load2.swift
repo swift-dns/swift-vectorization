@@ -143,7 +143,7 @@ extension SIMDInt64CodegenTests {
         let fromInputs = Inputs.buffers(UInt8.self, count: H.laneCount, seed: 0x53A8_3260_1408_72FA)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(SIMDInt64.laneCount))
+                Array(from.prefix(SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningU8ToI64ConstantCountLaneCount(from: source),
@@ -189,7 +189,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(2 * SIMDInt64.laneCount))
+                Array(from.prefix(2 * SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningU8ToI64ConstantCountTwiceLaneCount(from: source),
@@ -371,7 +371,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(SIMDInt64.laneCount))
+                Array(from.prefix(SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningU16ToI64ConstantCountLaneCount(from: source),
@@ -417,7 +417,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(2 * SIMDInt64.laneCount))
+                Array(from.prefix(2 * SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningU16ToI64ConstantCountTwiceLaneCount(from: source),
@@ -599,7 +599,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(SIMDInt64.laneCount))
+                Array(from.prefix(SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningU32ToI64ConstantCountLaneCount(from: source),
@@ -645,7 +645,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(2 * SIMDInt64.laneCount))
+                Array(from.prefix(2 * SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningU32ToI64ConstantCountTwiceLaneCount(from: source),
@@ -793,7 +793,7 @@ extension SIMDInt64CodegenTests {
         let fromInputs = Inputs.buffers(Int8.self, count: H.laneCount, seed: 0xFAC4_9FE0_5A7E_33CF)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(SIMDInt64.laneCount))
+                Array(from.prefix(SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningI8ToI64ConstantCountLaneCount(from: source),
@@ -839,7 +839,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(2 * SIMDInt64.laneCount))
+                Array(from.prefix(2 * SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningI8ToI64ConstantCountTwiceLaneCount(from: source),
@@ -989,7 +989,7 @@ extension SIMDInt64CodegenTests {
         let fromInputs = Inputs.buffers(Int16.self, count: H.laneCount, seed: 0xFFCC_5494_6A89_4764)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(SIMDInt64.laneCount))
+                Array(from.prefix(SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningI16ToI64ConstantCountLaneCount(from: source),
@@ -1035,7 +1035,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(2 * SIMDInt64.laneCount))
+                Array(from.prefix(2 * SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningI16ToI64ConstantCountTwiceLaneCount(from: source),
@@ -1185,7 +1185,7 @@ extension SIMDInt64CodegenTests {
         let fromInputs = Inputs.buffers(Int32.self, count: H.laneCount, seed: 0x3F6F_B90A_B6F9_87AE)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(SIMDInt64.laneCount))
+                Array(from.prefix(SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningI32ToI64ConstantCountLaneCount(from: source),
@@ -1231,7 +1231,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(2 * SIMDInt64.laneCount))
+                Array(from.prefix(2 * SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningI32ToI64ConstantCountTwiceLaneCount(from: source),
@@ -1381,7 +1381,7 @@ extension SIMDInt64CodegenTests {
         let fromInputs = Inputs.buffers(Float.self, count: H.laneCount, seed: 0xBD91_AE91_A2F8_D8AC)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(SIMDInt64.laneCount))
+                Array(from.prefix(SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningF32ToI64ConstantCountLaneCount(from: source),
@@ -1427,7 +1427,7 @@ extension SIMDInt64CodegenTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(
-                Array(from.prefix(2 * SIMDInt64.laneCount))
+                Array(from.prefix(2 * SIMD<Int64>.laneCount))
             ) { source in
                 (
                     unsafe portLoadFirstWideningF32ToI64ConstantCountTwiceLaneCount(from: source),

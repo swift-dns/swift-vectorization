@@ -4,25 +4,25 @@ import CHighwayReference
 public import Vectorization
 
 @inline(never)
-public func portReversedBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversed(a)
+public func portReversedBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversed(a)
 }
 
 @inline(never)
-public func highwayReversedBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.reversedBF16(a.raw))
+public func highwayReversedBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.reversedBF16(a.raw))
 }
 
 @inline(never)
-public func portReversedBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversed(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portReversedBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversed(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayReversedBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayReversedBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.reversedBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -30,25 +30,25 @@ public func highwayReversedBF16ConstantA() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
-public func portByteSwappedBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.byteSwapped(a)
+public func portByteSwappedBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.byteSwapped(a)
 }
 
 @inline(never)
-public func highwayByteSwappedBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.byteSwappedBF16(a.raw))
+public func highwayByteSwappedBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.byteSwappedBF16(a.raw))
 }
 
 @inline(never)
-public func portByteSwappedBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.byteSwapped(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portByteSwappedBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.byteSwapped(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayByteSwappedBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayByteSwappedBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.byteSwappedBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -56,25 +56,25 @@ public func highwayByteSwappedBF16ConstantA() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
-public func portReversedBlocksBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversedBlocks(a)
+public func portReversedBlocksBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversedBlocks(a)
 }
 
 @inline(never)
-public func highwayReversedBlocksBF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.reversedBlocksBF16(a.raw))
+public func highwayReversedBlocksBF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.reversedBlocksBF16(a.raw))
 }
 
 @inline(never)
-public func portReversedBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversedBlocks(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portReversedBlocksBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversedBlocks(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayReversedBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayReversedBlocksBF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.reversedBlocksBF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -82,25 +82,25 @@ public func highwayReversedBlocksBF16ConstantA() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
-public func portReversed2BF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversed2(a)
+public func portReversed2BF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversed2(a)
 }
 
 @inline(never)
-public func highwayReversed2BF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.reversed2BF16(a.raw))
+public func highwayReversed2BF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.reversed2BF16(a.raw))
 }
 
 @inline(never)
-public func portReversed2BF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversed2(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portReversed2BF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversed2(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayReversed2BF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayReversed2BF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.reversed2BF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -108,25 +108,25 @@ public func highwayReversed2BF16ConstantA() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
-public func portReversed4BF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversed4(a)
+public func portReversed4BF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversed4(a)
 }
 
 @inline(never)
-public func highwayReversed4BF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.reversed4BF16(a.raw))
+public func highwayReversed4BF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.reversed4BF16(a.raw))
 }
 
 @inline(never)
-public func portReversed4BF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversed4(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portReversed4BF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversed4(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayReversed4BF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayReversed4BF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.reversed4BF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )
@@ -134,25 +134,25 @@ public func highwayReversed4BF16ConstantA() -> SIMDBFloat16.Vector {
 }
 
 @inline(never)
-public func portReversed8BF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversed8(a)
+public func portReversed8BF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversed8(a)
 }
 
 @inline(never)
-public func highwayReversed8BF16(_ a: SIMDBFloat16.Vector) -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(raw: HighwayReference.Nothrow.reversed8BF16(a.raw))
+public func highwayReversed8BF16(_ a: SIMD<BFloat16>) -> SIMD<BFloat16> {
+    SIMD<BFloat16>(raw: HighwayReference.Nothrow.reversed8BF16(a.raw))
 }
 
 @inline(never)
-public func portReversed8BF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.reversed8(SIMDBFloat16.repeating(BFloat16(bitPattern: 26)))
+public func portReversed8BF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>.reversed8(SIMD<BFloat16>.repeating(BFloat16(bitPattern: 26)))
 }
 
 @inline(never)
-public func highwayReversed8BF16ConstantA() -> SIMDBFloat16.Vector {
-    SIMDBFloat16.Vector(
+public func highwayReversed8BF16ConstantA() -> SIMD<BFloat16> {
+    SIMD<BFloat16>(
         raw: HighwayReference.Nothrow.reversed8BF16(
-            SIMDBFloat16.Vector(
+            SIMD<BFloat16>(
                 raw: HighwayReference.Nothrow.repeatingBF16(BFloat16(bitPattern: 26).bitPattern)
             ).raw
         )

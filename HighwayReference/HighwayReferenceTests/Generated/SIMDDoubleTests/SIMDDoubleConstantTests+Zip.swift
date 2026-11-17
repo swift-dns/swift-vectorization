@@ -7,18 +7,23 @@ import Vectorization
 
 extension SIMDDoubleConstantTests {
     @inline(__always)
-    private func checkZippingLowerFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkZippingLowerFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("zippingLowerFromFloat with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x021C_EF9D_487E_6AAD)
+        let bInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x021C_EF9D_487E_6AAD)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.zippingLower(SIMDFloat.repeating(value), b),
-                HighwayReference.zippingLowerF32ToF64(SIMDFloat.repeating(value), b),
+                H.zippingLower(SIMD<Float>.repeating(value), b),
+                H(
+                    raw: HighwayReference.zippingLowerF32ToF64(
+                        SIMD<Float>.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +31,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkZippingLowerFromFloatConstantB(_ value: SIMDFloat.Lane) {
+    private func checkZippingLowerFromFloatConstantB(_ value: Float) {
         let mismatches = Mismatches("zippingLowerFromFloat with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0xE8CA_699D_3A56_CAFB)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0xE8CA_699D_3A56_CAFB)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.zippingLower(a, SIMDFloat.repeating(value)),
-                HighwayReference.zippingLowerF32ToF64(a, SIMDFloat.repeating(value)),
+                H.zippingLower(a, SIMD<Float>.repeating(value)),
+                H(
+                    raw: HighwayReference.zippingLowerF32ToF64(
+                        a.raw,
+                        SIMD<Float>.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -115,8 +125,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func zippingLowerFromFloatConstantSplatPayloadNaN() {
-        checkZippingLowerFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
-        checkZippingLowerFromFloatConstantB(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkZippingLowerFromFloatConstantA(Float(nan: 1, signaling: false))
+        checkZippingLowerFromFloatConstantB(Float(nan: 1, signaling: false))
     }
 
     @Test func zippingLowerFromFloatConstantSplatSignalingNaN() {
@@ -140,18 +150,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkZippingUpperFromFloatConstantA(_ value: SIMDFloat.Lane) {
+    private func checkZippingUpperFromFloatConstantA(_ value: Float) {
         let mismatches = Mismatches("zippingUpperFromFloat with a repeating \(hex(value))")
-        let bInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x377E_7B60_87B1_7B24)
+        let bInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x377E_7B60_87B1_7B24)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.zippingUpper(SIMDFloat.repeating(value), b),
-                HighwayReference.zippingUpperF32ToF64(SIMDFloat.repeating(value), b),
+                H.zippingUpper(SIMD<Float>.repeating(value), b),
+                H(
+                    raw: HighwayReference.zippingUpperF32ToF64(
+                        SIMD<Float>.repeating(value).raw,
+                        b.raw
+                    )
+                ),
                 "b: \(describe(b))"
             )
         }
@@ -159,18 +174,23 @@ extension SIMDDoubleConstantTests {
     }
 
     @inline(__always)
-    private func checkZippingUpperFromFloatConstantB(_ value: SIMDFloat.Lane) {
+    private func checkZippingUpperFromFloatConstantB(_ value: Float) {
         let mismatches = Mismatches("zippingUpperFromFloat with b repeating \(hex(value))")
-        let aInputs = Inputs.conversions(SIMDFloat.Vector.self, seed: 0x513D_E160_9635_B656)
+        let aInputs = Inputs.conversions(SIMD<Float>.self, seed: 0x513D_E160_9635_B656)
         mismatches.check(
-            SIMDFloat.repeating(value),
-            HighwayReference.repeatingF32(value),
+            SIMD<Float>.repeating(value),
+            SIMD<Float>(raw: HighwayReference.repeatingF32(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.zippingUpper(a, SIMDFloat.repeating(value)),
-                HighwayReference.zippingUpperF32ToF64(a, SIMDFloat.repeating(value)),
+                H.zippingUpper(a, SIMD<Float>.repeating(value)),
+                H(
+                    raw: HighwayReference.zippingUpperF32ToF64(
+                        a.raw,
+                        SIMD<Float>.repeating(value).raw
+                    )
+                ),
                 "a: \(describe(a))"
             )
         }
@@ -248,8 +268,8 @@ extension SIMDDoubleConstantTests {
     }
 
     @Test func zippingUpperFromFloatConstantSplatPayloadNaN() {
-        checkZippingUpperFromFloatConstantA(SIMDFloat.Lane(nan: 1, signaling: false))
-        checkZippingUpperFromFloatConstantB(SIMDFloat.Lane(nan: 1, signaling: false))
+        checkZippingUpperFromFloatConstantA(Float(nan: 1, signaling: false))
+        checkZippingUpperFromFloatConstantB(Float(nan: 1, signaling: false))
     }
 
     @Test func zippingUpperFromFloatConstantSplatSignalingNaN() {

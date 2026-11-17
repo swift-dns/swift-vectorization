@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDInt64ConstantTests {
     @inline(__always)
-    private func checkRoundedAverageConstantA(_ value: H.Lane) {
+    private func checkRoundedAverageConstantA(_ value: Lane) {
         let mismatches = Mismatches("roundedAverage with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x266F_37A5_9E53_5B8C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x266F_37A5_9E53_5B8C)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.roundedAverage(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.roundedAverageI64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.roundedAverageI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -26,18 +26,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkRoundedAverageConstantB(_ value: H.Lane) {
+    private func checkRoundedAverageConstantB(_ value: Lane) {
         let mismatches = Mismatches("roundedAverage with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3FC1_BDA5_AC7A_FB3E)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3FC1_BDA5_AC7A_FB3E)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.roundedAverage(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.roundedAverageI64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.roundedAverageI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -130,28 +130,28 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func roundedAverageConstantSplatMax() {
-        checkRoundedAverageConstantA(H.Lane.max)
-        checkRoundedAverageConstantB(H.Lane.max)
+        checkRoundedAverageConstantA(Lane.max)
+        checkRoundedAverageConstantB(Lane.max)
     }
 
     @Test func roundedAverageConstantSplatMin() {
-        checkRoundedAverageConstantA(H.Lane.min)
-        checkRoundedAverageConstantB(H.Lane.min)
+        checkRoundedAverageConstantA(Lane.min)
+        checkRoundedAverageConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkPairwiseAddingConstantA(_ value: H.Lane) {
+    private func checkPairwiseAddingConstantA(_ value: Lane) {
         let mismatches = Mismatches("pairwiseAdding with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xB700_8E8A_59AF_9413)
+        let bInputs = Inputs.vectors(H.self, seed: 0xB700_8E8A_59AF_9413)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.pairwiseAdding(H.repeating(value), b),
-                H.Vector(raw: HighwayReference.pairwiseAddingI64(H.repeating(value).raw, b.raw)),
+                H(raw: HighwayReference.pairwiseAddingI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -159,18 +159,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseAddingConstantB(_ value: H.Lane) {
+    private func checkPairwiseAddingConstantB(_ value: Lane) {
         let mismatches = Mismatches("pairwiseAdding with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xC002_448A_5EE2_6CD5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xC002_448A_5EE2_6CD5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.pairwiseAdding(a, H.repeating(value)),
-                H.Vector(raw: HighwayReference.pairwiseAddingI64(a.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.pairwiseAddingI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -263,30 +263,28 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func pairwiseAddingConstantSplatMax() {
-        checkPairwiseAddingConstantA(H.Lane.max)
-        checkPairwiseAddingConstantB(H.Lane.max)
+        checkPairwiseAddingConstantA(Lane.max)
+        checkPairwiseAddingConstantB(Lane.max)
     }
 
     @Test func pairwiseAddingConstantSplatMin() {
-        checkPairwiseAddingConstantA(H.Lane.min)
-        checkPairwiseAddingConstantB(H.Lane.min)
+        checkPairwiseAddingConstantA(Lane.min)
+        checkPairwiseAddingConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkPairwiseSubtractingConstantA(_ value: H.Lane) {
+    private func checkPairwiseSubtractingConstantA(_ value: Lane) {
         let mismatches = Mismatches("pairwiseSubtracting with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8A5A_29C2_2E37_751A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8A5A_29C2_2E37_751A)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
                 H.pairwiseSubtracting(H.repeating(value), b),
-                H.Vector(
-                    raw: HighwayReference.pairwiseSubtractingI64(H.repeating(value).raw, b.raw)
-                ),
+                H(raw: HighwayReference.pairwiseSubtractingI64(H.repeating(value).raw, b.raw)),
                 "b: \(describe(b))"
             )
         }
@@ -294,20 +292,18 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkPairwiseSubtractingConstantB(_ value: H.Lane) {
+    private func checkPairwiseSubtractingConstantB(_ value: Lane) {
         let mismatches = Mismatches("pairwiseSubtracting with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x80EB_73C2_28A7_CA78)
+        let aInputs = Inputs.vectors(H.self, seed: 0x80EB_73C2_28A7_CA78)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI64(value)),
+            H(raw: HighwayReference.repeatingI64(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
                 H.pairwiseSubtracting(a, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.pairwiseSubtractingI64(a.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.pairwiseSubtractingI64(a.raw, H.repeating(value).raw)),
                 "a: \(describe(a))"
             )
         }
@@ -400,26 +396,26 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func pairwiseSubtractingConstantSplatMax() {
-        checkPairwiseSubtractingConstantA(H.Lane.max)
-        checkPairwiseSubtractingConstantB(H.Lane.max)
+        checkPairwiseSubtractingConstantA(Lane.max)
+        checkPairwiseSubtractingConstantB(Lane.max)
     }
 
     @Test func pairwiseSubtractingConstantSplatMin() {
-        checkPairwiseSubtractingConstantA(H.Lane.min)
-        checkPairwiseSubtractingConstantB(H.Lane.min)
+        checkPairwiseSubtractingConstantA(Lane.min)
+        checkPairwiseSubtractingConstantB(Lane.min)
     }
 
     @inline(__always)
-    private func checkSumsOf2FromInt32ConstantA(_ value: SIMDInt32.Lane) {
+    private func checkSumsOf2FromInt32ConstantA(_ value: Int32) {
         let mismatches = Mismatches("sumsOf2FromInt32 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt32.repeating(value),
-            SIMDInt32.Vector(raw: HighwayReference.repeatingI32(value)),
+            SIMD<Int32>.repeating(value),
+            SIMD<Int32>(raw: HighwayReference.repeatingI32(value)),
             "repeating"
         )
         mismatches.check(
-            H.sumsOf2(SIMDInt32.repeating(value)),
-            H.Vector(raw: HighwayReference.sumsOf2I32ToI64(SIMDInt32.repeating(value).raw)),
+            H.sumsOf2(SIMD<Int32>.repeating(value)),
+            H(raw: HighwayReference.sumsOf2I32ToI64(SIMD<Int32>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -494,24 +490,24 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func sumsOf2FromInt32ConstantSplatMax() {
-        checkSumsOf2FromInt32ConstantA(SIMDInt32.Lane.max)
+        checkSumsOf2FromInt32ConstantA(Int32.max)
     }
 
     @Test func sumsOf2FromInt32ConstantSplatMin() {
-        checkSumsOf2FromInt32ConstantA(SIMDInt32.Lane.min)
+        checkSumsOf2FromInt32ConstantA(Int32.min)
     }
 
     @inline(__always)
-    private func checkSumsOf4FromInt16ConstantA(_ value: SIMDInt16.Lane) {
+    private func checkSumsOf4FromInt16ConstantA(_ value: Int16) {
         let mismatches = Mismatches("sumsOf4FromInt16 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt16.repeating(value),
-            SIMDInt16.Vector(raw: HighwayReference.repeatingI16(value)),
+            SIMD<Int16>.repeating(value),
+            SIMD<Int16>(raw: HighwayReference.repeatingI16(value)),
             "repeating"
         )
         mismatches.check(
-            H.sumsOf4(SIMDInt16.repeating(value)),
-            H.Vector(raw: HighwayReference.sumsOf4I16ToI64(SIMDInt16.repeating(value).raw)),
+            H.sumsOf4(SIMD<Int16>.repeating(value)),
+            H(raw: HighwayReference.sumsOf4I16ToI64(SIMD<Int16>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -578,24 +574,24 @@ extension SIMDInt64ConstantTests {
     }
 
     @Test func sumsOf4FromInt16ConstantSplatMax() {
-        checkSumsOf4FromInt16ConstantA(SIMDInt16.Lane.max)
+        checkSumsOf4FromInt16ConstantA(Int16.max)
     }
 
     @Test func sumsOf4FromInt16ConstantSplatMin() {
-        checkSumsOf4FromInt16ConstantA(SIMDInt16.Lane.min)
+        checkSumsOf4FromInt16ConstantA(Int16.min)
     }
 
     @inline(__always)
-    private func checkSumsOf8FromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkSumsOf8FromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches("sumsOf8FromInt8 with a repeating \(hex(value))")
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         mismatches.check(
-            H.sumsOf8(SIMDInt8.repeating(value)),
-            H.Vector(raw: HighwayReference.sumsOf8I8ToI64(SIMDInt8.repeating(value).raw)),
+            H.sumsOf8(SIMD<Int8>.repeating(value)),
+            H(raw: HighwayReference.sumsOf8I8ToI64(SIMD<Int8>.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -642,22 +638,22 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(_ value: SIMDInt8.Lane) {
+    private func checkSumsOf8AbsoluteDifferencesFromInt8ConstantA(_ value: Int8) {
         let mismatches = Mismatches(
             "sumsOf8AbsoluteDifferencesFromInt8 with a repeating \(hex(value))"
         )
-        let bInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x1C8A_6B2E_83CA_DD0F)
+        let bInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x1C8A_6B2E_83CA_DD0F)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for b in bInputs {
             mismatches.check(
-                H.sumsOf8AbsoluteDifferences(SIMDInt8.repeating(value), b),
-                H.Vector(
+                H.sumsOf8AbsoluteDifferences(SIMD<Int8>.repeating(value), b),
+                H(
                     raw: HighwayReference.sumsOf8AbsoluteDifferencesI8ToI64(
-                        SIMDInt8.repeating(value).raw,
+                        SIMD<Int8>.repeating(value).raw,
                         b.raw
                     )
                 ),
@@ -668,23 +664,23 @@ extension SIMDInt64ConstantTests {
     }
 
     @inline(__always)
-    private func checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(_ value: SIMDInt8.Lane) {
+    private func checkSumsOf8AbsoluteDifferencesFromInt8ConstantB(_ value: Int8) {
         let mismatches = Mismatches(
             "sumsOf8AbsoluteDifferencesFromInt8 with b repeating \(hex(value))"
         )
-        let aInputs = Inputs.conversions(SIMDInt8.Vector.self, seed: 0x2445_A12E_87E8_19B1)
+        let aInputs = Inputs.conversions(SIMD<Int8>.self, seed: 0x2445_A12E_87E8_19B1)
         mismatches.check(
-            SIMDInt8.repeating(value),
-            SIMDInt8.Vector(raw: HighwayReference.repeatingI8(value)),
+            SIMD<Int8>.repeating(value),
+            SIMD<Int8>(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for a in aInputs {
             mismatches.check(
-                H.sumsOf8AbsoluteDifferences(a, SIMDInt8.repeating(value)),
-                H.Vector(
+                H.sumsOf8AbsoluteDifferences(a, SIMD<Int8>.repeating(value)),
+                H(
                     raw: HighwayReference.sumsOf8AbsoluteDifferencesI8ToI64(
                         a.raw,
-                        SIMDInt8.repeating(value).raw
+                        SIMD<Int8>.repeating(value).raw
                     )
                 ),
                 "a: \(describe(a))"

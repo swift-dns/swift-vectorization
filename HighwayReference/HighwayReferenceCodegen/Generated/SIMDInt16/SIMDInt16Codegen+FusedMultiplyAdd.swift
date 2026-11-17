@@ -5,38 +5,32 @@ public import Vectorization
 
 @inline(never)
 public func portMultiplyAddingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplyAdding(a, b, c)
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplyAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.multiplyAddingI16(a.raw, b.raw, c.raw))
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.multiplyAddingI16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portMultiplyAddingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplyAdding(SIMDInt16.repeating(26), b, c)
+public func portMultiplyAddingI16ConstantA(_ b: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>.multiplyAdding(SIMD<Int16>.repeating(26), b, c)
 }
 
 @inline(never)
-public func highwayMultiplyAddingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayMultiplyAddingI16ConstantA(_ b: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -44,83 +38,69 @@ public func highwayMultiplyAddingI16ConstantA(
 }
 
 @inline(never)
-public func portMultiplyAddingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplyAdding(a, SIMDInt16.repeating(26), c)
+public func portMultiplyAddingI16ConstantB(_ a: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>.multiplyAdding(a, SIMD<Int16>.repeating(26), c)
 }
 
 @inline(never)
-public func highwayMultiplyAddingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayMultiplyAddingI16ConstantB(_ a: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplyAddingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplyAdding(a, b, SIMDInt16.repeating(26))
+public func portMultiplyAddingI16ConstantC(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>.multiplyAdding(a, b, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
-public func highwayMultiplyAddingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+public func highwayMultiplyAddingI16ConstantC(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingI16(
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplyAddingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.negatedMultiplyAdding(a, b, c)
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.negatedMultiplyAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.negatedMultiplyAddingI16(a.raw, b.raw, c.raw))
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.negatedMultiplyAddingI16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portNegatedMultiplyAddingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.negatedMultiplyAdding(SIMDInt16.repeating(26), b, c)
+public func portNegatedMultiplyAddingI16ConstantA(_ b: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16>
+{
+    SIMD<Int16>.negatedMultiplyAdding(SIMD<Int16>.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -128,83 +108,76 @@ public func highwayNegatedMultiplyAddingI16ConstantA(
 }
 
 @inline(never)
-public func portNegatedMultiplyAddingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.negatedMultiplyAdding(a, SIMDInt16.repeating(26), c)
+public func portNegatedMultiplyAddingI16ConstantB(_ a: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16>
+{
+    SIMD<Int16>.negatedMultiplyAdding(a, SIMD<Int16>.repeating(26), c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
 }
 
 @inline(never)
-public func portNegatedMultiplyAddingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.negatedMultiplyAdding(a, b, SIMDInt16.repeating(26))
+public func portNegatedMultiplyAddingI16ConstantC(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16>
+{
+    SIMD<Int16>.negatedMultiplyAdding(a, b, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayNegatedMultiplyAddingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplyAddingI16(
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplySubtracting(a, b, c)
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplySubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(raw: HighwayReference.Nothrow.multiplySubtractingI16(a.raw, b.raw, c.raw))
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.multiplySubtractingI16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
-public func portMultiplySubtractingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplySubtracting(SIMDInt16.repeating(26), b, c)
+public func portMultiplySubtractingI16ConstantA(_ b: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>.multiplySubtracting(SIMD<Int16>.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -212,85 +185,77 @@ public func highwayMultiplySubtractingI16ConstantA(
 }
 
 @inline(never)
-public func portMultiplySubtractingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplySubtracting(a, SIMDInt16.repeating(26), c)
+public func portMultiplySubtractingI16ConstantB(_ a: SIMD<Int16>, _ c: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>.multiplySubtracting(a, SIMD<Int16>.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
 }
 
 @inline(never)
-public func portMultiplySubtractingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplySubtracting(a, b, SIMDInt16.repeating(26))
+public func portMultiplySubtractingI16ConstantC(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
+    SIMD<Int16>.multiplySubtracting(a, b, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplySubtractingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingI16(
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.negatedMultiplySubtracting(a, b, c)
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.negatedMultiplySubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
-        raw: HighwayReference.Nothrow.negatedMultiplySubtractingI16(a.raw, b.raw, c.raw)
-    )
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.negatedMultiplySubtractingI16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portNegatedMultiplySubtractingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.negatedMultiplySubtracting(SIMDInt16.repeating(26), b, c)
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.negatedMultiplySubtracting(SIMD<Int16>.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -299,21 +264,21 @@ public func highwayNegatedMultiplySubtractingI16ConstantA(
 
 @inline(never)
 public func portNegatedMultiplySubtractingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.negatedMultiplySubtracting(a, SIMDInt16.repeating(26), c)
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.negatedMultiplySubtracting(a, SIMD<Int16>.repeating(26), c)
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
@@ -321,62 +286,60 @@ public func highwayNegatedMultiplySubtractingI16ConstantB(
 
 @inline(never)
 public func portNegatedMultiplySubtractingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.negatedMultiplySubtracting(a, b, SIMDInt16.repeating(26))
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.negatedMultiplySubtracting(a, b, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayNegatedMultiplySubtractingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.negatedMultiplySubtractingI16(
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplyAddingSubtracting(a, b, c)
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplyAddingSubtracting(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
-        raw: HighwayReference.Nothrow.multiplyAddingSubtractingI16(a.raw, b.raw, c.raw)
-    )
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.multiplyAddingSubtractingI16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplyAddingSubtractingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplyAddingSubtracting(SIMDInt16.repeating(26), b, c)
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplyAddingSubtracting(SIMD<Int16>.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingSubtractingI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -385,21 +348,21 @@ public func highwayMultiplyAddingSubtractingI16ConstantA(
 
 @inline(never)
 public func portMultiplyAddingSubtractingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplyAddingSubtracting(a, SIMDInt16.repeating(26), c)
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplyAddingSubtracting(a, SIMD<Int16>.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingSubtractingI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
@@ -407,62 +370,60 @@ public func highwayMultiplyAddingSubtractingI16ConstantB(
 
 @inline(never)
 public func portMultiplyAddingSubtractingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplyAddingSubtracting(a, b, SIMDInt16.repeating(26))
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplyAddingSubtracting(a, b, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplyAddingSubtractingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplyAddingSubtractingI16(
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplySubtractingAdding(a, b, c)
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplySubtractingAdding(a, b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingI16(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
-        raw: HighwayReference.Nothrow.multiplySubtractingAddingI16(a.raw, b.raw, c.raw)
-    )
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(raw: HighwayReference.Nothrow.multiplySubtractingAddingI16(a.raw, b.raw, c.raw))
 }
 
 @inline(never)
 public func portMultiplySubtractingAddingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplySubtractingAdding(SIMDInt16.repeating(26), b, c)
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplySubtractingAdding(SIMD<Int16>.repeating(26), b, c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingI16ConstantA(
-    _ b: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ b: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingAddingI16(
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             b.raw,
             c.raw
         )
@@ -471,21 +432,21 @@ public func highwayMultiplySubtractingAddingI16ConstantA(
 
 @inline(never)
 public func portMultiplySubtractingAddingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplySubtractingAdding(a, SIMDInt16.repeating(26), c)
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplySubtractingAdding(a, SIMD<Int16>.repeating(26), c)
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingI16ConstantB(
-    _ a: SIMDInt16.Vector,
-    _ c: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ c: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingAddingI16(
             a.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw,
             c.raw
         )
     )
@@ -493,22 +454,22 @@ public func highwayMultiplySubtractingAddingI16ConstantB(
 
 @inline(never)
 public func portMultiplySubtractingAddingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.multiplySubtractingAdding(a, b, SIMDInt16.repeating(26))
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>.multiplySubtractingAdding(a, b, SIMD<Int16>.repeating(26))
 }
 
 @inline(never)
 public func highwayMultiplySubtractingAddingI16ConstantC(
-    _ a: SIMDInt16.Vector,
-    _ b: SIMDInt16.Vector
-) -> SIMDInt16.Vector {
-    SIMDInt16.Vector(
+    _ a: SIMD<Int16>,
+    _ b: SIMD<Int16>
+) -> SIMD<Int16> {
+    SIMD<Int16>(
         raw: HighwayReference.Nothrow.multiplySubtractingAddingI16(
             a.raw,
             b.raw,
-            SIMDInt16.Vector(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
+            SIMD<Int16>(raw: HighwayReference.Nothrow.repeatingI16(26)).raw
         )
     )
 }

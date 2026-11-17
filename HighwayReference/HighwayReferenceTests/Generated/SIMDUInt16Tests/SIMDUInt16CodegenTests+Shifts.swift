@@ -9,7 +9,7 @@ import Vectorization
 extension SIMDUInt16CodegenTests {
     @Test func shiftedLeft() {
         let mismatches = Mismatches("portShiftedLeftU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x55C7_17E1_AD13_4DA7)
+        let aInputs = Inputs.vectors(H.self, seed: 0x55C7_17E1_AD13_4DA7)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
@@ -36,7 +36,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedLeftConstantBits() {
         let mismatches = Mismatches("portShiftedLeftU16ConstantBits")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3921_0D14_FD87_D743)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3921_0D14_FD87_D743)
         for a in aInputs {
             mismatches.check(
                 portShiftedLeftU16ConstantBits(a),
@@ -49,7 +49,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedRight() {
         let mismatches = Mismatches("portShiftedRightU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7616_0438_A20A_C9CA)
+        let aInputs = Inputs.vectors(H.self, seed: 0x7616_0438_A20A_C9CA)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
@@ -76,7 +76,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedRightConstantBits() {
         let mismatches = Mismatches("portShiftedRightU16ConstantBits")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x747B_1CA9_C8B3_07F6)
+        let aInputs = Inputs.vectors(H.self, seed: 0x747B_1CA9_C8B3_07F6)
         for a in aInputs {
             mismatches.check(
                 portShiftedRightU16ConstantBits(a),
@@ -89,12 +89,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedLeftBy() {
         let mismatches = Mismatches("portShiftedLeftByU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xFF01_F960_2CA2_4832)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xFF01_FA60_2CA2_49E5,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xFF01_F960_2CA2_4832)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xFF01_FA60_2CA2_49E5, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portShiftedLeftByU16(a, by: b),
@@ -107,11 +103,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedLeftByConstantA() {
         let mismatches = Mismatches("portShiftedLeftByU16ConstantA")
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x77A4_9EE9_732A_8D00,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x77A4_9EE9_732A_8D00, inContract: true)
         for b in bInputs {
             mismatches.check(
                 portShiftedLeftByU16ConstantA(by: b),
@@ -124,7 +116,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedLeftByConstantB() {
         let mismatches = Mismatches("portShiftedLeftByU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9164_24E9_81AE_FE92)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9164_24E9_81AE_FE92)
         for a in aInputs {
             mismatches.check(
                 portShiftedLeftByU16ConstantB(a),
@@ -137,12 +129,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedRightBy() {
         let mismatches = Mismatches("portShiftedRightByU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x93B1_D6B4_0DF3_2963)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x93B1_D5B4_0DF3_27B0,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x93B1_D6B4_0DF3_2963)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x93B1_D5B4_0DF3_27B0, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portShiftedRightByU16(a, by: b),
@@ -155,11 +143,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedRightByConstantA() {
         let mismatches = Mismatches("portShiftedRightByU16ConstantA")
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x2BEF_36B4_EBEA_941F,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x2BEF_36B4_EBEA_941F, inContract: true)
         for b in bInputs {
             mismatches.check(
                 portShiftedRightByU16ConstantA(by: b),
@@ -172,7 +156,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func shiftedRightByConstantB() {
         let mismatches = Mismatches("portShiftedRightByU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3484_6CB4_F0C1_7481)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3484_6CB4_F0C1_7481)
         for a in aInputs {
             mismatches.check(
                 portShiftedRightByU16ConstantB(a),
@@ -185,12 +169,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func roundingShiftedRightBy() {
         let mismatches = Mismatches("portRoundingShiftedRightByU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCDF9_6E2B_F098_4073)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xCDF9_6D2B_F098_3EC0,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xCDF9_6E2B_F098_4073)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xCDF9_6D2B_F098_3EC0, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portRoundingShiftedRightByU16(a, by: b),
@@ -203,11 +183,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func roundingShiftedRightByConstantA() {
         let mismatches = Mismatches("portRoundingShiftedRightByU16ConstantA")
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xA514_A789_D3C8_D56F,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xA514_A789_D3C8_D56F, inContract: true)
         for b in bInputs {
             mismatches.check(
                 portRoundingShiftedRightByU16ConstantA(by: b),
@@ -220,7 +196,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func roundingShiftedRightByConstantB() {
         let mismatches = Mismatches("portRoundingShiftedRightByU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xAE83_5D89_D958_8011)
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE83_5D89_D958_8011)
         for a in aInputs {
             mismatches.check(
                 portRoundingShiftedRightByU16ConstantB(a),
@@ -233,7 +209,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func roundingShiftedRight() {
         let mismatches = Mismatches("portRoundingShiftedRightU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xCDC9_F090_8833_233A)
+        let aInputs = Inputs.vectors(H.self, seed: 0xCDC9_F090_8833_233A)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
@@ -260,7 +236,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func roundingShiftedRightConstantBits() {
         let mismatches = Mismatches("portRoundingShiftedRightU16ConstantBits")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE3F0_05A2_502E_E586)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE3F0_05A2_502E_E586)
         for a in aInputs {
             mismatches.check(
                 portRoundingShiftedRightU16ConstantBits(a),
@@ -273,12 +249,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedLeftBy() {
         let mismatches = Mismatches("portRotatedLeftByU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x7AAE_73D1_F319_4A36)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x7AAE_74D1_F319_4BE9,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x7AAE_73D1_F319_4A36)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x7AAE_74D1_F319_4BE9, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portRotatedLeftByU16(a, by: b),
@@ -291,11 +263,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedLeftByConstantA() {
         let mismatches = Mismatches("portRotatedLeftByU16ConstantA")
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xF66A_6510_882A_9A64,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xF66A_6510_882A_9A64, inContract: true)
         for b in bInputs {
             mismatches.check(
                 portRotatedLeftByU16ConstantA(by: b),
@@ -308,7 +276,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedLeftByConstantB() {
         let mismatches = Mismatches("portRotatedLeftByU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1029_CB10_96AE_D596)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1029_CB10_96AE_D596)
         for a in aInputs {
             mismatches.check(
                 portRotatedLeftByU16ConstantB(a),
@@ -321,12 +289,8 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedRightBy() {
         let mismatches = Mismatches("portRotatedRightByU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9F61_54D3_F75C_EA3F)
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0x9F61_53D3_F75C_E88C,
-            inContract: true
-        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x9F61_54D3_F75C_EA3F)
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0x9F61_53D3_F75C_E88C, inContract: true)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portRotatedRightByU16(a, by: b),
@@ -339,11 +303,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedRightByConstantA() {
         let mismatches = Mismatches("portRotatedRightByU16ConstantA")
-        let bInputs = Inputs.shiftCounts(
-            H.Vector.self,
-            seed: 0xFE2E_5673_A5A2_7D0B,
-            inContract: true
-        )
+        let bInputs = Inputs.shiftCounts(H.self, seed: 0xFE2E_5673_A5A2_7D0B, inContract: true)
         for b in bInputs {
             mismatches.check(
                 portRotatedRightByU16ConstantA(by: b),
@@ -356,7 +316,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedRightByConstantB() {
         let mismatches = Mismatches("portRotatedRightByU16ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x05EA_0C73_A9C0_932D)
+        let aInputs = Inputs.vectors(H.self, seed: 0x05EA_0C73_A9C0_932D)
         for a in aInputs {
             mismatches.check(
                 portRotatedRightByU16ConstantB(a),
@@ -369,7 +329,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedLeft() {
         let mismatches = Mismatches("portRotatedLeftU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE1D1_F2F9_61EA_79BB)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE1D1_F2F9_61EA_79BB)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
@@ -396,7 +356,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedLeftConstantBits() {
         let mismatches = Mismatches("portRotatedLeftU16ConstantBits")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xA918_587A_649B_5827)
+        let aInputs = Inputs.vectors(H.self, seed: 0xA918_587A_649B_5827)
         for a in aInputs {
             mismatches.check(
                 portRotatedLeftU16ConstantBits(a),
@@ -409,7 +369,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedRight() {
         let mismatches = Mismatches("portRotatedRightU16")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xB5EE_F037_1B4C_B6C6)
+        let aInputs = Inputs.vectors(H.self, seed: 0xB5EE_F037_1B4C_B6C6)
         let bitsInputs = Inputs.shiftAmounts(bits: 16, inContract: true)
         for (a, bits) in everyPair(aInputs, bitsInputs) {
             mismatches.check(
@@ -436,7 +396,7 @@ extension SIMDUInt16CodegenTests {
 
     @Test func rotatedRightConstantBits() {
         let mismatches = Mismatches("portRotatedRightU16ConstantBits")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x1A27_4A9E_0B35_B3F2)
+        let aInputs = Inputs.vectors(H.self, seed: 0x1A27_4A9E_0B35_B3F2)
         for a in aInputs {
             mismatches.check(
                 portRotatedRightU16ConstantBits(a),

@@ -7,7 +7,7 @@ public import Vectorization
 @available(SwiftStdlib 5.3, *)
 extension HighwayReferenceFloat16 {
     @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, to span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         precondition(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         precondition(
             span.withUnsafeBufferPointer {
@@ -19,7 +19,7 @@ extension HighwayReferenceFloat16 {
     }
 
     @unsafe @export(implementation) @inline(always)
-    public static func storeStreaming(_ a: Vector, toUnchecked span: inout MutableSpan<Lane>) {
+    public static func storeStreaming(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         assert(span.count >= laneCount, "Span has fewer elements than a vector has lanes")
         assert(
             span.withUnsafeBufferPointer {
@@ -28,34 +28,36 @@ extension HighwayReferenceFloat16 {
             "Span does not start at an address aligned to the vector size"
         )
         span.withUnsafeMutableBufferPointer {
-            unsafe HighwayReference.Nothrow.storeStreamingF16(a, $0.baseAddress.unsafelyUnwrapped)
+            unsafe HighwayReference.Nothrow.storeStreamingF16(
+                a.raw,
+                $0.baseAddress.unsafelyUnwrapped
+            )
         }
     }
 
 }
 
 @inline(never)
-public func portStoreStreamingF16(
-    _ a: SIMDFloat16.Vector,
-    to: UnsafeMutablePointer<SIMDFloat16.Lane>
-) {
-    unsafe SIMDFloat16.storeStreaming(a, to: to)
+public func portStoreStreamingF16(_ a: SIMD<Float16>, to: UnsafeMutablePointer<Float16>) {
+    unsafe SIMD<Float16>.storeStreaming(a, to: to)
 }
 
 @inline(never)
-public func highwayStoreStreamingF16(_ a: SIMDFloat16.Vector, to: UnsafeMutablePointer<Float16>) {
-    unsafe HighwayReference.Nothrow.storeStreamingF16(a, to)
+public func highwayStoreStreamingF16(_ a: SIMD<Float16>, to: UnsafeMutablePointer<Float16>) {
+    unsafe HighwayReference.Nothrow.storeStreamingF16(a.raw, to)
 }
 
 @inline(never)
-public func portStoreStreamingF16ConstantA(to: UnsafeMutablePointer<SIMDFloat16.Lane>) {
-    unsafe SIMDFloat16.storeStreaming(SIMDFloat16.repeating(Float16(bitPattern: 26)), to: to)
+public func portStoreStreamingF16ConstantA(to: UnsafeMutablePointer<Float16>) {
+    unsafe SIMD<Float16>.storeStreaming(SIMD<Float16>.repeating(Float16(bitPattern: 26)), to: to)
 }
 
 @inline(never)
 public func highwayStoreStreamingF16ConstantA(to: UnsafeMutablePointer<Float16>) {
     unsafe HighwayReference.Nothrow.storeStreamingF16(
-        HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern),
+        SIMD<Float16>(
+            raw: HighwayReference.Nothrow.repeatingF16(Float16(bitPattern: 26).bitPattern)
+        ).raw,
         to
     )
 }

@@ -7,18 +7,18 @@ import Vectorization
 
 extension SIMDInt8ConstantTests {
     @inline(__always)
-    private func checkSelectingOrZeroConstantA(_ value: H.Lane) {
+    private func checkSelectingOrZeroConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingOrZero with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x92E6_8B34_2C99_CF82)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
                 H.selectingOrZero(mask, H.repeating(value)),
-                H.Vector(raw: HighwayReference.selectingOrZeroI8(mask.raw, H.repeating(value).raw)),
+                H(raw: HighwayReference.selectingOrZeroI8(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -66,21 +66,19 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantA(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantA(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with a repeating \(hex(value))")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x1EF9_D2CB_2F71_DF72)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x1EF9_D1CB_2F71_DDBF)
+        let bInputs = Inputs.vectors(H.self, seed: 0x1EF9_D2CB_2F71_DF72)
+        let cInputs = Inputs.vectors(H.self, seed: 0x1EF9_D1CB_2F71_DDBF)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (b, c) in everyPair(bInputs, cInputs) {
             mismatches.check(
                 H.selecting(H.repeating(value), b, c),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorI8(H.repeating(value).raw, b.raw, c.raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorI8(H.repeating(value).raw, b.raw, c.raw)),
                 "b: \(describe(b)), c: \(describe(c))"
             )
         }
@@ -88,21 +86,19 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantB(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantB(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with b repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x15F8_1CCB_2A3F_06B0)
-        let cInputs = Inputs.vectors(H.Vector.self, seed: 0x15F8_1ECB_2A3F_0A16)
+        let aInputs = Inputs.vectors(H.self, seed: 0x15F8_1CCB_2A3F_06B0)
+        let cInputs = Inputs.vectors(H.self, seed: 0x15F8_1ECB_2A3F_0A16)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (a, c) in everyPair(aInputs, cInputs) {
             mismatches.check(
                 H.selecting(a, H.repeating(value), c),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorI8(a.raw, H.repeating(value).raw, c.raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorI8(a.raw, H.repeating(value).raw, c.raw)),
                 "a: \(describe(a)), c: \(describe(c))"
             )
         }
@@ -110,21 +106,19 @@ extension SIMDInt8ConstantTests {
     }
 
     @inline(__always)
-    private func checkSelectingByVectorConstantC(_ value: H.Lane) {
+    private func checkSelectingByVectorConstantC(_ value: Lane) {
         let mismatches = Mismatches("selectingByVector with c repeating \(hex(value))")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x0D63_05CB_2568_5AFB)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x0D63_04CB_2568_5948)
+        let aInputs = Inputs.vectors(H.self, seed: 0x0D63_05CB_2568_5AFB)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0D63_04CB_2568_5948)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingI8(value)),
+            H(raw: HighwayReference.repeatingI8(value)),
             "repeating"
         )
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 H.selecting(a, b, H.repeating(value)),
-                H.Vector(
-                    raw: HighwayReference.selectingByVectorI8(a.raw, b.raw, H.repeating(value).raw)
-                ),
+                H(raw: HighwayReference.selectingByVectorI8(a.raw, b.raw, H.repeating(value).raw)),
                 "a: \(describe(a)), b: \(describe(b))"
             )
         }

@@ -9,9 +9,9 @@ import Vectorization
 extension SIMDDoubleCodegenTests {
     @Test func multiplying() {
         let mismatches = Mismatches("portMultiplyingF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x11B3_489B_B17E_71F3)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x11B3_479B_B17E_7040)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x11B3_489B_B17E_71F3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x11B3_479B_B17E_7040)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portMultiplyingF64(a, b),
                 highwayMultiplyingF64(a, b),
@@ -23,7 +23,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingConstantA() {
         let mismatches = Mismatches("portMultiplyingF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xC795_DBCA_1F6F_81EF)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC795_DBCA_1F6F_81EF)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingF64ConstantA(b),
@@ -36,7 +36,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingConstantB() {
         let mismatches = Mismatches("portMultiplyingF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xD104_91CA_24FF_2C91)
+        let aInputs = Inputs.vectors(H.self, seed: 0xD104_91CA_24FF_2C91)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingF64ConstantB(a),
@@ -49,9 +49,9 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingRounded() {
         let mismatches = Mismatches("portMultiplyingRoundedF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x8928_9FF5_F84B_C00A)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x8928_A0F5_F84B_C1BD)
-        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a, b) {
+        let aInputs = Inputs.vectors(H.self, seed: 0x8928_9FF5_F84B_C00A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x8928_A0F5_F84B_C1BD)
+        for (a, b) in everyPair(aInputs, bInputs) where !hasUnorderedNaNs(a.simd, b.simd) {
             mismatches.check(
                 portMultiplyingRoundedF64(a, b),
                 highwayMultiplyingRoundedF64(a, b),
@@ -63,7 +63,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingRoundedConstantA() {
         let mismatches = Mismatches("portMultiplyingRoundedF64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x7BEF_693C_87B7_7AD8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x7BEF_693C_87B7_7AD8)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingRoundedF64ConstantA(b),
@@ -76,7 +76,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingRoundedConstantB() {
         let mismatches = Mismatches("portMultiplyingRoundedF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9541_EF3C_95DF_1A8A)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9541_EF3C_95DF_1A8A)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingRoundedF64ConstantB(a),
@@ -89,8 +89,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingByFloorPowerOf2() {
         let mismatches = Mismatches("portMultiplyingByFloorPowerOf2F64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x07C4_7966_7E70_647C)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x07C4_7A66_7E70_662F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x07C4_7966_7E70_647C)
+        let bInputs = Inputs.vectors(H.self, seed: 0x07C4_7A66_7E70_662F)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingByFloorPowerOf2F64(a, b),
@@ -103,7 +103,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingByFloorPowerOf2ConstantA() {
         let mismatches = Mismatches("portMultiplyingByFloorPowerOf2F64ConstantA")
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x5042_BAF4_2C87_7942)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5042_BAF4_2C87_7942)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingByFloorPowerOf2F64ConstantA(b),
@@ -116,7 +116,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingByFloorPowerOf2ConstantB() {
         let mismatches = Mismatches("portMultiplyingByFloorPowerOf2F64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x4740_84F4_2753_C700)
+        let aInputs = Inputs.vectors(H.self, seed: 0x4740_84F4_2753_C700)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingByFloorPowerOf2F64ConstantB(a),
@@ -129,8 +129,8 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingByPowerOf2FromInt64() {
         let mismatches = Mismatches("portMultiplyingByPowerOf2I64ToF64")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xE751_1323_C444_E5A5)
-        let bInputs = Inputs.exponents(SIMDInt64.Vector.self, seed: 0xE751_1223_C444_E3F2)
+        let aInputs = Inputs.vectors(H.self, seed: 0xE751_1323_C444_E5A5)
+        let bInputs = Inputs.exponents(SIMD<Int64>.self, seed: 0xE751_1223_C444_E3F2)
         for (a, b) in everyPair(aInputs, bInputs) {
             mismatches.check(
                 portMultiplyingByPowerOf2I64ToF64(a, b),
@@ -143,7 +143,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingByPowerOf2FromInt64ConstantA() {
         let mismatches = Mismatches("portMultiplyingByPowerOf2I64ToF64ConstantA")
-        let bInputs = Inputs.exponents(SIMDInt64.Vector.self, seed: 0xF5FF_874B_2ED9_BB89)
+        let bInputs = Inputs.exponents(SIMD<Int64>.self, seed: 0xF5FF_874B_2ED9_BB89)
         for b in bInputs {
             mismatches.check(
                 portMultiplyingByPowerOf2I64ToF64ConstantA(b),
@@ -156,7 +156,7 @@ extension SIMDDoubleCodegenTests {
 
     @Test func multiplyingByPowerOf2FromInt64ConstantB() {
         let mismatches = Mismatches("portMultiplyingByPowerOf2I64ToF64ConstantB")
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xDC40_214B_2055_8057)
+        let aInputs = Inputs.vectors(H.self, seed: 0xDC40_214B_2055_8057)
         for a in aInputs {
             mismatches.check(
                 portMultiplyingByPowerOf2I64ToF64ConstantB(a),

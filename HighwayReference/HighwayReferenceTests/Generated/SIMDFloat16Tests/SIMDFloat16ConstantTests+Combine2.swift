@@ -8,16 +8,16 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkLowerHalfConstantA(_ value: H.Lane) {
+    private func checkLowerHalfConstantA(_ value: Lane) {
         let mismatches = Mismatches("lowerHalf with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.lowerHalf(H.repeating(value)),
-            H.HalfVector(raw: HighwayReference.lowerHalfF16(H.repeating(value))),
+            H.HalfVector(raw: HighwayReference.lowerHalfF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -80,7 +80,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func lowerHalfConstantSplatPayloadNaN() {
-        checkLowerHalfConstantA(H.Lane(nan: 1, signaling: false))
+        checkLowerHalfConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func lowerHalfConstantSplatSignalingNaN() {
@@ -100,16 +100,16 @@ extension SIMDFloat16ConstantTests {
     }
 
     @inline(__always)
-    private func checkUpperHalfConstantA(_ value: H.Lane) {
+    private func checkUpperHalfConstantA(_ value: Lane) {
         let mismatches = Mismatches("upperHalf with a repeating \(hex(value))")
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         mismatches.check(
             H.upperHalf(H.repeating(value)),
-            H.HalfVector(raw: HighwayReference.upperHalfF16(H.repeating(value))),
+            H.HalfVector(raw: HighwayReference.upperHalfF16(H.repeating(value).raw)),
             ""
         )
         mismatches.record()
@@ -172,7 +172,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func upperHalfConstantSplatPayloadNaN() {
-        checkUpperHalfConstantA(H.Lane(nan: 1, signaling: false))
+        checkUpperHalfConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func upperHalfConstantSplatSignalingNaN() {

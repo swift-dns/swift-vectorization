@@ -7,23 +7,23 @@ import Vectorization
 
 extension SIMDUInt32ConstantTests {
     @inline(__always)
-    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseAndWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseAndWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9688_1D34_2D2D_13CD)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x9688_1A34_2D2D_0EB4)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x9688_1B34_2D2D_1067)
+        let aInputs = Inputs.vectors(H.self, seed: 0x9688_1A34_2D2D_0EB4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x9688_1B34_2D2D_1067)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0xB575_8C8A_AED9_AF5E)
         {
             mismatches.check(
                 H.bitwiseAnd(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseAndWhereOtherwiseU32(
                         H.repeating(value).raw,
                         mask.raw,
@@ -86,27 +86,27 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func bitwiseAndWhereOtherwiseConstantSplatMax() {
-        checkBitwiseAndWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkBitwiseAndWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseOrWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseOrWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBE02_94D0_1BA4_397F)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0xBE02_95D0_1BA4_3B32)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0xBE02_96D0_1BA4_3CE5)
+        let aInputs = Inputs.vectors(H.self, seed: 0xBE02_95D0_1BA4_3B32)
+        let bInputs = Inputs.vectors(H.self, seed: 0xBE02_96D0_1BA4_3CE5)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x839C_8E84_CD9C_F6A0)
         {
             mismatches.check(
                 H.bitwiseOr(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseOrWhereOtherwiseU32(
                         H.repeating(value).raw,
                         mask.raw,
@@ -169,27 +169,27 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func bitwiseOrWhereOtherwiseConstantSplatMax() {
-        checkBitwiseOrWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkBitwiseOrWhereOtherwiseConstantOtherwise(Lane.max)
     }
 
     @inline(__always)
-    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: H.Lane) {
+    private func checkBitwiseXorWhereOtherwiseConstantOtherwise(_ value: Lane) {
         let mismatches = Mismatches(
             "bitwiseXorWhereOtherwise with otherwise repeating \(hex(value))"
         )
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3F2E_C438_469D_A2F5)
-        let aInputs = Inputs.vectors(H.Vector.self, seed: 0x3F2E_C138_469D_9DDC)
-        let bInputs = Inputs.vectors(H.Vector.self, seed: 0x3F2E_C238_469D_9F8F)
+        let aInputs = Inputs.vectors(H.self, seed: 0x3F2E_C138_469D_9DDC)
+        let bInputs = Inputs.vectors(H.self, seed: 0x3F2E_C238_469D_9F8F)
         mismatches.check(
             H.repeating(value),
-            H.Vector(raw: HighwayReference.repeatingU32(value)),
+            H(raw: HighwayReference.repeatingU32(value)),
             "repeating"
         )
         for (mask, a, b) in mixedTriples(maskInputs, aInputs, bInputs, seed: 0x70BD_C106_D1E1_6A86)
         {
             mismatches.check(
                 H.bitwiseXor(a, b, where: mask, otherwise: H.repeating(value)),
-                H.Vector(
+                H(
                     raw: HighwayReference.bitwiseXorWhereOtherwiseU32(
                         H.repeating(value).raw,
                         mask.raw,
@@ -252,6 +252,6 @@ extension SIMDUInt32ConstantTests {
     }
 
     @Test func bitwiseXorWhereOtherwiseConstantSplatMax() {
-        checkBitwiseXorWhereOtherwiseConstantOtherwise(H.Lane.max)
+        checkBitwiseXorWhereOtherwiseConstantOtherwise(Lane.max)
     }
 }

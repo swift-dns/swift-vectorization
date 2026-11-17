@@ -8,18 +8,18 @@ import Vectorization
 
 extension SIMDFloat16ConstantTests {
     @inline(__always)
-    private func checkIsNaNWhereConstantA(_ value: H.Lane) {
+    private func checkIsNaNWhereConstantA(_ value: Lane) {
         let mismatches = Mismatches("isNaNWhere with a repeating \(hex(value))")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x9C8A_4864_E156_EFCB)
         mismatches.check(
             H.repeating(value),
-            HighwayReference.repeatingF16(value.bitPattern),
+            H(raw: HighwayReference.repeatingF16(value.bitPattern)),
             "repeating"
         )
         for mask in maskInputs {
             mismatches.check(
                 H.isNaN(H.repeating(value), where: mask),
-                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, H.repeating(value))),
+                H.Mask(raw: HighwayReference.isNaNWhereF16(mask.raw, H.repeating(value).raw)),
                 "mask: \(describe(mask))"
             )
         }
@@ -83,7 +83,7 @@ extension SIMDFloat16ConstantTests {
     }
 
     @Test func isNaNWhereConstantSplatPayloadNaN() {
-        checkIsNaNWhereConstantA(H.Lane(nan: 1, signaling: false))
+        checkIsNaNWhereConstantA(Lane(nan: 1, signaling: false))
     }
 
     @Test func isNaNWhereConstantSplatSignalingNaN() {
