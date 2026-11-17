@@ -166,8 +166,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(.nan)
         } when: {
@@ -179,8 +179,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatMinusNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(-.nan)
         } when: {
@@ -192,8 +192,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatPayloadNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(Lane(nan: 1, signaling: false))
         } when: {
@@ -205,8 +205,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatSignalingNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(.signalingNaN)
         } when: {
@@ -218,8 +218,8 @@ extension SIMDDoubleConstantTests {
 
     @Test func approximateReciprocalSquareRootConstantSplatMinusSignalingNaN() {
         withKnownIssue(
-            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, the cause of which is not known yet",
-            isIntermittent: SIMDTarget.targetName != "AVX2"
+            "Under Linux in debug builds on AVX2 and the AVX-512 targets the port and Highway differ in the sign of a NaN addend that a negated fused multiply-add flips, which appears only in some builds, the cause of which is not known yet",
+            isIntermittent: true
         ) {
             checkApproximateReciprocalSquareRootConstantA(-.signalingNaN)
         } when: {

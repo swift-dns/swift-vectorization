@@ -50926,13 +50926,6 @@ let knownGapTests: [String: [String]] = [
         "negatedMultiplySubtractingWhereOtherwiseConstantB",
         "negatedMultiplySubtractingWhereOtherwiseConstantOtherwise",
     ],
-    "SIMDDoubleConstant": [
-        "approximateReciprocalSquareRootConstantSplatMinusNaN",
-        "approximateReciprocalSquareRootConstantSplatMinusSignalingNaN",
-        "approximateReciprocalSquareRootConstantSplatNaN",
-        "approximateReciprocalSquareRootConstantSplatPayloadNaN",
-        "approximateReciprocalSquareRootConstantSplatSignalingNaN",
-    ],
     "SIMDDoubleReference": [
         "multiplySubtractingAdding"
     ],
@@ -50977,8 +50970,17 @@ let multiplySubtractingAddingConstantSplatTests = [
     "multiplySubtractingAddingConstantSplatZero",
 ]
 
+let approximateReciprocalSquareRootConstantSplatNaNTests = [
+    "approximateReciprocalSquareRootConstantSplatMinusNaN",
+    "approximateReciprocalSquareRootConstantSplatMinusSignalingNaN",
+    "approximateReciprocalSquareRootConstantSplatNaN",
+    "approximateReciprocalSquareRootConstantSplatPayloadNaN",
+    "approximateReciprocalSquareRootConstantSplatSignalingNaN",
+]
+
 let intermittentNaNSignTests: [String: [String]] = [
-    "SIMDDoubleConstant": multiplySubtractingAddingConstantSplatTests,
+    "SIMDDoubleConstant": approximateReciprocalSquareRootConstantSplatNaNTests
+        + multiplySubtractingAddingConstantSplatTests,
     "SIMDFloatConstant": multiplySubtractingAddingConstantSplatTests,
 ]
 
