@@ -42,6 +42,24 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeMisaligned() {
+        let mismatches = Mismatches("portStoreF16 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDFC0_A7CE_0C7C_1456)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreF16(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreF16(a, to: destination) }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeConstantA() {
         let mismatches = Mismatches("portStoreF16ConstantA")
         let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
@@ -66,6 +84,21 @@ extension SIMDFloat16CodegenTests {
         let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
             unsafe highwayStoreF16ConstantA(to: destination)
         }
+        mismatches.check(portLanes, referenceLanes, "")
+        mismatches.record()
+    }
+
+    @Test func storeConstantAMisaligned() {
+        let mismatches = Mismatches("portStoreF16ConstantA on misaligned memory")
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        let (_, portLanes) = unsafe withMisalignedLanes(
+            sentinel,
+            vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+        ) { destination in unsafe portStoreF16ConstantA(to: destination) }
+        let (_, referenceLanes) = unsafe withMisalignedLanes(
+            sentinel,
+            vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+        ) { destination in unsafe highwayStoreF16ConstantA(to: destination) }
         mismatches.check(portLanes, referenceLanes, "")
         mismatches.record()
     }
@@ -164,6 +197,25 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeFirstMisaligned() {
+        let mismatches = Mismatches("portStoreFirstF16 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2C96_1FEC_B315_1D94)
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, count) in everyPair(aInputs, countInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreFirstF16(a, to: destination, count: count) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreFirstF16(a, to: destination, count: count) }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
+        }
+        mismatches.record()
+    }
+
     @Test func storeFirstConstantA() {
         let mismatches = Mismatches("portStoreFirstF16ConstantA")
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
@@ -193,6 +245,24 @@ extension SIMDFloat16CodegenTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe highwayStoreFirstF16ConstantA(to: destination, count: count)
             }
+            mismatches.check(portLanes, referenceLanes, "count: \(count)")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstConstantAMisaligned() {
+        let mismatches = Mismatches("portStoreFirstF16ConstantA on misaligned memory")
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for count in countInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreFirstF16ConstantA(to: destination, count: count) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreFirstF16ConstantA(to: destination, count: count) }
             mismatches.check(portLanes, referenceLanes, "count: \(count)")
         }
         mismatches.record()
@@ -232,6 +302,24 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeFirstConstantCountMisaligned() {
+        let mismatches = Mismatches("portStoreFirstF16ConstantCount on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xAF3B_5914_9641_110B)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreFirstF16ConstantCount(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreFirstF16ConstantCount(a, to: destination) }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeFirstConstantCountTwo() {
         let mismatches = Mismatches("portStoreFirstF16ConstantCountTwo")
         let aInputs = Inputs.vectors(H.self, seed: 0xEEBE_FEC5_ECE9_50AE)
@@ -266,6 +354,24 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeFirstConstantCountTwoMisaligned() {
+        let mismatches = Mismatches("portStoreFirstF16ConstantCountTwo on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6E19_E309_FE37_DA47)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreFirstF16ConstantCountTwo(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreFirstF16ConstantCountTwo(a, to: destination) }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeFirstConstantCountLaneCount() {
         let mismatches = Mismatches("portStoreFirstF16ConstantCountLaneCount")
         let aInputs = Inputs.vectors(H.self, seed: 0x02D7_8EF6_168D_5C09)
@@ -294,6 +400,25 @@ extension SIMDFloat16CodegenTests {
             ) { destination in unsafe portStoreFirstF16ConstantCountLaneCount(a, to: destination) }
             let (_, referenceLanes) = unsafe withGuardedLanes(
                 Array(sentinel.prefix(SIMD<Float16>.laneCount))
+            ) { destination in unsafe highwayStoreFirstF16ConstantCountLaneCount(a, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstConstantCountLaneCountMisaligned() {
+        let mismatches = Mismatches("portStoreFirstF16ConstantCountLaneCount on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xE0D3_D621_144C_8DAC)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreFirstF16ConstantCountLaneCount(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
             ) { destination in unsafe highwayStoreFirstF16ConstantCountLaneCount(a, to: destination)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
@@ -336,6 +461,30 @@ extension SIMDFloat16CodegenTests {
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(
                 Array(sentinel.prefix(2 * SIMD<Float16>.laneCount))
+            ) { destination in
+                unsafe highwayStoreFirstF16ConstantCountTwiceLaneCount(a, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstConstantCountTwiceLaneCountMisaligned() {
+        let mismatches = Mismatches(
+            "portStoreFirstF16ConstantCountTwiceLaneCount on misaligned memory"
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x27B3_5401_3547_B23E)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe portStoreFirstF16ConstantCountTwiceLaneCount(a, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
             ) { destination in
                 unsafe highwayStoreFirstF16ConstantCountTwiceLaneCount(a, to: destination)
             }
@@ -388,6 +537,29 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeWhereMisaligned() {
+        let mismatches = Mismatches("portStoreWhereF16 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDFF1_883A_D5E5_7159)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xDFF1_873A_D5E5_6FA6)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreWhereF16(a, to: destination, where: mask) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreWhereF16(a, to: destination, where: mask) }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeWhereConstantA() {
         let mismatches = Mismatches("portStoreWhereF16ConstantA")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0ECB_4A69_892D_FFB2)
@@ -417,6 +589,24 @@ extension SIMDFloat16CodegenTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe highwayStoreWhereF16ConstantA(to: destination, where: mask)
             }
+            mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeWhereConstantAMisaligned() {
+        let mismatches = Mismatches("portStoreWhereF16ConstantA on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x0580_C477_18C9_7BBB)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for mask in maskInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreWhereF16ConstantA(to: destination, where: mask) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreWhereF16ConstantA(to: destination, where: mask) }
             mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
         }
         mismatches.record()
@@ -452,6 +642,26 @@ extension SIMDFloat16CodegenTests {
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe highwayStoreRepeatingF16(value, count: count, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "count: \(count), value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeRepeatingMisaligned() {
+        let mismatches = Mismatches("portStoreRepeatingF16 on misaligned memory")
+        let countInputs = Inputs.counts(through: 2 * H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xF134_E55A_70BE_F044)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for (count, value) in everyPair(countInputs, valueInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreRepeatingF16(value, count: count, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreRepeatingF16(value, count: count, to: destination)
             }
             mismatches.check(portLanes, referenceLanes, "count: \(count), value: \(hex(value))")
         }
@@ -500,6 +710,28 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeRepeatingConstantValueMisaligned() {
+        let mismatches = Mismatches("portStoreRepeatingF16ConstantValue on misaligned memory")
+        let countInputs = Inputs.counts(through: 2 * H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for count in countInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe portStoreRepeatingF16ConstantValue(count: count, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe highwayStoreRepeatingF16ConstantValue(count: count, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "count: \(count)")
+        }
+        mismatches.record()
+    }
+
     @Test func storeRepeatingConstantCount() {
         let mismatches = Mismatches("portStoreRepeatingF16ConstantCount")
         let valueInputs = Inputs.lanes(Lane.self, seed: 0x6EA6_9E6A_4C2F_4DF4)
@@ -534,6 +766,25 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeRepeatingConstantCountMisaligned() {
+        let mismatches = Mismatches("portStoreRepeatingF16ConstantCount on misaligned memory")
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x3AA4_C221_1D65_B061)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for value in valueInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreRepeatingF16ConstantCount(value, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreRepeatingF16ConstantCount(value, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeRepeatingConstantCountTwo() {
         let mismatches = Mismatches("portStoreRepeatingF16ConstantCountTwo")
         let valueInputs = Inputs.lanes(Lane.self, seed: 0x93DD_E26B_1075_A8CA)
@@ -562,6 +813,27 @@ extension SIMDFloat16CodegenTests {
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(2))) {
                 destination in
+                unsafe highwayStoreRepeatingF16ConstantCountTwo(value, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeRepeatingConstantCountTwoMisaligned() {
+        let mismatches = Mismatches("portStoreRepeatingF16ConstantCountTwo on misaligned memory")
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xD523_4FAC_2584_67A3)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for value in valueInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreRepeatingF16ConstantCountTwo(value, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
                 unsafe highwayStoreRepeatingF16ConstantCountTwo(value, to: destination)
             }
             mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
@@ -615,6 +887,30 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeRepeatingConstantCountLaneCountMisaligned() {
+        let mismatches = Mismatches(
+            "portStoreRepeatingF16ConstantCountLaneCount on misaligned memory"
+        )
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xB344_F7BC_29FE_5C7C)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for value in valueInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe portStoreRepeatingF16ConstantCountLaneCount(value, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe highwayStoreRepeatingF16ConstantCountLaneCount(value, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeRepeatingConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portStoreRepeatingF16ConstantCountTwiceLaneCount")
         let valueInputs = Inputs.lanes(Lane.self, seed: 0x51E0_4735_0411_A3AD)
@@ -653,6 +949,30 @@ extension SIMDFloat16CodegenTests {
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(
                 Array(sentinel.prefix(2 * SIMD<Float16>.laneCount))
+            ) { destination in
+                unsafe highwayStoreRepeatingF16ConstantCountTwiceLaneCount(value, to: destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeRepeatingConstantCountTwiceLaneCountMisaligned() {
+        let mismatches = Mismatches(
+            "portStoreRepeatingF16ConstantCountTwiceLaneCount on misaligned memory"
+        )
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0x4CCB_127B_8834_DFB0)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for value in valueInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe portStoreRepeatingF16ConstantCountTwiceLaneCount(value, to: destination)
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
             ) { destination in
                 unsafe highwayStoreRepeatingF16ConstantCountTwiceLaneCount(value, to: destination)
             }
@@ -717,6 +1037,41 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func copyMisaligned() {
+        let mismatches = Mismatches("portCopyF16 on misaligned memory")
+        let countInputs = Inputs.counts(through: 2 * H.laneCount)
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0xDADC_27EF_F2C8_6F2F
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for (count, from) in everyPair(countInputs, fromInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe portCopyF16(count: count, from: source, to: destination) }
+                .result
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe highwayCopyF16(count: count, from: source, to: destination) }
+                .result
+            }
+            mismatches.check(portLanes, referenceLanes, "count: \(count), from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func copyConstantCount() {
         let mismatches = Mismatches("portCopyF16ConstantCount")
         let fromInputs = Inputs.buffers(
@@ -762,6 +1117,40 @@ extension SIMDFloat16CodegenTests {
                 unsafe withGuardedLanes(Array(from.prefix(1))) { source in
                     unsafe highwayCopyF16ConstantCount(from: source, to: destination)
                 }.result
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func copyConstantCountMisaligned() {
+        let mismatches = Mismatches("portCopyF16ConstantCount on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0xBF27_1A24_7983_7120
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for from in fromInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe portCopyF16ConstantCount(from: source, to: destination) }
+                .result
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe highwayCopyF16ConstantCount(from: source, to: destination) }
+                .result
             }
             mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
         }
@@ -819,6 +1208,40 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func copyConstantCountTwoMisaligned() {
+        let mismatches = Mismatches("portCopyF16ConstantCountTwo on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0xB68B_D24C_2416_635C
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for from in fromInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe portCopyF16ConstantCountTwo(from: source, to: destination) }
+                .result
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe highwayCopyF16ConstantCountTwo(from: source, to: destination) }
+                .result
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func copyConstantCountLaneCount() {
         let mismatches = Mismatches("portCopyF16ConstantCountLaneCount")
         let fromInputs = Inputs.buffers(
@@ -865,6 +1288,42 @@ extension SIMDFloat16CodegenTests {
                 Array(sentinel.prefix(SIMD<Float16>.laneCount))
             ) { destination in
                 unsafe withGuardedLanes(Array(from.prefix(SIMD<Float16>.laneCount))) { source in
+                    unsafe highwayCopyF16ConstantCountLaneCount(from: source, to: destination)
+                }.result
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func copyConstantCountLaneCountMisaligned() {
+        let mismatches = Mismatches("portCopyF16ConstantCountLaneCount on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0xC961_01AA_8020_5977
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for from in fromInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in
+                    unsafe portCopyF16ConstantCountLaneCount(from: source, to: destination)
+                }.result
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in
                     unsafe highwayCopyF16ConstantCountLaneCount(from: source, to: destination)
                 }.result
             }
@@ -931,6 +1390,42 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func copyConstantCountTwiceLaneCountMisaligned() {
+        let mismatches = Mismatches("portCopyF16ConstantCountTwiceLaneCount on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x6F03_B652_450D_C689
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for from in fromInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in
+                    unsafe portCopyF16ConstantCountTwiceLaneCount(from: source, to: destination)
+                }.result
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in
+                    unsafe highwayCopyF16ConstantCountTwiceLaneCount(from: source, to: destination)
+                }.result
+            }
+            mismatches.check(portLanes, referenceLanes, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeHalf() {
         let mismatches = Mismatches("portStoreHalfF16")
         let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x9AC1_B75F_8277_61CE).map(
@@ -964,6 +1459,26 @@ extension SIMDFloat16CodegenTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe highwayStoreHalfF16(a, to: destination)
             }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeHalfMisaligned() {
+        let mismatches = Mismatches("portStoreHalfF16 on misaligned memory")
+        let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x1CAF_2DE0_B390_ABA7).map(
+            poisoningUpperBytes
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2 + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreHalfF16(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreHalfF16(a, to: destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
         mismatches.record()
@@ -1007,39 +1522,21 @@ extension SIMDFloat16CodegenTests {
         mismatches.record()
     }
 
-    @Test func storeBlock() {
-        let mismatches = Mismatches("portStoreBlockF16")
-        let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x6AE0_13AB_7EC2_08C6).map(
+    @Test func storeQuarterMisaligned() {
+        let mismatches = Mismatches("portStoreQuarterF16 on misaligned memory")
+        let aInputs = Inputs.vectors(H.QuarterVector.self, seed: 0x3934_084B_3B3E_C402).map(
             poisoningUpperBytes
         )
-        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size + 4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 4 + 4)
         for a in aInputs {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portStoreBlockF16(a, to: destination.baseAddress!)
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayStoreBlockF16(a, to: destination.baseAddress!)
-            }
-            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
-        }
-        mismatches.record()
-    }
-
-    @Test func storeBlockBeforeGuardPage() {
-        let mismatches = Mismatches("portStoreBlockF16 before a guard page")
-        let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x98E9_D74D_30F1_A7B7).map(
-            poisoningUpperBytes
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size)
-        for a in aInputs {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portStoreBlockF16(a, to: destination)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayStoreBlockF16(a, to: destination)
-            }
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreQuarterF16(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreQuarterF16(a, to: destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
         mismatches.record()

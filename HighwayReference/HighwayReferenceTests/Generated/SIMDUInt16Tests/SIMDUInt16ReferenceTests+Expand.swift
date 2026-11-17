@@ -76,6 +76,29 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadExpandedWhereMisaligned() {
+        let mismatches = Mismatches("loadExpandedWhere on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB9AC_49AF_9DA0_A80E)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xB9AC_4AAF_9DA0_A9C1)
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.loadExpanded(from: source, where: mask),
+                    unsafe H(raw: HighwayReference.loadExpandedWhereU16(mask.raw, source))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadExpandedWhereNonCanonical() {
         let mismatches = Mismatches("loadExpandedWhere with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0xFE12_84B2_6AC4_7794)
@@ -115,6 +138,39 @@ extension SIMDUInt16ReferenceTests {
                     })()
                 )
             }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadExpandedWhereUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadExpandedWhere unchecked span on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD329_AEAA_459D_F99A)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD329_AFAA_459D_FB4D)
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.loadExpanded(fromUnchecked: span, where: mask)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.loadExpanded(from: span, where: mask)
+                    })()
+                )
+            }.result
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -172,6 +228,41 @@ extension SIMDUInt16ReferenceTests {
             seed: 0xD14F_207A_2698_EED6
         ) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.loadExpanded(from: source, where: mask, otherwise: otherwise),
+                    unsafe H(
+                        raw: HighwayReference.loadExpandedWhereOtherwiseU16(
+                            otherwise.raw,
+                            mask.raw,
+                            source
+                        )
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadExpandedWhereOtherwiseMisaligned() {
+        let mismatches = Mismatches("loadExpandedWhereOtherwise on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x997F_DB8E_03E7_F768)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x997F_DC8E_03E7_F91B)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x997F_DD8E_03E7_FACE)
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0xB4B9_C2D1_1E59_1D64
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe H.loadExpanded(from: source, where: mask, otherwise: otherwise),
                     unsafe H(
@@ -255,6 +346,51 @@ extension SIMDUInt16ReferenceTests {
                     })()
                 )
             }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadExpandedWhereOtherwiseUncheckedSpanMisaligned() {
+        let mismatches = Mismatches(
+            "loadExpandedWhereOtherwise unchecked span on misaligned memory"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3FAB_9D1A_795E_8FA8)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x3FAB_9E1A_795E_915B)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x3FAB_9F1A_795E_930E)
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0x2E77_D194_082C_4D24
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.loadExpanded(
+                            fromUnchecked: span,
+                            where: mask,
+                            otherwise: otherwise
+                        )
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.loadExpanded(from: span, where: mask, otherwise: otherwise)
+                    })()
+                )
+            }.result
             mismatches.check(
                 portResult,
                 referenceResult,

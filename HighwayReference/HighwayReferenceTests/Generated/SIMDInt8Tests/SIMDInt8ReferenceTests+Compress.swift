@@ -165,6 +165,36 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeCompressedMisaligned() {
+        let mismatches = Mismatches("storeCompressed on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x1D7A_F302_EF5E_0E51)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1D7A_F202_EF5E_0C9E)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeCompressed(a, where: mask, to: destination) }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe HighwayReference.storeCompressedI8(a.raw, mask.raw, destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeCompressedNonCanonical() {
         let mismatches = Mismatches("storeCompressed with masks from arbitrary vectors")
         let aInputs = Inputs.vectors(H.self, seed: 0xCA05_3914_1BC6_B12B)
@@ -227,6 +257,54 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeCompressedUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeCompressed unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x35AB_6E96_051E_19A7)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x35AB_6D96_051E_17F4)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.storeCompressed(a, where: mask, toUnchecked: &span)
+                })()
+            }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return H.storeCompressed(a, where: mask, to: &span)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeCompressedBlended() {
         let mismatches = Mismatches("storeCompressedBlended")
         let aInputs = Inputs.vectors(H.self, seed: 0x80B5_A8D5_8055_47C4)
@@ -270,6 +348,36 @@ extension SIMDInt8ReferenceTests {
             }
             let (referenceResult, referenceLanes) = unsafe withGuardedLanes(sentinel) {
                 destination in
+                unsafe HighwayReference.storeCompressedBlendedI8(a.raw, mask.raw, destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeCompressedBlendedMisaligned() {
+        let mismatches = Mismatches("storeCompressedBlended on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x80CE_18CA_9F24_D581)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x80CE_17CA_9F24_D3CE)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeCompressedBlended(a, where: mask, to: destination) }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
                 unsafe HighwayReference.storeCompressedBlendedI8(a.raw, mask.raw, destination)
             }
             mismatches.check(
@@ -352,6 +460,54 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeCompressedBlendedUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeCompressedBlended unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x1E94_0F0F_BF2B_E4D7)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1E94_0E0F_BF2B_E324)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.storeCompressedBlended(a, where: mask, toUnchecked: &span)
+                })()
+            }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return H.storeCompressedBlended(a, where: mask, to: &span)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func compressedBits() {
         let mismatches = Mismatches("compressedBits")
         let aInputs = Inputs.vectors(H.self, seed: 0x801D_F67F_478E_2357)
@@ -414,6 +570,42 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func compressedBitsMisaligned() {
+        let mismatches = Mismatches("compressedBits on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x48DB_F3D2_AC71_89BE)
+        let bitsInputs = Inputs.buffers(
+            UInt8.self,
+            count: (H.laneCount + 7) / 8,
+            seed: 0x48DB_F4D2_AC71_8B71
+        )
+        for (a, bits) in everyPair(aInputs, bitsInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                bits,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.compressed(a, bits: source),
+                    unsafe withMisalignedLanes(
+                        bits + [UInt8](repeating: 0, count: 8),
+                        vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                    ) { padded in unsafe H(raw: HighwayReference.compressedBitsI8(a.raw, padded)) }
+                    .result
+                )
+            }.result
+            let checkedLanes = compressedLaneCount(
+                bits: bits,
+                lanes: H.laneCount,
+                tailIsDeterministic: HighwayReference.compressTailIsDeterministicI8()
+            )
+            mismatches.check(
+                (0..<checkedLanes).map { portResult.simd[$0] },
+                (0..<checkedLanes).map { referenceResult.simd[$0] },
+                "a: \(describe(a)), bits: \(describe(bits))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func compressedBitsUncheckedSpan() {
         let mismatches = Mismatches("compressedBits unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0x9E3B_766F_EAA8_0BB3)
@@ -437,6 +629,59 @@ extension SIMDInt8ReferenceTests {
                     }
                 )
             }
+            let checkedLanes = compressedLaneCount(
+                bits: bits,
+                lanes: H.laneCount,
+                tailIsDeterministic: HighwayReference.compressTailIsDeterministicI8()
+            )
+            mismatches.check(
+                (0..<checkedLanes).map { portResult.simd[$0] },
+                (0..<checkedLanes).map { referenceResult.simd[$0] },
+                "a: \(describe(a)), bits: \(describe(bits))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func compressedBitsUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("compressedBits unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x06DD_5785_B6E2_E88A)
+        let bitsInputs = Inputs.buffers(
+            UInt8.self,
+            count: (H.laneCount + 7) / 8,
+            seed: 0x06DD_5885_B6E2_EA3D
+        )
+        for (a, bits) in everyPair(aInputs, bitsInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                bits,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: (H.laneCount + 7) / 8
+                            )
+                        )
+                        return unsafe H.compressed(a, bitsUnchecked: span)
+                    })(),
+                    unsafe withMisalignedLanes(
+                        bits + [UInt8](repeating: 0, count: 8),
+                        vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                    ) { padded in
+                        ({
+                            let span = unsafe Span(
+                                _unsafeElements: UnsafeBufferPointer(
+                                    start: source,
+                                    count: (H.laneCount + 7) / 8
+                                )
+                            )
+                            return H.compressed(a, bits: span)
+                        })()
+                    }.result
+                )
+            }.result
             let checkedLanes = compressedLaneCount(
                 bits: bits,
                 lanes: H.laneCount,
@@ -538,6 +783,55 @@ extension SIMDInt8ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeCompressedBitsMisaligned() {
+        let mismatches = Mismatches("storeCompressedBits on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8447_0F03_9DF8_EABD)
+        let bitsInputs = Inputs.buffers(
+            UInt8.self,
+            count: (H.laneCount + 7) / 8,
+            seed: 0x8447_0E03_9DF8_E90A
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, bits) in everyPair(aInputs, bitsInputs) {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    bits,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe H.storeCompressed(a, bits: source, to: destination) }.result
+            }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    bits,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in
+                    unsafe withMisalignedLanes(
+                        bits + [UInt8](repeating: 0, count: 8),
+                        vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                    ) { padded in
+                        unsafe HighwayReference.storeCompressedBitsI8(a.raw, padded, destination)
+                    }.result
+                }.result
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), bits: \(describe(bits))"
+            )
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "a: \(describe(a)), bits: \(describe(bits))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeCompressedBitsUncheckedSpan() {
         let mismatches = Mismatches("storeCompressedBits unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0x872A_DCD3_8A91_FEB2)
@@ -573,6 +867,85 @@ extension SIMDInt8ReferenceTests {
                         }
                     }
                 )
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), bits: \(describe(bits))"
+            )
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "a: \(describe(a)), bits: \(describe(bits))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeCompressedBitsUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeCompressedBits unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x8BA1_337C_451F_61EB)
+        let bitsInputs = Inputs.buffers(
+            UInt8.self,
+            count: (H.laneCount + 7) / 8,
+            seed: 0x8BA1_327C_451F_6038
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, bits) in everyPair(aInputs, bitsInputs) {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    bits,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in
+                    ({
+                        let bits = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: (H.laneCount + 7) / 8
+                            )
+                        )
+                        var to = unsafe MutableSpan(
+                            _unsafeElements: UnsafeMutableBufferPointer(
+                                start: destination,
+                                count: H.laneCount
+                            )
+                        )
+                        return unsafe H.storeCompressed(a, bitsUnchecked: bits, toUnchecked: &to)
+                    })()
+                }.result
+            }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    bits,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in
+                    unsafe withMisalignedLanes(
+                        bits + [UInt8](repeating: 0, count: 8),
+                        vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                    ) { padded in
+                        ({
+                            let bits = unsafe Span(
+                                _unsafeElements: UnsafeBufferPointer(
+                                    start: source,
+                                    count: (H.laneCount + 7) / 8
+                                )
+                            )
+                            var to = unsafe MutableSpan(
+                                _unsafeElements: UnsafeMutableBufferPointer(
+                                    start: destination,
+                                    count: H.laneCount
+                                )
+                            )
+                            return H.storeCompressed(a, bits: bits, to: &to)
+                        })()
+                    }.result
+                }.result
             }
             mismatches.check(
                 portLanes,

@@ -51,6 +51,31 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func loadInterleaved2Misaligned() {
+        let mismatches = Mismatches("portLoadInterleaved2I16 on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x4142_435C_B4C9_4715
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                unsafe portLoadInterleaved2I16(from: source, &p0, &p1)
+                unsafe highwayLoadInterleaved2I16(from: source, &r0, &r1)
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+        }
+        mismatches.record()
+    }
+
     @Test func loadInterleaved3() {
         let mismatches = Mismatches("portLoadInterleaved3I16")
         let fromInputs = Inputs.buffers(
@@ -91,6 +116,34 @@ extension SIMDInt16CodegenTests {
             var r1 = H(raw: HighwayReference.zeroI16())
             var r2 = H(raw: HighwayReference.zeroI16())
             _ = unsafe withGuardedLanes(from) { source in
+                unsafe portLoadInterleaved3I16(from: source, &p0, &p1, &p2)
+                unsafe highwayLoadInterleaved3I16(from: source, &r0, &r1, &r2)
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadInterleaved3Misaligned() {
+        let mismatches = Mismatches("portLoadInterleaved3I16 on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 3 * H.laneCount,
+            seed: 0xDA86_CB28_8112_E98A
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var p2 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
+            var r2 = H(raw: HighwayReference.zeroI16())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 unsafe portLoadInterleaved3I16(from: source, &p0, &p1, &p2)
                 unsafe highwayLoadInterleaved3I16(from: source, &r0, &r1, &r2)
             }
@@ -157,6 +210,37 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func loadInterleaved4Misaligned() {
+        let mismatches = Mismatches("portLoadInterleaved4I16 on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 4 * H.laneCount,
+            seed: 0x5330_E848_DF18_EE77
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var p2 = H.zero()
+            var p3 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI16())
+            var r1 = H(raw: HighwayReference.zeroI16())
+            var r2 = H(raw: HighwayReference.zeroI16())
+            var r3 = H(raw: HighwayReference.zeroI16())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                unsafe portLoadInterleaved4I16(from: source, &p0, &p1, &p2, &p3)
+                unsafe highwayLoadInterleaved4I16(from: source, &r0, &r1, &r2, &r3)
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+            mismatches.check(p3, r3, "from: \(describe(from)), v3")
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved2() {
         let mismatches = Mismatches("portStoreInterleaved2I16")
         let aInputs = Inputs.vectors(H.self, seed: 0xD99E_74FB_91A1_AF81)
@@ -188,6 +272,25 @@ extension SIMDInt16CodegenTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe highwayStoreInterleaved2I16(a, b, to: destination)
             }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved2Misaligned() {
+        let mismatches = Mismatches("portStoreInterleaved2I16 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x068C_A3CB_700B_27D4)
+        let bInputs = Inputs.vectors(H.self, seed: 0x068C_A4CB_700B_2987)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved2I16(a, b, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved2I16(a, b, to: destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
         }
         mismatches.record()
@@ -227,6 +330,24 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved2ConstantAMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved2I16ConstantA on misaligned memory")
+        let bInputs = Inputs.vectors(H.self, seed: 0x5A8D_0CB7_3E08_BCA8)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for b in bInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved2I16ConstantA(b, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved2I16ConstantA(b, to: destination) }
+            mismatches.check(portLanes, referenceLanes, "b: \(describe(b))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved2ConstantB() {
         let mismatches = Mismatches("portStoreInterleaved2I16ConstantB")
         let aInputs = Inputs.vectors(H.self, seed: 0x453B_0998_B71F_9463)
@@ -256,6 +377,24 @@ extension SIMDInt16CodegenTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe highwayStoreInterleaved2I16ConstantB(a, to: destination)
             }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved2ConstantBMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved2I16ConstantB on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x9D04_2C05_BFB1_96DA)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved2I16ConstantB(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved2I16ConstantB(a, to: destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
         mismatches.record()
@@ -307,6 +446,30 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved3Misaligned() {
+        let mismatches = Mismatches("portStoreInterleaved3I16 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xDFF5_E61C_0FF5_4CBF)
+        let bInputs = Inputs.vectors(H.self, seed: 0xDFF5_E51C_0FF5_4B0C)
+        let cInputs = Inputs.vectors(H.self, seed: 0xDFF5_E81C_0FF5_5025)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xB8C6_F4A2_6A9C_FF59) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved3I16(a, b, c, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved3I16(a, b, c, to: destination) }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved3ConstantA() {
         let mismatches = Mismatches("portStoreInterleaved3I16ConstantA")
         let bInputs = Inputs.vectors(H.self, seed: 0x120C_7DE1_D94B_47A4)
@@ -338,6 +501,25 @@ extension SIMDInt16CodegenTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe highwayStoreInterleaved3I16ConstantA(b, c, to: destination)
             }
+            mismatches.check(portLanes, referenceLanes, "b: \(describe(b)), c: \(describe(c))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved3ConstantAMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved3I16ConstantA on misaligned memory")
+        let bInputs = Inputs.vectors(H.self, seed: 0x387C_B7D7_3A6D_6171)
+        let cInputs = Inputs.vectors(H.self, seed: 0x387C_B4D7_3A6D_5C58)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
+        for (b, c) in everyPair(bInputs, cInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved3I16ConstantA(b, c, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved3I16ConstantA(b, c, to: destination) }
             mismatches.check(portLanes, referenceLanes, "b: \(describe(b)), c: \(describe(c))")
         }
         mismatches.record()
@@ -379,6 +561,25 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved3ConstantBMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved3I16ConstantB on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2E8D_8DAC_BE35_775F)
+        let cInputs = Inputs.vectors(H.self, seed: 0x2E8D_8FAC_BE35_7AC5)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
+        for (a, c) in everyPair(aInputs, cInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved3I16ConstantB(a, c, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved3I16ConstantB(a, c, to: destination) }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), c: \(describe(c))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved3ConstantC() {
         let mismatches = Mismatches("portStoreInterleaved3I16ConstantC")
         let aInputs = Inputs.vectors(H.self, seed: 0x2410_4CE1_E3B1_A161)
@@ -410,6 +611,25 @@ extension SIMDInt16CodegenTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe highwayStoreInterleaved3I16ConstantC(a, b, to: destination)
             }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved3ConstantCMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved3I16ConstantC on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xFA00_830D_8CEC_EEF4)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFA00_840D_8CEC_F0A7)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved3I16ConstantC(a, b, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved3I16ConstantC(a, b, to: destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
         }
         mismatches.record()
@@ -475,6 +695,37 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved4Misaligned() {
+        let mismatches = Mismatches("portStoreInterleaved4I16 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x0977_0E1F_4C31_F1B2)
+        let bInputs = Inputs.vectors(H.self, seed: 0x0977_0F1F_4C31_F365)
+        let cInputs = Inputs.vectors(H.self, seed: 0x0977_0C1F_4C31_EE4C)
+        let dInputs = Inputs.vectors(H.self, seed: 0x0977_0D1F_4C31_EFFF)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
+        for (a, b, c, d) in mixedQuadruples(
+            aInputs,
+            bInputs,
+            cInputs,
+            dInputs,
+            seed: 0x46CF_6E3B_FC82_2C76
+        ) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved4I16(a, b, c, d, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved4I16(a, b, c, d, to: destination) }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c)), d: \(describe(d))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved4ConstantA() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantA")
         let bInputs = Inputs.vectors(H.self, seed: 0x5C83_22E6_51D1_98C7)
@@ -511,6 +762,31 @@ extension SIMDInt16CodegenTests {
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe highwayStoreInterleaved4I16ConstantA(b, c, d, to: destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "b: \(describe(b)), c: \(describe(c)), d: \(describe(d))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved4ConstantAMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved4I16ConstantA on misaligned memory")
+        let bInputs = Inputs.vectors(H.self, seed: 0xE4FA_8FD7_BD7E_40BE)
+        let cInputs = Inputs.vectors(H.self, seed: 0xE4FA_8ED7_BD7E_3F0B)
+        let dInputs = Inputs.vectors(H.self, seed: 0xE4FA_8DD7_BD7E_3D58)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
+        for (b, c, d) in mixedTriples(bInputs, cInputs, dInputs, seed: 0xA4ED_5F85_B8DF_852B) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved4I16ConstantA(b, c, d, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved4I16ConstantA(b, c, d, to: destination)
             }
             mismatches.check(
                 portLanes,
@@ -567,6 +843,31 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved4ConstantBMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved4I16ConstantB on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x28A6_8CCC_970F_AE2C)
+        let cInputs = Inputs.vectors(H.self, seed: 0x28A6_8ECC_970F_B192)
+        let dInputs = Inputs.vectors(H.self, seed: 0x28A6_8FCC_970F_B345)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
+        for (a, c, d) in mixedTriples(aInputs, cInputs, dInputs, seed: 0x0EF6_88CC_3C32_9A80) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved4I16ConstantB(a, c, d, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved4I16ConstantB(a, c, d, to: destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), c: \(describe(c)), d: \(describe(d))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved4ConstantC() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantC")
         let aInputs = Inputs.vectors(H.self, seed: 0x6D40_6FE6_5B22_52FE)
@@ -613,6 +914,31 @@ extension SIMDInt16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved4ConstantCMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved4I16ConstantC on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA1F8_D0A7_3944_3877)
+        let bInputs = Inputs.vectors(H.self, seed: 0xA1F8_CFA7_3944_36C4)
+        let dInputs = Inputs.vectors(H.self, seed: 0xA1F8_D1A7_3944_3A2A)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
+        for (a, b, d) in mixedTriples(aInputs, bInputs, dInputs, seed: 0xA681_31EE_6A1C_DDF1) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved4I16ConstantC(a, b, d, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved4I16ConstantC(a, b, d, to: destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), d: \(describe(d))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved4ConstantD() {
         let mismatches = Mismatches("portStoreInterleaved4I16ConstantD")
         let aInputs = Inputs.vectors(H.self, seed: 0x75D5_86E6_5FF8_FEB3)
@@ -649,6 +975,31 @@ extension SIMDInt16CodegenTests {
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe highwayStoreInterleaved4I16ConstantD(a, b, c, to: destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved4ConstantDMisaligned() {
+        let mismatches = Mismatches("portStoreInterleaved4I16ConstantD on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x294E_B386_DB3E_338A)
+        let bInputs = Inputs.vectors(H.self, seed: 0x294E_B486_DB3E_353D)
+        let cInputs = Inputs.vectors(H.self, seed: 0x294E_B186_DB3E_3024)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0xFE82_4147_A5D9_604E) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreInterleaved4I16ConstantD(a, b, c, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreInterleaved4I16ConstantD(a, b, c, to: destination)
             }
             mismatches.check(
                 portLanes,

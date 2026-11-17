@@ -40,6 +40,24 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeMisaligned() {
+        let mismatches = Mismatches("store on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x37EE_684C_17F9_00B7)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.store(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeU16(a.raw, destination) }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeUncheckedSpan() {
         let mismatches = Mismatches("store unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0xBF11_42C7_4E09_539C)
@@ -72,6 +90,65 @@ extension SIMDUInt16ReferenceTests {
                 unsafe H.append(a, toUnchecked: &output)
             }
             let (_, referenceLanes) = withOutputSpan(capacity: H.laneCount) { output in
+                H.append(a, to: &output)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("store unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5A2C_D3B7_5FEE_F669)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.store(a, toUnchecked: &span)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return H.store(a, to: &span)
+                })()
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeUncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("store unchecked output span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xA6BF_4C4A_D41D_53A0)
+        for a in aInputs {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: H.laneCount,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.append(a, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: H.laneCount,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
                 H.append(a, to: &output)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
@@ -202,6 +279,25 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeFirstMisaligned() {
+        let mismatches = Mismatches("storeFirst on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xF703_2038_8B6D_31B3)
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, count) in everyPair(aInputs, countInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeFirst(a, to: destination, count: count) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeFirstU16(a.raw, destination, count) }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
+        }
+        mismatches.record()
+    }
+
     @Test func storeFirstUncheckedOutputSpan() {
         let mismatches = Mismatches("storeFirst unchecked output span")
         let aInputs = Inputs.vectors(H.self, seed: 0xB8DE_DBEA_3D82_0529)
@@ -211,6 +307,28 @@ extension SIMDUInt16ReferenceTests {
                 unsafe H.append(a, addingCount: count, toUnchecked: &output)
             }
             let (_, referenceLanes) = withOutputSpan(capacity: count) { output in
+                H.append(a, addingCount: count, to: &output)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeFirstUncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("storeFirst unchecked output span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6B04_76B7_7E9D_E78C)
+        let countInputs = Inputs.counts(through: H.laneCount)
+        for (a, count) in everyPair(aInputs, countInputs) {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: count,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.append(a, addingCount: count, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: count,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
                 H.append(a, addingCount: count, to: &output)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
@@ -253,6 +371,29 @@ extension SIMDUInt16ReferenceTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe HighwayReference.storeWhereU16(a.raw, mask.raw, destination)
             }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeWhereMisaligned() {
+        let mismatches = Mismatches("storeWhere on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xAE3B_D550_5304_F03A)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xAE3B_D650_5304_F1ED)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.store(a, to: destination, where: mask) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeWhereU16(a.raw, mask.raw, destination) }
             mismatches.check(
                 portLanes,
                 referenceLanes,
@@ -343,6 +484,49 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeWhereUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeWhere unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x31E6_B2C4_BE57_A17E)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x31E6_B3C4_BE57_A331)
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, mask) in everyPair(aInputs, maskInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.store(a, toUnchecked: &span, where: mask)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return H.store(a, to: &span, where: mask)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), mask: \(describe(mask))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeRepeating() {
         let mismatches = Mismatches("storeRepeating")
         let countInputs = Inputs.counts(through: 2 * H.laneCount)
@@ -373,6 +557,26 @@ extension SIMDUInt16ReferenceTests {
             }
             let (_, referenceLanes) = unsafe withGuardedLanes(Array(sentinel.prefix(count))) {
                 destination in unsafe HighwayReference.storeRepeatingU16(count, value, destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "count: \(count), value: \(hex(value))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeRepeatingMisaligned() {
+        let mismatches = Mismatches("storeRepeating on misaligned memory")
+        let countInputs = Inputs.counts(through: 2 * H.laneCount)
+        let valueInputs = Inputs.lanes(Lane.self, seed: 0xD001_77BB_8F68_B52B)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for (count, value) in everyPair(countInputs, valueInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeRepeating(value, count: count, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeRepeatingU16(count, value, destination)
             }
             mismatches.check(portLanes, referenceLanes, "count: \(count), value: \(hex(value))")
         }
@@ -435,6 +639,39 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func copyMisaligned() {
+        let mismatches = Mismatches("copy on misaligned memory")
+        let countInputs = Inputs.counts(through: 2 * H.laneCount)
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x9ABC_F2D8_C0D6_9548
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for (count, from) in everyPair(countInputs, fromInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe H.copy(count: count, from: source, to: destination) }.result
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe withMisalignedLanes(
+                    from,
+                    vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                ) { source in unsafe HighwayReference.copyU16(count, source, destination) }.result
+            }
+            mismatches.check(portLanes, referenceLanes, "count: \(count), from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeTruncatingU8() {
         let mismatches = Mismatches("storeTruncatingU8")
         let aInputs = Inputs.vectors(H.self, seed: 0xC0A0_F1B8_D4F1_1006)
@@ -469,6 +706,24 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeTruncatingU8Misaligned() {
+        let mismatches = Mismatches("storeTruncatingU8 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x514D_8AAD_61FF_F12F)
+        let sentinel = Inputs.sentinel(UInt8.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeTruncating(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeTruncatingU8U16(a.raw, destination) }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeTruncatingU8UncheckedSpan() {
         let mismatches = Mismatches("storeTruncatingU8 unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0x678A_EB14_9A48_7934)
@@ -485,6 +740,44 @@ extension SIMDUInt16ReferenceTests {
             referenceLanes.withUnsafeMutableBufferPointer { destination in
                 ({
                     var span = unsafe MutableSpan(_unsafeElements: destination)
+                    return H.storeTruncating(a, to: &span)
+                })()
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeTruncatingU8UncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeTruncatingU8 unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5B15_76F3_3007_EED1)
+        let sentinel = Inputs.sentinel(UInt8.self, count: H.laneCount + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
+                    return unsafe H.storeTruncating(a, toUnchecked: &span)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount
+                        )
+                    )
                     return H.storeTruncating(a, to: &span)
                 })()
             }
@@ -526,6 +819,26 @@ extension SIMDUInt16ReferenceTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe HighwayReference.storeHalfU16(a.raw, destination)
             }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeHalfMisaligned() {
+        let mismatches = Mismatches("storeHalf on misaligned memory")
+        let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0xFE32_1062_9519_CE7E).map(
+            poisoningUpperBytes
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2 + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.store(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeHalfU16(a.raw, destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
         mismatches.record()
@@ -574,6 +887,69 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeHalfUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeHalf unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x6CF1_0954_24D8_F74A).map(
+            poisoningUpperBytes
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 2 + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount / 2
+                        )
+                    )
+                    return unsafe H.store(a, toUnchecked: &span)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount / 2
+                        )
+                    )
+                    return H.store(a, to: &span)
+                })()
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeHalfUncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("storeHalf unchecked output span on misaligned memory")
+        let aInputs = Inputs.vectors(H.HalfVector.self, seed: 0x656B_5A26_3138_AA83).map(
+            poisoningUpperBytes
+        )
+        for a in aInputs {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: H.laneCount / 2,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.append(a, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: H.laneCount / 2,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                H.append(a, to: &output)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeQuarter() {
         let mismatches = Mismatches("storeQuarter")
         let aInputs = Inputs.vectors(H.QuarterVector.self, seed: 0xBE4E_1617_E1CF_635C).map(
@@ -607,6 +983,26 @@ extension SIMDUInt16ReferenceTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe HighwayReference.storeQuarterU16(a.raw, destination)
             }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeQuarterMisaligned() {
+        let mismatches = Mismatches("storeQuarter on misaligned memory")
+        let aInputs = Inputs.vectors(H.QuarterVector.self, seed: 0xFEB0_35F6_E0EA_4C29).map(
+            poisoningUpperBytes
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 4 + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.store(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeQuarterU16(a.raw, destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
         mismatches.record()
@@ -655,6 +1051,69 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeQuarterUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeQuarter unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.QuarterVector.self, seed: 0x1C61_BCE6_C124_1A6F).map(
+            poisoningUpperBytes
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount / 4 + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount / 4
+                        )
+                    )
+                    return unsafe H.store(a, toUnchecked: &span)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: H.laneCount / 4
+                        )
+                    )
+                    return H.store(a, to: &span)
+                })()
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeQuarterUncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("storeQuarter unchecked output span on misaligned memory")
+        let aInputs = Inputs.vectors(H.QuarterVector.self, seed: 0xBA61_BBC8_DCAB_541A).map(
+            poisoningUpperBytes
+        )
+        for a in aInputs {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: H.laneCount / 4,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.append(a, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: H.laneCount / 4,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                H.append(a, to: &output)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeBlock() {
         let mismatches = Mismatches("storeBlock")
         let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0xD44D_D84B_AEE8_BEE1).map(
@@ -688,6 +1147,26 @@ extension SIMDUInt16ReferenceTests {
             let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
                 unsafe HighwayReference.storeBlockU16(a.raw, destination)
             }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeBlockMisaligned() {
+        let mismatches = Mismatches("storeBlock on misaligned memory")
+        let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x9C10_DF07_898F_5874).map(
+            poisoningUpperBytes
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.store(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeBlockU16(a.raw, destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
         }
         mismatches.record()
@@ -730,6 +1209,69 @@ extension SIMDUInt16ReferenceTests {
             }
             let (_, referenceLanes) = withOutputSpan(capacity: 16 / MemoryLayout<Lane>.size) {
                 output in
+                H.append(a, to: &output)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeBlockUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeBlock unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0xA4AA_096C_AF5A_D26C).map(
+            poisoningUpperBytes
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: 16 / MemoryLayout<Lane>.size + 4)
+        for a in aInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: 16 / MemoryLayout<Lane>.size
+                        )
+                    )
+                    return unsafe H.store(a, toUnchecked: &span)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: 16 / MemoryLayout<Lane>.size
+                        )
+                    )
+                    return H.store(a, to: &span)
+                })()
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeBlockUncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("storeBlock unchecked output span on misaligned memory")
+        let aInputs = Inputs.vectors(H.BlockVector.self, seed: 0x2D12_CD60_21D6_2B21).map(
+            poisoningUpperBytes
+        )
+        for a in aInputs {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: 16 / MemoryLayout<Lane>.size,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.append(a, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: 16 / MemoryLayout<Lane>.size,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
                 H.append(a, to: &output)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")

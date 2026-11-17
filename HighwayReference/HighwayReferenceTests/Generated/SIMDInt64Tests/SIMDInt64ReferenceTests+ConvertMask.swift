@@ -94,6 +94,25 @@ extension SIMDInt64ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeMaskMisaligned() {
+        let mismatches = Mismatches("storeMask on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x7B05_5C9F_C8CB_BD1A)
+        let sentinel = Inputs.sentinel(UInt8.self, count: (H.laneCount + 7) / 8 + 4)
+        for mask in maskInputs {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeMask(mask, to: destination) }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe HighwayReference.storeMaskI64(mask.raw, destination) }
+            mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
+            mismatches.check(portResult, referenceResult, "mask: \(describe(mask))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeMaskNonCanonical() {
         let mismatches = Mismatches("storeMask with masks from arbitrary vectors")
         let maskInputs = Inputs.nonCanonicalMasks(H.Mask.self, seed: 0x1416_9B8F_8B1E_7278)
@@ -146,6 +165,66 @@ extension SIMDInt64ReferenceTests {
                 unsafe H.appendMask(mask, toUnchecked: &output)
             }
             let (_, referenceLanes) = withOutputSpan(capacity: (H.laneCount + 7) / 8) { output in
+                H.appendMask(mask, to: &output)
+            }
+            mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeMaskUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeMask unchecked span on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC7AE_437C_D835_1BDE)
+        let sentinel = Inputs.sentinel(UInt8.self, count: (H.laneCount + 7) / 8 + 4)
+        for mask in maskInputs {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: (H.laneCount + 7) / 8
+                        )
+                    )
+                    return unsafe H.storeMask(mask, toUnchecked: &span)
+                })()
+            }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: (H.laneCount + 7) / 8
+                        )
+                    )
+                    return H.storeMask(mask, to: &span)
+                })()
+            }
+            mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
+            mismatches.check(portResult, referenceResult, "mask: \(describe(mask))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeMaskUncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("storeMask unchecked output span on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x4B48_26C2_CA7E_1C7F)
+        for mask in maskInputs {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: (H.laneCount + 7) / 8,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.appendMask(mask, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: (H.laneCount + 7) / 8,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
                 H.appendMask(mask, to: &output)
             }
             mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")

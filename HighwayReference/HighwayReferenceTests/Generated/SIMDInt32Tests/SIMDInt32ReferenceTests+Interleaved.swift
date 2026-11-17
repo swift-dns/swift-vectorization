@@ -50,6 +50,31 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadInterleaved2Misaligned() {
+        let mismatches = Mismatches("loadInterleaved2 on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x6B05_534E_FBB3_6EAB
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI32())
+            var r1 = H(raw: HighwayReference.zeroI32())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                unsafe H.loadInterleaved2(from: source, &p0, &p1)
+                unsafe HighwayReference.loadInterleaved2I32(source, &r0.raw, &r1.raw)
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+        }
+        mismatches.record()
+    }
+
     @Test func loadInterleaved2UncheckedSpan() {
         let mismatches = Mismatches("loadInterleaved2 unchecked span")
         let fromInputs = Inputs.buffers(
@@ -69,6 +94,41 @@ extension SIMDInt32ReferenceTests {
                 })()
                 ({
                     let span = unsafe Span(_unsafeElements: source)
+                    return H.loadInterleaved2(from: span, &r0, &r1)
+                })()
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadInterleaved2UncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadInterleaved2 unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 2 * H.laneCount,
+            seed: 0x928A_281A_B3E3_0CD5
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI32())
+            var r1 = H(raw: HighwayReference.zeroI32())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                ({
+                    let span = unsafe Span(
+                        _unsafeElements: UnsafeBufferPointer(start: source, count: 2 * H.laneCount)
+                    )
+                    return unsafe H.loadInterleaved2(fromUnchecked: span, &p0, &p1)
+                })()
+                ({
+                    let span = unsafe Span(
+                        _unsafeElements: UnsafeBufferPointer(start: source, count: 2 * H.laneCount)
+                    )
                     return H.loadInterleaved2(from: span, &r0, &r1)
                 })()
             }
@@ -133,6 +193,34 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadInterleaved3Misaligned() {
+        let mismatches = Mismatches("loadInterleaved3 on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 3 * H.laneCount,
+            seed: 0x64B4_6F7E_D323_94F0
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var p2 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI32())
+            var r1 = H(raw: HighwayReference.zeroI32())
+            var r2 = H(raw: HighwayReference.zeroI32())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                unsafe H.loadInterleaved3(from: source, &p0, &p1, &p2)
+                unsafe HighwayReference.loadInterleaved3I32(source, &r0.raw, &r1.raw, &r2.raw)
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+        }
+        mismatches.record()
+    }
+
     @Test func loadInterleaved3UncheckedSpan() {
         let mismatches = Mismatches("loadInterleaved3 unchecked span")
         let fromInputs = Inputs.buffers(
@@ -154,6 +242,44 @@ extension SIMDInt32ReferenceTests {
                 })()
                 ({
                     let span = unsafe Span(_unsafeElements: source)
+                    return H.loadInterleaved3(from: span, &r0, &r1, &r2)
+                })()
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadInterleaved3UncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadInterleaved3 unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 3 * H.laneCount,
+            seed: 0x7D73_C23E_DF83_BAE0
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var p2 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI32())
+            var r1 = H(raw: HighwayReference.zeroI32())
+            var r2 = H(raw: HighwayReference.zeroI32())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                ({
+                    let span = unsafe Span(
+                        _unsafeElements: UnsafeBufferPointer(start: source, count: 3 * H.laneCount)
+                    )
+                    return unsafe H.loadInterleaved3(fromUnchecked: span, &p0, &p1, &p2)
+                })()
+                ({
+                    let span = unsafe Span(
+                        _unsafeElements: UnsafeBufferPointer(start: source, count: 3 * H.laneCount)
+                    )
                     return H.loadInterleaved3(from: span, &r0, &r1, &r2)
                 })()
             }
@@ -232,6 +358,43 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadInterleaved4Misaligned() {
+        let mismatches = Mismatches("loadInterleaved4 on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 4 * H.laneCount,
+            seed: 0x1577_C8F3_3F56_3591
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var p2 = H.zero()
+            var p3 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI32())
+            var r1 = H(raw: HighwayReference.zeroI32())
+            var r2 = H(raw: HighwayReference.zeroI32())
+            var r3 = H(raw: HighwayReference.zeroI32())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                unsafe H.loadInterleaved4(from: source, &p0, &p1, &p2, &p3)
+                unsafe HighwayReference.loadInterleaved4I32(
+                    source,
+                    &r0.raw,
+                    &r1.raw,
+                    &r2.raw,
+                    &r3.raw
+                )
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+            mismatches.check(p3, r3, "from: \(describe(from)), v3")
+        }
+        mismatches.record()
+    }
+
     @Test func loadInterleaved4UncheckedSpan() {
         let mismatches = Mismatches("loadInterleaved4 unchecked span")
         let fromInputs = Inputs.buffers(
@@ -255,6 +418,47 @@ extension SIMDInt32ReferenceTests {
                 })()
                 ({
                     let span = unsafe Span(_unsafeElements: source)
+                    return H.loadInterleaved4(from: span, &r0, &r1, &r2, &r3)
+                })()
+            }
+            mismatches.check(p0, r0, "from: \(describe(from)), v0")
+            mismatches.check(p1, r1, "from: \(describe(from)), v1")
+            mismatches.check(p2, r2, "from: \(describe(from)), v2")
+            mismatches.check(p3, r3, "from: \(describe(from)), v3")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadInterleaved4UncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadInterleaved4 unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 4 * H.laneCount,
+            seed: 0x3A6F_AD40_FB60_8CE7
+        )
+        for from in fromInputs {
+            var p0 = H.zero()
+            var p1 = H.zero()
+            var p2 = H.zero()
+            var p3 = H.zero()
+            var r0 = H(raw: HighwayReference.zeroI32())
+            var r1 = H(raw: HighwayReference.zeroI32())
+            var r2 = H(raw: HighwayReference.zeroI32())
+            var r3 = H(raw: HighwayReference.zeroI32())
+            _ = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                ({
+                    let span = unsafe Span(
+                        _unsafeElements: UnsafeBufferPointer(start: source, count: 4 * H.laneCount)
+                    )
+                    return unsafe H.loadInterleaved4(fromUnchecked: span, &p0, &p1, &p2, &p3)
+                })()
+                ({
+                    let span = unsafe Span(
+                        _unsafeElements: UnsafeBufferPointer(start: source, count: 4 * H.laneCount)
+                    )
                     return H.loadInterleaved4(from: span, &r0, &r1, &r2, &r3)
                 })()
             }
@@ -302,6 +506,27 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved2Misaligned() {
+        let mismatches = Mismatches("storeInterleaved2 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xEF76_31EB_0A84_56DE)
+        let bInputs = Inputs.vectors(H.self, seed: 0xEF76_32EB_0A84_5891)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeInterleaved2(a, b, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe HighwayReference.storeInterleaved2I32(a.raw, b.raw, destination)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved2UncheckedSpan() {
         let mismatches = Mismatches("storeInterleaved2 unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0x2305_647E_E2BD_7493)
@@ -336,6 +561,67 @@ extension SIMDInt32ReferenceTests {
                 unsafe H.appendInterleaved2(a, b, toUnchecked: &output)
             }
             let (_, referenceLanes) = withOutputSpan(capacity: 2 * H.laneCount) { output in
+                H.appendInterleaved2(a, b, to: &output)
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved2UncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeInterleaved2 unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x2716_CDA7_2211_9DAA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x2716_CEA7_2211_9F5D)
+        let sentinel = Inputs.sentinel(Lane.self, count: 2 * H.laneCount + 4)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: 2 * H.laneCount
+                        )
+                    )
+                    return unsafe H.storeInterleaved2(a, b, toUnchecked: &span)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: 2 * H.laneCount
+                        )
+                    )
+                    return H.storeInterleaved2(a, b, to: &span)
+                })()
+            }
+            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved2UncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("storeInterleaved2 unchecked output span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x10BE_8917_6A2C_96A3)
+        let bInputs = Inputs.vectors(H.self, seed: 0x10BE_8817_6A2C_94F0)
+        for (a, b) in everyPair(aInputs, bInputs) {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: 2 * H.laneCount,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.appendInterleaved2(a, b, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: 2 * H.laneCount,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
                 H.appendInterleaved2(a, b, to: &output)
             }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), b: \(describe(b))")
@@ -394,6 +680,32 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved3Misaligned() {
+        let mismatches = Mismatches("storeInterleaved3 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xF117_409B_A102_7019)
+        let bInputs = Inputs.vectors(H.self, seed: 0xF117_3F9B_A102_6E66)
+        let cInputs = Inputs.vectors(H.self, seed: 0xF117_3E9B_A102_6CB3)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x4E84_55E2_9CA0_7F53) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeInterleaved3(a, b, c, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe HighwayReference.storeInterleaved3I32(a.raw, b.raw, c.raw, destination)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved3UncheckedSpan() {
         let mismatches = Mismatches("storeInterleaved3 unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0x03A5_CDE0_D9DE_E096)
@@ -434,6 +746,77 @@ extension SIMDInt32ReferenceTests {
                 unsafe H.appendInterleaved3(a, b, c, toUnchecked: &output)
             }
             let (_, referenceLanes) = withOutputSpan(capacity: 3 * H.laneCount) { output in
+                H.appendInterleaved3(a, b, c, to: &output)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved3UncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeInterleaved3 unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xC0BD_F09A_9727_F41F)
+        let bInputs = Inputs.vectors(H.self, seed: 0xC0BD_EF9A_9727_F26C)
+        let cInputs = Inputs.vectors(H.self, seed: 0xC0BD_F29A_9727_F785)
+        let sentinel = Inputs.sentinel(Lane.self, count: 3 * H.laneCount + 4)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x36BC_52E3_DD20_AD39) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: 3 * H.laneCount
+                        )
+                    )
+                    return unsafe H.storeInterleaved3(a, b, c, toUnchecked: &span)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: 3 * H.laneCount
+                        )
+                    )
+                    return H.storeInterleaved3(a, b, c, to: &span)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved3UncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("storeInterleaved3 unchecked output span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x6307_84A5_5555_DAEA)
+        let bInputs = Inputs.vectors(H.self, seed: 0x6307_85A5_5555_DC9D)
+        let cInputs = Inputs.vectors(H.self, seed: 0x6307_82A5_5555_D784)
+        for (a, b, c) in mixedTriples(aInputs, bInputs, cInputs, seed: 0x53DE_BEC6_AC98_132E) {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: 3 * H.laneCount,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.appendInterleaved3(a, b, c, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: 3 * H.laneCount,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
                 H.appendInterleaved3(a, b, c, to: &output)
             }
             mismatches.check(
@@ -517,6 +900,45 @@ extension SIMDInt32ReferenceTests {
         mismatches.record()
     }
 
+    @Test func storeInterleaved4Misaligned() {
+        let mismatches = Mismatches("storeInterleaved4 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x5CF1_4BAA_5CE8_D3B8)
+        let bInputs = Inputs.vectors(H.self, seed: 0x5CF1_4CAA_5CE8_D56B)
+        let cInputs = Inputs.vectors(H.self, seed: 0x5CF1_4DAA_5CE8_D71E)
+        let dInputs = Inputs.vectors(H.self, seed: 0x5CF1_4EAA_5CE8_D8D1)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
+        for (a, b, c, d) in mixedQuadruples(
+            aInputs,
+            bInputs,
+            cInputs,
+            dInputs,
+            seed: 0xF71D_BF5B_91BE_58F4
+        ) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe H.storeInterleaved4(a, b, c, d, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                unsafe HighwayReference.storeInterleaved4I32(
+                    a.raw,
+                    b.raw,
+                    c.raw,
+                    d.raw,
+                    destination
+                )
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c)), d: \(describe(d))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func storeInterleaved4UncheckedSpan() {
         let mismatches = Mismatches("storeInterleaved4 unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0x6A14_C1E9_A991_E435)
@@ -571,6 +993,91 @@ extension SIMDInt32ReferenceTests {
                 unsafe H.appendInterleaved4(a, b, c, d, toUnchecked: &output)
             }
             let (_, referenceLanes) = withOutputSpan(capacity: 4 * H.laneCount) { output in
+                H.appendInterleaved4(a, b, c, d, to: &output)
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c)), d: \(describe(d))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved4UncheckedSpanMisaligned() {
+        let mismatches = Mismatches("storeInterleaved4 unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x56BA_98D4_9DD7_5338)
+        let bInputs = Inputs.vectors(H.self, seed: 0x56BA_99D4_9DD7_54EB)
+        let cInputs = Inputs.vectors(H.self, seed: 0x56BA_9AD4_9DD7_569E)
+        let dInputs = Inputs.vectors(H.self, seed: 0x56BA_9BD4_9DD7_5851)
+        let sentinel = Inputs.sentinel(Lane.self, count: 4 * H.laneCount + 4)
+        for (a, b, c, d) in mixedQuadruples(
+            aInputs,
+            bInputs,
+            cInputs,
+            dInputs,
+            seed: 0x1CD1_5E7A_43DC_D374
+        ) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: 4 * H.laneCount
+                        )
+                    )
+                    return unsafe H.storeInterleaved4(a, b, c, d, toUnchecked: &span)
+                })()
+            }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in
+                ({
+                    var span = unsafe MutableSpan(
+                        _unsafeElements: UnsafeMutableBufferPointer(
+                            start: destination,
+                            count: 4 * H.laneCount
+                        )
+                    )
+                    return H.storeInterleaved4(a, b, c, d, to: &span)
+                })()
+            }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), b: \(describe(b)), c: \(describe(c)), d: \(describe(d))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func storeInterleaved4UncheckedOutputSpanMisaligned() {
+        let mismatches = Mismatches("storeInterleaved4 unchecked output span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xFD9C_1B6E_D1A2_D3B5)
+        let bInputs = Inputs.vectors(H.self, seed: 0xFD9C_1A6E_D1A2_D202)
+        let cInputs = Inputs.vectors(H.self, seed: 0xFD9C_196E_D1A2_D04F)
+        let dInputs = Inputs.vectors(H.self, seed: 0xFD9C_186E_D1A2_CE9C)
+        for (a, b, c, d) in mixedQuadruples(
+            aInputs,
+            bInputs,
+            cInputs,
+            dInputs,
+            seed: 0x2593_D68E_E5DC_6867
+        ) {
+            let (_, portLanes) = withMisalignedOutputSpan(
+                capacity: 4 * H.laneCount,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
+                unsafe H.appendInterleaved4(a, b, c, d, toUnchecked: &output)
+            }
+            let (_, referenceLanes) = withMisalignedOutputSpan(
+                capacity: 4 * H.laneCount,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { output in
                 H.appendInterleaved4(a, b, c, d, to: &output)
             }
             mismatches.check(

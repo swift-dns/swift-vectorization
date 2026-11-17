@@ -57,6 +57,34 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherMisaligned() {
+        let mismatches = Mismatches("portGatherU32 on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD91F_C1CC_1159_139F)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xD91F_C0CC_1159_11EC,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherU32(from: source, indices: indices),
+                    unsafe highwayGatherU32(from: source, indices: indices)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherConstantIndices() {
         let mismatches = Mismatches("portGatherU32ConstantIndices")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x207C_4622_3DFF_BC89)
@@ -77,6 +105,24 @@ extension SIMDUInt32CodegenTests {
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE8E4_7822_4D9B_3626)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherU32ConstantIndices(from: source),
+                    unsafe highwayGatherU32ConstantIndices(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherConstantIndicesMisaligned() {
+        let mismatches = Mismatches("portGatherU32ConstantIndices on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x7263_6B95_2CBB_122C)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherU32ConstantIndices(from: source),
                     unsafe highwayGatherU32ConstantIndices(from: source)
@@ -143,6 +189,34 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherByteOffsetsMisaligned() {
+        let mismatches = Mismatches("portGatherByteOffsetsU32 on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x101F_1BB4_54F8_1EBF)
+        let byteOffsetsInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
+            seed: 0x101F_1AB4_54F8_1D0C,
+            inContract: true
+        )
+        for (from, byteOffsets) in everyPair(fromInputs, byteOffsetsInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherByteOffsetsU32(from: source, byteOffsets: byteOffsets),
+                    unsafe highwayGatherByteOffsetsU32(from: source, byteOffsets: byteOffsets)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), byteOffsets: \(describe(byteOffsets))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherByteOffsetsConstantByteOffsets() {
         let mismatches = Mismatches("portGatherByteOffsetsU32ConstantByteOffsets")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD5E1_6F86_2E11_C0FE)
@@ -165,6 +239,26 @@ extension SIMDUInt32CodegenTests {
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE603_9018_7D22_5D4F)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherByteOffsetsU32ConstantByteOffsets(from: source),
+                    unsafe highwayGatherByteOffsetsU32ConstantByteOffsets(from: source)
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherByteOffsetsConstantByteOffsetsMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherByteOffsetsU32ConstantByteOffsets on misaligned memory"
+        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC0B3_A95A_8C26_9677)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherByteOffsetsU32ConstantByteOffsets(from: source),
                     unsafe highwayGatherByteOffsetsU32ConstantByteOffsets(from: source)
@@ -247,6 +341,41 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstMisaligned() {
+        let mismatches = Mismatches("portGatherFirstU32 on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x47BA_52E4_4959_055B)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x47BA_51E4_4959_03A8,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (from, indices, count) in mixedTriples(
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0x0B91_E780_0106_2CFD
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherFirstU32(from: source, indices: indices, count: count),
+                    unsafe highwayGatherFirstU32(from: source, indices: indices, count: count)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherFirstConstantIndices() {
         let mismatches = Mismatches("portGatherFirstU32ConstantIndices")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x233B_BC9C_8F8B_DDBD)
@@ -279,6 +408,29 @@ extension SIMDUInt32CodegenTests {
         let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
         for (from, count) in everyPair(fromInputs, countInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherFirstU32ConstantIndices(from: source, count: count),
+                    unsafe highwayGatherFirstU32ConstantIndices(from: source, count: count)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstConstantIndicesMisaligned() {
+        let mismatches = Mismatches("portGatherFirstU32ConstantIndices on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x0157_7159_A11F_D430)
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (from, count) in everyPair(fromInputs, countInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherFirstU32ConstantIndices(from: source, count: count),
                     unsafe highwayGatherFirstU32ConstantIndices(from: source, count: count)
@@ -349,6 +501,34 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstConstantCountMisaligned() {
+        let mismatches = Mismatches("portGatherFirstU32ConstantCount on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xEF94_DC5F_03B6_4582)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xEF94_DD5F_03B6_4735,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherFirstU32ConstantCount(from: source, indices: indices),
+                    unsafe highwayGatherFirstU32ConstantCount(from: source, indices: indices)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherFirstConstantCountTwo() {
         let mismatches = Mismatches("portGatherFirstU32ConstantCountTwo")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD0DC_57A2_5E69_3E31)
@@ -391,6 +571,34 @@ extension SIMDUInt32CodegenTests {
         )
         for (from, indices) in everyPair(fromInputs, indicesInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherFirstU32ConstantCountTwo(from: source, indices: indices),
+                    unsafe highwayGatherFirstU32ConstantCountTwo(from: source, indices: indices)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstConstantCountTwoMisaligned() {
+        let mismatches = Mismatches("portGatherFirstU32ConstantCountTwo on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDA05_5906_59E7_6AE4)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xDA05_5A06_59E7_6C97,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherFirstU32ConstantCountTwo(from: source, indices: indices),
                     unsafe highwayGatherFirstU32ConstantCountTwo(from: source, indices: indices)
@@ -464,6 +672,37 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstConstantCountLaneCountMisaligned() {
+        let mismatches = Mismatches("portGatherFirstU32ConstantCountLaneCount on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x0A7C_D964_EF6C_E913)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x0A7C_D864_EF6C_E760,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherFirstU32ConstantCountLaneCount(from: source, indices: indices),
+                    unsafe highwayGatherFirstU32ConstantCountLaneCount(
+                        from: source,
+                        indices: indices
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherFirstConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portGatherFirstU32ConstantCountTwiceLaneCount")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xA29B_0006_CE8C_5FAE)
@@ -508,6 +747,42 @@ extension SIMDUInt32CodegenTests {
         )
         for (from, indices) in everyPair(fromInputs, indicesInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherFirstU32ConstantCountTwiceLaneCount(
+                        from: source,
+                        indices: indices
+                    ),
+                    unsafe highwayGatherFirstU32ConstantCountTwiceLaneCount(
+                        from: source,
+                        indices: indices
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstConstantCountTwiceLaneCountMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherFirstU32ConstantCountTwiceLaneCount on misaligned memory"
+        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xDC95_FD23_ADB5_2147)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xDC95_FC23_ADB5_1F94,
+            inContract: true
+        )
+        for (from, indices) in everyPair(fromInputs, indicesInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherFirstU32ConstantCountTwiceLaneCount(
                         from: source,
@@ -616,6 +891,53 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstOtherwiseMisaligned() {
+        let mismatches = Mismatches("portGatherFirstOtherwiseU32 on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xC41B_E296_5F43_4473)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC41B_E196_5F43_42C0)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xC41B_E496_5F43_47D9,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, indices, count) in mixedQuadruples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0xD149_ABFB_ECB3_33B5
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherFirstOtherwiseU32(
+                        from: source,
+                        indices: indices,
+                        count: count,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayGatherFirstOtherwiseU32(
+                        from: source,
+                        indices: indices,
+                        count: count,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherFirstOtherwiseConstantIndices() {
         let mismatches = Mismatches("portGatherFirstOtherwiseU32ConstantIndices")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0x7F63_BA59_BD47_9EF5)
@@ -664,6 +986,45 @@ extension SIMDUInt32CodegenTests {
             seed: 0x3032_1017_1CAC_1166
         ) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherFirstOtherwiseU32ConstantIndices(
+                        from: source,
+                        count: count,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayGatherFirstOtherwiseU32ConstantIndices(
+                        from: source,
+                        count: count,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseConstantIndicesMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherFirstOtherwiseU32ConstantIndices on misaligned memory"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x90D5_833B_B252_50F8)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x90D5_843B_B252_52AB)
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, count) in mixedTriples(
+            otherwiseInputs,
+            fromInputs,
+            countInputs,
+            seed: 0x9F3C_9F07_3574_39B4
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherFirstOtherwiseU32ConstantIndices(
                         from: source,
@@ -742,6 +1103,48 @@ extension SIMDUInt32CodegenTests {
             seed: 0xD17E_B20E_E77E_1444
         ) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherFirstOtherwiseU32ConstantCount(
+                        from: source,
+                        indices: indices,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayGatherFirstOtherwiseU32ConstantCount(
+                        from: source,
+                        indices: indices,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseConstantCountMisaligned() {
+        let mismatches = Mismatches("portGatherFirstOtherwiseU32ConstantCount on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xD598_9B3C_639E_B77A)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD598_9C3C_639E_B92D)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xD598_993C_639E_B414,
+            inContract: true
+        )
+        for (otherwise, from, indices) in mixedTriples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0x4389_79DA_268F_AABE
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherFirstOtherwiseU32ConstantCount(
                         from: source,
@@ -846,6 +1249,51 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstOtherwiseConstantOtherwiseMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherFirstOtherwiseU32ConstantOtherwise on misaligned memory"
+        )
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC84B_BE0E_43DF_BB78)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xC84B_C10E_43DF_C091,
+            inContract: true
+        )
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (from, indices, count) in mixedTriples(
+            fromInputs,
+            indicesInputs,
+            countInputs,
+            seed: 0xF7F1_8CE3_C2DE_730D
+        ) {
+            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherFirstOtherwiseU32ConstantOtherwise(
+                        from: source,
+                        indices: indices,
+                        count: count
+                    ),
+                    unsafe highwayGatherFirstOtherwiseU32ConstantOtherwise(
+                        from: source,
+                        indices: indices,
+                        count: count
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), indices: \(describe(indices)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherFirstOtherwiseConstantCountTwo() {
         let mismatches = Mismatches("portGatherFirstOtherwiseU32ConstantCountTwo")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0x656F_8EB4_FAEE_AAD9)
@@ -904,6 +1352,50 @@ extension SIMDUInt32CodegenTests {
             seed: 0x66E4_501E_8429_7652
         ) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherFirstOtherwiseU32ConstantCountTwo(
+                        from: source,
+                        indices: indices,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayGatherFirstOtherwiseU32ConstantCountTwo(
+                        from: source,
+                        indices: indices,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseConstantCountTwoMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherFirstOtherwiseU32ConstantCountTwo on misaligned memory"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x1427_245D_6B07_C15C)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1427_255D_6B07_C30F)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x1427_265D_6B07_C4C2,
+            inContract: true
+        )
+        for (otherwise, from, indices) in mixedTriples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0xB126_1A8D_7CAC_F6B0
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherFirstOtherwiseU32ConstantCountTwo(
                         from: source,
@@ -1006,6 +1498,50 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherFirstOtherwiseConstantCountLaneCountMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherFirstOtherwiseU32ConstantCountLaneCount on misaligned memory"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xC4BC_A6CC_1B7A_E29B)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC4BC_A5CC_1B7A_E0E8)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xC4BC_A8CC_1B7A_E601,
+            inContract: true
+        )
+        for (otherwise, from, indices) in mixedTriples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0xE74D_17F4_519E_64BD
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherFirstOtherwiseU32ConstantCountLaneCount(
+                        from: source,
+                        indices: indices,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayGatherFirstOtherwiseU32ConstantCountLaneCount(
+                        from: source,
+                        indices: indices,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherFirstOtherwiseConstantCountTwiceLaneCount() {
         let mismatches = Mismatches("portGatherFirstOtherwiseU32ConstantCountTwiceLaneCount")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0x3EAE_12D5_143E_9EA6)
@@ -1064,6 +1600,50 @@ extension SIMDUInt32CodegenTests {
             seed: 0xFCA7_2AB4_621D_A5D1
         ) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherFirstOtherwiseU32ConstantCountTwiceLaneCount(
+                        from: source,
+                        indices: indices,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayGatherFirstOtherwiseU32ConstantCountTwiceLaneCount(
+                        from: source,
+                        indices: indices,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherFirstOtherwiseConstantCountTwiceLaneCountMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherFirstOtherwiseU32ConstantCountTwiceLaneCount on misaligned memory"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x14E3_F297_1D04_558F)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x14E3_F197_1D04_53DC)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x14E3_F497_1D04_58F5,
+            inContract: true
+        )
+        for (otherwise, from, indices) in mixedTriples(
+            otherwiseInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0xD7EA_CD00_ECBB_81E9
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherFirstOtherwiseU32ConstantCountTwiceLaneCount(
                         from: source,
@@ -1158,6 +1738,41 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherWhereMisaligned() {
+        let mismatches = Mismatches("portGatherWhereU32 on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x48AC_834E_B16F_EB02)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x48AC_844E_B16F_ECB5)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x48AC_814E_B16F_E79C,
+            inContract: true
+        )
+        for (mask, from, indices) in mixedTriples(
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0x4AFA_B00C_65EE_5FC6
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherWhereU32(from: source, indices: indices, where: mask),
+                    unsafe highwayGatherWhereU32(from: source, indices: indices, where: mask)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherWhereConstantIndices() {
         let mismatches = Mismatches("portGatherWhereU32ConstantIndices")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0x942B_4A0C_30C1_3E0A)
@@ -1190,6 +1805,29 @@ extension SIMDUInt32CodegenTests {
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC73F_F2D3_D371_AF38)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherWhereU32ConstantIndices(from: source, where: mask),
+                    unsafe highwayGatherWhereU32ConstantIndices(from: source, where: mask)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherWhereConstantIndicesMisaligned() {
+        let mismatches = Mismatches("portGatherWhereU32ConstantIndices on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x8ED3_D4D4_D03D_D953)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x8ED3_D3D4_D03D_D7A0)
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherWhereU32ConstantIndices(from: source, where: mask),
                     unsafe highwayGatherWhereU32ConstantIndices(from: source, where: mask)
@@ -1292,6 +1930,53 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherWhereOtherwiseMisaligned() {
+        let mismatches = Mismatches("portGatherWhereOtherwiseU32 on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0x1FBD_4B76_4FE8_1BDC)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x1FBD_4C76_4FE8_1D8F)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1FBD_4D76_4FE8_1F42)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x1FBD_4E76_4FE8_20F5,
+            inContract: true
+        )
+        for (otherwise, mask, from, indices) in mixedQuadruples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0xA866_D81A_82A5_DA30
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherWhereOtherwiseU32(
+                        from: source,
+                        indices: indices,
+                        where: mask,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayGatherWhereOtherwiseU32(
+                        from: source,
+                        indices: indices,
+                        where: mask,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func gatherWhereOtherwiseConstantIndices() {
         let mismatches = Mismatches("portGatherWhereOtherwiseU32ConstantIndices")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0x54D8_6189_D8C7_3AC4)
@@ -1340,6 +2025,45 @@ extension SIMDUInt32CodegenTests {
             seed: 0x8114_FB35_D959_2EAF
         ) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portGatherWhereOtherwiseU32ConstantIndices(
+                        from: source,
+                        where: mask,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayGatherWhereOtherwiseU32ConstantIndices(
+                        from: source,
+                        where: mask,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func gatherWhereOtherwiseConstantIndicesMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherWhereOtherwiseU32ConstantIndices on misaligned memory"
+        )
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xF583_83EB_E9E9_2081)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xF583_82EB_E9E9_1ECE)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xF583_81EB_E9E9_1D1B)
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0x0155_5BA5_93A5_927B
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portGatherWhereOtherwiseU32ConstantIndices(
                         from: source,
@@ -1444,6 +2168,51 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func gatherWhereOtherwiseConstantOtherwiseMisaligned() {
+        let mismatches = Mismatches(
+            "portGatherWhereOtherwiseU32ConstantOtherwise on misaligned memory"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5211_E56F_A79D_D25D)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x5211_E26F_A79D_CD44)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x5211_E36F_A79D_CEF7,
+            inContract: true
+        )
+        for (mask, from, indices) in mixedTriples(
+            maskInputs,
+            fromInputs,
+            indicesInputs,
+            seed: 0x637B_5103_A463_FC6E
+        ) {
+            let indices = poisoned(indices, where: mask, with: H.laneCount)
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portGatherWhereOtherwiseU32ConstantOtherwise(
+                        from: source,
+                        indices: indices,
+                        where: mask
+                    ),
+                    unsafe highwayGatherWhereOtherwiseU32ConstantOtherwise(
+                        from: source,
+                        indices: indices,
+                        where: mask
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func scatter() {
         let mismatches = Mismatches("portScatterU32")
         let aInputs = Inputs.vectors(H.self, seed: 0x5FAF_85F4_4E03_EECF)
@@ -1498,6 +2267,34 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func scatterMisaligned() {
+        let mismatches = Mismatches("portScatterU32 on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x22A5_24BF_CE33_3306)
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0x22A5_25BF_CE33_34B9,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for (a, indices) in everyPair(aInputs, indicesInputs) {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portScatterU32(a, to: destination, indices: indices) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayScatterU32(a, to: destination, indices: indices) }
+            mismatches.check(
+                portLanes,
+                referenceLanes,
+                "a: \(describe(a)), indices: \(describe(indices))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func scatterConstantA() {
         let mismatches = Mismatches("portScatterU32ConstantA")
         let indicesInputs = Inputs.tableIndices(
@@ -1542,6 +2339,30 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func scatterConstantAMisaligned() {
+        let mismatches = Mismatches("portScatterU32ConstantA on misaligned memory")
+        let indicesInputs = Inputs.tableIndices(
+            SIMD<Int32>.self,
+            count: H.laneCount,
+            seed: 0xBD96_095F_4829_B8C2,
+            inContract: true
+        )
+        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
+        for indices in indicesInputs {
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portScatterU32ConstantA(to: destination, indices: indices) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayScatterU32ConstantA(to: destination, indices: indices)
+            }
+            mismatches.check(portLanes, referenceLanes, "indices: \(describe(indices))")
+        }
+        mismatches.record()
+    }
+
     @Test func scatterConstantIndices() {
         let mismatches = Mismatches("portScatterU32ConstantIndices")
         let aInputs = Inputs.vectors(H.self, seed: 0x5DD0_34F2_3D83_8986)
@@ -1576,810 +2397,20 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
-    @Test func scatterByteOffsets() {
-        let mismatches = Mismatches("portScatterByteOffsetsU32")
-        let aInputs = Inputs.vectors(H.self, seed: 0x4E6E_A77D_51C6_8035)
-        let byteOffsetsInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
-            seed: 0x4E6E_A67D_51C6_7E82,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterByteOffsetsU32(
-                    a,
-                    to: destination.baseAddress!,
-                    byteOffsets: byteOffsets
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterByteOffsetsU32(
-                    a,
-                    to: destination.baseAddress!,
-                    byteOffsets: byteOffsets
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), byteOffsets: \(describe(byteOffsets))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterByteOffsetsBeforeGuardPage() {
-        let mismatches = Mismatches("portScatterByteOffsetsU32 before a guard page")
-        let aInputs = Inputs.vectors(H.self, seed: 0x8361_E4E3_65E4_7062)
-        let byteOffsetsInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
-            seed: 0x8361_E5E3_65E4_7215,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, byteOffsets) in everyPair(aInputs, byteOffsetsInputs) {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterByteOffsetsU32(a, to: destination, byteOffsets: byteOffsets)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterByteOffsetsU32(a, to: destination, byteOffsets: byteOffsets)
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), byteOffsets: \(describe(byteOffsets))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterByteOffsetsConstantA() {
-        let mismatches = Mismatches("portScatterByteOffsetsU32ConstantA")
-        let byteOffsetsInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
-            seed: 0x4596_EE54_0204_35D9,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for byteOffsets in byteOffsetsInputs {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterByteOffsetsU32ConstantA(
-                    to: destination.baseAddress!,
-                    byteOffsets: byteOffsets
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterByteOffsetsU32ConstantA(
-                    to: destination.baseAddress!,
-                    byteOffsets: byteOffsets
-                )
-            }
-            mismatches.check(portLanes, referenceLanes, "byteOffsets: \(describe(byteOffsets))")
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterByteOffsetsConstantABeforeGuardPage() {
-        let mismatches = Mismatches("portScatterByteOffsetsU32ConstantA before a guard page")
-        let byteOffsetsInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: (H.laneCount - 1) * MemoryLayout<Lane>.stride + 1,
-            seed: 0x20C0_B368_E645_3C24,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for byteOffsets in byteOffsetsInputs {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterByteOffsetsU32ConstantA(to: destination, byteOffsets: byteOffsets)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterByteOffsetsU32ConstantA(
-                    to: destination,
-                    byteOffsets: byteOffsets
-                )
-            }
-            mismatches.check(portLanes, referenceLanes, "byteOffsets: \(describe(byteOffsets))")
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterByteOffsetsConstantByteOffsets() {
-        let mismatches = Mismatches("portScatterByteOffsetsU32ConstantByteOffsets")
-        let aInputs = Inputs.vectors(H.self, seed: 0x5D76_2C3E_37B1_B20F)
+    @Test func scatterConstantIndicesMisaligned() {
+        let mismatches = Mismatches("portScatterU32ConstantIndices on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x3809_E462_1FE7_96AF)
         let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
         for a in aInputs {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterByteOffsetsU32ConstantByteOffsets(a, to: destination.baseAddress!)
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterByteOffsetsU32ConstantByteOffsets(
-                    a,
-                    to: destination.baseAddress!
-                )
-            }
+            let (_, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portScatterU32ConstantIndices(a, to: destination) }
+            let (_, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayScatterU32ConstantIndices(a, to: destination) }
             mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterByteOffsetsConstantByteOffsetsBeforeGuardPage() {
-        let mismatches = Mismatches(
-            "portScatterByteOffsetsU32ConstantByteOffsets before a guard page"
-        )
-        let aInputs = Inputs.vectors(H.self, seed: 0x446F_3030_C6E3_7D34)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for a in aInputs {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterByteOffsetsU32ConstantByteOffsets(a, to: destination)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterByteOffsetsU32ConstantByteOffsets(a, to: destination)
-            }
-            mismatches.check(portLanes, referenceLanes, "a: \(describe(a))")
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirst() {
-        let mismatches = Mismatches("portScatterFirstU32")
-        let aInputs = Inputs.vectors(H.self, seed: 0xB009_9527_F6D4_4051)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0xB009_9427_F6D4_3E9E,
-            inContract: true
-        )
-        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, indices, count) in mixedTriples(
-            aInputs,
-            indicesInputs,
-            countInputs,
-            seed: 0xFE31_98D1_D29B_F78B
-        ) {
-            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterFirstU32(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices,
-                    count: count
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterFirstU32(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices,
-                    count: count
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices)), count: \(count)"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstBeforeGuardPage() {
-        let mismatches = Mismatches("portScatterFirstU32 before a guard page")
-        let aInputs = Inputs.vectors(H.self, seed: 0x38EB_6A8A_D8E3_D9EE)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x38EB_6B8A_D8E3_DBA1,
-            inContract: true
-        )
-        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, indices, count) in mixedTriples(
-            aInputs,
-            indicesInputs,
-            countInputs,
-            seed: 0x74A6_32A4_A1D8_ACCA
-        ) {
-            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterFirstU32(a, to: destination, indices: indices, count: count)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterFirstU32(a, to: destination, indices: indices, count: count)
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices)), count: \(count)"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantA() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantA")
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0xF542_1DD2_6EEA_5145,
-            inContract: true
-        )
-        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (indices, count) in everyPair(indicesInputs, countInputs) {
-            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterFirstU32ConstantA(
-                    to: destination.baseAddress!,
-                    indices: indices,
-                    count: count
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterFirstU32ConstantA(
-                    to: destination.baseAddress!,
-                    indices: indices,
-                    count: count
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "indices: \(describe(indices)), count: \(count)"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantABeforeGuardPage() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantA before a guard page")
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x19F3_E9F3_A3FB_CC80,
-            inContract: true
-        )
-        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (indices, count) in everyPair(indicesInputs, countInputs) {
-            let indices = poisoned(indices, firstLanes: count, with: H.laneCount)
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterFirstU32ConstantA(to: destination, indices: indices, count: count)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterFirstU32ConstantA(
-                    to: destination,
-                    indices: indices,
-                    count: count
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "indices: \(describe(indices)), count: \(count)"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantIndices() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantIndices")
-        let aInputs = Inputs.vectors(H.self, seed: 0x5339_CF6F_271C_106C)
-        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, count) in everyPair(aInputs, countInputs) {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterFirstU32ConstantIndices(
-                    a,
-                    to: destination.baseAddress!,
-                    count: count
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterFirstU32ConstantIndices(
-                    a,
-                    to: destination.baseAddress!,
-                    count: count
-                )
-            }
-            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantIndicesBeforeGuardPage() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantIndices before a guard page")
-        let aInputs = Inputs.vectors(H.self, seed: 0x684A_7804_3C61_E4E5)
-        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, count) in everyPair(aInputs, countInputs) {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterFirstU32ConstantIndices(a, to: destination, count: count)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterFirstU32ConstantIndices(a, to: destination, count: count)
-            }
-            mismatches.check(portLanes, referenceLanes, "a: \(describe(a)), count: \(count)")
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantCount() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantCount")
-        let aInputs = Inputs.vectors(H.self, seed: 0xB48E_D414_95BE_A0A2)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0xB48E_D514_95BE_A255,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, indices) in everyPair(aInputs, indicesInputs) {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterFirstU32ConstantCount(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterFirstU32ConstantCount(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantCountBeforeGuardPage() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantCount before a guard page")
-        let aInputs = Inputs.vectors(H.self, seed: 0x3CF6_DE0C_AB01_6163)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x3CF6_DD0C_AB01_5FB0,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, indices) in everyPair(aInputs, indicesInputs) {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterFirstU32ConstantCount(a, to: destination, indices: indices)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterFirstU32ConstantCount(a, to: destination, indices: indices)
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantCountTwo() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantCountTwo")
-        let aInputs = Inputs.vectors(H.self, seed: 0xB4EE_48C3_8804_6F5E)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0xB4EE_49C3_8804_7111,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, indices) in everyPair(aInputs, indicesInputs) {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterFirstU32ConstantCountTwo(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterFirstU32ConstantCountTwo(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantCountTwoBeforeGuardPage() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantCountTwo before a guard page")
-        let aInputs = Inputs.vectors(H.self, seed: 0xDCDB_EB95_7B6E_5FEF)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0xDCDB_EA95_7B6E_5E3C,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, indices) in everyPair(aInputs, indicesInputs) {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterFirstU32ConstantCountTwo(a, to: destination, indices: indices)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterFirstU32ConstantCountTwo(a, to: destination, indices: indices)
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantCountLaneCount() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantCountLaneCount")
-        let aInputs = Inputs.vectors(H.self, seed: 0x5ECF_B49D_3479_2AB9)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x5ECF_B39D_3479_2906,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, indices) in everyPair(aInputs, indicesInputs) {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterFirstU32ConstantCountLaneCount(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterFirstU32ConstantCountLaneCount(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantCountLaneCountBeforeGuardPage() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantCountLaneCount before a guard page")
-        let aInputs = Inputs.vectors(H.self, seed: 0xC7AC_CC11_736A_BCF6)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0xC7AC_CD11_736A_BEA9,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, indices) in everyPair(aInputs, indicesInputs) {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterFirstU32ConstantCountLaneCount(
-                    a,
-                    to: destination,
-                    indices: indices
-                )
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterFirstU32ConstantCountLaneCount(
-                    a,
-                    to: destination,
-                    indices: indices
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantCountTwiceLaneCount() {
-        let mismatches = Mismatches("portScatterFirstU32ConstantCountTwiceLaneCount")
-        let aInputs = Inputs.vectors(H.self, seed: 0x6CBE_FC4D_D638_6FE7)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x6CBE_FB4D_D638_6E34,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, indices) in everyPair(aInputs, indicesInputs) {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterFirstU32ConstantCountTwiceLaneCount(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterFirstU32ConstantCountTwiceLaneCount(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterFirstConstantCountTwiceLaneCountBeforeGuardPage() {
-        let mismatches = Mismatches(
-            "portScatterFirstU32ConstantCountTwiceLaneCount before a guard page"
-        )
-        let aInputs = Inputs.vectors(H.self, seed: 0x3A0B_51A7_E15A_00EC)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x3A0B_52A7_E15A_029F,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, indices) in everyPair(aInputs, indicesInputs) {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterFirstU32ConstantCountTwiceLaneCount(
-                    a,
-                    to: destination,
-                    indices: indices
-                )
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterFirstU32ConstantCountTwiceLaneCount(
-                    a,
-                    to: destination,
-                    indices: indices
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterWhere() {
-        let mismatches = Mismatches("portScatterWhereU32")
-        let aInputs = Inputs.vectors(H.self, seed: 0x5D17_364F_9222_48DC)
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x5D17_374F_9222_4A8F)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x5D17_384F_9222_4C42,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, mask, indices) in mixedTriples(
-            aInputs,
-            maskInputs,
-            indicesInputs,
-            seed: 0xBB66_E7DB_BCBF_C930
-        ) {
-            let indices = poisoned(indices, where: mask, with: H.laneCount)
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterWhereU32(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices,
-                    where: mask
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterWhereU32(
-                    a,
-                    to: destination.baseAddress!,
-                    indices: indices,
-                    where: mask
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), mask: \(describe(mask)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterWhereBeforeGuardPage() {
-        let mismatches = Mismatches("portScatterWhereU32 before a guard page")
-        let aInputs = Inputs.vectors(H.self, seed: 0x6E63_D063_F42A_9935)
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6E63_CF63_F42A_9782)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x6E63_CE63_F42A_95CF,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, mask, indices) in mixedTriples(
-            aInputs,
-            maskInputs,
-            indicesInputs,
-            seed: 0x6357_CEBA_499C_E4E7
-        ) {
-            let indices = poisoned(indices, where: mask, with: H.laneCount)
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterWhereU32(a, to: destination, indices: indices, where: mask)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterWhereU32(a, to: destination, indices: indices, where: mask)
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), mask: \(describe(mask)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterWhereConstantA() {
-        let mismatches = Mismatches("portScatterWhereU32ConstantA")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC43F_0CB9_B9DE_AFA2)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0xC43F_0BB9_B9DE_ADEF,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (mask, indices) in everyPair(maskInputs, indicesInputs) {
-            let indices = poisoned(indices, where: mask, with: H.laneCount)
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterWhereU32ConstantA(
-                    to: destination.baseAddress!,
-                    indices: indices,
-                    where: mask
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterWhereU32ConstantA(
-                    to: destination.baseAddress!,
-                    indices: indices,
-                    where: mask
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "mask: \(describe(mask)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterWhereConstantABeforeGuardPage() {
-        let mismatches = Mismatches("portScatterWhereU32ConstantA before a guard page")
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x2840_3CAF_AF2B_6C75)
-        let indicesInputs = Inputs.tableIndices(
-            SIMD<Int32>.self,
-            count: H.laneCount,
-            seed: 0x2840_39AF_AF2B_675C,
-            inContract: true
-        )
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (mask, indices) in everyPair(maskInputs, indicesInputs) {
-            let indices = poisoned(indices, where: mask, with: H.laneCount)
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterWhereU32ConstantA(to: destination, indices: indices, where: mask)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterWhereU32ConstantA(
-                    to: destination,
-                    indices: indices,
-                    where: mask
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "mask: \(describe(mask)), indices: \(describe(indices))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterWhereConstantIndices() {
-        let mismatches = Mismatches("portScatterWhereU32ConstantIndices")
-        let aInputs = Inputs.vectors(H.self, seed: 0x483B_45E5_9BF3_4493)
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x483B_44E5_9BF3_42E0)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount + 4)
-        for (a, mask) in everyPair(aInputs, maskInputs) {
-            var portLanes = sentinel
-            portLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe portScatterWhereU32ConstantIndices(
-                    a,
-                    to: destination.baseAddress!,
-                    where: mask
-                )
-            }
-            var referenceLanes = sentinel
-            referenceLanes.withUnsafeMutableBufferPointer { destination in
-                unsafe highwayScatterWhereU32ConstantIndices(
-                    a,
-                    to: destination.baseAddress!,
-                    where: mask
-                )
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), mask: \(describe(mask))"
-            )
-        }
-        mismatches.record()
-    }
-
-    @Test func scatterWhereConstantIndicesBeforeGuardPage() {
-        let mismatches = Mismatches("portScatterWhereU32ConstantIndices before a guard page")
-        let aInputs = Inputs.vectors(H.self, seed: 0x6B0B_B843_60F5_E9F8)
-        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6B0B_B943_60F5_EBAB)
-        let sentinel = Inputs.sentinel(Lane.self, count: H.laneCount)
-        for (a, mask) in everyPair(aInputs, maskInputs) {
-            let (_, portLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe portScatterWhereU32ConstantIndices(a, to: destination, where: mask)
-            }
-            let (_, referenceLanes) = unsafe withGuardedLanes(sentinel) { destination in
-                unsafe highwayScatterWhereU32ConstantIndices(a, to: destination, where: mask)
-            }
-            mismatches.check(
-                portLanes,
-                referenceLanes,
-                "a: \(describe(a)), mask: \(describe(mask))"
-            )
         }
         mismatches.record()
     }

@@ -458,6 +458,28 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadIndicesMisaligned() {
+        let mismatches = Mismatches("loadIndices on misaligned memory")
+        let fromInputs = Inputs.indexBuffers(
+            UInt16.self,
+            lanes: H.laneCount,
+            seed: 0x4F5F_98E5_D648_556F
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.loadIndices(from: source),
+                    unsafe H.Indices(raw: HighwayReference.loadIndicesU16(source))
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadIndicesUncheckedSpan() {
         let mismatches = Mismatches("loadIndices unchecked span")
         let fromInputs = Inputs.indexBuffers(
@@ -478,6 +500,38 @@ extension SIMDUInt16ReferenceTests {
                     })()
                 )
             }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadIndicesUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadIndices unchecked span on misaligned memory")
+        let fromInputs = Inputs.indexBuffers(
+            UInt16.self,
+            lanes: H.laneCount,
+            seed: 0x4142_7CCF_96D7_2511
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.loadIndices(fromUnchecked: span)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.loadIndices(from: span)
+                    })()
+                )
+            }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
         mismatches.record()

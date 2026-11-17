@@ -74,6 +74,29 @@ extension SIMDFloatCodegenTests {
         mismatches.record()
     }
 
+    @Test func loadExpandedWhereMisaligned() {
+        let mismatches = Mismatches("portLoadExpandedWhereF32 on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xA215_AF1C_0E87_D901)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xA215_AE1C_0E87_D74E)
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portLoadExpandedWhereF32(from: source, where: mask),
+                    unsafe highwayLoadExpandedWhereF32(from: source, where: mask)
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadExpandedWhereOtherwise() {
         let mismatches = Mismatches("portLoadExpandedWhereOtherwiseF32")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0x6A90_5ADC_FA27_C478)
@@ -142,6 +165,43 @@ extension SIMDFloatCodegenTests {
         mismatches.record()
     }
 
+    @Test func loadExpandedWhereOtherwiseMisaligned() {
+        let mismatches = Mismatches("portLoadExpandedWhereOtherwiseF32 on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xB915_F37D_3F87_A5A5)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB915_F27D_3F87_A3F2)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xB915_F17D_3F87_A23F)
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0x06ED_1B36_1E6C_4B17
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe portLoadExpandedWhereOtherwiseF32(
+                        from: source,
+                        where: mask,
+                        otherwise: otherwise
+                    ),
+                    unsafe highwayLoadExpandedWhereOtherwiseF32(
+                        from: source,
+                        where: mask,
+                        otherwise: otherwise
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadExpandedWhereOtherwiseConstantOtherwise() {
         let mismatches = Mismatches("portLoadExpandedWhereOtherwiseF32ConstantOtherwise")
         let maskInputs = Inputs.masks(H.Mask.self, seed: 0xBDCC_B25B_236C_2223)
@@ -176,6 +236,37 @@ extension SIMDFloatCodegenTests {
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xEE54_3BE1_96E4_F963)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe portLoadExpandedWhereOtherwiseF32ConstantOtherwise(
+                        from: source,
+                        where: mask
+                    ),
+                    unsafe highwayLoadExpandedWhereOtherwiseF32ConstantOtherwise(
+                        from: source,
+                        where: mask
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadExpandedWhereOtherwiseConstantOtherwiseMisaligned() {
+        let mismatches = Mismatches(
+            "portLoadExpandedWhereOtherwiseF32ConstantOtherwise on misaligned memory"
+        )
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xC3A3_ED7A_2126_A3FA)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xC3A3_EC7A_2126_A247)
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe portLoadExpandedWhereOtherwiseF32ConstantOtherwise(
                         from: source,

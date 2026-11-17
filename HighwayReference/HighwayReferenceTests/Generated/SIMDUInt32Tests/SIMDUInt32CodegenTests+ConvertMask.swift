@@ -69,6 +69,25 @@ extension SIMDUInt32CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeMaskMisaligned() {
+        let mismatches = Mismatches("portStoreMaskU32 on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0x6A54_9BD3_2204_89AD)
+        let sentinel = Inputs.sentinel(UInt8.self, count: (H.laneCount + 7) / 8 + 4)
+        for mask in maskInputs {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreMaskU32(mask, to: destination) }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreMaskU32(mask, to: destination) }
+            mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
+            mismatches.check(portResult, referenceResult, "mask: \(describe(mask))")
+        }
+        mismatches.record()
+    }
+
     @Test func maskNarrowingFromUInt64() {
         let mismatches = Mismatches("portMaskNarrowingU64ToU32")
         let aInputs = Inputs.masks(SIMD<UInt64>.Mask.self, seed: 0x0C21_C6A3_A7D6_7FBA)

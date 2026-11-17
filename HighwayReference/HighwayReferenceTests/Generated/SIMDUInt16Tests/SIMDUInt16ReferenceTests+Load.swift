@@ -33,6 +33,21 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadMisaligned() {
+        let mismatches = Mismatches("load on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xBAB3_3F1A_41CA_0812)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (unsafe H.load(from: source), unsafe H(raw: HighwayReference.loadU16(source)))
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadUncheckedSpan() {
         let mismatches = Mismatches("load unchecked span")
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x7168_B3D8_D6B5_65AF)
@@ -49,6 +64,34 @@ extension SIMDUInt16ReferenceTests {
                     })()
                 )
             }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("load unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x9FCA_0CD8_E071_37A6)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.load(fromUnchecked: span)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.load(from: span)
+                    })()
+                )
+            }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
         mismatches.record()
@@ -156,6 +199,29 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadFirstMisaligned() {
+        let mismatches = Mismatches("loadFirst on misaligned memory")
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x1C2B_3B3E_63C7_8C28)
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (from, count) in everyPair(fromInputs, countInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.loadFirst(from: source, count: count),
+                    unsafe H(raw: HighwayReference.loadFirstU16(source, count))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadRepeatingBlock() {
         let mismatches = Mismatches("loadRepeatingBlock")
         let fromInputs = Inputs.buffers(
@@ -194,6 +260,28 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadRepeatingBlockMisaligned() {
+        let mismatches = Mismatches("loadRepeatingBlock on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 16 / MemoryLayout<Lane>.size,
+            seed: 0x2063_4E08_7AA2_1018
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.loadRepeatingBlock(from: source),
+                    unsafe H(raw: HighwayReference.loadRepeatingBlockU16(source))
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadRepeatingBlockUncheckedSpan() {
         let mismatches = Mismatches("loadRepeatingBlock unchecked span")
         let fromInputs = Inputs.buffers(
@@ -214,6 +302,44 @@ extension SIMDUInt16ReferenceTests {
                     })()
                 )
             }
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadRepeatingBlockUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadRepeatingBlock unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 16 / MemoryLayout<Lane>.size,
+            seed: 0x03DD_2C8B_412F_1518
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: 16 / MemoryLayout<Lane>.size
+                            )
+                        )
+                        return unsafe H.loadRepeatingBlock(fromUnchecked: span)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: 16 / MemoryLayout<Lane>.size
+                            )
+                        )
+                        return H.loadRepeatingBlock(from: span)
+                    })()
+                )
+            }.result
             mismatches.check(portResult, referenceResult, "from: \(describe(from))")
         }
         mismatches.record()
@@ -245,6 +371,29 @@ extension SIMDUInt16ReferenceTests {
         let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0x0A45_B37A_9299_008E)
         for (mask, from) in everyPair(maskInputs, fromInputs) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.load(from: source, where: mask),
+                    unsafe H(raw: HighwayReference.loadWhereU16(mask.raw, source))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadWhereMisaligned() {
+        let mismatches = Mismatches("loadWhere on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD65F_3046_DDD3_8215)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xD65F_2F46_DDD3_8062)
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe H.load(from: source, where: mask),
                     unsafe H(raw: HighwayReference.loadWhereU16(mask.raw, source))
@@ -335,6 +484,39 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadWhereUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadWhere unchecked span on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xB76D_BFFD_BAB2_2853)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xB76D_BEFD_BAB2_26A0)
+        for (mask, from) in everyPair(maskInputs, fromInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.load(fromUnchecked: span, where: mask)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.load(from: span, where: mask)
+                    })()
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadWhereOtherwise() {
         let mismatches = Mismatches("loadWhereOtherwise")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0x90B6_FC68_1424_5FFC)
@@ -379,6 +561,37 @@ extension SIMDUInt16ReferenceTests {
             seed: 0x999C_42B7_D952_2947
         ) {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.load(from: source, where: mask, otherwise: otherwise),
+                    unsafe H(
+                        raw: HighwayReference.loadWhereOtherwiseU16(otherwise.raw, mask.raw, source)
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadWhereOtherwiseMisaligned() {
+        let mismatches = Mismatches("loadWhereOtherwise on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xE364_1F1B_DCCA_E889)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xE364_1E1B_DCCA_E6D6)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xE364_1D1B_DCCA_E523)
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0x6B7A_9201_B0F8_6FC3
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe H.load(from: source, where: mask, otherwise: otherwise),
                     unsafe H(
@@ -497,6 +710,45 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadWhereOtherwiseUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadWhereOtherwise unchecked span on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xEFBE_F66F_2A19_4C4F)
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xEFBE_F56F_2A19_4A9C)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xEFBE_F86F_2A19_4FB5)
+        for (otherwise, mask, from) in mixedTriples(
+            otherwiseInputs,
+            maskInputs,
+            fromInputs,
+            seed: 0xB456_55B8_B7EE_8D29
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return unsafe H.load(fromUnchecked: span, where: mask, otherwise: otherwise)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(start: source, count: H.laneCount)
+                        )
+                        return H.load(from: span, where: mask, otherwise: otherwise)
+                    })()
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), mask: \(describe(mask)), from: \(describe(from))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadFirstOtherwise() {
         let mismatches = Mismatches("loadFirstOtherwise")
         let otherwiseInputs = Inputs.vectors(H.self, seed: 0xDBCD_B4A3_D832_34B7)
@@ -562,6 +814,37 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadFirstOtherwiseMisaligned() {
+        let mismatches = Mismatches("loadFirstOtherwise on misaligned memory")
+        let otherwiseInputs = Inputs.vectors(H.self, seed: 0xA235_2679_617A_3E5E)
+        let fromInputs = Inputs.buffers(Lane.self, count: H.laneCount, seed: 0xA235_2779_617A_4011)
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (otherwise, from, count) in mixedTriples(
+            otherwiseInputs,
+            fromInputs,
+            countInputs,
+            seed: 0xA6E6_61F0_0BEA_477A
+        ) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.loadFirst(from: source, count: count, otherwise: otherwise),
+                    unsafe H(
+                        raw: HighwayReference.loadFirstOtherwiseU16(otherwise.raw, source, count)
+                    )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "otherwise: \(describe(otherwise)), from: \(describe(from)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadingUpperHalf() {
         let mismatches = Mismatches("loadingUpperHalf")
         let fromInputs = Inputs.buffers(
@@ -610,6 +893,33 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadingUpperHalfMisaligned() {
+        let mismatches = Mismatches("loadingUpperHalf on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: H.laneCount / 2,
+            seed: 0xF53A_A229_03C4_64DF
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0xF53A_A129_03C4_632C)
+        for (from, a) in everyPair(fromInputs, aInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.loadingUpperHalf(a, from: source),
+                    unsafe H(raw: HighwayReference.loadingUpperHalfU16(source, a.raw))
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func loadingUpperHalfUncheckedSpan() {
         let mismatches = Mismatches("loadingUpperHalf unchecked span")
         let fromInputs = Inputs.buffers(
@@ -631,6 +941,49 @@ extension SIMDUInt16ReferenceTests {
                     })()
                 )
             }
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), a: \(describe(a))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadingUpperHalfUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadingUpperHalf unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: H.laneCount / 2,
+            seed: 0x492D_2FFE_1E01_6841
+        )
+        let aInputs = Inputs.vectors(H.self, seed: 0x492D_2EFE_1E01_668E)
+        for (from, a) in everyPair(fromInputs, aInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: H.laneCount / 2
+                            )
+                        )
+                        return unsafe H.loadingUpperHalf(a, fromUnchecked: span)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: H.laneCount / 2
+                            )
+                        )
+                        return H.loadingUpperHalf(a, from: span)
+                    })()
+                )
+            }.result
             mismatches.check(
                 portResult,
                 referenceResult,
@@ -668,6 +1021,28 @@ extension SIMDUInt16ReferenceTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.loadHalf(from: source),
+                    unsafe H.HalfVector(raw: HighwayReference.loadHalfU16(source))
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadHalfMisaligned() {
+        let mismatches = Mismatches("loadHalf on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: H.laneCount / 2,
+            seed: 0x7165_3D81_0445_CFF3
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe H.loadHalf(from: source),
                     unsafe H.HalfVector(raw: HighwayReference.loadHalfU16(source))
@@ -724,6 +1099,44 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadHalfUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadHalf unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: H.laneCount / 2,
+            seed: 0x49A6_A05F_2F4C_D62D
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: H.laneCount / 2
+                            )
+                        )
+                        return unsafe H.loadHalf(fromUnchecked: span)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: H.laneCount / 2
+                            )
+                        )
+                        return H.loadHalf(from: span)
+                    })()
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadQuarter() {
         let mismatches = Mismatches("loadQuarter")
         let fromInputs = Inputs.buffers(
@@ -754,6 +1167,28 @@ extension SIMDUInt16ReferenceTests {
         )
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.loadQuarter(from: source),
+                    unsafe H.QuarterVector(raw: HighwayReference.loadQuarterU16(source))
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadQuarterMisaligned() {
+        let mismatches = Mismatches("loadQuarter on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: H.laneCount / 4,
+            seed: 0xB47B_5991_99B4_C35E
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe H.loadQuarter(from: source),
                     unsafe H.QuarterVector(raw: HighwayReference.loadQuarterU16(source))
@@ -810,6 +1245,44 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadQuarterUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadQuarter unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: H.laneCount / 4,
+            seed: 0xB039_07C5_048E_432A
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: H.laneCount / 4
+                            )
+                        )
+                        return unsafe H.loadQuarter(fromUnchecked: span)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: H.laneCount / 4
+                            )
+                        )
+                        return H.loadQuarter(from: span)
+                    })()
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadBlock() {
         let mismatches = Mismatches("loadBlock")
         let fromInputs = Inputs.buffers(
@@ -848,6 +1321,28 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadBlockMisaligned() {
+        let mismatches = Mismatches("loadBlock on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 16 / MemoryLayout<Lane>.size,
+            seed: 0x72F0_DF97_5DB3_6713
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.loadBlock(from: source),
+                    unsafe H.BlockVector(raw: HighwayReference.loadBlockU16(source))
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadBlockUncheckedSpan() {
         let mismatches = Mismatches("loadBlock unchecked span")
         let fromInputs = Inputs.buffers(
@@ -873,6 +1368,44 @@ extension SIMDUInt16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func loadBlockUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("loadBlock unchecked span on misaligned memory")
+        let fromInputs = Inputs.buffers(
+            Lane.self,
+            count: 16 / MemoryLayout<Lane>.size,
+            seed: 0xFAC3_B771_B640_D7CD
+        )
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: 16 / MemoryLayout<Lane>.size
+                            )
+                        )
+                        return unsafe H.loadBlock(fromUnchecked: span)
+                    })(),
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: 16 / MemoryLayout<Lane>.size
+                            )
+                        )
+                        return H.loadBlock(from: span)
+                    })()
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
     @Test func loadWideningFromUInt8() {
         let mismatches = Mismatches("loadWidening from UInt8")
         let fromInputs = Inputs.buffers(UInt8.self, count: H.laneCount, seed: 0xBA96_8809_B7E0_3B80)
@@ -893,6 +1426,24 @@ extension SIMDUInt16ReferenceTests {
         let fromInputs = Inputs.buffers(UInt8.self, count: H.laneCount, seed: 0x939C_AF03_9273_9F39)
         for from in fromInputs {
             let (portResult, referenceResult) = unsafe withGuardedLanes(from) { source in
+                (
+                    unsafe H.loadWidening(from: source),
+                    unsafe H(raw: HighwayReference.loadWideningU8ToU16(source))
+                )
+            }.result
+            mismatches.check(portResult, referenceResult, "from: \(describe(from))")
+        }
+        mismatches.record()
+    }
+
+    @Test func loadWideningFromUInt8Misaligned() {
+        let mismatches = Mismatches("loadWidening from UInt8 on misaligned memory")
+        let fromInputs = Inputs.buffers(UInt8.self, count: H.laneCount, seed: 0x956F_6DE3_3222_5A9D)
+        for from in fromInputs {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
                 (
                     unsafe H.loadWidening(from: source),
                     unsafe H(raw: HighwayReference.loadWideningU8ToU16(source))
@@ -940,6 +1491,29 @@ extension SIMDUInt16ReferenceTests {
                             min(count, H.laneCount)
                         )
                     )
+                )
+            }.result
+            mismatches.check(
+                portResult,
+                referenceResult,
+                "from: \(describe(from)), count: \(count)"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func loadFirstWideningFromUInt8Misaligned() {
+        let mismatches = Mismatches("loadFirstWidening from UInt8 on misaligned memory")
+        let fromInputs = Inputs.buffers(UInt8.self, count: H.laneCount, seed: 0x4CD6_5DDC_45AF_96BF)
+        let countInputs = Inputs.bufferCounts(lanes: H.laneCount)
+        for (from, count) in everyPair(fromInputs, countInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                from,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.loadFirstWidening(from: source, count: count),
+                    unsafe H(raw: HighwayReference.loadFirstWideningU8ToU16(source, count))
                 )
             }.result
             mismatches.check(

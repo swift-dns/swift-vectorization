@@ -148,6 +148,42 @@ extension SIMDBFloat16ReferenceTests {
         mismatches.record()
     }
 
+    @Test func compressedBitsMisaligned() {
+        let mismatches = Mismatches("compressedBits on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0xC7A7_568F_3C7D_8C68)
+        let bitsInputs = Inputs.buffers(
+            UInt8.self,
+            count: (H.laneCount + 7) / 8,
+            seed: 0xC7A7_578F_3C7D_8E1B
+        )
+        for (a, bits) in everyPair(aInputs, bitsInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                bits,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    unsafe H.compressed(a, bits: source),
+                    unsafe withMisalignedLanes(
+                        bits + [UInt8](repeating: 0, count: 8),
+                        vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                    ) { padded in unsafe H(raw: HighwayReference.compressedBitsBF16(a.raw, padded))
+                    }.result
+                )
+            }.result
+            let checkedLanes = compressedLaneCount(
+                bits: bits,
+                lanes: H.laneCount,
+                tailIsDeterministic: HighwayReference.compressTailIsDeterministicBF16()
+            )
+            mismatches.check(
+                (0..<checkedLanes).map { portResult.simd[$0] },
+                (0..<checkedLanes).map { referenceResult.simd[$0] },
+                "a: \(describe(a)), bits: \(describe(bits))"
+            )
+        }
+        mismatches.record()
+    }
+
     @Test func compressedBitsUncheckedSpan() {
         let mismatches = Mismatches("compressedBits unchecked span")
         let aInputs = Inputs.vectors(H.self, seed: 0xAA21_FAE6_A0C7_9745)
@@ -171,6 +207,59 @@ extension SIMDBFloat16ReferenceTests {
                     }
                 )
             }
+            let checkedLanes = compressedLaneCount(
+                bits: bits,
+                lanes: H.laneCount,
+                tailIsDeterministic: HighwayReference.compressTailIsDeterministicBF16()
+            )
+            mismatches.check(
+                (0..<checkedLanes).map { portResult.simd[$0] },
+                (0..<checkedLanes).map { referenceResult.simd[$0] },
+                "a: \(describe(a)), bits: \(describe(bits))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func compressedBitsUncheckedSpanMisaligned() {
+        let mismatches = Mismatches("compressedBits unchecked span on misaligned memory")
+        let aInputs = Inputs.vectors(H.self, seed: 0x7A13_8DC5_5A33_0EA8)
+        let bitsInputs = Inputs.buffers(
+            UInt8.self,
+            count: (H.laneCount + 7) / 8,
+            seed: 0x7A13_8EC5_5A33_105B
+        )
+        for (a, bits) in everyPair(aInputs, bitsInputs) {
+            let (portResult, referenceResult) = unsafe withMisalignedLanes(
+                bits,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { source in
+                (
+                    ({
+                        let span = unsafe Span(
+                            _unsafeElements: UnsafeBufferPointer(
+                                start: source,
+                                count: (H.laneCount + 7) / 8
+                            )
+                        )
+                        return unsafe H.compressed(a, bitsUnchecked: span)
+                    })(),
+                    unsafe withMisalignedLanes(
+                        bits + [UInt8](repeating: 0, count: 8),
+                        vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+                    ) { padded in
+                        ({
+                            let span = unsafe Span(
+                                _unsafeElements: UnsafeBufferPointer(
+                                    start: source,
+                                    count: (H.laneCount + 7) / 8
+                                )
+                            )
+                            return H.compressed(a, bits: span)
+                        })()
+                    }.result
+                )
+            }.result
             let checkedLanes = compressedLaneCount(
                 bits: bits,
                 lanes: H.laneCount,

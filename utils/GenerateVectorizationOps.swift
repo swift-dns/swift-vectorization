@@ -47465,8 +47465,24 @@ func referenceTestFunction(
         """
 }
 
+let misalignedTestSuffix = "Misaligned"
+
 func alignedLanes(_ lanes: String, to laneCount: String = "H.laneCount") -> String {
     "withAlignedLanes(\(lanes), laneCount: \(laneCount))"
+}
+
+let vectorByteCount = "H.laneCount * MemoryLayout<Lane>.stride"
+
+func misalignedLanes(_ lanes: String) -> String {
+    "withMisalignedLanes(\(lanes), vectorBytes: \(vectorByteCount))"
+}
+
+func misalignedOutputSpan(capacity: String) -> String {
+    "withMisalignedOutputSpan(capacity: \(capacity), vectorBytes: \(vectorByteCount))"
+}
+
+func placedLanes(_ lanes: String, misaligned: Bool) -> String {
+    misaligned ? misalignedLanes(lanes) : "withGuardedLanes(\(lanes))"
 }
 
 func referenceLoadStatements(
@@ -47474,6 +47490,7 @@ func referenceLoadStatements(
     aligned: Bool,
     alignedTo laneCount: String = "H.laneCount",
     guardedLanes: String?,
+    misaligned: Bool = false,
     comparison: String? = nil,
     port: String,
     reference: String,
@@ -47482,7 +47499,7 @@ func referenceLoadStatements(
     let results = "(\(port), \(reference))"
     let scope =
         if let guardedLanes {
-            "unsafe withGuardedLanes(\(guardedLanes)) { source in \(results) }.result"
+            "unsafe \(placedLanes(guardedLanes, misaligned: misaligned)) { source in \(results) }.result"
         } else if aligned {
             "unsafe \(alignedLanes(source, to: laneCount)) { source in \(results) }.result"
         } else {
@@ -47518,6 +47535,7 @@ func referenceOutVectorStatements(
     count: Int,
     for element: Element,
     guardedLanes: String?,
+    misaligned: Bool = false,
     port: String,
     reference: String,
     inputs: [ReferenceInput]
@@ -47531,7 +47549,8 @@ func referenceOutVectorStatements(
     statements += (0..<count).map { "var r\($0) = \(zero)" }
     let calls = "{ source in\n\(port)\n\(reference)\n}"
     if let guardedLanes {
-        statements.append("_ = unsafe withGuardedLanes(\(guardedLanes)) \(calls)")
+        let scope = placedLanes(guardedLanes, misaligned: misaligned)
+        statements.append("_ = unsafe \(scope) \(calls)")
     } else {
         statements.append("\(source).withUnsafeBufferPointer \(calls)")
     }
@@ -47545,6 +47564,7 @@ func referenceOutVectorStatements(
 func referenceStoreStatements(
     aligned: Bool,
     guardedLanes: String?,
+    misaligned: Bool = false,
     returnsResult: Bool,
     port: String,
     reference: String,
@@ -47555,7 +47575,8 @@ func referenceStoreStatements(
         let call = side == "port" ? port : reference
         let closure = "{ destination in \(call) }"
         if let guardedLanes {
-            return "let (\(result), \(lanes)) = unsafe withGuardedLanes(\(guardedLanes)) \(closure)"
+            let scope = placedLanes(guardedLanes, misaligned: misaligned)
+            return "let (\(result), \(lanes)) = unsafe \(scope) \(closure)"
         }
         if aligned {
             return "let (\(result), \(lanes)) = unsafe \(alignedLanes("sentinel")) \(closure)"
@@ -47575,6 +47596,7 @@ func referenceCopyStatements(
     of source: String,
     sourceLanes: String?,
     destinationLanes: String?,
+    misaligned: Bool = false,
     returnsResult: Bool,
     port: String,
     reference: String,
@@ -47600,8 +47622,8 @@ func referenceCopyStatements(
         let call = side == "port" ? port : reference
         let result = returnsResult ? "\(side)Result" : "_"
         return """
-            let (\(result), \(side)Lanes) = unsafe withGuardedLanes(\(destinationLanes)) { destination in
-            unsafe withGuardedLanes(\(sourceLanes)) { source in \(call) }.result
+            let (\(result), \(side)Lanes) = unsafe \(placedLanes(destinationLanes, misaligned: misaligned)) { destination in
+            unsafe \(placedLanes(sourceLanes, misaligned: misaligned)) { source in \(call) }.result
             }
             """
     }
@@ -47616,14 +47638,22 @@ func readsMaskBits(_ op: Op) -> Bool {
     return op.parameters.contains(.constBytePointer)
 }
 
-func paddedPointer(of op: Op) -> String? {
-    readsMaskBits(op) ? "padded.baseAddress!" : nil
+func paddedPointer(of op: Op, misaligned: Bool = false) -> String? {
+    readsMaskBits(op) ? pointerExpression("padded", aligned: misaligned) : nil
 }
 
-func paddedReferenceCall(_ call: String, of op: Op, source: String) -> String {
+func paddedReferenceCall(
+    _ call: String,
+    of op: Op,
+    source: String,
+    misaligned: Bool = false
+) -> String {
     guard paddedPointer(of: op) != nil else { return call }
     let padding = "[UInt8](repeating: 0, count: 8)"
-    return "(\(source) + \(padding)).withUnsafeBufferPointer { padded in \(call) }"
+    guard misaligned else {
+        return "(\(source) + \(padding)).withUnsafeBufferPointer { padded in \(call) }"
+    }
+    return "unsafe \(misalignedLanes("\(source) + \(padding)")) { padded in \(call) }.result"
 }
 
 func hasCopiedLanes(_ op: Op) -> Bool {
@@ -47631,14 +47661,17 @@ func hasCopiedLanes(_ op: Op) -> Bool {
         && op.parameters.contains(where: \.isMutablePointer)
 }
 
-func referencePointer(of op: Op, guarded: Bool) -> String {
+func referencePointer(of op: Op, guarded: Bool, misaligned: Bool = false) -> String {
     let isStore = op.parameters.contains(where: \.isMutablePointer) && !hasCopiedLanes(op)
-    return pointerExpression(isStore ? "destination" : "source", aligned: isAligned(op) || guarded)
+    return pointerExpression(
+        isStore ? "destination" : "source",
+        aligned: isAligned(op) || guarded || misaligned
+    )
 }
 
-func referenceDestination(of op: Op, guarded: Bool) -> String? {
+func referenceDestination(of op: Op, guarded: Bool, misaligned: Bool = false) -> String? {
     hasCopiedLanes(op)
-        ? pointerExpression("destination", aligned: isAligned(op) || guarded) : nil
+        ? pointerExpression("destination", aligned: isAligned(op) || guarded || misaligned) : nil
 }
 
 /// Indices of the lanes that an op does not use are made to point just past its lanes, so that a
@@ -47665,12 +47698,17 @@ func referenceStatements(
     inputs: [ReferenceInput],
     guarded: Bool,
     maskedOff: Bool = false,
+    misaligned: Bool = false,
     count: String = "count",
     alternative: CodegenAlternative? = nil,
     calls: (port: String, reference: String)
 ) -> (declarations: [String], statements: String) {
     let extent: SpanExtent? = maskedOff ? .first : op.span
     let guardedCount = maskedOff ? "lanesThroughLastTrue(of: mask)" : count
+    func placed(_ buffer: String) -> String? {
+        if guarded { return guardedLanes(of: buffer, extent: extent, count: guardedCount) }
+        return misaligned ? buffer : nil
+    }
     let description = referenceDescription(of: inputs)
     let aligned = isAligned(op)
     let isStore = op.parameters.contains(where: \.isMutablePointer)
@@ -47684,26 +47722,35 @@ func referenceStatements(
         )
         statements = referenceCopyStatements(
             of: source,
-            sourceLanes: guarded
-                ? guardedLanes(of: source, extent: extent, count: guardedCount) : nil,
-            destinationLanes: guarded
-                ? guardedLanes(of: "sentinel", extent: extent, count: guardedCount) : nil,
+            sourceLanes: placed(source),
+            destinationLanes: placed("sentinel"),
+            misaligned: misaligned,
             returnsResult: op.returns != .void,
             port: calls.port,
-            reference: paddedReferenceCall(calls.reference, of: op, source: source),
+            reference: paddedReferenceCall(
+                calls.reference,
+                of: op,
+                source: source,
+                misaligned: misaligned
+            ),
             description: description
         )
     } else if let source = inputs.first(where: { $0.parameter.isConstPointer })?.name {
         let outVectors = op.parameters.filter { $0 == .outVector }.count
-        let reference = paddedReferenceCall(calls.reference, of: op, source: source)
+        let reference = paddedReferenceCall(
+            calls.reference,
+            of: op,
+            source: source,
+            misaligned: misaligned
+        )
         statements =
             outVectors == 0
             ? referenceLoadStatements(
                 of: source,
                 aligned: aligned,
                 alignedTo: alignmentLanes(of: op),
-                guardedLanes: guarded
-                    ? guardedLanes(of: source, extent: extent, count: guardedCount) : nil,
+                guardedLanes: placed(source),
+                misaligned: misaligned,
                 comparison: op.leavesLanesUnspecified
                     ? compressedPrefixComparison(of: source, for: element, description: description)
                     : nil,
@@ -47715,8 +47762,8 @@ func referenceStatements(
                 of: source,
                 count: outVectors,
                 for: element,
-                guardedLanes: guarded
-                    ? guardedLanes(of: source, extent: extent, count: guardedCount) : nil,
+                guardedLanes: placed(source),
+                misaligned: misaligned,
                 port: calls.port,
                 reference: calls.reference,
                 inputs: inputs
@@ -47733,8 +47780,8 @@ func referenceStatements(
         )
         statements = referenceStoreStatements(
             aligned: aligned,
-            guardedLanes: guarded
-                ? guardedLanes(of: "sentinel", extent: extent, count: guardedCount) : nil,
+            guardedLanes: placed("sentinel"),
+            misaligned: misaligned,
             returnsResult: op.returns != .void,
             port: calls.port,
             reference: calls.reference,
@@ -47822,11 +47869,17 @@ func referenceTest(
     checked: Bool = true,
     guarded: Bool = false,
     maskedOff: Bool = false,
-    nonCanonical: Bool = false
+    nonCanonical: Bool = false,
+    misaligned: Bool = false
 ) -> String {
     let (test, label) =
         if guarded {
             ("\(op.testIdentifier)BeforeGuardPage", "\(op.testIdentifier) before a guard page")
+        } else if misaligned {
+            (
+                "\(op.testIdentifier)\(misalignedTestSuffix)",
+                "\(op.testIdentifier) on misaligned memory"
+            )
         } else if maskedOff {
             (
                 "\(op.testIdentifier)MaskedOffPastGuardPage",
@@ -47856,9 +47909,9 @@ func referenceTest(
     let calls = referenceCalls(
         of: op,
         for: element,
-        pointer: referencePointer(of: op, guarded: isGuarded),
-        referencePointer: paddedPointer(of: op),
-        destination: referenceDestination(of: op, guarded: isGuarded),
+        pointer: referencePointer(of: op, guarded: isGuarded, misaligned: misaligned),
+        referencePointer: paddedPointer(of: op, misaligned: misaligned),
+        destination: referenceDestination(of: op, guarded: isGuarded, misaligned: misaligned),
         checked: checked
     )
     let (declarations, statements) = referenceStatements(
@@ -47867,6 +47920,7 @@ func referenceTest(
         inputs: inputs,
         guarded: isGuarded,
         maskedOff: maskedOff,
+        misaligned: misaligned,
         calls: calls
     )
 
@@ -47889,10 +47943,13 @@ func wideningReferenceTest(
     from narrow: Element,
     to wide: Element,
     guarded: Bool = false,
+    misaligned: Bool = false,
     constantCount: Bool = false
 ) -> String {
     let name = "\(op.swiftName)From\(narrow.swiftType)"
-    let guardedName = guarded ? "\(name)BeforeGuardPage" : name
+    let guardedName =
+        guarded
+        ? "\(name)BeforeGuardPage" : misaligned ? "\(name)\(misalignedTestSuffix)" : name
     let test = constantCount ? "check\(uppercasedFirst(guardedName))ConstantCount" : guardedName
     let seed = "seed: \(referenceTestSeed(wide, test, "0"))"
     var inputs = [
@@ -47902,7 +47959,7 @@ func wideningReferenceTest(
             values: "Inputs.buffers(\(narrow.swiftType).self, count: H.laneCount, \(seed))"
         )
     ]
-    let pointer = pointerExpression("source", aligned: guarded)
+    let pointer = pointerExpression("source", aligned: guarded || misaligned)
     var portArguments = ["from: \(pointer)"]
     var referenceArguments = [pointer]
     if op.takesCount {
@@ -47925,7 +47982,7 @@ func wideningReferenceTest(
         returning: .vector,
         for: wide
     )
-    let suffix = guarded ? " before a guard page" : ""
+    let suffix = guarded ? " before a guard page" : misaligned ? " on misaligned memory" : ""
     let countLabel = constantCount ? " with count \\(count)" : ""
     return referenceTestFunction(
         test,
@@ -47936,7 +47993,9 @@ func wideningReferenceTest(
         statements: referenceLoadStatements(
             of: "from",
             aligned: false,
-            guardedLanes: guarded ? guardedLanes(of: "from", extent: op.span) : nil,
+            guardedLanes: guarded
+                ? guardedLanes(of: "from", extent: op.span) : misaligned ? "from" : nil,
+            misaligned: misaligned,
             port: "unsafe \(portCall(op.swiftName, portArguments))",
             reference: "unsafe \(reference)",
             description: referenceDescription(of: inputs)
@@ -48124,6 +48183,9 @@ func referenceTests(of op: Op, for element: Element) -> [String] {
     if op.span != nil {
         tests.append(referenceTest(of: op, for: element, inContract: true, guarded: true))
     }
+    if op.span != nil && !isAligned(op) {
+        tests.append(referenceTest(of: op, for: element, inContract: true, misaligned: true))
+    }
     if op.mightFaultOnMaskedOffLanes {
         tests.append(referenceTest(of: op, for: element, inContract: true, maskedOff: true))
     }
@@ -48186,23 +48248,32 @@ func resizedReferenceTest(of op: Op, for element: Element) -> String? {
 func uncheckedSpanTests(of op: Op, for element: Element) -> [String] {
     guard !takesLookupIndices(op), let forms = spanForms(of: op, for: element) else { return [] }
     var tests: [String] = []
-    if !forms.takesCountFromSpans {
-        tests.append(uncheckedSpanTest(of: op, forms: forms, for: element))
-    }
-    if forms.isMutable && forms.appendsToOutput {
-        tests.append(uncheckedOutputSpanTest(of: op, forms: forms, for: element))
+    let placements = isAligned(op) ? [false] : [false, true]
+    for misaligned in placements {
+        if !forms.takesCountFromSpans {
+            tests.append(
+                uncheckedSpanTest(of: op, forms: forms, for: element, misaligned: misaligned)
+            )
+        }
+        if forms.isMutable && forms.appendsToOutput {
+            tests.append(
+                uncheckedOutputSpanTest(of: op, forms: forms, for: element, misaligned: misaligned)
+            )
+        }
     }
     return tests
 }
 
-func uncheckedSpanBinding(_ span: SpanArgument, of op: Op) -> String {
+func uncheckedSpanBinding(_ span: SpanArgument, of op: Op, misaligned: Bool) -> String {
     let (pointer, buffer, constructor) =
         span.isMutable
         ? ("destination", "UnsafeMutableBufferPointer", "var \(span.name) = unsafe MutableSpan")
         : ("source", "UnsafeBufferPointer", "let \(span.name) = unsafe Span")
     let lanes =
         if case .maskBytes = span.extent { "(H.laneCount + 7) / 8" } else { pointerLanes(of: op) }
-    let elements = isAligned(op) ? "\(buffer)(start: \(pointer), count: \(lanes))" : pointer
+    let elements =
+        isAligned(op) || misaligned
+        ? "\(buffer)(start: \(pointer), count: \(lanes))" : pointer
     return "\(constructor)(_unsafeElements: \(elements))"
 }
 
@@ -48210,7 +48281,8 @@ func uncheckedSpanCall(
     of op: Op,
     forms: SpanForms,
     for element: Element,
-    checked: Bool
+    checked: Bool,
+    misaligned: Bool = false
 ) -> String {
     var arguments = spanSignature(forms, checked: checked).arguments
     let outVectors = zip(bindings(of: op, for: element), op.parameters)
@@ -48222,7 +48294,7 @@ func uncheckedSpanCall(
             with: "&\(checked ? "r" : "p")\(index)"
         )
     }
-    let bindings = forms.spans.map { uncheckedSpanBinding($0, of: op) }
+    let bindings = forms.spans.map { uncheckedSpanBinding($0, of: op, misaligned: misaligned) }
     let call = portCall(forms.name, [arguments])
     return """
         ({
@@ -48232,22 +48304,40 @@ func uncheckedSpanCall(
         """
 }
 
-func uncheckedSpanTest(of op: Op, forms: SpanForms, for element: Element) -> String {
-    let test = "\(op.testIdentifier)UncheckedSpan"
+func uncheckedSpanTest(
+    of op: Op,
+    forms: SpanForms,
+    for element: Element,
+    misaligned: Bool = false
+) -> String {
+    let test = "\(op.testIdentifier)UncheckedSpan\(misaligned ? misalignedTestSuffix : "")"
     let inputs = referenceInputs(of: op, for: element, test: test, inContract: true)
     let (declarations, statements) = referenceStatements(
         of: op,
         for: element,
         inputs: inputs,
         guarded: false,
+        misaligned: misaligned,
         calls: (
-            port: uncheckedSpanCall(of: op, forms: forms, for: element, checked: false),
-            reference: uncheckedSpanCall(of: op, forms: forms, for: element, checked: true)
+            port: uncheckedSpanCall(
+                of: op,
+                forms: forms,
+                for: element,
+                checked: false,
+                misaligned: misaligned
+            ),
+            reference: uncheckedSpanCall(
+                of: op,
+                forms: forms,
+                for: element,
+                checked: true,
+                misaligned: misaligned
+            )
         )
     )
     return referenceTestFunction(
         test,
-        label: "\(op.testIdentifier) unchecked span",
+        label: "\(op.testIdentifier) unchecked span\(misaligned ? " on misaligned memory" : "")",
         for: element,
         inputs: inputs,
         declarations: declarations,
@@ -48255,8 +48345,13 @@ func uncheckedSpanTest(of op: Op, forms: SpanForms, for element: Element) -> Str
     )
 }
 
-func uncheckedOutputSpanTest(of op: Op, forms: SpanForms, for element: Element) -> String {
-    let test = "\(op.testIdentifier)UncheckedOutputSpan"
+func uncheckedOutputSpanTest(
+    of op: Op,
+    forms: SpanForms,
+    for element: Element,
+    misaligned: Bool = false
+) -> String {
+    let test = "\(op.testIdentifier)UncheckedOutputSpan\(misaligned ? misalignedTestSuffix : "")"
     let inputs = referenceInputs(of: op, for: element, test: test, inContract: true).map {
         $0.parameter == .count
             ? ReferenceInput(
@@ -48276,12 +48371,16 @@ func uncheckedOutputSpanTest(of op: Op, forms: SpanForms, for element: Element) 
         isAligned(op)
         ? ", alignment: H.laneCount * MemoryLayout<\(pointeeType(of: op, for: element))>.stride"
         : ""
+    let scope =
+        misaligned
+        ? misalignedOutputSpan(capacity: capacity)
+        : "withOutputSpan(capacity: \(capacity)\(alignment))"
     let stores = [("port", false), ("reference", true)].map { side, checked in
         let arguments = outputSpanSignature(forms, checked: checked).arguments
             .replacingOccurrences(of: "addingCount: addingCount", with: "addingCount: count")
         let call = "\(checked ? "" : "unsafe ")\(portCall(outputSpanName(forms), [arguments]))"
         return """
-            let (_, \(side)Lanes) = withOutputSpan(capacity: \(capacity)\(alignment)) { output in
+            let (_, \(side)Lanes) = \(scope) { output in
             \(call)
             }
             """
@@ -48289,7 +48388,8 @@ func uncheckedOutputSpanTest(of op: Op, forms: SpanForms, for element: Element) 
     let comparison = "mismatches.check(portLanes, referenceLanes, \(description))"
     return referenceTestFunction(
         test,
-        label: "\(op.testIdentifier) unchecked output span",
+        label:
+            "\(op.testIdentifier) unchecked output span\(misaligned ? " on misaligned memory" : "")",
         for: element,
         inputs: inputs,
         statements: (stores + [comparison]).joined(separator: "\n")
@@ -48368,6 +48468,7 @@ func generateReferenceTestMembers(_ element: Element, by keys: Set<String>?) -> 
             [
                 wideningReferenceTest(op, from: narrow, to: element),
                 wideningReferenceTest(op, from: narrow, to: element, guarded: true),
+                wideningReferenceTest(op, from: narrow, to: element, misaligned: true),
             ]
         }
         return SectionMember(section: op.section, inside: tests)
@@ -50106,7 +50207,8 @@ func codegenTest(
     for element: Element,
     constant: Int?,
     alternative: CodegenAlternative? = nil,
-    guarded: Bool = false
+    guarded: Bool = false,
+    misaligned: Bool = false
 ) -> String {
     let parameters = codegenParameters(of: op, for: element)
     let constantName = codegenConstantName(
@@ -50115,7 +50217,8 @@ func codegenTest(
         alternative: alternative
     )
     let name = "\(op.testIdentifier)\(codegenConstantSuffix(constantName))"
-    let test = guarded ? "\(name)BeforeGuardPage" : name
+    let test =
+        guarded ? "\(name)BeforeGuardPage" : misaligned ? "\(name)\(misalignedTestSuffix)" : name
     let referenceName = referenceFunctionName(of: op, for: element)
     let function = codegenFunctionName("port", referenceName, constantParameter: constantName)
     let constants = codegenConstantIndices(of: parameters, variant: constant)
@@ -50136,15 +50239,16 @@ func codegenTest(
         constant: constant,
         alternative: alternative,
         keyword: isUnsafe(op) ? "unsafe " : "",
-        pointer: referencePointer(of: op, guarded: guarded),
-        referencePointer: paddedPointer(of: op),
-        destination: referenceDestination(of: op, guarded: guarded)
+        pointer: referencePointer(of: op, guarded: guarded, misaligned: misaligned),
+        referencePointer: paddedPointer(of: op, misaligned: misaligned),
+        destination: referenceDestination(of: op, guarded: guarded, misaligned: misaligned)
     )
     let (declarations, statements) = referenceStatements(
         of: op,
         for: element,
         inputs: inputs,
         guarded: guarded,
+        misaligned: misaligned,
         count: codegenGuardedCount(
             of: parameters,
             for: element,
@@ -50157,7 +50261,9 @@ func codegenTest(
 
     return referenceTestFunction(
         test,
-        label: guarded ? "\(function) before a guard page" : function,
+        label: guarded
+            ? "\(function) before a guard page"
+            : misaligned ? "\(function) on misaligned memory" : function,
         for: element,
         inputs: inputs,
         declarations: declarations,
@@ -50179,7 +50285,8 @@ func codegenWideningTest(
     to wide: Element,
     constant: Int?,
     alternative: CodegenAlternative? = nil,
-    guarded: Bool = false
+    guarded: Bool = false,
+    misaligned: Bool = false
 ) -> String {
     let parameters = codegenParameters(of: op, from: narrow)
     let constantName = codegenConstantName(
@@ -50188,7 +50295,8 @@ func codegenWideningTest(
         alternative: alternative
     )
     let name = "\(op.swiftName)From\(narrow.swiftType)\(codegenConstantSuffix(constantName))"
-    let test = guarded ? "\(name)BeforeGuardPage" : name
+    let test =
+        guarded ? "\(name)BeforeGuardPage" : misaligned ? "\(name)\(misalignedTestSuffix)" : name
     let referenceName = wideningFunctionName(op, from: narrow, to: wide)
     let function = codegenFunctionName("port", referenceName, constantParameter: constantName)
     let seed = "seed: \(referenceTestSeed(wide, test, "0"))"
@@ -50216,7 +50324,7 @@ func codegenWideningTest(
         constant: constant,
         alternative: alternative,
         keyword: "unsafe ",
-        pointer: pointerExpression("source", aligned: guarded),
+        pointer: pointerExpression("source", aligned: guarded || misaligned),
         highwayCount: guarded ? "min(count, H.laneCount)" : nil
     )
     let count = codegenGuardedCount(
@@ -50228,13 +50336,18 @@ func codegenWideningTest(
 
     return referenceTestFunction(
         test,
-        label: guarded ? "\(function) before a guard page" : function,
+        label: guarded
+            ? "\(function) before a guard page"
+            : misaligned ? "\(function) on misaligned memory" : function,
         for: wide,
         inputs: inputs,
         statements: referenceLoadStatements(
             of: "from",
             aligned: false,
-            guardedLanes: guarded ? guardedLanes(of: "from", extent: op.span, count: count) : nil,
+            guardedLanes: guarded
+                ? guardedLanes(of: "from", extent: op.span, count: count)
+                : misaligned ? "from" : nil,
+            misaligned: misaligned,
             port: calls.port,
             reference: calls.reference,
             description: referenceDescription(of: inputs)
@@ -50454,6 +50567,17 @@ func codegenTests(of op: Op, for element: Element) -> [String] {
                 )
             )
         }
+        if op.span != nil && !isAligned(op) {
+            tests.append(
+                codegenTest(
+                    of: op,
+                    for: element,
+                    constant: variant.constant,
+                    alternative: variant.alternative,
+                    misaligned: true
+                )
+            )
+        }
     }
     return tests
 }
@@ -50462,7 +50586,7 @@ func codegenWideningTests(_ op: WideningOp, from narrow: Element, to wide: Eleme
     var tests: [String] = []
     let parameters = codegenParameters(of: op, from: narrow)
     for variant in codegenVariants(of: parameters, for: wide) {
-        for guarded in [false, true] {
+        for (guarded, misaligned) in [(false, false), (true, false), (false, true)] {
             tests.append(
                 codegenWideningTest(
                     op,
@@ -50470,7 +50594,8 @@ func codegenWideningTests(_ op: WideningOp, from narrow: Element, to wide: Eleme
                     to: wide,
                     constant: variant.constant,
                     alternative: variant.alternative,
-                    guarded: guarded
+                    guarded: guarded,
+                    misaligned: misaligned
                 )
             )
         }

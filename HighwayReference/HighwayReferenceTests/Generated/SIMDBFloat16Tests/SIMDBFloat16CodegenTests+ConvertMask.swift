@@ -69,6 +69,25 @@ extension SIMDBFloat16CodegenTests {
         mismatches.record()
     }
 
+    @Test func storeMaskMisaligned() {
+        let mismatches = Mismatches("portStoreMaskBF16 on misaligned memory")
+        let maskInputs = Inputs.masks(H.Mask.self, seed: 0xD0E7_3542_6038_910E)
+        let sentinel = Inputs.sentinel(UInt8.self, count: (H.laneCount + 7) / 8 + 4)
+        for mask in maskInputs {
+            let (portResult, portLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe portStoreMaskBF16(mask, to: destination) }
+            let (referenceResult, referenceLanes) = unsafe withMisalignedLanes(
+                sentinel,
+                vectorBytes: H.laneCount * MemoryLayout<Lane>.stride
+            ) { destination in unsafe highwayStoreMaskBF16(mask, to: destination) }
+            mismatches.check(portLanes, referenceLanes, "mask: \(describe(mask))")
+            mismatches.check(portResult, referenceResult, "mask: \(describe(mask))")
+        }
+        mismatches.record()
+    }
+
     @Test func maskWideningFromHalfUInt8() {
         let mismatches = Mismatches("portMaskWideningHalfU8ToBF16")
         let maskInputs = Inputs.masks(SIMD<UInt8>.HalfMask.self, seed: 0xA0DB_9067_66E3_9436)
