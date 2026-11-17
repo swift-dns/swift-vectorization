@@ -37,29 +37,69 @@ targets: [
 ]
 ```
 
-Each element type has its own namespace of ops, such as `SIMDUInt8`, and `SIMDElement` lets a kernel be written once for all of them except `SIMDBFloat16`:
+`SIMD<Lane>` is a vector of `Lane` values, with its ops as static functions. `Lane` is any of the eight integer types, `Float16`, `Float`, `Double` and `BFloat16`:
 
 ```swift
 import Vectorization
 
 func count(of needle: UInt8, in bytes: UnsafeBufferPointer<UInt8>) -> Int {
-    let target = SIMDUInt8.repeating(needle)
+    let target = SIMD<UInt8>.repeating(needle)
     var count = 0
     var index = 0
-    while index + SIMDUInt8.laneCount <= bytes.count {
-        let vector = SIMDUInt8.load(from: bytes.baseAddress! + index)
-        count += SIMDUInt8.trueCount(SIMDUInt8.equalTo(vector, target))
-        index += SIMDUInt8.laneCount
+    while index + SIMD<UInt8>.laneCount <= bytes.count {
+        let vector = SIMD<UInt8>.load(from: bytes.baseAddress! + index)
+        count += SIMD<UInt8>.trueCount(SIMD<UInt8>.equalTo(vector, target))
+        index += SIMD<UInt8>.laneCount
     }
     return bytes[index...].reduce(count) { $0 + ($1 == needle ? 1 : 0) }
 }
 ```
 
+Protocols on the lane types let a kernel be written once for several of them: `SIMDElement` for all
+twelve, `SIMDNumericElement` for all but `BFloat16`, and `SIMDIntegerElement` and `SIMDFloatElement`
+for the integer and the floating-point ones. Swift infers the lane type from a `SIMD<Lane>`
+argument:
+
+```swift
+func squaredLength<Lane: SIMDNumericElement>(_ vector: SIMD<Lane>) -> Lane {
+    SIMD<Lane>.sum(SIMD<Lane>.multiplying(vector, vector))
+}
+
+let length = squaredLength(SIMD<Float>.repeating(2))
+```
+
+Associated types link the lane types: `UnsignedLane` and `SignedLane` on every lane type, `WideLane`
+and `NarrowLane` where one of the same kind is twice or half as wide (`BFloat16` has neither), and
+`FloatLane` on the integer types with a floating-point type of the same width. So generic code can
+widen, clamp, convert, rebind masks and gather. A kernel over `SIMDWidenableIntegerElement`, the
+integer types that have an integer `WideLane`, can widen both halves of a vector:
+
+```swift
+func widenedSum<Lane: SIMDWidenableIntegerElement>(_ vector: SIMD<Lane>) -> Lane.WideLane {
+    let lower = SIMD<Lane.WideLane>.vector(wideningLower: vector)
+    let upper = SIMD<Lane.WideLane>.vector(wideningUpper: vector)
+    return SIMD<Lane.WideLane>.sum(SIMD<Lane.WideLane>.adding(lower, upper))
+}
+```
+
+Concrete code, as in the first example, involves no generic dispatch: its ops are declared for each
+lane type and call highway's op directly. In release builds, a generic kernel is as fast as a
+concrete one only where Swift specializes it, such as for callers in its own module or when it is
+`@inlinable`.
+
+In files that import `Vectorization`, `SIMD` is the library's type and hides the standard library's
+`SIMD` protocol, which `Swift.SIMD` still names. The standard library's concrete types, such as
+`SIMD16<UInt8>`, are unaffected.
+
+Swift allows one conformance per generic type, so `SIMD<UInt8>` and `SIMD<Int8>` cannot conform
+separately to a protocol of yours. Conform `SIMD` once, where `Lane` conforms to a second protocol
+of yours that holds the part that differs per lane, and conform the lane types to it.
+
 ## Which target you get
 
 The ops are compiled for highway's static target: the one highway picks for the same compiler flags,
 found by highway's own target detection. So `laneCount` is what highway's `Lanes(ScalableTag<T>())`
-returns under static dispatch, and `Vector.SIMDType` is as wide as the target's vectors.
+returns under static dispatch, and `SIMD<Lane>.SIMDType` is as wide as the target's vectors.
 
 | Platform | Target                               | Bytes | Description                                                                                                                 |
 | -------- | ------------------------------------ | ----- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -128,8 +168,8 @@ A mask made from a vector whose lanes are not all zeros or all ones, with `mask(
 `Mask(raw:)`, behaves in every op as highway's `MaskFromVec` of the same vector does on the same
 target, which highway leaves to the target. On NEON, SSE2 through AVX2 and EMU128 each op reads the
 bits of the mask that highway's op reads, on the AVX-512 targets only the sign bit of each lane
-counts, and on SVE2_128 a lane is true when it is not zero, compared as a number for `SIMDFloat`,
-`SIMDDouble` and `SIMDFloat16`, so that `-0.0` is false there.
+counts, and on SVE2_128 a lane is true when it is not zero, compared as a number for `SIMD<Float>`,
+`SIMD<Double>` and `SIMD<Float16>`, so that `-0.0` is false there.
 
 On the targets without a carry-less multiply instruction, SSE2, SSSE3, NEON_WITHOUT_AES, SVE2_128
 without SVE2-AES, and EMU128, highway's `CLMulLower` and `CLMulUpper` return a wrong upper 64 bits
@@ -163,10 +203,10 @@ These differences are deliberate:
 - `reversed4` and `reversed8` trap where `canReverse4` and `canReverse8` are false, on vectors of
   fewer than 4 or 8 lanes. Highway's NEON and x86 ops abort there, its SVE2_128 ops return zeros,
   and its EMU128 ops read and write outside the vector.
-- `SIMDFloat16` has arithmetic on every target. Where highway has none for `float16_t` (x86, NEON
+- `SIMD<Float16>` has arithmetic on every target. Where highway has none for `float16_t` (x86, NEON
   without FP16, and EMU128), the port computes in `Float` and rounds once to `Float16`. Fused ops go
   through `Double`, so every result is correctly rounded.
-- `SIMDFloat16` is not available on Intel macOS, where Swift has no `Float16`.
+- `SIMD<Float16>` is not available on Intel macOS, where Swift has no `Float16`.
 
 ## What is not wrapped
 
