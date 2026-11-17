@@ -35928,11 +35928,14 @@ func resizeHelperTargets(
             #endif
             """
     }
-    func sveGrowth(arm: Bool) -> (Element) -> String? {
+    func sveGrowth(arm: Bool, zeroing: Bool = false) -> (Element) -> String? {
         { element in
             let from = registerBytes(of: source, for: element, arm: arm)
             let to = registerBytes(of: result, for: element, arm: arm)
-            return zeroExtending || from >= to ? nil : sveGrownRegister(from: from, to: to)
+            guard !zeroExtending, from < to else { return nil }
+            return zeroing
+                ? body(element, zeroing: true, arm: arm)
+                : sveGrownRegister(from: from, to: to)
         }
     }
     let targets = TargetBodies<Element>(
@@ -35942,7 +35945,7 @@ func resizeHelperTargets(
                 ? sveZeroExtendedRegister(from: source, to: result, for: element)
                 : sveGrowth(arm: true)(element)
         },
-        sve: sveGrowth(arm: false),
+        sve: sveGrowth(arm: false, zeroing: result != .full),
         avx3: leavingRegister,
         avx2: leavingRegister,
         sse4: leavingRegister,

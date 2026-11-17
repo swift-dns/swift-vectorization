@@ -530,7 +530,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_register_vector cvectorization_ops_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_register_half_vector cvectorization_ops_resize_quarter_vector_to_half_vector(cvectorization_ops_register_quarter_vector a) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return __builtin_shufflevector(a, (__typeof__(a))cvectorization_ops_sve_unspecified_16(), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+  return __builtin_shufflevector(a, (cvectorization_ops_register_quarter_vector){0}, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return __builtin_shufflevector(a, __builtin_nondeterministic_value(a), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
@@ -585,7 +585,7 @@ CVECTORIZATION_OPS_INLINE cvectorization_ops_register_vector cvectorization_ops_
 }
 CVECTORIZATION_OPS_INLINE cvectorization_ops_register_half_vector cvectorization_ops_resize_eighth_vector_to_half_vector(cvectorization_ops_register_eighth_vector a) {
 #if CVECTORIZATION_OPS_SVE && CVECTORIZATION_OPS_VECTOR_BYTES == 64
-  return __builtin_shufflevector(a, (__typeof__(a))cvectorization_ops_sve_unspecified_16(), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+  return __builtin_shufflevector(a, (cvectorization_ops_register_eighth_vector){0}, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 #elif CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6
   return __builtin_shufflevector(a, __builtin_nondeterministic_value(a), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 #elif !CVECTORIZATION_OPS_NEON && !CVECTORIZATION_OPS_SVE && !CVECTORIZATION_OPS_X86
