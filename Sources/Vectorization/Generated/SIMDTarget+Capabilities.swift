@@ -39,6 +39,12 @@ extension SIMDTarget {
         cvectorization_ops_has_native64_bit_multiply()
     }
 
+    /// Whether `multiplyingByPowerOf2` and `multiplyingByFloorPowerOf2` are native instructions.
+    @export(implementation) @inline(always)
+    public static var hasNativeMultiplyByPowerOf2: Bool {
+        cvectorization_ops_has_native_multiply_by_power_of2()
+    }
+
     /// Whether `SIMD<Float16>` arithmetic runs on native instructions rather than through `Float`.
     @export(implementation) @inline(always)
     public static var hasNativeFloat16Arithmetic: Bool {

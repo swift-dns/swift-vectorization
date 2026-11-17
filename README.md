@@ -139,8 +139,9 @@ EMU128, as highway's is, where scalar code is faster.
 `HWY_MEM_OPS_MIGHT_FAULT`, `hasNativeFusedMultiplyAdd` is `HWY_NATIVE_FMA`, `hasNativeMasking` is
 `HWY_NATIVE_MASK`, `hasNativeBFloat16DotProduct` is `HWY_NATIVE_DOT_BF16`,
 `hasNativeWholeInterleave` is `HWY_NATIVE_INTERLEAVE_WHOLE`, `hasNativeStoreFirst` is
-`HWY_NATIVE_STORE_N`, `hasNative64BitMultiply` is `HWY_NATIVE_MUL64`, `hasNativeFloat16Arithmetic`
-is `HWY_HAVE_FLOAT16` and `registerCount` is `HWY_REGISTERS`. They describe the port's own ops, so
+`HWY_NATIVE_STORE_N`, `hasNative64BitMultiply` is `HWY_NATIVE_MUL64`,
+`hasNativeMultiplyByPowerOf2` is `HWY_NATIVE_MUL_BY_POW2`, `hasNativeFloat16Arithmetic` is
+`HWY_HAVE_FLOAT16` and `registerCount` is `HWY_REGISTERS`. They describe the port's own ops, so
 on the portable C targets, whose ops follow highway's EMU128, they take EMU128's values:
 `hasNativeFusedMultiplyAdd` is false on PPC8 and Z14, for example, where highway's own ops fuse.
 

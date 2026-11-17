@@ -996,6 +996,13 @@ CVECTORIZATION_OPS_INLINE bool cvectorization_ops_has_native64_bit_multiply(void
   return false;
 #endif
 }
+CVECTORIZATION_OPS_INLINE bool cvectorization_ops_has_native_multiply_by_power_of2(void) {
+#if CVECTORIZATION_OPS_SVE || (CVECTORIZATION_OPS_X86 >= 5 && CVECTORIZATION_OPS_X86 <= 6)
+  return true;
+#else
+  return false;
+#endif
+}
 CVECTORIZATION_OPS_INLINE bool cvectorization_ops_has_native_float16_arithmetic(void) {
 #if CVECTORIZATION_OPS_SVE || (CVECTORIZATION_OPS_NEON == 1 && (defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) || HWY_STATIC_TARGET == HWY_NEON_BF16))
   return true;

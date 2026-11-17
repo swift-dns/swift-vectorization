@@ -81,6 +81,16 @@ struct HighwayTargetReferenceTests {
         mismatches.record()
     }
 
+    @Test func hasNativeMultiplyByPowerOf2() {
+        let mismatches = Mismatches("hasNativeMultiplyByPowerOf2")
+        mismatches.check(
+            SIMDTarget.hasNativeMultiplyByPowerOf2,
+            HighwayReference.hasNativeMultiplyByPowerOf2(),
+            ""
+        )
+        mismatches.record()
+    }
+
     @Test func hasNativeFloat16Arithmetic() {
         let mismatches = Mismatches("hasNativeFloat16Arithmetic")
         mismatches.check(

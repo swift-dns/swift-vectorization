@@ -42411,6 +42411,13 @@ let targetCapabilities = [
         values: [("\(sveCondition) || (\(emu128Condition))", "true")]
     ),
     TargetCapability(
+        swiftName: "hasNativeMultiplyByPowerOf2",
+        highwayName: "HWY_NATIVE_MUL_BY_POW2",
+        summary: "Whether `multiplyingByPowerOf2` and `multiplyingByFloorPowerOf2` are native "
+            + "instructions.",
+        values: [("\(sveCondition) || (\(x86Avx3Condition))", "true")]
+    ),
+    TargetCapability(
         swiftName: "hasNativeFloat16Arithmetic",
         highwayName: "HWY_HAVE_FLOAT16",
         summary: "Whether `SIMD<Float16>` arithmetic runs on native instructions rather than "
