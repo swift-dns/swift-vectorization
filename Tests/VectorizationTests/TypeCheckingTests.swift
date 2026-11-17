@@ -18,7 +18,7 @@ struct TypeCheckingTests {
 
     #if os(macOS) || os(Linux) || os(Windows) || os(FreeBSD) || os(OpenBSD)
     @Test("A lane count in the arithmetic of an exit test closure type-checks")
-    func propertyArithmeticInClosure() async {
+    func propertyArithmeticInTrappingClosure() async {
         await #expect(processExitsWith: .failure) {
             let count = (SIMD<UInt8>.laneCount + 7) / 8 - 1
             let input = ContiguousArray<UInt8>(repeating: 0, count: count)
