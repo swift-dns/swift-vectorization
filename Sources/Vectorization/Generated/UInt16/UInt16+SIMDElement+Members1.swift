@@ -531,6 +531,11 @@ extension UInt16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _nonzeroBitCount(_ a: SIMD<UInt16>) -> SIMD<UInt16> {
+        SIMD<UInt16>.nonzeroBitCount(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func _firstLanes(count: Int) -> SIMD<UInt16>.Mask {
         SIMD<UInt16>.firstLanes(count: count)
     }
@@ -985,6 +990,24 @@ extension UInt16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _loadQuarter(from: UnsafePointer<UInt16>) -> SIMD<UInt16>.QuarterVector {
+        unsafe SIMD<UInt16>.loadQuarter(from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _loadQuarter(from span: Span<UInt16>) -> SIMD<UInt16>.QuarterVector {
+        SIMD<UInt16>.loadQuarter(from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _loadQuarter(fromUnchecked span: Span<UInt16>) -> SIMD<UInt16>.QuarterVector
+    {
+        unsafe SIMD<UInt16>.loadQuarter(fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
     public static func _store(_ a: SIMD<UInt16>, to: UnsafeMutablePointer<UInt16>) {
         unsafe SIMD<UInt16>.store(a, to: to)
     }
@@ -1135,6 +1158,42 @@ extension UInt16 {
     @export(implementation) @inline(always)
     public static func _copy(from: Span<UInt16>, to: inout MutableSpan<UInt16>) {
         SIMD<UInt16>.copy(from: from, to: &to)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<UInt16>.QuarterVector, to: UnsafeMutablePointer<UInt16>) {
+        unsafe SIMD<UInt16>.store(a, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<UInt16>.QuarterVector, to span: inout MutableSpan<UInt16>) {
+        SIMD<UInt16>.store(a, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _store(
+        _ a: SIMD<UInt16>.QuarterVector,
+        toUnchecked span: inout MutableSpan<UInt16>
+    ) {
+        unsafe SIMD<UInt16>.store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _append(_ a: SIMD<UInt16>.QuarterVector, to output: inout OutputSpan<UInt16>)
+    {
+        SIMD<UInt16>.append(a, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _append(
+        _ a: SIMD<UInt16>.QuarterVector,
+        toUnchecked output: inout OutputSpan<UInt16>
+    ) {
+        unsafe SIMD<UInt16>.append(a, toUnchecked: &output)
     }
 
     @export(implementation) @inline(always)

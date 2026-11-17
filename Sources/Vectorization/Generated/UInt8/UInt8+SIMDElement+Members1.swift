@@ -529,6 +529,11 @@ extension UInt8 {
     }
 
     @export(implementation) @inline(always)
+    public static func _nonzeroBitCount(_ a: SIMD<UInt8>) -> SIMD<UInt8> {
+        SIMD<UInt8>.nonzeroBitCount(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func _firstLanes(count: Int) -> SIMD<UInt8>.Mask {
         SIMD<UInt8>.firstLanes(count: count)
     }
@@ -962,6 +967,40 @@ extension UInt8 {
     }
 
     @export(implementation) @inline(always)
+    public static func _loadQuarter(from: UnsafePointer<UInt8>) -> SIMD<UInt8>.QuarterVector {
+        unsafe SIMD<UInt8>.loadQuarter(from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _loadQuarter(from span: Span<UInt8>) -> SIMD<UInt8>.QuarterVector {
+        SIMD<UInt8>.loadQuarter(from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _loadQuarter(fromUnchecked span: Span<UInt8>) -> SIMD<UInt8>.QuarterVector {
+        unsafe SIMD<UInt8>.loadQuarter(fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _loadEighth(from: UnsafePointer<UInt8>) -> SIMD<UInt8>.EighthVector {
+        unsafe SIMD<UInt8>.loadEighth(from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _loadEighth(from span: Span<UInt8>) -> SIMD<UInt8>.EighthVector {
+        SIMD<UInt8>.loadEighth(from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _loadEighth(fromUnchecked span: Span<UInt8>) -> SIMD<UInt8>.EighthVector {
+        unsafe SIMD<UInt8>.loadEighth(fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
     public static func _store(_ a: SIMD<UInt8>, to: UnsafeMutablePointer<UInt8>) {
         unsafe SIMD<UInt8>.store(a, to: to)
     }
@@ -1105,6 +1144,76 @@ extension UInt8 {
     @export(implementation) @inline(always)
     public static func _copy(from: Span<UInt8>, to: inout MutableSpan<UInt8>) {
         SIMD<UInt8>.copy(from: from, to: &to)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<UInt8>.QuarterVector, to: UnsafeMutablePointer<UInt8>) {
+        unsafe SIMD<UInt8>.store(a, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<UInt8>.QuarterVector, to span: inout MutableSpan<UInt8>) {
+        SIMD<UInt8>.store(a, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _store(
+        _ a: SIMD<UInt8>.QuarterVector,
+        toUnchecked span: inout MutableSpan<UInt8>
+    ) {
+        unsafe SIMD<UInt8>.store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _append(_ a: SIMD<UInt8>.QuarterVector, to output: inout OutputSpan<UInt8>) {
+        SIMD<UInt8>.append(a, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _append(
+        _ a: SIMD<UInt8>.QuarterVector,
+        toUnchecked output: inout OutputSpan<UInt8>
+    ) {
+        unsafe SIMD<UInt8>.append(a, toUnchecked: &output)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<UInt8>.EighthVector, to: UnsafeMutablePointer<UInt8>) {
+        unsafe SIMD<UInt8>.store(a, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<UInt8>.EighthVector, to span: inout MutableSpan<UInt8>) {
+        SIMD<UInt8>.store(a, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _store(
+        _ a: SIMD<UInt8>.EighthVector,
+        toUnchecked span: inout MutableSpan<UInt8>
+    ) {
+        unsafe SIMD<UInt8>.store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _append(_ a: SIMD<UInt8>.EighthVector, to output: inout OutputSpan<UInt8>) {
+        SIMD<UInt8>.append(a, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _append(
+        _ a: SIMD<UInt8>.EighthVector,
+        toUnchecked output: inout OutputSpan<UInt8>
+    ) {
+        unsafe SIMD<UInt8>.append(a, toUnchecked: &output)
     }
 
     @export(implementation) @inline(always)

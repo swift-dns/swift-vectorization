@@ -532,19 +532,6 @@ extension Float16 {
     }
 
     @export(implementation) @inline(always)
-    public static func _copyingSign(_ a: SIMD<Float16>, from b: SIMD<Float16>) -> SIMD<Float16> {
-        SIMD<Float16>.copyingSign(a, from: b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _copyingSignToMagnitude(
-        _ a: SIMD<Float16>,
-        from b: SIMD<Float16>
-    ) -> SIMD<Float16> {
-        SIMD<Float16>.copyingSignToMagnitude(a, from: b)
-    }
-
-    @export(implementation) @inline(always)
     public static func _zeroingNegative(_ a: SIMD<Float16>) -> SIMD<Float16> {
         SIMD<Float16>.zeroingNegative(a)
     }
@@ -575,6 +562,19 @@ extension Float16 {
     public static func _negatingIfNegative(_ a: SIMD<Float16>, _ b: SIMD<Float16>) -> SIMD<Float16>
     {
         SIMD<Float16>.negatingIfNegative(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _copyingSign(_ a: SIMD<Float16>, from b: SIMD<Float16>) -> SIMD<Float16> {
+        SIMD<Float16>.copyingSign(a, from: b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _copyingSignToMagnitude(
+        _ a: SIMD<Float16>,
+        from b: SIMD<Float16>
+    ) -> SIMD<Float16> {
+        SIMD<Float16>.copyingSignToMagnitude(a, from: b)
     }
 
     @export(implementation) @inline(always)
@@ -1024,6 +1024,23 @@ extension Float16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _loadQuarter(from: UnsafePointer<Float16>) -> SIMD<Float16>.QuarterVector {
+        unsafe SIMD<Float16>.loadQuarter(from: from)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _loadQuarter(from span: Span<Float16>) -> SIMD<Float16>.QuarterVector {
+        SIMD<Float16>.loadQuarter(from: span)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _loadQuarter(
+        fromUnchecked span: Span<Float16>
+    ) -> SIMD<Float16>.QuarterVector {
+        unsafe SIMD<Float16>.loadQuarter(fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
     public static func _store(_ a: SIMD<Float16>, to: UnsafeMutablePointer<Float16>) {
         unsafe SIMD<Float16>.store(a, to: to)
     }
@@ -1164,6 +1181,41 @@ extension Float16 {
     @export(implementation) @inline(always)
     public static func _copy(from: Span<Float16>, to: inout MutableSpan<Float16>) {
         SIMD<Float16>.copy(from: from, to: &to)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<Float16>.QuarterVector, to: UnsafeMutablePointer<Float16>) {
+        unsafe SIMD<Float16>.store(a, to: to)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<Float16>.QuarterVector, to span: inout MutableSpan<Float16>)
+    {
+        SIMD<Float16>.store(a, to: &span)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _store(
+        _ a: SIMD<Float16>.QuarterVector,
+        toUnchecked span: inout MutableSpan<Float16>
+    ) {
+        unsafe SIMD<Float16>.store(a, toUnchecked: &span)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _append(
+        _ a: SIMD<Float16>.QuarterVector,
+        to output: inout OutputSpan<Float16>
+    ) {
+        SIMD<Float16>.append(a, to: &output)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _append(
+        _ a: SIMD<Float16>.QuarterVector,
+        toUnchecked output: inout OutputSpan<Float16>
+    ) {
+        unsafe SIMD<Float16>.append(a, toUnchecked: &output)
     }
 
     @export(implementation) @inline(always)

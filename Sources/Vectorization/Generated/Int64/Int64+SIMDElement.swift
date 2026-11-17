@@ -2,7 +2,7 @@
 
 public import CVectorizationOps
 
-extension Int64: SIMDIntegerElement {
+extension Int64: SIMDSignedIntegerElement {
     public typealias _RawVector = cvectorization_ops_raw_vector_i64
     public typealias _RawMask = cvectorization_ops_raw_mask_i64
     public typealias _SIMDVector = cvectorization_ops_vector_i64

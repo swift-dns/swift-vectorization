@@ -13566,20 +13566,32 @@ func takesPointerIndices(_ op: Op) -> Bool {
 
 /// The ops whose types depend on more than the element type of their protocol's conformer.
 func isOutsideProtocols(_ op: Op) -> Bool {
-    takesPointerIndices(op) || op.parameters.contains(.constIndexPointer) || usesNarrowTypes(op)
+    takesIndexTypes(op) || usesNarrowTypes(op)
+}
+
+func takesIndexTypes(_ op: Op) -> Bool {
+    takesPointerIndices(op) || op.parameters.contains(.constIndexPointer)
 }
 
 func usesNarrowTypes(_ op: Op) -> Bool {
+    !narrowShapes(of: op).isEmpty
+}
+
+func narrowShapes(of op: Op) -> Set<Shape> {
+    var shapes = Set(
+        op.parameters.compactMap { parameter -> Shape? in
+            switch parameter {
+            case .narrowVector, .sourceNarrowVector, .narrowMask, .sourceNarrowMask:
+                return parameter.shape
+            default: return nil
+            }
+        }
+    )
     switch op.returns {
-    case .narrowVector, .narrowMask: return true
+    case .narrowVector(let shape), .narrowMask(let shape): shapes.insert(shape)
     default: break
     }
-    return op.parameters.contains { parameter in
-        switch parameter {
-        case .narrowVector, .sourceNarrowVector, .narrowMask, .sourceNarrowMask: return true
-        default: return false
-        }
-    }
+    return shapes
 }
 
 /// What a span form of a gather or a scatter checks: that the indices, or the byte offsets, of the
@@ -44693,23 +44705,30 @@ func outputSpanMembers(_ forms: SpanForms) -> String {
 
 let integerElements = classicElements.filter { $0.category != .float }
 
-/// A protocol that lane types conform to. It requires the ops that every conformer has and that its
-/// parent does not already require. A half-precision conformer has an op if any op of its
-/// identifier applies to it.
+/// A protocol that lane types conform to. It requires the ops that every conformer has and that no
+/// ancestor already requires. A half-precision conformer has an op if any op of its identifier
+/// applies to it. A protocol that carries only shape ops requires just the ops that take or return a
+/// vector or a mask of one of its shapes, not every op that happens to exist on all of its
+/// conformers.
 struct ElementProtocol {
     let name: String
-    let parent: String?
+    let parents: [String]
     let documentation: String
     let conformers: [Element]
     let shapes: [Shape]
-    let carriesOps: Bool
+    let carriesOnlyShapeOps: Bool
 
-    var parentProtocol: ElementProtocol? {
-        parent.flatMap { parent in elementProtocols.first { $0.name == parent } }
+    var parentProtocols: [ElementProtocol] {
+        parents.compactMap { parent in elementProtocols.first { $0.name == parent } }
     }
 
     var ancestors: [ElementProtocol] {
-        parentProtocol.map { [$0] + $0.ancestors } ?? []
+        var ancestors: [ElementProtocol] = []
+        for ancestor in parentProtocols.flatMap({ [$0] + $0.ancestors })
+        where !ancestors.contains(where: { $0.name == ancestor.name }) {
+            ancestors.append(ancestor)
+        }
+        return ancestors
     }
 
     func isConformed(by element: Element) -> Bool {
@@ -44720,7 +44739,7 @@ struct ElementProtocol {
 let elementProtocols = [
     ElementProtocol(
         name: "SIMDElement",
-        parent: nil,
+        parents: [],
         documentation: """
             /// A lane type that `SIMD` can hold, and the ops every such type has.
             ///
@@ -44729,50 +44748,76 @@ let elementProtocols = [
             """,
         conformers: elements,
         shapes: [.full, .half, .block],
-        carriesOps: true
+        carriesOnlyShapeOps: false
     ),
     ElementProtocol(
         name: "SIMDNumericElement",
-        parent: "SIMDElement",
+        parents: ["SIMDElement"],
         documentation: """
             /// The lane types that have numeric ops, which are all but `BFloat16`, and the ops only
             /// they have.
             """,
         conformers: elements.filter { $0.category != .bfloat16 },
         shapes: [],
-        carriesOps: true
+        carriesOnlyShapeOps: false
     ),
     ElementProtocol(
         name: "SIMDIntegerElement",
-        parent: "SIMDNumericElement",
+        parents: ["SIMDNumericElement"],
         documentation: "/// The ops that only the integer lane types have.",
         conformers: integerElements,
         shapes: [],
-        carriesOps: true
+        carriesOnlyShapeOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDUnsignedIntegerElement",
+        parents: ["SIMDIntegerElement"],
+        documentation: "/// The ops that only the unsigned integer lane types have.",
+        conformers: elements.filter { $0.category == .unsignedInteger },
+        shapes: [],
+        carriesOnlyShapeOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDSignedElement",
+        parents: ["SIMDNumericElement"],
+        documentation: """
+            /// The ops that only the signed integer and floating point lane types have.
+            """,
+        conformers: elements.filter { $0.category == .signedInteger || $0.isFloatingPoint },
+        shapes: [],
+        carriesOnlyShapeOps: false
+    ),
+    ElementProtocol(
+        name: "SIMDSignedIntegerElement",
+        parents: ["SIMDIntegerElement", "SIMDSignedElement"],
+        documentation: "/// The ops that only the signed integer lane types have.",
+        conformers: elements.filter { $0.category == .signedInteger },
+        shapes: [],
+        carriesOnlyShapeOps: false
     ),
     ElementProtocol(
         name: "SIMDFloatElement",
-        parent: "SIMDNumericElement",
+        parents: ["SIMDSignedElement"],
         documentation: "/// The ops that only the floating point lane types have.",
         conformers: elements.filter(\.isFloatingPoint),
         shapes: [],
-        carriesOps: true
+        carriesOnlyShapeOps: false
     ),
     ElementProtocol(
         name: "SIMDQuarterVectorElement",
-        parent: "SIMDElement",
-        documentation: "/// The lane types that have quarter vectors.",
+        parents: ["SIMDElement"],
+        documentation: "/// The lane types that have quarter vectors, and the ops on them.",
         conformers: elements.filter { $0.supports(.quarter) },
         shapes: [.quarter],
-        carriesOps: false
+        carriesOnlyShapeOps: true
     ),
     ElementProtocol(
         name: "SIMDEighthVectorElement",
-        parent: "SIMDQuarterVectorElement",
-        documentation: "/// The lane types that have eighth vectors.",
+        parents: ["SIMDQuarterVectorElement"],
+        documentation: "/// The lane types that have eighth vectors, and the ops on them.",
         conformers: elements.filter { $0.supports(.eighth) },
         shapes: [.eighth],
-        carriesOps: false
+        carriesOnlyShapeOps: true
     ),
 ]
 
@@ -44782,19 +44827,38 @@ func isProvided(_ op: Op, by element: Element) -> Bool {
             && ops.contains { $0.identifier == op.identifier && $0.applies.matches(element) })
 }
 
-func requirementOps(of elementProtocol: ElementProtocol) -> [Op] {
-    guard elementProtocol.carriesOps else { return [] }
-    let parent = elementProtocol.parentProtocol
-    return ops.filter { op in
-        op.source == nil && !isOutsideProtocols(op)
-            && elementProtocol.conformers.allSatisfy { isProvided(op, by: $0) }
-            && !(parent?.conformers.allSatisfy { isProvided(op, by: $0) } ?? false)
-    }
+func isCarried(_ op: Op, by elementProtocol: ElementProtocol) -> Bool {
+    guard op.source == nil else { return false }
+    guard elementProtocol.carriesOnlyShapeOps else { return !isOutsideProtocols(op) }
+    return !takesIndexTypes(op) && !narrowShapes(of: op).isDisjoint(with: elementProtocol.shapes)
 }
 
-let protocolRequirementOps = Dictionary(
-    uniqueKeysWithValues: elementProtocols.map { ($0.name, requirementOps(of: $0)) }
-)
+func isRequirable(_ op: Op, by elementProtocol: ElementProtocol) -> Bool {
+    isCarried(op, by: elementProtocol)
+        && elementProtocol.conformers.allSatisfy { isProvided(op, by: $0) }
+}
+
+func requiringProtocols(of op: Op) -> [ElementProtocol] {
+    let requiring = elementProtocols.filter { elementProtocol in
+        isRequirable(op, by: elementProtocol)
+            && !elementProtocol.ancestors.contains { isRequirable(op, by: $0) }
+    }
+    if requiring.count > 1 {
+        let names = requiring.map(\.name).joined(separator: " and ")
+        fatalError("\(op.identifier) would be required by both \(names)")
+    }
+    return requiring
+}
+
+let protocolRequirementOps: [String: [Op]] = {
+    var requirements: [String: [Op]] = [:]
+    for op in ops {
+        for elementProtocol in requiringProtocols(of: op) {
+            requirements[elementProtocol.name, default: []].append(op)
+        }
+    }
+    return requirements
+}()
 
 func protocolConformances(of element: Element) -> [String] {
     let conformed = elementProtocols.filter { $0.isConformed(by: element) }
@@ -44830,9 +44894,9 @@ struct StaticRequirement {
 }
 
 func staticRequirements(of elementProtocol: ElementProtocol) -> [StaticRequirement] {
-    guard elementProtocol.carriesOps else { return [] }
+    guard !elementProtocol.carriesOnlyShapeOps else { return [] }
     var requirements: [StaticRequirement] = []
-    if elementProtocol.parent == nil {
+    if elementProtocol.parents.isEmpty {
         requirements = [
             StaticRequirement(
                 name: "laneCount",
@@ -44848,10 +44912,11 @@ func staticRequirements(of elementProtocol: ElementProtocol) -> [StaticRequireme
             ),
         ]
     }
-    let parent = elementProtocol.parentProtocol
     for capability in laneCapabilities
     where elementProtocol.conformers.allSatisfy(capability.applies.matches)
-        && !(parent?.conformers.allSatisfy(capability.applies.matches) ?? false)
+        && !elementProtocol.ancestors.contains(where: {
+            $0.conformers.allSatisfy(capability.applies.matches)
+        })
     {
         requirements.append(
             StaticRequirement(
@@ -44984,7 +45049,7 @@ func protocolDeclaration(_ elementProtocol: ElementProtocol) -> String {
             members += "    associatedtype \(simdTypeName(of: shape, isMask: true))\n"
         }
     }
-    if elementProtocol.parent == nil {
+    if elementProtocol.parents.isEmpty {
         members +=
             "    associatedtype IndexLane: SIMDElement where IndexLane.IndexLane == IndexLane\n"
     }
@@ -45000,7 +45065,8 @@ func protocolDeclaration(_ elementProtocol: ElementProtocol) -> String {
         members += "\n"
         members += forms.map(requirementDeclaration).joined()
     }
-    let inheritance = elementProtocol.parent.map { ": \($0)" } ?? ""
+    let parents = elementProtocol.parents.joined(separator: ", ")
+    let inheritance = parents.isEmpty ? "" : ": \(parents)"
     return """
         \(elementProtocol.documentation)
         public protocol \(elementProtocol.name)\(inheritance) {
@@ -45143,8 +45209,7 @@ func generateGenericMembers(of elementProtocol: ElementProtocol) -> [SectionMemb
 
 func generateElementWitnesses(_ element: Element) -> [SectionMember] {
     var members: [SectionMember] = []
-    for elementProtocol in elementProtocols
-    where elementProtocol.carriesOps && elementProtocol.isConformed(by: element) {
+    for elementProtocol in elementProtocols where elementProtocol.isConformed(by: element) {
         members += staticRequirements(of: elementProtocol).map { requirement in
             SectionMember(
                 section: .initialization,
@@ -45195,7 +45260,7 @@ func generateElementConformance(_ element: Element) -> String {
                     "    public typealias \(simdTypeName(of: shape, isMask: true)) = \(simdMaskType(of: element, shape: shape))\n"
             }
         }
-        if elementProtocol.parent == nil {
+        if elementProtocol.parents.isEmpty {
             aliases +=
                 "    public typealias IndexLane = \(laneIndexElement(of: element).swiftType)\n"
         }
@@ -50409,13 +50474,13 @@ try write(
 try write(generateCodegenTarget(), to: "\(generatedCodegenRoot)/HighwayTargetCodegen.swift")
 try write(generateProtocols(), to: "\(generatedSwiftRoot)/SIMDElement.swift")
 try write(generateSIMD(), to: "\(generatedSwiftRoot)/SIMD.swift")
-for elementProtocol in elementProtocols where elementProtocol.carriesOps {
+for elementProtocol in elementProtocols {
     try writeSections(
         generateGenericMembers(of: elementProtocol),
         named: "SIMD+Generic\(elementProtocol.name.dropFirst("SIMD".count))",
         in: generatedSwiftRoot,
         imports: "",
-        extending: elementProtocol.parent == nil
+        extending: elementProtocol.parents.isEmpty
             ? "SIMD" : "SIMD where Lane: \(elementProtocol.name)",
         balancing: true
     )

@@ -1035,18 +1035,53 @@ public protocol SIMDIntegerElement: SIMDNumericElement {
     ) -> SIMD<Self>
 }
 
-/// The ops that only the floating point lane types have.
-public protocol SIMDFloatElement: SIMDNumericElement {
+/// The ops that only the unsigned integer lane types have.
+public protocol SIMDUnsignedIntegerElement: SIMDIntegerElement {
+
+    static func _nonzeroBitCount(_ a: SIMD<Self>) -> SIMD<Self>
+}
+
+/// The ops that only the signed integer and floating point lane types have.
+public protocol SIMDSignedElement: SIMDNumericElement {
 
     static func _negated(_ a: SIMD<Self>) -> SIMD<Self>
     static func _magnitude(_ a: SIMD<Self>) -> SIMD<Self>
+    static func _complexConjugate(_ a: SIMD<Self>) -> SIMD<Self>
+    static func _zeroingNegative(_ a: SIMD<Self>) -> SIMD<Self>
+    static func _selectingIfNegative(
+        _ a: SIMD<Self>,
+        _ b: SIMD<Self>,
+        _ c: SIMD<Self>
+    ) -> SIMD<Self>
+    static func _selectingIfNegativeOrZero(_ a: SIMD<Self>, _ b: SIMD<Self>) -> SIMD<Self>
+    static func _zeroingIfNegative(_ a: SIMD<Self>, _ b: SIMD<Self>) -> SIMD<Self>
+    static func _negatingIfNegative(_ a: SIMD<Self>, _ b: SIMD<Self>) -> SIMD<Self>
+    static func _isNegative(_ a: SIMD<Self>) -> SIMD<Self>.Mask
+}
+
+/// The ops that only the signed integer lane types have.
+public protocol SIMDSignedIntegerElement: SIMDIntegerElement, SIMDSignedElement {
+
+    static func _saturatingNegated(_ a: SIMD<Self>) -> SIMD<Self>
+    static func _saturatingMagnitude(_ a: SIMD<Self>) -> SIMD<Self>
+    static func _broadcastingSignBit(_ a: SIMD<Self>) -> SIMD<Self>
+    static func _magnitude(_ a: SIMD<Self>, where mask: SIMD<Self>.Mask) -> SIMD<Self>
+    static func _magnitude(
+        _ a: SIMD<Self>,
+        where mask: SIMD<Self>.Mask,
+        otherwise: SIMD<Self>
+    ) -> SIMD<Self>
+}
+
+/// The ops that only the floating point lane types have.
+public protocol SIMDFloatElement: SIMDSignedElement {
+
     static func _copyingSign(_ a: SIMD<Self>, from b: SIMD<Self>) -> SIMD<Self>
     static func _copyingSignToMagnitude(_ a: SIMD<Self>, from b: SIMD<Self>) -> SIMD<Self>
     static func _squareRoot(_ a: SIMD<Self>) -> SIMD<Self>
     static func _approximateReciprocalSquareRoot(_ a: SIMD<Self>) -> SIMD<Self>
     static func _approximateReciprocal(_ a: SIMD<Self>) -> SIMD<Self>
     static func _exponent(_ a: SIMD<Self>) -> SIMD<Self>
-    static func _complexConjugate(_ a: SIMD<Self>) -> SIMD<Self>
     static func _multiplyingRounded(_ a: SIMD<Self>, _ b: SIMD<Self>) -> SIMD<Self>
     static func _roundedToNearestOrEven(_ a: SIMD<Self>) -> SIMD<Self>
     static func _roundedTowardZero(_ a: SIMD<Self>) -> SIMD<Self>
@@ -1061,16 +1096,6 @@ public protocol SIMDFloatElement: SIMDNumericElement {
     static func _largestOrNaN(_ a: SIMD<Self>) -> Self
     static func _nan() -> SIMD<Self>
     static func _infinity() -> SIMD<Self>
-    static func _zeroingNegative(_ a: SIMD<Self>) -> SIMD<Self>
-    static func _selectingIfNegative(
-        _ a: SIMD<Self>,
-        _ b: SIMD<Self>,
-        _ c: SIMD<Self>
-    ) -> SIMD<Self>
-    static func _selectingIfNegativeOrZero(_ a: SIMD<Self>, _ b: SIMD<Self>) -> SIMD<Self>
-    static func _zeroingIfNegative(_ a: SIMD<Self>, _ b: SIMD<Self>) -> SIMD<Self>
-    static func _negatingIfNegative(_ a: SIMD<Self>, _ b: SIMD<Self>) -> SIMD<Self>
-    static func _isNegative(_ a: SIMD<Self>) -> SIMD<Self>.Mask
     static func _byteSwapped(_ a: SIMD<Self>) -> SIMD<Self>
     static func _squareRoot(_ a: SIMD<Self>, where mask: SIMD<Self>.Mask) -> SIMD<Self>
     static func _squareRoot(
@@ -1086,18 +1111,60 @@ public protocol SIMDFloatElement: SIMDNumericElement {
     static func _isNaN(_ a: SIMD<Self>, where mask: SIMD<Self>.Mask) -> SIMD<Self>.Mask
 }
 
-/// The lane types that have quarter vectors.
+/// The lane types that have quarter vectors, and the ops on them.
 public protocol SIMDQuarterVectorElement: SIMDElement {
     associatedtype _RawQuarterVector: Sendable
     associatedtype _RawQuarterMask: Sendable
     associatedtype _SIMDQuarterVector
     associatedtype _SIMDQuarterMask
+
+    static func _loadQuarter(from: UnsafePointer<Self>) -> SIMD<Self>.QuarterVector
+    @available(SwiftStdlib 5.1, *)
+    static func _loadQuarter(from span: Span<Self>) -> SIMD<Self>.QuarterVector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _loadQuarter(fromUnchecked span: Span<Self>) -> SIMD<Self>.QuarterVector
+    static func _store(_ a: SIMD<Self>.QuarterVector, to: UnsafeMutablePointer<Self>)
+    @available(SwiftStdlib 5.1, *)
+    static func _store(_ a: SIMD<Self>.QuarterVector, to span: inout MutableSpan<Self>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _store(
+        _ a: SIMD<Self>.QuarterVector,
+        toUnchecked span: inout MutableSpan<Self>
+    )
+    @available(SwiftStdlib 5.1, *)
+    static func _append(_ a: SIMD<Self>.QuarterVector, to output: inout OutputSpan<Self>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _append(
+        _ a: SIMD<Self>.QuarterVector,
+        toUnchecked output: inout OutputSpan<Self>
+    )
 }
 
-/// The lane types that have eighth vectors.
+/// The lane types that have eighth vectors, and the ops on them.
 public protocol SIMDEighthVectorElement: SIMDQuarterVectorElement {
     associatedtype _RawEighthVector: Sendable
     associatedtype _RawEighthMask: Sendable
     associatedtype _SIMDEighthVector
     associatedtype _SIMDEighthMask
+
+    static func _loadEighth(from: UnsafePointer<Self>) -> SIMD<Self>.EighthVector
+    @available(SwiftStdlib 5.1, *)
+    static func _loadEighth(from span: Span<Self>) -> SIMD<Self>.EighthVector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _loadEighth(fromUnchecked span: Span<Self>) -> SIMD<Self>.EighthVector
+    static func _store(_ a: SIMD<Self>.EighthVector, to: UnsafeMutablePointer<Self>)
+    @available(SwiftStdlib 5.1, *)
+    static func _store(_ a: SIMD<Self>.EighthVector, to span: inout MutableSpan<Self>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _store(
+        _ a: SIMD<Self>.EighthVector,
+        toUnchecked span: inout MutableSpan<Self>
+    )
+    @available(SwiftStdlib 5.1, *)
+    static func _append(_ a: SIMD<Self>.EighthVector, to output: inout OutputSpan<Self>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _append(
+        _ a: SIMD<Self>.EighthVector,
+        toUnchecked output: inout OutputSpan<Self>
+    )
 }

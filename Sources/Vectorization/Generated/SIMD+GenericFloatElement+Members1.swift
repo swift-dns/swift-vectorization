@@ -12,16 +12,6 @@ extension SIMD where Lane: SIMDFloatElement {
     }
 
     @export(implementation) @inline(always)
-    public static func negated(_ a: SIMD) -> SIMD {
-        Lane._negated(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func magnitude(_ a: SIMD) -> SIMD {
-        Lane._magnitude(a)
-    }
-
-    @export(implementation) @inline(always)
     public static func squareRoot(_ a: SIMD) -> SIMD {
         Lane._squareRoot(a)
     }
@@ -49,11 +39,6 @@ extension SIMD where Lane: SIMDFloatElement {
     @export(implementation) @inline(always)
     public static func multiplyingByFloorPowerOf2(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._multiplyingByFloorPowerOf2(a, b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func complexConjugate(_ a: SIMD) -> SIMD {
-        Lane._complexConjugate(a)
     }
 
     @export(implementation) @inline(always)
@@ -104,36 +89,6 @@ extension SIMD where Lane: SIMDFloatElement {
     @export(implementation) @inline(always)
     public static func copyingSignToMagnitude(_ a: SIMD, from b: SIMD) -> SIMD {
         Lane._copyingSignToMagnitude(a, from: b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func zeroingNegative(_ a: SIMD) -> SIMD {
-        Lane._zeroingNegative(a)
-    }
-
-    @export(implementation) @inline(always)
-    public static func selectingIfNegative(_ a: SIMD, _ b: SIMD, _ c: SIMD) -> SIMD {
-        Lane._selectingIfNegative(a, b, c)
-    }
-
-    @export(implementation) @inline(always)
-    public static func selectingIfNegativeOrZero(_ a: SIMD, _ b: SIMD) -> SIMD {
-        Lane._selectingIfNegativeOrZero(a, b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func zeroingIfNegative(_ a: SIMD, _ b: SIMD) -> SIMD {
-        Lane._zeroingIfNegative(a, b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func negatingIfNegative(_ a: SIMD, _ b: SIMD) -> SIMD {
-        Lane._negatingIfNegative(a, b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func isNegative(_ a: SIMD) -> Mask {
-        Lane._isNegative(a)
     }
 
     @export(implementation) @inline(always)

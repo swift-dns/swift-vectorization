@@ -41,6 +41,59 @@ private func floatOps<Lane: SIMDFloatElement>(
     return (H.squareRoot(H.magnitude(a)), H.roundedDown(a), H.negated(a))
 }
 
+private func signedOps<Lane: SIMDSignedElement>(
+    _ a: SIMD<Lane>
+) -> (negated: SIMD<Lane>, magnitude: SIMD<Lane>, signs: SIMD<Lane>.Mask, zeroed: SIMD<Lane>) {
+    typealias H = SIMD<Lane>
+
+    return (H.negated(a), H.magnitude(a), H.isNegative(a), H.zeroingNegative(a))
+}
+
+private func unsignedIntegerOps<Lane: SIMDUnsignedIntegerElement>(
+    _ a: SIMD<Lane>
+) -> (bitCounts: SIMD<Lane>, halved: SIMD<Lane>) {
+    typealias H = SIMD<Lane>
+
+    let bitCounts = H.nonzeroBitCount(a)
+    return (bitCounts, H.shiftedRight(bitCounts, by: 1))
+}
+
+private func signedIntegerOps<Lane: SIMDSignedIntegerElement>(
+    _ a: SIMD<Lane>
+) -> (saturated: SIMD<Lane>, magnitude: SIMD<Lane>, signs: SIMD<Lane>, masked: SIMD<Lane>) {
+    typealias H = SIMD<Lane>
+
+    return (
+        H.saturatingNegated(a), H.saturatingMagnitude(a), H.broadcastingSignBit(a),
+        H.magnitude(a, where: H.isNegative(a))
+    )
+}
+
+private func quarterVectorOps<Lane: SIMDQuarterVectorElement>(
+    _ input: ContiguousArray<Lane>
+) -> [Lane] {
+    typealias H = SIMD<Lane>
+
+    let copy = ContiguousArray<Lane>(capacity: H.laneCount) { output in
+        H.append(H.loadQuarter(from: input.span), to: &output)
+    }
+    return Array(copy)
+}
+
+private func eighthVectorOps<Lane: SIMDEighthVectorElement>(
+    _ input: ContiguousArray<Lane>
+) -> (eighth: [Lane], quarter: [Lane]) {
+    typealias H = SIMD<Lane>
+
+    let eighth = ContiguousArray<Lane>(capacity: H.laneCount) { output in
+        H.append(H.loadEighth(from: input.span), to: &output)
+    }
+    let quarter = ContiguousArray<Lane>(capacity: H.laneCount) { output in
+        H.append(H.loadQuarter(from: input.span), to: &output)
+    }
+    return (Array(eighth), Array(quarter))
+}
+
 @Suite("Generic ops")
 struct GenericOpsTests {
     @Test("Ops of SIMDElement called through a generic lane type match the concrete ones")
@@ -148,5 +201,130 @@ struct GenericOpsTests {
         )
         #expect(genericDoubles.rounded.raw == SIMD<Double>.roundedDown(doubles).raw)
         #expect(genericDoubles.negated.raw == SIMD<Double>.negated(doubles).raw)
+    }
+
+    @Test("Ops of SIMDSignedElement called through a generic lane type match the concrete ones")
+    func signedOpsMatchConcreteOnes() {
+        let shorts = SIMD<Int16>.iota(-3)
+        let genericShorts = signedOps(shorts)
+
+        #expect(genericShorts.negated.raw == SIMD<Int16>.negated(shorts).raw)
+        #expect(genericShorts.magnitude.raw == SIMD<Int16>.magnitude(shorts).raw)
+        #expect(genericShorts.signs.raw == SIMD<Int16>.isNegative(shorts).raw)
+        #expect(genericShorts.zeroed.raw == SIMD<Int16>.zeroingNegative(shorts).raw)
+
+        let floats = SIMD<Float>.iota(-2.5)
+        let genericFloats = signedOps(floats)
+
+        #expect(genericFloats.negated.raw == SIMD<Float>.negated(floats).raw)
+        #expect(genericFloats.magnitude.raw == SIMD<Float>.magnitude(floats).raw)
+        #expect(genericFloats.signs.raw == SIMD<Float>.isNegative(floats).raw)
+        #expect(genericFloats.zeroed.raw == SIMD<Float>.zeroingNegative(floats).raw)
+    }
+
+    @Test(
+        "Ops of SIMDUnsignedIntegerElement called through a generic lane type match the concrete ones"
+    )
+    func unsignedIntegerOpsMatchConcreteOnes() {
+        let bytes = SIMD<UInt8>.iota(250)
+        let genericBytes = unsignedIntegerOps(bytes)
+        let byteCounts = SIMD<UInt8>.nonzeroBitCount(bytes)
+
+        #expect(genericBytes.bitCounts.raw == byteCounts.raw)
+        #expect(genericBytes.halved.raw == SIMD<UInt8>.shiftedRight(byteCounts, by: 1).raw)
+
+        let words = SIMD<UInt32>.iota(0xFFFF_FFFE)
+        let genericWords = unsignedIntegerOps(words)
+        let wordCounts = SIMD<UInt32>.nonzeroBitCount(words)
+
+        #expect(genericWords.bitCounts.raw == wordCounts.raw)
+        #expect(genericWords.halved.raw == SIMD<UInt32>.shiftedRight(wordCounts, by: 1).raw)
+    }
+
+    @Test(
+        "Ops of SIMDSignedIntegerElement called through a generic lane type match the concrete ones"
+    )
+    func signedIntegerOpsMatchConcreteOnes() {
+        let bytes = SIMD<Int8>.iota(-128)
+        let genericBytes = signedIntegerOps(bytes)
+
+        #expect(genericBytes.saturated.raw == SIMD<Int8>.saturatingNegated(bytes).raw)
+        #expect(genericBytes.magnitude.raw == SIMD<Int8>.saturatingMagnitude(bytes).raw)
+        #expect(genericBytes.signs.raw == SIMD<Int8>.broadcastingSignBit(bytes).raw)
+        let maskedBytes = SIMD<Int8>.magnitude(bytes, where: SIMD<Int8>.isNegative(bytes))
+        #expect(genericBytes.masked.raw == maskedBytes.raw)
+
+        let words = SIMD<Int32>.iota(-3)
+        let genericWords = signedIntegerOps(words)
+
+        #expect(genericWords.saturated.raw == SIMD<Int32>.saturatingNegated(words).raw)
+        #expect(genericWords.magnitude.raw == SIMD<Int32>.saturatingMagnitude(words).raw)
+        #expect(genericWords.signs.raw == SIMD<Int32>.broadcastingSignBit(words).raw)
+        let maskedWords = SIMD<Int32>.magnitude(words, where: SIMD<Int32>.isNegative(words))
+        #expect(genericWords.masked.raw == maskedWords.raw)
+    }
+
+    @Test(
+        "Ops of SIMDQuarterVectorElement called through a generic lane type match the concrete ones"
+    )
+    func quarterVectorOpsMatchConcreteOnes() {
+        let shorts = ContiguousArray(
+            (0..<SIMD<UInt16>.laneCount).map { UInt16(truncatingIfNeeded: $0 &* 37 &+ 11) }
+        )
+        let genericShorts = quarterVectorOps(shorts)
+        let concreteShorts = ContiguousArray<UInt16>(capacity: SIMD<UInt16>.laneCount) { output in
+            SIMD<UInt16>.append(SIMD<UInt16>.loadQuarter(from: shorts.span), to: &output)
+        }
+
+        #expect(genericShorts == Array(concreteShorts))
+        #expect(genericShorts == Array(shorts.prefix(SIMD<UInt16>.laneCount / 4)))
+
+        let bytes = ContiguousArray(
+            (0..<SIMD<Int8>.laneCount).map { Int8(truncatingIfNeeded: $0 &* 37 &- 90) }
+        )
+        let genericBytes = quarterVectorOps(bytes)
+        let concreteBytes = ContiguousArray<Int8>(capacity: SIMD<Int8>.laneCount) { output in
+            SIMD<Int8>.append(SIMD<Int8>.loadQuarter(from: bytes.span), to: &output)
+        }
+
+        #expect(genericBytes == Array(concreteBytes))
+        #expect(genericBytes == Array(bytes.prefix(SIMD<Int8>.laneCount / 4)))
+    }
+
+    @Test(
+        "Ops of SIMDEighthVectorElement called through a generic lane type match the concrete ones"
+    )
+    func eighthVectorOpsMatchConcreteOnes() {
+        let bytes = ContiguousArray(
+            (0..<SIMD<UInt8>.laneCount).map { UInt8(truncatingIfNeeded: $0 &* 37 &+ 11) }
+        )
+        let genericBytes = eighthVectorOps(bytes)
+        let concreteEighth = ContiguousArray<UInt8>(capacity: SIMD<UInt8>.laneCount) { output in
+            SIMD<UInt8>.append(SIMD<UInt8>.loadEighth(from: bytes.span), to: &output)
+        }
+        let concreteQuarter = ContiguousArray<UInt8>(capacity: SIMD<UInt8>.laneCount) { output in
+            SIMD<UInt8>.append(SIMD<UInt8>.loadQuarter(from: bytes.span), to: &output)
+        }
+
+        #expect(genericBytes.eighth == Array(concreteEighth))
+        #expect(genericBytes.quarter == Array(concreteQuarter))
+        #expect(genericBytes.eighth == Array(bytes.prefix(SIMD<UInt8>.laneCount / 8)))
+        #expect(genericBytes.quarter == Array(bytes.prefix(SIMD<UInt8>.laneCount / 4)))
+
+        let signedBytes = ContiguousArray(
+            (0..<SIMD<Int8>.laneCount).map { Int8(truncatingIfNeeded: $0 &* 37 &- 90) }
+        )
+        let genericSignedBytes = eighthVectorOps(signedBytes)
+        let signedEighth = ContiguousArray<Int8>(capacity: SIMD<Int8>.laneCount) { output in
+            SIMD<Int8>.append(SIMD<Int8>.loadEighth(from: signedBytes.span), to: &output)
+        }
+        let signedQuarter = ContiguousArray<Int8>(capacity: SIMD<Int8>.laneCount) { output in
+            SIMD<Int8>.append(SIMD<Int8>.loadQuarter(from: signedBytes.span), to: &output)
+        }
+
+        #expect(genericSignedBytes.eighth == Array(signedEighth))
+        #expect(genericSignedBytes.quarter == Array(signedQuarter))
+        #expect(genericSignedBytes.eighth == Array(signedBytes.prefix(SIMD<Int8>.laneCount / 8)))
+        #expect(genericSignedBytes.quarter == Array(signedBytes.prefix(SIMD<Int8>.laneCount / 4)))
     }
 }

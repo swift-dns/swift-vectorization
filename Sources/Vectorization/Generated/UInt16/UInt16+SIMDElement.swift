@@ -2,7 +2,7 @@
 
 public import CVectorizationOps
 
-extension UInt16: SIMDIntegerElement, SIMDQuarterVectorElement {
+extension UInt16: SIMDUnsignedIntegerElement, SIMDQuarterVectorElement {
     public typealias _RawVector = cvectorization_ops_raw_vector_u16
     public typealias _RawMask = cvectorization_ops_raw_mask_u16
     public typealias _SIMDVector = cvectorization_ops_vector_u16

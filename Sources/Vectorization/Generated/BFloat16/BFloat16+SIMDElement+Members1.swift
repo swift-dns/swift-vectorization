@@ -390,6 +390,25 @@ extension BFloat16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _loadQuarter(from: UnsafePointer<BFloat16>) -> SIMD<BFloat16>.QuarterVector {
+        unsafe SIMD<BFloat16>.loadQuarter(from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _loadQuarter(from span: Span<BFloat16>) -> SIMD<BFloat16>.QuarterVector {
+        SIMD<BFloat16>.loadQuarter(from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _loadQuarter(
+        fromUnchecked span: Span<BFloat16>
+    ) -> SIMD<BFloat16>.QuarterVector {
+        unsafe SIMD<BFloat16>.loadQuarter(fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
     public static func _store(_ a: SIMD<BFloat16>, to: UnsafeMutablePointer<BFloat16>) {
         unsafe SIMD<BFloat16>.store(a, to: to)
     }
@@ -546,6 +565,48 @@ extension BFloat16 {
     @export(implementation) @inline(always)
     public static func _copy(from: Span<BFloat16>, to: inout MutableSpan<BFloat16>) {
         SIMD<BFloat16>.copy(from: from, to: &to)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<BFloat16>.QuarterVector, to: UnsafeMutablePointer<BFloat16>)
+    {
+        unsafe SIMD<BFloat16>.store(a, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _store(
+        _ a: SIMD<BFloat16>.QuarterVector,
+        to span: inout MutableSpan<BFloat16>
+    ) {
+        SIMD<BFloat16>.store(a, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _store(
+        _ a: SIMD<BFloat16>.QuarterVector,
+        toUnchecked span: inout MutableSpan<BFloat16>
+    ) {
+        unsafe SIMD<BFloat16>.store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _append(
+        _ a: SIMD<BFloat16>.QuarterVector,
+        to output: inout OutputSpan<BFloat16>
+    ) {
+        SIMD<BFloat16>.append(a, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _append(
+        _ a: SIMD<BFloat16>.QuarterVector,
+        toUnchecked output: inout OutputSpan<BFloat16>
+    ) {
+        unsafe SIMD<BFloat16>.append(a, toUnchecked: &output)
     }
 
     @export(implementation) @inline(always)

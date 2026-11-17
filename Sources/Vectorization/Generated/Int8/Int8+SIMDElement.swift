@@ -2,7 +2,7 @@
 
 public import CVectorizationOps
 
-extension Int8: SIMDIntegerElement, SIMDEighthVectorElement {
+extension Int8: SIMDSignedIntegerElement, SIMDEighthVectorElement {
     public typealias _RawVector = cvectorization_ops_raw_vector_i8
     public typealias _RawMask = cvectorization_ops_raw_mask_i8
     public typealias _SIMDVector = cvectorization_ops_vector_i8

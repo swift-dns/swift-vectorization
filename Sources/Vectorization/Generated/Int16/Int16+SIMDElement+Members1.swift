@@ -156,6 +156,26 @@ extension Int16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _negated(_ a: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.negated(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _magnitude(_ a: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.magnitude(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _saturatingNegated(_ a: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.saturatingNegated(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _saturatingMagnitude(_ a: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.saturatingMagnitude(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func _minimum(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
         SIMD<Int16>.minimum(a, b)
     }
@@ -307,6 +327,11 @@ extension Int16 {
         where mask: SIMD<Int16>.Mask
     ) -> SIMD<Int16> {
         SIMD<Int16>.multiplyAddingComplexConjugate(a, b, c, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _complexConjugate(_ a: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.complexConjugate(a)
     }
 
     @export(implementation) @inline(always)
@@ -526,6 +551,41 @@ extension Int16 {
         where mask: SIMD<Int16>.Mask
     ) -> SIMD<Int16> {
         SIMD<Int16>.leadingZeroBitCount(a, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _zeroingNegative(_ a: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.zeroingNegative(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _selectingIfNegative(
+        _ a: SIMD<Int16>,
+        _ b: SIMD<Int16>,
+        _ c: SIMD<Int16>
+    ) -> SIMD<Int16> {
+        SIMD<Int16>.selectingIfNegative(a, b, c)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _selectingIfNegativeOrZero(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16>
+    {
+        SIMD<Int16>.selectingIfNegativeOrZero(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _zeroingIfNegative(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.zeroingIfNegative(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _negatingIfNegative(_ a: SIMD<Int16>, _ b: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.negatingIfNegative(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _broadcastingSignBit(_ a: SIMD<Int16>) -> SIMD<Int16> {
+        SIMD<Int16>.broadcastingSignBit(a)
     }
 
     @export(implementation) @inline(always)
@@ -810,6 +870,11 @@ extension Int16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _isNegative(_ a: SIMD<Int16>) -> SIMD<Int16>.Mask {
+        SIMD<Int16>.isNegative(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func _load(from: UnsafePointer<Int16>) -> SIMD<Int16> {
         unsafe SIMD<Int16>.load(from: from)
     }
@@ -962,6 +1027,23 @@ extension Int16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _loadQuarter(from: UnsafePointer<Int16>) -> SIMD<Int16>.QuarterVector {
+        unsafe SIMD<Int16>.loadQuarter(from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _loadQuarter(from span: Span<Int16>) -> SIMD<Int16>.QuarterVector {
+        SIMD<Int16>.loadQuarter(from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _loadQuarter(fromUnchecked span: Span<Int16>) -> SIMD<Int16>.QuarterVector {
+        unsafe SIMD<Int16>.loadQuarter(fromUnchecked: span)
+    }
+
+    @export(implementation) @inline(always)
     public static func _store(_ a: SIMD<Int16>, to: UnsafeMutablePointer<Int16>) {
         unsafe SIMD<Int16>.store(a, to: to)
     }
@@ -1105,6 +1187,41 @@ extension Int16 {
     @export(implementation) @inline(always)
     public static func _copy(from: Span<Int16>, to: inout MutableSpan<Int16>) {
         SIMD<Int16>.copy(from: from, to: &to)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<Int16>.QuarterVector, to: UnsafeMutablePointer<Int16>) {
+        unsafe SIMD<Int16>.store(a, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _store(_ a: SIMD<Int16>.QuarterVector, to span: inout MutableSpan<Int16>) {
+        SIMD<Int16>.store(a, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _store(
+        _ a: SIMD<Int16>.QuarterVector,
+        toUnchecked span: inout MutableSpan<Int16>
+    ) {
+        unsafe SIMD<Int16>.store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _append(_ a: SIMD<Int16>.QuarterVector, to output: inout OutputSpan<Int16>) {
+        SIMD<Int16>.append(a, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _append(
+        _ a: SIMD<Int16>.QuarterVector,
+        toUnchecked output: inout OutputSpan<Int16>
+    ) {
+        unsafe SIMD<Int16>.append(a, toUnchecked: &output)
     }
 
     @export(implementation) @inline(always)
@@ -1901,6 +2018,15 @@ extension Int16 {
     }
 
     @export(implementation) @inline(always)
+    public static func _magnitude(
+        _ a: SIMD<Int16>,
+        where mask: SIMD<Int16>.Mask,
+        otherwise: SIMD<Int16>
+    ) -> SIMD<Int16> {
+        SIMD<Int16>.magnitude(a, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
     public static func _maximum(
         _ a: SIMD<Int16>,
         _ b: SIMD<Int16>,
@@ -1983,6 +2109,11 @@ extension Int16 {
         where mask: SIMD<Int16>.Mask
     ) -> SIMD<Int16> {
         SIMD<Int16>.negatedMultiplySubtracting(a, b, c, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _magnitude(_ a: SIMD<Int16>, where mask: SIMD<Int16>.Mask) -> SIMD<Int16> {
+        SIMD<Int16>.magnitude(a, where: mask)
     }
 
     @export(implementation) @inline(always)

@@ -156,6 +156,26 @@ extension Int32 {
     }
 
     @export(implementation) @inline(always)
+    public static func _negated(_ a: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.negated(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _magnitude(_ a: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.magnitude(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _saturatingNegated(_ a: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.saturatingNegated(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _saturatingMagnitude(_ a: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.saturatingMagnitude(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func _minimum(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
         SIMD<Int32>.minimum(a, b)
     }
@@ -307,6 +327,11 @@ extension Int32 {
         where mask: SIMD<Int32>.Mask
     ) -> SIMD<Int32> {
         SIMD<Int32>.multiplyAddingComplexConjugate(a, b, c, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _complexConjugate(_ a: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.complexConjugate(a)
     }
 
     @export(implementation) @inline(always)
@@ -526,6 +551,41 @@ extension Int32 {
         where mask: SIMD<Int32>.Mask
     ) -> SIMD<Int32> {
         SIMD<Int32>.leadingZeroBitCount(a, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _zeroingNegative(_ a: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.zeroingNegative(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _selectingIfNegative(
+        _ a: SIMD<Int32>,
+        _ b: SIMD<Int32>,
+        _ c: SIMD<Int32>
+    ) -> SIMD<Int32> {
+        SIMD<Int32>.selectingIfNegative(a, b, c)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _selectingIfNegativeOrZero(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32>
+    {
+        SIMD<Int32>.selectingIfNegativeOrZero(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _zeroingIfNegative(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.zeroingIfNegative(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _negatingIfNegative(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.negatingIfNegative(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _broadcastingSignBit(_ a: SIMD<Int32>) -> SIMD<Int32> {
+        SIMD<Int32>.broadcastingSignBit(a)
     }
 
     @export(implementation) @inline(always)
@@ -807,6 +867,11 @@ extension Int32 {
     @export(implementation) @inline(always)
     public static func _testingBit(_ a: SIMD<Int32>, _ b: SIMD<Int32>) -> SIMD<Int32>.Mask {
         SIMD<Int32>.testingBit(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _isNegative(_ a: SIMD<Int32>) -> SIMD<Int32>.Mask {
+        SIMD<Int32>.isNegative(a)
     }
 
     @export(implementation) @inline(always)
@@ -1901,6 +1966,15 @@ extension Int32 {
     }
 
     @export(implementation) @inline(always)
+    public static func _magnitude(
+        _ a: SIMD<Int32>,
+        where mask: SIMD<Int32>.Mask,
+        otherwise: SIMD<Int32>
+    ) -> SIMD<Int32> {
+        SIMD<Int32>.magnitude(a, where: mask, otherwise: otherwise)
+    }
+
+    @export(implementation) @inline(always)
     public static func _maximum(
         _ a: SIMD<Int32>,
         _ b: SIMD<Int32>,
@@ -1983,6 +2057,11 @@ extension Int32 {
         where mask: SIMD<Int32>.Mask
     ) -> SIMD<Int32> {
         SIMD<Int32>.negatedMultiplySubtracting(a, b, c, where: mask)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _magnitude(_ a: SIMD<Int32>, where mask: SIMD<Int32>.Mask) -> SIMD<Int32> {
+        SIMD<Int32>.magnitude(a, where: mask)
     }
 
     @export(implementation) @inline(always)

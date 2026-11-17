@@ -531,6 +531,11 @@ extension UInt64 {
     }
 
     @export(implementation) @inline(always)
+    public static func _nonzeroBitCount(_ a: SIMD<UInt64>) -> SIMD<UInt64> {
+        SIMD<UInt64>.nonzeroBitCount(a)
+    }
+
+    @export(implementation) @inline(always)
     public static func _firstLanes(count: Int) -> SIMD<UInt64>.Mask {
         SIMD<UInt64>.firstLanes(count: count)
     }

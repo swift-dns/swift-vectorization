@@ -524,19 +524,6 @@ extension Double {
     }
 
     @export(implementation) @inline(always)
-    public static func _copyingSign(_ a: SIMD<Double>, from b: SIMD<Double>) -> SIMD<Double> {
-        SIMD<Double>.copyingSign(a, from: b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _copyingSignToMagnitude(
-        _ a: SIMD<Double>,
-        from b: SIMD<Double>
-    ) -> SIMD<Double> {
-        SIMD<Double>.copyingSignToMagnitude(a, from: b)
-    }
-
-    @export(implementation) @inline(always)
     public static func _zeroingNegative(_ a: SIMD<Double>) -> SIMD<Double> {
         SIMD<Double>.zeroingNegative(a)
     }
@@ -566,6 +553,19 @@ extension Double {
     @export(implementation) @inline(always)
     public static func _negatingIfNegative(_ a: SIMD<Double>, _ b: SIMD<Double>) -> SIMD<Double> {
         SIMD<Double>.negatingIfNegative(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _copyingSign(_ a: SIMD<Double>, from b: SIMD<Double>) -> SIMD<Double> {
+        SIMD<Double>.copyingSign(a, from: b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _copyingSignToMagnitude(
+        _ a: SIMD<Double>,
+        from b: SIMD<Double>
+    ) -> SIMD<Double> {
+        SIMD<Double>.copyingSignToMagnitude(a, from: b)
     }
 
     @export(implementation) @inline(always)

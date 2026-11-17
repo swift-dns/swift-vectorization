@@ -524,17 +524,6 @@ extension Float {
     }
 
     @export(implementation) @inline(always)
-    public static func _copyingSign(_ a: SIMD<Float>, from b: SIMD<Float>) -> SIMD<Float> {
-        SIMD<Float>.copyingSign(a, from: b)
-    }
-
-    @export(implementation) @inline(always)
-    public static func _copyingSignToMagnitude(_ a: SIMD<Float>, from b: SIMD<Float>) -> SIMD<Float>
-    {
-        SIMD<Float>.copyingSignToMagnitude(a, from: b)
-    }
-
-    @export(implementation) @inline(always)
     public static func _zeroingNegative(_ a: SIMD<Float>) -> SIMD<Float> {
         SIMD<Float>.zeroingNegative(a)
     }
@@ -562,6 +551,17 @@ extension Float {
     @export(implementation) @inline(always)
     public static func _negatingIfNegative(_ a: SIMD<Float>, _ b: SIMD<Float>) -> SIMD<Float> {
         SIMD<Float>.negatingIfNegative(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _copyingSign(_ a: SIMD<Float>, from b: SIMD<Float>) -> SIMD<Float> {
+        SIMD<Float>.copyingSign(a, from: b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _copyingSignToMagnitude(_ a: SIMD<Float>, from b: SIMD<Float>) -> SIMD<Float>
+    {
+        SIMD<Float>.copyingSignToMagnitude(a, from: b)
     }
 
     @export(implementation) @inline(always)
