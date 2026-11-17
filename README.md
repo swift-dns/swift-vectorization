@@ -162,8 +162,9 @@ SVE2_128, SSE2, SSSE3, SSE4, AVX2, the AVX-512 targets under Intel's SDE, and hi
 No CI runner has the wide SVE targets: their ops were compared with highway's under QEMU, outside
 these tests.
 
-When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or a
-minimum or maximum on SVE, which payload comes out is up to the compiler, in highway as in the port.
+When an op meets two NaNs with different payloads, as in an addition, a multiplication, a sum, or
+an absolute difference, minimum or maximum on SVE, which payload comes out is up to the compiler, in
+highway as in the port.
 
 A mask made from a vector whose lanes are not all zeros or all ones, with `mask(from:)` or
 `Mask(raw:)`, behaves in every op as highway's `MaskFromVec` of the same vector does on the same

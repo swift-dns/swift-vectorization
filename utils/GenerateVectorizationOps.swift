@@ -13294,6 +13294,11 @@ func sveAbsoluteDifference(for element: Element) -> String? {
     isInteger64(element) ? svePredicatedBinary("abd", for: element) : nil
 }
 
+func sveWideAbsoluteDifference(for element: Element) -> String? {
+    element.category == .float
+        ? svePredicatedBinary("abd", for: element) : sveAbsoluteDifference(for: element)
+}
+
 func sveConstantNaNAbsoluteDifference(for element: Element) -> String? {
     guard element.category == .float || element.category == .float16 else { return nil }
     let constantNaN = cFunctionName("constantNaN", element)
@@ -14316,8 +14321,7 @@ let basicOps: [Op] = [
             neon: { element in neonAbsoluteDifference(for: element) },
             sve2_128: { element in sveAbsoluteDifference(for: element) },
             sve2_128Splat: { element in sveConstantNaNAbsoluteDifference(for: element) },
-            sve: { element in sveAbsoluteDifference(for: element) },
-            sveSplat: { element in sveConstantNaNAbsoluteDifference(for: element) }
+            sve: { element in sveWideAbsoluteDifference(for: element) }
         )
     ) { element in
         portableAbsoluteDifference(for: element)
@@ -51150,6 +51154,57 @@ let sveFirstTrueSettingGaps = [
     (issue: sveFirstTrueSettingIssue(result), tests: firstTrueCompositionTests(of: identifier))
 }
 
+let sveNaNOperandOrderComment =
+    "On SVE with a constant operand the compiler orders the operands of the destructive minimum, maximum or absolute-difference instruction differently for the port and for Highway, so where both operands are NaN with different payloads the port returns the NaN that Highway does not"
+
+let sveAt512Condition =
+    "(SIMDTarget.targetName == \"SVE\" || SIMDTarget.targetName == \"SVE2\") && H.laneCount * MemoryLayout<Lane>.stride == 64"
+
+let sveWideNaNOperandOrder = KnownIssue(
+    comment: sveNaNOperandOrderComment,
+    condition: "SIMDTarget.targetName == \"SVE_256\" || (\(sveAt512Condition))"
+)
+
+let sveAt512NaNOperandOrder = KnownIssue(
+    comment: sveNaNOperandOrderComment,
+    condition: sveAt512Condition
+)
+
+let sveNaNSplats = ["MinusNaN", "MinusSignalingNaN", "NaN", "PayloadNaN", "SignalingNaN"]
+
+let sveNaNSplatsWithoutSignalingNaN = sveNaNSplats.filter { $0 != "SignalingNaN" }
+
+func constantSplatTests(_ groups: [(identifiers: [String], splats: [String])]) -> [String] {
+    groups.flatMap { identifiers, splats in
+        identifiers.flatMap { identifier in splats.map { "\(identifier)ConstantSplat\($0)" } }
+    }
+}
+
+let sveWideNaNOperandOrderTests: [String: [String]] = [
+    "SIMDDoubleConstant": constantSplatTests([
+        (["absoluteDifference"], ["MinusNaN", "NaN", "PayloadNaN"]),
+        (["maximum", "minimum", "minimumNumber"], sveNaNSplatsWithoutSignalingNaN),
+        (["maximumNumber"], sveNaNSplats),
+    ]),
+    "SIMDFloat16Constant": constantSplatTests([
+        (
+            ["absoluteDifference", "maximum", "maximumNumber", "minimum", "minimumNumber"],
+            sveNaNSplats
+        )
+    ]),
+    "SIMDFloatConstant": constantSplatTests([
+        (["absoluteDifference"], sveNaNSplats),
+        (
+            ["maximum", "maximumNumber", "minimum", "minimumNumber"],
+            sveNaNSplatsWithoutSignalingNaN
+        ),
+    ]),
+]
+
+let sveAt512NaNOperandOrderTests: [String: [String]] = [
+    "SIMDFloatConstant": ["maximumNumberConstantSplatSignalingNaN"]
+]
+
 let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] =
     [
         (linuxAvx2AndAvx512NaNSign, knownGapTests),
@@ -51157,6 +51212,8 @@ let knownGaps: [(issue: KnownIssue, tests: [String: [String]])] =
         (linuxAvx512MaskedZeroSign, maskedZeroSignTests),
         (linuxAvx3SprFloat16OrderedComparison, float16OrderedComparisonTests),
         (darwinEmu128Folding, emu128FoldedConstantTests),
+        (sveWideNaNOperandOrder, sveWideNaNOperandOrderTests),
+        (sveAt512NaNOperandOrder, sveAt512NaNOperandOrderTests),
     ] + sveFirstTrueSettingGaps
 
 func markingKnownGaps(_ tests: [String], suite: String) -> [String] {
