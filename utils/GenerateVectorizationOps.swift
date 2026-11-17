@@ -33843,6 +33843,25 @@ func fixedPointNeon(to result: Element) -> String {
     return vectorResult("(\(result.cVector))\(accumulated)", for: result)
 }
 
+func fixedPointSve(from source: Element, to result: Element) -> String {
+    let padding = Array(repeating: -1, count: source.laneCount - result.laneCount)
+    let indices = laneIndices(Array(0..<result.laneCount) + padding)
+    func duplicated(_ name: String) -> String {
+        let operand = sveOperand("widened\(uppercasedFirst(name))", for: source)
+        return sveBuiltin("zip1", [operand, operand], for: source)
+    }
+    let accumulated = sveBuiltin(
+        "qdmlalb",
+        [sveSplatOperand("c", for: result), duplicated("a"), duplicated("b")],
+        for: result
+    )
+    return """
+        const \(source.cVector) widenedA = __builtin_shufflevector(a, a, \(indices));
+        const \(source.cVector) widenedB = __builtin_shufflevector(b, b, \(indices));
+        \(vectorResult(sveResult(accumulated, for: result), for: result))
+        """
+}
+
 let fixedPointMultiplyOps = sourcedOps(accepting: widenMulAccumulatingAccepts) { source, results in
     func x86(_ level: X86Level) -> (Element) -> String? {
         sourced(source) { source, result in
@@ -33880,6 +33899,7 @@ let fixedPointMultiplyOps = sourcedOps(accepting: widenMulAccumulatingAccepts) {
         source: source,
         targets: TargetBodies(
             neon: sourced(source) { _, result in fixedPointNeon(to: result) },
+            sve2: sourced(source) { source, result in fixedPointSve(from: source, to: result) },
             avx3dl: x86(.avx3dl),
             avx3: x86(.avx3),
             avx2: x86(.avx2),
@@ -41676,8 +41696,8 @@ func x86Branches<Input: WidthScaled>(
 
 let sve2OnlyBuiltins = [
     "adalp_", "addp_", "bcax_", "bsl_", "cadd_s", "cadd_u", "eor3_", "logb_", "mlalb_", "mlalt_",
-    "movlb_", "movlt_", "mullb_", "mullt_", "qabs_", "qneg_", "qrdmulh_", "qxtnb_", "qxtnt_",
-    "qxtunb_", "qxtunt_", "rhadd_", "rshl_", "rshr_", "tbl2_",
+    "movlb_", "movlt_", "mullb_", "mullt_", "qabs_", "qdmlalb_", "qneg_", "qrdmulh_", "qxtnb_",
+    "qxtnt_", "qxtunb_", "qxtunt_", "rhadd_", "rshl_", "rshr_", "tbl2_",
 ]
 
 func sve1Checked(_ body: String) -> String {

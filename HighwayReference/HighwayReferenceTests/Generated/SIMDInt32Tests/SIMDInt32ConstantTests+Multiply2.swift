@@ -416,4 +416,111 @@ extension SIMDInt32ConstantTests {
         checkRearrangedToOddPlusEvenConstantA(Lane.min)
         checkRearrangedToOddPlusEvenConstantB(Lane.min)
     }
+
+    @inline(__always)
+    private func checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(_ value: Lane)
+    {
+        let mismatches = Mismatches(
+            "saturatingMultiplyAccumulatingFixedPointFromHalfInt16 with c repeating \(hex(value))"
+        )
+        let aInputs = Inputs.conversions(SIMD<Int16>.HalfVector.self, seed: 0xD8F4_E0D7_BF4C_D154)
+            .map(poisoningUpperBytes)
+        let bInputs = Inputs.conversions(SIMD<Int16>.HalfVector.self, seed: 0xD8F4_E1D7_BF4C_D307)
+            .map(poisoningUpperBytes)
+        mismatches.check(
+            H.repeating(value),
+            H(raw: HighwayReference.repeatingI32(value)),
+            "repeating"
+        )
+        for (a, b) in everyPair(aInputs, bInputs) {
+            mismatches.check(
+                H.saturatingMultiplyAccumulatingFixedPoint(a, b, H.repeating(value)),
+                H(
+                    raw: HighwayReference.saturatingMultiplyAccumulatingFixedPointHalfI16ToI32(
+                        a.raw,
+                        b.raw,
+                        H.repeating(value).raw
+                    )
+                ),
+                "a: \(describe(a)), b: \(describe(b))"
+            )
+        }
+        mismatches.record()
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat0() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(0)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat1() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(1)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat15() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(15)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat16() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(16)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat26() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(26)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat127() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(127)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat128() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(128)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat255() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(255)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat256() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(256)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat257() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(257)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat65280() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(65280)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplat65281() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(65281)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplatMinus1() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(-1)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplatMinus16() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(-16)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplatMinus17() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(-17)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplatMinus128() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(-128)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplatMinus129() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(-129)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplatMax() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(Lane.max)
+    }
+
+    @Test func saturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantSplatMin() {
+        checkSaturatingMultiplyAccumulatingFixedPointFromHalfInt16ConstantC(Lane.min)
+    }
 }
