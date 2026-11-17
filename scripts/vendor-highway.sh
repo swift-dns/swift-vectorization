@@ -202,7 +202,7 @@ library_sources_from_cmake() {
     ' "${clone_dir}/CMakeLists.txt"
   )"
 
-  printf -- '%s\n' "${listed_sources}" | sort -u
+  printf -- '%s\n' "${listed_sources}" | LC_ALL=C sort -u
   return 0
 }
 
@@ -301,7 +301,7 @@ apply_patches() {
   local patch_path
   while IFS= read -r -d '' patch_path; do
     patch_paths+=( "${patch_path}" )
-  done < <(find "${patch_root}" -name '*.patch' -type f -print0 | sort -z)
+  done < <(find "${patch_root}" -name '*.patch' -type f -print0 | LC_ALL=C sort -z)
 
   if [[ "${#patch_paths[@]}" -eq 0 ]]; then
     return 0
@@ -347,7 +347,7 @@ headers_reachable_from_seeds() {
     fatal "None of the seed headers of the module map exist under '${include_root}'"
   fi
 
-  printf -- '%s\n' "${!reached[@]}" | sort
+  printf -- '%s\n' "${!reached[@]}" | LC_ALL=C sort
   return 0
 }
 
@@ -375,7 +375,7 @@ generate_module_map() {
   local header_path
   while IFS= read -r -d '' header_path; do
     header_paths+=( "${header_path#"${include_root}/"}" )
-  done < <(find "${include_root}/hwy" -name '*.h' -type f -print0 | sort -z)
+  done < <(find "${include_root}/hwy" -name '*.h' -type f -print0 | LC_ALL=C sort -z)
 
   if [[ "${#header_paths[@]}" -eq 0 ]]; then
     fatal "Found no headers under '${include_root}/hwy' to generate a module map from"
