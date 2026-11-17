@@ -506,6 +506,63 @@ public protocol SIMDElement {
     static func _storeStreaming(_ a: SIMD<Self>, to span: inout MutableSpan<Self>)
     @available(SwiftStdlib 5.1, *)
     @unsafe static func _storeStreaming(_ a: SIMD<Self>, toUnchecked span: inout MutableSpan<Self>)
+    static func _loadHalf(from: UnsafePointer<Self>) -> SIMD<Self>.HalfVector
+    @available(SwiftStdlib 5.1, *)
+    static func _loadHalf(from span: Span<Self>) -> SIMD<Self>.HalfVector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _loadHalf(fromUnchecked span: Span<Self>) -> SIMD<Self>.HalfVector
+    static func _store(_ a: SIMD<Self>.HalfVector, to: UnsafeMutablePointer<Self>)
+    @available(SwiftStdlib 5.1, *)
+    static func _store(_ a: SIMD<Self>.HalfVector, to span: inout MutableSpan<Self>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _store(
+        _ a: SIMD<Self>.HalfVector,
+        toUnchecked span: inout MutableSpan<Self>
+    )
+    @available(SwiftStdlib 5.1, *)
+    static func _append(_ a: SIMD<Self>.HalfVector, to output: inout OutputSpan<Self>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _append(
+        _ a: SIMD<Self>.HalfVector,
+        toUnchecked output: inout OutputSpan<Self>
+    )
+    static func _loadBlock(from: UnsafePointer<Self>) -> SIMD<Self>.BlockVector
+    @available(SwiftStdlib 5.1, *)
+    static func _loadBlock(from span: Span<Self>) -> SIMD<Self>.BlockVector
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _loadBlock(fromUnchecked span: Span<Self>) -> SIMD<Self>.BlockVector
+    static func _store(_ a: SIMD<Self>.BlockVector, to: UnsafeMutablePointer<Self>)
+    @available(SwiftStdlib 5.1, *)
+    static func _store(_ a: SIMD<Self>.BlockVector, to span: inout MutableSpan<Self>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _store(
+        _ a: SIMD<Self>.BlockVector,
+        toUnchecked span: inout MutableSpan<Self>
+    )
+    @available(SwiftStdlib 5.1, *)
+    static func _append(_ a: SIMD<Self>.BlockVector, to output: inout OutputSpan<Self>)
+    @available(SwiftStdlib 5.1, *)
+    @unsafe static func _append(
+        _ a: SIMD<Self>.BlockVector,
+        toUnchecked output: inout OutputSpan<Self>
+    )
+    static func _lowerHalf(_ a: SIMD<Self>) -> SIMD<Self>.HalfVector
+    static func _upperHalf(_ a: SIMD<Self>) -> SIMD<Self>.HalfVector
+    static func _combining(_ a: SIMD<Self>.HalfVector, _ b: SIMD<Self>.HalfVector) -> SIMD<Self>
+    static func _zeroExtending(_ a: SIMD<Self>.HalfVector) -> SIMD<Self>
+    static func _lowerHalf(_ mask: SIMD<Self>.Mask) -> SIMD<Self>.HalfMask
+    static func _block(_ a: SIMD<Self>, at index: Int) -> SIMD<Self>.BlockVector
+    @unsafe static func _block(_ a: SIMD<Self>, atUnchecked index: Int) -> SIMD<Self>.BlockVector
+    static func _replacingBlock(
+        _ a: SIMD<Self>,
+        at index: Int,
+        with b: SIMD<Self>.BlockVector
+    ) -> SIMD<Self>
+    @unsafe static func _replacingBlock(
+        _ a: SIMD<Self>,
+        atUnchecked index: Int,
+        with b: SIMD<Self>.BlockVector
+    ) -> SIMD<Self>
 }
 
 /// The lane types that have numeric ops, which are all but `BFloat16`, and the ops only

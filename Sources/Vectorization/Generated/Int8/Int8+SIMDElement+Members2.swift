@@ -2,6 +2,38 @@
 
 extension Int8 {
     @export(implementation) @inline(always)
+    public static func _loadInterleaved3(
+        from: UnsafePointer<Int8>,
+        _ v0: inout SIMD<Int8>,
+        _ v1: inout SIMD<Int8>,
+        _ v2: inout SIMD<Int8>
+    ) {
+        unsafe SIMD<Int8>.loadInterleaved3(from: from, &v0, &v1, &v2)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @export(implementation) @inline(always)
+    public static func _loadInterleaved3(
+        from span: Span<Int8>,
+        _ v0: inout SIMD<Int8>,
+        _ v1: inout SIMD<Int8>,
+        _ v2: inout SIMD<Int8>
+    ) {
+        SIMD<Int8>.loadInterleaved3(from: span, &v0, &v1, &v2)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @export(implementation) @inline(always)
+    public static func _loadInterleaved3(
+        fromUnchecked span: Span<Int8>,
+        _ v0: inout SIMD<Int8>,
+        _ v1: inout SIMD<Int8>,
+        _ v2: inout SIMD<Int8>
+    ) {
+        unsafe SIMD<Int8>.loadInterleaved3(fromUnchecked: span, &v0, &v1, &v2)
+    }
+
+    @export(implementation) @inline(always)
     public static func _loadInterleaved4(
         from: UnsafePointer<Int8>,
         _ v0: inout SIMD<Int8>,
@@ -973,6 +1005,34 @@ extension Int8 {
     }
 
     @export(implementation) @inline(always)
+    public static func _block(_ a: SIMD<Int8>, at index: Int) -> SIMD<Int8>.BlockVector {
+        SIMD<Int8>.block(a, at: index)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _block(_ a: SIMD<Int8>, atUnchecked index: Int) -> SIMD<Int8>.BlockVector {
+        unsafe SIMD<Int8>.block(a, atUnchecked: index)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _replacingBlock(
+        _ a: SIMD<Int8>,
+        at index: Int,
+        with b: SIMD<Int8>.BlockVector
+    ) -> SIMD<Int8> {
+        SIMD<Int8>.replacingBlock(a, at: index, with: b)
+    }
+
+    @unsafe @export(implementation) @inline(always)
+    public static func _replacingBlock(
+        _ a: SIMD<Int8>,
+        atUnchecked index: Int,
+        with b: SIMD<Int8>.BlockVector
+    ) -> SIMD<Int8> {
+        unsafe SIMD<Int8>.replacingBlock(a, atUnchecked: index, with: b)
+    }
+
+    @export(implementation) @inline(always)
     public static func _create2(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> (SIMD<Int8>, SIMD<Int8>) {
         SIMD<Int8>.create2(a, b)
     }
@@ -1389,6 +1449,29 @@ extension Int8 {
     @export(implementation) @inline(always)
     public static func _concatenatingUpperLower(_ a: SIMD<Int8>, _ b: SIMD<Int8>) -> SIMD<Int8> {
         SIMD<Int8>.concatenatingUpperLower(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _lowerHalf(_ a: SIMD<Int8>) -> SIMD<Int8>.HalfVector {
+        SIMD<Int8>.lowerHalf(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _upperHalf(_ a: SIMD<Int8>) -> SIMD<Int8>.HalfVector {
+        SIMD<Int8>.upperHalf(a)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _combining(
+        _ a: SIMD<Int8>.HalfVector,
+        _ b: SIMD<Int8>.HalfVector
+    ) -> SIMD<Int8> {
+        SIMD<Int8>.combining(a, b)
+    }
+
+    @export(implementation) @inline(always)
+    public static func _zeroExtending(_ a: SIMD<Int8>.HalfVector) -> SIMD<Int8> {
+        SIMD<Int8>.zeroExtending(a)
     }
 
     @export(implementation) @inline(always)

@@ -139,27 +139,9 @@ extension SIMD.BlockVector where Lane == Int8 {
 
 extension SIMD where Lane == Int8 {
     @export(implementation) @inline(always)
-    public static var laneCount: Int { Int(cvectorization_ops_lane_count_i8()) }
-
-    @export(implementation) @inline(always)
-    public static var blockCount: Int { Int(cvectorization_ops_block_count_i8()) }
-
-    @export(implementation) @inline(always)
-    public static var canLookup8: Bool { cvectorization_ops_can_lookup8_i8() }
-
-    @export(implementation) @inline(always)
-    public static var canLookup16: Bool { cvectorization_ops_can_lookup16_i8() }
-
-    @export(implementation) @inline(always)
     public static var canLookup32: Bool { cvectorization_ops_can_lookup32_i8() }
 
     @export(implementation) @inline(always)
     public static var canLookup64: Bool { cvectorization_ops_can_lookup64_i8() }
-
-    @export(implementation) @inline(always)
-    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_i8() }
-
-    @export(implementation) @inline(always)
-    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_i8() }
 
 }

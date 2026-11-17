@@ -13679,7 +13679,9 @@ func laneCapabilityStatements(of op: Op, for element: Element) -> String {
 
 func laneCapabilityMembers(for element: Element) -> String {
     var output = ""
-    for capability in laneCapabilities where capability.applies.matches(element) {
+    let requirements = staticRequirementNames(of: element)
+    for capability in laneCapabilities
+    where capability.applies.matches(element) && !requirements.contains(capability.name) {
         let name = capability.name
         output += "    @export(implementation) @inline(always)\n"
         output += "    public static var \(name): Bool { \(cFunctionName(name, element))() }\n\n"
@@ -44709,7 +44711,7 @@ let integerElements = classicElements.filter { $0.category != .float }
 /// ancestor already requires. A half-precision conformer has an op if any op of its identifier
 /// applies to it. A protocol that carries only shape ops requires just the ops that take or return a
 /// vector or a mask of one of its shapes, not every op that happens to exist on all of its
-/// conformers.
+/// conformers. Any other protocol requires the ops whose narrow shapes are all among its own.
 struct ElementProtocol {
     let name: String
     let parents: [String]
@@ -44828,9 +44830,12 @@ func isProvided(_ op: Op, by element: Element) -> Bool {
 }
 
 func isCarried(_ op: Op, by elementProtocol: ElementProtocol) -> Bool {
-    guard op.source == nil else { return false }
-    guard elementProtocol.carriesOnlyShapeOps else { return !isOutsideProtocols(op) }
-    return !takesIndexTypes(op) && !narrowShapes(of: op).isDisjoint(with: elementProtocol.shapes)
+    guard op.source == nil, !takesIndexTypes(op) else { return false }
+    let shapes = narrowShapes(of: op)
+    guard elementProtocol.carriesOnlyShapeOps else {
+        return shapes.isSubset(of: elementProtocol.shapes)
+    }
+    return !shapes.isDisjoint(with: elementProtocol.shapes)
 }
 
 func isRequirable(_ op: Op, by elementProtocol: ElementProtocol) -> Bool {
@@ -44928,6 +44933,18 @@ func staticRequirements(of elementProtocol: ElementProtocol) -> [StaticRequireme
         )
     }
     return requirements
+}
+
+func staticWitnessBody(of requirement: StaticRequirement, for element: Element) -> String {
+    let call = "\(cFunctionName(requirement.name, element))()"
+    return requirement.type == "Int" ? "Int(\(call))" : call
+}
+
+func staticRequirementNames(of element: Element) -> Set<String> {
+    Set(
+        elementProtocols.filter { $0.isConformed(by: element) }
+            .flatMap { staticRequirements(of: $0).map(\.name) }
+    )
 }
 
 /// A form of an op as a protocol requirement, and as the generic and the per-lane functions that
@@ -45160,26 +45177,31 @@ func generateSIMD() -> String {
 func forwardingMember(
     _ form: RequirementForm,
     named name: String,
-    calling callee: String
+    calling callee: String,
+    disfavored: Bool
 ) -> String {
-    """
-        \(form.availability)\(form.unsafeAttribute)@export(implementation) @inline(always)
-        public static func \(name)(\(form.parameters))\(form.returnClause) {
-            \(form.callKeyword)\(callee)(\(form.arguments))
-        }
-    """
+    let disfavoredAttribute = disfavored ? "@_disfavoredOverload " : ""
+    return """
+            \(form.availability)\(form.unsafeAttribute)\(disfavoredAttribute)@export(implementation) @inline(always)
+            public static func \(name)(\(form.parameters))\(form.returnClause) {
+                \(form.callKeyword)\(callee)(\(form.arguments))
+            }
+        """
 }
 
 func forwardingProperty(
     _ requirement: StaticRequirement,
     named name: String,
     calling callee: String,
-    documented: Bool
+    documented: Bool,
+    disfavored: Bool
 ) -> String {
-    """
-        \(documented ? "/// \(requirement.documentation)\n" : "")@export(implementation) @inline(always)
-        public static var \(name): \(requirement.type) { \(callee) }
-    """
+    let documentation = documented ? "/// \(requirement.documentation)\n" : ""
+    let disfavoredAttribute = disfavored ? "@_disfavoredOverload " : ""
+    return """
+            \(documentation)\(disfavoredAttribute)@export(implementation) @inline(always)
+            public static var \(name): \(requirement.type) { \(callee) }
+        """
 }
 
 func generateGenericMembers(of elementProtocol: ElementProtocol) -> [SectionMember] {
@@ -45191,7 +45213,8 @@ func generateGenericMembers(of elementProtocol: ElementProtocol) -> [SectionMemb
                     requirement,
                     named: requirement.name,
                     calling: "Lane._\(requirement.name)",
-                    documented: true
+                    documented: true,
+                    disfavored: true
                 )
             ]
         )
@@ -45200,7 +45223,12 @@ func generateGenericMembers(of elementProtocol: ElementProtocol) -> [SectionMemb
         SectionMember(
             section: op.section,
             inside: requirementForms(of: op, scope: nil).map {
-                forwardingMember($0, named: $0.name, calling: "Lane._\($0.name)")
+                forwardingMember(
+                    $0,
+                    named: $0.name,
+                    calling: "Lane._\($0.name)",
+                    disfavored: true
+                )
             }
         )
     }
@@ -45217,8 +45245,9 @@ func generateElementWitnesses(_ element: Element) -> [SectionMember] {
                     forwardingProperty(
                         requirement,
                         named: "_\(requirement.name)",
-                        calling: "\(element.vectorType).\(requirement.name)",
-                        documented: false
+                        calling: staticWitnessBody(of: requirement, for: element),
+                        documented: false,
+                        disfavored: false
                     )
                 ]
             )
@@ -45230,7 +45259,8 @@ func generateElementWitnesses(_ element: Element) -> [SectionMember] {
                     forwardingMember(
                         $0,
                         named: "_\($0.name)",
-                        calling: "\(element.vectorType).\($0.name)"
+                        calling: "\(element.vectorType).\($0.name)",
+                        disfavored: false
                     )
                 }
             )
@@ -45364,18 +45394,10 @@ func generateElement(_ element: Element) -> String {
     extensions += narrowShapes(of: element).flatMap {
         narrowConcreteExtensions(of: element, shape: $0)
     }
-    var staticMembers = """
-            @export(implementation) @inline(always)
-            public static var laneCount: Int { Int(\(cFunctionName("laneCount", element))()) }
-
-            @export(implementation) @inline(always)
-            public static var blockCount: Int { Int(\(cFunctionName("blockCount", element))()) }
-
-
-        """
-    staticMembers += laneCapabilityMembers(for: element)
-    staticMembers += indexLimitMembers(for: element)
-    extensions.append(concreteExtension("SIMD", of: element, members: staticMembers))
+    let staticMembers = laneCapabilityMembers(for: element) + indexLimitMembers(for: element)
+    if !staticMembers.isEmpty {
+        extensions.append(concreteExtension("SIMD", of: element, members: staticMembers))
+    }
     return """
         \(generationNotice)
 
@@ -50255,6 +50277,10 @@ func exposesVectorization(_ source: String) -> Bool {
     source.range(of: #"public [^{]*\b(SIMD\w*|BFloat16)\b"#, options: .regularExpression) != nil
 }
 
+func usesCVectorizationOps(_ source: String) -> Bool {
+    source.contains("cvectorization_ops_")
+}
+
 func sectionFile(
     _ members: [SectionMember],
     imports: String,
@@ -50286,6 +50312,9 @@ func sectionFile(
             of: "public import Vectorization",
             with: "import Vectorization"
         )
+    }
+    if !usesCVectorizationOps(output) {
+        output = output.replacingOccurrences(of: "\(elementImports)\n", with: "")
     }
     return conditioned(
         output,
@@ -50507,7 +50536,7 @@ for element in elements {
         generateElementWitnesses(element),
         named: witnessesName,
         in: swiftDirectory,
-        imports: "",
+        imports: elementImports,
         extending: element.swiftType,
         for: element,
         balancing: true

@@ -12,6 +12,41 @@ private func elementOps<Lane: SIMDElement>(
     return (H.laneCount, Array(copy), H.zero())
 }
 
+private func expectHalfAndBlockOps<Lane: SIMDElement & Equatable>(
+    _ input: ContiguousArray<Lane>
+) {
+    typealias H = SIMD<Lane>
+
+    func appended(_ body: (inout OutputSpan<Lane>) -> Void) -> [Lane] {
+        Array(ContiguousArray<Lane>(capacity: H.laneCount, initializingWith: body))
+    }
+
+    let a = H.load(from: input.span)
+    let lower = Array(input[..<(H.laneCount / 2)])
+    let upper = Array(input[(H.laneCount / 2)...])
+    let blockLanes = H.laneCount / H.blockCount
+    let firstBlock = Array(input[..<blockLanes])
+    let lastBlock = Array(input[(H.laneCount - blockLanes)...])
+    let replaced = Array(input[..<(H.laneCount - blockLanes)]) + firstBlock
+
+    #expect(appended { H.append(H.lowerHalf(a), to: &$0) } == lower, "\(H.self) lower half")
+    #expect(appended { H.append(H.upperHalf(a), to: &$0) } == upper, "\(H.self) upper half")
+    #expect(appended { H.append(H.loadHalf(from: input.span), to: &$0) } == lower)
+    let extended = H.zeroExtending(H.lowerHalf(a))
+    let zeros = appended { H.append(H.zero(), to: &$0) }
+    #expect(
+        appended { H.append(extended, to: &$0) } == lower + zeros[..<upper.count],
+        "\(H.self) zero-extended half"
+    )
+    let swapped = H.combining(H.lowerHalf(a), H.upperHalf(a))
+    #expect(appended { H.append(swapped, to: &$0) } == upper + lower, "\(H.self) combined halves")
+    let extracted = H.block(a, at: H.blockCount - 1)
+    #expect(appended { H.append(extracted, to: &$0) } == lastBlock, "\(H.self) last block")
+    #expect(appended { H.append(H.loadBlock(from: input.span), to: &$0) } == firstBlock)
+    let replacing = H.replacingBlock(a, at: H.blockCount - 1, with: H.block(a, at: 0))
+    #expect(appended { H.append(replacing, to: &$0) } == replaced, "\(H.self) replaced block")
+}
+
 private func numericOps<Lane: SIMDNumericElement>(
     _ a: SIMD<Lane>,
     _ b: SIMD<Lane>
@@ -135,6 +170,24 @@ struct GenericOpsTests {
         #expect(genericBrains.copy == Array(concreteBrains))
         #expect(genericBrains.copy == Array(brains))
         #expect(genericBrains.zero.raw == SIMD<BFloat16>.zero().raw)
+    }
+
+    @Test("Half and block ops of SIMDElement called through a generic lane type match the lanes")
+    func halfAndBlockOpsMatchLanes() {
+        expectHalfAndBlockOps(
+            ContiguousArray(
+                (0..<SIMD<UInt8>.laneCount).map { UInt8(truncatingIfNeeded: $0 &* 37 &+ 11) }
+            )
+        )
+        expectHalfAndBlockOps(
+            ContiguousArray((0..<SIMD<Float>.laneCount).map { Float($0) * 1.5 - 4 })
+        )
+        expectHalfAndBlockOps(
+            ContiguousArray((0..<SIMD<Int64>.laneCount).map { Int64($0) &* 1_000_003 &- 7 })
+        )
+        expectHalfAndBlockOps(
+            ContiguousArray((0..<SIMD<BFloat16>.laneCount).map { BFloat16(Float($0) * 0.5) })
+        )
     }
 
     @Test("Ops of SIMDNumericElement called through a generic lane type match the concrete ones")

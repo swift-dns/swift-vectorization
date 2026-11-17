@@ -106,24 +106,3 @@ extension SIMD.BlockVector where Lane == BFloat16 {
     @export(implementation) @inline(always)
     public var simd: SIMDType { cvectorization_ops_from_raw_block_bf16(raw) }
 }
-
-extension SIMD where Lane == BFloat16 {
-    @export(implementation) @inline(always)
-    public static var laneCount: Int { Int(cvectorization_ops_lane_count_bf16()) }
-
-    @export(implementation) @inline(always)
-    public static var blockCount: Int { Int(cvectorization_ops_block_count_bf16()) }
-
-    @export(implementation) @inline(always)
-    public static var canLookup8: Bool { cvectorization_ops_can_lookup8_bf16() }
-
-    @export(implementation) @inline(always)
-    public static var canLookup16: Bool { cvectorization_ops_can_lookup16_bf16() }
-
-    @export(implementation) @inline(always)
-    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_bf16() }
-
-    @export(implementation) @inline(always)
-    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_bf16() }
-
-}

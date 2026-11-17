@@ -114,26 +114,4 @@ extension SIMD.BlockVector where Lane == Float16 {
     @export(implementation) @inline(always)
     public var simd: SIMDType { cvectorization_ops_from_raw_block_f16(raw) }
 }
-
-@available(SwiftStdlib 5.3, *)
-extension SIMD where Lane == Float16 {
-    @export(implementation) @inline(always)
-    public static var laneCount: Int { Int(cvectorization_ops_lane_count_f16()) }
-
-    @export(implementation) @inline(always)
-    public static var blockCount: Int { Int(cvectorization_ops_block_count_f16()) }
-
-    @export(implementation) @inline(always)
-    public static var canLookup8: Bool { cvectorization_ops_can_lookup8_f16() }
-
-    @export(implementation) @inline(always)
-    public static var canLookup16: Bool { cvectorization_ops_can_lookup16_f16() }
-
-    @export(implementation) @inline(always)
-    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_f16() }
-
-    @export(implementation) @inline(always)
-    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_f16() }
-
-}
 #endif

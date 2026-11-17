@@ -79,24 +79,6 @@ extension SIMD.BlockVector where Lane == Int64 {
 
 extension SIMD where Lane == Int64 {
     @export(implementation) @inline(always)
-    public static var laneCount: Int { Int(cvectorization_ops_lane_count_i64()) }
-
-    @export(implementation) @inline(always)
-    public static var blockCount: Int { Int(cvectorization_ops_block_count_i64()) }
-
-    @export(implementation) @inline(always)
-    public static var canLookup8: Bool { cvectorization_ops_can_lookup8_i64() }
-
-    @export(implementation) @inline(always)
-    public static var canLookup16: Bool { cvectorization_ops_can_lookup16_i64() }
-
-    @export(implementation) @inline(always)
-    public static var canReverse4: Bool { cvectorization_ops_can_reverse4_i64() }
-
-    @export(implementation) @inline(always)
-    public static var canReverse8: Bool { cvectorization_ops_can_reverse8_i64() }
-
-    @export(implementation) @inline(always)
     package static func indexLimit(count: Int, stride: Int) -> Int {
         guard count > 0 else { return 0 }
         let lanes = Swift.min(UInt64(count), (1 << 63) / UInt64(stride) + 1)

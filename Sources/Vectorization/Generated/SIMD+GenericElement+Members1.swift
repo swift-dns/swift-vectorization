@@ -2,292 +2,297 @@
 
 extension SIMD {
     /// How many lanes of `Lane` a `SIMD<Lane>` holds on the target this was compiled for.
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static var laneCount: Int { Lane._laneCount }
 
     /// How many 16-byte blocks a `SIMD<Lane>` holds on the target this was compiled for.
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static var blockCount: Int { Lane._blockCount }
 
     /// Whether a `SIMD<Lane>` holds enough lanes for `lookup8` on the target this was compiled for.
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static var canLookup8: Bool { Lane._canLookup8 }
 
     /// Whether a `SIMD<Lane>` holds enough lanes for `lookup16` on the target this was compiled for.
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static var canLookup16: Bool { Lane._canLookup16 }
 
     /// Whether a `SIMD<Lane>` holds enough lanes for `reversed4` on the target this was compiled for.
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static var canReverse4: Bool { Lane._canReverse4 }
 
     /// Whether a `SIMD<Lane>` holds enough lanes for `reversed8` on the target this was compiled for.
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static var canReverse8: Bool { Lane._canReverse8 }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func zero() -> SIMD {
         Lane._zero()
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func repeating(_ value: Lane) -> SIMD {
         Lane._repeating(value)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func signBit() -> SIMD {
         Lane._signBit()
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func unspecified() -> SIMD {
         Lane._unspecified()
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func repeating(_ value: Lane, where mask: Mask) -> SIMD {
         Lane._repeating(value, where: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func repeating(_ value: Lane, where mask: Mask, otherwise: SIMD) -> SIMD {
         Lane._repeating(value, where: mask, otherwise: otherwise)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func replacingLane(_ a: SIMD, at index: Int, with value: Lane) -> SIMD {
         Lane._replacingLane(a, at: index, with: value)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func replacingLane(_ a: SIMD, atUnchecked index: Int, with value: Lane) -> SIMD {
         unsafe Lane._replacingLane(a, atUnchecked: index, with: value)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func allBitsSet(_ a: SIMD) -> Bool {
         Lane._allBitsSet(a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func firstLanes(count: Int) -> Mask {
         Lane._firstLanes(count: count)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func repeatingMask(_ value: Bool) -> Mask {
         Lane._repeatingMask(value)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func repeatingBlockMask(bits: UInt) -> Mask {
         Lane._repeatingBlockMask(bits: bits)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadMask(from: UnsafePointer<UInt8>) -> Mask {
         unsafe Lane._loadMask(from: from)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadMask(from span: Span<UInt8>) -> Mask {
         Lane._loadMask(from: span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadMask(fromUnchecked span: Span<UInt8>) -> Mask {
         unsafe Lane._loadMask(fromUnchecked: span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func vector(from mask: Mask) -> SIMD {
         Lane._vector(from: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func bits(of mask: Mask) -> UInt64 {
         Lane._bits(of: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeMask(_ mask: Mask, to: UnsafeMutablePointer<UInt8>) -> Int {
         unsafe Lane._storeMask(mask, to: to)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeMask(_ mask: Mask, to span: inout MutableSpan<UInt8>) -> Int {
         Lane._storeMask(mask, to: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeMask(_ mask: Mask, toUnchecked span: inout MutableSpan<UInt8>) -> Int {
         unsafe Lane._storeMask(mask, toUnchecked: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendMask(_ mask: Mask, to output: inout OutputSpan<UInt8>) {
         Lane._appendMask(mask, to: &output)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendMask(_ mask: Mask, toUnchecked output: inout OutputSpan<UInt8>) {
         unsafe Lane._appendMask(mask, toUnchecked: &output)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func lowerHalf(_ mask: Mask) -> HalfMask {
+        Lane._lowerHalf(mask)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func allFalse(_ mask: Mask) -> Bool {
         Lane._allFalse(mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func lastTrueIndex(_ mask: Mask) -> Int {
         Lane._lastTrueIndex(mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func knownLastTrueIndex(_ mask: Mask) -> Int {
         Lane._knownLastTrueIndex(mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func selecting(_ mask: Mask, _ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._selecting(mask, a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func selectingOrZero(_ mask: Mask, _ a: SIMD) -> SIMD {
         Lane._selectingOrZero(mask, a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func zeroingSelected(_ mask: Mask, _ a: SIMD) -> SIMD {
         Lane._zeroingSelected(mask, a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func bitwiseNot(_ mask: Mask) -> Mask {
         Lane._bitwiseNot(mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func onlyFirstTrue(_ mask: Mask) -> Mask {
         Lane._onlyFirstTrue(mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func beforeFirstTrue(_ mask: Mask) -> Mask {
         Lane._beforeFirstTrue(mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func atOrBeforeFirstTrue(_ mask: Mask) -> Mask {
         Lane._atOrBeforeFirstTrue(mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func atOrAfterFirstTrue(_ mask: Mask) -> Mask {
         Lane._atOrAfterFirstTrue(mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(from: UnsafePointer<Lane>) -> SIMD {
         unsafe Lane._load(from: from)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(from span: Span<Lane>) -> SIMD {
         Lane._load(from: span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(fromUnchecked span: Span<Lane>) -> SIMD {
         unsafe Lane._load(fromUnchecked: span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadAligned(from: UnsafePointer<Lane>) -> SIMD {
         unsafe Lane._loadAligned(from: from)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadAligned(from span: Span<Lane>) -> SIMD {
         Lane._loadAligned(from: span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadAligned(fromUnchecked span: Span<Lane>) -> SIMD {
         unsafe Lane._loadAligned(fromUnchecked: span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadFirst(from: UnsafePointer<Lane>, count: Int) -> SIMD {
         unsafe Lane._loadFirst(from: from, count: count)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadFirst(from span: Span<Lane>) -> SIMD {
         Lane._loadFirst(from: span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadRepeatingBlock(from: UnsafePointer<Lane>) -> SIMD {
         unsafe Lane._loadRepeatingBlock(from: from)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadRepeatingBlock(from span: Span<Lane>) -> SIMD {
         Lane._loadRepeatingBlock(from: span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadRepeatingBlock(fromUnchecked span: Span<Lane>) -> SIMD {
         unsafe Lane._loadRepeatingBlock(fromUnchecked: span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(from: UnsafePointer<Lane>, where mask: Mask) -> SIMD {
         unsafe Lane._load(from: from, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(from span: Span<Lane>, where mask: Mask) -> SIMD {
         Lane._load(from: span, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         unsafe Lane._load(fromUnchecked: span, where: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(from: UnsafePointer<Lane>, where mask: Mask, otherwise: SIMD) -> SIMD {
         unsafe Lane._load(from: from, where: mask, otherwise: otherwise)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(from span: Span<Lane>, where mask: Mask, otherwise: SIMD) -> SIMD {
         Lane._load(from: span, where: mask, otherwise: otherwise)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func load(
         fromUnchecked span: Span<Lane>,
         where mask: Mask,
@@ -296,111 +301,145 @@ extension SIMD {
         unsafe Lane._load(fromUnchecked: span, where: mask, otherwise: otherwise)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadFirst(from: UnsafePointer<Lane>, count: Int, otherwise: SIMD) -> SIMD {
         unsafe Lane._loadFirst(from: from, count: count, otherwise: otherwise)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadFirst(from span: Span<Lane>, otherwise: SIMD) -> SIMD {
         Lane._loadFirst(from: span, otherwise: otherwise)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadingUpperHalf(_ a: SIMD, from: UnsafePointer<Lane>) -> SIMD {
         unsafe Lane._loadingUpperHalf(a, from: from)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadingUpperHalf(_ a: SIMD, from span: Span<Lane>) -> SIMD {
         Lane._loadingUpperHalf(a, from: span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadingUpperHalf(_ a: SIMD, fromUnchecked span: Span<Lane>) -> SIMD {
         unsafe Lane._loadingUpperHalf(a, fromUnchecked: span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func loadHalf(from: UnsafePointer<Lane>) -> HalfVector {
+        unsafe Lane._loadHalf(from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func loadHalf(from span: Span<Lane>) -> HalfVector {
+        Lane._loadHalf(from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
+    public static func loadHalf(fromUnchecked span: Span<Lane>) -> HalfVector {
+        unsafe Lane._loadHalf(fromUnchecked: span)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func loadBlock(from: UnsafePointer<Lane>) -> BlockVector {
+        unsafe Lane._loadBlock(from: from)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func loadBlock(from span: Span<Lane>) -> BlockVector {
+        Lane._loadBlock(from: span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
+    public static func loadBlock(fromUnchecked span: Span<Lane>) -> BlockVector {
+        unsafe Lane._loadBlock(fromUnchecked: span)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func store(_ a: SIMD, to: UnsafeMutablePointer<Lane>) {
         unsafe Lane._store(a, to: to)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func store(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         Lane._store(a, to: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func store(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         unsafe Lane._store(a, toUnchecked: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func append(_ a: SIMD, to output: inout OutputSpan<Lane>) {
         Lane._append(a, to: &output)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func append(_ a: SIMD, toUnchecked output: inout OutputSpan<Lane>) {
         unsafe Lane._append(a, toUnchecked: &output)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeAligned(_ a: SIMD, to: UnsafeMutablePointer<Lane>) {
         unsafe Lane._storeAligned(a, to: to)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeAligned(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         Lane._storeAligned(a, to: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeAligned(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         unsafe Lane._storeAligned(a, toUnchecked: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendAligned(_ a: SIMD, to output: inout OutputSpan<Lane>) {
         Lane._appendAligned(a, to: &output)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendAligned(_ a: SIMD, toUnchecked output: inout OutputSpan<Lane>) {
         unsafe Lane._appendAligned(a, toUnchecked: &output)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeFirst(_ a: SIMD, to: UnsafeMutablePointer<Lane>, count: Int) {
         unsafe Lane._storeFirst(a, to: to, count: count)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeFirst(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         Lane._storeFirst(a, to: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func append(_ a: SIMD, addingCount: Int, to output: inout OutputSpan<Lane>) {
         Lane._append(a, addingCount: addingCount, to: &output)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func append(
         _ a: SIMD,
         addingCount: Int,
@@ -409,47 +448,105 @@ extension SIMD {
         unsafe Lane._append(a, addingCount: addingCount, toUnchecked: &output)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func store(_ a: SIMD, to: UnsafeMutablePointer<Lane>, where mask: Mask) {
         unsafe Lane._store(a, to: to, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func store(_ a: SIMD, to span: inout MutableSpan<Lane>, where mask: Mask) {
         Lane._store(a, to: &span, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func store(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>, where mask: Mask)
     {
         unsafe Lane._store(a, toUnchecked: &span, where: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeRepeating(_ value: Lane, count: Int, to: UnsafeMutablePointer<Lane>) {
         unsafe Lane._storeRepeating(value, count: count, to: to)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeRepeating(_ value: Lane, to span: inout MutableSpan<Lane>) {
         Lane._storeRepeating(value, to: &span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func copy(count: Int, from: UnsafePointer<Lane>, to: UnsafeMutablePointer<Lane>) {
         unsafe Lane._copy(count: count, from: from, to: to)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func copy(from: Span<Lane>, to: inout MutableSpan<Lane>) {
         Lane._copy(from: from, to: &to)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func store(_ a: HalfVector, to: UnsafeMutablePointer<Lane>) {
+        unsafe Lane._store(a, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func store(_ a: HalfVector, to span: inout MutableSpan<Lane>) {
+        Lane._store(a, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
+    public static func store(_ a: HalfVector, toUnchecked span: inout MutableSpan<Lane>) {
+        unsafe Lane._store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func append(_ a: HalfVector, to output: inout OutputSpan<Lane>) {
+        Lane._append(a, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
+    public static func append(_ a: HalfVector, toUnchecked output: inout OutputSpan<Lane>) {
+        unsafe Lane._append(a, toUnchecked: &output)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, to: UnsafeMutablePointer<Lane>) {
+        unsafe Lane._store(a, to: to)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, to span: inout MutableSpan<Lane>) {
+        Lane._store(a, to: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
+    public static func store(_ a: BlockVector, toUnchecked span: inout MutableSpan<Lane>) {
+        unsafe Lane._store(a, toUnchecked: &span)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func append(_ a: BlockVector, to output: inout OutputSpan<Lane>) {
+        Lane._append(a, to: &output)
+    }
+
+    @available(SwiftStdlib 5.1, *)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
+    public static func append(_ a: BlockVector, toUnchecked output: inout OutputSpan<Lane>) {
+        unsafe Lane._append(a, toUnchecked: &output)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved2(
         from: UnsafePointer<Lane>,
         _ v0: inout SIMD,
@@ -459,13 +556,13 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved2(from span: Span<Lane>, _ v0: inout SIMD, _ v1: inout SIMD) {
         Lane._loadInterleaved2(from: span, &v0, &v1)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved2(
         fromUnchecked span: Span<Lane>,
         _ v0: inout SIMD,
@@ -474,7 +571,7 @@ extension SIMD {
         unsafe Lane._loadInterleaved2(fromUnchecked: span, &v0, &v1)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved3(
         from: UnsafePointer<Lane>,
         _ v0: inout SIMD,
@@ -485,7 +582,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved3(
         from span: Span<Lane>,
         _ v0: inout SIMD,
@@ -496,7 +593,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved3(
         fromUnchecked span: Span<Lane>,
         _ v0: inout SIMD,
@@ -506,7 +603,7 @@ extension SIMD {
         unsafe Lane._loadInterleaved3(fromUnchecked: span, &v0, &v1, &v2)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved4(
         from: UnsafePointer<Lane>,
         _ v0: inout SIMD,
@@ -518,7 +615,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved4(
         from span: Span<Lane>,
         _ v0: inout SIMD,
@@ -530,7 +627,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadInterleaved4(
         fromUnchecked span: Span<Lane>,
         _ v0: inout SIMD,
@@ -541,19 +638,19 @@ extension SIMD {
         unsafe Lane._loadInterleaved4(fromUnchecked: span, &v0, &v1, &v2, &v3)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved2(_ a: SIMD, _ b: SIMD, to: UnsafeMutablePointer<Lane>) {
         unsafe Lane._storeInterleaved2(a, b, to: to)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved2(_ a: SIMD, _ b: SIMD, to span: inout MutableSpan<Lane>) {
         Lane._storeInterleaved2(a, b, to: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved2(
         _ a: SIMD,
         _ b: SIMD,
@@ -563,13 +660,13 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendInterleaved2(_ a: SIMD, _ b: SIMD, to output: inout OutputSpan<Lane>) {
         Lane._appendInterleaved2(a, b, to: &output)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendInterleaved2(
         _ a: SIMD,
         _ b: SIMD,
@@ -578,7 +675,7 @@ extension SIMD {
         unsafe Lane._appendInterleaved2(a, b, toUnchecked: &output)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved3(
         _ a: SIMD,
         _ b: SIMD,
@@ -589,7 +686,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved3(
         _ a: SIMD,
         _ b: SIMD,
@@ -600,7 +697,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved3(
         _ a: SIMD,
         _ b: SIMD,
@@ -611,7 +708,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendInterleaved3(
         _ a: SIMD,
         _ b: SIMD,
@@ -622,7 +719,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendInterleaved3(
         _ a: SIMD,
         _ b: SIMD,
@@ -632,7 +729,7 @@ extension SIMD {
         unsafe Lane._appendInterleaved3(a, b, c, toUnchecked: &output)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved4(
         _ a: SIMD,
         _ b: SIMD,
@@ -644,7 +741,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved4(
         _ a: SIMD,
         _ b: SIMD,
@@ -656,7 +753,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeInterleaved4(
         _ a: SIMD,
         _ b: SIMD,
@@ -668,7 +765,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendInterleaved4(
         _ a: SIMD,
         _ b: SIMD,
@@ -680,7 +777,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func appendInterleaved4(
         _ a: SIMD,
         _ b: SIMD,
@@ -691,42 +788,42 @@ extension SIMD {
         unsafe Lane._appendInterleaved4(a, b, c, d, toUnchecked: &output)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func tableLookupBytes(_ a: SIMD, at indices: SIMD) -> SIMD {
         Lane._tableLookupBytes(a, at: indices)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func tableLookupBytes(_ a: SIMD, atUnchecked indices: SIMD) -> SIMD {
         unsafe Lane._tableLookupBytes(a, atUnchecked: indices)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func tableLookupBytesOrZero(_ a: SIMD, at indices: SIMD) -> SIMD {
         Lane._tableLookupBytesOrZero(a, at: indices)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func tableLookupBytesOrZero(_ a: SIMD, atUnchecked indices: SIMD) -> SIMD {
         unsafe Lane._tableLookupBytesOrZero(a, atUnchecked: indices)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func shiftedLeftLanes(_ a: SIMD, by lanes: Int) -> SIMD {
         Lane._shiftedLeftLanes(a, by: lanes)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func shiftedLeftLanes(_ a: SIMD, byUnchecked lanes: Int) -> SIMD {
         unsafe Lane._shiftedLeftLanes(a, byUnchecked: lanes)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func combinedShiftedRightBytes(_ a: SIMD, _ b: SIMD, by bytes: Int) -> SIMD {
         Lane._combinedShiftedRightBytes(a, b, by: bytes)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func combinedShiftedRightBytes(
         _ a: SIMD,
         _ b: SIMD,
@@ -735,12 +832,12 @@ extension SIMD {
         unsafe Lane._combinedShiftedRightBytes(a, b, byUnchecked: bytes)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func combinedShiftedRightLanes(_ a: SIMD, _ b: SIMD, by lanes: Int) -> SIMD {
         Lane._combinedShiftedRightLanes(a, b, by: lanes)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func combinedShiftedRightLanes(
         _ a: SIMD,
         _ b: SIMD,
@@ -749,108 +846,132 @@ extension SIMD {
         unsafe Lane._combinedShiftedRightLanes(a, b, byUnchecked: lanes)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func reversed(_ a: SIMD) -> SIMD {
         Lane._reversed(a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func reversedBlocks(_ a: SIMD) -> SIMD {
         Lane._reversedBlocks(a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func reversed2(_ a: SIMD) -> SIMD {
         Lane._reversed2(a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func reversed4(_ a: SIMD) -> SIMD {
         Lane._reversed4(a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func reversed8(_ a: SIMD) -> SIMD {
         Lane._reversed8(a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func indices(from vector: Indices) -> Indices {
         Lane._indices(from: vector)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func indices(fromUnchecked vector: Indices) -> Indices {
         unsafe Lane._indices(fromUnchecked: vector)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func slide1Up(_ a: SIMD) -> SIMD {
         Lane._slide1Up(a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func slide1Up(_ a: SIMD, fillingWith fill: Lane) -> SIMD {
         Lane._slide1Up(a, fillingWith: fill)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func slide1Down(_ a: SIMD, fillingWith fill: Lane) -> SIMD {
         Lane._slide1Down(a, fillingWith: fill)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func slideUpBlocks(_ a: SIMD, by blocks: Int) -> SIMD {
         Lane._slideUpBlocks(a, by: blocks)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func slideUpBlocks(_ a: SIMD, byUnchecked blocks: Int) -> SIMD {
         unsafe Lane._slideUpBlocks(a, byUnchecked: blocks)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func slideDownBlocks(_ a: SIMD, by blocks: Int) -> SIMD {
         Lane._slideDownBlocks(a, by: blocks)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func slideDownBlocks(_ a: SIMD, byUnchecked blocks: Int) -> SIMD {
         unsafe Lane._slideDownBlocks(a, byUnchecked: blocks)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func combinedSlideDownLanes(_ a: SIMD, _ b: SIMD, by lanes: Int) -> SIMD {
         Lane._combinedSlideDownLanes(a, b, by: lanes)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func combinedSlideDownLanes(_ a: SIMD, _ b: SIMD, byUnchecked lanes: Int) -> SIMD
     {
         unsafe Lane._combinedSlideDownLanes(a, b, byUnchecked: lanes)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func block(_ a: SIMD, at index: Int) -> BlockVector {
+        Lane._block(a, at: index)
+    }
+
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
+    public static func block(_ a: SIMD, atUnchecked index: Int) -> BlockVector {
+        unsafe Lane._block(a, atUnchecked: index)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func replacingBlock(_ a: SIMD, at index: Int, with b: BlockVector) -> SIMD {
+        Lane._replacingBlock(a, at: index, with: b)
+    }
+
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
+    public static func replacingBlock(
+        _ a: SIMD,
+        atUnchecked index: Int,
+        with b: BlockVector
+    ) -> SIMD {
+        unsafe Lane._replacingBlock(a, atUnchecked: index, with: b)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func create2(_ a: SIMD, _ b: SIMD) -> (SIMD, SIMD) {
         Lane._create2(a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func get2(_ tuple: (SIMD, SIMD), at index: Int) -> SIMD {
         Lane._get2(tuple, at: index)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func get2(_ tuple: (SIMD, SIMD), atUnchecked index: Int) -> SIMD {
         unsafe Lane._get2(tuple, atUnchecked: index)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func set2(_ tuple: (SIMD, SIMD), at index: Int, to a: SIMD) -> (SIMD, SIMD) {
         Lane._set2(tuple, at: index, to: a)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func set2(
         _ tuple: (SIMD, SIMD),
         atUnchecked index: Int,
@@ -859,22 +980,22 @@ extension SIMD {
         unsafe Lane._set2(tuple, atUnchecked: index, to: a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func create3(_ a: SIMD, _ b: SIMD, _ c: SIMD) -> (SIMD, SIMD, SIMD) {
         Lane._create3(a, b, c)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func get3(_ tuple: (SIMD, SIMD, SIMD), at index: Int) -> SIMD {
         Lane._get3(tuple, at: index)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func get3(_ tuple: (SIMD, SIMD, SIMD), atUnchecked index: Int) -> SIMD {
         unsafe Lane._get3(tuple, atUnchecked: index)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func set3(
         _ tuple: (SIMD, SIMD, SIMD),
         at index: Int,
@@ -883,7 +1004,7 @@ extension SIMD {
         Lane._set3(tuple, at: index, to: a)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func set3(
         _ tuple: (SIMD, SIMD, SIMD),
         atUnchecked index: Int,
@@ -892,7 +1013,7 @@ extension SIMD {
         unsafe Lane._set3(tuple, atUnchecked: index, to: a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func create4(
         _ a: SIMD,
         _ b: SIMD,
@@ -902,17 +1023,17 @@ extension SIMD {
         Lane._create4(a, b, c, d)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func get4(_ tuple: (SIMD, SIMD, SIMD, SIMD), at index: Int) -> SIMD {
         Lane._get4(tuple, at: index)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func get4(_ tuple: (SIMD, SIMD, SIMD, SIMD), atUnchecked index: Int) -> SIMD {
         unsafe Lane._get4(tuple, atUnchecked: index)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func set4(
         _ tuple: (SIMD, SIMD, SIMD, SIMD),
         at index: Int,
@@ -921,7 +1042,7 @@ extension SIMD {
         Lane._set4(tuple, at: index, to: a)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func set4(
         _ tuple: (SIMD, SIMD, SIMD, SIMD),
         atUnchecked index: Int,
@@ -930,73 +1051,73 @@ extension SIMD {
         unsafe Lane._set4(tuple, atUnchecked: index, to: a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeStreaming(_ a: SIMD, to: UnsafeMutablePointer<Lane>) {
         unsafe Lane._storeStreaming(a, to: to)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeStreaming(_ a: SIMD, to span: inout MutableSpan<Lane>) {
         Lane._storeStreaming(a, to: &span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func storeStreaming(_ a: SIMD, toUnchecked span: inout MutableSpan<Lane>) {
         unsafe Lane._storeStreaming(a, toUnchecked: &span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func compressed(_ a: SIMD, where mask: Mask) -> SIMD {
         Lane._compressed(a, where: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func compressedNot(_ a: SIMD, where mask: Mask) -> SIMD {
         Lane._compressedNot(a, where: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func compressed(_ a: SIMD, bits: UnsafePointer<UInt8>) -> SIMD {
         unsafe Lane._compressed(a, bits: bits)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func compressed(_ a: SIMD, bits span: Span<UInt8>) -> SIMD {
         Lane._compressed(a, bits: span)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func compressed(_ a: SIMD, bitsUnchecked span: Span<UInt8>) -> SIMD {
         unsafe Lane._compressed(a, bitsUnchecked: span)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func expanded(_ a: SIMD, where mask: Mask) -> SIMD {
         Lane._expanded(a, where: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadExpanded(from: UnsafePointer<Lane>, where mask: Mask) -> SIMD {
         unsafe Lane._loadExpanded(from: from, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadExpanded(from span: Span<Lane>, where mask: Mask) -> SIMD {
         Lane._loadExpanded(from: span, where: mask)
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadExpanded(fromUnchecked span: Span<Lane>, where mask: Mask) -> SIMD {
         unsafe Lane._loadExpanded(fromUnchecked: span, where: mask)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadExpanded(
         from: UnsafePointer<Lane>,
         where mask: Mask,
@@ -1006,7 +1127,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadExpanded(
         from span: Span<Lane>,
         where mask: Mask,
@@ -1016,7 +1137,7 @@ extension SIMD {
     }
 
     @available(SwiftStdlib 5.1, *)
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func loadExpanded(
         fromUnchecked span: Span<Lane>,
         where mask: Mask,
@@ -1025,58 +1146,78 @@ extension SIMD {
         unsafe Lane._loadExpanded(fromUnchecked: span, where: mask, otherwise: otherwise)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func oddEvenBlocks(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._oddEvenBlocks(a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func swappingAdjacentBlocks(_ a: SIMD) -> SIMD {
         Lane._swappingAdjacentBlocks(a)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func interleavingEvenBlocks(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._interleavingEvenBlocks(a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func interleavingOddBlocks(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._interleavingOddBlocks(a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func interleavingLowerBlocks(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._interleavingLowerBlocks(a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func interleavingUpperBlocks(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._interleavingUpperBlocks(a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func broadcasting(_ a: SIMD, block: Int) -> SIMD {
         Lane._broadcasting(a, block: block)
     }
 
-    @unsafe @export(implementation) @inline(always)
+    @unsafe @_disfavoredOverload @export(implementation) @inline(always)
     public static func broadcasting(_ a: SIMD, blockUnchecked block: Int) -> SIMD {
         unsafe Lane._broadcasting(a, blockUnchecked: block)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func concatenatingLowerLower(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._concatenatingLowerLower(a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func concatenatingUpperUpper(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._concatenatingUpperUpper(a, b)
     }
 
-    @export(implementation) @inline(always)
+    @_disfavoredOverload @export(implementation) @inline(always)
     public static func concatenatingUpperLower(_ a: SIMD, _ b: SIMD) -> SIMD {
         Lane._concatenatingUpperLower(a, b)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func lowerHalf(_ a: SIMD) -> HalfVector {
+        Lane._lowerHalf(a)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func upperHalf(_ a: SIMD) -> HalfVector {
+        Lane._upperHalf(a)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func combining(_ a: HalfVector, _ b: HalfVector) -> SIMD {
+        Lane._combining(a, b)
+    }
+
+    @_disfavoredOverload @export(implementation) @inline(always)
+    public static func zeroExtending(_ a: HalfVector) -> SIMD {
+        Lane._zeroExtending(a)
     }
 }
